@@ -8,7 +8,12 @@
 import Foundation
 
 @objc(BigNumber)
-class BigNumber: NSObject {
+class BigNumber: NSObject, RCTBridgeModule {
+  
+  static func moduleName() -> String! {
+    return "BigNumber"
+  }
+  
   
   @objc(test:)
   func test(text: String) -> bignum256 {
