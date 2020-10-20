@@ -17,6 +17,7 @@
 		2DCD954D1E0B4F2C00145EB5 /* zilpayMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* zilpayMobileTests.m */; };
 		500D6675A51E33291568C18C /* libPods-zilpayMobile-zilpayMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 499A4287F0844E769256EDA1 /* libPods-zilpayMobile-zilpayMobileTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
+		85773A51253F3A780075591E /* BigNumer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 85773A50253F3A780075591E /* BigNumer.swift */; };
 		E7ACAA8CA946DE5887897E03 /* libPods-zilpayMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A27B99C6AC2259AC0BA413C /* libPods-zilpayMobile.a */; };
 /* End PBXBuildFile section */
 
@@ -57,6 +58,8 @@
 		4A27B99C6AC2259AC0BA413C /* libPods-zilpayMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-zilpayMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
 		721F395010B42E11D3700D9C /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; path = "Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = zilpayMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		85773A50253F3A780075591E /* BigNumer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BigNumer.swift; sourceTree = "<group>"; };
+		85773A56253F4D750075591E /* ZilpayMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "ZilpayMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -122,6 +125,7 @@
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
 				13B07FB71A68108700A75B9A /* main.m */,
+				85773A56253F4D750075591E /* ZilpayMobile-Bridging-Header.h */,
 			);
 			name = zilpayMobile;
 			sourceTree = "<group>";
@@ -147,6 +151,7 @@
 		83CBB9F61A601CBA00E9B192 = {
 			isa = PBXGroup;
 			children = (
+				85773A50253F3A780075591E /* BigNumer.swift */,
 				13B07FAE1A68108700A75B9A /* zilpayMobile */,
 				832341AE1AAA6A7D00B99B32 /* Libraries */,
 				00E356EF1AD99517003FC87E /* zilpayMobileTests */,
@@ -507,6 +512,7 @@
 			files = (
 				13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */,
 				13B07FC11A68108700A75B9A /* main.m in Sources */,
+				85773A51253F3A780075591E /* BigNumer.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -547,6 +553,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 213068AB36243429AF9584EE /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -570,6 +577,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 721F395010B42E11D3700D9C /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = zilpayMobileTests/Info.plist;
@@ -795,6 +803,7 @@
 				MTL_ENABLE_DEBUG_INFO = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "zilpayMobile/ZilpayMobile-Bridging-Header.h";
 			};
 			name = Debug;
 		};
@@ -847,6 +856,7 @@
 				);
 				MTL_ENABLE_DEBUG_INFO = NO;
 				SDKROOT = iphoneos;
+				SWIFT_OBJC_BRIDGING_HEADER = "zilpayMobile/ZilpayMobile-Bridging-Header.h";
 				VALIDATE_PRODUCT = YES;
 			};
 			name = Release;
