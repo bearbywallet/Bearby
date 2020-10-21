@@ -54,6 +54,24 @@ RCT_EXPORT_METHOD(deriveSeedFromMnemonic:(nonnull NSString *)mnemonic passphrase
   resolve([[NSData alloc] initWithBytes:seed length:512 / 8]);
 }
 
+RCT_EXPORT_METHOD(base58DecodeRaw:(nonnull NSString *)string
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  const char *str = [string cStringUsingEncoding:NSUTF8StringEncoding];
+
+  size_t len = 128;
+  size_t res = len;
+  uint8_t buff[len];
+
+  if (b58tobin(buff, &res, str) != true) {
+    NSError *error = nil;
+
+    reject(@"b58tobin_fail", @"b58tobin failed", error);
+  }
+
+  resolve([[NSData alloc] initWithBytes:buff + len - res length:res]);
+}
+
 //RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
 //                  resolver:(RCTPromiseResolveBlock)resolve
 //                  rejecter:(RCTPromiseRejectBlock)reject) {
