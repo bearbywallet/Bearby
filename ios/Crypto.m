@@ -14,20 +14,6 @@
 // To export a module named CalendarManager
 RCT_EXPORT_MODULE();
 
-RCT_EXPORT_METHOD(generateMnemonic:(NSInteger *)strength
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject) {
-  if (strength == nil) {
-    NSError *error = nil;
-
-    reject(@"strength_fail", @"strength failed", error);
-  } else {
-    const char *cstring = mnemonic_generate((int)strength);
-  
-    resolve([[NSString alloc] initWithCString:cstring encoding:NSUTF8StringEncoding]);
-  }
-}
-
 RCT_EXPORT_METHOD(signHash:(nonnull NSData *)hash privateKey:(nonnull NSData *)privateKey
                   resolver:(RCTPromiseResolveBlock)resolve) {
   NSMutableData *signature = [[NSMutableData alloc] initWithLength:65];
@@ -73,13 +59,24 @@ RCT_EXPORT_METHOD(base58DecodeRaw:(nonnull NSString *)string
 }
 
 //RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
-//                  resolver:(RCTPromiseResolveBlock)resolve
-//                  rejecter:(RCTPromiseRejectBlock)reject) {
+//                  resolver:(RCTPromiseResolveBlock)resolve) {
 //  const char *str = [mnemonic cStringUsingEncoding:NSUTF8StringEncoding];
 //
-//  resolve(str);
-//
-////  resolve([mnemonic_check([mnemonic cStringUsingEncoding:NSUTF8StringEncoding])]);
+//  resolve([NSData dataWithBytes:str length:dataLen]);
 //}
+
+RCT_EXPORT_METHOD(generateMnemonic:(NSInteger *)strength
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  if (strength == nil) {
+    NSError *error = nil;
+
+    reject(@"strength_fail", @"strength failed", error);
+  } else {
+    const char *cstring = mnemonic_generate((int)strength);
+  
+    resolve([[NSString alloc] initWithCString:cstring encoding:NSUTF8StringEncoding]);
+  }
+}
 
 @end

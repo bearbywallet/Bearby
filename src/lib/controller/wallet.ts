@@ -22,8 +22,8 @@ export class WalletControler {
     // return Crypto.isValidMnemonic(mnemonic);
   }
 
-  public generateMnemonic(): Promise<string> {
-    return Crypto.generateMnemonic(128);
+  public generateMnemonic(len: number = 128): Promise<string> {
+    return Crypto.generateMnemonic(len);
   }
 
   public async initWallet(password: string, mnemonic: string) {

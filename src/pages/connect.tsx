@@ -7,26 +7,20 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
-// import { useTheme } from '@react-navigation/native';
+import { View, StyleSheet } from 'react-native';
 
 import { colors } from '../styles';
 
-export const HomePage = () => {
-  // const { colors } = useTheme();
+export const ConnectPage = () => {
 
   return (
-    <View style={styles.container}>
-      <Text>
-        dasdsa
-      </Text>
-    </View>
+    <View style={styles.container} />
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.primary
+    backgroundColor: colors.secondary
   }
 });
