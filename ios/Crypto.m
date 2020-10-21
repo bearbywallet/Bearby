@@ -38,6 +38,14 @@ RCT_EXPORT_METHOD(signHash:(nonnull NSData *)hash privateKey:(nonnull NSData *)p
   resolve(signature);
 }
 
+RCT_EXPORT_METHOD(getPublicKeyFrom:(nonnull NSData *)privateKey
+                  resolver:(RCTPromiseResolveBlock)resolve) {
+  NSMutableData *publicKey = [[NSMutableData alloc] initWithLength:65];
+  ecdsa_get_public_key65(&secp256k1, privateKey.bytes, publicKey.mutableBytes);
+  
+  resolve(publicKey);
+}
+
 //RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
 //                  resolver:(RCTPromiseResolveBlock)resolve
 //                  rejecter:(RCTPromiseRejectBlock)reject) {
