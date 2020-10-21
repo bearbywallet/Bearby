@@ -8,7 +8,7 @@
  */
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 
 import { HomePage } from './pages/home';
 import { LockPage } from './pages/lock';
@@ -20,20 +20,20 @@ import { VerifyPage } from './pages/verify';
 
 import { theme } from './styles';
 
-const Stack = createStackNavigator();
+const Tab = createBottomTabNavigator();
 
 export default function Root() {
   return (
     <NavigationContainer theme={theme}>
-      <Stack.Navigator headerMode="float">
-        <Stack.Screen name="Home" component={HomePage} />
-        <Stack.Screen name="Lock" component={LockPage} />
-        <Stack.Screen name="Accounts" component={AccountsPage} />
-        <Stack.Screen name="Conect" component={ConnectPage} />
-        <Stack.Screen name="Contacts" component={ContactsPage} />
-        <Stack.Screen name="Create" component={CreateWalletPage} />
-        <Stack.Screen name="Verify" component={VerifyPage} />
-      </Stack.Navigator>
+      <Tab.Navigator>
+        <Tab.Screen name="Home" component={HomePage} />
+        <Tab.Screen name="Lock" component={LockPage} />
+        <Tab.Screen name="Accounts" component={AccountsPage} />
+        <Tab.Screen name="Conect" component={ConnectPage} />
+        <Tab.Screen name="Contacts" component={ContactsPage} />
+        <Tab.Screen name="Create" component={CreateWalletPage} />
+        <Tab.Screen name="Verify" component={VerifyPage} />
+      </Tab.Navigator>
     </NavigationContainer>
   );
 }
