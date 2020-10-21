@@ -7,7 +7,6 @@
 
 #import "AppDelegate.h"
 #import "Crypto.h"
-#import <React/RCTLog.h>
 #import <TrezorCrypto/TrezorCrypto.h>
 
 @implementation Crypto
@@ -29,7 +28,24 @@ RCT_EXPORT_METHOD(generateMnemonic:(NSInteger *)strength
   }
 }
 
-// This would name the module AwesomeCalendarManager instead
-// RCT_EXPORT_MODULE(AwesomeCalendarManager);
+RCT_EXPORT_METHOD(signHash:(nonnull NSData *)hash privateKey:(nonnull NSData *)privateKey
+                  resolver:(RCTPromiseResolveBlock)resolve) {
+  NSMutableData *signature = [[NSMutableData alloc] initWithLength:65];
+  uint8_t by = 0;
+  ecdsa_sign_digest(&secp256k1, privateKey.bytes, hash.bytes, signature.mutableBytes, &by, nil);
+  ((uint8_t *)signature.mutableBytes)[64] = by;
+
+  resolve(signature);
+}
+
+//RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
+//                  resolver:(RCTPromiseResolveBlock)resolve
+//                  rejecter:(RCTPromiseRejectBlock)reject) {
+//  const char *str = [mnemonic cStringUsingEncoding:NSUTF8StringEncoding];
+//
+//  resolve(str);
+//
+////  resolve([mnemonic_check([mnemonic cStringUsingEncoding:NSUTF8StringEncoding])]);
+//}
 
 @end

@@ -7,16 +7,19 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet, Text, NativeModules } from 'react-native';
+import { View, StyleSheet, Text } from 'react-native';
 // import { useTheme } from '@react-navigation/native';
 
 import { colors } from '../styles';
+import { WalletControler } from '../lib/controller';
 
-// NativeModules
-//   .Crypto
-//   .test('retererere')
-//   .then(console.log)
-//   .catch(console.error)
+const wallet = new WalletControler();
+
+// wallet
+//   .generateMnemonic()
+//   .then(console.log);
+
+
 export const HomePage = () => {
   // const { colors } = useTheme();
 
