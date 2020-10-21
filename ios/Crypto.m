@@ -46,6 +46,14 @@ RCT_EXPORT_METHOD(getPublicKeyFrom:(nonnull NSData *)privateKey
   resolve(publicKey);
 }
 
+RCT_EXPORT_METHOD(deriveSeedFromMnemonic:(nonnull NSString *)mnemonic passphrase:(nonnull NSString *)passphrase
+                  resolver:(RCTPromiseResolveBlock)resolve) {
+  uint8_t seed[512 / 8];
+  mnemonic_to_seed([mnemonic cStringUsingEncoding:NSUTF8StringEncoding], [passphrase cStringUsingEncoding:NSUTF8StringEncoding], seed, nil);
+  
+  resolve([[NSData alloc] initWithBytes:seed length:512 / 8]);
+}
+
 //RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
 //                  resolver:(RCTPromiseResolveBlock)resolve
 //                  rejecter:(RCTPromiseRejectBlock)reject) {
