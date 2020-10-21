@@ -7,11 +7,16 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet, Text } from 'react-native';
+import { View, StyleSheet, Text, NativeModules } from 'react-native';
 // import { useTheme } from '@react-navigation/native';
 
 import { colors } from '../styles';
 
+// NativeModules
+//   .Crypto
+//   .test('retererere')
+//   .then(console.log)
+//   .catch(console.error)
 export const HomePage = () => {
   // const { colors } = useTheme();
 
