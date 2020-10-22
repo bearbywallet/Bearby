@@ -5,7 +5,7 @@
   "license": "MIT",
   "scripts": {
     "android": "react-native run-android",
-    "ios": "react-native run-ios",
+    "ios": "react-native run-ios --simulator=\"iPhone SE\"",
     "start": "react-native start",
     "test": "jest",
     "type-check": "tsc",
@@ -32,7 +32,8 @@
     "react-native-fs": "^2.16.6",
     "react-native-gesture-handler": "^1.8.0",
     "react-native-safe-area-context": "^3.1.8",
-    "react-native-screens": "^2.11.0"
+    "react-native-screens": "^2.11.0",
+    "react-native-touch-id": "^4.4.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",

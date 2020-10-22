@@ -6,8 +6,14 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './account';
-export * from './wallet';
-export * from './zilliqa';
-export * from './auth';
-export * from './guard';
+
+export class GuardControler {
+
+  public setupPassword() {
+    //
+  }
+
+  public unlock() {
+    //
+  }
+}

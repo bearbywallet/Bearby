@@ -310,6 +310,8 @@ PODS:
     - React
   - RNScreens (2.11.0):
     - React
+  - TouchID (4.4.1):
+    - React
   - TrezorCrypto (0.0.9)
   - Yoga (1.14.0)
   - YogaKit (1.18.1):
@@ -369,6 +371,7 @@ DEPENDENCIES:
   - RNFS (from `../node_modules/react-native-fs`)
   - RNGestureHandler (from `../node_modules/react-native-gesture-handler`)
   - RNScreens (from `../node_modules/react-native-screens`)
+  - TouchID (from `../node_modules/react-native-touch-id`)
   - TrezorCrypto
   - Yoga (from `../node_modules/react-native/ReactCommon/yoga`)
 
@@ -453,6 +456,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-gesture-handler"
   RNScreens:
     :path: "../node_modules/react-native-screens"
+  TouchID:
+    :path: "../node_modules/react-native-touch-id"
   Yoga:
     :path: "../node_modules/react-native/ReactCommon/yoga"
 
@@ -500,10 +505,11 @@ SPEC CHECKSUMS:
   RNFS: 2bd9eb49dc82fa9676382f0585b992c424cd59df
   RNGestureHandler: 7a5833d0f788dbd107fbb913e09aa0c1ff333c39
   RNScreens: 0e91da98ab26d5d04c7b59a9b6bd694124caf88c
+  TouchID: ba4c656d849cceabc2e4eef722dea5e55959ecf4
   TrezorCrypto: bfeea47a052dca2c77d4a39e1e183865e52de14d
   Yoga: 7d13633d129fd179e01b8953d38d47be90db185a
   YogaKit: f782866e155069a2cca2517aafea43200b01fd5a
 
-PODFILE CHECKSUM: 702bbb6d473f5334fb4b1cfbd6588f7172ab5d39
+PODFILE CHECKSUM: fb8e270d9e80845084abccf9b78a16884a59db00
 
 COCOAPODS: 1.10.0.rc.1

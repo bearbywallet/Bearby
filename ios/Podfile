@@ -10,6 +10,8 @@ target 'zilpayMobile' do
   
   pod 'TrezorCrypto'
 
+  pod 'TouchID', :path => '../node_modules/react-native-touch-id'
+
   target 'zilpayMobileTests' do
     inherit! :complete
     # Pods for testing
