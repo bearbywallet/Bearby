@@ -6,32 +6,17 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { NativeModules } from 'react-native';
-import { MobileStorage, buildObject } from '../storage';
-import { AuthControler, Auth } from './auth';
-import { STORAGE_FIELDS } from '../../config';
+import { GuardControler } from './guard';
+import { Mnemonic } from './mnemonic';
 
-const { Crypto } = NativeModules;
+export class WalletControler extends Mnemonic {
+  private _guard = new GuardControler();
 
-export class WalletControler {
-  private _storage = new MobileStorage();
-  private _auth: Auth | null = null;
-
-  public validateMnemonic(mnemonic: string): Promise<boolean> {
-    return Promise.resolve(false);
-    // return Crypto.isValidMnemonic(mnemonic);
+  public initWallet(password: string, mnemonic: string) {
+    return this._guard.setupWallet(password, mnemonic);
   }
 
-  public generateMnemonic(len: number = 128): Promise<string> {
-    return Crypto.generateMnemonic(len);
-  }
-
-  public async initWallet(password: string, mnemonic: string) {
-    this._auth = await AuthControler(password);
-
-    await this._auth.encryptVault(mnemonic);
-    await this._storage.set(
-      buildObject(STORAGE_FIELDS.VAULT, this._auth.getEncrypted())
-    );
+  public unlockWallet(password: string) {
+    return this._guard.unlock(password);
   }
 }
