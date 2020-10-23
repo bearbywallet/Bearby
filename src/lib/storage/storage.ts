@@ -48,7 +48,7 @@ export class MobileStorage {
    * const storage = new MobileStorage()
    * storage.get(key).then(recievePaylod => / Do something... /)
    */
-  public get(..._keys: string[]) {
+  public get(..._keys: string[]): Promise<any> {
     if (_keys.length === 1) {
       return new Promise((resolve, reject) => {
         AsyncStorage.getItem(_keys[0], (err, result) => {
