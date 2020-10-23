@@ -10,14 +10,20 @@ import { sha256, Encryptor, EncryptedType } from '../crypto';
 
 export interface Auth {
   getEncrypted: () => EncryptedType;
+  setPassword: (password: string) => Promise<void>;
   encryptVault: (decrypted: string) => Promise<EncryptedType>;
   decryptVault: () => Promise<string>;
 }
 
-export async function AuthControler(password: string, encryptedContent?: EncryptedType): Promise<Auth> {
+export async function AuthControler(password?: string, encryptedContent?: EncryptedType): Promise<Auth> {
   const encryptor = new Encryptor();
-  const _hashSum = await sha256(password);
+  let _hashSum = password ? await sha256(password) : null;
   let _encrypted = encryptedContent;
+  const checkPassword = () => {
+    if (!_hashSum) {
+      throw new Error('password isnot initialized');
+    }
+  };
 
   return {
     getEncrypted() {
@@ -27,12 +33,19 @@ export async function AuthControler(password: string, encryptedContent?: Encrypt
 
       return _encrypted;
     },
+    async setPassword(_password: string) {
+      _hashSum = await sha256(_password);
+    },
     async encryptVault(decrypted: string) {
+      checkPassword();
+
       _encrypted = await encryptor.encrypt(_hashSum, decrypted);
 
       return _encrypted;
     },
     decryptVault() {
+      checkPassword();
+
       if (!_encrypted) {
         throw new Error('encrypted has not initialized');
       }
