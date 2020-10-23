@@ -13,6 +13,7 @@ export const STORAGE_FIELDS = {
   TOKENS: 'tokens',
   THEME: 'theme',
   SELECTED_COIN: 'selectedcoin',
+  SELECTED_NET: 'selectednet',
   CONFIG: 'config',
   ACCOUNTS: 'accounts',
   TRANSACTIONS: 'transactions'
