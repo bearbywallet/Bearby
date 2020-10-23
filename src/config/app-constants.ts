@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { ZilliqaNetwork } from 'types';
 
 export const FIAT_ORDERS = {
   TRANSAK_URL: 'https://global.transak.com/',
@@ -16,7 +17,7 @@ export const FIAT_ORDERS = {
   WYRE_API_ENDPOINT_TEST: 'https://api.testwyre.com/'
 };
 
-export const ZILLIQA = {
+export const ZILLIQA: ZilliqaNetwork = {
   mainnet: {
     PROVIDER: 'https://api.zilliqa.com',
     WS: 'wss://api-ws.zilliqa.com',

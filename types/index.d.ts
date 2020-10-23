@@ -7,3 +7,12 @@
  * Copyright (c) 2020 ZilPay
  */
 export * from './store';
+
+
+export interface ZilliqaNetwork {
+  [key: string]: {
+    PROVIDER: string;
+    WS: string;
+    MSG_VERSION: number
+  }
+}
