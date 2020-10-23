@@ -16,8 +16,12 @@ let _isEnable = false;
 let _isReady = false;
 
 export class GuardControler {
-  private _storage = new MobileStorage();
+  private _storage: MobileStorage;
   private _auth?: Auth;
+
+  constructor(storage: MobileStorage) {
+    this._storage = storage;
+  }
 
   public get isEnable() {
     return _isEnable;
