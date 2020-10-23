@@ -6,4 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export class Zilliqa {}
+export class ZilliqaControl {}
