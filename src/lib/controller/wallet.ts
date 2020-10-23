@@ -7,12 +7,20 @@
  * Copyright (c) 2020 ZilPay
  */
 import { GuardControler } from './guard';
+import { MobileStorage } from '../storage';
 import { Mnemonic } from './mnemonic';
+import { ZilliqaControl } from './zilliqa';
+import { NetworkControll } from './network';
 
 export class WalletControler extends Mnemonic {
-  private _guard = new GuardControler();
+  private _storage = new MobileStorage();
+  private _guard = new GuardControler(this._storage);
+  private _zilliqa = new ZilliqaControl();
+  private _network = new NetworkControll(this._storage);
 
   public initWallet(password: string, mnemonic: string) {
+    this._network.sync();
+
     return this._guard.setupWallet(password, mnemonic);
   }
 
