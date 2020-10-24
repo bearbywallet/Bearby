@@ -125,7 +125,7 @@ export class NetworkControll {
   }
 
   private _getStore() {
-    return this._storage.get(
+    return this._storage.multiGet<ZilliqaNetwork | string>(
       STORAGE_FIELDS.CONFIG,
       STORAGE_FIELDS.SELECTED_NET
     );
@@ -133,8 +133,15 @@ export class NetworkControll {
 
   private async _update() {
     const data = await this._getStore();
+    const selected = data[STORAGE_FIELDS.SELECTED_NET];
+    const config = data[STORAGE_FIELDS.CONFIG];
 
-    _selected = data[STORAGE_FIELDS.SELECTED_NET];
-    _config = JSON.stringify(data[STORAGE_FIELDS.CONFIG]);
+    if (typeof selected === 'string') {
+      _selected = selected;
+    }
+
+    if (typeof config === 'object') {
+      _config = JSON.stringify(config);
+    }
   }
 }

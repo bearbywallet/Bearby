@@ -41,39 +41,51 @@ export class MobileStorage {
   }
 
   /**
-   * Get value from storage by keys.
-   * @param {String, Number} keys - key or keys.
-   * @example
-   * import { MobileStorage } from 'lib/storage'
-   * const storage = new MobileStorage()
-   * storage.get(key).then(recievePaylod => / Do something... /)
+   * Cat return storage content by a lot of keys
+   * @param _keys - an Array of args.
+   * @extends
+   * import { MobileStorage } from 'lib/storage';
+   * const storage = new MobileStorage();
+   * storage
+   *   .get('key0', 'key1', 'key2')
+   *   .then(recievePaylod => / Do something... /)
    */
-  public get(..._keys: string[]): Promise<any> {
-    if (_keys.length === 1) {
-      return new Promise((resolve, reject) => {
-        AsyncStorage.getItem(_keys[0], (err, result) => {
-          if (err) {
-            return reject(err);
-          }
-
-          return resolve(result);
-        });
-      });
-    }
-
+  public multiGet<T>(..._keys: string[]): Promise<{ [key: string]: T }> {
     return new Promise((resolve, reject) => {
       AsyncStorage.multiGet(_keys, (err, result) => {
         if (err || !result) {
           return reject(err || result);
         }
 
-        const values: { [key: string]: string | object | number | null } = {};
+        const values: { [key: string]: T } = {};
 
         for (const [key, value] of result) {
-          values[key] = value;
+          if (value) {
+            values[key] = value as unknown as T;
+          }
         }
 
         return resolve(values);
+      });
+    });
+  }
+
+  /**
+   * Get value from storage by keys.
+   * @param key - key or keys.
+   * @example
+   * import { MobileStorage } from 'lib/storage'
+   * const storage = new MobileStorage()
+   * storage.get(key).then(recievePaylod => / Do something... /)
+   */
+  public get<T>(key: string): Promise<T | unknown> {
+    return new Promise((resolve, reject) => {
+      AsyncStorage.getItem(key, (err, result: T | unknown) => {
+        if (err) {
+          return reject(err);
+        }
+
+        return resolve(result);
       });
     });
   }
@@ -85,7 +97,7 @@ export class MobileStorage {
       return null;
     }
 
-    return this.get(...keys);
+    return this.multiGet(...keys);
   }
 
   /**

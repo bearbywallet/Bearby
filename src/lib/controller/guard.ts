@@ -43,8 +43,8 @@ export class GuardControler {
   }
 
   public async unlock(password: string) {
-    const encrypted = await this._storage.get(STORAGE_FIELDS.VAULT);
-    const cipher = JSON.parse(encrypted as string);
+    const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
+    const cipher = JSON.parse(String(encrypted));
 
     this._auth = await AuthControler(password, cipher);
 
