@@ -18,9 +18,10 @@ export class Mnemonic {
    * Check and validate the mnemonic seed phrase.
    * @param mnemonic - Mnemonic seed phrase.
    */
-  public validateMnemonic(mnemonic: string): Promise<boolean> {
-    return Promise.resolve(true);
-    // return Crypto.isValidMnemonic(mnemonic);
+  public async validateMnemonic(mnemonic: string): Promise<boolean> {
+    const checked = await Crypto.isValidMnemonic(mnemonic);
+
+    return Number(checked) !== 0;
   }
 
   /**

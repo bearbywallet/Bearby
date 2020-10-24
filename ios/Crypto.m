@@ -58,12 +58,22 @@ RCT_EXPORT_METHOD(base58DecodeRaw:(nonnull NSString *)string
   resolve([[NSData alloc] initWithBytes:buff + len - res length:res]);
 }
 
-//RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
-//                  resolver:(RCTPromiseResolveBlock)resolve) {
-//  const char *str = [mnemonic cStringUsingEncoding:NSUTF8StringEncoding];
-//
-//  resolve([NSData dataWithBytes:str length:dataLen]);
-//}
+RCT_EXPORT_METHOD(isValidMnemonic:(NSString *)mnemonic
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject) {
+  if (mnemonic == nil) {
+    NSError *error = nil;
+
+    reject(@"mnemonic_fail", @"mnemonic failed", error);
+  } else {
+    const char *csmnemonic = [mnemonic cStringUsingEncoding:NSUTF8StringEncoding];
+    const int *isValid = mnemonic_check(csmnemonic);
+
+    NSNumber *checked = [NSNumber numberWithInt:isValid];
+
+    resolve(checked);
+  }
+}
 
 RCT_EXPORT_METHOD(generateMnemonic:(NSInteger *)strength
                   resolver:(RCTPromiseResolveBlock)resolve
