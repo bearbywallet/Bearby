@@ -16,7 +16,7 @@
 
 - (dispatch_queue_t)methodQueue
 {
-    return dispatch_queue_create("wallet.zilpay.keystore_queue", DISPATCH_QUEUE_CONCURRENT);
+  return dispatch_queue_create("wallet.zilpay.keystore_queue", DISPATCH_QUEUE_CONCURRENT);
 }
 
 RCT_EXPORT_MODULE()
@@ -25,7 +25,7 @@ RCT_EXPORT_METHOD(generateMnemonic:(NSInteger)length
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve([Mnemonic generateRandomWithStrength:(int)length].value);
+  resolve([Mnemonic generateRandomWithStrength:(int)length].value);
 }
 
 RCT_EXPORT_METHOD(fromMnemonic:(NSString *)mnemonic
@@ -33,14 +33,30 @@ RCT_EXPORT_METHOD(fromMnemonic:(NSString *)mnemonic
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve([Mnemonic fromMnemonic:mnemonic passphrase:passphrase].value);
+  resolve([Mnemonic fromMnemonic:mnemonic passphrase:passphrase].value);
 }
 
 RCT_EXPORT_METHOD(mnemonicIsValid:(NSString *)mnemonic
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    resolve([Mnemonic isValid:mnemonic] ? @"1" : @"0");
+  resolve([Mnemonic isValid:mnemonic] ? @"1" : @"0");
+}
+
+RCT_EXPORT_METHOD(getCompressedPublicKeyFrom:(nonnull NSData *)privateKey
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  if (privateKey == nil) {
+    return reject(@"PRIV_KEY_IS_NULL", @"PrivateKey is null", NULL);
+  }
+
+  NSMutableData *publicKey = [[NSMutableData alloc] initWithLength:33];
+  ecdsa_get_public_key33(&secp256k1, privateKey.bytes, publicKey.mutableBytes);
+  
+  dispatch_async(dispatch_get_main_queue(), ^{
+    resolve(publicKey);
+  });
 }
 
 RCT_EXPORT_METHOD(createHDKeyPair:(NSString *)mnemonic
@@ -50,45 +66,21 @@ RCT_EXPORT_METHOD(createHDKeyPair:(NSString *)mnemonic
                   resolver:(RCTPromiseResolveBlock)resolve
                   rejecter:(RCTPromiseRejectBlock)reject)
 {
-    dispatch_async(dispatch_get_global_queue(0, 0), ^{
-        Mnemonic *m = [Mnemonic fromMnemonic:mnemonic passphrase:passphrase];
-        KeyDerivation *kd = [m keyDerivationWithPath:path];
-
-        if (kd == NULL) return reject(@"PATH_NOT_SUPPORTED", @"Path is not supported", NULL);
-        
-        HDKeyPair *key = [[kd derivePathFromSeed:m.seed] keyAt:(int)index];
-        NSDictionary *result = [NSDictionary dictionaryWithObjectsAndKeys:[key privateKey], @"private_key", [key publicKey], @"public_key", nil];
-        
-        dispatch_async(dispatch_get_main_queue(), ^{
-            resolve(result);
-        });
-    });
-}
-
-RCT_EXPORT_METHOD(createHDKeyPairs:(NSString *)mnemonic
-                  passphrase:(NSString *)passphrase
-                  path:(NSString *)path
-                  from:(NSInteger)fromIndex
-                  to:(NSInteger)toIndex
-                  resolver:(RCTPromiseResolveBlock)resolve
-                  rejecter:(RCTPromiseRejectBlock)reject)
-{
+  dispatch_async(dispatch_get_global_queue(0, 0), ^{
     Mnemonic *m = [Mnemonic fromMnemonic:mnemonic passphrase:passphrase];
     KeyDerivation *kd = [m keyDerivationWithPath:path];
 
-    if (kd == NULL) return reject(@"PATH_NOT_SUPPORTED", @"Path is not supported", NULL);
-
-    NSMutableArray *result = [[NSMutableArray alloc] init];
-
-    kd = [kd derivePathFromSeed:m.seed];
-    for (NSInteger i = fromIndex; i <= toIndex; i++) {
-        HDKeyPair *key = [kd keyAt:(int)i];
-        NSDictionary *keyDict = [NSDictionary dictionaryWithObjectsAndKeys:[key privateKey], @"private_key", [key publicKey], @"public_key", nil];
-        [result addObject: keyDict];
+    if (kd == NULL) {
+      return reject(@"PATH_NOT_SUPPORTED", @"Path is not supported", NULL);
     }
-
-    resolve(result);
-
+    
+    HDKeyPair *key = [[kd derivePathFromSeed:m.seed] keyAt:(int)index];
+    NSDictionary *result = [NSDictionary dictionaryWithObjectsAndKeys:[key privateKey], @"private_key", [key publicKey], @"public_key", nil];
+    
+    dispatch_async(dispatch_get_main_queue(), ^{
+      resolve(result);
+    });
+  });
 }
 
 @end
