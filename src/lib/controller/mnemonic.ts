@@ -45,6 +45,7 @@ export class Mnemonic {
     );
 
     return {
+      index,
       privateKey: private_key,
       publicKey: public_key
     };

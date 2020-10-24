@@ -16,7 +16,7 @@
 
 - (dispatch_queue_t)methodQueue
 {
-    return dispatch_queue_create("wallet.golden.keystore_queue", DISPATCH_QUEUE_CONCURRENT);
+    return dispatch_queue_create("wallet.zilpay.keystore_queue", DISPATCH_QUEUE_CONCURRENT);
 }
 
 RCT_EXPORT_MODULE()

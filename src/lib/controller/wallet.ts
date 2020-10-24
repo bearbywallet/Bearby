@@ -18,10 +18,9 @@ export class WalletControler extends Mnemonic {
   private _zilliqa = new ZilliqaControl();
   private _network = new NetworkControll(this._storage);
 
-  public initWallet(password: string, mnemonic: string) {
-    this._network.sync();
-
-    return this._guard.setupWallet(password, mnemonic);
+  public async initWallet(password: string, mnemonic: string) {
+    await this._network.sync();
+    await this._guard.setupWallet(password, mnemonic);
   }
 
   public unlockWallet(password: string) {
