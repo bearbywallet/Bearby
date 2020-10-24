@@ -8,6 +8,8 @@
  */
 import { NativeModules } from 'react-native';
 
+import { MNEMONIC_PACH } from '../../config';
+
 const { Crypto } = NativeModules;
 
 /**
@@ -22,6 +24,33 @@ export class Mnemonic {
     const checked = await Crypto.mnemonicIsValid(mnemonic);
 
     return Number(checked) !== 0;
+  }
+
+  /**
+   * Generate account keyPair private key and public key.
+   * @param mnemonic - 12 or 24 mnemonic words.
+   * @param index - Account index.
+   * @example
+   * import { Mnemonic } from 'lib/controller/mnemonic';
+   * const mnemonicController = new Mnemonic();
+   * const mnemonicPhrase = mnemonicController.generateMnemonic();
+   * const pairs = mnemonicController.getKeyPair(mnemonicPhrase, 0);
+   */
+  public async getKeyPair(mnemonic: string, index: number = 0) {
+    // By default is emnty.
+    const passphrase = '';
+
+    const { private_key, public_key } = await Crypto.createHDKeyPair(
+      mnemonic,
+      passphrase,
+      MNEMONIC_PACH,
+      index
+    );
+
+    return {
+      privateKey: private_key,
+      publicKey: public_key
+    };
   }
 
   /**

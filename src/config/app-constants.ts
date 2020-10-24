@@ -55,3 +55,5 @@ export const DEFAULT_TOKENS_LIST = {
     '0x6f0B1fbDA199dc4AbFda28fa2eaa299599b3e8F2'
   ]
 };
+
+export const MNEMONIC_PACH = "m/44'/313'/0'/0/index";
