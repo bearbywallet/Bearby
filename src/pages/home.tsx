@@ -11,6 +11,25 @@ import { View, StyleSheet, Text } from 'react-native';
 // import { useTheme } from '@react-navigation/native';
 
 import { colors } from '../styles';
+// import { WalletControler } from '../lib/controller';
+
+// const wallet = new WalletControler();
+
+// async function test() {
+//   const seed = await wallet.generateMnemonic();
+//   const password = '123';
+
+//   await wallet.initWallet(password, seed);
+
+//   try {
+//     const isValid = await wallet.validateMnemonic(seed);
+//     console.log(isValid);
+//   } catch (err) {
+//     console.error(err);
+//   }
+// };
+
+// test();
 
 export const HomePage = () => {
   // const { colors } = useTheme();
