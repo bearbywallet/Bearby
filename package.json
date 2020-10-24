@@ -21,7 +21,6 @@
     "@react-navigation/stack": "^5.9.3",
     "@unimodules/core": "^5.5.1",
     "buffer": "^5.6.0",
-    "crypto": "^1.0.1",
     "effector": "^21.5.0",
     "effector-react": "^21.0.6",
     "expo-asset": "^8.2.0",
