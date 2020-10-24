@@ -36,10 +36,7 @@ export class Mnemonic {
    * const mnemonicPhrase = mnemonicController.generateMnemonic();
    * const pairs = mnemonicController.getKeyPair(mnemonicPhrase, 0);
    */
-  public async getKeyPair(mnemonic: string, index: number = 0) {
-    // By default is emnty.
-    const passphrase = '';
-
+  public async getKeyPair(mnemonic: string, index: number = 0, passphrase = '') {
     const { private_key, public_key } = await Crypto.createHDKeyPair(
       mnemonic,
       passphrase,
