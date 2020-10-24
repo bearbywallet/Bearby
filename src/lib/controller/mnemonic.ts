@@ -19,7 +19,7 @@ export class Mnemonic {
    * @param mnemonic - Mnemonic seed phrase.
    */
   public async validateMnemonic(mnemonic: string): Promise<boolean> {
-    const checked = await Crypto.isValidMnemonic(mnemonic);
+    const checked = await Crypto.mnemonicIsValid(mnemonic);
 
     return Number(checked) !== 0;
   }
