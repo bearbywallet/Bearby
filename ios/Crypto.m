@@ -73,7 +73,7 @@ RCT_EXPORT_METHOD(createHDKeyPair:(NSString *)mnemonic
     if (kd == NULL) {
       return reject(@"PATH_NOT_SUPPORTED", @"Path is not supported", NULL);
     }
-    
+
     HDKeyPair *key = [[kd derivePathFromSeed:m.seed] keyAt:(int)index];
     NSDictionary *result = [NSDictionary dictionaryWithObjectsAndKeys:[key privateKey], @"private_key", [key publicKey], @"public_key", nil];
     

@@ -30,12 +30,12 @@
 }
 
 - (NSData *)publicKeyData {
-  NSUInteger length = 512/8;
+  NSUInteger length = 256/8 + 1;
 //  uint8_t *key = malloc(length);
 //  memset(key, 0, length);
   uint8_t *key = (uint8_t *)[NSMutableData dataWithLength:length].bytes;
   
-  ecdsa_get_public_key65(_node.curve->params, [self privateKeyData].bytes, key);
+  ecdsa_get_public_key33(_node.curve->params, [self privateKeyData].bytes, key);
   NSData *keyData = [NSData dataWithBytes:key length:length];
 
   return keyData;
