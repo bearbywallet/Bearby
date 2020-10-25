@@ -8,7 +8,6 @@
  */
 import { NativeModules } from 'react-native';
 import { MNEMONIC_PACH } from '../../config';
-import { getAddressFromPublicKey, toBech32Address } from '../../utils';
 
 const { Crypto } = NativeModules;
 
