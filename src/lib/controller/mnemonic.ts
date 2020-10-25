@@ -8,6 +8,7 @@
  */
 import { NativeModules } from 'react-native';
 import { MNEMONIC_PACH } from '../../config';
+// import { getAddressFromPublicKey } from '../../utils';
 
 const { Crypto } = NativeModules;
 
@@ -21,6 +22,12 @@ export class Mnemonic {
    */
   public async validateMnemonic(mnemonic: string): Promise<boolean> {
     const checked = await Crypto.mnemonicIsValid(mnemonic);
+    // const { publicKey } = await this.getKeyPair(mnemonic);
+    // const address = await getAddressFromPublicKey(publicKey);
+
+    // console.log(mnemonic)
+    // console.log(publicKey)
+    // console.log(address)
 
     return Number(checked) !== 0;
   }
