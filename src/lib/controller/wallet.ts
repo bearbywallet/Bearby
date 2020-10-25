@@ -11,12 +11,14 @@ import { MobileStorage } from '../storage';
 import { Mnemonic } from './mnemonic';
 import { ZilliqaControl } from './zilliqa';
 import { NetworkControll } from './network';
+import { AccountControler } from './account';
 
 export class WalletControler extends Mnemonic {
   private _storage = new MobileStorage();
   private _guard = new GuardControler(this._storage);
   private _zilliqa = new ZilliqaControl();
   private _network = new NetworkControll(this._storage);
+  private _account = new AccountControler(this._storage);
 
   public async initWallet(password: string, mnemonic: string) {
     await this._network.sync();

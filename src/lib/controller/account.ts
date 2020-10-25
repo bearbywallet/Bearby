@@ -11,7 +11,11 @@ import { STORAGE_FIELDS } from '../../config';
 import { AccountState, Account } from 'types';
 
 export class AccountControler {
-  private _storage = new MobileStorage();
+  private _storage: MobileStorage;
+
+  constructor(storage: MobileStorage) {
+    this._storage = storage;
+  }
 
   public async get(): Promise<AccountState> {
     const accounts = await this._storage.get<AccountState>(
