@@ -18,13 +18,13 @@ export const isByteString = (str: string, len: number) => {
 };
 
 export const isAddress = (address: string) => {
-  return isByteString(address, 40);
+  if (!isByteString(address, 40)) {
+    throw new Error(`${address} is not a valid base 16 address`);
+  }
 };
 
 export const toChecksumAddress = (address: string): string => {
-  if (!isAddress(address)) {
-    throw new Error(`${address} is not a valid base 16 address`);
-  }
+  isAddress(address);
 
   address = tohexString(address);
   const hash = hashjs

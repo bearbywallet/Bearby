@@ -9,3 +9,4 @@
 export * from './device';
 export * from './entry-inject-script';
 export * from './address';
+export * from './bech32';
