@@ -11,6 +11,7 @@
 #import "KeyDerivation.h"
 #import "KeyIndexPath.h"
 #import "HDKeyPair.h"
+#import "AesCrypt.h"
 
 @implementation Crypto
 

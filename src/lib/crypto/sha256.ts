@@ -9,6 +9,7 @@
 import { NativeModules } from 'react-native';
 
 const Aes = NativeModules.Aes;
+const { Crypto } = NativeModules;
 
 /**
  * Method for get hashsum from content.

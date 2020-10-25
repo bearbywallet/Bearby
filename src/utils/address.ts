@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import BN from 'bn.js';
-import { sha256 } from '../lib/crypto';
+import hashjs from 'hash.js';
 
 export function tohexString(hex: string) {
   return String(hex).toLowerCase().replace('0x', '');
@@ -21,13 +21,16 @@ export const isAddress = (address: string) => {
   return isByteString(address, 40);
 };
 
-export const toChecksumAddress = async (address: string): Promise<string> => {
+export const toChecksumAddress = (address: string): string => {
   if (!isAddress(address)) {
     throw new Error(`${address} is not a valid base 16 address`);
   }
 
   address = tohexString(address);
-  const hash = await sha256(address);
+  const hash = hashjs
+    .sha256()
+    .update(address, 'hex')
+    .digest('hex');
   const v = new BN(hash, 'hex', 'be');
   let ret = '0x';
 
@@ -44,9 +47,13 @@ export const toChecksumAddress = async (address: string): Promise<string> => {
   return ret;
 };
 
-export const getAddressFromPublicKey = async (publicKey: string) => {
-  const normalized = tohexString(publicKey);
-  const hash = await sha256(normalized);
+export const getAddressFromPublicKey = (publicKey: string) => {
+  const pub = tohexString(publicKey);
+  const hash = hashjs
+    .sha256()
+    .update(pub, 'hex')
+    .digest('hex')
+    .slice(24);
 
-  return toChecksumAddress(hash.slice(24));
+  return toChecksumAddress(hash);
 };
