@@ -22,7 +22,7 @@ export class WalletControler extends Mnemonic {
   private _network = new NetworkControll(this._storage);
   private _account = new AccountControler(this._storage);
   private _zilliqa = new ZilliqaControl(this._network);
-  private _token = new TokenControll(this._zilliqa, this._storage);
+  private _token = new TokenControll(this._zilliqa, this._storage, this._network);
 
   public async initWallet(password: string, mnemonic: string) {
     await this._network.sync();

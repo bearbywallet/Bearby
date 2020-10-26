@@ -7,22 +7,14 @@
  * Copyright (c) 2020 ZilPay
  */
 
+export type KeyValue = {
+  [key: string]: string;
+};
+
 export interface Token {
-  address: {
-    mainnet: string;
-    testnet: string;
-    private: string;
-  };
-  balance: {
-    mainnet: string;
-    testnet: string;
-    private: string;
-  };
-  totalSupply: {
-    mainnet: string;
-    testnet: string;
-    private: string;
-  };
+  address: KeyValue;
+  balance: KeyValue;
+  totalSupply: KeyValue;
   decimals: string;
   default?: boolean;
   name: string;

@@ -8,6 +8,7 @@
  */
 import { MobileStorage, buildObject } from '../storage';
 import { ZilliqaControl } from './zilliqa';
+import { NetworkControll } from './network';
 
 import { STORAGE_FIELDS } from '../../config';
 import { Token } from 'types';
@@ -30,12 +31,14 @@ export class TokenControll {
     }
   }
 
-  private _network: ZilliqaControl;
+  private _network: NetworkControll;
+  private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
 
-  constructor(network: ZilliqaControl, storage: MobileStorage) {
+  constructor(zilliqa: ZilliqaControl, storage: MobileStorage, network: NetworkControll) {
     this._storage = storage;
     this._network = network;
+    this._zilliqa = zilliqa;
   }
 
   public async getTokensList(): Promise<Token[]> {
@@ -51,11 +54,26 @@ export class TokenControll {
   }
 
   public async addToken(token: Token) {
-    const tokens = await this.getTokensList();
+    let tokens = await this.getTokensList();
 
     TokenControll.isUnique(token, tokens);
+    const hasSymbol = tokens.some(
+      (t) => t.symbol === token.symbol
+    );
 
-    tokens.push(token);
+    if (hasSymbol) {
+      tokens = tokens.map((t) => {
+        const { selected } = this._network;
+
+        t.address[selected] = token.address[selected];
+        t.balance[selected] = token.balance[selected];
+        t.totalSupply[selected] = token.totalSupply[selected];
+
+        return t;
+      });
+    } else {
+      tokens.push(token);
+    }
 
     await this._update(tokens);
 
