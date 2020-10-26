@@ -8,12 +8,24 @@
  */
 
 export interface Token {
-  address: string;
-  balance: string;
+  address: {
+    mainnet: string;
+    testnet: string;
+    private: string;
+  };
+  balance: {
+    mainnet: string;
+    testnet: string;
+    private: string;
+  };
+  totalSupply: {
+    mainnet: string;
+    testnet: string;
+    private: string;
+  };
   decimals: string;
   default?: boolean;
   name: string;
   owner: string;
   symbol: string;
-  totalSupply: string;
 }

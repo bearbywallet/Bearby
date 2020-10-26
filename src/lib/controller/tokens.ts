@@ -15,7 +15,15 @@ import { Token } from 'types';
 export class TokenControll {
 
   public static isUnique(token: Token, list: Token[]) {
-    const isAddress = list.some((t) => t.address === token.address);
+    const isAddress = list.some((t) => {
+      const { mainnet, testnet } = t.address;
+      const checkMainnet = mainnet && mainnet === token.address.mainnet;
+      const checkTestnet = testnet && testnet === token.address.testnet;
+      const checkPrivate = t.address.private &&
+        t.address.private === token.address.private;
+
+      return checkMainnet || checkTestnet || checkPrivate;
+    });
     const isSymbol = list.some((t) => t.symbol === token.symbol);
 
     if (isAddress) {

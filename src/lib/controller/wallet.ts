@@ -12,6 +12,7 @@ import { Mnemonic } from './mnemonic';
 import { ZilliqaControl } from './zilliqa';
 import { NetworkControll } from './network';
 import { AccountControler } from './account';
+import { TokenControll } from './tokens';
 
 import { AccountTypes } from '../../config';
 
@@ -21,6 +22,7 @@ export class WalletControler extends Mnemonic {
   private _network = new NetworkControll(this._storage);
   private _account = new AccountControler(this._storage);
   private _zilliqa = new ZilliqaControl(this._network);
+  private _token = new TokenControll(this._zilliqa, this._storage);
 
   public async initWallet(password: string, mnemonic: string) {
     await this._network.sync();
