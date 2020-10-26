@@ -62,4 +62,9 @@ export class GuardControler {
 
     return this._auth.decryptVault();
   }
+
+  public logout() {
+    this._auth = undefined;
+    _isEnable = false;
+  }
 }

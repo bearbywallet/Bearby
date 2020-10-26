@@ -7,8 +7,12 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from '../storage';
-import { STORAGE_FIELDS } from '../../config';
-import { AccountState, Account } from 'types';
+import { STORAGE_FIELDS, AccountTypes } from '../../config';
+import {
+  getAddressFromPublicKey,
+  toBech32Address
+} from '../../utils';
+import { AccountState, Account, KeyPair } from 'types';
 
 export class AccountControler {
   private _storage: MobileStorage;
@@ -30,6 +34,29 @@ export class AccountControler {
       identities: [],
       selectedAddress: -1
     };
+  }
+
+  public fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Account {
+    const base16 = getAddressFromPublicKey(acc.publicKey);
+    const bech32 = toBech32Address(base16);
+
+    return {
+      base16,
+      bech32,
+      name,
+      type,
+      index: Number(acc.index),
+      nonce: 0 // TODO: check and update nonce.
+    };
+  }
+
+  public reset() {
+    const accountsState = {
+      identities: [],
+      selectedAddress: -1
+    };
+
+    return this.update(accountsState);
   }
 
   public update(accountState: AccountState): Promise<void> {

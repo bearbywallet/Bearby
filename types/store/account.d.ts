@@ -11,7 +11,7 @@ import { AccountTypes } from 'src/config/account-type';
 
 export interface Account {
   name: string;
-  index: string;
+  index: number;
   type: AccountTypes;
   nonce: number;
   base16: string;
@@ -21,4 +21,10 @@ export interface Account {
 export interface AccountState {
   identities: Account[];
   selectedAddress: number;
+}
+
+export interface KeyPair {
+  index: number,
+  privateKey: string;
+  publicKey: string;
 }

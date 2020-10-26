@@ -8,6 +8,7 @@
  */
 import { NativeModules } from 'react-native';
 import { MNEMONIC_PACH } from '../../config';
+import { KeyPair } from 'types';
 
 const { Crypto } = NativeModules;
 
@@ -35,7 +36,7 @@ export class Mnemonic {
    * const mnemonicPhrase = mnemonicController.generateMnemonic();
    * const pairs = mnemonicController.getKeyPair(mnemonicPhrase, 0);
    */
-  public async getKeyPair(mnemonic: string, index: number = 0, passphrase = '') {
+  public async getKeyPair(mnemonic: string, index: number = 0, passphrase = ''): Promise<KeyPair> {
     const { private_key, public_key } = await Crypto.createHDKeyPair(
       mnemonic,
       passphrase,

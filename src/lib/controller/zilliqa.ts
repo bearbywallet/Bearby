@@ -6,4 +6,12 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export class ZilliqaControl {}
+import { NetworkControll } from './network';
+
+export class ZilliqaControl {
+  private _network: NetworkControll;
+
+  constructor(network: NetworkControll) {
+    this._network = network;
+  }
+}
