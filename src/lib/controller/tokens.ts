@@ -24,12 +24,9 @@ export class TokenControll {
 
       return checkMainnet || checkTestnet || checkPrivate;
     });
-    const isSymbol = list.some((t) => t.symbol === token.symbol);
 
     if (isAddress) {
       throw new Error('Token address must be unique');
-    } else if (isSymbol) {
-      throw new Error('Token symbol must be unique');
     }
   }
 
@@ -59,6 +56,8 @@ export class TokenControll {
     TokenControll.isUnique(token, tokens);
 
     tokens.push(token);
+
+    await this._update(tokens);
 
     return tokens;
   }
