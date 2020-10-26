@@ -7,7 +7,13 @@
  * Copyright (c) 2020 ZilPay
  */
 
-export * from './account';
-export * from './contact';
-export * from './settings';
-export * from './token';
+export interface Token {
+  address: string;
+  balance: string;
+  decimals: string;
+  default?: boolean;
+  name: string;
+  owner: string;
+  symbol: string;
+  totalSupply: string;
+}

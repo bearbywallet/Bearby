@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import AsyncStorage from '@react-native-community/async-storage';
-import { buildObject, buildObjectType } from './value-builder';
+import { buildObjectType } from './value-builder';
 
 /**
  * Default class for working with browser Storage.
@@ -16,7 +16,6 @@ import { buildObject, buildObjectType } from './value-builder';
  * new MobileStorage().get('KEY')
  */
 export class MobileStorage {
-
   /**
    * Set value by someting key.
    * @param {Object, String, Number, Array} value - Any value for set storage.
