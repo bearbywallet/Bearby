@@ -19,12 +19,14 @@ import { CreateWalletPage } from './pages/create-wallet';
 import { VerifyPage } from './pages/verify';
 
 import { theme } from './styles';
+import { StatusBar } from 'react-native';
 
 const Tab = createBottomTabNavigator();
 
 export default function Root() {
   return (
     <NavigationContainer theme={theme}>
+      <StatusBar barStyle="light-content"/>
       <Tab.Navigator>
         <Tab.Screen name="Home" component={HomePage} />
         <Tab.Screen name="Lock" component={LockPage} />
