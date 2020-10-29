@@ -13,24 +13,29 @@ import {
   StyleSheet,
   Text
 } from 'react-native';
-import { LogoSVG } from '../components';
-import { SvgXml } from 'react-native-svg';
+import { HomeAccount } from '../components/home';
 
 import { theme } from '../styles';
+import I18n from '../lib/i18n';
+
 
 export const HomePage = () => {
   // const { colors } = useTheme();
 
   return (
     <View style={styles.container}>
-      <View style={styles.top}>
-        <SvgXml
-          xml={LogoSVG}
-          viewBox="50 0 300 200"
-        />
-        <View style={[StyleSheet.absoluteFill, styles.topContent]}>
+      <HomeAccount />
+      <View style={styles.center}>
+        <View style={{
+          width: '100%',
+          flexDirection: 'row',
+          justifyContent: 'space-between'
+        }}>
           <Text>
-            dasdsa
+            {I18n.t('my_tokens')}
+          </Text>
+          <Text>
+            {I18n.t('manage')}
           </Text>
         </View>
       </View>
@@ -42,16 +47,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    backgroundColor: theme.colors.background
+    backgroundColor: theme.colors.black
   },
-  top: {
-    width: '100%',
-    height: '30%',
+  center: {
+    flex: 1,
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center'
-  },
-  topContent: {
-    alignItems: 'center',
-    justifyContent: 'center'
+
+    backgroundColor: theme.colors.background,
+
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16
   }
 });

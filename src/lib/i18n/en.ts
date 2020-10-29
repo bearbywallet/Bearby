@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './storage';
-export * from './controller';
-export * from './crypto';
+export default {
+  my_tokens: 'My tokens',
+  manage: 'Manage'
+};
