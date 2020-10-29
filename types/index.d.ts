@@ -8,6 +8,10 @@
  */
 export * from './store';
 
+declare module '*.svg' {
+  const content: any;
+  export default content;
+}
 
 export interface ZilliqaNetwork {
   [key: string]: {
