@@ -12,19 +12,22 @@ import {
   StyleSheet,
   Text
 } from 'react-native';
-import { LogoSVG } from '../svg';
-import { SvgXml } from 'react-native-svg';
+import I18n from '../../lib/i18n';
+import { theme } from '../../styles';
 
-export const HomeAccount = () => {
+export const HomeTokens = () => {
   return (
     <View style={styles.container}>
-      <SvgXml
-        xml={LogoSVG}
-        viewBox="50 0 300 200"
-      />
-      <View style={[StyleSheet.absoluteFill, styles.content]}>
+      <View style={{
+        width: '100%',
+        flexDirection: 'row',
+        justifyContent: 'space-between'
+      }}>
         <Text>
-          dasdsa
+          {I18n.t('my_tokens')}
+        </Text>
+        <Text>
+          {I18n.t('manage')}
         </Text>
       </View>
     </View>
@@ -33,13 +36,14 @@ export const HomeAccount = () => {
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
-    height: '30%',
+    flex: 1,
+    flexDirection: 'column',
     alignItems: 'center',
-    justifyContent: 'center'
-  },
-  content: {
-    alignItems: 'center',
-    justifyContent: 'center'
+
+    backgroundColor: theme.colors.background,
+
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    padding: 16
   }
 });

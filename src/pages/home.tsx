@@ -10,35 +10,17 @@
 import React from 'react';
 import {
   View,
-  StyleSheet,
-  Text
+  StyleSheet
 } from 'react-native';
-import { HomeAccount } from '../components/home';
+import { HomeAccount, HomeTokens } from 'app/components/home';
 
-import { theme } from '../styles';
-import I18n from '../lib/i18n';
-
+import { theme } from 'app/styles';
 
 export const HomePage = () => {
-  // const { colors } = useTheme();
-
   return (
     <View style={styles.container}>
       <HomeAccount />
-      <View style={styles.center}>
-        <View style={{
-          width: '100%',
-          flexDirection: 'row',
-          justifyContent: 'space-between'
-        }}>
-          <Text>
-            {I18n.t('my_tokens')}
-          </Text>
-          <Text>
-            {I18n.t('manage')}
-          </Text>
-        </View>
-      </View>
+      <HomeTokens />
     </View>
   );
 };
@@ -48,16 +30,5 @@ const styles = StyleSheet.create({
     flex: 1,
     flexDirection: 'column',
     backgroundColor: theme.colors.black
-  },
-  center: {
-    flex: 1,
-    flexDirection: 'column',
-    alignItems: 'center',
-
-    backgroundColor: theme.colors.background,
-
-    borderTopLeftRadius: 16,
-    borderTopRightRadius: 16,
-    padding: 16
   }
 });
