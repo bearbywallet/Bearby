@@ -9,3 +9,5 @@
 export * from './logo';
 export * from './home';
 export * from './timer';
+export * from './browser';
+export * from './settings';

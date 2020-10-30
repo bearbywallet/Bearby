@@ -9,5 +9,8 @@
 export default {
   my_tokens: 'My tokens',
   manage: 'Manage',
-  home: 'Home'
+  home: 'Home',
+  history: 'History',
+  browser: 'Browser',
+  settings: 'Settings'
 };

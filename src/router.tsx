@@ -11,16 +11,16 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SvgXml } from 'react-native-svg';
 
 import { HomePage } from './pages/home';
-import { LockPage } from './pages/lock';
-import { AccountsPage } from './pages/accounts';
-import { ConnectPage } from './pages/connect';
-import { ContactsPage } from './pages/contacts';
-import { CreateWalletPage } from './pages/create-wallet';
-import { VerifyPage } from './pages/verify';
+import { BrowserPage } from './pages/browser';
+import { SettingsPage } from './pages/settings';
+import { HistoryPage } from './pages/history';
+
 
 import {
   HomeIconSVG,
-  TimerIconSVG
+  TimerIconSVG,
+  BrowserIconSVG,
+  SettingsIconSVG
 } from 'app/components/svg';
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -47,20 +47,35 @@ export default function Router() {
         }}
       />
       <Tab.Screen
-        name="Lock"
-        component={LockPage}
+        name="History"
+        component={HistoryPage}
         options={{
-          tabBarLabel: I18n.t('home'),
+          tabBarLabel: I18n.t('history'),
           tabBarIcon: () => (
             <SvgXml xml={TimerIconSVG} />
           )
         }}
       />
-      <Tab.Screen name="Accounts" component={AccountsPage} />
-      <Tab.Screen name="Conect" component={ConnectPage} />
-      <Tab.Screen name="Contacts" component={ContactsPage} />
-      <Tab.Screen name="Create" component={CreateWalletPage} />
-      <Tab.Screen name="Verify" component={VerifyPage} />
+      <Tab.Screen
+        name="Browser"
+        component={BrowserPage}
+        options={{
+          tabBarLabel: I18n.t('browser'),
+          tabBarIcon: () => (
+            <SvgXml xml={BrowserIconSVG} />
+          )
+        }}
+      />
+      <Tab.Screen
+        name="Settings"
+        component={SettingsPage}
+        options={{
+          tabBarLabel: I18n.t('settings'),
+          tabBarIcon: () => (
+            <SvgXml xml={SettingsIconSVG} />
+          )
+        }}
+      />
     </Tab.Navigator>
   );
 }
