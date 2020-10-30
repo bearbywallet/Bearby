@@ -15,7 +15,6 @@ import { BrowserPage } from './pages/browser';
 import { SettingsPage } from './pages/settings';
 import { HistoryPage } from './pages/history';
 
-
 import {
   HomeIconSVG,
   TimerIconSVG,
@@ -27,7 +26,10 @@ import { theme } from 'app/styles';
 
 const Tab = createBottomTabNavigator();
 const tabBarOptions = {
-  activeTintColor: theme.colors.white,
+  activeTintColor: theme.colors.primary,
+  activeColor: theme.colors.white,
+  labelStyle: { fontSize: 12 },
+  inactiveTintColor: theme.colors.muted,
   style: {
     backgroundColor: theme.colors.gray
   }
@@ -41,8 +43,11 @@ export default function Router() {
         component={HomePage}
         options={{
           tabBarLabel: I18n.t('home'),
-          tabBarIcon: () => (
-            <SvgXml xml={HomeIconSVG} />
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={HomeIconSVG}
+              fill={color}
+            />
           )
         }}
       />
@@ -51,8 +56,11 @@ export default function Router() {
         component={HistoryPage}
         options={{
           tabBarLabel: I18n.t('history'),
-          tabBarIcon: () => (
-            <SvgXml xml={TimerIconSVG} />
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={TimerIconSVG}
+              fill={color}
+            />
           )
         }}
       />
@@ -61,8 +69,11 @@ export default function Router() {
         component={BrowserPage}
         options={{
           tabBarLabel: I18n.t('browser'),
-          tabBarIcon: () => (
-            <SvgXml xml={BrowserIconSVG} />
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={BrowserIconSVG}
+              fill={color}
+            />
           )
         }}
       />
@@ -71,8 +82,11 @@ export default function Router() {
         component={SettingsPage}
         options={{
           tabBarLabel: I18n.t('settings'),
-          tabBarIcon: () => (
-            <SvgXml xml={SettingsIconSVG} />
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={SettingsIconSVG}
+              fill={color}
+            />
           )
         }}
       />
