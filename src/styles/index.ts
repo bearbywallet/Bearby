@@ -18,6 +18,7 @@ import { DefaultTheme } from '@react-navigation/native';
 export const colors = {
   primary: '#2CB9B0',
   secondary: '#0C0D34',
+  gray: '#1D2024',
   success: '#00D99A',
   danger: '#FF0058',
   warning: '#FFC641',

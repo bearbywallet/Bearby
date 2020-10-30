@@ -8,5 +8,6 @@
  */
 export default {
   my_tokens: 'My tokens',
-  manage: 'Manage'
+  manage: 'Manage',
+  home: 'Home'
 };
