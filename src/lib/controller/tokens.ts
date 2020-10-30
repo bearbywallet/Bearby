@@ -67,7 +67,6 @@ export class TokenControll {
 
         t.address[selected] = token.address[selected];
         t.balance[selected] = token.balance[selected];
-        t.totalSupply[selected] = token.totalSupply[selected];
 
         return t;
       });

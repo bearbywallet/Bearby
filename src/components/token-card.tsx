@@ -16,6 +16,7 @@ import {
 export const TokenCard = () => {
   return (
     <View style={styles.container}>
+      <Text>dasdsa</Text>
     </View>
   );
 };

@@ -14,10 +14,8 @@ export type KeyValue = {
 export interface Token {
   address: KeyValue;
   balance: KeyValue;
-  totalSupply: KeyValue;
-  decimals: string;
+  decimals: number;
   default?: boolean;
   name: string;
-  owner: string;
   symbol: string;
 }
