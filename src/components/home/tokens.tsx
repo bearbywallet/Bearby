@@ -18,11 +18,21 @@ import { theme } from 'app/styles';
 import { useStore } from 'effector-react';
 
 import TokensStore from 'app/store/tokens';
+import SettingsStore from 'app/store/settings';
 
 import { TokenCard } from 'app/components/token-card';
 
 export const HomeTokens = () => {
   const tokensState = useStore(TokensStore.store);
+  const settingsState = useStore(SettingsStore.store);
+
+  const tokensList = React.useMemo(
+    () => tokensState.filter(
+      // Filtering the only selected netwrok tokens.
+      (token) => Boolean(token.address[settingsState.netwrok])
+    ),
+    [settingsState.netwrok]
+  );
 
   return (
     <View style={styles.container}>
@@ -36,10 +46,12 @@ export const HomeTokens = () => {
       </View>
       <ScrollView >
         <View style={styles.list}>
-          {tokensState.map((token, index) => (
+          {tokensList.map((token, index) => (
             <TokenCard
               key={index}
               token={token}
+              net={settingsState.netwrok}
+              rate={settingsState.rate}
               style={styles.token}
             />
           ))}
@@ -69,7 +81,7 @@ const styles = StyleSheet.create({
   list: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
+    justifyContent: 'space-around',
     alignItems: 'center'
   },
   token: {
