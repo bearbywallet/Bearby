@@ -27,7 +27,7 @@ export const HomeTokens = () => {
   const settingsState = useStore(SettingsStore.store);
 
   const tokensList = React.useMemo(
-    () => tokensState.filter(
+    () => tokensState.identities.filter(
       // Filtering the only selected netwrok tokens.
       (token) => Boolean(token.address[settingsState.netwrok])
     ),
@@ -37,10 +37,10 @@ export const HomeTokens = () => {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Text>
+        <Text style={styles.title}>
           {I18n.t('my_tokens')}
         </Text>
-        <Text>
+        <Text style={styles.manage}>
           {I18n.t('manage')}
         </Text>
       </View>
@@ -52,7 +52,9 @@ export const HomeTokens = () => {
               token={token}
               net={settingsState.netwrok}
               rate={settingsState.rate}
+              selected={index === tokensState.selected}
               style={styles.token}
+              onSelect={() => TokensStore.selectToken(index)}
             />
           ))}
         </View>
@@ -86,5 +88,13 @@ const styles = StyleSheet.create({
   },
   token: {
     marginTop: 16
+  },
+  title: {
+    color: theme.colors.white,
+    fontSize: 20
+  },
+  manage: {
+    color: theme.colors.primary,
+    fontSize: 20
   }
 });

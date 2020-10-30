@@ -12,7 +12,13 @@ import { ZILLIQA, NIL_ADDRESS } from '../config';
 
 const [mainnet, testnet, privatenet] = Object.keys(ZILLIQA);
 const TokenDomain = createDomain();
-const initalState: Token[] = [
+
+/**
+ * mehods.
+ */
+export const selectToken = TokenDomain.event<number>();
+
+const identities: Token[] = [
   {
     address: {
       [mainnet]: NIL_ADDRESS,
@@ -72,8 +78,20 @@ const initalState: Token[] = [
     symbol: 'gZIL'
   }
 ];
-const store = TokenDomain.store(initalState);
+const initalState = {
+  identities,
+  selected: 0
+};
+const store = TokenDomain
+  .store(initalState)
+  .on(selectToken, (state, selected) => {
+    return {
+      ...state,
+      selected
+    };
+  });
 
 export default {
-  store
+  store,
+  selectToken
 };

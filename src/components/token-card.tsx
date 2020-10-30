@@ -23,10 +23,20 @@ export type Prop = {
   token: Token;
   net: string;
   rate: number;
+  selected: boolean;
   style?: ViewStyle;
+
+  onSelect: () => void;
 };
 
-export const TokenCard: React.FC<Prop> = ({ token, net, rate, style }) => {
+export const TokenCard: React.FC<Prop> = ({
+  token,
+  net,
+  rate,
+  selected,
+  style,
+  onSelect
+}) => {
   /**
    * ZIL(Default token) amount in float.
    */
@@ -44,7 +54,10 @@ export const TokenCard: React.FC<Prop> = ({ token, net, rate, style }) => {
   }, [token.balance, net, rate]);
 
   return (
-    <View style={[styles.container, style]}>
+    <View
+      style={[styles.container, style, (selected ? styles.selected : null)]}
+      onTouchEnd={onSelect}
+    >
       <View style={styles.header}>
         <Text style={styles.symbol}>
           {token.symbol}
@@ -55,7 +68,7 @@ export const TokenCard: React.FC<Prop> = ({ token, net, rate, style }) => {
           uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
         />
       </View>
-      <View style={styles.content}>
+      <View>
         <Text style={styles.zilAmount}>
           {toLocaleString(amount)}
         </Text>
@@ -74,7 +87,12 @@ const styles = StyleSheet.create({
     width: '45%',
     maxWidth: 150,
     backgroundColor: theme.colors.gray,
-    padding: 10
+    padding: 10,
+    borderWidth: 0.9,
+    borderColor: theme.colors.gray
+  },
+  selected: {
+    borderColor: theme.colors.primary
   },
   header: {
     width: '100%',
@@ -82,11 +100,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
-  content: {
-
-  },
   symbol: {
-    color: theme.colors.muted
+    color: theme.colors.muted,
+    fontSize: 17
   },
   zilAmount: {
     color: theme.colors.white,

@@ -16,7 +16,7 @@ import { DefaultTheme } from '@react-navigation/native';
  * Map of color names to HEX values
  */
 export const colors = {
-  primary: '#2CB9B0',
+  primary: '#26D6BC',
   secondary: '#0C0D34',
   gray: '#1D2024',
   success: '#00D99A',
