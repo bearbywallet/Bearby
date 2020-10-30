@@ -12,8 +12,8 @@ import {
   StyleSheet,
   Text
 } from 'react-native';
-import I18n from '../../lib/i18n';
-import { theme } from '../../styles';
+import I18n from 'app/lib/i18n';
+import { theme } from 'app/styles';
 
 export const HomeTokens = () => {
   return (
