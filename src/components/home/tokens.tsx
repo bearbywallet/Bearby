@@ -10,19 +10,23 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text
+  Text,
+  ScrollView
 } from 'react-native';
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
+import { useStore } from 'effector-react';
+
+import TokensStore from 'app/store/tokens';
+
+import { TokenCard } from 'app/components/token-card';
 
 export const HomeTokens = () => {
+  const tokensState = useStore(TokensStore.store);
+
   return (
     <View style={styles.container}>
-      <View style={{
-        width: '100%',
-        flexDirection: 'row',
-        justifyContent: 'space-between'
-      }}>
+      <View style={styles.header}>
         <Text>
           {I18n.t('my_tokens')}
         </Text>
@@ -30,6 +34,17 @@ export const HomeTokens = () => {
           {I18n.t('manage')}
         </Text>
       </View>
+      <ScrollView >
+        <View style={styles.list}>
+          {tokensState.map((token, index) => (
+            <TokenCard
+              key={index}
+              token={token}
+              style={styles.token}
+            />
+          ))}
+        </View>
+      </ScrollView>
     </View>
   );
 };
@@ -45,5 +60,19 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16
+  },
+  header: {
+    width: '100%',
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  list: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    alignItems: 'center'
+  },
+  token: {
+    marginTop: 16
   }
 });

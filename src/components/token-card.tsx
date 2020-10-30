@@ -10,18 +10,33 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text
+  Text,
+  ViewStyle
 } from 'react-native';
+import { Token } from 'types';
+import { theme } from 'app/styles';
 
-export const TokenCard = () => {
+export type Prop = {
+  token: Token;
+  style?: ViewStyle;
+};
+
+export const TokenCard: React.FC<Prop> = ({ token, style }) => {
   return (
-    <View style={styles.container}>
-      <Text>dasdsa</Text>
+    <View style={[styles.container, style]}>
+      <Text>
+        {token.symbol}
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
+    borderRadius: 8,
+    minHeight: 90,
+    width: '45%',
+    maxWidth: 150,
+    backgroundColor: theme.colors.gray
   }
 });
