@@ -52,9 +52,10 @@ const styles = StyleSheet.create({
   line: {
     width: 30,
     height: 3,
-    backgroundColor: theme.colors.primary
+    backgroundColor: theme.colors.primary,
+    borderRadius: 5
   },
   line0: {
-    transform: [{ rotate: '90deg' }]
+    transform: [{ rotate: '90deg' }, { translateX: 3 }]
   }
 });

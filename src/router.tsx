@@ -28,7 +28,9 @@ const Tab = createBottomTabNavigator();
 const tabBarOptions = {
   activeTintColor: theme.colors.primary,
   activeColor: theme.colors.white,
-  labelStyle: { fontSize: 12 },
+  labelStyle: {
+    fontSize: 12
+  },
   inactiveTintColor: theme.colors.muted,
   style: {
     backgroundColor: theme.colors.gray
