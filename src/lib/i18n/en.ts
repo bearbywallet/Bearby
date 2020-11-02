@@ -12,5 +12,7 @@ export default {
   home: 'Home',
   history: 'History',
   browser: 'Browser',
-  settings: 'Settings'
+  settings: 'Settings',
+  send: 'Send',
+  receive: 'Receive'
 };

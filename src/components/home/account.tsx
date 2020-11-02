@@ -10,10 +10,13 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text
+  Text,
+  Button
 } from 'react-native';
 import { LogoSVG } from '../svg';
 import { SvgXml } from 'react-native-svg';
+import { theme } from 'app/styles';
+import I18n from 'app/lib/i18n';
 
 export const HomeAccount = () => {
   return (
@@ -23,9 +26,27 @@ export const HomeAccount = () => {
         viewBox="50 0 300 200"
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <Text>
-          dasdsa
+        <View>
+          <Text style={styles.accountName}>
+            0
+          </Text>
+        </View>
+        <Text style={styles.accountName}>
+          0
         </Text>
+        <View style={styles.buttons}>
+          <Button
+            color={theme.colors.primary}
+            title={I18n.t('send')}
+            onPress={() => null}
+          />
+          <View style={styles.seporate}/>
+          <Button
+            color={theme.colors.primary}
+            title={I18n.t('receive')}
+            onPress={() => null}
+          />
+        </View>
       </View>
     </View>
   );
@@ -40,6 +61,25 @@ const styles = StyleSheet.create({
   },
   content: {
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'space-around',
+    marginTop: 40
+  },
+  accountName: {
+    color: theme.colors.white
+  },
+  amount: {
+    color: theme.colors.white
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    width: 150,
+    marginLeft: 20
+  },
+  seporate: {
+    width: 1,
+    height: 40,
+    backgroundColor: '#666666'
   }
 });

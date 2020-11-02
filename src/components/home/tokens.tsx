@@ -21,6 +21,7 @@ import TokensStore from 'app/store/tokens';
 import SettingsStore from 'app/store/settings';
 
 import { TokenCard } from 'app/components/token-card';
+import { AddToken } from 'app/components/add-token';
 
 export const HomeTokens = () => {
   const tokensState = useStore(TokensStore.store);
@@ -29,7 +30,7 @@ export const HomeTokens = () => {
   const tokensList = React.useMemo(
     () => tokensState.identities.filter(
       // Filtering the only selected netwrok tokens.
-      (token) => Boolean(token.address[settingsState.netwrok])
+      (token) => Boolean(token.address[settingsState.netwrok] && token.symbol !== 'ZIL')
     ),
     [settingsState.netwrok]
   );
@@ -44,7 +45,7 @@ export const HomeTokens = () => {
           {I18n.t('manage')}
         </Text>
       </View>
-      <ScrollView >
+      <ScrollView>
         <View style={styles.list}>
           {tokensList.map((token, index) => (
             <TokenCard
@@ -52,11 +53,10 @@ export const HomeTokens = () => {
               token={token}
               net={settingsState.netwrok}
               rate={settingsState.rate}
-              selected={index === tokensState.selected}
               style={styles.token}
-              onSelect={() => TokensStore.selectToken(index)}
             />
           ))}
+          <AddToken style={styles.token}/>
         </View>
       </ScrollView>
     </View>
@@ -83,8 +83,7 @@ const styles = StyleSheet.create({
   list: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    alignItems: 'center'
+    justifyContent: 'space-between'
   },
   token: {
     marginTop: 16

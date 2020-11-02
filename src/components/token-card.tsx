@@ -23,19 +23,14 @@ export type Prop = {
   token: Token;
   net: string;
   rate: number;
-  selected: boolean;
   style?: ViewStyle;
-
-  onSelect: () => void;
 };
 
 export const TokenCard: React.FC<Prop> = ({
   token,
   net,
   rate,
-  selected,
-  style,
-  onSelect
+  style
 }) => {
   /**
    * ZIL(Default token) amount in float.
@@ -54,10 +49,7 @@ export const TokenCard: React.FC<Prop> = ({
   }, [token.balance, net, rate]);
 
   return (
-    <View
-      style={[styles.container, style, (selected ? styles.selected : null)]}
-      onTouchEnd={onSelect}
-    >
+    <View style={[styles.container, style]}>
       <View style={styles.header}>
         <Text style={styles.symbol}>
           {token.symbol}
@@ -84,15 +76,11 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     minHeight: 90,
-    width: '45%',
-    maxWidth: 150,
+    width: 180,
     backgroundColor: theme.colors.gray,
     padding: 10,
     borderWidth: 0.9,
     borderColor: theme.colors.gray
-  },
-  selected: {
-    borderColor: theme.colors.primary
   },
   header: {
     width: '100%',

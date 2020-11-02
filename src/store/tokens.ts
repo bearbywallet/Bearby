@@ -13,10 +13,6 @@ import { ZILLIQA, NIL_ADDRESS } from '../config';
 const [mainnet, testnet, privatenet] = Object.keys(ZILLIQA);
 const TokenDomain = createDomain();
 
-/**
- * mehods.
- */
-export const selectToken = TokenDomain.event<number>();
 
 const identities: Token[] = [
   {
@@ -79,19 +75,11 @@ const identities: Token[] = [
   }
 ];
 const initalState = {
-  identities,
-  selected: 0
+  identities
 };
 const store = TokenDomain
-  .store(initalState)
-  .on(selectToken, (state, selected) => {
-    return {
-      ...state,
-      selected
-    };
-  });
+  .store(initalState);
 
 export default {
-  store,
-  selectToken
+  store
 };
