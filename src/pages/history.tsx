@@ -20,7 +20,7 @@ export const HistoryPage = () => {
   return (
     <View style={styles.container}>
       <HomeAccount />
-      <HomeTokens />
+      {/* <HomeTokens /> */}
     </View>
   );
 };

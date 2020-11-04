@@ -13,6 +13,7 @@ import TouchID from 'react-native-touch-id';
 import { colors } from '../styles';
 import { touchIDConfig } from '../config';
 
+export const name = 'Lock';
 export const LockPage = () => {
 
   const pressHandler = React.useCallback(async(event) => {
@@ -43,3 +44,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary
   }
 });
+
+export default {
+  name,
+  component: LockPage
+};

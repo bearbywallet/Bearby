@@ -7,13 +7,19 @@
  * Copyright (c) 2020 ZilPay
  */
 import * as React from 'react';
+import { createStackNavigator } from '@react-navigation/stack';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SvgXml } from 'react-native-svg';
 
+import CreateWalletPage from 'app/pages/create-wallet';
+import GetStartedPage from 'app/pages/get-started';
+import LockPage from 'app/pages/lock';
+import RestorePage from 'app/pages/restore';
 import { HomePage } from './pages/home';
 import { BrowserPage } from './pages/browser';
 import { SettingsPage } from './pages/settings';
 import { HistoryPage } from './pages/history';
+
+import { SvgXml } from 'react-native-svg';
 
 import {
   HomeIconSVG,
@@ -23,7 +29,9 @@ import {
 } from 'app/components/svg';
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
+import { WalletContext } from './keystore';
 
+const Stack = createStackNavigator();
 const Tab = createBottomTabNavigator();
 const tabBarOptions = {
   activeTintColor: theme.colors.primary,
@@ -36,8 +44,31 @@ const tabBarOptions = {
     backgroundColor: theme.colors.gray
   }
 };
+const screens = [
+  CreateWalletPage,
+  GetStartedPage,
+  LockPage,
+  RestorePage
+];
 
-export default function Router() {
+export default function Navigator() {
+  const keystore = React.useContext(WalletContext);
+  const { isEnable, isReady } = keystore.guard;
+
+  if (!isEnable) {
+    return (
+      <Stack.Navigator initialRouteName={isReady ? 'Lock' : 'GetStarted'}>
+        {screens.map((screen, index) => (
+          <Stack.Screen
+            key={index}
+            name={screen.name}
+            component={screen.component}
+          />
+        ))}
+      </Stack.Navigator>
+    );
+  }
+
   return (
     <Tab.Navigator tabBarOptions={tabBarOptions}>
       <Tab.Screen

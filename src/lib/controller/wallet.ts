@@ -16,32 +16,33 @@ import { TokenControll } from './tokens';
 
 import { AccountTypes } from '../../config';
 
+const _storage = new MobileStorage();
+
 export class WalletControler extends Mnemonic {
-  private _storage = new MobileStorage();
-  private _guard = new GuardControler(this._storage);
-  private _network = new NetworkControll(this._storage);
-  private _account = new AccountControler(this._storage);
-  private _zilliqa = new ZilliqaControl(this._network);
-  private _token = new TokenControll(this._zilliqa, this._storage, this._network);
+  public guard = new GuardControler(_storage);
+  public network = new NetworkControll(_storage);
+  public account = new AccountControler(_storage);
+  public zilliqa = new ZilliqaControl(this.network);
+  public token = new TokenControll(this.zilliqa, _storage, this.network);
 
   public async initWallet(password: string, mnemonic: string) {
-    await this._network.sync();
-    await this._guard.setupWallet(password, mnemonic);
+    await this.network.sync();
+    await this.guard.setupWallet(password, mnemonic);
     const keyPairs = await this.getKeyPair(mnemonic);
-    const account = this._account.fromKeyPairs(
+    const account = this.account.fromKeyPairs(
       keyPairs,
       AccountTypes.Seed
     );
-    await this._account.reset();
-    await this._account.add(account);
+    await this.account.reset();
+    await this.account.add(account);
   }
 
   public unlockWallet(password: string) {
-    return this._guard.unlock(password);
+    return this.guard.unlock(password);
   }
 
   public async sync() {
-    await this._network.sync();
-    await this._guard.sync();
+    await this.network.sync();
+    await this.guard.sync();
   }
 }

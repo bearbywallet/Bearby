@@ -9,12 +9,13 @@
 import React from 'react';
 import { SafeAreaView, Button, StyleSheet, Text } from 'react-native';
 
-import { WalletControler } from '../lib/controller';
+import { WalletControler } from 'app/lib/controller';
 
-import { colors } from '../styles';
+import { colors } from 'app/styles';
 
 const wallet = new WalletControler();
 
+export const name = 'Create';
 export const CreateWalletPage = () => {
   const [mnemonic, setMnemonic] = React.useState<string>('');
 
@@ -51,3 +52,8 @@ const styles = StyleSheet.create({
     padding: 20
   }
 });
+
+export default {
+  name,
+  component: CreateWalletPage
+};

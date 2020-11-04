@@ -11,6 +11,7 @@ import { View, StyleSheet } from 'react-native';
 
 import { colors } from '../styles';
 
+export const name = 'Restore';
 export const RestorePage = () => {
 
   return (
@@ -24,3 +25,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary
   }
 });
+
+export default {
+  name,
+  component: RestorePage
+};

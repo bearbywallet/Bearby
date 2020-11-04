@@ -11,7 +11,8 @@ import { View, StyleSheet } from 'react-native';
 
 import { colors } from '../styles';
 
-export const GetStartedpage = () => {
+export const name = 'GetStarted';
+export const GetStartedPage = () => {
 
   return (
     <View style={styles.container} />
@@ -24,3 +25,8 @@ const styles = StyleSheet.create({
     backgroundColor: colors.secondary
   }
 });
+
+export default {
+  name,
+  component: GetStartedPage
+};

@@ -7,16 +7,21 @@
  * Copyright (c) 2020 ZilPay
  */
 import * as React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import Tabs from './tabs';
-import { theme } from './styles';
 import { StatusBar } from 'react-native';
+
+import { NavigationContainer } from '@react-navigation/native';
+
+import Routers from './router';
+import { WalletContext, wallet } from './keystore';
+import { theme } from './styles';
 
 export default function Root() {
   return (
-    <NavigationContainer theme={theme}>
-      <StatusBar barStyle="light-content"/>
-      <Tabs />
-    </NavigationContainer>
+    <WalletContext.Provider value={wallet}>
+      <NavigationContainer theme={theme}>
+        <StatusBar barStyle="light-content"/>
+        <Routers />
+      </NavigationContainer>
+    </WalletContext.Provider>
   );
 }
