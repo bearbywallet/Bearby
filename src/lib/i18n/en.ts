@@ -14,5 +14,12 @@ export default {
   browser: 'Browser',
   settings: 'Settings',
   send: 'Send',
-  receive: 'Receive'
+  receive: 'Receive',
+  get_started: 'Let’s get started!',
+  get_started_title_1: 'ZilPay Wallet',
+  get_started_description_1: 'Full supporting Zilliqa and DApps interactive wallet.',
+  get_started_title_2: 'The most secure',
+  get_started_description_2: 'Protecting your data with reliable means encryption.',
+  get_started_title_3: 'The most convenient',
+  get_started_description_3: 'Easy management your Zilliqa accounts.'
 };
