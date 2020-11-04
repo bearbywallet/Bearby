@@ -23,6 +23,13 @@ export class GuardControler {
     this._storage = storage;
   }
 
+  public get self() {
+    return {
+      isEnable: _isEnable,
+      isReady: _isReady
+    };
+  }
+
   public get isEnable() {
     return _isEnable;
   }
@@ -66,5 +73,38 @@ export class GuardControler {
   public logout() {
     this._auth = undefined;
     _isEnable = false;
+  }
+
+  public async sync() {
+    if (this._auth) {
+      try {
+        await this._auth.decryptVault();
+
+        _isEnable = true;
+        _isReady = true;
+
+        return this.self;
+      } catch (err) {
+        _isEnable = false;
+        _isReady = false;
+      }
+    }
+
+    const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
+
+    try {
+      if (encrypted) {
+        const cipher = JSON.parse(String(encrypted));
+
+        this._auth = await AuthControler(undefined, cipher);
+
+        _isReady = true;
+      } else {
+        _isReady = false;
+      }
+    } catch (err) {
+      _isReady = false;
+      _isEnable = false;
+    }
   }
 }

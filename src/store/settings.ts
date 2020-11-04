@@ -8,7 +8,7 @@
  */
 import { createDomain } from 'effector';
 import { Settings } from 'types';
-import { ZILLIQA, AddressFormats } from '../config';
+import { ZILLIQA, AddressFormats } from 'app/config';
 
 const [mainnet] = Object.keys(ZILLIQA);
 const SettingsDomain = createDomain();

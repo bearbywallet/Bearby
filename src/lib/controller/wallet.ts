@@ -39,4 +39,9 @@ export class WalletControler extends Mnemonic {
   public unlockWallet(password: string) {
     return this._guard.unlock(password);
   }
+
+  public async sync() {
+    await this._network.sync();
+    await this._guard.sync();
+  }
 }
