@@ -8,7 +8,7 @@
  */
 import * as React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import Router from './router';
+import Tabs from './tabs';
 import { theme } from './styles';
 import { StatusBar } from 'react-native';
 
@@ -16,7 +16,7 @@ export default function Root() {
   return (
     <NavigationContainer theme={theme}>
       <StatusBar barStyle="light-content"/>
-      <Router />
+      <Tabs />
     </NavigationContainer>
   );
 }
