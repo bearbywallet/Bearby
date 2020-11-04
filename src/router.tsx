@@ -53,11 +53,23 @@ const screens = [
 
 export default function Navigator() {
   const keystore = React.useContext(WalletContext);
-  const { isEnable, isReady } = keystore.guard;
 
-  if (!isEnable) {
+  const initialRouteName = React.useMemo(() => {
+    const { isEnable } = keystore.guard;
+
+    if (!isEnable) {
+      return GetStartedPage.name;
+    }
+
+    return LockPage.name;
+  }, [keystore]);
+
+  if (!keystore.guard.isEnable) {
     return (
-      <Stack.Navigator initialRouteName={isReady ? 'Lock' : 'GetStarted'}>
+      <Stack.Navigator
+        headerMode={'none'}
+        initialRouteName={initialRouteName}
+      >
         {screens.map((screen, index) => (
           <Stack.Screen
             key={index}
