@@ -9,13 +9,18 @@
 import { createDomain } from 'effector';
 import { WalletControler } from 'app/lib/controller';
 
-const KeystoreDomain = createDomain();
 const _wallet = new WalletControler();
-const initalState = {
-  wallet: _wallet
-};
-const store = KeystoreDomain.store(initalState);
+const KeystoreDomain = createDomain();
+
+export const toSync = KeystoreDomain
+  .effect()
+  .use(_wallet.sync);
+
+const store = KeystoreDomain
+  .store(_wallet)
+  .on(toSync.done, () => _wallet);
 
 export default {
-  store
+  store,
+  toSync
 };
