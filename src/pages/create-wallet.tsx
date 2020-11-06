@@ -15,7 +15,6 @@ import { colors } from 'app/styles';
 
 const wallet = new WalletControler();
 
-export const name = 'Create';
 export const CreateWalletPage = () => {
   const [mnemonic, setMnemonic] = React.useState<string>('');
 
@@ -53,7 +52,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default {
-  name,
-  component: CreateWalletPage
-};
+export default CreateWalletPage;

@@ -11,7 +11,7 @@ import { View, StyleSheet } from 'react-native';
 
 import { colors } from '../styles';
 
-export const RestorePage = () => {
+export const PrivacyPage = () => {
 
   return (
     <View style={styles.container} />
@@ -25,4 +25,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default RestorePage;
+export default PrivacyPage;

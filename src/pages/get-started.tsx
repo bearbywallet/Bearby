@@ -16,13 +16,19 @@ import {
   Dimensions,
   Button
 } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
+import { RootStackParamList } from 'app/router';
 
 import GetStartedFirst from 'app/assets/get_started_1.svg';
 import GetStartedSecond from 'app/assets/get_started_2.svg';
 import GetStartedThird from 'app/assets/get_started_3.svg';
+
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, 'GetStarted'>;
+};
 
 const { width, height } = Dimensions.get('window');
 const pages = [
@@ -43,8 +49,7 @@ const pages = [
   }
 ];
 
-export const name = 'GetStarted';
-export const GetStartedPage = () => {
+export const GetStartedPage: React.FC<Props> = ({ navigation }) => {
   const [sliderState, setSliderState] = React.useState({ currentPage: 0 });
 
   const setSliderPage = React.useCallback((event) => {
@@ -104,7 +109,7 @@ export const GetStartedPage = () => {
         <Button
           title={i18n.t('get_started')}
           color={theme.colors.primary}
-          onPress={() => null}
+          onPress={() => navigation.push('Privacy')}
         />
       </SafeAreaView>
     </View>
@@ -167,7 +172,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default {
-  name,
-  component: GetStartedPage
-};
+export default GetStartedPage;
