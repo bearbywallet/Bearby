@@ -58,5 +58,8 @@ export default {
   privacy_30: 'To comply with law',
   privacy_31: 'All data that you own (private key, initial phrase) is available only to you, only you can manage your account. If you forget your password or seed phrase words, you will lose your money.',
   privacy_32: 'Warning of liability',
-  privacy_33: 'We accept no liability for the loss of your finances. Also, if someone wants to receive your data such as (initial passphrase or private keys), do not in any case pass this information to third parties.'
+  privacy_33: 'We accept no liability for the loss of your finances. Also, if someone wants to receive your data such as (initial passphrase or private keys), do not in any case pass this information to third parties.',
+  create_sub: 'Create or Import your Zilliqa account',
+  create: 'Create',
+  restore: 'Restore'
 };

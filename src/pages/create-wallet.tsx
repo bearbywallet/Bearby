@@ -7,36 +7,56 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { SafeAreaView, Button, StyleSheet, Text } from 'react-native';
+import {
+  SafeAreaView,
+  Button,
+  StyleSheet,
+  Dimensions,
+  Text,
+  View
+} from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
-import { WalletControler } from 'app/lib/controller';
+import i18n from 'app/lib/i18n';
+import { theme } from 'app/styles';
+import { RootStackParamList } from 'app/router';
 
-import { colors } from 'app/styles';
+import CreateBackground from 'app/assets/get_started_1.svg';
 
-const wallet = new WalletControler();
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, 'Create'>;
+};
 
-export const CreateWalletPage = () => {
-  const [mnemonic, setMnemonic] = React.useState<string>('');
-
-  const generateSeed = React.useCallback(async() => {
-    const mnemonicPhrase = await wallet.generateMnemonic();
-
-    setMnemonic(mnemonicPhrase);
-  }, [mnemonic, setMnemonic]);
-
-  React.useEffect(() => {
-    generateSeed();
-  }, []);
-
+const { width } = Dimensions.get('window');
+export const CreateWalletPage: React.FC<Props> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
-      <Button
-        title="generate"
-        onPress={generateSeed}
-      />
-      <Text style={styles.mnemonic}>
-        {mnemonic}
-      </Text>
+      <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
+        <CreateBackground
+          width={width + width / 2}
+          height={width + width / 2}
+        />
+      </View>
+      <View style={styles.pageContainer}>
+        <Text style={styles.title}>
+          {i18n.t('get_started')}
+        </Text>
+        <Text style={styles.subTitle}>
+          {i18n.t('create_sub')}
+        </Text>
+        <View style={styles.buttons}>
+          <Button
+            title={i18n.t('create')}
+            color={theme.colors.primary}
+            onPress={() => navigation.push('Create')}
+          />
+          <Button
+            title={i18n.t('restore')}
+            color={theme.colors.primary}
+            onPress={() => navigation.push('Restore')}
+          />
+        </View>
+      </View>
     </SafeAreaView>
   );
 };
@@ -44,11 +64,34 @@ export const CreateWalletPage = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary
+    backgroundColor: theme.colors.black
   },
-  mnemonic: {
-    color: colors.info,
-    padding: 20
+  backgroundImage: {
+    justifyContent: 'center',
+    alignItems: 'center'
+  },
+  pageContainer: {
+    justifyContent: 'flex-end',
+    alignItems: 'center',
+    height: '100%',
+    paddingBottom: 100
+  },
+  title: {
+    fontWeight: 'bold',
+    color: theme.colors.white,
+    lineHeight: 41,
+    fontSize: 34
+  },
+  subTitle: {
+    color: theme.colors.white,
+    lineHeight: 22,
+    fontSize: 17
+  },
+  buttons: {
+    flexDirection: 'row',
+    justifyContent: 'space-evenly',
+    marginTop: 72,
+    minWidth: '100%'
   }
 });
 
