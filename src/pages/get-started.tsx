@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
   },
   slideContainer: {
     alignItems: 'center',
-    marginTop: 100
+    marginTop: 50
   },
   wrapper: {
     justifyContent: 'center',

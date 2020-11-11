@@ -16,6 +16,8 @@ import RestorePage from 'app/pages/restore';
 import PrivacyPage from 'app/pages/privacy';
 
 import { WalletContext } from './keystore';
+import { theme } from './styles';
+import i18n from 'app/lib/i18n';
 
 export type RootStackParamList = {
   GetStarted: undefined;
@@ -40,22 +42,37 @@ export default function Navigator() {
     return 'Lock';
   }, [keystore]);
 
+  const HanldeRoute = React.useCallback(({ route, navigation }) => {
+    return {
+      headerShown: true,
+      gestureEnabled: true,
+      cardOverlayEnabled: true,
+      headerTintColor: theme.colors.white,
+      headerStyle: {
+        backgroundColor: theme.colors.black
+      }
+    };
+  }, []);
   return (
     <Stack.Navigator
-      headerMode={'none'}
+      headerMode={'screen'}
       initialRouteName={initialRouteName}
+      screenOptions={HanldeRoute}
     >
       <Stack.Screen
         name={'GetStarted'}
         component={GetStartedPage}
+        options={{ title: '' }}
       />
       <Stack.Screen
         name={'Privacy'}
         component={PrivacyPage}
+        options={{ title: i18n.t('privacy_title') }}
       />
       <Stack.Screen
         name={'Create'}
         component={CreateWalletPage}
+        options={{ title: '' }}
       />
       <Stack.Screen
         name={'Lock'}
@@ -64,6 +81,7 @@ export default function Navigator() {
       <Stack.Screen
         name={'Restore'}
         component={RestorePage}
+        options={{ title: '' }}
       />
     </Stack.Navigator>
   );

@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootStackParamList } from 'app/router';
@@ -28,9 +27,6 @@ type Prop = {
 export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>
-        {i18n.t('privacy_title')}
-      </Text>
       <Text style={styles.sub}>
         {i18n.t('privacy_sub')}
       </Text>
@@ -142,13 +138,6 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.black,
     alignItems: 'center'
-  },
-  header: {
-    fontWeight: 'bold',
-    fontSize: 20,
-    lineHeight: 60,
-    color: theme.colors.white,
-    marginTop: 40
   },
   sub: {
     color: theme.colors.white,

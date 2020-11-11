@@ -2,7 +2,6 @@
   "compilerOptions": {
     "rootDir": ".",
     "paths": {
-      "@components/*": ["src/components/*"],
       "app/*": ["src/*"]
     },
     "baseUrl": ".",
@@ -19,7 +18,7 @@
     "experimentalDecorators": true,
     "removeComments": true
   },
-  "include": ["src/components", "types/*"],
+  "include": ["types/*"],
   "exclude": [
     "node_modules", "babel.config.js", "metro.config.js", "jest.config.js"
   ]
