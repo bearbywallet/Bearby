@@ -12,13 +12,30 @@ import {
   StyleSheet,
   Text,
   Button,
-  TextInput
+  TextInput,
+  NativeSyntheticEvent,
+  TextInputTextInputEventData
 } from 'react-native';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
+import { Mnemonic } from 'app/lib/controller/mnemonic';
 
 export const RestorePage = () => {
+  const [disabled, setDisabled] = React.useState(true);
+  const [phrase, setphrase] = React.useState<string>('');
+
+  const hanldeChange = React.useCallback(async(value) => {
+    const mnemonic = new Mnemonic();
+    const isValid = await mnemonic.validateMnemonic(value);
+
+    setDisabled(!isValid);
+    setphrase(value);
+  }, [setDisabled, setphrase]);
+  const hanldecreateWallet = React.useCallback(async() => {
+    const mnemonic = new Mnemonic();
+    await mnemonic.validateMnemonic(phrase);
+  }, [phrase]);
 
   return (
     <View style={styles.container}>
@@ -30,12 +47,16 @@ export const RestorePage = () => {
           multiline={true}
           numberOfLines={10}
           style={styles.text}
+          placeholder={i18n.t('restore_placeholder')}
+          placeholderTextColor="#2B2E33"
+          onChangeText={hanldeChange}
         />
       </View>
       <Button
         title={i18n.t('restore_btn')}
         color={theme.colors.primary}
-        onPress={() => null}
+        disabled={disabled}
+        onPress={hanldecreateWallet}
       />
     </View>
   );
@@ -62,12 +83,12 @@ const styles = StyleSheet.create({
   text: {
     marginTop: 60,
     height: 300,
-    borderColor: 'gray',
+    borderColor: '#2B2E33',
     borderWidth: 1,
     borderRadius: 8,
     color: theme.colors.white,
     padding: 20,
-    fontSize: 17
+    fontSize: 23
   }
 });
 

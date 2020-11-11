@@ -18,6 +18,7 @@ export default {
   receive: 'Receive',
   restore_title: 'Restore wallet',
   restore_btn: 'Continue',
+  restore_placeholder: 'Write your secret phrase',
   accept: 'Accept',
   get_started: 'Let’s get started!',
   get_started_title_1: 'ZilPay Wallet',
