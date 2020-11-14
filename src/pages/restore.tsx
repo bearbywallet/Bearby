@@ -40,7 +40,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
     navigation.push('SetupPassword', {
       phrase
     });
-  }, [phrase]);
+  }, [phrase, navigation]);
 
   return (
     <View style={styles.container}>

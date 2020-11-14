@@ -26,6 +26,7 @@ export default {
   verify_title: 'Verify',
   verify_btn: 'Continue',
   verify_sub_title: 'Tap on words to build your secret phrase.',
+  password_title: 'Account setup',
   accept: 'Accept',
   get_started: 'Let’s get started!',
   get_started_title_1: 'ZilPay Wallet',
