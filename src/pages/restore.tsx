@@ -14,12 +14,18 @@ import {
   Button,
   TextInput
 } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
+import { RootStackParamList } from 'app/router';
 
-export const RestorePage = () => {
+type Prop = {
+  navigation: StackNavigationProp<RootStackParamList, 'SetupPassword'>;
+};
+
+export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const [disabled, setDisabled] = React.useState(true);
   const [phrase, setphrase] = React.useState<string>('');
 
@@ -30,9 +36,10 @@ export const RestorePage = () => {
     setDisabled(!isValid);
     setphrase(value);
   }, [setDisabled, setphrase]);
-  const hanldecreateWallet = React.useCallback(async() => {
-    const mnemonic = new Mnemonic();
-    await mnemonic.validateMnemonic(phrase);
+  const hanldecreateWallet = React.useCallback(() => {
+    navigation.push('SetupPassword', {
+      phrase
+    });
   }, [phrase]);
 
   return (

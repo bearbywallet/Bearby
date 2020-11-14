@@ -47,14 +47,20 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
 
     setSelectedWords(new Set(selectedWords));
     setShuffledWords(new Set(shuffledWords));
-  }, [setSelectedWords]);
+  }, [setShuffledWords, setSelectedWords]);
   const handleSelect = React.useCallback((word) => {
     selectedWords.add(word);
     shuffledWords.delete(word);
 
     setShuffledWords(new Set(shuffledWords));
     setSelectedWords(new Set(selectedWords));
-  }, [selectedWords, shuffledWords, setShuffledWords, setSelectedWords]);
+  }, [setShuffledWords, setSelectedWords]);
+  const hanldeContinue = React.useCallback(() => {
+    navigation.push(
+      'SetupPassword',
+      { phrase: route.params.phrase }
+    );
+  }, [navigation, route]);
 
   return (
     <View style={styles.container}>
@@ -92,7 +98,7 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
           title={i18n.t('verify_btn')}
           color={theme.colors.primary}
           disabled={!buttonDisabled}
-          onPress={() => null}
+          onPress={hanldeContinue}
         />
       </View>
     </View>
