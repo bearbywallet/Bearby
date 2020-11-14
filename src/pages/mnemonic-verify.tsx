@@ -20,7 +20,7 @@ import { Chip } from 'app/components/chip';
 
 import { RootStackParamList } from 'app/router';
 import { theme } from 'app/styles';
-import { splitByChunk, shuffle } from 'app/utils';
+import { shuffle } from 'app/utils';
 import i18n from 'app/lib/i18n';
 
 type Prop = {
@@ -29,12 +29,32 @@ type Prop = {
 };
 
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
-  // const [words, setWords] = React.useReducer<string[]>();
-
-  const shufflePhrase = React.useMemo(
-    () => shuffle(route.params.phrase.split(' ')),
-    [route]
+  const [selectedWords, setSelectedWords] = React.useState<Set<string>>(new Set());
+  const [shuffledWords, setShuffledWords] = React.useState(
+    new Set(shuffle(route.params.phrase.split(' ')))
   );
+
+  const buttonDisabled = React.useMemo(() => {
+    const words = Array.from(selectedWords).join(' ');
+    const trueWords = route.params.phrase;
+
+    return words === trueWords;
+  }, [selectedWords, route]);
+
+  const handleRemove = React.useCallback((word) => {
+    selectedWords.delete(word);
+    shuffledWords.add(word);
+
+    setSelectedWords(new Set(selectedWords));
+    setShuffledWords(new Set(shuffledWords));
+  }, [setSelectedWords]);
+  const handleSelect = React.useCallback((word) => {
+    selectedWords.add(word);
+    shuffledWords.delete(word);
+
+    setShuffledWords(new Set(shuffledWords));
+    setSelectedWords(new Set(selectedWords));
+  }, [selectedWords, shuffledWords, setShuffledWords, setSelectedWords]);
 
   return (
     <View style={styles.container}>
@@ -42,18 +62,23 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
         {i18n.t('verify_title')}
       </Text>
       <View style={styles.verified}>
-        <Chip count="2">
-          sadsad
-        </Chip>
-        <Chip count="2">
-          sadsad
-        </Chip>
-      </View>
-      <View style={styles.randoms}>
-        {shufflePhrase.map((word, index) => (
+        {Array.from(selectedWords).map((word, index) => (
           <Chip
             key={index}
             style={styles.defaultChip}
+            count={index + 1}
+            onPress={() => handleRemove(word)}
+          >
+            {word}
+          </Chip>
+        ))}
+      </View>
+      <View style={styles.randoms}>
+        {Array.from(shuffledWords).map((word, index) => (
+          <Chip
+            key={index}
+            style={styles.defaultChip}
+            onPress={() => handleSelect(word)}
           >
             {word}
           </Chip>
@@ -66,6 +91,7 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
         <Button
           title={i18n.t('verify_btn')}
           color={theme.colors.primary}
+          disabled={!buttonDisabled}
           onPress={() => null}
         />
       </View>
@@ -91,13 +117,15 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#8A8A8F',
     lineHeight: 21,
-    fontSize: 16
+    fontSize: 16,
+    marginVertical: 50
   },
   verified: {
     flexDirection: 'row',
     paddingHorizontal: 30,
     flexWrap: 'wrap',
-    justifyContent: 'space-around'
+    justifyContent: 'space-between',
+    marginVertical: 100
   },
   randoms: {
     flexDirection: 'row',
@@ -108,7 +136,7 @@ const styles = StyleSheet.create({
     marginTop: 100
   },
   defaultChip: {
-    margin: 10
+    margin: 8
   }
 });
 

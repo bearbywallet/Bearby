@@ -44,7 +44,8 @@ const styles = StyleSheet.create({
     padding: 8,
     backgroundColor: theme.colors.gray,
     borderRadius: 10,
-    flexDirection: 'row'
+    flexDirection: 'row',
+    minWidth: 100
   },
   count: {
     color: '#666666',

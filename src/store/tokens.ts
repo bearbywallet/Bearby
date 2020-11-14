@@ -12,8 +12,6 @@ import { ZILLIQA, NIL_ADDRESS } from '../config';
 
 const [mainnet, testnet, privatenet] = Object.keys(ZILLIQA);
 const TokenDomain = createDomain();
-
-
 const identities: Token[] = [
   {
     address: {
