@@ -28,7 +28,9 @@ export type RootStackParamList = {
   Lock: undefined;
   Restore: undefined;
   Mnemonic: undefined;
-  MnemonicVerif: undefined;
+  MnemonicVerif: {
+    phrase: string
+  };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();

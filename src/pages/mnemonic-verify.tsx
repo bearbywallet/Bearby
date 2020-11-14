@@ -14,27 +14,50 @@ import {
   Button
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 
 import { Chip } from 'app/components/chip';
 
 import { RootStackParamList } from 'app/router';
 import { theme } from 'app/styles';
+import { splitByChunk, shuffle } from 'app/utils';
 import i18n from 'app/lib/i18n';
 
 type Prop = {
   navigation: StackNavigationProp<RootStackParamList, 'MnemonicVerif'>;
+  route: RouteProp<RootStackParamList, 'MnemonicVerif'>;
 };
 
-export const MnemonicVerifypage: React.FC<Prop> = ({ navigation }) => {
+export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
+  // const [words, setWords] = React.useReducer<string[]>();
+
+  const shufflePhrase = React.useMemo(
+    () => shuffle(route.params.phrase.split(' ')),
+    [route]
+  );
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>
         {i18n.t('verify_title')}
       </Text>
-      <View>
-        <Chip>
+      <View style={styles.verified}>
+        <Chip count="2">
           sadsad
         </Chip>
+        <Chip count="2">
+          sadsad
+        </Chip>
+      </View>
+      <View style={styles.randoms}>
+        {shufflePhrase.map((word, index) => (
+          <Chip
+            key={index}
+            style={styles.defaultChip}
+          >
+            {word}
+          </Chip>
+        ))}
       </View>
       <View>
         <Text style={styles.subTitle}>
@@ -53,6 +76,7 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    height: '100%',
     backgroundColor: theme.colors.black
   },
   title: {
@@ -67,7 +91,24 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     color: '#8A8A8F',
     lineHeight: 21,
-    fontSize: 16,
+    fontSize: 16
+  },
+  verified: {
+    flexDirection: 'row',
+    paddingHorizontal: 30,
+    flexWrap: 'wrap',
+    justifyContent: 'space-around'
+  },
+  randoms: {
+    flexDirection: 'row',
+    paddingHorizontal: 30,
+    flexWrap: 'wrap',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginTop: 100
+  },
+  defaultChip: {
+    margin: 10
   }
 });
 

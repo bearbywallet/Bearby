@@ -88,7 +88,7 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
         <Button
           title={i18n.t('mnemonic_btn1')}
           color={theme.colors.primary}
-          onPress={() => navigation.push('MnemonicVerif')}
+          onPress={() => navigation.push('MnemonicVerif', { phrase })}
         />
       </View>
     </View>

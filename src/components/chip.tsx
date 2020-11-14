@@ -10,20 +10,26 @@ import React from 'react';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  ViewStyle
 } from 'react-native';
 import { theme } from 'app/styles';
 
 type Prop = {
-  index?: number;
+  count?: number | string;
+  style?: ViewStyle;
+  onPress?: () => void;
 };
 
-export const Chip: React.FC<Prop> = ({ children, index }) => {
+export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
   return (
-    <View style={styles.container}>
-      {index && !isNaN(index) ? (
-        <Text>
-          {index}
+    <View
+      style={[styles.container, style]}
+      onTouchEnd={onPress}
+    >
+      {count && !isNaN(Number(count)) ? (
+        <Text style={styles.count}>
+          {count}
         </Text>
       ) : null}
       <Text style={styles.text}>
@@ -35,8 +41,20 @@ export const Chip: React.FC<Prop> = ({ children, index }) => {
 
 const styles = StyleSheet.create({
   container: {
+    padding: 8,
+    backgroundColor: theme.colors.gray,
+    borderRadius: 10,
+    flexDirection: 'row'
+  },
+  count: {
+    color: '#666666',
+    fontSize: 16,
+    lineHeight: 18
   },
   text: {
-    color: theme.colors.white
+    color: theme.colors.white,
+    fontSize: 16,
+    lineHeight: 18,
+    marginLeft: 4
   }
 });
