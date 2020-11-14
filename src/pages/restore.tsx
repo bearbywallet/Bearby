@@ -12,9 +12,7 @@ import {
   StyleSheet,
   Text,
   Button,
-  TextInput,
-  NativeSyntheticEvent,
-  TextInputTextInputEventData
+  TextInput
 } from 'react-native';
 
 import { theme } from 'app/styles';

@@ -48,7 +48,7 @@ export const CreateWalletPage: React.FC<Props> = ({ navigation }) => {
           <Button
             title={i18n.t('create')}
             color={theme.colors.primary}
-            onPress={() => navigation.push('Create')}
+            onPress={() => navigation.push('Mnemonic')}
           />
           <Button
             title={i18n.t('restore')}

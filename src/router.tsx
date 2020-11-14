@@ -14,6 +14,7 @@ import GetStartedPage from 'app/pages/get-started';
 import LockPage from 'app/pages/lock';
 import RestorePage from 'app/pages/restore';
 import PrivacyPage from 'app/pages/privacy';
+import MnemonicGenPage from 'app/pages/mnemonic-gen';
 
 import { WalletContext } from './keystore';
 import { theme } from './styles';
@@ -25,6 +26,7 @@ export type RootStackParamList = {
   Create: undefined;
   Lock: undefined;
   Restore: undefined;
+  Mnemonic: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -81,6 +83,11 @@ export default function Navigator() {
       <Stack.Screen
         name={'Restore'}
         component={RestorePage}
+        options={{ title: '' }}
+      />
+      <Stack.Screen
+        name={'Mnemonic'}
+        component={MnemonicGenPage}
         options={{ title: '' }}
       />
     </Stack.Navigator>
