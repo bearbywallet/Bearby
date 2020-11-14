@@ -15,6 +15,7 @@ import LockPage from 'app/pages/lock';
 import RestorePage from 'app/pages/restore';
 import PrivacyPage from 'app/pages/privacy';
 import MnemonicGenPage from 'app/pages/mnemonic-gen';
+import MnemonicVerifypage from 'app/pages/mnemonic-verify';
 
 import { WalletContext } from './keystore';
 import { theme } from './styles';
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   Lock: undefined;
   Restore: undefined;
   Mnemonic: undefined;
+  MnemonicVerif: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -55,6 +57,7 @@ export default function Navigator() {
       }
     };
   }, []);
+
   return (
     <Stack.Navigator
       headerMode={'screen'}
@@ -88,6 +91,11 @@ export default function Navigator() {
       <Stack.Screen
         name={'Mnemonic'}
         component={MnemonicGenPage}
+        options={{ title: '' }}
+      />
+      <Stack.Screen
+        name={'MnemonicVerif'}
+        component={MnemonicVerifypage}
         options={{ title: '' }}
       />
     </Stack.Navigator>
