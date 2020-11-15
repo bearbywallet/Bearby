@@ -24,6 +24,7 @@ import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from 'app/router';
+import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
 
 type Prop = {
   navigation: StackNavigationProp<RootStackParamList, 'SetupPassword'>;
@@ -32,6 +33,21 @@ type Prop = {
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [mnemonicPhrase] = React.useState(route.params.phrase);
+  const [accountName, setAccountName] = React.useState('');
+  const [password, setpassword] = React.useState(null);
+  const [passwordConfirm, setPasswordConfirm] = React.useState(null);
+
+  const disabledContinue = React.useMemo(() => {
+    if (!passwordConfirm || !password) {
+      return true;
+    }
+
+    const isConfirmed = passwordConfirm === password;
+    const isDifficulty = String(password).length < PASSWORD_DIFFICULTY;
+    const isName = String(accountName).length > MAX_NAME_DIFFICULTY;
+
+    return !isConfirmed || isDifficulty || isName;
+  }, [password, passwordConfirm, accountName]);
 
   return (
     <View style={styles.container}>
@@ -79,6 +95,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       <Button
         title={i18n.t('pass_setup_btn')}
         color={theme.colors.primary}
+        disabled={disabledContinue}
         onPress={() => null}
       />
     </View>

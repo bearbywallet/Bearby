@@ -19,6 +19,8 @@ export const FIAT_ORDERS = {
 
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
+export const PASSWORD_DIFFICULTY = 6;
+export const MAX_NAME_DIFFICULTY = 10;
 
 export const ZILLIQA: ZilliqaNetwork = {
   mainnet: {
