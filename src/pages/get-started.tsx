@@ -16,40 +16,39 @@ import {
   Dimensions,
   Button
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { RootStackParamList } from 'app/router';
 
 import GetStartedFirst from 'app/assets/get_started_1.svg';
 import GetStartedSecond from 'app/assets/get_started_2.svg';
 import GetStartedThird from 'app/assets/get_started_3.svg';
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'GetStarted'>;
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 const { width, height } = Dimensions.get('window');
 const pages = [
   {
-    img: <GetStartedFirst width={width} />,
+    img: <GetStartedFirst width={width} height={'50%'}/>,
     title: i18n.t('get_started_title_1'),
     description: i18n.t('get_started_description_1')
   },
   {
-    img: <GetStartedSecond width={width} />,
+    img: <GetStartedSecond width={width} height={'50%'} />,
     title: i18n.t('get_started_title_2'),
     description: i18n.t('get_started_description_2')
   },
   {
-    img: <GetStartedThird width={width} />,
+    img: <GetStartedThird width={width} height={'50%'} />,
     title: i18n.t('get_started_title_3'),
     description: i18n.t('get_started_description_3')
   }
 ];
 
-export const GetStartedPage: React.FC<Props> = ({ navigation }) => {
+export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
   const [sliderState, setSliderState] = React.useState({ currentPage: 0 });
 
   const setSliderPage = React.useCallback((event) => {
@@ -109,7 +108,7 @@ export const GetStartedPage: React.FC<Props> = ({ navigation }) => {
         <Button
           title={i18n.t('get_started')}
           color={theme.colors.primary}
-          onPress={() => navigation.push('Privacy')}
+          onPress={() => navigation.navigate('Privacy')}
         />
       </SafeAreaView>
     </View>
@@ -119,7 +118,8 @@ export const GetStartedPage: React.FC<Props> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.black
+    backgroundColor: theme.colors.black,
+    paddingVertical: 30
   },
   safeArea: {
     flex: 2
@@ -128,13 +128,12 @@ const styles = StyleSheet.create({
     flex: 1
   },
   slideContainer: {
-    alignItems: 'center',
-    marginTop: 50
+    alignItems: 'center'
   },
   wrapper: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginVertical: 30
+    marginVertical: 90
   },
   header: {
     fontSize: 34,
@@ -146,11 +145,12 @@ const styles = StyleSheet.create({
   paragraph: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white
+    color: theme.colors.white,
+    textAlign: 'center'
   },
   paginationWrapper: {
     position: 'absolute',
-    bottom: 200,
+    bottom: '40%',
     left: 0,
     right: 0,
     justifyContent: 'center',
