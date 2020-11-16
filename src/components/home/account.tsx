@@ -20,13 +20,12 @@ import { useStore } from 'effector-react';
 import { DropDownMenu } from 'app/components/drop-down-menu';
 import { LogoSVG } from 'app/components/svg';
 
-import { WalletContext } from 'app/keystore';
+import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 
 const { width } = Dimensions.get('window');
 export const HomeAccount: React.FC = () => {
-  const keystore = React.useContext(WalletContext);
   const accountState = useStore(keystore.account.store);
 
   return (
