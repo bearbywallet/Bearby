@@ -6,15 +6,15 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { GuardControler } from './guard';
-import { MobileStorage } from '../storage';
-import { Mnemonic } from './mnemonic';
-import { ZilliqaControl } from './zilliqa';
-import { NetworkControll } from './network';
-import { AccountControler } from './account';
-import { TokenControll } from './tokens';
+import { GuardControler } from 'app/lib/controller/guard';
+import { MobileStorage } from 'app/lib/storage';
+import { Mnemonic } from 'app/lib/controller/mnemonic';
+import { ZilliqaControl } from 'app/lib/controller/zilliqa';
+import { NetworkControll } from 'app/lib/controller/network';
+import { AccountControler } from 'app/lib/controller/account';
+import { TokenControll } from 'app/lib/controller/tokens';
 
-import { AccountTypes } from '../../config';
+import { AccountTypes } from 'app/config';
 
 const _storage = new MobileStorage();
 
@@ -38,7 +38,8 @@ export class WalletControler extends Mnemonic {
       AccountTypes.Seed,
       name
     );
-    await this.account.add(account);
+
+    return this.account.add(account);
   }
 
   public unlockWallet(password: string) {

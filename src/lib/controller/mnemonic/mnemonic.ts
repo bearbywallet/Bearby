@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { NativeModules } from 'react-native';
-import { MNEMONIC_PACH } from '../../config';
+import { MNEMONIC_PACH } from 'app/config';
 import { KeyPair } from 'types';
 
 const { Crypto } = NativeModules;

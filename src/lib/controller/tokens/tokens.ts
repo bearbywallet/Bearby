@@ -6,11 +6,11 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject } from '../storage';
-import { ZilliqaControl } from './zilliqa';
-import { NetworkControll } from './network';
+import { MobileStorage, buildObject } from 'app/lib/storage';
+import { ZilliqaControl } from 'app/lib/controller/zilliqa';
+import { NetworkControll } from 'app/lib/controller/network';
 
-import { STORAGE_FIELDS } from '../../config';
+import { STORAGE_FIELDS } from 'app/config';
 import { Token } from 'types';
 
 export class TokenControll {

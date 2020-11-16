@@ -6,12 +6,12 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject } from '../storage';
-import { STORAGE_FIELDS, AccountTypes } from '../../config';
+import { MobileStorage, buildObject } from 'app/lib/storage';
+import { STORAGE_FIELDS, AccountTypes } from 'app/config';
 import {
   getAddressFromPublicKey,
   toBech32Address
-} from '../../utils';
+} from 'app/utils';
 import { AccountState, Account, KeyPair } from 'types';
 
 export class AccountControler {

@@ -6,9 +6,9 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject } from '../storage';
-import { AuthControler, Auth } from './auth';
-import { STORAGE_FIELDS } from '../../config';
+import { MobileStorage, buildObject } from 'app/lib/storage';
+import { AuthControler, Auth } from 'app/lib/controller/auth';
+import { STORAGE_FIELDS } from 'app/config';
 
 // this property is responsible for control session.
 let _isEnable = false;

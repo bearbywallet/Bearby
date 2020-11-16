@@ -6,8 +6,8 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject } from '../storage';
-import { ZILLIQA, STORAGE_FIELDS } from '../../config';
+import { MobileStorage, buildObject } from 'app/lib/storage';
+import { ZILLIQA, STORAGE_FIELDS } from 'app/config';
 import { ZilliqaNetwork } from 'types';
 
 const defualtNetwroks = Object.keys(ZILLIQA);

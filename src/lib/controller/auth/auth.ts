@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { sha256, Encryptor, EncryptedType } from '../crypto';
+import { sha256, Encryptor, EncryptedType } from 'app/lib/crypto';
 
 export interface Auth {
   getEncrypted: () => EncryptedType;
