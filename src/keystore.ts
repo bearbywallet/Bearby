@@ -9,5 +9,4 @@
 import * as React from 'react';
 import { WalletControler } from 'app/lib/controller';
 
-export const wallet = new WalletControler();
-export const WalletContext = React.createContext(wallet);
+export const keystore = new WalletControler();
