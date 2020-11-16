@@ -20,13 +20,12 @@ import { useStore } from 'effector-react';
 
 import SettingsStore from 'app/store/settings';
 
-import { WalletContext } from 'app/keystore';
+import { keystore } from 'app/keystore';
 
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
 
 export const HomeTokens: React.FC = () => {
-  const keystore = React.useContext(WalletContext);
   const tokensState = useStore(keystore.token.store);
 
   const settingsState = useStore(SettingsStore.store);
