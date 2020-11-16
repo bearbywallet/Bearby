@@ -15,27 +15,26 @@ import {
   Button,
   StyleSheet
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 import { SvgXml } from 'react-native-svg';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
-import { RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from 'app/router';
-import { WalletContext } from 'app/keystore';
+import { keystore } from 'app/keystore';
 import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
 
+interface NavigationParams {
+  phrase: string;
+}
+
 type Prop = {
-  navigation: StackNavigationProp<RootStackParamList, 'SetupPassword'>;
-  route: RouteProp<RootStackParamList, 'SetupPassword'>;
+  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 };
 
-export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
-  const keystore = React.useContext(WalletContext);
-
-  const [mnemonicPhrase] = React.useState(route.params.phrase);
+export const SetupPasswordPage: React.FC<Prop> = ({ navigation }) => {
+  const [mnemonicPhrase] = React.useState(String(navigation.state.params?.phrase));
   const [accountName, setAccountName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
@@ -56,10 +55,14 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
    * Create Keystore and account by KeyPairs.
    */
   const handleCreate = React.useCallback(async() => {
-    await keystore.initWallet(password, mnemonicPhrase);
-    await keystore.addAccount(mnemonicPhrase, accountName);
+    try {
+      await keystore.initWallet(password, mnemonicPhrase);
+      await keystore.addAccount(mnemonicPhrase, accountName);
 
-    navigation.push('InitSuccessfully');
+      navigation.navigate('InitSuccessfully');
+    } catch (err) {
+      console.error(err);
+    }
   }, [password, mnemonicPhrase, accountName]);
 
   return (
@@ -159,7 +162,7 @@ const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 20,
     marginTop: 40,
-    marginBottom: '50%'
+    marginBottom: 60
   }
 });
 
