@@ -38,7 +38,9 @@
     "react-native-screens": "^2.11.0",
     "react-native-svg": "^12.1.0",
     "react-native-svg-transformer": "^0.14.3",
-    "react-native-touch-id": "^4.4.1"
+    "react-native-touch-id": "^4.4.1",
+    "react-navigation": "^4.4.3",
+    "react-navigation-stack": "^2.10.1"
   },
   "devDependencies": {
     "@babel/core": "^7.8.4",
