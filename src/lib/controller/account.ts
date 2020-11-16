@@ -71,7 +71,8 @@ export class AccountControler {
     accounts
       .identities
       .push(account);
-    accounts.selectedAddress = accounts.identities.length - 1;
+    accounts
+      .selectedAddress = accounts.identities.length - 1;
 
     await this.update(accounts);
 

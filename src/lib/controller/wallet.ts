@@ -28,12 +28,16 @@ export class WalletControler extends Mnemonic {
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
     await this.guard.setupWallet(password, mnemonic);
+    await this.account.reset();
+  }
+
+  public async addAccount(mnemonic: string, name: string) {
     const keyPairs = await this.getKeyPair(mnemonic);
     const account = this.account.fromKeyPairs(
       keyPairs,
-      AccountTypes.Seed
+      AccountTypes.Seed,
+      name
     );
-    await this.account.reset();
     await this.account.add(account);
   }
 

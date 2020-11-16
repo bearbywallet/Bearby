@@ -24,6 +24,7 @@ import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from 'app/router';
+import { WalletContext } from 'app/keystore';
 import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
 
 type Prop = {
@@ -32,10 +33,12 @@ type Prop = {
 };
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
+  const keystore = React.useContext(WalletContext);
+
   const [mnemonicPhrase] = React.useState(route.params.phrase);
   const [accountName, setAccountName] = React.useState('');
-  const [password, setpassword] = React.useState(null);
-  const [passwordConfirm, setPasswordConfirm] = React.useState(null);
+  const [password, setPassword] = React.useState('');
+  const [passwordConfirm, setPasswordConfirm] = React.useState('');
 
   const disabledContinue = React.useMemo(() => {
     if (!passwordConfirm || !password) {
@@ -48,6 +51,16 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 
     return !isConfirmed || isDifficulty || isName;
   }, [password, passwordConfirm, accountName]);
+
+  /**
+   * Create Keystore and account by KeyPairs.
+   */
+  const handleCreate = React.useCallback(async() => {
+    await keystore.initWallet(password, mnemonicPhrase);
+    await keystore.addAccount(mnemonicPhrase, accountName);
+
+    navigation.push('InitSuccessfully');
+  }, [password, mnemonicPhrase, accountName]);
 
   return (
     <View style={styles.container}>
@@ -62,6 +75,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
               style={styles.textInput}
               placeholder={i18n.t('pass_setup_input0')}
               placeholderTextColor="#2B2E33"
+              onChangeText={setAccountName}
             />
           </View>
           <Text style={styles.label}>
@@ -73,15 +87,19 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             <SvgXml xml={LockSVG} />
             <TextInput
               style={styles.textInput}
+              secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input1')}
               placeholderTextColor="#2B2E33"
+              onChangeText={setPassword}
             />
           </View>
           <View style={{ marginLeft: 39 }}>
             <TextInput
               style={styles.textInput}
+              secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input2')}
               placeholderTextColor="#2B2E33"
+              onChangeText={setPasswordConfirm}
             />
           </View>
           <Text style={styles.label}>
@@ -96,7 +114,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         title={i18n.t('pass_setup_btn')}
         color={theme.colors.primary}
         disabled={disabledContinue}
-        onPress={() => null}
+        onPress={handleCreate}
       />
     </View>
   );
@@ -114,6 +132,7 @@ const styles = StyleSheet.create({
     padding: 10,
     borderBottomColor: '#2B2E33',
     borderBottomWidth: 1,
+    color: theme.colors.white,
     width: '90%'
   },
   inputWrapper: {

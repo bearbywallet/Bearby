@@ -17,6 +17,8 @@ export default {
   send: 'Send',
   receive: 'Receive',
   restore_title: 'Restore wallet',
+  successfully_title: 'Your wallet was successfully created!',
+  successfully_btn: 'OK',
   restore_btn: 'Continue',
   pass_setup_btn: 'Continue',
   pass_setup_input0: 'Name of account',
