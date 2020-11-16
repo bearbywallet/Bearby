@@ -6,13 +6,18 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain } from 'effector';
+import { createDomain, createEvent } from 'effector';
 import { AccountState } from 'types';
+
+export const accountStoreUpdate = createEvent<AccountState>();
+export const accountStoreReset = createEvent();
 
 const AccountDomain = createDomain();
 const initalState: AccountState = {
   identities: [],
   selectedAddress: 0
 };
-export const store = AccountDomain
-  .store<AccountState>(initalState);
+export const accountStore = AccountDomain
+  .store<AccountState>(initalState)
+  .on(accountStoreUpdate, (_, payload) => payload)
+  .reset(accountStoreReset);

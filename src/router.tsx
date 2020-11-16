@@ -58,7 +58,7 @@ export default function Navigator() {
 
   const HanldeRoute = React.useCallback(({ route, navigation }) => {
     return {
-      headerShown: true,
+      headerShown: false,
       gestureEnabled: true,
       cardOverlayEnabled: true,
       headerTintColor: theme.colors.white,

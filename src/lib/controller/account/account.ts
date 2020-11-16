@@ -12,11 +12,11 @@ import {
   getAddressFromPublicKey,
   toBech32Address
 } from 'app/utils';
-import { store } from './sate';
+import { accountStore, accountStoreReset, accountStoreUpdate } from './sate';
 import { AccountState, Account, KeyPair } from 'types';
 
 export class AccountControler {
-  public store = store;
+  public store = accountStore;
   private _storage: MobileStorage;
 
   constructor(storage: MobileStorage) {
@@ -58,10 +58,14 @@ export class AccountControler {
       selectedAddress: -1
     };
 
+    accountStoreReset();
+
     return this.update(accountsState);
   }
 
   public update(accountState: AccountState): Promise<void> {
+    accountStoreUpdate(accountState);
+
     return this._storage.set(
       buildObject(STORAGE_FIELDS.ACCOUNTS, accountState)
     );

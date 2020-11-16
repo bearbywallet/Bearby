@@ -13,3 +13,4 @@ export * from './browser';
 export * from './settings';
 export * from './lock';
 export * from './profile';
+export * from './arrow';

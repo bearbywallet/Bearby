@@ -11,29 +11,46 @@ import {
   View,
   StyleSheet,
   Text,
-  Button
+  Button,
+  Dimensions
 } from 'react-native';
-import { LogoSVG } from '../svg';
 import { SvgXml } from 'react-native-svg';
+import { useStore } from 'effector-react';
+
+import { DropDownMenu } from 'app/components/drop-down-menu';
+import { LogoSVG } from 'app/components/svg';
+
+import { WalletContext } from 'app/keystore';
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 
-export const HomeAccount = () => {
+const { width } = Dimensions.get('window');
+export const HomeAccount: React.FC = () => {
+  const keystore = React.useContext(WalletContext);
+  const accountState = useStore(keystore.account.store);
+
   return (
     <View style={styles.container}>
       <SvgXml
         xml={LogoSVG}
-        viewBox="50 0 300 200"
+        width={width}
+        viewBox="50 0 320 220"
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <View>
-          <Text style={styles.accountName}>
-            0
+        <DropDownMenu>
+          Account 0
+        </DropDownMenu>
+        <View style={styles.amountWrapper}>
+          <Text style={styles.amount}>
+            25,040
+            <Text style={styles.symbol}>
+              ZIL
+            </Text>
+          </Text>
+          <Text style={styles.convertedAmount}>
+            $ 105,250
           </Text>
         </View>
-        <Text style={styles.accountName}>
-          0
-        </Text>
         <View style={styles.buttons}>
           <Button
             color={theme.colors.primary}
@@ -55,20 +72,34 @@ export const HomeAccount = () => {
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: '30%',
+    height: 300,
     alignItems: 'center',
     justifyContent: 'center'
   },
   content: {
+    top: 0,
     alignItems: 'center',
-    justifyContent: 'space-around',
-    marginTop: 40
+    justifyContent: 'space-between',
+    paddingBottom: 15,
+    paddingTop: 50
   },
-  accountName: {
-    color: theme.colors.white
+  amountWrapper: {
+    alignItems: 'center',
+    // minHeight: 50
   },
   amount: {
+    color: theme.colors.white,
+    fontSize: 44,
+    fontWeight: 'bold'
+  },
+  symbol: {
+    fontSize: 17,
+    fontWeight: 'normal',
     color: theme.colors.white
+  },
+  convertedAmount: {
+    color: '#8A8A8F',
+    fontSize: 13
   },
   buttons: {
     flexDirection: 'row',
