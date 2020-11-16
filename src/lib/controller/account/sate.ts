@@ -6,22 +6,13 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { makeObservable, observable, computed } from 'mobx';
-import { Account } from 'types';
+import { createDomain } from 'effector';
+import { AccountState } from 'types';
 
-export class AccountsStore {
-  @observable
-  public identities: Account[] = [];
-
-  @observable
-  public selectedAddress = 0;
-
-  constructor() {
-      makeObservable(this);
-  }
-
-  @computed
-  get account() {
-    return this.identities[this.selectedAddress];
-  }
-}
+const AccountDomain = createDomain();
+const initalState: AccountState = {
+  identities: [],
+  selectedAddress: 0
+};
+export const store = AccountDomain
+  .store<AccountState>(initalState);

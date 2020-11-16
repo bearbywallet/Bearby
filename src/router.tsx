@@ -74,7 +74,7 @@ export default function Navigator() {
       initialRouteName={initialRouteName}
       screenOptions={HanldeRoute}
     >
-      <Stack.Screen
+      {/* <Stack.Screen
         name={'GetStarted'}
         component={GetStartedPage}
         options={{ title: '' }}
@@ -112,14 +112,14 @@ export default function Navigator() {
         name={'SetupPassword'}
         component={SetupPasswordPage}
         options={{ title: '' }}
-      />
+      /> */}
 
       {/* guarded */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name={'InitSuccessfully'}
         component={InitSuccessfullyPage}
         options={{ title: '' }}
-      />
+      /> */}
       <Stack.Screen
         name={'Home'}
         component={HomePage}

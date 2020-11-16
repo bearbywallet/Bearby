@@ -12,6 +12,7 @@ import { NetworkControll } from 'app/lib/controller/network';
 
 import { STORAGE_FIELDS } from 'app/config';
 import { Token } from 'types';
+import { store } from './state';
 
 export class TokenControll {
 
@@ -30,6 +31,8 @@ export class TokenControll {
       throw new Error('Token address must be unique');
     }
   }
+
+  public store = store;
 
   private _network: NetworkControll;
   private _zilliqa: ZilliqaControl;

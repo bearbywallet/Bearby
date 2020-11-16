@@ -12,11 +12,11 @@ import {
   getAddressFromPublicKey,
   toBech32Address
 } from 'app/utils';
-import { AccountsStore } from './sate';
+import { store } from './sate';
 import { AccountState, Account, KeyPair } from 'types';
 
 export class AccountControler {
-  public store = new AccountsStore();
+  public store = store;
   private _storage: MobileStorage;
 
   constructor(storage: MobileStorage) {

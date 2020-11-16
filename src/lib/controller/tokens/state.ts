@@ -7,8 +7,8 @@
  * Copyright (c) 2020 ZilPay
  */
 import { createDomain } from 'effector';
-import { Token } from '../../types';
-import { ZILLIQA, NIL_ADDRESS } from '../config';
+import { Token } from 'types';
+import { ZILLIQA, NIL_ADDRESS } from 'app/config';
 
 const [mainnet, testnet, privatenet] = Object.keys(ZILLIQA);
 const TokenDomain = createDomain();
@@ -75,9 +75,5 @@ const identities: Token[] = [
 const initalState = {
   identities
 };
-const store = TokenDomain
+export const store = TokenDomain
   .store(initalState);
-
-export default {
-  store
-};

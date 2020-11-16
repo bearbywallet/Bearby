@@ -13,18 +13,22 @@ import {
   Text,
   ScrollView
 } from 'react-native';
+
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { useStore } from 'effector-react';
 
-import TokensStore from 'app/store/tokens';
 import SettingsStore from 'app/store/settings';
+
+import { WalletContext } from 'app/keystore';
 
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
 
-export const HomeTokens = () => {
-  const tokensState = useStore(TokensStore.store);
+export const HomeTokens: React.FC = () => {
+  const keystore = React.useContext(WalletContext);
+  const tokensState = useStore(keystore.token.store);
+
   const settingsState = useStore(SettingsStore.store);
 
   const tokensList = React.useMemo(
