@@ -12,16 +12,13 @@ import { StatusBar } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 
 import Routers from './router';
-import { WalletContext, wallet } from './keystore';
 import { theme } from './styles';
 
 export default function Root() {
   return (
-    <WalletContext.Provider value={wallet}>
-      <NavigationContainer theme={theme}>
-        <StatusBar barStyle="light-content"/>
-        <Routers />
-      </NavigationContainer>
-    </WalletContext.Provider>
+    <NavigationContainer theme={theme}>
+      <StatusBar barStyle="light-content"/>
+      <Routers />
+    </NavigationContainer>
   );
 }
