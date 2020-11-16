@@ -14,16 +14,15 @@ import {
   Text,
   Button
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { splitByChunk } from 'app/utils';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
-import { RootStackParamList } from 'app/router';
 
 type Prop = {
-  navigation: StackNavigationProp<RootStackParamList, 'Mnemonic'>;
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 const AMOUNT_OF_WORDS_IN_LINE = 3;
@@ -88,7 +87,7 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
         <Button
           title={i18n.t('mnemonic_btn1')}
           color={theme.colors.primary}
-          onPress={() => navigation.push('MnemonicVerif', { phrase })}
+          onPress={() => navigation.navigate('MnemonicVerif', { phrase })}
         />
       </View>
     </View>
