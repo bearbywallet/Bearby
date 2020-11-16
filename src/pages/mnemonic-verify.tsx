@@ -13,33 +13,35 @@ import {
   Text,
   Button
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import { Chip } from 'app/components/chip';
 
-import { RootStackParamList } from 'app/router';
 import { theme } from 'app/styles';
 import { shuffle } from 'app/utils';
 import i18n from 'app/lib/i18n';
 
+interface NavigationParams {
+  phrase: string;
+}
+
 type Prop = {
-  navigation: StackNavigationProp<RootStackParamList, 'MnemonicVerif'>;
-  route: RouteProp<RootStackParamList, 'MnemonicVerif'>;
+  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
 };
 
-export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
+export const MnemonicVerifypage: React.FC<Prop> = ({ navigation }) => {
+  const [phrase] = React.useState(String(navigation.state.params?.phrase));
   const [selectedWords, setSelectedWords] = React.useState<Set<string>>(new Set());
   const [shuffledWords, setShuffledWords] = React.useState(
-    new Set(shuffle(route.params.phrase.split(' ')))
+    new Set(shuffle(phrase.split(' ')))
   );
 
   const buttonDisabled = React.useMemo(() => {
     const words = Array.from(selectedWords).join(' ');
-    const trueWords = route.params.phrase;
+    const trueWords = phrase;
 
     return words === trueWords;
-  }, [selectedWords, route]);
+  }, [selectedWords, phrase]);
 
   const handleRemove = React.useCallback((word) => {
     selectedWords.delete(word);
@@ -56,11 +58,10 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
     setSelectedWords(new Set(selectedWords));
   }, [setShuffledWords, setSelectedWords]);
   const hanldeContinue = React.useCallback(() => {
-    navigation.push(
-      'SetupPassword',
-      { phrase: route.params.phrase }
-    );
-  }, [navigation, route]);
+    navigation.navigate('SetupPassword', {
+      phrase
+    });
+  }, [navigation, phrase]);
 
   return (
     <View style={styles.container}>
@@ -128,18 +129,17 @@ const styles = StyleSheet.create({
   },
   verified: {
     flexDirection: 'row',
-    paddingHorizontal: 30,
+    paddingHorizontal: '3%',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginVertical: 100
+    marginVertical: '10%'
   },
   randoms: {
     flexDirection: 'row',
-    paddingHorizontal: 30,
+    paddingHorizontal: '3%',
     flexWrap: 'wrap',
     alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 100
+    justifyContent: 'center'
   },
   defaultChip: {
     margin: 8
