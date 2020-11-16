@@ -18,6 +18,7 @@ import MnemonicGenPage from 'app/pages/mnemonic-gen';
 import MnemonicVerifypage from 'app/pages/mnemonic-verify';
 import SetupPasswordPage from 'app/pages/setup-password';
 import InitSuccessfullyPage from 'app/pages/init-successfully';
+import HomePage from 'app/pages/home';
 
 import { WalletContext } from './keystore';
 import { theme } from './styles';
@@ -37,6 +38,7 @@ export type RootStackParamList = {
     phrase: string
   };
   InitSuccessfully: undefined;
+  Home: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -116,6 +118,11 @@ export default function Navigator() {
       <Stack.Screen
         name={'InitSuccessfully'}
         component={InitSuccessfullyPage}
+        options={{ title: '' }}
+      />
+      <Stack.Screen
+        name={'Home'}
+        component={HomePage}
         options={{ title: '' }}
       />
     </Stack.Navigator>
