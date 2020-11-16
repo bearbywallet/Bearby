@@ -30,6 +30,10 @@ type Props = {
 
 const { width } = Dimensions.get('window');
 export const InitSuccessfullyPage: React.FC<Props> = ({ navigation }) => {
+  const hanldeOK = React.useCallback(() => {
+    navigation.push('Home');
+  }, [navigation]);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
@@ -45,7 +49,7 @@ export const InitSuccessfullyPage: React.FC<Props> = ({ navigation }) => {
         <Button
           color={theme.colors.primary}
           title={i18n.t('successfully_btn')}
-          onPress={() => null}
+          onPress={hanldeOK}
         />
       </View>
     </SafeAreaView>

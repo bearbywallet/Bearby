@@ -32,3 +32,5 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.black
   }
 });
+
+export default HomePage;
