@@ -15,20 +15,19 @@ import {
   Text,
   View
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { RootStackParamList } from 'app/router';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Create'>;
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 const { width } = Dimensions.get('window');
-export const CreateWalletPage: React.FC<Props> = ({ navigation }) => {
+export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
@@ -48,12 +47,12 @@ export const CreateWalletPage: React.FC<Props> = ({ navigation }) => {
           <Button
             title={i18n.t('create')}
             color={theme.colors.primary}
-            onPress={() => navigation.push('Mnemonic')}
+            onPress={() => navigation.navigate('Mnemonic')}
           />
           <Button
             title={i18n.t('restore')}
             color={theme.colors.primary}
-            onPress={() => navigation.push('Restore')}
+            onPress={() => navigation.navigate('Restore')}
           />
         </View>
       </View>
@@ -95,4 +94,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default CreateWalletPage;
+export default LetStartPage;
