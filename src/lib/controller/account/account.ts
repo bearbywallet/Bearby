@@ -86,7 +86,7 @@ export class AccountControler {
   }
 
   private async _checkAccount(account: Account) {
-    const accounts = await this.get();
+    const accounts = await this.sync();
     const isUnique = accounts.identities.some(
       (acc) => (acc.base16 === account.base16)
     );
