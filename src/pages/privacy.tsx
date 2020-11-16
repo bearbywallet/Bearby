@@ -14,14 +14,13 @@ import {
   ScrollView,
   Button
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { RootStackParamList } from 'app/router';
 
 type Prop = {
-  navigation: StackNavigationProp<RootStackParamList, 'Privacy'>;
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
@@ -126,7 +125,7 @@ export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
         <Button
           title={i18n.t('accept')}
           color={theme.colors.primary}
-          onPress={() => navigation.push('Create')}
+          onPress={() => navigation.navigate('LetStart')}
         />
       </View>
     </View>
