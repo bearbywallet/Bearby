@@ -16,22 +16,22 @@ import {
   Text,
   Button
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import { theme } from 'app/styles';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
-import { RootStackParamList } from 'app/router';
+
 import i18n from 'app/lib/i18n';
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'InitSuccessfully'>;
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 const { width } = Dimensions.get('window');
-export const InitSuccessfullyPage: React.FC<Props> = ({ navigation }) => {
+export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
   const hanldeOK = React.useCallback(() => {
-    navigation.push('Home');
+    navigation.navigate('Home');
   }, [navigation]);
 
   return (
