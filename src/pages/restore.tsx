@@ -14,15 +14,14 @@ import {
   Button,
   TextInput
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
-import { RootStackParamList } from 'app/router';
 
 type Prop = {
-  navigation: StackNavigationProp<RootStackParamList, 'SetupPassword'>;
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
@@ -37,7 +36,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
     setphrase(value);
   }, [setDisabled, setphrase]);
   const hanldecreateWallet = React.useCallback(() => {
-    navigation.push('SetupPassword', {
+    navigation.navigate('SetupPassword', {
       phrase
     });
   }, [phrase, navigation]);
