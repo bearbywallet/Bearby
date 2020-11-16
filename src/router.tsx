@@ -90,10 +90,6 @@ export default function Navigator() {
         options={{ title: '' }}
       />
       <Stack.Screen
-        name={'Lock'}
-        component={LockPage}
-      />
-      <Stack.Screen
         name={'Restore'}
         component={RestorePage}
         options={{ title: '' }}
@@ -113,6 +109,10 @@ export default function Navigator() {
         component={SetupPasswordPage}
         options={{ title: '' }}
       /> */}
+      <Stack.Screen
+        name={'Lock'}
+        component={LockPage}
+      />
 
       {/* guarded */}
       {/* <Stack.Screen
@@ -120,11 +120,11 @@ export default function Navigator() {
         component={InitSuccessfullyPage}
         options={{ title: '' }}
       /> */}
-      <Stack.Screen
+      {/* <Stack.Screen
         name={'Home'}
         component={HomePage}
         options={{ title: '' }}
-      />
+      /> */}
     </Stack.Navigator>
   );
 }

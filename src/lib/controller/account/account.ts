@@ -23,7 +23,7 @@ export class AccountControler {
     this._storage = storage;
   }
 
-  public async get(): Promise<AccountState> {
+  public async sync(): Promise<AccountState> {
     const accounts = await this._storage.get<AccountState>(
       STORAGE_FIELDS.ACCOUNTS
     );

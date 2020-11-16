@@ -7,40 +7,136 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet, Text, TouchableHighlight } from 'react-native';
-import TouchID from 'react-native-touch-id';
+import {
+  View,
+  SafeAreaView,
+  StyleSheet,
+  Text,
+  TextInput,
+  Button,
+  Dimensions
+} from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { SvgXml } from 'react-native-svg';
 
-import { colors } from '../styles';
-import { touchIDConfig } from '../config';
+import CreateBackground from 'app/assets/get_started_1.svg';
+import { LockSVG } from 'app/components/svg';
 
-export const LockPage = () => {
+import i18n from 'app/lib/i18n';
+import { theme } from 'app/styles';
+import { WalletContext } from 'app/keystore';
+import { RootStackParamList } from 'app/router';
 
-  const pressHandler = React.useCallback(async(event) => {
+type Props = {
+  navigation: StackNavigationProp<RootStackParamList, 'Lock'>;
+};
+
+const { width } = Dimensions.get('window');
+export const LockPage: React.FC<Props> = ({ navigation }) => {
+  const keystore = React.useContext(WalletContext);
+
+  const [password, setPassword] = React.useState('');
+  const [passwordError, setPasswordError] = React.useState(' ');
+
+  const color = React.useMemo(
+    () => passwordError.length > 2 ? theme.colors.danger : '#666666',
+    [passwordError]
+  );
+
+  const hanldeUnlock = React.useCallback(async() => {
     try {
-      const success = await TouchID
-        .authenticate('to demo this react-native component', touchIDConfig);
-      // console.log(success);
+      await keystore.unlockWallet(password);
+      await keystore.sync();
+
+      navigation.push('Home');
     } catch (err) {
-      // console.warn(err);
+      setPasswordError(i18n.t('lock_error'));
     }
-  }, []);
+  }, [password, setPasswordError]);
+  const hanldeInputPassword = React.useCallback((value) => {
+    setPassword(value);
+    setPasswordError(' ');
+  }, [setPassword]);
 
   return (
-    <View style={styles.container}>
-      <TouchableHighlight onPress={pressHandler}>
-        <Text>
-          Authenticate with Touch ID
+    <SafeAreaView style={styles.container}>
+      <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
+        <CreateBackground
+          width={width + width / 2}
+          height={width + width / 2}
+        />
+      </View>
+      <View style={styles.pageContainer}>
+        <Text style={styles.title}>
+          {i18n.t('lock_title')}
         </Text>
-      </TouchableHighlight>
-    </View>
+        <View>
+          <View style={[styles.inputWrapper, { borderBottomColor: color }]}>
+            <SvgXml
+              xml={LockSVG}
+              fill={color}
+            />
+            <TextInput
+              style={styles.textInput}
+              secureTextEntry={true}
+              placeholder={i18n.t('pass_setup_input1')}
+              placeholderTextColor={color}
+              onChangeText={hanldeInputPassword}
+            />
+          </View>
+          <Text style={styles.errorMessage}>
+            {passwordError}
+          </Text>
+        </View>
+        <Button
+          title={i18n.t('lock_btn')}
+          color={theme.colors.primary}
+          onPress={hanldeUnlock}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 100,
-    backgroundColor: colors.secondary
+    backgroundColor: theme.colors.black
+  },
+  backgroundImage: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: '50%'
+  },
+  textInput: {
+    fontSize: 17,
+    lineHeight: 22,
+    padding: 10,
+    color: theme.colors.white,
+    width: '100%'
+  },
+  errorMessage: {
+    color: theme.colors.danger,
+    marginTop: 4,
+    lineHeight: 22
+  },
+  inputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderBottomWidth: 1
+  },
+  pageContainer: {
+    justifyContent: 'space-evenly',
+    alignItems: 'center',
+    height: '100%',
+    paddingTop: '100%',
+    paddingHorizontal: 60
+  },
+  title: {
+    fontWeight: 'bold',
+    color: theme.colors.white,
+    lineHeight: 41,
+    fontSize: 34
   }
 });
 

@@ -47,7 +47,8 @@ export class WalletControler extends Mnemonic {
   }
 
   public async sync() {
-    await this.network.sync();
     await this.guard.sync();
+    await this.network.sync();
+    await this.account.sync();
   }
 }
