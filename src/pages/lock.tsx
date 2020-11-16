@@ -16,7 +16,7 @@ import {
   Button,
   Dimensions
 } from 'react-native';
-import { StackNavigationProp } from '@react-navigation/stack';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 import { SvgXml } from 'react-native-svg';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -24,16 +24,14 @@ import { LockSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { WalletContext } from 'app/keystore';
-import { RootStackParamList } from 'app/router';
+import { keystore } from 'app/keystore';
 
-type Props = {
-  navigation: StackNavigationProp<RootStackParamList, 'Lock'>;
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
 };
 
 const { width } = Dimensions.get('window');
-export const LockPage: React.FC<Props> = ({ navigation }) => {
-  const keystore = React.useContext(WalletContext);
+export const LockPage: React.FC<Prop> = ({ navigation }) => {
 
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
@@ -48,7 +46,7 @@ export const LockPage: React.FC<Props> = ({ navigation }) => {
       await keystore.unlockWallet(password);
       await keystore.sync();
 
-      navigation.push('Home');
+      navigation.navigate('Home');
     } catch (err) {
       setPasswordError(i18n.t('lock_error'));
     }
