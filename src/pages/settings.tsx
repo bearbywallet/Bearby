@@ -57,7 +57,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'General' })}
+      >
         <SvgXml xml={GearIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
@@ -70,7 +73,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Advanced' })}
+      >
         <SvgXml xml={AdvancedIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
@@ -83,7 +89,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Network' })}
+      >
         <SvgXml xml={NetworkIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
@@ -96,7 +105,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Connections' })}
+      >
         <SvgXml xml={ConnectIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
@@ -109,7 +121,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Security' })}
+      >
         <SvgXml xml={SecureIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
@@ -122,7 +137,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
           />
         </View>
       </View>
-      <View style={styles.listItemWrapper}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'About' })}
+      >
         <SvgXml xml={AboutIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
