@@ -14,14 +14,15 @@ import {
   Button,
   TextInput
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {

@@ -16,16 +16,17 @@ import {
   Text,
   Button
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';
+import { RootParamList } from 'app/navigator';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 
 import i18n from 'app/lib/i18n';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<RootParamList>;
 };
 
 const { width } = Dimensions.get('window');

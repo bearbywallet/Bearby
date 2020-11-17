@@ -14,15 +14,16 @@ import {
   Text,
   Button
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { splitByChunk } from 'app/utils';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 const AMOUNT_OF_WORDS_IN_LINE = 3;

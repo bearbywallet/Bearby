@@ -14,13 +14,14 @@ import {
   ScrollView,
   Button
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import i18n from 'app/lib/i18n';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { theme } from 'app/styles';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {

@@ -13,24 +13,23 @@ import {
   Text,
   Button
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Chip } from 'app/components/chip';
 
 import { theme } from 'app/styles';
 import { shuffle } from 'app/utils';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 
-interface NavigationParams {
-  phrase: string;
-}
-
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
+  route: RouteProp<UnauthorizedStackParamList, 'MnemonicVerif'>;
 };
 
-export const MnemonicVerifypage: React.FC<Prop> = ({ navigation }) => {
-  const [phrase] = React.useState(String(navigation.state.params?.phrase));
+export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
+  const [phrase] = React.useState(String(route.params.phrase));
   const [selectedWords, setSelectedWords] = React.useState<Set<string>>(new Set());
   const [shuffledWords, setShuffledWords] = React.useState(
     new Set(shuffle(phrase.split(' ')))

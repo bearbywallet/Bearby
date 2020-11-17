@@ -15,26 +15,25 @@ import {
   Button,
   StyleSheet
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
 import { SvgXml } from 'react-native-svg';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
 
-interface NavigationParams {
-  phrase: string;
-}
-
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState, NavigationParams>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList, 'SetupPassword'>;
+  route: RouteProp<UnauthorizedStackParamList, 'SetupPassword'>;
 };
 
-export const SetupPasswordPage: React.FC<Prop> = ({ navigation }) => {
-  const [mnemonicPhrase] = React.useState(String(navigation.state.params?.phrase));
+export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
+  const [mnemonicPhrase] = React.useState(String(route.params.phrase));
   const [accountName, setAccountName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');

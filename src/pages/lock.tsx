@@ -16,7 +16,7 @@ import {
   Button,
   Dimensions
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { SvgXml } from 'react-native-svg';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -25,9 +25,10 @@ import { LockSVG } from 'app/components/svg';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 const { width } = Dimensions.get('window');

@@ -16,9 +16,10 @@ import {
   Dimensions,
   Button
 } from 'react-native';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import i18n from 'app/lib/i18n';
+import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { theme } from 'app/styles';
 
 import GetStartedFirst from 'app/assets/get_started_1.svg';
@@ -26,7 +27,7 @@ import GetStartedSecond from 'app/assets/get_started_2.svg';
 import GetStartedThird from 'app/assets/get_started_3.svg';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 const { width, height } = Dimensions.get('window');

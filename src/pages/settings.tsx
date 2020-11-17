@@ -9,13 +9,12 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet,
   Text,
   View
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import {
   ArrowIconSVG,
@@ -29,10 +28,11 @@ import {
 } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
+import { RootParamList } from 'app/navigator';
 import { theme } from 'app/styles';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<RootParamList>;
 };
 
 export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
