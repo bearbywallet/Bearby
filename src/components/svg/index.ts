@@ -21,3 +21,4 @@ export * from './network';
 export * from './connect';
 export * from './secure';
 export * from './about';
+export * from './ok';

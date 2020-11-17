@@ -35,37 +35,58 @@ export const Settings: React.FC = () => (
     <SettingsStack.Screen
       name="Contacts"
       component={ContactsPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="Connections"
       component={ConnectionsPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="Advanced"
       component={AdvancedPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="About"
       component={AboutPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="Security"
       component={SecurityPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="Network"
       component={NetworkPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <SettingsStack.Screen
       name="General"
       component={GeneralPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
   </SettingsStack.Navigator>
 );
