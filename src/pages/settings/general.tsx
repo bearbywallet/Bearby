@@ -13,19 +13,17 @@ import {
   Button,
   StyleSheet
 } from 'react-native';
+import { useStore } from 'effector-react';
 
 import { Selector } from 'app/components/selector';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-
-const testitems = [
-  'USD',
-  'ETH',
-  'BTC'
-];
+import { keystore } from 'app/keystore';
 
 export const GeneralPage = () => {
+  const currencyState = useStore(keystore.currency.store);
+
   return (
     <View style={styles.container}>
       <View style={styles.titleWrapper}>
@@ -38,7 +36,12 @@ export const GeneralPage = () => {
           onPress={() => null}
         />
       </View>
-      <Selector items={testitems} selected={testitems[0]} title="Currency"/>
+      <Selector
+        items={keystore.currency.currencies}
+        selected={currencyState}
+        title={i18n.t('currency')}
+        onSelect={(item) => keystore.currency.setCurrency(item)}
+      />
     </View>
   );
 };

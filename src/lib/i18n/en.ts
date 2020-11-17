@@ -17,6 +17,7 @@ export default {
   send: 'Send',
   reset: 'Reset',
   receive: 'Receive',
+  currency: 'Currency',
   lock_title: 'Welcome back',
   lock_btn: 'Unlock',
   lock_error: 'Password is incorrect!',
