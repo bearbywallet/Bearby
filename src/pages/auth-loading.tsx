@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { NavigationScreenProp, NavigationState } from 'react-navigation';
+import { StackNavigationProp } from '@react-navigation/stack';
 import {
   ActivityIndicator,
   StatusBar,
@@ -15,10 +15,11 @@ import {
 } from 'react-native';
 
 import { keystore } from 'app/keystore';
+import { RootParamList } from 'app/navigator';
 import { theme } from 'app/styles';
 
 type Prop = {
-  navigation: NavigationScreenProp<NavigationState>;
+  navigation: StackNavigationProp<RootParamList>;
 };
 
 export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {

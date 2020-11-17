@@ -25,7 +25,14 @@ import { HistoryPage } from 'app/pages/history';
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 
-const TabStack = createBottomTabNavigator();
+export type TabStackParamList = {
+  Home: undefined;
+  History: undefined;
+  Browser: undefined;
+  Settings: undefined;
+};
+
+const TabStack = createBottomTabNavigator<TabStackParamList>();
 const tabBarOptions = {
   activeTintColor: theme.colors.primary,
   activeColor: theme.colors.white,

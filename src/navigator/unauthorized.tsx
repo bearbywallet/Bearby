@@ -21,7 +21,23 @@ import InitSuccessfullyPage from 'app/pages/init-successfully';
 
 import { headerOptions } from 'app/config';
 
-const UnauthorizedStack = createStackNavigator();
+export type UnauthorizedStackParamList = {
+  GetStarted: undefined;
+  Privacy: undefined;
+  LetStart: undefined;
+  Lock: undefined;
+  Restore: undefined;
+  Mnemonic: undefined;
+  MnemonicVerif: {
+    phrase: string
+  };
+  SetupPassword: {
+    phrase: string
+  };
+  InitSuccessfully: undefined;
+};
+
+const UnauthorizedStack = createStackNavigator<UnauthorizedStackParamList>();
 export const Unauthorized: React.FC = () => (
   <UnauthorizedStack.Navigator>
     <UnauthorizedStack.Screen
@@ -64,7 +80,10 @@ export const Unauthorized: React.FC = () => (
     <UnauthorizedStack.Screen
       name="LetStart"
       component={LetStartPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <UnauthorizedStack.Screen
       name="Restore"
@@ -74,12 +93,18 @@ export const Unauthorized: React.FC = () => (
     <UnauthorizedStack.Screen
       name="Mnemonic"
       component={MnemonicGenPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
     <UnauthorizedStack.Screen
       name="MnemonicVerif"
       component={MnemonicVerifyPage}
-      options={headerOptions}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
     />
   </UnauthorizedStack.Navigator>
 );

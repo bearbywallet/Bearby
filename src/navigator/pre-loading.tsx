@@ -11,7 +11,11 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import AuthLoadingPage from 'app/pages/auth-loading';
 
-const PreLoadingStack = createStackNavigator();
+export type PreLoadingStackParamList = {
+  AuthLoading: undefined;
+};
+
+const PreLoadingStack = createStackNavigator<PreLoadingStackParamList>();
 export const PreLoading: React.FC = () => (
   <PreLoadingStack.Navigator>
     <PreLoadingStack.Screen

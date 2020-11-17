@@ -19,7 +19,17 @@ import { GeneralPage } from 'app/pages/settings/general';
 
 import { headerOptions } from 'app/config';
 
-const SettingsStack = createStackNavigator();
+export type SettingsStackParamList = {
+  Contacts: undefined;
+  Connections: undefined;
+  About: undefined;
+  Advanced: undefined;
+  Security: undefined;
+  Network: undefined;
+  General: undefined;
+};
+
+const SettingsStack = createStackNavigator<SettingsStackParamList>();
 export const Settings: React.FC = () => (
   <SettingsStack.Navigator>
     <SettingsStack.Screen

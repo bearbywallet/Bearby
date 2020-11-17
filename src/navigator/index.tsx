@@ -9,13 +9,21 @@
 import React from 'react';
 
 import { createStackNavigator } from '@react-navigation/stack';
+import { NavigatorScreenParams } from '@react-navigation/native';
 
-import { TabNavigator } from './tab-navigator';
-import { Unauthorized } from './unauthorized';
-import { PreLoading } from './pre-loading';
-import { Settings } from './settings';
+import { TabNavigator, TabStackParamList } from './tab-navigator';
+import { Unauthorized, UnauthorizedStackParamList } from './unauthorized';
+import { PreLoading, PreLoadingStackParamList } from './pre-loading';
+import { Settings, SettingsStackParamList } from './settings';
 
-const Stack = createStackNavigator();
+export type RootParamList = {
+  Loading: NavigatorScreenParams<PreLoadingStackParamList>;
+  Unauthorized: NavigatorScreenParams<UnauthorizedStackParamList>;
+  App: NavigatorScreenParams<TabStackParamList>;
+  SettingsPages: NavigatorScreenParams<SettingsStackParamList>;
+};
+
+const Stack = createStackNavigator<RootParamList>();
 
 export default () => (
   <Stack.Navigator
