@@ -27,7 +27,7 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
       const { isEnable, isReady } = keystore.guard.self;
 
       if (!isReady) {
-        return navigation.navigate('GetStarted');
+        return navigation.navigate('Unauthorized', { screen: 'GetStarted' });
       }
       if (!isEnable && isReady) {
         return navigation.navigate('Unauthorized', { screen: 'Lock' });

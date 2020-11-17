@@ -67,8 +67,8 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
   const { currentPage: pageIndex } = sliderState;
 
   return (
-    <View style={styles.container}>
-      <SafeAreaView style={styles.scrollView}>
+    <SafeAreaView style={styles.container}>
+      <View style={styles.scrollView}>
         <ScrollView
           style={styles.scrollView}
           horizontal={true}
@@ -110,8 +110,8 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
           color={theme.colors.primary}
           onPress={() => navigation.navigate('Privacy')}
         />
-      </SafeAreaView>
-    </View>
+      </View>
+    </SafeAreaView>
   );
 };
 

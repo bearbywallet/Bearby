@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   Button,
+  SafeAreaView,
   StyleSheet
 } from 'react-native';
 import { NavigationScreenProp, NavigationState } from 'react-navigation';
@@ -22,12 +23,12 @@ type Prop = {
 
 export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <Button
         title="test"
         onPress={() => null}
       />
-    </View>
+    </SafeAreaView>
   );
 };
 

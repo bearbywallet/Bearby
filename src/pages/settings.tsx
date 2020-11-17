@@ -36,7 +36,7 @@ type Prop = {
 };
 
 export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
-  <SafeAreaView style={styles.container}>
+  <View style={styles.container}>
     <Text style={styles.title}>
       {i18n.t('settings_title')}
     </Text>
@@ -154,7 +154,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
         </View>
       </View>
     </View>
-  </SafeAreaView>
+  </View>
 );
 
 const styles = StyleSheet.create({

@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import * as React from 'react';
+import React from 'react';
 import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
@@ -17,8 +17,8 @@ import { theme } from './styles';
 export default function Root() {
   return (
     <NavigationContainer theme={theme}>
-      <StatusBar barStyle="light-content"/>
       <Navigator />
+      <StatusBar barStyle="light-content"/>
     </NavigationContainer>
   );
 }

@@ -19,10 +19,8 @@ const Stack = createStackNavigator();
 
 export default () => (
   <Stack.Navigator
+    headerMode="none"
     initialRouteName="Loading"
-    screenOptions={{
-      header: () => null
-    }}
   >
     <Stack.Screen name="Loading" component={PreLoading} />
     <Stack.Screen name="Unauthorized" component={Unauthorized} />
