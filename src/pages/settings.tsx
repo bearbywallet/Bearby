@@ -15,6 +15,7 @@ import {
   View
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import {
   ArrowIconSVG,
@@ -30,7 +31,11 @@ import {
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 
-export const SettingsPage = () => {
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
+};
+
+export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>
@@ -41,7 +46,7 @@ export const SettingsPage = () => {
           <SvgXml xml={BookIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              Contacts
+              {i18n.t('settings_item0')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -54,7 +59,7 @@ export const SettingsPage = () => {
           <SvgXml xml={GearIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              General
+              {i18n.t('settings_item1')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -67,7 +72,7 @@ export const SettingsPage = () => {
           <SvgXml xml={AdvancedIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              Advanced
+              {i18n.t('settings_item2')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -80,7 +85,7 @@ export const SettingsPage = () => {
           <SvgXml xml={NetworkIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              Network
+              {i18n.t('settings_item3')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -93,7 +98,7 @@ export const SettingsPage = () => {
           <SvgXml xml={ConnectIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              Connections
+              {i18n.t('settings_item4')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -106,7 +111,7 @@ export const SettingsPage = () => {
           <SvgXml xml={SecureIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-              Security
+              {i18n.t('settings_item5')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
@@ -119,7 +124,7 @@ export const SettingsPage = () => {
           <SvgXml xml={AboutIconSVG} />
           <View style={styles.listItem}>
             <Text style={styles.listTextItem}>
-            About
+              {i18n.t('settings_item6')}
             </Text>
             <SvgXml
               xml={ArrowIconSVG}
