@@ -25,7 +25,7 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
     <View style={styles.container}>
       <Button
         title="test"
-        onPress={() => console.log(navigation)}
+        onPress={() => null}
       />
     </View>
   );

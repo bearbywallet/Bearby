@@ -18,4 +18,4 @@ export const headerOptions: StackNavigationOptions = {
   headerTitleStyle: {
     fontWeight: 'bold'
   }
-}
+};
