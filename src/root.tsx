@@ -11,14 +11,14 @@ import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 
-import Routers from './router';
+import Navigator from './navigator';
 import { theme } from './styles';
 
 export default function Root() {
   return (
     <NavigationContainer theme={theme}>
       <StatusBar barStyle="light-content"/>
-      <Routers />
+      <Navigator />
     </NavigationContainer>
   );
 }

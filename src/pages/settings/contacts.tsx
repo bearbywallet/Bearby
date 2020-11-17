@@ -7,14 +7,27 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {
+  View,
+  Button,
+  StyleSheet
+} from 'react-native';
+import { NavigationScreenProp, NavigationState } from 'react-navigation';
 
 import { colors } from 'app/styles';
 
-export const ContactsPage = () => {
+type Prop = {
+  navigation: NavigationScreenProp<NavigationState>;
+};
 
+export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
   return (
-    <View style={styles.container} />
+    <View style={styles.container}>
+      <Button
+        title="test"
+        onPress={() => console.log(navigation)}
+      />
+    </View>
   );
 };
 

@@ -23,7 +23,7 @@ import { SettingsPage } from 'app/pages/settings';
 import { HistoryPage } from 'app/pages/history';
 
 import I18n from 'app/lib/i18n';
-import { theme } from './styles';
+import { theme } from 'app/styles';
 
 const TabStack = createBottomTabNavigator();
 const tabBarOptions = {

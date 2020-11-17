@@ -46,7 +46,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
       await keystore.unlockWallet(password);
       await keystore.sync();
 
-      navigation.navigate('Home');
+      navigation.navigate('App', { screen: 'Home' });
     } catch (err) {
       setPasswordError(i18n.t('lock_error'));
     }

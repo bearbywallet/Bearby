@@ -30,10 +30,10 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
         return navigation.navigate('GetStarted');
       }
       if (!isEnable && isReady) {
-        return navigation.navigate('Lock');
+        return navigation.navigate('Unauthorized', { screen: 'Lock' });
       }
 
-      return navigation.navigate('home');
+      return navigation.navigate('App', { screen: 'Home' });
     });
   });
 

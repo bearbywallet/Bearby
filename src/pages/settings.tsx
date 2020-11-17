@@ -35,108 +35,109 @@ type Prop = {
   navigation: NavigationScreenProp<NavigationState>;
 };
 
-export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
-  return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
-        {i18n.t('settings_title')}
-      </Text>
-      <View style={styles.list}>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={BookIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item0')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={GearIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item1')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={AdvancedIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item2')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={NetworkIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item3')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={ConnectIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item4')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={SecureIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item5')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
-        </View>
-        <View style={styles.listItemWrapper}>
-          <SvgXml xml={AboutIconSVG} />
-          <View style={styles.listItem}>
-            <Text style={styles.listTextItem}>
-              {i18n.t('settings_item6')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={styles.arrow}
-            />
-          </View>
+export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
+  <SafeAreaView style={styles.container}>
+    <Text style={styles.title}>
+      {i18n.t('settings_title')}
+    </Text>
+    <View style={styles.list}>
+      <View
+        style={styles.listItemWrapper}
+        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}
+      >
+        <SvgXml xml={BookIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item0')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
         </View>
       </View>
-    </SafeAreaView>
-  );
-};
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={GearIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item1')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={AdvancedIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item2')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={NetworkIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item3')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={ConnectIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item4')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={SecureIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item5')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+      <View style={styles.listItemWrapper}>
+        <SvgXml xml={AboutIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item6')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </View>
+    </View>
+  </SafeAreaView>
+);
 
 const styles = StyleSheet.create({
   container: {

@@ -31,7 +31,7 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
   const hanldeOK = React.useCallback(() => {
-    navigation.navigate('Home');
+    navigation.navigate('App', { screen: 'Home' });
   }, [navigation]);
 
   return (
