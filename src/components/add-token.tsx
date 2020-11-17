@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     minHeight: 90,
-    width: 180,
+    width: '47%',
     backgroundColor: theme.colors.gray,
     padding: 10,
     borderWidth: 0.9,

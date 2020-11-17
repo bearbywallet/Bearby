@@ -11,6 +11,7 @@ import {
   View,
   StyleSheet,
   Text,
+  Button,
   ScrollView
 } from 'react-native';
 
@@ -44,9 +45,11 @@ export const HomeTokens: React.FC = () => {
         <Text style={styles.title}>
           {I18n.t('my_tokens')}
         </Text>
-        <Text style={styles.manage}>
-          {I18n.t('manage')}
-        </Text>
+        <Button
+          title={I18n.t('manage')}
+          color={theme.colors.primary}
+          onPress={() => null}
+        />
       </View>
       <ScrollView>
         <View style={styles.list}>
@@ -93,10 +96,6 @@ const styles = StyleSheet.create({
   },
   title: {
     color: theme.colors.white,
-    fontSize: 20
-  },
-  manage: {
-    color: theme.colors.primary,
     fontSize: 20
   }
 });

@@ -6,9 +6,9 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import * as React from 'react';
-import { createAppContainer, createSwitchNavigator, NavigationScreenConfig } from 'react-navigation';
+import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
+// import { createBottomTabNavigator } from 'react-navigation';
 
 import LetStartPage from 'app/pages/let-start';
 import GetStartedPage from 'app/pages/get-started';
@@ -23,6 +23,8 @@ import HomePage from 'app/pages/home';
 import AuthLoadingPage from 'app/pages/auth-loading';
 
 import { theme } from './styles';
+
+// const TabStack = createBottomTabNavigator();
 
 const AppStack = createStackNavigator({
   Home: {
@@ -127,7 +129,7 @@ const GuardStack = createSwitchNavigator(
   {
     AuthLoading: AuthLoadingPage,
     App: AppStack,
-    Auth: AuthStack,
+    Auth: AuthStack
   },
   {
     initialRouteName: 'AuthLoading',
