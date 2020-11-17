@@ -18,6 +18,9 @@ import {
 } from 'app/components/svg';
 
 import HomePage from 'app/pages/home';
+import { BrowserPage } from 'app/pages/browser';
+import { SettingsPage } from 'app/pages/settings';
+import { HistoryPage } from 'app/pages/history';
 
 import I18n from 'app/lib/i18n';
 import { theme } from './styles';
@@ -46,6 +49,45 @@ export const TabNavigator: React.FC = () => {
           tabBarIcon: ({ color }) => (
             <SvgXml
               xml={HomeIconSVG}
+              fill={color}
+            />
+          )
+        }}
+      />
+      <TabStack.Screen
+        name="History"
+        component={HistoryPage}
+        options={{
+          tabBarLabel: I18n.t('history'),
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={TimerIconSVG}
+              fill={color}
+            />
+          )
+        }}
+      />
+      <TabStack.Screen
+        name="Browser"
+        component={BrowserPage}
+        options={{
+          tabBarLabel: I18n.t('browser'),
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={BrowserIconSVG}
+              fill={color}
+            />
+          )
+        }}
+      />
+      <TabStack.Screen
+        name="Settings"
+        component={SettingsPage}
+        options={{
+          tabBarLabel: I18n.t('settings'),
+          tabBarIcon: ({ color }) => (
+            <SvgXml
+              xml={SettingsIconSVG}
               fill={color}
             />
           )

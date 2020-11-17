@@ -23,6 +23,7 @@ export default {
   successfully_title: 'Your wallet was successfully created!',
   successfully_btn: 'OK',
   restore_btn: 'Continue',
+  settings_title: 'Settings',
   pass_setup_btn: 'Continue',
   pass_setup_input0: 'Name of account',
   pass_setup_input1: 'Password',
