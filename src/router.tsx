@@ -8,7 +8,6 @@
  */
 import { createAppContainer, createSwitchNavigator } from 'react-navigation';
 import { createStackNavigator } from 'react-navigation-stack';
-// import { createBottomTabNavigator } from 'react-navigation';
 
 import LetStartPage from 'app/pages/let-start';
 import GetStartedPage from 'app/pages/get-started';
@@ -22,13 +21,12 @@ import InitSuccessfullyPage from 'app/pages/init-successfully';
 import HomePage from 'app/pages/home';
 import AuthLoadingPage from 'app/pages/auth-loading';
 
+import { TabNavigator } from './tab-navigator';
 import { theme } from './styles';
-
-// const TabStack = createBottomTabNavigator();
 
 const AppStack = createStackNavigator({
   Home: {
-    screen: HomePage,
+    screen: TabNavigator,
     navigationOptions: {
       header: () => null,
       title: ''

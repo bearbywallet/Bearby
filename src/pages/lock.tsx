@@ -80,6 +80,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               placeholder={i18n.t('pass_setup_input1')}
               placeholderTextColor={color}
               onChangeText={hanldeInputPassword}
+              onSubmitEditing={hanldeUnlock}
             />
           </View>
           <Text style={styles.errorMessage}>
