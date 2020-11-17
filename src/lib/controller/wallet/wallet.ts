@@ -13,6 +13,7 @@ import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { AccountControler } from 'app/lib/controller/account';
 import { TokenControll } from 'app/lib/controller/tokens';
+import { CurrencyControler } from 'app/lib/controller/currency';
 
 import { AccountTypes } from 'app/config';
 
@@ -22,6 +23,7 @@ export class WalletControler extends Mnemonic {
   public guard = new GuardControler(_storage);
   public network = new NetworkControll(_storage);
   public account = new AccountControler(_storage);
+  public currency = new CurrencyControler(_storage);
   public zilliqa = new ZilliqaControl(this.network);
   public token = new TokenControll(this.zilliqa, _storage, this.network);
 
@@ -50,5 +52,6 @@ export class WalletControler extends Mnemonic {
     await this.guard.sync();
     await this.network.sync();
     await this.account.sync();
+    await this.currency.sync();
   }
 }

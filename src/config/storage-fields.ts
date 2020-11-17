@@ -16,5 +16,6 @@ export const STORAGE_FIELDS = {
   SELECTED_NET: 'selectednet',
   CONFIG: 'config',
   ACCOUNTS: 'accounts',
-  TRANSACTIONS: 'transactions'
+  TRANSACTIONS: 'transactions',
+  CURRENCY: 'currency'
 };

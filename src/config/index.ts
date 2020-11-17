@@ -14,3 +14,4 @@ export * from './account-type';
 export * from './address-format';
 export * from './touch-id';
 export * from './stack-navigation-options';
+export * from './currency';
