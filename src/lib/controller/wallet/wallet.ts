@@ -17,6 +17,7 @@ import { CurrencyControler } from 'app/lib/controller/currency';
 import { ThemeControler } from 'app/lib/controller/theme';
 import { ContactsControler } from 'app/lib/controller/contacts';
 import { SettingsControler } from 'app/lib/controller/settings';
+import { GasControler } from 'app/lib/controller/gas';
 
 import { AccountTypes } from 'app/config';
 
@@ -30,6 +31,7 @@ export class WalletControler extends Mnemonic {
   public theme = new ThemeControler(_storage);
   public settings = new SettingsControler(_storage);
   public contacts = new ContactsControler(_storage);
+  public gas = new GasControler(_storage);
   public zilliqa = new ZilliqaControl(this.network);
   public token = new TokenControll(this.zilliqa, _storage, this.network);
 
