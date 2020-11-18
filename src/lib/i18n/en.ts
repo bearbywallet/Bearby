@@ -26,6 +26,8 @@ export default {
   successfully_title: 'Your wallet was successfully created!',
   successfully_btn: 'OK',
   restore_btn: 'Continue',
+  contacts_title: 'Contacts',
+  contacts_btn: 'Add',
   settings_title: 'Settings',
   settings_item0: 'Contacts',
   settings_item1: 'General',

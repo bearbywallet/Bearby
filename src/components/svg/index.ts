@@ -22,3 +22,4 @@ export * from './connect';
 export * from './secure';
 export * from './about';
 export * from './ok';
+export * from './delete';
