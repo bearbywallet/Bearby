@@ -6,6 +6,12 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import {
+  networkStore,
+  setNetworkStore,
+  setConfigNetworkStore,
+  networkStoreReset
+} from './state';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZILLIQA, STORAGE_FIELDS } from 'app/config';
 import { ZilliqaNetwork } from 'types';
@@ -13,34 +19,26 @@ import { ZilliqaNetwork } from 'types';
 const defualtNetwroks = Object.keys(ZILLIQA);
 const [mainnet, testnet, privateNet] = defualtNetwroks;
 
-let _selected = mainnet;
-let _config = JSON.stringify(ZILLIQA);
-
 export class NetworkControll {
-
   public static isValidSelected(selected: string) {
     if (!defualtNetwroks.includes(selected)) {
       throw new Error('unavailable network');
     }
   }
 
+  public readonly store = networkStore;
   private _storage: MobileStorage;
 
-  constructor(storage: MobileStorage, config = ZILLIQA, selected = mainnet) {
-    NetworkControll.isValidSelected(selected);
-
-    _config = JSON.stringify(config);
-    _selected = selected;
-
+  constructor(storage: MobileStorage) {
     this._storage = storage;
   }
 
   public get selected() {
-    return _selected;
+    return this.store.getState().selected;
   }
 
-  public get config(): ZilliqaNetwork {
-    return JSON.parse(_config);
+  public get config(): typeof ZILLIQA {
+    return this.store.getState().config;
   }
 
   public get http() {
@@ -57,7 +55,7 @@ export class NetworkControll {
 
   public get self() {
     return {
-      selected: _selected,
+      selected: this.selected,
       http: this.http,
       ws: this.ws
     };
@@ -70,11 +68,11 @@ export class NetworkControll {
       return this.self;
     }
 
+    setNetworkStore(selected);
+
     await this._storage.set(
       buildObject(STORAGE_FIELDS.SELECTED_NET, selected)
     );
-
-    _selected = selected;
 
     return this.self;
   }
@@ -91,29 +89,41 @@ export class NetworkControll {
       [privateNet]: config[privateNet]
     };
 
+    setConfigNetworkStore(newConfig);
+
     await this._storage.set(
       buildObject(STORAGE_FIELDS.CONFIG, newConfig)
     );
-
-    _config = JSON.stringify(newConfig);
 
     return newConfig;
   }
 
   public async sync() {
-    const data = await this._getStore();
+    const data = await this._storage.multiGet<ZilliqaNetwork | string>(
+      STORAGE_FIELDS.CONFIG,
+      STORAGE_FIELDS.SELECTED_NET
+    );
 
     if (data && data[STORAGE_FIELDS.SELECTED_NET]) {
-      await this.changeNetwork(_selected);
+      const selected = String(data[STORAGE_FIELDS.SELECTED_NET]);
+
+      setNetworkStore(selected);
     }
 
     if (data && data[STORAGE_FIELDS.CONFIG]) {
-      await this.changeConfig(this.config);
+      setConfigNetworkStore(this.config);
     }
+  }
 
-    await this._update();
+  public async reset() {
+    networkStoreReset();
 
-    return self;
+    const { selected, config } = this.store.getState();
+
+    await this._storage.set(
+      buildObject(STORAGE_FIELDS.CONFIG, config),
+      buildObject(STORAGE_FIELDS.SELECTED_NET, selected)
+    );
   }
 
   private _getHTTP(selected: string) {
@@ -122,26 +132,5 @@ export class NetworkControll {
 
   private _getWS(selected: string) {
     return this.config[selected].WS;
-  }
-
-  private _getStore() {
-    return this._storage.multiGet<ZilliqaNetwork | string>(
-      STORAGE_FIELDS.CONFIG,
-      STORAGE_FIELDS.SELECTED_NET
-    );
-  }
-
-  private async _update() {
-    const data = await this._getStore();
-    const selected = data[STORAGE_FIELDS.SELECTED_NET];
-    const config = data[STORAGE_FIELDS.CONFIG];
-
-    if (typeof selected === 'string') {
-      _selected = selected;
-    }
-
-    if (typeof config === 'object') {
-      _config = JSON.stringify(config);
-    }
   }
 }

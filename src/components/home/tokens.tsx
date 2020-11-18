@@ -19,24 +19,22 @@ import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { useStore } from 'effector-react';
 
-import SettingsStore from 'app/store/settings';
-
-import { keystore } from 'app/keystore';
-
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
 
+import { keystore } from 'app/keystore';
+
 export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
-
-  const settingsState = useStore(SettingsStore.store);
+  const settingsState = useStore(keystore.settings.store);
+  const netwrokState = useStore(keystore.network.store);
 
   const tokensList = React.useMemo(
     () => tokensState.identities.filter(
       // Filtering the only selected netwrok tokens.
-      (token) => Boolean(token.address[settingsState.netwrok] && token.symbol !== 'ZIL')
+      (token) => Boolean(token.address[netwrokState.selected] && token.symbol !== 'ZIL')
     ),
-    [settingsState.netwrok]
+    [netwrokState.selected]
   );
 
   return (
@@ -57,7 +55,7 @@ export const HomeTokens: React.FC = () => {
             <TokenCard
               key={index}
               token={token}
-              net={settingsState.netwrok}
+              net={'mainnet'}
               rate={settingsState.rate}
               style={styles.token}
             />
