@@ -29,28 +29,66 @@ type Prop = {
 
 const items = [
   {
-    name: 'test0',
+    name: 'Jim',
     bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
   },
   {
-    name: 'test1',
+    name: 'Andrey',
     bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
   },
   {
-    name: 'test2',
+    name: 'Rinat',
     bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
   },
   {
-    name: 'test3',
+    name: 'King',
     bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
   },
   {
-    name: 'test4',
+    name: 'Bob',
+    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
+  },
+  {
+    name: 'Bingo',
+    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
+  },
+  {
+    name: 'Aana',
+    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
+  },
+  {
+    name: 'Doll',
     bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
   }
 ];
 
-export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
+const checkChar = (elements: { name: string }[], index: number) => {
+  if (index === 0) {
+    return false;
+  } else if (index - 1 < 0) {
+    return false;
+  }
+
+  const [previous] = elements[index].name;
+  const [next] = elements[index - 1].name;
+
+  return previous.toLowerCase() === next.toLowerCase();
+};
+
+export const ContactsPage: React.FC<Prop> = () => {
+  const alphabetSorted = React.useMemo(() => {
+    return items.sort((a, b) => {
+      if (a.name < b.name) {
+        return -1;
+      }
+      if (a.name > b.name) {
+        return 1;
+      }
+
+      return 0;
+    });
+  }, []);
+
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.titleWrapper}>
@@ -64,11 +102,12 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
         />
       </View>
       <ScrollView style={styles.list}>
-        {items.map((item, index) => (
+        {alphabetSorted.map((item, index) => (
           <ContactItem
             key={index}
             name={item.name}
-            last={index === items.length - 1}
+            isChar={!checkChar(alphabetSorted, index)}
+            last={index === alphabetSorted.length - 1}
             bech32={item.bech32}
           />
         ))}

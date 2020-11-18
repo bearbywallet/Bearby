@@ -22,16 +22,25 @@ import { theme } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   last?: boolean;
+  isChar?: boolean;
   name: string;
   bech32: string;
+  onRemove?: () => void;
 };
 
-export const ContactItem: React.FC<Prop> = ({ style, name, bech32, last }) => (
+export const ContactItem: React.FC<Prop> = ({
+  style,
+  name,
+  bech32,
+  isChar,
+  last,
+  onRemove = () => null
+}) => (
   <View
     style={[styles.container, style]}
   >
     <Text style={styles.char}>
-      A
+      {isChar ? name[0].toUpperCase() : ' '}
     </Text>
     <View style={[styles.wrapper, { borderBottomWidth: last ? 0 : 1 }]}>
       <View>
@@ -42,7 +51,10 @@ export const ContactItem: React.FC<Prop> = ({ style, name, bech32, last }) => (
           {bech32}
         </Text>
       </View>
-      <SvgXml xml={DeleteIconSVG} />
+      <SvgXml
+        xml={DeleteIconSVG}
+        onTouchEnd={onRemove}
+      />
     </View>
   </View>
 );
