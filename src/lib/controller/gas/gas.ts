@@ -12,7 +12,7 @@ import {
   gasStoreUpdate,
   GasStoreReset
 } from './state';
-import { STORAGE_FIELDS } from 'app/config';
+import { STORAGE_FIELDS, DEFAULT_GAS } from 'app/config';
 import { GasState } from 'types';
 
 export class GasControler {
@@ -24,23 +24,40 @@ export class GasControler {
   }
 
   public async sync() {
-    const gasConfig = await this._storage.get<GasState>(
+    const gasConfig = await this._storage.get(
       STORAGE_FIELDS.GAS
     );
 
-    if (gasConfig || typeof gasConfig !== 'object') {
-      return null;
-    } else if (Object.keys(gasConfig || {}).length !== 3) {
+    try {
+      const state = JSON.parse(String(gasConfig));
+      gasStoreUpdate(state);
+    } catch (err) {
       return null;
     }
-
-    gasStoreUpdate(gasConfig as GasState);
   }
 
   public reset() {
     GasStoreReset();
 
     return this._storage.set(
+      buildObject(STORAGE_FIELDS.GAS, this.store.getState())
+    );
+  }
+
+  public async changeGas(gas: GasState) {
+    if (isNaN(Number(gas.gasLimit))) {
+      return null;
+    } else if (isNaN(Number(gas.gasPrice))) {
+      return null;
+    } else if (Number(gas.gasPrice) < Number(DEFAULT_GAS.gasPrice)) {
+      return null;
+    } else if (Number(gas.gasLimit) < Number(DEFAULT_GAS.gasLimit)) {
+      return null;
+    }
+
+    gasStoreUpdate(gas);
+
+    await this._storage.set(
       buildObject(STORAGE_FIELDS.GAS, this.store.getState())
     );
   }

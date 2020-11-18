@@ -25,9 +25,11 @@ import i18n from 'app/lib/i18n';
 
 export const AdvancedPage = () => {
   const settings = useStore(keystore.settings.store);
+  const gasState = useStore(keystore.gas.store);
 
   const hanldeReset = React.useCallback(() => {
     keystore.settings.reset();
+    keystore.gas.reset();
   }, []);
 
   return (
@@ -42,7 +44,12 @@ export const AdvancedPage = () => {
           onPress={hanldeReset}
         />
       </View>
-      <GasSelector style={{ marginVertical: 16 }}/>
+      <GasSelector
+        style={{ marginVertical: 16 }}
+        gasLimit={gasState.gasLimit}
+        gasPrice={gasState.gasPrice}
+        onChange={(gas) => keystore.gas.changeGas(gas)}
+      />
       <Selector
         style={{ marginVertical: 16 }}
         title={i18n.t('advanced_selector_title')}

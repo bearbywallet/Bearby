@@ -18,25 +18,32 @@ import {
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
+import { GasState } from 'types';
 
 type Prop = {
-  // gasLimit: number;
-  // gasPrice: number;
+  gasLimit: string;
+  gasPrice: string;
+  onChange?: (gas: GasState) => void;
   style?: ViewStyle;
 };
 
 const { width } = Dimensions.get('window');
-export const GasSelector: React.FC<Prop> = ({ style }) => {
-  return (
-    <View style={[styles.container, style]}>
-    <View style={{ width: width / 2 - 16 }}>
+export const GasSelector: React.FC<Prop> = ({
+  style,
+  gasLimit,
+  gasPrice,
+  onChange = () => null
+}) => (
+  <View style={[styles.container, style]}>
+    <View style={{ width: width / 2 - 32 }}>
       <Text style={styles.textLable}>
         {i18n.t('gas_limit')}
       </Text>
       <TextInput
         style={styles.textInput}
-        value="1000"
+        defaultValue={gasLimit}
         placeholderTextColor="#2B2E33"
+        onChangeText={(value) => onChange({ gasPrice, gasLimit: value })}
       />
     </View>
     <View style={{ width: width / 2 - 32 }}>
@@ -44,21 +51,21 @@ export const GasSelector: React.FC<Prop> = ({ style }) => {
         {i18n.t('gas_price')}
       </Text>
       <TextInput
-        value="1"
+        defaultValue={gasPrice}
         style={styles.textInput}
         placeholderTextColor="#2B2E33"
+        onChangeText={(value) => onChange({ gasLimit, gasPrice: value })}
       />
     </View>
   </View>
-  );
-};
+);
 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
     backgroundColor: theme.colors.gray,
     flexDirection: 'row',
-    minWidth: 100
+    justifyContent: 'space-between'
   },
   textLable: {
     color: '#8A8A8F',

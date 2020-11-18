@@ -16,3 +16,4 @@ export * from './touch-id';
 export * from './stack-navigation-options';
 export * from './currency';
 export * from './theme';
+export * from './gas';

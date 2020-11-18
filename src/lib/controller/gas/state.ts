@@ -9,15 +9,13 @@
 import { createDomain, createEvent } from 'effector';
 
 import { GasState } from 'types';
+import { DEFAULT_GAS } from 'app/config';
 
 export const gasStoreUpdate = createEvent<GasState>();
 export const GasStoreReset = createEvent();
 
 const GasDomain = createDomain();
-const initalState: GasState = {
-  gasPrice: '2000',
-  gasLimit: '1'
-};
+const initalState: GasState = DEFAULT_GAS;
 export const gasStore = GasDomain
   .store<GasState>(initalState)
   .reset(GasStoreReset)
