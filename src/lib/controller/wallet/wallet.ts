@@ -15,6 +15,7 @@ import { AccountControler } from 'app/lib/controller/account';
 import { TokenControll } from 'app/lib/controller/tokens';
 import { CurrencyControler } from 'app/lib/controller/currency';
 import { ThemeControler } from 'app/lib/controller/theme';
+import { ContactsControler } from 'app/lib/controller/contacts';
 
 import { AccountTypes } from 'app/config';
 
@@ -26,6 +27,7 @@ export class WalletControler extends Mnemonic {
   public account = new AccountControler(_storage);
   public currency = new CurrencyControler(_storage);
   public theme = new ThemeControler(_storage);
+  public contacts = new ContactsControler(_storage);
   public zilliqa = new ZilliqaControl(this.network);
   public token = new TokenControll(this.zilliqa, _storage, this.network);
 
@@ -56,5 +58,6 @@ export class WalletControler extends Mnemonic {
     await this.network.sync();
     await this.account.sync();
     await this.currency.sync();
+    await this.contacts.sync();
   }
 }
