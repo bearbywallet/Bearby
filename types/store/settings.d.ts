@@ -9,9 +9,6 @@
 import { ZILLIQA, AddressFormats } from 'src/config/app-constants';
 
 export interface Settings {
-  netwrok: string;
-  config: ZILLIQA;
-  blockNumber: number;
   addressFormat: AddressFormats;
   rate: number;
 }

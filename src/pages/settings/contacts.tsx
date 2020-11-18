@@ -16,53 +16,22 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useStore } from 'effector-react';
 
 import { ContactItem } from 'app/components/contact-item';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
+// import { ContactTypes } from 'src/config/account-type';
+import { Contact } from 'types';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
-const items = [
-  {
-    name: 'Jim',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Andrey',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Rinat',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'King',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Bob',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Bingo',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Aana',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  },
-  {
-    name: 'Doll',
-    bech32: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace'
-  }
-];
-
-const checkChar = (elements: { name: string }[], index: number) => {
+const checkChar = (elements: Contact[], index: number) => {
   if (index === 0) {
     return false;
   } else if (index - 1 < 0) {
@@ -76,8 +45,10 @@ const checkChar = (elements: { name: string }[], index: number) => {
 };
 
 export const ContactsPage: React.FC<Prop> = () => {
+  const contactsState = useStore(keystore.contacts.store);
+
   const alphabetSorted = React.useMemo(() => {
-    return items.sort((a, b) => {
+    return contactsState.sort((a, b) => {
       if (a.name < b.name) {
         return -1;
       }
@@ -87,7 +58,7 @@ export const ContactsPage: React.FC<Prop> = () => {
 
       return 0;
     });
-  }, []);
+  }, [contactsState]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -108,7 +79,7 @@ export const ContactsPage: React.FC<Prop> = () => {
             name={item.name}
             isChar={!checkChar(alphabetSorted, index)}
             last={index === alphabetSorted.length - 1}
-            bech32={item.bech32}
+            bech32={item.address}
           />
         ))}
       </ScrollView>

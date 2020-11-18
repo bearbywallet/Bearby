@@ -6,8 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-
-export const ADDRESS_FORMATS = [
-  'bech32',
-  'base16'
-];
+export * from './settings';

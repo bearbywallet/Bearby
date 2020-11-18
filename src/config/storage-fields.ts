@@ -17,5 +17,7 @@ export const STORAGE_FIELDS = {
   CONFIG: 'config',
   ACCOUNTS: 'accounts',
   TRANSACTIONS: 'transactions',
-  CURRENCY: 'currency'
+  CURRENCY: 'currency',
+  RATE: 'rate',
+  ADDRESS_FORMAT: 'address_format'
 };
