@@ -26,7 +26,7 @@ export class CurrencyControler {
     this._storage = storage;
   }
 
-  public setCurrency(currency: string) {
+  public set(currency: string) {
     currenciesStoreUpdate(currency);
 
     return this._storage.set(

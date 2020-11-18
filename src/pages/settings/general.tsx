@@ -23,6 +23,12 @@ import { keystore } from 'app/keystore';
 
 export const GeneralPage = () => {
   const currencyState = useStore(keystore.currency.store);
+  const themeState = useStore(keystore.theme.store);
+
+  const hanldeReset = React.useCallback(() => {
+    keystore.currency.reset();
+    keystore.theme.reset();
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -33,14 +39,22 @@ export const GeneralPage = () => {
         <Button
           title={i18n.t('reset')}
           color={theme.colors.primary}
-          onPress={() => null}
+          onPress={hanldeReset}
         />
       </View>
       <Selector
+        style={styles.selector}
         items={keystore.currency.currencies}
         selected={currencyState}
         title={i18n.t('currency')}
-        onSelect={(item) => keystore.currency.setCurrency(item)}
+        onSelect={(item) => keystore.currency.set(item)}
+      />
+      <Selector
+        style={styles.selector}
+        items={keystore.theme.themes}
+        selected={themeState}
+        title={i18n.t('theme')}
+        onSelect={(item) => keystore.theme.set(item)}
       />
     </View>
   );
@@ -63,6 +77,9 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
+  },
+  selector: {
+    marginVertical: 16
   }
 });
 
