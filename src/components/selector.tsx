@@ -27,6 +27,20 @@ type Prop = {
   onSelect?: (item: string, index: number) => void;
 };
 
+/**
+ * Selector an option component.
+ * @example
+ * import { Selector } from 'app/components/selector';
+ * const view = () => (
+ *  <Selector
+ *    style={{ marginVertical: 16 }}
+ *    title={'test'}
+ *    items={['option1', 'option2', 'option3']}
+ *    selected={'option2'}
+ *    onSelect={(option) => console.log(option)}
+ *  />
+ * );
+ */
 export const Selector: React.FC<Prop> = ({
   selected,
   title,

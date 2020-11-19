@@ -99,19 +99,25 @@ export class NetworkControll {
   }
 
   public async sync() {
-    const data = await this._storage.multiGet<ZilliqaNetwork | string>(
+    const data = await this._storage.multiGet<string>(
       STORAGE_FIELDS.CONFIG,
       STORAGE_FIELDS.SELECTED_NET
     );
 
-    if (data && data[STORAGE_FIELDS.SELECTED_NET]) {
-      const selected = String(data[STORAGE_FIELDS.SELECTED_NET]);
+    try {
+      if (data && data[STORAGE_FIELDS.SELECTED_NET]) {
+        const selected = String(data[STORAGE_FIELDS.SELECTED_NET]);
 
-      setNetworkStore(selected);
-    }
+        setNetworkStore(selected);
+      }
 
-    if (data && data[STORAGE_FIELDS.CONFIG]) {
-      setConfigNetworkStore(this.config);
+      if (data && data[STORAGE_FIELDS.CONFIG]) {
+        const config = JSON.parse(data[STORAGE_FIELDS.CONFIG]);
+
+        setConfigNetworkStore(config);
+      }
+    } catch (err) {
+      return null;
     }
   }
 

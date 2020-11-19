@@ -28,8 +28,13 @@ export class GasControler {
       STORAGE_FIELDS.GAS
     );
 
+    if (!gasConfig) {
+      return null;
+    }
+
     try {
       const state = JSON.parse(String(gasConfig));
+
       gasStoreUpdate(state);
     } catch (err) {
       return null;

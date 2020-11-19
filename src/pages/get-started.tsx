@@ -119,14 +119,14 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.black,
-    paddingVertical: 30
+    backgroundColor: theme.colors.black
   },
   safeArea: {
     flex: 2
   },
   scrollView: {
-    flex: 1
+    flex: 1,
+    maxHeight: height - 50
   },
   slideContainer: {
     alignItems: 'center'
@@ -156,7 +156,7 @@ const styles = StyleSheet.create({
     right: 0,
     justifyContent: 'center',
     alignItems: 'center',
-    flexDirection: 'row',
+    flexDirection: 'row'
   },
   paginationDots: {
     height: 8,

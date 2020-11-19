@@ -7,22 +7,77 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  TextInput,
+  Button,
+  SafeAreaView
+} from 'react-native';
+import { useStore } from 'effector-react';
 
-import { colors } from 'app/styles';
+import { Selector } from 'app/components/selector';
+import { NetwrokConfig } from 'app/components/netwrok-config';
 
+import { theme } from 'app/styles';
+import i18n from 'app/lib/i18n';
+import { keystore } from 'app/keystore';
+
+const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
+  const netwrokState = useStore(keystore.network.store);
+
+  const handleReset = React.useCallback(() => {
+    keystore.network.reset();
+  }, []);
 
   return (
-    <View style={styles.container} />
+    <SafeAreaView style={styles.container}>
+      <View style={styles.titleWrapper}>
+        <Text style={styles.title}>
+          {i18n.t('netwrok_title')}
+        </Text>
+        <Button
+          title={i18n.t('reset')}
+          color={theme.colors.primary}
+          onPress={handleReset}
+        />
+      </View>
+      <Selector
+        style={{ marginVertical: 16 }}
+        title={i18n.t('netwrok_options')}
+        items={netwroks}
+        selected={netwrokState.selected}
+        onSelect={(net) => keystore.network.changeNetwork(net)}
+      />
+      <NetwrokConfig
+        config={netwrokState.config}
+        selected={netwrokState.selected}
+        onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
+      />
+    </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary
-  }
+    backgroundColor: theme.colors.black
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: '10%',
+    paddingHorizontal: 15
+  },
+  title: {
+    color: theme.colors.white,
+    fontSize: 34,
+    lineHeight: 41,
+    fontWeight: 'bold'
+  },
 });
 
 export default NetworkPage;
