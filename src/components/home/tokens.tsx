@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Text,
   Button,
+  Dimensions,
   ScrollView
 } from 'react-native';
 
@@ -24,6 +25,7 @@ import { AddToken } from 'app/components/add-token';
 
 import { keystore } from 'app/keystore';
 
+const { width } = Dimensions.get('window');
 export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
@@ -55,7 +57,7 @@ export const HomeTokens: React.FC = () => {
             <TokenCard
               key={index}
               token={token}
-              net={'mainnet'}
+              net={netwrokState.selected}
               rate={settingsState.rate}
               style={styles.token}
             />
@@ -85,6 +87,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   list: {
+    width: width - 32,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between'
