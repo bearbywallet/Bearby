@@ -21,6 +21,8 @@ export default {
   gas_limit: 'GAS Limit',
   currency: 'Currency',
   theme: 'Theme',
+  connections_title: 'Connections',
+  connections_remove_all: 'Remove All',
   netwrok_title: 'Network',
   netwrok_options: 'Selected network',
   netwrok_node: 'Node',
