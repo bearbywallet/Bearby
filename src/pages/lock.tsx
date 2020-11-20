@@ -25,10 +25,10 @@ import { LockSVG } from 'app/components/svg';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
-import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
+import { RootParamList } from 'app/navigator';
 
 type Prop = {
-  navigation: StackNavigationProp<UnauthorizedStackParamList>;
+  navigation: StackNavigationProp<RootParamList>;
 };
 
 const { width } = Dimensions.get('window');

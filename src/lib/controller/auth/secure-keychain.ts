@@ -53,10 +53,10 @@ export class SecureKeychain {
   /**
    * Sync with storage.
    */
-  async sync() {
+  public async sync() {
     this.supportedBiometryType = await this.getSupportedBiometryType();
 
-    let biometryType = await this._storage.get<string>(
+    const biometryType = await this._storage.get<string>(
       STORAGE_FIELDS.BIOMETRY_CHOSEN
     );
 
@@ -136,7 +136,7 @@ export class SecureKeychain {
     const buildID = await DeviceInfo.getBuildId();
     const fingerPrint = await DeviceInfo.getFingerprint();
     const ipAddress = await DeviceInfo.getIpAddress();
-  
+
     return sha256(name + buildNumber + id + buildID + fingerPrint + ipAddress);
   }
 

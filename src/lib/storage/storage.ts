@@ -127,8 +127,8 @@ export class MobileStorage {
    * const storage = new MobileStorage()
    * storage.rm('any-key-item').then(() => / Do something... /)
    */
-  public rm(...keys: string[]) {
-    AsyncStorage.multiRemove(keys);
+  public async rm(...keys: string[]): Promise<void> {
+    await AsyncStorage.multiRemove(keys);
   }
 
   /**

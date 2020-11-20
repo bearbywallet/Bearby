@@ -15,16 +15,16 @@ const _storage = new MobileStorage();
 const chain = new SecureKeychain(_storage);
 
 export class KeychainControler {
-  public get hasAccess() {
-    return Boolean(this._secureKeychain.accessControl);
-  }
-
   private _secureKeychain: SecureKeychain;
   private _encryptor: Encryptor;
 
   constructor(storage: MobileStorage) {
     this._encryptor = new Encryptor();
     this._secureKeychain = new SecureKeychain(storage);
+  }
+
+  public get hasAccess() {
+    return Boolean(this._secureKeychain.accessControl);
   }
 
   public async reset() {
@@ -54,9 +54,11 @@ export class KeychainControler {
 
     if (!password) {
       hashSum = await this._secureKeychain.getGenericPassword();
-    } else {
-      hashSum = await sha256(password);
+
+      return this._encryptor.decrypt(hashSum, encrypted);
     }
+
+    hashSum = await sha256(password);
 
     return this._encryptor.decrypt(hashSum, encrypted);
   }

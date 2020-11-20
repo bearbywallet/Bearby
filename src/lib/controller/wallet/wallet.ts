@@ -24,16 +24,16 @@ import { AccountTypes } from 'app/config';
 const _storage = new MobileStorage();
 
 export class WalletControler extends Mnemonic {
-  public guard = new GuardControler(_storage);
-  public network = new NetworkControll(_storage);
-  public account = new AccountControler(_storage);
-  public currency = new CurrencyControler(_storage);
-  public theme = new ThemeControler(_storage);
-  public settings = new SettingsControler(_storage);
-  public contacts = new ContactsControler(_storage);
-  public gas = new GasControler(_storage);
-  public zilliqa = new ZilliqaControl(this.network);
-  public token = new TokenControll(this.zilliqa, _storage, this.network);
+  public readonly guard = new GuardControler(_storage);
+  public readonly network = new NetworkControll(_storage);
+  public readonly account = new AccountControler(_storage);
+  public readonly currency = new CurrencyControler(_storage);
+  public readonly theme = new ThemeControler(_storage);
+  public readonly settings = new SettingsControler(_storage);
+  public readonly contacts = new ContactsControler(_storage);
+  public readonly gas = new GasControler(_storage);
+  public readonly zilliqa = new ZilliqaControl(this.network);
+  public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
@@ -52,7 +52,7 @@ export class WalletControler extends Mnemonic {
     return this.account.add(account);
   }
 
-  public unlockWallet(password: string) {
+  public async unlockWallet(password: string) {
     return this.guard.unlock(password);
   }
 

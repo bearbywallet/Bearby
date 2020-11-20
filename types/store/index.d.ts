@@ -14,3 +14,4 @@ export * from './token';
 export * from './network';
 export * from './gas';
 export * from './connect';
+export * from './auth';

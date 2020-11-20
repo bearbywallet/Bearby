@@ -30,9 +30,24 @@ export default () => (
     headerMode="none"
     initialRouteName="Loading"
   >
-    <Stack.Screen name="Loading" component={PreLoading} />
-    <Stack.Screen name="Unauthorized" component={Unauthorized} />
-    <Stack.Screen name="App" component={TabNavigator} />
-    <Stack.Screen name="SettingsPages" component={Settings} />
+    <Stack.Screen
+      name="Loading"
+      component={PreLoading}
+    />
+    <Stack.Screen
+      name="Unauthorized"
+      component={Unauthorized}
+    />
+    <Stack.Screen
+      name="App"
+      component={TabNavigator}
+      options={{
+        title: ''
+      }}
+    />
+    <Stack.Screen
+      name="SettingsPages"
+      component={Settings}
+    />
   </Stack.Navigator>
 );
