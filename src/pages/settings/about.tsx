@@ -7,21 +7,71 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { View, StyleSheet } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  Text,
+  Linking,
+  Button,
+  Dimensions,
+  SafeAreaView
+} from 'react-native';
 
-import { colors } from 'app/styles';
+const supportedURL = "https://google.com";
 
+import CreateBackground from 'app/assets/get_started_1.svg';
+
+import { theme } from 'app/styles';
+import i18n from 'app/lib/i18n';
+
+const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
+const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
+const TERMS_URL = 'https://zilpay.xyz/Terms/';
+const { width } = Dimensions.get('window');
 export const AboutPage = () => {
 
   return (
-    <View style={styles.container} />
+    <SafeAreaView style={styles.container}>
+      <Text style={styles.title}>
+        {i18n.t('about_title')}
+      </Text>
+      <CreateBackground
+        width={width}
+        height={width}
+      />
+      <View>
+        <Button
+          title={i18n.t('about_link_0')}
+          color={theme.colors.primary}
+          onPress={() => Linking.openURL(GIHTUB_URL)}
+        />
+        <Button
+          title={i18n.t('about_link_1')}
+          color={theme.colors.primary}
+          onPress={() => Linking.openURL(PRIVACY_URL)}
+        />
+        <Button
+          title={i18n.t('about_link_2')}
+          color={theme.colors.primary}
+          onPress={() => Linking.openURL(TERMS_URL)}
+        />
+      </View>
+    </ SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: colors.secondary
+    backgroundColor: theme.colors.black
+  },
+  title: {
+    textAlign: 'center',
+    color: theme.colors.white,
+    fontSize: 34,
+    lineHeight: 41,
+    fontWeight: 'bold',
+    marginTop: '5%'
   }
 });
 
