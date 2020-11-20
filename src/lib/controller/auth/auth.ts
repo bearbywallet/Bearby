@@ -6,51 +6,58 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import Keychain from 'react-native-keychain';
 import { sha256, Encryptor, EncryptedType } from 'app/lib/crypto';
+import { MobileStorage } from 'app/lib';
+import { SecureKeychain } from './secure-keychain';
 
-export interface Auth {
-  getEncrypted: () => EncryptedType;
-  setPassword: (password: string) => Promise<void>;
-  encryptVault: (decrypted: string) => Promise<EncryptedType>;
-  decryptVault: () => Promise<string>;
-}
+const _storage = new MobileStorage();
+const chain = new SecureKeychain(_storage);
 
-export async function AuthControler(password?: string, encryptedContent?: EncryptedType): Promise<Auth> {
-  const encryptor = new Encryptor();
-  let _hashSum = password ? await sha256(password) : null;
-  let _encrypted = encryptedContent;
-  const checkPassword = () => {
-    if (!_hashSum) {
-      throw new Error('password isnot initialized');
+export class KeychainControler {
+  public get hasAccess() {
+    return Boolean(this._secureKeychain.accessControl);
+  }
+
+  private _secureKeychain: SecureKeychain;
+  private _encryptor: Encryptor;
+
+  constructor(storage: MobileStorage) {
+    this._encryptor = new Encryptor();
+    this._secureKeychain = new SecureKeychain(storage);
+  }
+
+  public async reset() {
+    await this._secureKeychain.reset();
+  }
+
+  public async sync() {
+    await this._secureKeychain.sync();
+  }
+
+  public async initKeychain(password: string, biometric: Keychain.ACCESS_CONTROL) {
+    const hashSum = await sha256(password);
+
+    await this._secureKeychain.setAccessControl(biometric);
+    await this._secureKeychain.createKeychain(hashSum);
+  }
+
+  public async encryptVault(decrypted: string, password: string) {
+    const hashSum = await sha256(password);
+    const encrypted = await this._encryptor.encrypt(hashSum, decrypted);
+
+    return encrypted;
+  }
+
+  public async decryptVault(encrypted: EncryptedType, password?: string) {
+    let hashSum: string;
+
+    if (!password) {
+      hashSum = await this._secureKeychain.getGenericPassword();
+    } else {
+      hashSum = await sha256(password);
     }
-  };
 
-  return {
-    getEncrypted() {
-      if (!_encrypted) {
-        throw new Error('encrypted has not initialized');
-      }
-
-      return _encrypted;
-    },
-    async setPassword(_password: string) {
-      _hashSum = await sha256(_password);
-    },
-    async encryptVault(decrypted: string) {
-      checkPassword();
-
-      _encrypted = await encryptor.encrypt(_hashSum, decrypted);
-
-      return _encrypted;
-    },
-    decryptVault() {
-      checkPassword();
-
-      if (!_encrypted) {
-        throw new Error('encrypted has not initialized');
-      }
-
-      return encryptor.decrypt(_hashSum, _encrypted);
-    }
-  };
+    return this._encryptor.decrypt(hashSum, encrypted);
+  }
 }

@@ -6,19 +6,23 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+const app = 'ZilPay';
+const prefix = `@/${app}/`;
 
 export const STORAGE_FIELDS = {
-  VAULT: 'vault',
-  CONTACTS: 'contacts',
-  TOKENS: 'tokens',
-  THEME: 'theme',
-  SELECTED_COIN: 'selectedcoin',
-  SELECTED_NET: 'selectednet',
-  CONFIG: 'config',
-  ACCOUNTS: 'accounts',
-  TRANSACTIONS: 'transactions',
-  CURRENCY: 'currency',
-  RATE: 'rate',
-  GAS: 'gas_config',
-  ADDRESS_FORMAT: 'address_format'
+  VAULT: `${prefix}vault`,
+  CONTACTS: `${prefix}contacts`,
+  TOKENS: `${prefix}tokens`,
+  THEME: `${prefix}theme`,
+  SELECTED_COIN: `${prefix}selectedcoin`,
+  SELECTED_NET: `${prefix}selectednet`,
+  CONFIG: `${prefix}config`,
+  ACCOUNTS: `${prefix}accounts`,
+  TRANSACTIONS: `${prefix}transactions`,
+  CURRENCY: `${prefix}currency`,
+  RATE: `${prefix}rate`,
+  GAS: `${prefix}gas_config`,
+  ADDRESS_FORMAT: `${prefix}address_format`,
+
+  BIOMETRY_CHOSEN: `${prefix}biometry_chosen`
 };
