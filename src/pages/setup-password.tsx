@@ -114,7 +114,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           enabled={isBiometric}
           onChange={setIsBiometric}
         >
-          {biometric}
+          <Text style={styles.label}>
+            {biometric}
+          </Text>
         </Switcher>
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>

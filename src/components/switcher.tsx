@@ -34,9 +34,7 @@ export const Switcher: React.FC<Prop> = ({
 }) => {
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.text}>
-        {children}
-      </Text>
+      {children}
       <Switch
         style={{ marginLeft: 10 }}
         trackColor={{ false: theme.colors.muted, true: theme.colors.primary }}

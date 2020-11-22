@@ -72,7 +72,14 @@ export const SecurityPage: React.FC = () => {
           enabled={biometric}
           onChange={hanldeChangeBiometric}
         >
-          {i18n.t('biometric_touch_id')}
+          <View>
+            <Text style={styles.biometricText}>
+              {i18n.t('use')} {keystore.guard.auth.secureKeychain.supportedBiometryType}
+            </Text>
+            <Text style={styles.biometricLabel}>
+              {i18n.t('biometric_description')}
+            </Text>
+          </View>
         </Switcher>
         <Button
           title={i18n.t('security_btn0')}
@@ -129,8 +136,19 @@ const styles = StyleSheet.create({
     fontWeight: 'bold'
   },
   biometric: {
+    backgroundColor: theme.colors.gray,
     paddingVertical: 15,
-    paddingHorizontal: 50
+    paddingHorizontal: 15
+  },
+  biometricText: {
+    fontSize: 17,
+    lineHeight: 22,
+    color: theme.colors.white
+  },
+  biometricLabel: {
+    fontSize: 16,
+    lineHeight: 21,
+    color: '#8A8A8F'
   }
 });
 
