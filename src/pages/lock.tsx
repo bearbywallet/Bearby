@@ -9,13 +9,13 @@
 import React from 'react';
 import {
   View,
-  SafeAreaView,
   StyleSheet,
   Text,
   TextInput,
   Button,
   Dimensions
 } from 'react-native';
+import { useStore } from 'effector-react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SvgXml } from 'react-native-svg';
@@ -34,7 +34,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const LockPage: React.FC<Prop> = ({ navigation }) => {
-  const [biometric] = React.useState(keystore.guard.auth.secureKeychain.biometricEnable);
+  const authState = useStore(keystore.guard.auth.store);
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
 
@@ -68,10 +68,10 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
   }, []);
 
   React.useEffect(() => {
-    if (biometric) {
+    if (authState.biometricEnable) {
       hanldeBiometricUnlock();
     }
-  }, []);
+  }, [authState.biometricEnable]);
 
   return (
     <KeyboardAwareScrollView style={styles.container}>
@@ -99,7 +99,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               onChangeText={hanldeInputPassword}
               onSubmitEditing={hanldeUnlock}
             />
-            {biometric ? (
+            {authState.biometricEnable ? (
               <SvgXml
                 xml={FingerPrintIconSVG}
                 onTouchEnd={hanldeBiometricUnlock}

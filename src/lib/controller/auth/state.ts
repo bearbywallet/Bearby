@@ -12,12 +12,29 @@ import { AuthState } from 'types';
 
 export const authStoreUpdate = createEvent<AuthState>();
 export const setAuthStoreAccessControl = createEvent<Keychain.ACCESS_CONTROL>();
+export const setAuthStoreBiometricEnable = createEvent<boolean>();
+export const setAuthStoreSupportedBiometryType = createEvent<Keychain.BIOMETRY_TYPE>();
 export const authStoreReset = createEvent();
 
 const AuthDomain = createDomain();
 const initalState: AuthState = {
+  accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
+  biometricEnable: false,
+  supportedBiometryType: null
 };
 export const authStore = AuthDomain
   .store<AuthState>(initalState)
   .on(authStoreUpdate, (_, payload) => payload)
+  .on(setAuthStoreAccessControl, (state, accessControl) => ({
+    ...state,
+    accessControl
+  }))
+  .on(setAuthStoreBiometricEnable, (state, biometricEnable) => ({
+    ...state,
+    biometricEnable
+  }))
+  .on(setAuthStoreSupportedBiometryType, (state, supportedBiometryType) => ({
+    ...state,
+    supportedBiometryType
+  }))
   .reset(authStoreReset);

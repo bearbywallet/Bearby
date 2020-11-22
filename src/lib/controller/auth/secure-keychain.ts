@@ -6,11 +6,19 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { sha256, Encryptor, EncryptedType } from 'app/lib/crypto';
+import { Encryptor, EncryptedType } from 'app/lib/crypto';
 import DeviceInfo from 'react-native-device-info';
 import Keychain from 'react-native-keychain';
 import { MobileStorage, buildObject } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
+import {
+  setAuthStoreAccessControl,
+  setAuthStoreBiometricEnable,
+  setAuthStoreSupportedBiometryType,
+  authStore
+} from './state';
+
+import i18n from 'app/lib/i18n';
 
 const _encryptor = new Encryptor();
 const _options = {
@@ -19,31 +27,11 @@ const _options = {
   securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
   storage: Keychain.STORAGE_TYPE.RSA,
   authenticationPrompt: {
-    title: 'Authentication needed',
-    subtitle: 'Subtitle',
-    description: 'Some descriptive text',
-    cancel: 'Cancel',
+    title: i18n.t('biometric_promt_titie')
   }
 };
 
 export class SecureKeychain {
-  /**
-   * All variants of access to storage.
-   */
-  public static readonly ACCESS_CONTROLS = Keychain.ACCESS_CONTROL;
-  public static readonly BIOMETRY_TYPES = Keychain.BIOMETRY_TYPE;
-
-  /**
-   * Selected by user for example `TouchID`.
-   */
-  public accessControl: Keychain.ACCESS_CONTROL | undefined;
-  /**
-   * Support of phone some Biometry.
-   */
-  public supportedBiometryType: Keychain.BIOMETRY_TYPE | null = null;
-
-  public biometricEnable = false;
-
   private _storage: MobileStorage;
 
   constructor(storage: MobileStorage) {
@@ -56,43 +44,27 @@ export class SecureKeychain {
   public async reset() {
     await Keychain.resetGenericPassword();
     await this._storage.rm(STORAGE_FIELDS.ACCESS_CONTROL);
-    this.biometricEnable = false;
+    setAuthStoreBiometricEnable(false);
   }
 
   /**
    * Sync with storage.
    */
   public async sync() {
-    this.supportedBiometryType = await this.getSupportedBiometryType();
+    const supportedBiometryType = await this.getSupportedBiometryType();
+
+    if (supportedBiometryType) {
+      setAuthStoreSupportedBiometryType(supportedBiometryType);
+    }
 
     const accessControl = await this._storage.get<string>(
       STORAGE_FIELDS.ACCESS_CONTROL
-    );
-
-    if (!accessControl) {
-      this.accessControl = await this.getAccessControl();
-    }
+    ) as Keychain.ACCESS_CONTROL;
 
     if (typeof accessControl === 'string') {
-      this.accessControl = accessControl as Keychain.ACCESS_CONTROL;
-      this.biometricEnable = true;
+      setAuthStoreAccessControl(accessControl);
+      setAuthStoreBiometricEnable(true);
     }
-  }
-
-  public async getAccessControl() {
-    this.supportedBiometryType = await this.getSupportedBiometryType();
-
-    if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.TOUCH_ID) {
-      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
-    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FINGERPRINT) {
-      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
-    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FACE_ID) {
-      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
-    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FACE) {
-      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
-    }
-
-    return Keychain.ACCESS_CONTROL.DEVICE_PASSCODE;
   }
 
   /**
@@ -113,32 +85,40 @@ export class SecureKeychain {
    * @param password - User password.
    */
   public async createKeychain(password: string) {
-    await this._storage.set(
-      buildObject(STORAGE_FIELDS.ACCESS_CONTROL, String(this.accessControl))
-    );
+    const { accessControl } = authStore.getState();
 
     const name = DeviceInfo.getApplicationName();
     const encrypted = await this._encryptPassword(password);
     const jsonEncrypted = JSON.stringify(encrypted);
     const options = {
       ..._options,
-      accessControl: this.accessControl
+      accessControl
     };
 
     await Keychain.setGenericPassword(name, jsonEncrypted, options);
+    await this._storage.set(
+      buildObject(STORAGE_FIELDS.ACCESS_CONTROL, String(accessControl))
+    );
+
+    setAuthStoreBiometricEnable(true);
   }
 
   /**
    * Get content from secure storage and decrypt it.
    */
   public async getGenericPassword() {
+    const { accessControl } = authStore.getState();
     const options = {
       ..._options,
-      accessControl: this.accessControl
+      accessControl
     };
     const credentials = await Keychain.getGenericPassword(options);
 
     if (!credentials || !credentials.password) {
+      this.reset();
+
+      // Rejcet isEnable
+
       throw new Error('Fail credentials');
     }
 

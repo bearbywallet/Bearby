@@ -15,6 +15,7 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
+import { useStore } from 'effector-react';
 import { SvgXml } from 'react-native-svg';
 
 import { Selector } from 'app/components/selector';
@@ -41,16 +42,13 @@ const times = [
   },
 ];
 export const SecurityPage: React.FC = () => {
-  const [biometric, setBiometric] = React.useState(keystore.guard.auth.secureKeychain.biometricEnable);
+  const authState = useStore(keystore.guard.auth.store);
   const [hour, sethour] = React.useState(0);
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const hanldeChangeBiometric = React.useCallback((value) => {
-    if (!value) {
-      keystore.guard.auth.secureKeychain.reset();
-      setBiometric(value);
-    }
-  }, [biometric]);
+    keystore.guard.auth.updateBiometric(value);
+  }, [authState.biometricEnable]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,12 +67,12 @@ export const SecurityPage: React.FC = () => {
         />
         <Switcher
           style={styles.biometric}
-          enabled={biometric}
+          enabled={authState.biometricEnable}
           onChange={hanldeChangeBiometric}
         >
           <View>
             <Text style={styles.biometricText}>
-              {i18n.t('use')} {keystore.guard.auth.secureKeychain.supportedBiometryType}
+              {i18n.t('use')} {authState.supportedBiometryType}
             </Text>
             <Text style={styles.biometricLabel}>
               {i18n.t('biometric_description')}

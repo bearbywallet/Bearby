@@ -29,6 +29,7 @@ export default {
   security_btn1: 'Reveal secret phrase',
   biometric_touch_id: 'Use biometric',
   biometric_pin: 'Use pincode',
+  biometric_promt_titie: 'ZilPay Authentication',
   biometric_error: 'Incorect biometric!',
   biometric_description: 'LogIn and confirm transactions',
   theme: 'Theme',

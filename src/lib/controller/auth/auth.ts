@@ -6,30 +6,53 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import Keychain from 'react-native-keychain';
 import { sha256, Encryptor, EncryptedType } from 'app/lib/crypto';
-import { MobileStorage } from 'app/lib';
+import { MobileStorage, buildObject } from 'app/lib';
+import { STORAGE_FIELDS } from 'app/config';
 import { SecureKeychain } from './secure-keychain';
+import {
+  authStore,
+  setAuthStoreBiometricEnable,
+  authStoreReset
+} from './state';
 
 export class KeychainControler {
+  public store = authStore;
   public secureKeychain: SecureKeychain;
+  private _storage: MobileStorage;
   private _encryptor: Encryptor;
 
   constructor(storage: MobileStorage) {
+    this._storage = storage;
     this._encryptor = new Encryptor();
     this.secureKeychain = new SecureKeychain(storage);
   }
 
-  public get hasAccess() {
-    return Boolean(this.secureKeychain.accessControl);
-  }
-
   public async reset() {
+    authStoreReset();
     await this.secureKeychain.reset();
   }
 
   public async sync() {
     await this.secureKeychain.sync();
+  }
+
+  public async updateBiometric(value: boolean) {
+    if (value) {
+      const { accessControl } = authStore.getState();
+
+      await this._storage.set(
+        buildObject(STORAGE_FIELDS.ACCESS_CONTROL, String(accessControl))
+      );
+
+      setAuthStoreBiometricEnable(value);
+
+      return value;
+    }
+
+    await this.reset();
+
+    return value;
   }
 
   public async initKeychain(password: string) {

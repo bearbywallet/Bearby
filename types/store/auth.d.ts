@@ -10,4 +10,6 @@ import Keychain from 'react-native-keychain';
 
 export interface AuthState {
   accessControl?: Keychain.ACCESS_CONTROL;
+  biometricEnable: boolean;
+  supportedBiometryType: Keychain.BIOMETRY_TYPE | null;
 }
