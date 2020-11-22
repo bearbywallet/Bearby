@@ -14,7 +14,6 @@ import {
   TextInput,
   Button,
   Keyboard,
-  Switch,
   ScrollView,
   StyleSheet
 } from 'react-native';
@@ -23,6 +22,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
+import { Switcher } from 'app/components/switcher';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
@@ -109,19 +109,13 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             {i18n.t('pass_setup_label0')}
           </Text>
         </View>
-        <View style={styles.biometric}>
-          <Text style={styles.label}>
-            {biometric}
-          </Text>
-          <Switch
-            style={{ marginLeft: 10 }}
-            trackColor={{ false: theme.colors.muted, true: theme.colors.primary }}
-            thumbColor={isBiometric ? theme.colors.success : theme.colors.muted}
-            ios_backgroundColor="#3e3e3e"
-            onValueChange={setIsBiometric}
-            value={isBiometric}
-          />
-        </View>
+        <Switcher
+          style={styles.biometric}
+          enabled={isBiometric}
+          onChange={setIsBiometric}
+        >
+          {biometric}
+        </Switcher>
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
             <SvgXml xml={LockSVG} />
