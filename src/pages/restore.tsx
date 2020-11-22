@@ -12,8 +12,12 @@ import {
   StyleSheet,
   Text,
   Button,
+  SafeAreaView,
+  Keyboard,
+  Dimensions,
   TextInput
 } from 'react-native';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';
@@ -25,6 +29,7 @@ type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
+const { height } = Dimensions.get('window');
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const [disabled, setDisabled] = React.useState(true);
   const [phrase, setphrase] = React.useState<string>('');
@@ -35,6 +40,10 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
 
     setDisabled(!isValid);
     setphrase(value);
+
+    if (isValid) {
+      Keyboard.dismiss();
+    }
   }, [setDisabled, setphrase]);
   const hanldecreateWallet = React.useCallback(() => {
     navigation.navigate('SetupPassword', {
@@ -43,27 +52,29 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   }, [phrase, navigation]);
 
   return (
-    <View style={styles.container}>
-      <View style={styles.pageContainer}>
-        <Text style={styles.title}>
-          {i18n.t('restore_title')}
-        </Text>
-        <TextInput
-          multiline={true}
-          numberOfLines={10}
-          style={styles.text}
-          placeholder={i18n.t('restore_placeholder')}
-          placeholderTextColor="#2B2E33"
-          onChangeText={hanldeChange}
+    <SafeAreaView style={styles.container}>
+      <KeyboardAwareScrollView>
+        <View style={styles.pageContainer}>
+          <Text style={styles.title}>
+            {i18n.t('restore_title')}
+          </Text>
+          <TextInput
+            multiline={true}
+            numberOfLines={10}
+            style={styles.text}
+            placeholder={i18n.t('restore_placeholder')}
+            placeholderTextColor="#2B2E33"
+            onChangeText={hanldeChange}
+          />
+        </View>
+        <Button
+          title={i18n.t('restore_btn')}
+          color={theme.colors.primary}
+          disabled={disabled}
+          onPress={hanldecreateWallet}
         />
-      </View>
-      <Button
-        title={i18n.t('restore_btn')}
-        color={theme.colors.primary}
-        disabled={disabled}
-        onPress={hanldecreateWallet}
-      />
-    </View>
+      </KeyboardAwareScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -76,7 +87,7 @@ const styles = StyleSheet.create({
     marginTop: 54,
     justifyContent: 'flex-start',
     paddingHorizontal: 16,
-    height: '80%'
+    marginBottom: '5%'
   },
   title: {
     textAlign: 'center',
@@ -87,7 +98,7 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 60,
-    height: 300,
+    height: height / 5,
     borderColor: '#2B2E33',
     borderWidth: 1,
     borderRadius: 8,

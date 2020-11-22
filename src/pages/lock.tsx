@@ -17,6 +17,7 @@ import {
   Dimensions
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SvgXml } from 'react-native-svg';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -33,7 +34,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const LockPage: React.FC<Prop> = ({ navigation }) => {
-
+  const [biometric] = React.useState(keystore.guard.auth.secureKeychain.biometricEnable);
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
 
@@ -45,8 +46,6 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
   const hanldeUnlock = React.useCallback(async() => {
     try {
       await keystore.guard.unlock(password);
-      await keystore.unlockWallet(password);
-      await keystore.sync();
 
       navigation.navigate('App', { screen: 'Home' });
     } catch (err) {
@@ -59,8 +58,18 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
     setPasswordError(' ');
   }, [setPassword]);
 
+  React.useEffect(() => {
+    if (biometric) {
+      keystore
+        .guard
+        .unlock()
+        .then(() => navigation.navigate('App', { screen: 'Home' }))
+        .catch(() => setPasswordError(i18n.t('biometric_error')));
+    }
+  }, [biometric]);
+
   return (
-    <SafeAreaView style={styles.container}>
+    <KeyboardAwareScrollView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
           width={width + width / 2}
@@ -96,7 +105,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
           onPress={hanldeUnlock}
         />
       </View>
-    </SafeAreaView>
+    </KeyboardAwareScrollView>
   );
 };
 
@@ -128,11 +137,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1
   },
   pageContainer: {
-    justifyContent: 'space-evenly',
-    alignItems: 'center',
-    height: '100%',
     paddingTop: '100%',
-    paddingHorizontal: 60
+    padding: 60
   },
   title: {
     fontWeight: 'bold',

@@ -13,8 +13,12 @@ import {
   Text,
   TextInput,
   Button,
+  Keyboard,
+  Switch,
+  ScrollView,
   StyleSheet
 } from 'react-native';
+import Keychain from 'react-native-keychain';
 import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
@@ -37,6 +41,8 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [accountName, setAccountName] = React.useState('');
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
+  const [isBiometric, setIsBiometric] = React.useState(true);
+  const [biometric, setBiometric] = React.useState<string>();
 
   const disabledContinue = React.useMemo(() => {
     if (!passwordConfirm || !password) {
@@ -56,16 +62,36 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const handleCreate = React.useCallback(async() => {
     try {
       await keystore.initWallet(password, mnemonicPhrase);
+      await keystore.account.reset();
       await keystore.addAccount(mnemonicPhrase, accountName);
+
+      if (isBiometric) {
+        await keystore.guard.auth.initKeychain(password);
+      }
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {
       console.error(err);
     }
-  }, [password, mnemonicPhrase, accountName]);
+  }, [password, mnemonicPhrase, accountName, isBiometric]);
+
+  React.useEffect(() => {
+    const { accessControl } = keystore.guard.auth.secureKeychain;
+
+    if (!accessControl) {
+      setBiometric(i18n.t('biometric_pin'));
+    } else {
+      setBiometric(i18n.t('biometric_touch_id'));
+    }
+  }, []);
+  React.useEffect(() => {
+    if (!disabledContinue) {
+      Keyboard.dismiss();
+    }
+  }, [disabledContinue]);
 
   return (
-    <View style={styles.container}>
+    <ScrollView style={styles.container}>
       <Text style={styles.title}>
         {i18n.t('password_title')}
       </Text>
@@ -83,6 +109,19 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           <Text style={styles.label}>
             {i18n.t('pass_setup_label0')}
           </Text>
+        </View>
+        <View style={styles.biometric}>
+          <Text style={styles.label}>
+            {biometric}
+          </Text>
+          <Switch
+            style={{ marginLeft: 10 }}
+            trackColor={{ false: theme.colors.muted, true: theme.colors.primary }}
+            thumbColor={isBiometric ? theme.colors.success : theme.colors.muted}
+            ios_backgroundColor="#3e3e3e"
+            onValueChange={setIsBiometric}
+            value={isBiometric}
+          />
         </View>
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
@@ -118,7 +157,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         disabled={disabledContinue}
         onPress={handleCreate}
       />
-    </View>
+    </ScrollView>
   );
 };
 
@@ -136,6 +175,10 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     color: theme.colors.white,
     width: '90%'
+  },
+  biometric: {
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   inputWrapper: {
     flexDirection: 'row',
