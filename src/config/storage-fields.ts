@@ -24,5 +24,5 @@ export const STORAGE_FIELDS = {
   GAS: `${prefix}gas_config`,
   ADDRESS_FORMAT: `${prefix}address_format`,
 
-  BIOMETRY_CHOSEN: `${prefix}biometry_chosen`
+  ACCESS_CONTROL: `${prefix}access_control`
 };
