@@ -66,7 +66,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
         .then(() => navigation.navigate('App', { screen: 'Home' }))
         .catch(() => setPasswordError(i18n.t('biometric_error')));
     }
-  }, [biometric]);
+  }, []);
 
   return (
     <KeyboardAwareScrollView style={styles.container}>

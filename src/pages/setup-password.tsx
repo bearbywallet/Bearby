@@ -18,7 +18,6 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import Keychain from 'react-native-keychain';
 import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';

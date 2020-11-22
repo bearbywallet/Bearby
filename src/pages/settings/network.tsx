@@ -11,7 +11,6 @@ import {
   View,
   StyleSheet,
   Text,
-  TextInput,
   Button,
   SafeAreaView
 } from 'react-native';
