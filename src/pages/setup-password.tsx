@@ -50,9 +50,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 
     const isConfirmed = passwordConfirm === password;
     const isDifficulty = String(password).length < PASSWORD_DIFFICULTY;
-    const isName = String(accountName).length > MAX_NAME_DIFFICULTY;
+    const isNameLength = String(accountName).length > MAX_NAME_DIFFICULTY;
 
-    return !isConfirmed || isDifficulty || isName;
+    return !isConfirmed || isDifficulty || isNameLength;
   }, [password, passwordConfirm, accountName]);
 
   /**

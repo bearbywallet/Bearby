@@ -47,7 +47,9 @@ const tabBarOptions = {
 
 export const TabNavigator: React.FC = () => {
   return (
-    <TabStack.Navigator tabBarOptions={tabBarOptions}>
+    <TabStack.Navigator
+      tabBarOptions={tabBarOptions}
+    >
       <TabStack.Screen
         name="Home"
         component={HomePage}

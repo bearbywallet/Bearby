@@ -21,7 +21,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { SvgXml } from 'react-native-svg';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
-import { LockSVG } from 'app/components/svg';
+import { LockSVG, FingerPrintIconSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -57,14 +57,19 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
     setPassword(value);
     setPasswordError(' ');
   }, [setPassword]);
+  const hanldeBiometricUnlock = React.useCallback(async() => {
+    try {
+      await  keystore.guard.unlock();
+
+      return navigation.navigate('App', { screen: 'Home' });
+    } catch (err) {
+      setPasswordError(i18n.t('biometric_error'));
+    }
+  }, []);
 
   React.useEffect(() => {
     if (biometric) {
-      keystore
-        .guard
-        .unlock()
-        .then(() => navigation.navigate('App', { screen: 'Home' }))
-        .catch(() => setPasswordError(i18n.t('biometric_error')));
+      hanldeBiometricUnlock();
     }
   }, []);
 
@@ -94,6 +99,12 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               onChangeText={hanldeInputPassword}
               onSubmitEditing={hanldeUnlock}
             />
+            {biometric ? (
+              <SvgXml
+                xml={FingerPrintIconSVG}
+                onTouchEnd={hanldeBiometricUnlock}
+              />
+            ) : null}
           </View>
           <Text style={styles.errorMessage}>
             {passwordError}
@@ -124,7 +135,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     padding: 10,
     color: theme.colors.white,
-    width: '100%'
+    width: '84%'
   },
   errorMessage: {
     color: theme.colors.danger,

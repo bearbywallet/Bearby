@@ -15,9 +15,12 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 
 import { Selector } from 'app/components/selector';
 import { Switcher } from 'app/components/switcher';
+import Modal from 'react-native-modal';
+import { DeleteIconSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -40,6 +43,7 @@ const times = [
 export const SecurityPage: React.FC = () => {
   const [biometric, setBiometric] = React.useState(keystore.guard.auth.secureKeychain.biometricEnable);
   const [hour, sethour] = React.useState(0);
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   const hanldeChangeBiometric = React.useCallback((value) => {
     if (!value) {
@@ -78,8 +82,29 @@ export const SecurityPage: React.FC = () => {
         <Button
           title={i18n.t('security_btn1')}
           color={theme.colors.primary}
-          onPress={() => null}
+          onPress={() => setModalVisible(true)}
         />
+        <Modal
+          isVisible={modalVisible}
+          onSwipeComplete={() => setModalVisible(false)}
+          swipeDirection={['up', 'left', 'right', 'down']}
+          style={{
+            justifyContent: 'flex-end',
+            margin: 0
+          }}
+        >
+          <View>
+            <View>
+              <Text>
+                Reveal private key
+              </Text>
+              <SvgXml
+                xml={DeleteIconSVG}
+                onTouchEnd={() => setModalVisible(false)}
+              />
+            </View>
+          </View>
+        </Modal>
       </ScrollView>
     </SafeAreaView>
   );

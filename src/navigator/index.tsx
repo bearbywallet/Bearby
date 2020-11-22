@@ -29,6 +29,7 @@ export default () => (
   <Stack.Navigator
     headerMode="none"
     initialRouteName="Loading"
+    screenOptions={{ gestureEnabled: false }}
   >
     <Stack.Screen
       name="Loading"
