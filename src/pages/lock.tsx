@@ -44,11 +44,13 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
 
   const hanldeUnlock = React.useCallback(async() => {
     try {
+      await keystore.guard.unlock(password);
       await keystore.unlockWallet(password);
       await keystore.sync();
 
       navigation.navigate('App', { screen: 'Home' });
     } catch (err) {
+      // console.log(err);
       setPasswordError(i18n.t('lock_error'));
     }
   }, [password, setPasswordError]);

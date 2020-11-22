@@ -15,7 +15,7 @@ const _storage = new MobileStorage();
 const chain = new SecureKeychain(_storage);
 
 export class KeychainControler {
-  private _secureKeychain: SecureKeychain;
+  public _secureKeychain: SecureKeychain;
   private _encryptor: Encryptor;
 
   constructor(storage: MobileStorage) {

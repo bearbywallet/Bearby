@@ -16,7 +16,15 @@ const _private = new WeakMap();
 const _encryptor = new Encryptor();
 const _options = {
   service: 'com.zilpay',
-  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY
+  accessible: Keychain.ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+  securityLevel: Keychain.SECURITY_LEVEL.SECURE_HARDWARE,
+  storage: Keychain.STORAGE_TYPE.RSA,
+  authenticationPrompt: {
+    title: 'Authentication needed',
+    subtitle: 'Subtitle',
+    description: 'Some descriptive text',
+    cancel: 'Cancel',
+  }
 };
 
 export class SecureKeychain {
@@ -45,9 +53,9 @@ export class SecureKeychain {
    * Reset all params.
    */
   public async reset() {
-    await this._storage.rm(STORAGE_FIELDS.BIOMETRY_CHOSEN);
-    await Keychain.resetGenericPassword(_options);
-    this.accessControl = undefined;
+    await Keychain.resetGenericPassword();
+    // await this._storage.rm(STORAGE_FIELDS.BIOMETRY_CHOSEN);
+    // this.accessControl = undefined;
   }
 
   /**

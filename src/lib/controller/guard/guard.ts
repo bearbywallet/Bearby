@@ -59,13 +59,16 @@ export class GuardControler {
   }
 
   public async unlock(password: string) {
+    await this._auth._secureKeychain.reset();
+
+    await this._auth._secureKeychain.createKeychain(password);
     const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
     const cipher = JSON.parse(String(encrypted));
 
     await this._auth.decryptVault(cipher, password);
   }
 
-  public getMnemonic() {
+  public async getMnemonic() {
     if (!this.isEnable) {
       throw new Error('wallet is disabled');
     } else if (!this.isReady) {
@@ -74,7 +77,11 @@ export class GuardControler {
       throw new Error('guard is not initialized');
     }
 
-    return this._auth.decryptVault();
+    const password = await this._auth._secureKeychain.getGenericPassword();
+    const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
+    const cipher = JSON.parse(String(encrypted));
+
+    return this._auth.decryptVault(cipher, password);
   }
 
   public logout() {
