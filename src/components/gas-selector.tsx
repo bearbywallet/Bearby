@@ -15,10 +15,22 @@ import {
   TextInput,
   ViewStyle
 } from 'react-native';
+import { SvgXml } from 'react-native-svg';
+
+import {
+  BigArrowIconSVG,
+  HelpIconSVG
+} from 'app/components/svg';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { GasState } from 'types';
+import {
+  gasToFee,
+  fromZil
+} from 'app/filters';
+import { keystore } from 'app/keystore';
+import { useStore } from 'effector-react';
 
 type Prop = {
   gasLimit: string;
@@ -33,51 +45,126 @@ export const GasSelector: React.FC<Prop> = ({
   gasLimit,
   gasPrice,
   onChange = () => null
-}) => (
-  <View style={[styles.container, style]}>
-    <View style={{ width: width / 2 - 32 }}>
-      <Text style={styles.textLable}>
-        {i18n.t('gas_limit')}
-      </Text>
-      <TextInput
-        style={styles.textInput}
-        defaultValue={gasLimit}
-        placeholderTextColor="#2B2E33"
-        onChangeText={(value) => onChange({ gasPrice, gasLimit: value })}
-      />
+}) => {
+  const tokensState = useStore(keystore.token.store);
+  const amount = React.useMemo(() => {
+    const fee = gasToFee(gasLimit, gasPrice);
+    const [zilliqa] = tokensState.identities;
+
+    return fromZil(fee, zilliqa.decimals);
+  }, [tokensState, gasLimit, gasPrice]);
+
+  return (
+    <View style={[styles.container, style]}>
+      <View style={styles.header}>
+        <Text style={styles.title}>
+          {i18n.t('fee')}
+        </Text>
+        <SvgXml
+          xml={HelpIconSVG}
+          fill="#8A8A8F"
+        />
+      </View>
+      <View style={styles.wrapper}>
+        <View style={styles.item}>
+          <View style={{ flexDirection: 'row' }}>
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill="#666666"
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill="#666666"
+            />
+          </View>
+          <Text style={styles.amount}>
+            {amount} ZIL
+          </Text>
+        </View>
+        <View style={styles.item}>
+          <View style={{ flexDirection: 'row' }}>
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill="#666666"
+            />
+          </View>
+          <Text style={styles.amount}>
+            0.002 ZIL
+          </Text>
+        </View>
+        <View style={styles.item}>
+          <View style={{ flexDirection: 'row' }}>
+          <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+            <SvgXml
+              xml={BigArrowIconSVG}
+              fill={theme.colors.white}
+            />
+          </View>
+          <Text style={styles.amount}>
+            0.002 ZIL
+          </Text>
+        </View>
+      </View>
     </View>
-    <View style={{ width: width / 2 - 32 }}>
-      <Text style={styles.textLable}>
-        {i18n.t('gas_price')}
-      </Text>
-      <TextInput
-        defaultValue={gasPrice}
-        style={styles.textInput}
-        placeholderTextColor="#2B2E33"
-        onChangeText={(value) => onChange({ gasLimit, gasPrice: value })}
-      />
-    </View>
-  </View>
-);
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: theme.colors.gray,
+    backgroundColor: theme.colors.gray
+  },
+  header: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%'
   },
-  textLable: {
-    color: '#8A8A8F',
+  title: {
     fontSize: 16,
-    lineHeight: 21
+    lineHeight: 21,
+    color: '#8A8A8F'
   },
-  textInput: {
-    fontSize: 17,
-    lineHeight: 22,
-    padding: 10,
-    borderBottomColor: '#2B2E33',
-    borderBottomWidth: 1,
+  wrapper: {
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 5,
+    marginTop: 10,
+    borderColor: theme.colors.black,
+    justifyContent: 'space-between',
+    flexDirection: 'row'
+  },
+  item: {
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+    borderRadius: 8,
+    backgroundColor: 'red',
+    width: (width / 3) - 20
+  },
+  amount: {
+    fontSize: 13,
+    lineHeight: 17,
     color: theme.colors.white
   }
 });

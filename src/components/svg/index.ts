@@ -24,3 +24,5 @@ export * from './about';
 export * from './ok';
 export * from './delete';
 export * from './fingerprint';
+export * from './big-arrow';
+export * from './help';

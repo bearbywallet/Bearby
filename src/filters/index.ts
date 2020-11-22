@@ -9,3 +9,4 @@
 export * from './to-locale-string';
 export * from './to-conversion';
 export * from './from-zil';
+export * from './gas-to-fee';

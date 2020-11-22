@@ -17,6 +17,7 @@ export default {
   send: 'Send',
   use: 'Use',
   hour: 'hour',
+  fee: 'Fee',
   hours: 'hours',
   reset: 'Reset',
   receive: 'Receive',
