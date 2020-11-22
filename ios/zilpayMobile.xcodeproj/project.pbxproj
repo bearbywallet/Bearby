@@ -21,9 +21,9 @@
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
 		2DCD954D1E0B4F2C00145EB5 /* zilpayMobileTests.m in Sources */ = {isa = PBXBuildFile; fileRef = 00E356F21AD99517003FC87E /* zilpayMobileTests.m */; };
-		500D6675A51E33291568C18C /* libPods-zilpayMobile-zilpayMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 499A4287F0844E769256EDA1 /* libPods-zilpayMobile-zilpayMobileTests.a */; };
+		37260D4AEF19232D446FF2C6 /* libPods-zilpayMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 438097A4090D9A0908071CB4 /* libPods-zilpayMobile.a */; };
+		799157E786F30BAC20DA5ACA /* libPods-zilpayMobile-zilpayMobileTests.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 979A0609E2F9480C075BA913 /* libPods-zilpayMobile-zilpayMobileTests.a */; };
 		81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */; };
-		E7ACAA8CA946DE5887897E03 /* libPods-zilpayMobile.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 4A27B99C6AC2259AC0BA413C /* libPods-zilpayMobile.a */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -66,15 +66,15 @@
 		158A2C002544540800D32C44 /* Mnemonic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Mnemonic.m; sourceTree = "<group>"; };
 		1593FFB225404277003A377C /* Crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
 		1593FFB325404282003A377C /* Crypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
-		213068AB36243429AF9584EE /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
-		2B41D9F7C1AAD2548D52D76D /* Pods-zilpayMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile.debug.xcconfig"; path = "Target Support Files/Pods-zilpayMobile/Pods-zilpayMobile.debug.xcconfig"; sourceTree = "<group>"; };
+		29A3322CDD91E2C0522DA163 /* Pods-zilpayMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile.debug.xcconfig"; path = "Target Support Files/Pods-zilpayMobile/Pods-zilpayMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* zilpayMobile-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zilpayMobile-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* zilpayMobile-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "zilpayMobile-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
-		30B34C0599EA14B9B7E1AF2E /* Pods-zilpayMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile.release.xcconfig"; path = "Target Support Files/Pods-zilpayMobile/Pods-zilpayMobile.release.xcconfig"; sourceTree = "<group>"; };
-		499A4287F0844E769256EDA1 /* libPods-zilpayMobile-zilpayMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-zilpayMobile-zilpayMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		4A27B99C6AC2259AC0BA413C /* libPods-zilpayMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-zilpayMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
-		721F395010B42E11D3700D9C /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; path = "Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; sourceTree = "<group>"; };
+		438097A4090D9A0908071CB4 /* libPods-zilpayMobile.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-zilpayMobile.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		548B8C59E87A1011C6D7E8C8 /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig"; path = "Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig"; sourceTree = "<group>"; };
 		81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.storyboard; name = LaunchScreen.storyboard; path = zilpayMobile/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		979A0609E2F9480C075BA913 /* libPods-zilpayMobile-zilpayMobileTests.a */ = {isa = PBXFileReference; explicitFileType = archive.ar; includeInIndex = 0; path = "libPods-zilpayMobile-zilpayMobileTests.a"; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC615C09147408A68E2FEF55 /* Pods-zilpayMobile.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile.release.xcconfig"; path = "Target Support Files/Pods-zilpayMobile/Pods-zilpayMobile.release.xcconfig"; sourceTree = "<group>"; };
+		EAA570961FEEF23D53EC31C6 /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; path = "Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests.release.xcconfig"; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		ED2971642150620600B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = Platforms/AppleTVOS.platform/Developer/SDKs/AppleTVOS12.0.sdk/System/Library/Frameworks/JavaScriptCore.framework; sourceTree = DEVELOPER_DIR; };
 /* End PBXFileReference section */
@@ -84,7 +84,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				500D6675A51E33291568C18C /* libPods-zilpayMobile-zilpayMobileTests.a in Frameworks */,
+				799157E786F30BAC20DA5ACA /* libPods-zilpayMobile-zilpayMobileTests.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -92,7 +92,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				E7ACAA8CA946DE5887897E03 /* libPods-zilpayMobile.a in Frameworks */,
+				37260D4AEF19232D446FF2C6 /* libPods-zilpayMobile.a in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -149,8 +149,8 @@
 			children = (
 				ED297162215061F000B7C4FE /* JavaScriptCore.framework */,
 				ED2971642150620600B7C4FE /* JavaScriptCore.framework */,
-				4A27B99C6AC2259AC0BA413C /* libPods-zilpayMobile.a */,
-				499A4287F0844E769256EDA1 /* libPods-zilpayMobile-zilpayMobileTests.a */,
+				438097A4090D9A0908071CB4 /* libPods-zilpayMobile.a */,
+				979A0609E2F9480C075BA913 /* libPods-zilpayMobile-zilpayMobileTests.a */,
 			);
 			name = Frameworks;
 			sourceTree = "<group>";
@@ -203,10 +203,10 @@
 		F699FC85008A4CCE040CF979 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
-				2B41D9F7C1AAD2548D52D76D /* Pods-zilpayMobile.debug.xcconfig */,
-				30B34C0599EA14B9B7E1AF2E /* Pods-zilpayMobile.release.xcconfig */,
-				213068AB36243429AF9584EE /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */,
-				721F395010B42E11D3700D9C /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */,
+				29A3322CDD91E2C0522DA163 /* Pods-zilpayMobile.debug.xcconfig */,
+				CC615C09147408A68E2FEF55 /* Pods-zilpayMobile.release.xcconfig */,
+				548B8C59E87A1011C6D7E8C8 /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */,
+				EAA570961FEEF23D53EC31C6 /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */,
 			);
 			path = Pods;
 			sourceTree = "<group>";
@@ -218,11 +218,11 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 00E357021AD99517003FC87E /* Build configuration list for PBXNativeTarget "zilpayMobileTests" */;
 			buildPhases = (
-				7823F641399966176FA0CD3F /* [CP] Check Pods Manifest.lock */,
+				70D2286B393FADC3A9172CF7 /* [CP] Check Pods Manifest.lock */,
 				00E356EA1AD99517003FC87E /* Sources */,
 				00E356EB1AD99517003FC87E /* Frameworks */,
 				00E356EC1AD99517003FC87E /* Resources */,
-				050B713C8D9ABCE3C1ADA0FE /* [CP] Copy Pods Resources */,
+				5273A2402B97EC112BF0A768 /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -238,13 +238,13 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 13B07F931A680F5B00A75B9A /* Build configuration list for PBXNativeTarget "zilpayMobile" */;
 			buildPhases = (
-				0739099A55F31CA89EEB5C98 /* [CP] Check Pods Manifest.lock */,
+				467A2B270449791F3E715F4F /* [CP] Check Pods Manifest.lock */,
 				FD10A7F022414F080027D42C /* Start Packager */,
 				13B07F871A680F5B00A75B9A /* Sources */,
 				13B07F8C1A680F5B00A75B9A /* Frameworks */,
 				13B07F8E1A680F5B00A75B9A /* Resources */,
 				00DD1BFF1BD5951E006B06BC /* Bundle React Native code and images */,
-				C27DC4793D0827C7BA16F9C0 /* [CP] Copy Pods Resources */,
+				987F5221F06364A6222B769E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -388,25 +388,21 @@
 			shellPath = /bin/sh;
 			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		050B713C8D9ABCE3C1ADA0FE /* [CP] Copy Pods Resources */ = {
+		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
-				"${PODS_ROOT}/Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests-resources.sh",
-				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
-			name = "[CP] Copy Pods Resources";
+			name = "Bundle React Native Code And Images";
 			outputPaths = (
-				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests-resources.sh\"\n";
-			showEnvVarsInLog = 0;
+			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
 		};
-		0739099A55F31CA89EEB5C98 /* [CP] Check Pods Manifest.lock */ = {
+		467A2B270449791F3E715F4F /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -428,21 +424,25 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		2D02E4CB1E0B4B27006451C7 /* Bundle React Native Code And Images */ = {
+		5273A2402B97EC112BF0A768 /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
+				"${PODS_ROOT}/Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests-resources.sh",
+				"${PODS_CONFIGURATION_BUILD_DIR}/React-Core/AccessibilityResources.bundle",
 			);
-			name = "Bundle React Native Code And Images";
+			name = "[CP] Copy Pods Resources";
 			outputPaths = (
+				"${TARGET_BUILD_DIR}/${UNLOCALIZED_RESOURCES_FOLDER_PATH}/AccessibilityResources.bundle",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "export NODE_BINARY=node\n../node_modules/react-native/scripts/react-native-xcode.sh";
+			shellScript = "\"${PODS_ROOT}/Target Support Files/Pods-zilpayMobile-zilpayMobileTests/Pods-zilpayMobile-zilpayMobileTests-resources.sh\"\n";
+			showEnvVarsInLog = 0;
 		};
-		7823F641399966176FA0CD3F /* [CP] Check Pods Manifest.lock */ = {
+		70D2286B393FADC3A9172CF7 /* [CP] Check Pods Manifest.lock */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -464,7 +464,7 @@
 			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
 			showEnvVarsInLog = 0;
 		};
-		C27DC4793D0827C7BA16F9C0 /* [CP] Copy Pods Resources */ = {
+		987F5221F06364A6222B769E /* [CP] Copy Pods Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -581,7 +581,7 @@
 /* Begin XCBuildConfiguration section */
 		00E356F61AD99517003FC87E /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 213068AB36243429AF9584EE /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */;
+			baseConfigurationReference = 548B8C59E87A1011C6D7E8C8 /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
@@ -604,7 +604,7 @@
 		};
 		00E356F71AD99517003FC87E /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 721F395010B42E11D3700D9C /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */;
+			baseConfigurationReference = EAA570961FEEF23D53EC31C6 /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */;
 			buildSettings = {
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
@@ -624,7 +624,7 @@
 		};
 		13B07F941A680F5B00A75B9A /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2B41D9F7C1AAD2548D52D76D /* Pods-zilpayMobile.debug.xcconfig */;
+			baseConfigurationReference = 29A3322CDD91E2C0522DA163 /* Pods-zilpayMobile.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -648,7 +648,7 @@
 		};
 		13B07F951A680F5B00A75B9A /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 30B34C0599EA14B9B7E1AF2E /* Pods-zilpayMobile.release.xcconfig */;
+			baseConfigurationReference = CC615C09147408A68E2FEF55 /* Pods-zilpayMobile.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CLANG_ENABLE_MODULES = YES;
@@ -806,6 +806,7 @@
 				COPY_PHASE_STRIP = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
 				ENABLE_TESTABILITY = YES;
+				ENABLE_TESTING_SEARCH_PATHS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_NO_COMMON_BLOCKS = YES;
@@ -867,6 +868,7 @@
 				COPY_PHASE_STRIP = YES;
 				ENABLE_NS_ASSERTIONS = NO;
 				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTING_SEARCH_PATHS = NO;
 				GCC_C_LANGUAGE_STANDARD = gnu99;
 				GCC_NO_COMMON_BLOCKS = YES;
 				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
