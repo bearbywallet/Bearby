@@ -11,35 +11,31 @@ import { sha256, Encryptor, EncryptedType } from 'app/lib/crypto';
 import { MobileStorage } from 'app/lib';
 import { SecureKeychain } from './secure-keychain';
 
-const _storage = new MobileStorage();
-const chain = new SecureKeychain(_storage);
-
 export class KeychainControler {
-  public _secureKeychain: SecureKeychain;
+  public secureKeychain: SecureKeychain;
   private _encryptor: Encryptor;
 
   constructor(storage: MobileStorage) {
     this._encryptor = new Encryptor();
-    this._secureKeychain = new SecureKeychain(storage);
+    this.secureKeychain = new SecureKeychain(storage);
   }
 
   public get hasAccess() {
-    return Boolean(this._secureKeychain.accessControl);
+    return Boolean(this.secureKeychain.accessControl);
   }
 
   public async reset() {
-    await this._secureKeychain.reset();
+    await this.secureKeychain.reset();
   }
 
   public async sync() {
-    await this._secureKeychain.sync();
+    await this.secureKeychain.sync();
   }
 
-  public async initKeychain(password: string, biometric: Keychain.ACCESS_CONTROL) {
+  public async initKeychain(password: string) {
     const hashSum = await sha256(password);
 
-    await this._secureKeychain.setAccessControl(biometric);
-    await this._secureKeychain.createKeychain(hashSum);
+    await this.secureKeychain.createKeychain(hashSum);
   }
 
   public async encryptVault(decrypted: string, password: string) {
@@ -53,7 +49,7 @@ export class KeychainControler {
     let hashSum: string;
 
     if (!password) {
-      hashSum = await this._secureKeychain.getGenericPassword();
+      hashSum = await this.secureKeychain.getGenericPassword();
 
       return this._encryptor.decrypt(hashSum, encrypted);
     }

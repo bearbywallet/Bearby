@@ -38,7 +38,6 @@ export class WalletControler extends Mnemonic {
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
     await this.guard.setupWallet(password, mnemonic);
-    await this.account.reset();
   }
 
   public async addAccount(mnemonic: string, name: string) {
@@ -50,10 +49,6 @@ export class WalletControler extends Mnemonic {
     );
 
     return this.account.add(account);
-  }
-
-  public async unlockWallet(password: string) {
-    return this.guard.unlock(password);
   }
 
   public async sync() {

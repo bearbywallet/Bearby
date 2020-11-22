@@ -12,7 +12,6 @@ import Keychain from 'react-native-keychain';
 import { MobileStorage, buildObject } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
 
-const _private = new WeakMap();
 const _encryptor = new Encryptor();
 const _options = {
   service: 'com.zilpay',
@@ -43,6 +42,8 @@ export class SecureKeychain {
    */
   public supportedBiometryType: Keychain.BIOMETRY_TYPE | null = null;
 
+  public biometricEnable = false;
+
   private _storage: MobileStorage;
 
   constructor(storage: MobileStorage) {
@@ -54,8 +55,8 @@ export class SecureKeychain {
    */
   public async reset() {
     await Keychain.resetGenericPassword();
-    // await this._storage.rm(STORAGE_FIELDS.BIOMETRY_CHOSEN);
-    // this.accessControl = undefined;
+    await this._storage.rm(STORAGE_FIELDS.ACCESS_CONTROL);
+    this.biometricEnable = false;
   }
 
   /**
@@ -64,21 +65,34 @@ export class SecureKeychain {
   public async sync() {
     this.supportedBiometryType = await this.getSupportedBiometryType();
 
-    const biometryType = await this._storage.get<string>(
-      STORAGE_FIELDS.BIOMETRY_CHOSEN
+    const accessControl = await this._storage.get<string>(
+      STORAGE_FIELDS.ACCESS_CONTROL
     );
 
-    if (typeof biometryType === 'string') {
-      this.accessControl = biometryType as Keychain.ACCESS_CONTROL;
+    if (!accessControl) {
+      this.accessControl = await this.getAccessControl();
+    }
+
+    if (typeof accessControl === 'string') {
+      this.accessControl = accessControl as Keychain.ACCESS_CONTROL;
+      this.biometricEnable = true;
     }
   }
 
-  public async setAccessControl(value: Keychain.ACCESS_CONTROL) {
-    this.accessControl = value;
+  public async getAccessControl() {
+    this.supportedBiometryType = await this.getSupportedBiometryType();
 
-    await this._storage.set(
-      buildObject(STORAGE_FIELDS.BIOMETRY_CHOSEN, value)
-    );
+    if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.TOUCH_ID) {
+      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
+    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FINGERPRINT) {
+      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
+    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FACE_ID) {
+      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
+    } else if (this.supportedBiometryType === Keychain.BIOMETRY_TYPE.FACE) {
+      return Keychain.ACCESS_CONTROL.BIOMETRY_CURRENT_SET;
+    }
+
+    return Keychain.ACCESS_CONTROL.DEVICE_PASSCODE;
   }
 
   /**
@@ -99,9 +113,9 @@ export class SecureKeychain {
    * @param password - User password.
    */
   public async createKeychain(password: string) {
-    if (!this.accessControl) {
-      throw new Error('Need accessControl');
-    }
+    await this._storage.set(
+      buildObject(STORAGE_FIELDS.ACCESS_CONTROL, String(this.accessControl))
+    );
 
     const name = DeviceInfo.getApplicationName();
     const encrypted = await this._encryptPassword(password);
@@ -135,26 +149,12 @@ export class SecureKeychain {
   }
 
   /**
-   * Create some sha256 hashSum from some device and app params.
-   */
-  private async _entropy() {
-    const name = DeviceInfo.getApplicationName();
-    const buildNumber = DeviceInfo.getApplicationName();
-    const id = DeviceInfo.getUniqueId();
-    const buildID = await DeviceInfo.getBuildId();
-    const fingerPrint = await DeviceInfo.getFingerprint();
-    const ipAddress = await DeviceInfo.getIpAddress();
-
-    return sha256(name + buildNumber + id + buildID + fingerPrint + ipAddress);
-  }
-
-  /**
    * Encrypt password via entropy.
    * @param password - User password.
    */
   private async _encryptPassword(password: string) {
-    const salt = await this._entropy();
-    const encrypted = await _encryptor.encrypt(salt, password);
+    const name = DeviceInfo.getApplicationName();
+    const encrypted = await _encryptor.encrypt(name, password);
 
     return encrypted;
   }
@@ -165,8 +165,8 @@ export class SecureKeychain {
    * @retunrs - User password.
    */
   private async _decryptPassword(encrypted: EncryptedType) {
-    const salt = await this._entropy();
-    const decrypted = await _encryptor.decrypt(salt, encrypted);
+    const name = DeviceInfo.getApplicationName();
+    const decrypted = await _encryptor.decrypt(name, encrypted);
 
     return decrypted;
   }

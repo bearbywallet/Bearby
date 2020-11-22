@@ -8,7 +8,6 @@
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { KeychainControler } from 'app/lib/controller/auth';
-import Keychain from 'react-native-keychain';
 import { STORAGE_FIELDS } from 'app/config';
 
 // this property is responsible for control session.
@@ -17,12 +16,12 @@ let _isEnable = false;
 let _isReady = false;
 
 export class GuardControler {
+  public auth: KeychainControler;
   private _storage: MobileStorage;
-  private _auth: KeychainControler;
 
   constructor(storage: MobileStorage) {
     this._storage = storage;
-    this._auth = new KeychainControler(storage);
+    this.auth = new KeychainControler(storage);
   }
 
   public get self() {
@@ -40,32 +39,23 @@ export class GuardControler {
     return _isReady;
   }
 
-  public async setupWallet(
-    password: string,
-    mnemonic: string,
-    biometric?: Keychain.ACCESS_CONTROL
-  ) {
-    const encrypted = await this._auth.encryptVault(mnemonic, password);
+  public async setupWallet(password: string, mnemonic: string) {
+    const encrypted = await this.auth.encryptVault(mnemonic, password);
     await this._storage.set(
       buildObject(STORAGE_FIELDS.VAULT, encrypted)
     );
-
-    if (biometric) {
-      this._auth.initKeychain(password, biometric);
-    }
 
     _isEnable = true;
     _isReady = true;
   }
 
-  public async unlock(password: string) {
-    await this._auth._secureKeychain.reset();
-
-    await this._auth._secureKeychain.createKeychain(password);
+  public async unlock(password?: string) {
     const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
     const cipher = JSON.parse(String(encrypted));
 
-    await this._auth.decryptVault(cipher, password);
+    await this.auth.decryptVault(cipher, password);
+
+    _isEnable = true;
   }
 
   public async getMnemonic() {
@@ -73,15 +63,15 @@ export class GuardControler {
       throw new Error('wallet is disabled');
     } else if (!this.isReady) {
       throw new Error('wallet is not ready');
-    } else if (!this._auth) {
+    } else if (!this.auth) {
       throw new Error('guard is not initialized');
     }
 
-    const password = await this._auth._secureKeychain.getGenericPassword();
+    const password = await this.auth.secureKeychain.getGenericPassword();
     const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
     const cipher = JSON.parse(String(encrypted));
 
-    return this._auth.decryptVault(cipher, password);
+    return this.auth.decryptVault(cipher, password);
   }
 
   public logout() {
@@ -89,7 +79,7 @@ export class GuardControler {
   }
 
   public async sync() {
-    this._auth.sync();
+    this.auth.sync();
 
     const vault = await this._storage.get<string>(
       STORAGE_FIELDS.VAULT
