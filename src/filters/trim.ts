@@ -6,8 +6,14 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './to-locale-string';
-export * from './to-conversion';
-export * from './from-zil';
-export * from './gas-to-fee';
-export * from './trim';
+
+export function trim(addr: string, length = 6) {
+  if (!addr) {
+    return null;
+  }
+
+  const part0 = addr.substr(0, length);
+  const part1 = addr.substr(length * -1);
+
+  return `${part0}...${part1}`;
+}
