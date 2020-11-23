@@ -52,7 +52,7 @@ export class WalletControler extends Mnemonic {
     return this.account.add(account);
   }
 
-  public async addNextAccount(password?: string) {
+  public async addNextAccount(name: string, password?: string) {
     const { identities } = this.account.store.getState();
     const nextIndex = identities.length + 1;
     const mnemonic = await this.guard.getMnemonic(password);
@@ -64,7 +64,9 @@ export class WalletControler extends Mnemonic {
       name
     );
 
-    return this.account.add(account);
+    await this.account.add(account);
+
+    return account;
   }
 
   public async getkeyPairs(account: Account, password?: string) {

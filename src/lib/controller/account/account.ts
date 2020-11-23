@@ -12,7 +12,12 @@ import {
   getAddressFromPublicKey,
   toBech32Address
 } from 'app/utils';
-import { accountStore, accountStoreReset, accountStoreUpdate } from './sate';
+import {
+  accountStore,
+  accountStoreReset,
+  accountStoreUpdate,
+  accountStoreSelect
+} from './sate';
 import { AccountState, Account, KeyPair } from 'types';
 
 export class AccountControler {
@@ -92,6 +97,18 @@ export class AccountControler {
     await this.update(accounts);
 
     return accounts;
+  }
+
+  public async selectAccount(index: number) {
+    const { identities } = this.store.getState();
+
+    if (identities.length < index) {
+      return null;
+    }
+
+    accountStoreSelect(index);
+
+    await this.update(this.store.getState());
   }
 
   private async _checkAccount(account: Account) {

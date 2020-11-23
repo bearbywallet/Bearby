@@ -10,6 +10,7 @@ import { createDomain, createEvent } from 'effector';
 import { AccountState } from 'types';
 
 export const accountStoreUpdate = createEvent<AccountState>();
+export const accountStoreSelect = createEvent<number>();
 export const accountStoreReset = createEvent();
 
 const AccountDomain = createDomain();
@@ -20,4 +21,8 @@ const initalState: AccountState = {
 export const accountStore = AccountDomain
   .store<AccountState>(initalState)
   .on(accountStoreUpdate, (_, payload) => payload)
+  .on(accountStoreSelect, (state, selectedAddress) => ({
+    ...state,
+    selectedAddress
+  }))
   .reset(accountStoreReset);
