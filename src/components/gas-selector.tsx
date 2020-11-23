@@ -12,6 +12,7 @@ import {
   Text,
   StyleSheet,
   Alert,
+  TouchableOpacity,
   Dimensions,
   ViewStyle
 } from 'react-native';
@@ -81,20 +82,20 @@ export const GasSelector: React.FC<Prop> = ({
         <Text style={styles.title}>
           {i18n.t('fee')}
         </Text>
-        <View onTouchEnd={createTwoButtonAlert}>
+        <TouchableOpacity onPress={createTwoButtonAlert}>
           <SvgXml
             xml={HelpIconSVG}
             fill="#8A8A8F"
           />
-        </View>
+        </TouchableOpacity>
       </View>
       <View style={styles.wrapper}>
-        <View
+        <TouchableOpacity
           style={[
             firstSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onTouchEnd={() => onChange({ gasLimit, gasPrice: DEFAULT_GAS.gasPrice })}
+          onPress={() => onChange({ gasLimit, gasPrice: DEFAULT_GAS.gasPrice })}
         >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
@@ -113,13 +114,13 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={styles.amount}>
             {amountGas(1)}
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[
             secondSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onTouchEnd={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 2) })}
+          onPress={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 2) })}
         >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
@@ -138,13 +139,13 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={styles.amount}>
             {amountGas(2)}
           </Text>
-        </View>
-        <View
+        </TouchableOpacity>
+        <TouchableOpacity
           style={[
             threeSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onTouchEnd={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 3) })}
+          onPress={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 3) })}
         >
           <View style={{ flexDirection: 'row' }}>
           <SvgXml
@@ -163,7 +164,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={styles.amount}>
             {amountGas(3)}
           </Text>
-        </View>
+        </TouchableOpacity>
       </View>
     </View>
   );
