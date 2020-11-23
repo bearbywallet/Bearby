@@ -11,6 +11,7 @@ import {
   View,
   StyleSheet,
   Text,
+  TouchableOpacity,
   ViewStyle
 } from 'react-native';
 import { SvgCssUri } from 'react-native-svg';
@@ -24,13 +25,15 @@ export type Prop = {
   net: string;
   rate: number;
   style?: ViewStyle;
+  onPress?: () => void;
 };
 
 export const TokenCard: React.FC<Prop> = ({
   token,
   net,
   rate,
-  style
+  style,
+  onPress = () => null
 }) => {
   /**
    * ZIL(Default token) amount in float.
@@ -49,7 +52,10 @@ export const TokenCard: React.FC<Prop> = ({
   }, [token.balance, net, rate]);
 
   return (
-    <View style={[styles.container, style]}>
+    <TouchableOpacity
+      style={[styles.container, style]}
+      onPress={onPress}
+    >
       <View style={styles.header}>
         <Text style={styles.symbol}>
           {token.symbol}
@@ -68,7 +74,7 @@ export const TokenCard: React.FC<Prop> = ({
           ${toLocaleString(conversion)}
         </Text>
       </View>
-    </View>
+    </TouchableOpacity>
   );
 };
 
