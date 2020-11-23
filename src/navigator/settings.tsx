@@ -16,8 +16,9 @@ import { AboutPage } from 'app/pages/settings/about';
 import { SecurityPage } from 'app/pages/settings/security';
 import { NetworkPage } from 'app/pages/settings/network';
 import { GeneralPage } from 'app/pages/settings/general';
+import { ExportPage } from 'app/pages/settings/export';
 
-import { headerOptions } from 'app/config';
+import { headerOptions, SecureTypes } from 'app/config';
 
 export type SettingsStackParamList = {
   Contacts: undefined;
@@ -27,6 +28,10 @@ export type SettingsStackParamList = {
   Security: undefined;
   Network: undefined;
   General: undefined;
+  Export: {
+    type: SecureTypes;
+    content: string;
+  }
 };
 
 const SettingsStack = createStackNavigator<SettingsStackParamList>();
@@ -35,6 +40,14 @@ export const Settings: React.FC = () => (
     <SettingsStack.Screen
       name="Contacts"
       component={ContactsPage}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
+    />
+    <SettingsStack.Screen
+      name="Export"
+      component={ExportPage}
       options={{
         ...headerOptions,
         title: ''
