@@ -15,12 +15,14 @@ import { TabNavigator, TabStackParamList } from './tab-navigator';
 import { Unauthorized, UnauthorizedStackParamList } from './unauthorized';
 import { PreLoading, PreLoadingStackParamList } from './pre-loading';
 import { Settings, SettingsStackParamList } from './settings';
+import { Common, CommonStackParamList } from './common';
 
 export type RootParamList = {
   Loading: NavigatorScreenParams<PreLoadingStackParamList>;
   Unauthorized: NavigatorScreenParams<UnauthorizedStackParamList>;
   App: NavigatorScreenParams<TabStackParamList>;
   SettingsPages: NavigatorScreenParams<SettingsStackParamList>;
+  Common: NavigatorScreenParams<CommonStackParamList>;
 };
 
 const Stack = createStackNavigator<RootParamList>();
@@ -42,6 +44,13 @@ export default () => (
     <Stack.Screen
       name="App"
       component={TabNavigator}
+      options={{
+        title: ''
+      }}
+    />
+    <Stack.Screen
+      name="Common"
+      component={Common}
       options={{
         title: ''
       }}

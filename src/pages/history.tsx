@@ -12,7 +12,6 @@ import {
   View,
   StyleSheet
 } from 'react-native';
-import { HomeAccount, HomeTokens } from 'app/components/home';
 
 import { theme } from 'app/styles';
 

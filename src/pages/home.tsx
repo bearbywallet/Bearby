@@ -12,14 +12,26 @@ import {
   View,
   StyleSheet
 } from 'react-native';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { HomeAccount, HomeTokens } from 'app/components/home';
 
 import { theme } from 'app/styles';
+import { RootParamList } from 'app/navigator';
 
-export const HomePage = () => {
+type Prop = {
+  navigation: StackNavigationProp<RootParamList>;
+};
+
+export const HomePage: React.FC<Prop> = ({ navigation }) => {
+  const handleCreateAccount = React.useCallback(() => {
+    navigation.navigate('Common', {
+      screen: 'CreateAccount'
+    });
+  }, []);
+
   return (
     <View style={styles.container}>
-      <HomeAccount />
+      <HomeAccount onCreateAccount={handleCreateAccount}/>
       <HomeTokens />
     </View>
   );
