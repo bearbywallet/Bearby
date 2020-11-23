@@ -59,14 +59,6 @@ export class GuardControler {
   }
 
   public async getMnemonic(password?: string) {
-    if (!this.isEnable) {
-      throw new Error('wallet is disabled');
-    } else if (!this.isReady) {
-      throw new Error('wallet is not ready');
-    } else if (!this.auth) {
-      throw new Error('guard is not initialized');
-    }
-
     const encrypted = await this._storage.get<string>(STORAGE_FIELDS.VAULT);
     const cipher = JSON.parse(String(encrypted));
 
