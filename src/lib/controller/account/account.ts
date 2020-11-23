@@ -24,18 +24,21 @@ export class AccountControler {
   }
 
   public async sync(): Promise<AccountState> {
-    const accounts = await this._storage.get<AccountState>(
-      STORAGE_FIELDS.ACCOUNTS
-    );
+    try {
+      const accounts = await this._storage.get<string>(
+        STORAGE_FIELDS.ACCOUNTS
+      );
 
-    if (typeof accounts === 'object') {
-      return accounts as AccountState;
+      if (typeof accounts === 'string') {
+        const parsed = JSON.parse(accounts);
+
+        accountStoreUpdate(parsed);
+      }
+    } catch (err) {
+      //
     }
 
-    return {
-      identities: [],
-      selectedAddress: -1
-    };
+    return this.store.getState();
   }
 
   public fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Account {
@@ -50,6 +53,12 @@ export class AccountControler {
       index: Number(acc.index),
       nonce: 0 // TODO: check and update nonce.
     };
+  }
+
+  public getCurrentAccount() {
+    const { identities, selectedAddress } = this.store.getState();
+
+    return identities[selectedAddress];
   }
 
   public reset() {

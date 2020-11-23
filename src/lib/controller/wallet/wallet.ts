@@ -20,6 +20,7 @@ import { SettingsControler } from 'app/lib/controller/settings';
 import { GasControler } from 'app/lib/controller/gas';
 
 import { AccountTypes } from 'app/config';
+import { Account } from 'types';
 
 const _storage = new MobileStorage();
 
@@ -49,6 +50,13 @@ export class WalletControler extends Mnemonic {
     );
 
     return this.account.add(account);
+  }
+
+  public async getkeyPairs(account: Account, password?: string) {
+    const mnemonic = await this.guard.getMnemonic(password);
+    const keyPairs = await this.getKeyPair(mnemonic, account.index);
+
+    return keyPairs;
   }
 
   public async sync() {
