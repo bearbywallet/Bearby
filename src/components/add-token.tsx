@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  TouchableOpacity,
   ViewStyle
 } from 'react-native';
 import { theme } from 'app/styles';
@@ -26,13 +27,13 @@ export const AddToken: React.FC<Prop> = ({
 }) => {
 
   return (
-    <View
+    <TouchableOpacity
       style={[styles.container, style]}
-      onTouchEnd={onSelect}
+      onPress={onSelect}
     >
       <View style={[styles.line, styles.line0]}/>
       <View style={styles.line}/>
-    </View>
+    </TouchableOpacity>
   );
 };
 
