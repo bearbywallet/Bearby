@@ -11,6 +11,7 @@ import {
   View,
   Text,
   StyleSheet,
+  TouchableOpacity,
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
@@ -53,10 +54,10 @@ export const Selector: React.FC<Prop> = ({
       {title}
     </Text>
     {items.map((item, index) => (
-      <View
+      <TouchableOpacity
         key={index}
         style={styles.item}
-        onTouchEnd={() => onSelect(item, index)}
+        onPress={() => onSelect(item, index)}
       >
         {String(selected) === String(item) ? (
           <SvgXml xml={OKIconSVG} />
@@ -66,7 +67,7 @@ export const Selector: React.FC<Prop> = ({
         <Text style={styles.itemText}>
           {item}
         </Text>
-      </View>
+      </TouchableOpacity>
     ))}
   </View>
 );
