@@ -17,8 +17,6 @@ import {
   SafeAreaView
 } from 'react-native';
 
-const supportedURL = "https://google.com";
-
 import CreateBackground from 'app/assets/get_started_1.svg';
 
 import { theme } from 'app/styles';

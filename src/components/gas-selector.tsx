@@ -12,7 +12,6 @@ import {
   Text,
   StyleSheet,
   Dimensions,
-  TextInput,
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
@@ -25,12 +24,10 @@ import {
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { GasState } from 'types';
-import {
-  gasToFee,
-  fromZil
-} from 'app/filters';
+import { gasToFee } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { useStore } from 'effector-react';
+import { DEFAULT_GAS } from 'app/config';
 
 type Prop = {
   gasLimit: string;
@@ -47,12 +44,26 @@ export const GasSelector: React.FC<Prop> = ({
   onChange = () => null
 }) => {
   const tokensState = useStore(keystore.token.store);
-  const amount = React.useMemo(() => {
-    const fee = gasToFee(gasLimit, gasPrice);
+  const amountGas = (increse: number) => {
+    const incresedGasPrice = Number(DEFAULT_GAS.gasPrice) * increse;
+    const { fee } = gasToFee(gasLimit, String(incresedGasPrice));
     const [zilliqa] = tokensState.identities;
 
-    return fromZil(fee, zilliqa.decimals);
-  }, [tokensState, gasLimit, gasPrice]);
+    return `${fee} ${zilliqa.symbol}`;
+  };
+
+  const firstSelected = React.useMemo(
+    () => DEFAULT_GAS.gasPrice === gasPrice,
+    [gasPrice]
+  );
+  const secondSelected = React.useMemo(
+    () => (Number(DEFAULT_GAS.gasPrice) * 2) === Number(gasPrice),
+    [gasPrice]
+  );
+  const threeSelected = React.useMemo(
+    () => (Number(DEFAULT_GAS.gasPrice) * 3) === Number(gasPrice),
+    [gasPrice]
+  );
 
   return (
     <View style={[styles.container, style]}>
@@ -66,7 +77,13 @@ export const GasSelector: React.FC<Prop> = ({
         />
       </View>
       <View style={styles.wrapper}>
-        <View style={styles.item}>
+        <View
+          style={[
+            firstSelected ? { backgroundColor: '#2B2E33' } : null,
+            styles.item
+          ]}
+          onTouchEnd={() => onChange({ gasLimit, gasPrice: DEFAULT_GAS.gasPrice })}
+        >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
               xml={BigArrowIconSVG}
@@ -82,10 +99,16 @@ export const GasSelector: React.FC<Prop> = ({
             />
           </View>
           <Text style={styles.amount}>
-            {amount} ZIL
+            {amountGas(1)}
           </Text>
         </View>
-        <View style={styles.item}>
+        <View
+          style={[
+            secondSelected ? { backgroundColor: '#2B2E33' } : null,
+            styles.item
+          ]}
+          onTouchEnd={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 2) })}
+        >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
               xml={BigArrowIconSVG}
@@ -101,10 +124,16 @@ export const GasSelector: React.FC<Prop> = ({
             />
           </View>
           <Text style={styles.amount}>
-            0.002 ZIL
+            {amountGas(2)}
           </Text>
         </View>
-        <View style={styles.item}>
+        <View
+          style={[
+            threeSelected ? { backgroundColor: '#2B2E33' } : null,
+            styles.item
+          ]}
+          onTouchEnd={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 3) })}
+        >
           <View style={{ flexDirection: 'row' }}>
           <SvgXml
               xml={BigArrowIconSVG}
@@ -120,7 +149,7 @@ export const GasSelector: React.FC<Prop> = ({
             />
           </View>
           <Text style={styles.amount}>
-            0.002 ZIL
+            {amountGas(3)}
           </Text>
         </View>
       </View>
@@ -131,7 +160,8 @@ export const GasSelector: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     padding: 16,
-    backgroundColor: theme.colors.gray
+    backgroundColor: theme.colors.gray,
+    alignItems: 'center'
   },
   header: {
     flexDirection: 'row',
@@ -151,7 +181,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     borderColor: theme.colors.black,
     justifyContent: 'space-between',
-    flexDirection: 'row'
+    alignItems: 'center',
+    flexDirection: 'row',
+    maxWidth: 400,
+    width: width - 20
   },
   item: {
     justifyContent: 'center',
@@ -159,8 +192,8 @@ const styles = StyleSheet.create({
     paddingVertical: 8,
     paddingHorizontal: 4,
     borderRadius: 8,
-    backgroundColor: 'red',
-    width: (width / 3) - 20
+    width: (width / 3) - 20,
+    maxWidth: 100
   },
   amount: {
     fontSize: 13,
