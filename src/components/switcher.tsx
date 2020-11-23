@@ -9,7 +9,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   Switch,
   StyleSheet,
   ViewStyle
