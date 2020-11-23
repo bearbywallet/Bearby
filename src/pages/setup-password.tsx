@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useStore } from 'effector-react';
 import { RouteProp } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
@@ -36,6 +37,7 @@ type Prop = {
 };
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
+  const authState = useStore(keystore.guard.auth.store);
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
   const [accountName, setAccountName] = React.useState('');
   const [password, setPassword] = React.useState('');
@@ -75,7 +77,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   }, [password, mnemonicPhrase, accountName, isBiometric]);
 
   React.useEffect(() => {
-    const { accessControl } = keystore.guard.auth.secureKeychain;
+    const { accessControl } = authState;
 
     if (!accessControl) {
       setBiometric(i18n.t('biometric_pin'));
