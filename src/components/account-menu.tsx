@@ -29,25 +29,24 @@ import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
+  onCreate: () => void;
 };
 
-export const AccountMenu: React.FC<Prop> = ({ style }) => {
+export const AccountMenu: React.FC<Prop> = ({ style, onCreate }) => {
   const accountState = useStore(keystore.account.store);
 
   const [isModal, setIsModal] = React.useState(false);
 
-  const selectedAccount = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    [accountState]
-  );
-
   const handleSelect = React.useCallback(async(index: number) => {
-    // console.log(index);
-  }, []);
+    await keystore.account.selectAccount(index);
 
-  const handleAddAccount = React.useCallback(async() => {
-    // await keystore.addNextAccount();
-  }, []);
+    setIsModal(false);
+  }, [setIsModal]);
+
+  const handleCreateAccount = React.useCallback(() => {
+    setIsModal(false);
+    onCreate();
+  }, [setIsModal]);
 
   return (
     <View
@@ -58,7 +57,7 @@ export const AccountMenu: React.FC<Prop> = ({ style }) => {
         onPress={() => setIsModal(true)}
       >
         <Text style={styles.title}>
-          {selectedAccount.name}
+          {accountState.identities[accountState.selectedAddress].name}
         </Text>
         <SvgXml
           style={{ marginLeft: 5 }}
@@ -86,6 +85,7 @@ export const AccountMenu: React.FC<Prop> = ({ style }) => {
           <ScrollView style={{ marginVertical: 20 }}>
             {accountState.identities.map((account, index) => (
               <AccountItem
+                key={index}
                 account={account}
                 selected={accountState.selectedAddress === index}
                 onPress={() => handleSelect(index)}
@@ -95,7 +95,7 @@ export const AccountMenu: React.FC<Prop> = ({ style }) => {
           <Button
             title={i18n.t('account_menu_add')}
             color={theme.colors.primary}
-            onPress={handleAddAccount}
+            onPress={handleCreateAccount}
           />
         </View>
       </Modal>
