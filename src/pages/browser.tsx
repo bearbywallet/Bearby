@@ -18,10 +18,7 @@ import { theme } from 'app/styles';
 
 export const BrowserPage = () => {
   return (
-    <View style={styles.container}>
-      <HomeAccount />
-      <HomeTokens />
-    </View>
+    <View style={styles.container} />
   );
 };
 

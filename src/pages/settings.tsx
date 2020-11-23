@@ -11,6 +11,8 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
+  ScrollView,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
@@ -40,10 +42,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
     <Text style={styles.title}>
       {i18n.t('settings_title')}
     </Text>
-    <View style={styles.list}>
-      <View
+    <ScrollView style={styles.list}>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}
       >
         <SvgXml xml={BookIconSVG} />
         <View style={styles.listItem}>
@@ -56,10 +58,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'General' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'General' })}
       >
         <SvgXml xml={GearIconSVG} />
         <View style={styles.listItem}>
@@ -72,10 +74,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Advanced' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'Advanced' })}
       >
         <SvgXml xml={AdvancedIconSVG} />
         <View style={styles.listItem}>
@@ -88,10 +90,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Network' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'Network' })}
       >
         <SvgXml xml={NetworkIconSVG} />
         <View style={styles.listItem}>
@@ -104,10 +106,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Connections' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'Connections' })}
       >
         <SvgXml xml={ConnectIconSVG} />
         <View style={styles.listItem}>
@@ -120,10 +122,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'Security' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'Security' })}
       >
         <SvgXml xml={SecureIconSVG} />
         <View style={styles.listItem}>
@@ -136,10 +138,10 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-      <View
+      </TouchableOpacity>
+      <TouchableOpacity
         style={styles.listItemWrapper}
-        onTouchEnd={() => navigation.navigate('SettingsPages', { screen: 'About' })}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'About' })}
       >
         <SvgXml xml={AboutIconSVG} />
         <View style={styles.listItem}>
@@ -152,8 +154,8 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
             style={styles.arrow}
           />
         </View>
-      </View>
-    </View>
+      </TouchableOpacity>
+    </ScrollView>
   </View>
 );
 

@@ -48,12 +48,18 @@ const times = [
 ];
 export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const authState = useStore(keystore.guard.auth.store);
+  const accountStore = useStore(keystore.account.store);
 
   const [hour, sethour] = React.useState(0);
   const [modaltitle, setModalTitle] = React.useState('');
   const [modalBtntitle, setModalBtntitle] = React.useState('');
   const [exportType, setExportType] = React.useState<SecureTypes | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
+
+  const selectedAccount = React.useMemo(
+    () => accountStore.identities[accountStore.selectedAddress],
+    [accountStore]
+  );
 
   /**
    * Change biometric swicher.
@@ -70,7 +76,8 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
       return null;
     }
 
-    await keystore.guard.auth.reset();
+    await keystore.guard.auth.secureKeychain.reset();
+    await keystore.guard.auth.sync();
   }, [authState.biometricEnable]);
   /**
    * Export PrivateKey from current account.
@@ -94,6 +101,9 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
     setExportType(SecureTypes.privateKey);
     setModalVisible(true);
   }, [authState.biometricEnable]);
+  /**
+   * Export secret phrase.
+   */
   const hanldeRevealSecretPhrase = React.useCallback(async() => {
     if (authState.biometricEnable) {
       const SecretPhrase = await keystore.guard.getMnemonic();
@@ -178,7 +188,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
             onPress={hanldeRevealPrivateKey}
           />
           <Text style={styles.btnDesText}>
-            {i18n.t('security_des0')}
+            {i18n.t('security_des0', { account: selectedAccount.name })}
           </Text>
         </View>
         <View style={styles.btnWrapper}>
