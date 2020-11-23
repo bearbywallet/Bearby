@@ -11,6 +11,7 @@ import {
   View,
   Text,
   StyleSheet,
+  Alert,
   Dimensions,
   ViewStyle
 } from 'react-native';
@@ -65,16 +66,27 @@ export const GasSelector: React.FC<Prop> = ({
     [gasPrice]
   );
 
+  const createTwoButtonAlert = () =>
+    Alert.alert(
+      i18n.t('fee'),
+      i18n.t('gas_price_description'),
+      [
+        { text: "OK" }
+      ]
+    );
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.header}>
         <Text style={styles.title}>
           {i18n.t('fee')}
         </Text>
-        <SvgXml
-          xml={HelpIconSVG}
-          fill="#8A8A8F"
-        />
+        <View onTouchEnd={createTwoButtonAlert}>
+          <SvgXml
+            xml={HelpIconSVG}
+            fill="#8A8A8F"
+          />
+        </View>
       </View>
       <View style={styles.wrapper}>
         <View

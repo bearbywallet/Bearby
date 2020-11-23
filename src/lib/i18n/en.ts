@@ -21,6 +21,7 @@ export default {
   hours: 'hours',
   reset: 'Reset',
   receive: 'Receive',
+  gas_price_description: 'Gas price refers to the amount of ZILs you’re willing to pay for every unit of gas, and is usually measured in “Li”.',
   gas_price: 'Gas Price (Li)',
   gas_limit: 'GAS Limit',
   currency: 'Currency',
