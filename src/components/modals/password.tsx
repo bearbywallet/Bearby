@@ -33,6 +33,21 @@ type Prop = {
   onTriggered: () => void;
   onConfirmed: (passowrd: string) => void;
 };
+
+/**
+ * Modal wiht password validator.
+ * @example
+ * import { PasswordModal } from 'app/components/modals';
+ * const [modalVisible, setModalVisible] = React.useState(true);
+ *
+ * <PasswordModal
+ *   visible={modalVisible}
+ *   title="test title of modal"
+ *   btnTitle="submit"
+ *   onTriggered={() => setModalVisible(false)}
+ *   onConfirmed={hanldeConfirmPassword}
+ * />
+ */
 export const PasswordModal: React.FC<Prop> = ({
   style,
   visible,
@@ -63,7 +78,8 @@ export const PasswordModal: React.FC<Prop> = ({
       isVisible={visible}
       style={{
         justifyContent: 'flex-end',
-        margin: 0
+        margin: 0,
+        marginBottom: 1
       }}
       onBackdropPress={onTriggered}
     >
@@ -101,11 +117,12 @@ export const PasswordModal: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     paddingHorizontal: 15,
-    borderRadius: 16,
+    borderTopEndRadius: 16,
+    borderTopStartRadius: 16,
     backgroundColor: '#18191D',
-    height: '25%',
+    height: '30%',
     justifyContent: 'space-between',
-    paddingVertical: 30
+    paddingVertical: 15
   },
   titleWrapper: {
     flexDirection: 'row',

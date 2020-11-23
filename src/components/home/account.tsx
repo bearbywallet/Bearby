@@ -17,7 +17,7 @@ import {
 import { SvgXml } from 'react-native-svg';
 import { useStore } from 'effector-react';
 
-import { DropDownMenu } from 'app/components/drop-down-menu';
+import { AccountMenu } from 'app/components/account-menu';
 import { LogoSVG } from 'app/components/svg';
 
 import { keystore } from 'app/keystore';
@@ -36,9 +36,7 @@ export const HomeAccount: React.FC = () => {
         viewBox="50 0 320 220"
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <DropDownMenu>
-          Account 0
-        </DropDownMenu>
+        <AccountMenu />
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>
             25,040
