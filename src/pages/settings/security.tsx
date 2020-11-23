@@ -16,16 +16,21 @@ import {
   StyleSheet
 } from 'react-native';
 import { useStore } from 'effector-react';
-import { SvgXml } from 'react-native-svg';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Selector } from 'app/components/selector';
 import { Switcher } from 'app/components/switcher';
-import Modal from 'react-native-modal';
-import { DeleteIconSVG } from 'app/components/svg';
+import { PasswordModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
+import { RootParamList } from 'app/navigator';
+import { SecureTypes } from 'app/config';
+
+type Prop = {
+  navigation: StackNavigationProp<RootParamList>;
+};
 
 const times = [
   {
@@ -41,14 +46,101 @@ const times = [
     name: `5 ${i18n.t('hours')}`
   },
 ];
-export const SecurityPage: React.FC = () => {
+export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const authState = useStore(keystore.guard.auth.store);
+
   const [hour, sethour] = React.useState(0);
+  const [modaltitle, setModalTitle] = React.useState('');
+  const [modalBtntitle, setModalBtntitle] = React.useState('');
+  const [exportType, setExportType] = React.useState<SecureTypes | null>(null);
   const [modalVisible, setModalVisible] = React.useState(false);
 
-  const hanldeChangeBiometric = React.useCallback((value) => {
-    keystore.guard.auth.updateBiometric(value);
+  /**
+   * Change biometric swicher.
+   */
+  const hanldeChangeBiometric = React.useCallback(async(value) => {
+    if (value) {
+      await keystore.guard.auth.sync();
+
+      setModalBtntitle(i18n.t('enable'));
+      setModalTitle(`${i18n.t('enable')} ${authState.supportedBiometryType}`);
+      setExportType(SecureTypes.biometric);
+      setModalVisible(true);
+
+      return null;
+    }
+
+    await keystore.guard.auth.reset();
   }, [authState.biometricEnable]);
+  /**
+   * Export PrivateKey from current account.
+   */
+  const hanldeRevealPrivateKey = React.useCallback(async() => {
+    if (authState.biometricEnable) {
+      const currentAccount = keystore.account.getCurrentAccount();
+      const account = await keystore.getkeyPairs(currentAccount);
+
+      return navigation.navigate('SettingsPages', {
+        screen: 'Export',
+        params: {
+          type: SecureTypes.privateKey,
+          content: String(account.privateKey)
+        }
+      });
+    }
+
+    setModalTitle(i18n.t('security_btn0'));
+    setModalBtntitle(i18n.t('security_btn_modal0'));
+    setExportType(SecureTypes.privateKey);
+    setModalVisible(true);
+  }, [authState.biometricEnable]);
+  const hanldeRevealSecretPhrase = React.useCallback(async() => {
+    if (authState.biometricEnable) {
+      const SecretPhrase = await keystore.guard.getMnemonic();
+
+      return navigation.navigate('SettingsPages', {
+        screen: 'Export',
+        params: {
+          type: SecureTypes.seed,
+          content: SecretPhrase
+        }
+      });
+    }
+
+    setModalTitle(i18n.t('security_btn1'));
+    setModalBtntitle(i18n.t('security_btn_modal0'));
+    setExportType(SecureTypes.seed);
+    setModalVisible(true);
+  }, [authState.biometricEnable]);
+  const hanldeConfirmPassword = React.useCallback(async(password) => {
+    if (exportType === SecureTypes.biometric) {
+      await keystore.guard.auth.initKeychain(password);
+    } else if (exportType === SecureTypes.privateKey) {
+      const currentAccount = keystore.account.getCurrentAccount();
+      const account = await keystore.getkeyPairs(currentAccount, password);
+
+      navigation.navigate('SettingsPages', {
+        screen: 'Export',
+        params: {
+          type: SecureTypes.privateKey,
+          content: String(account.privateKey)
+        }
+      });
+    } else if (exportType === SecureTypes.seed) {
+      const SecretPhrase = await keystore.guard.getMnemonic(password);
+
+      navigation.navigate('SettingsPages', {
+        screen: 'Export',
+        params: {
+          type: SecureTypes.seed,
+          content: SecretPhrase
+        }
+      });
+    }
+
+    setExportType(null);
+    setModalVisible(false);
+  }, [exportType]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,37 +171,33 @@ export const SecurityPage: React.FC = () => {
             </Text>
           </View>
         </Switcher>
-        <Button
-          title={i18n.t('security_btn0')}
-          color={theme.colors.primary}
-          onPress={() => null}
+        <View style={styles.btnWrapper}>
+          <Button
+            title={i18n.t('security_btn0')}
+            color={theme.colors.primary}
+            onPress={hanldeRevealPrivateKey}
+          />
+          <Text style={styles.btnDesText}>
+            {i18n.t('security_des0')}
+          </Text>
+        </View>
+        <View style={styles.btnWrapper}>
+          <Button
+            title={i18n.t('security_btn1')}
+            color={theme.colors.primary}
+            onPress={hanldeRevealSecretPhrase}
+          />
+          <Text style={styles.btnDesText}>
+            {i18n.t('security_des1')}
+          </Text>
+        </View>
+        <PasswordModal
+          visible={modalVisible}
+          title={modaltitle}
+          btnTitle={modalBtntitle}
+          onTriggered={() => setModalVisible(false)}
+          onConfirmed={hanldeConfirmPassword}
         />
-        <Button
-          title={i18n.t('security_btn1')}
-          color={theme.colors.primary}
-          onPress={() => setModalVisible(true)}
-        />
-        <Modal
-          isVisible={modalVisible}
-          onSwipeComplete={() => setModalVisible(false)}
-          swipeDirection={['up', 'left', 'right', 'down']}
-          style={{
-            justifyContent: 'flex-end',
-            margin: 0
-          }}
-        >
-          <View>
-            <View>
-              <Text>
-                Reveal private key
-              </Text>
-              <SvgXml
-                xml={DeleteIconSVG}
-                onTouchEnd={() => setModalVisible(false)}
-              />
-            </View>
-          </View>
-        </Modal>
       </ScrollView>
     </SafeAreaView>
   );
@@ -147,6 +235,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 21,
     color: '#8A8A8F'
+  },
+  btnWrapper: {
+    marginTop: 32,
+    backgroundColor: theme.colors.gray,
+    alignItems: 'flex-start',
+    padding: 15
+  },
+  btnDesText: {
+    color: '#8A8A8F',
+    fontSize: 16,
+    lineHeight: 21
   }
 });
 
