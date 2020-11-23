@@ -15,19 +15,19 @@ import {
   Dimensions
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
-import { useStore } from 'effector-react';
 
 import { AccountMenu } from 'app/components/account-menu';
 import { LogoSVG } from 'app/components/svg';
 
-import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 
-const { width } = Dimensions.get('window');
-export const HomeAccount: React.FC = () => {
-  const accountState = useStore(keystore.account.store);
+type Prop = {
+  onCreateAccount: () => void;
+};
 
+const { width } = Dimensions.get('window');
+export const HomeAccount: React.FC<Prop> = ({ onCreateAccount }) => {
   return (
     <View style={styles.container}>
       <SvgXml
@@ -36,7 +36,7 @@ export const HomeAccount: React.FC = () => {
         viewBox="50 0 320 220"
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <AccountMenu />
+        <AccountMenu onCreate={onCreateAccount}/>
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>
             25,040
