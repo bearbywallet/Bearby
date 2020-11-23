@@ -6,7 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import * as React from 'react';
 import { WalletControler } from 'app/lib/controller';
 
 export const keystore = new WalletControler();
