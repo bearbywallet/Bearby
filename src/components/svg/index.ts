@@ -28,3 +28,5 @@ export * from './big-arrow';
 export * from './help';
 export * from './view-block';
 export * from './share';
+export * from './wallet';
+export * from './receive';
