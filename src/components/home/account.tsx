@@ -23,11 +23,19 @@ import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 
 type Prop = {
+  name: string;
   onCreateAccount: () => void;
+  onReceive: () => void;
+  onSend: () => void;
 };
 
 const { width } = Dimensions.get('window');
-export const HomeAccount: React.FC<Prop> = ({ onCreateAccount }) => {
+export const HomeAccount: React.FC<Prop> = ({
+  name,
+  onCreateAccount,
+  onReceive,
+  onSend
+}) => {
   return (
     <View style={styles.container}>
       <SvgXml
@@ -36,7 +44,10 @@ export const HomeAccount: React.FC<Prop> = ({ onCreateAccount }) => {
         viewBox="50 0 320 220"
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
-        <AccountMenu onCreate={onCreateAccount}/>
+        <AccountMenu
+          accountName={name}
+          onCreate={onCreateAccount}
+        />
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>
             25,040
@@ -52,13 +63,13 @@ export const HomeAccount: React.FC<Prop> = ({ onCreateAccount }) => {
           <Button
             color={theme.colors.primary}
             title={I18n.t('send')}
-            onPress={() => null}
+            onPress={onSend}
           />
           <View style={styles.seporate}/>
           <Button
             color={theme.colors.primary}
             title={I18n.t('receive')}
-            onPress={() => null}
+            onPress={onReceive}
           />
         </View>
       </View>

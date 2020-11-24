@@ -119,7 +119,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
+    backgroundColor: theme.colors.gray,
     height: '30%',
     justifyContent: 'space-between',
     paddingVertical: 15

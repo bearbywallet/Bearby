@@ -7,3 +7,4 @@
  * Copyright (c) 2020 ZilPay
  */
 export * from './password';
+export * from './receive';
