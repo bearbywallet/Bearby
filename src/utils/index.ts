@@ -12,3 +12,4 @@ export * from './address';
 export * from './bech32';
 export * from './array-chunk';
 export * from './shuffle';
+export * from './view-block';
