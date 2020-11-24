@@ -29,11 +29,13 @@ import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
+  accountName: string;
   onCreate: () => void;
 };
 
-export const AccountMenu: React.FC<Prop> = ({ style, onCreate }) => {
+export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) => {
   const accountState = useStore(keystore.account.store);
+  const settings = useStore(keystore.settings.store);
 
   const [isModal, setIsModal] = React.useState(false);
 
@@ -57,7 +59,7 @@ export const AccountMenu: React.FC<Prop> = ({ style, onCreate }) => {
         onPress={() => setIsModal(true)}
       >
         <Text style={styles.title}>
-          {accountState.identities[accountState.selectedAddress].name}
+          {accountName}
         </Text>
         <SvgXml
           style={{ marginLeft: 5 }}
@@ -87,6 +89,7 @@ export const AccountMenu: React.FC<Prop> = ({ style, onCreate }) => {
               <AccountItem
                 key={index}
                 account={account}
+                format={settings.addressFormat}
                 selected={accountState.selectedAddress === index}
                 onPress={() => handleSelect(index)}
               />

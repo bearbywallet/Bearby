@@ -27,11 +27,13 @@ type Prop = {
   onPress?: (account: Account) => void;
   account: Account;
   selected: boolean;
+  format: string;
 };
 
 export const AccountItem: React.FC<Prop> = ({
   selected,
   account,
+  format,
   style,
   onPress = () => null
 }) => (
@@ -44,7 +46,7 @@ export const AccountItem: React.FC<Prop> = ({
         {account.name}
       </Text>
       <Text style={styles.accountAddress}>
-        {trim(account.bech32)}
+        {trim(account[format])}
       </Text>
     </View>
     {selected ? (
