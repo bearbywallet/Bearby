@@ -22,6 +22,7 @@ import { SvgXml } from 'react-native-svg';
 import Modal from 'react-native-modal';
 import { AccountItem } from 'app/components/account-item';
 import { ArrowIconSVG, DeleteIconSVG } from 'app/components/svg';
+import { AccountsModal } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
@@ -35,15 +36,8 @@ type Prop = {
 
 export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) => {
   const accountState = useStore(keystore.account.store);
-  const settings = useStore(keystore.settings.store);
 
   const [isModal, setIsModal] = React.useState(false);
-
-  const handleSelect = React.useCallback(async(index: number) => {
-    await keystore.account.selectAccount(index);
-
-    setIsModal(false);
-  }, [setIsModal]);
 
   const handleCreateAccount = React.useCallback(() => {
     setIsModal(false);
@@ -66,42 +60,15 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
           xml={ArrowIconSVG}
         />
       </TouchableOpacity>
-      <Modal
-        isVisible={isModal}
-        style={{
-          justifyContent: 'flex-end',
-          margin: 0,
-          marginBottom: 1
-        }}
-        onBackdropPress={() => setIsModal(false)}
-      >
-        <View style={styles.modalContainer}>
-          <View style={styles.titleWrapper}>
-            <Text style={styles.title}>
-              {i18n.t('accounts')}
-            </Text>
-            <TouchableOpacity onPress={() => setIsModal(false)}>
-              <SvgXml xml={DeleteIconSVG}/>
-            </TouchableOpacity>
-          </View>
-          <ScrollView style={{ marginVertical: 20 }}>
-            {accountState.identities.map((account, index) => (
-              <AccountItem
-                key={index}
-                account={account}
-                format={settings.addressFormat}
-                selected={accountState.selectedAddress === index}
-                onPress={() => handleSelect(index)}
-              />
-            ))}
-          </ScrollView>
-          <Button
-            title={i18n.t('account_menu_add')}
-            color={theme.colors.primary}
-            onPress={handleCreateAccount}
-          />
-        </View>
-      </Modal>
+      <AccountsModal
+        accounts={accountState.identities}
+        selected={accountState.selectedAddress}
+        visible={isModal}
+        title={i18n.t('accounts')}
+        onTriggered={() => setIsModal(false)}
+        onSelected={(index) => keystore.account.selectAccount(index)}
+        onAdd={handleCreateAccount}
+      />
     </View>
   );
 };
@@ -118,19 +85,5 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
-  },
-  modalContainer: {
-    paddingHorizontal: 15,
-    borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
-    justifyContent: 'space-between',
-    paddingVertical: 15
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 15
   }
 });
