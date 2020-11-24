@@ -29,7 +29,7 @@ import {
   ArrowIconSVG
 } from 'app/components/svg';
 import { CustomButton } from 'app/components/custom-button';
-import { TokensModal } from 'app/components/modals';
+import { TokensModal, AccountsModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
@@ -53,9 +53,12 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [tokenModal, setTokenModal] = React.useState(false);
 
-  const selectedAccount = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    [accountState]
+  const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
+  const [isAccountModal, setIsAccountModal] = React.useState(false);
+
+  const account = React.useMemo(
+    () => accountState.identities[selectedAccount],
+    [accountState, selectedAccount]
   );
   const token = React.useMemo(
     () => tokensState.identities[selectedToken],
@@ -75,7 +78,10 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <KeyboardAwareScrollView>
         <View style={styles.wrapper}>
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => setIsAccountModal(true)}
+          >
             <SvgXml xml={ProfileSVG} />
             <View style={styles.itemInfo}>
               <Text style={styles.label}>
@@ -83,12 +89,12 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
               </Text>
               <View style={styles.infoWrapper}>
                 <Text style={styles.nameAmountText}>
-                  {selectedAccount.name}
+                  {account.name}
                 </Text>
               </View>
               <View style={[styles.infoWrapper, { marginBottom: 15 }]}>
                 <Text style={styles.addressAmount}>
-                  {trim(selectedAccount[settingsState.addressFormat])}
+                  {trim(account[settingsState.addressFormat])}
                 </Text>
               </View>
             </View>
@@ -215,6 +221,14 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
         selected={selectedToken}
         onTriggered={() => setTokenModal(false)}
         onSelect={setSelectedToken}
+      />
+      <AccountsModal
+        title={i18n.t('transfer_modal_title1')}
+        visible={isAccountModal}
+        selected={selectedAccount}
+        onTriggered={() => setIsAccountModal(false)}
+        accounts={accountState.identities}
+        onSelected={setSelectedAccount}
       />
     </SafeAreaView>
   );

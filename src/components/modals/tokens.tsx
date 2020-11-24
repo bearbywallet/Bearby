@@ -20,6 +20,7 @@ import Modal from 'react-native-modal';
 import { SvgXml, SvgCssUri } from 'react-native-svg';
 
 import { DeleteIconSVG, OKIconSVG } from 'app/components/svg';
+import { Unselected } from 'app/components/unselected';
 
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
@@ -95,7 +96,7 @@ export const TokensModal: React.FC<Prop> = ({
               {selected === index ? (
                 <SvgXml xml={OKIconSVG}/>
               ) : (
-                <View style={styles.circle}/>
+                <Unselected />
               )}
             </TouchableOpacity>
           ))}
@@ -142,12 +143,6 @@ const styles = StyleSheet.create({
     paddingVertical: 15,
     borderBottomColor: theme.colors.black,
     borderBottomWidth: 1
-  },
-  circle: {
-    padding: 14,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: theme.colors.primary
   },
   amount: {
     color: '#8A8A8F',
