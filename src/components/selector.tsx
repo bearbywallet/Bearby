@@ -17,6 +17,7 @@ import {
 import { SvgXml } from 'react-native-svg';
 
 import { OKIconSVG } from 'app/components/svg';
+import { Unselected } from 'app/components/unselected';
 
 import { theme } from 'app/styles';
 
@@ -62,7 +63,7 @@ export const Selector: React.FC<Prop> = ({
         {String(selected) === String(item) ? (
           <SvgXml xml={OKIconSVG} />
         ) : (
-          <View style={styles.circle}/>
+          <Unselected />
         )}
         <Text style={styles.itemText}>
           {item}
@@ -96,11 +97,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     marginLeft: 16
-  },
-  circle: {
-    padding: 14,
-    borderRadius: 100,
-    borderWidth: 1,
-    borderColor: theme.colors.primary
   }
 });
