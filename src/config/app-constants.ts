@@ -8,13 +8,9 @@
  */
 import { ZilliqaNetwork } from 'types';
 
-export const FIAT_ORDERS = {
+export const ORDERS = {
   TRANSAK_URL: 'https://global.transak.com/',
-  TRANSAK_URL_STAGING: 'https://staging-global.transak.com/',
-  TRANSAK_API_URL_PRODUCTION: 'https://api.transak.com/',
-  TRANSAK_API_URL_STAGING: 'https://staging-api.transak.com/',
-  WYRE_API_ENDPOINT: 'https://api.sendwyre.com/',
-  WYRE_API_ENDPOINT_TEST: 'https://api.testwyre.com/'
+  FAUCET: 'https://dev-wallet.zilliqa.com/faucet'
 };
 
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
