@@ -20,3 +20,9 @@ export interface ZilliqaNetwork {
     MSG_VERSION: number
   }
 }
+
+type getBase64 = (event: string) => void;
+
+export interface QrcodeType {
+  toDataURL: (cb: getBase64) => void;
+}
