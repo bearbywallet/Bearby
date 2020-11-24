@@ -26,3 +26,5 @@ export * from './delete';
 export * from './fingerprint';
 export * from './big-arrow';
 export * from './help';
+export * from './view-block';
+export * from './share';
