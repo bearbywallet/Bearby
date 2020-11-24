@@ -17,6 +17,7 @@ import {
 import { SvgXml } from 'react-native-svg';
 
 import { OKIconSVG } from 'app/components/svg';
+import { Unselected } from 'app/components/unselected';
 
 import { theme } from 'app/styles';
 import { trim } from 'app/filters';
@@ -51,7 +52,9 @@ export const AccountItem: React.FC<Prop> = ({
     </View>
     {selected ? (
       <SvgXml xml={OKIconSVG}/>
-    ) : null}
+    ) : (
+      <Unselected />
+    )}
   </TouchableOpacity>
 );
 
