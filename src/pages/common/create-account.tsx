@@ -62,7 +62,7 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
     } catch (err) {
       setPasswordError(i18n.t('lock_error'));
     }
-  }, [password]);
+  }, [password, name]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -103,11 +103,13 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
           </View>
         ) : null}
       </KeyboardAwareScrollView>
-      <Button
-        title={i18n.t('create_account_btn')}
-        color={theme.colors.primary}
-        onPress={handleCreate}
-      />
+      <View style={{ marginBottom: '10%' }}>
+        <Button
+          title={i18n.t('create_account_btn')}
+          color={theme.colors.primary}
+          onPress={handleCreate}
+        />
+      </View>
     </SafeAreaView>
   );
 };

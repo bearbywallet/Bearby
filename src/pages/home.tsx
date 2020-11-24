@@ -13,16 +13,24 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useStore } from 'effector-react';
+
 import { HomeAccount, HomeTokens } from 'app/components/home';
+import { ReceiveModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
 export const HomePage: React.FC<Prop> = ({ navigation }) => {
+  const accountState = useStore(keystore.account.store);
+
+  const [isReceiveModal, setIsReceiveModal] = React.useState(false);
+
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
       screen: 'CreateAccount'
@@ -31,8 +39,17 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
 
   return (
     <View style={styles.container}>
-      <HomeAccount onCreateAccount={handleCreateAccount}/>
+      <HomeAccount
+        name={accountState.identities[accountState.selectedAddress].name}
+        onCreateAccount={handleCreateAccount}
+        onReceive={() => setIsReceiveModal(true)}
+        onSend={() => null}
+      />
       <HomeTokens />
+      <ReceiveModal
+        visible={isReceiveModal}
+        onTriggered={() => setIsReceiveModal(false)}
+      />
     </View>
   );
 };
