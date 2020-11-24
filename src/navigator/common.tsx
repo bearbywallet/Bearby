@@ -9,12 +9,17 @@
 import React from 'react';
 import { createStackNavigator } from '@react-navigation/stack';
 
-import { CreateAccountPage } from 'app/pages/common';
+import {
+  CreateAccountPage,
+  TransferPage
+} from 'app/pages/common';
 
 import { headerOptions } from 'app/config';
+import i18n from 'app/lib/i18n';
 
 export type CommonStackParamList = {
   CreateAccount: undefined;
+  Transfer: undefined;
 };
 
 const CommonStack = createStackNavigator<CommonStackParamList>();
@@ -26,6 +31,14 @@ export const Common: React.FC = () => (
       options={{
         ...headerOptions,
         title: ''
+      }}
+    />
+    <CommonStack.Screen
+      name="Transfer"
+      component={TransferPage}
+      options={{
+        ...headerOptions,
+        title: i18n.t('transfer_title')
       }}
     />
   </CommonStack.Navigator>

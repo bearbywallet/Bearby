@@ -36,6 +36,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       screen: 'CreateAccount'
     });
   }, []);
+  const handleSend = React.useCallback(() => {
+    navigation.navigate('Common', {
+      screen: 'Transfer'
+    });
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -43,7 +48,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         name={accountState.identities[accountState.selectedAddress].name}
         onCreateAccount={handleCreateAccount}
         onReceive={() => setIsReceiveModal(true)}
-        onSend={() => null}
+        onSend={handleSend}
       />
       <HomeTokens />
       <ReceiveModal

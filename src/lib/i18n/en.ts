@@ -27,6 +27,7 @@ export default {
   buy: 'Buy ZIL',
   copy_address: 'Copy address',
   view_block: 'View on ViewBlock',
+  transfer_title: 'Transfer',
   create_account_title: 'New Account',
   create_account_btn: 'Create',
   create_account_name: 'Account %{number}',
