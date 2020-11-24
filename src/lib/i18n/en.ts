@@ -8,6 +8,7 @@
  */
 export default {
   my_tokens: 'My tokens',
+  token: 'Token',
   manage: 'Manage',
   home: 'Home',
   history: 'History',
@@ -28,6 +29,9 @@ export default {
   copy_address: 'Copy address',
   view_block: 'View on ViewBlock',
   transfer_title: 'Transfer',
+  transfer_view0: 'Receiving account',
+  transfer_amount: 'Amount',
+  transfer_account: 'Transfer account',
   create_account_title: 'New Account',
   create_account_btn: 'Create',
   create_account_name: 'Account %{number}',
