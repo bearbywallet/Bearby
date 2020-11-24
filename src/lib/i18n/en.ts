@@ -32,6 +32,7 @@ export default {
   transfer_view0: 'Receiving account',
   transfer_amount: 'Amount',
   transfer_account: 'Transfer account',
+  transfer_modal_title0: 'Select token',
   create_account_title: 'New Account',
   create_account_btn: 'Create',
   create_account_name: 'Account %{number}',

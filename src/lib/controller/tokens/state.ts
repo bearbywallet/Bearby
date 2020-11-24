@@ -21,7 +21,7 @@ const identities: Token[] = [
     },
     balance: {
       [mainnet]: '0',
-      [testnet]: '0',
+      [testnet]: '100000000000000',
       [privatenet]: '0'
     },
     decimals: 12,
@@ -36,7 +36,7 @@ const identities: Token[] = [
     },
     balance: {
       [mainnet]: '0',
-      [testnet]: '0'
+      [testnet]: '32454377664643'
     },
     decimals: 6,
     default: true,
@@ -50,7 +50,7 @@ const identities: Token[] = [
     },
     balance: {
       [mainnet]: '0',
-      [testnet]: '0'
+      [testnet]: '65474575688884634'
     },
     decimals: 18,
     default: true,
@@ -64,7 +64,7 @@ const identities: Token[] = [
     },
     balance: {
       [mainnet]: '0',
-      [testnet]: '0'
+      [testnet]: '3495794778777663857'
     },
     decimals: 15,
     default: true,

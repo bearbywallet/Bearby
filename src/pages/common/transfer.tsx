@@ -29,30 +29,47 @@ import {
   ArrowIconSVG
 } from 'app/components/svg';
 import { CustomButton } from 'app/components/custom-button';
+import { TokensModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { TOKEN_ICONS } from 'app/config';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
-import { trim } from 'app/filters';
+import { fromZil, toConversion, trim } from 'app/filters';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = useStore(keystore.account.store);
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
+  const networkState = useStore(keystore.network.store);
+  const currencyState = useStore(keystore.currency.store);
 
-  const [token, setToken] = React.useState(tokensState.identities[0]);
+  const [selectedToken, setSelectedToken] = React.useState(0);
+  const [tokenModal, setTokenModal] = React.useState(false);
 
   const selectedAccount = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+  const token = React.useMemo(
+    () => tokensState.identities[selectedToken],
+    [tokensState, selectedToken]
+  );
+
+  const converted = React.useMemo(() => {
+    const { balance, decimals } = token;
+    const { selected } = networkState;
+    const { rate } = settingsState;
+    const convert = toConversion(balance[selected], rate, decimals);
+
+    return `${convert} ${currencyState}`;
+  }, [token, networkState, settingsState, currencyState]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -81,7 +98,10 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
               style={styles.arrowIcon}
             />
           </TouchableOpacity>
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => setTokenModal(true)}
+          >
             <SvgXml xml={WalletIconSVG} />
             <View style={styles.itemInfo}>
               <Text style={styles.label}>
@@ -99,7 +119,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
                       {token.symbol}
                     </Text>
                     <Text style={styles.nameAmountText}>
-                      25,040
+                      {fromZil(token.balance[networkState.selected], token.decimals)}
                     </Text>
                   </View>
                   <View style={[styles.infoWrapper, {
@@ -110,7 +130,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
                       {token.name}
                     </Text>
                     <Text style={styles.addressAmount}>
-                      $ 105,250
+                      {converted}
                     </Text>
                   </View>
                 </View>
@@ -187,6 +207,15 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
           />
         </View>
       </KeyboardAwareScrollView>
+      <TokensModal
+        title={i18n.t('transfer_modal_title0')}
+        visible={tokenModal}
+        network={networkState.selected}
+        tokens={tokensState.identities}
+        selected={selectedToken}
+        onTriggered={() => setTokenModal(false)}
+        onSelect={setSelectedToken}
+      />
     </SafeAreaView>
   );
 };
