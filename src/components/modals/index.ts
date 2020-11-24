@@ -8,3 +8,4 @@
  */
 export * from './password';
 export * from './receive';
+export * from './tokens';
