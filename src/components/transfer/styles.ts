@@ -52,7 +52,6 @@ export default StyleSheet.create({
     color: '#8A8A8F'
   },
   receiving: {
-    marginTop: 30,
     padding: 15,
     flexDirection: 'row',
     alignItems: 'center',

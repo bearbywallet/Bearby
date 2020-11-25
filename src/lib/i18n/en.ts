@@ -8,6 +8,9 @@
  */
 export default {
   my_tokens: 'My tokens',
+  my_accounts: 'My accounts',
+  my_contacts: 'My contacts',
+  scan_qr: 'Scan QR',
   token: 'Token',
   manage: 'Manage',
   home: 'Home',
@@ -34,6 +37,7 @@ export default {
   transfer_account: 'Transfer account',
   transfer_modal_title0: 'Select token',
   transfer_modal_title1: 'Select account',
+  transfer_modal_title2: 'Select contact',
   create_account_title: 'New Account',
   create_account_btn: 'Create',
   create_account_name: 'Account %{number}',

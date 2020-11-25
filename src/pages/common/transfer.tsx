@@ -38,12 +38,14 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = useStore(keystore.account.store);
+  const contactsState = useStore(keystore.contacts.store);
   const tokensState = useStore(keystore.token.store);
   const networkState = useStore(keystore.network.store);
 
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
+  const [recipient, setRecipient] = React.useState<string>('');
 
   const token = React.useMemo(
     () => tokensState.identities[selectedToken],
@@ -67,8 +69,11 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
           />
         </View>
         <TransferRecipient
-          style={styles.wrapper}
-          onSelect={() => null}
+          style={{ ...styles.wrapper, marginTop: 30 }}
+          accounts={accountState.identities}
+          recipient={recipient}
+          contacts={contactsState}
+          onSelect={setRecipient}
         />
         <TransferAmount
           style={styles.wrapper}

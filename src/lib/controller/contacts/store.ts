@@ -13,7 +13,20 @@ export const contactsStoreUpdate = createEvent<Contact[]>();
 export const contactsStoreReset = createEvent();
 
 const ContactsDomain = createDomain();
-const initalState: Contact[] = [];
+const initalState: Contact[] = [
+  {
+    address: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace',
+    name: 'zilpay'
+  },
+  {
+    address: 'zil1gmk7xpsyxthczk202a0yavhxk56mqch0ghl02f',
+    name: 'DragonZIL'
+  },
+  {
+    address: 'zil1dnztgf0upz2tf6tkrsdx4jnf5wax7w9rdqwr0f',
+    name: 'ledger'
+  },
+];
 export const contactsStore = ContactsDomain
   .store<Contact[]>(initalState)
   .on(contactsStoreUpdate, (_, payload) => payload)
