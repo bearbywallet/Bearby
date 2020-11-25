@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   Text,
+  TouchableOpacity,
   StyleSheet,
   ViewStyle
 } from 'react-native';
@@ -26,6 +27,7 @@ type Prop = {
   name: string;
   bech32: string;
   onRemove?: () => void;
+  onSelect?: () => void;
 };
 
 export const ContactItem: React.FC<Prop> = ({
@@ -34,10 +36,12 @@ export const ContactItem: React.FC<Prop> = ({
   bech32,
   isChar,
   last,
-  onRemove = () => null
+  onRemove,
+  onSelect = () => null
 }) => (
-  <View
+  <TouchableOpacity
     style={[styles.container, style]}
+    onPress={onSelect}
   >
     <Text style={styles.char}>
       {isChar ? name[0].toUpperCase() : ' '}
@@ -51,12 +55,14 @@ export const ContactItem: React.FC<Prop> = ({
           {bech32}
         </Text>
       </View>
-      <SvgXml
-        xml={DeleteIconSVG}
-        onTouchEnd={onRemove}
-      />
+      {onRemove ? (
+        <SvgXml
+          xml={DeleteIconSVG}
+          onTouchEnd={onRemove}
+        />
+      ) : null}
     </View>
-  </View>
+  </TouchableOpacity>
 );
 
 const styles = StyleSheet.create({
