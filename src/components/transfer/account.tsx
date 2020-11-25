@@ -11,8 +11,7 @@ import React from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  Dimensions
+  TouchableOpacity
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { useStore } from 'effector-react';
