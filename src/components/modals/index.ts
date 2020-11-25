@@ -10,3 +10,4 @@ export * from './password';
 export * from './receive';
 export * from './tokens';
 export * from './accounts';
+export * from './contacts';

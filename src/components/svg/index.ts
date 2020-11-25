@@ -30,3 +30,4 @@ export * from './view-block';
 export * from './share';
 export * from './wallet';
 export * from './receive';
+export * from './qrcode';
