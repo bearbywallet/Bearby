@@ -2,7 +2,7 @@
 
 ### run:
 
-Close:
+Clone:
 ```bash
 $ git clone https://github.com/zilpay/zilpay-mobile.git
 $ cd zilpay-mobile
