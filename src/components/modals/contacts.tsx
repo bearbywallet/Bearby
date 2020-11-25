@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
     lineHeight: 22
   },
   modalContainer: {
-    paddingHorizontal: 15,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
     backgroundColor: '#18191D',
@@ -99,6 +98,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingTop: 15
+    padding: 15
   }
 });
