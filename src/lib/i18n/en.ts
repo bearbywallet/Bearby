@@ -12,6 +12,7 @@ export default {
   my_contacts: 'My contacts',
   scan_qr: 'Scan QR',
   token: 'Token',
+  close: 'Close',
   manage: 'Manage',
   home: 'Home',
   history: 'History',

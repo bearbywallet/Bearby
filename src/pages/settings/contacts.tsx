@@ -23,7 +23,6 @@ import { ContactItem } from 'app/components/contact-item';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
-// import { ContactTypes } from 'src/config/account-type';
 import { Contact } from 'types';
 import { keystore } from 'app/keystore';
 
@@ -80,6 +79,7 @@ export const ContactsPage: React.FC<Prop> = () => {
             isChar={!checkChar(alphabetSorted, index)}
             last={index === alphabetSorted.length - 1}
             bech32={item.address}
+            onRemove={() => keystore.contacts.rm(item)}
           />
         ))}
       </ScrollView>

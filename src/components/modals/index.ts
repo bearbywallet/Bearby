@@ -11,3 +11,4 @@ export * from './receive';
 export * from './tokens';
 export * from './accounts';
 export * from './contacts';
+export * from './qr-scaner';

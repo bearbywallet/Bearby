@@ -32,7 +32,7 @@ export default StyleSheet.create({
     justifyContent: 'space-around',
     flexDirection: 'row',
     paddingVertical: 5,
-    marginLeft: 8
+    marginTop: 10
   },
   percent: {
     color: theme.colors.primary,

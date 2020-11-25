@@ -24,7 +24,11 @@ import {
   BookIconSVG,
   QrcodeIconSVG
 } from 'app/components/svg';
-import { AccountsModal, ContactsModal } from 'app/components/modals';
+import {
+  AccountsModal,
+  ContactsModal,
+  QRScaner
+} from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import coomonStyles from './styles';
@@ -48,6 +52,13 @@ export const TransferRecipient: React.FC<Prop> = ({
 }) => {
   const [accountModal, setAccountModal] = React.useState(false);
   const [contactModal, setContactModal] = React.useState(false);
+  const [qrcodeModal, setQrcode] = React.useState(false);
+
+  const handleQrcode = React.useCallback((qrcode) => {
+    const address = String(qrcode).replace('zilliqa://', '');
+
+    onSelect(address);
+  }, [onSelect]);
 
   return (
     <React.Fragment>
@@ -87,7 +98,10 @@ export const TransferRecipient: React.FC<Prop> = ({
               {i18n.t('my_contacts')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.item}>
+          <TouchableOpacity
+            style={styles.item}
+            onPress={() => setQrcode(true)}
+          >
             <SvgXml xml={QrcodeIconSVG} />
             <Text style={styles.textItem}>
               {i18n.t('scan_qr')}
@@ -108,6 +122,11 @@ export const TransferRecipient: React.FC<Prop> = ({
         contacts={contacts}
         onTriggered={() => setContactModal(false)}
         onSelected={(index) => onSelect(contacts[index].address)}
+      />
+      <QRScaner
+        visible={qrcodeModal}
+        onTriggered={() => setQrcode(false)}
+        onScan={handleQrcode}
       />
     </React.Fragment>
   );
