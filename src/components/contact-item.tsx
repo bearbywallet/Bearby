@@ -14,9 +14,6 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
-
-import { DeleteIconSVG } from 'app/components/svg';
 
 import { theme } from 'app/styles';
 
@@ -44,7 +41,7 @@ export const ContactItem: React.FC<Prop> = ({
     onPress={onSelect}
   >
     <Text style={styles.char}>
-      {isChar ? name[0].toUpperCase() : ' '}
+      {isChar ? name[0].toUpperCase() : ''}
     </Text>
     <View style={[styles.wrapper, { borderBottomWidth: last ? 0 : 1 }]}>
       <View>
@@ -55,12 +52,6 @@ export const ContactItem: React.FC<Prop> = ({
           {bech32}
         </Text>
       </View>
-      {onRemove ? (
-        <SvgXml
-          xml={DeleteIconSVG}
-          onTouchEnd={onRemove}
-        />
-      ) : null}
     </View>
   </TouchableOpacity>
 );
@@ -70,7 +61,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingLeft: 15,
     backgroundColor: '#18191D'
   },
   wrapper: {
