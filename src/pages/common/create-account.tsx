@@ -14,7 +14,6 @@ import {
   TextInput,
   Button,
   SafeAreaView,
-  ScrollView,
   StyleSheet
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';

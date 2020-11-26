@@ -32,6 +32,7 @@ export default {
   buy: 'Buy ZIL',
   copy_address: 'Copy address',
   view_block: 'View on ViewBlock',
+  history_btn0: 'Clear all',
   transfer_title: 'Transfer',
   transfer_view0: 'Recipient',
   transfer_amount: 'Amount',
