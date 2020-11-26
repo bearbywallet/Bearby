@@ -8,7 +8,7 @@
  */
 import React from 'react';
 import {
-  ViewStyle,
+  Dimensions,
   View
 } from 'react-native';
 
@@ -19,14 +19,13 @@ import { CustomButton } from 'app/components/custom-button';
 import i18n from 'app/lib/i18n';
 
 type Prop = {
-  style?: ViewStyle;
   visible: boolean;
   onTriggered: () => void;
   onScan: (address: string) => void;
 };
 
+const { width } = Dimensions.get('window');
 export const QRScaner: React.FC<Prop> = ({
-  style,
   visible,
   onTriggered,
   onScan
@@ -51,7 +50,9 @@ export const QRScaner: React.FC<Prop> = ({
           onRead={handleSuccess}
           bottomContent={
             <CustomButton
-              style={style}
+              style={{
+                width: width - 200
+              }}
               title={i18n.t('close')}
               onPress={onTriggered}
             />
