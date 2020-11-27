@@ -8,20 +8,16 @@
  */
 import React from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
   ScrollView,
-  TouchableOpacity,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 import Modal from 'react-native-modal';
-import { DeleteIconSVG } from 'app/components/svg';
 import { ContactItem } from 'app/components/contact-item';
+import { ModalTitle } from 'app/components/modal-title';
+import { ModalWrapper } from 'app/components/modal-wrapper';
 
-import { theme } from 'app/styles';
 import { Contact } from 'types';
 
 type Prop = {
@@ -56,15 +52,13 @@ export const ContactsModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <View style={[styles.modalContainer, style]}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.title}>
-            {title}
-          </Text>
-          <TouchableOpacity onPress={onTriggered}>
-            <SvgXml xml={DeleteIconSVG}/>
-          </TouchableOpacity>
-        </View>
+      <ModalWrapper style={style}>
+        <ModalTitle
+          style={{ padding: 15 }}
+          onClose={onTriggered}
+        >
+          {title}
+        </ModalTitle>
         <ScrollView style={{ marginVertical: 20 }}>
           {contacts.map((contact, index) => (
             <ContactItem
@@ -76,28 +70,10 @@ export const ContactsModal: React.FC<Prop> = ({
             />
           ))}
         </ScrollView>
-      </View>
+      </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  title: {
-    color: theme.colors.white,
-    fontSize: 17,
-    lineHeight: 22
-  },
-  modalContainer: {
-    borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
-    justifyContent: 'space-between',
-    paddingVertical: 15
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 15
-  }
 });
