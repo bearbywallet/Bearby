@@ -22,8 +22,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
-import { ArrowIconSVG } from 'app/components/svg';
 import { TransactionItem } from 'app/components/transaction-item';
+import { DropDownItem } from 'app/components/drop-down-item';
+import { SortingWrapper } from 'app/components/history/sort-wrapper';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -47,6 +48,10 @@ const TEST = [
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const accountsState = useStore(keystore.account.store);
+  const tokensState = useStore(keystore.token.store);
+
+  const [selectedToken, setSelectedToken] = React.useState(0);
+  const [selectedStatus, setSelectedStatus] = React.useState(0);
 
   const account = React.useMemo(
     () => accountsState.identities[accountsState.selectedAddress],
@@ -78,38 +83,13 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         </View>
       </View>
       <View style={styles.main}>
-        <View style={styles.sortWrapper}>
-          <TouchableOpacity style={styles.sorted}>
-            <Text style={styles.sortedText}>
-              Status
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={{ marginLeft: 5 }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sorted}>
-            <Text style={styles.sortedText}>
-              Token
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={{ marginLeft: 5 }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.sorted}>
-            <Text style={styles.sortedText}>
-              Date
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={'#666666'}
-              style={{ marginLeft: 5 }}
-            />
-          </TouchableOpacity>
-        </View>
+        <SortingWrapper
+          tokens={tokensState.identities}
+          selectedToken={selectedToken}
+          selectedStatus={selectedStatus}
+          onSelectStatus={setSelectedStatus}
+          onSelectToken={setSelectedToken}
+        />
         <ScrollView style={styles.list}>
           <Text style={styles.date}>
             25.10.2020
@@ -153,10 +133,6 @@ const styles = StyleSheet.create({
     borderTopStartRadius: 16,
     backgroundColor: '#18191D'
   },
-  sortWrapper: {
-    flexDirection: 'row',
-    paddingHorizontal: 30
-  },
   date: {
     fontSize: 16,
     lineHeight: 21,
@@ -164,15 +140,5 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 15
-  },
-  sorted: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 15
-  },
-  sortedText: {
-    color: theme.colors.white,
-    fontSize: 13,
-    lineHeight: 17
   }
 });

@@ -6,8 +6,9 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export enum TxStatsues {
-  pending,
-  rejected,
-  success
-}
+
+export const TxStatsues: { [key: string]: number; } = {
+  pending: 0,
+  rejected: 1,
+  success: 2
+};
