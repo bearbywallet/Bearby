@@ -27,6 +27,8 @@ export class CurrencyControler {
   }
 
   public set(currency: string) {
+    currency = currency.toLowerCase();
+
     currenciesStoreUpdate(currency);
 
     return this._storage.set(

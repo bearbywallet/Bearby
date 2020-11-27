@@ -29,6 +29,7 @@ const { width } = Dimensions.get('window');
 export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
+  const currencyState = useStore(keystore.currency.store);
   const netwrokState = useStore(keystore.network.store);
 
   const tokensList = React.useMemo(
@@ -57,8 +58,9 @@ export const HomeTokens: React.FC = () => {
             <TokenCard
               key={index}
               token={token}
+              currency={currencyState}
               net={netwrokState.selected}
-              rate={settingsState.rate}
+              rate={settingsState.rate[currencyState]}
               style={styles.token}
             />
           ))}

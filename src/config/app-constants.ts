@@ -13,6 +13,7 @@ export const ORDERS = {
   FAUCET: 'https://dev-wallet.zilliqa.com/faucet'
 };
 
+export const API_COINGECKO = 'https://api.coingecko.com/api/v3/simple/price';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
 export const PASSWORD_DIFFICULTY = 6;

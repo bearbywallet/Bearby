@@ -113,7 +113,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
             <TransactionItem
               transaction={tx}
               currency={currencyState}
-              rate={settingsState.rate}
+              rate={settingsState.rate[currencyState]}
               tokens={tokensState.identities}
               status={TxStatsues.success}
               key={index}

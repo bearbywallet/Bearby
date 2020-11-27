@@ -21,9 +21,15 @@ import { LogoSVG } from 'app/components/svg';
 
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
+import { Account, Token } from 'types';
+import { fromZil, toConversion } from 'app/filters';
 
 type Prop = {
-  name: string;
+  account: Account;
+  token: Token;
+  netwrok: string;
+  currency: string;
+  rate: number;
   onCreateAccount: () => void;
   onReceive: () => void;
   onSend: () => void;
@@ -31,11 +37,31 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const HomeAccount: React.FC<Prop> = ({
-  name,
+  account,
+  token,
+  netwrok,
+  rate,
+  currency,
   onCreateAccount,
   onReceive,
   onSend
 }) => {
+  /**
+   * ZIL(Default token) amount in float.
+   */
+  const amount = React.useMemo(
+    () => fromZil(token.balance[netwrok], token.decimals),
+    [token.balance, netwrok]
+  );
+  /**
+   * Converted to BTC/USD/ETH.
+   */
+  const conversion = React.useMemo(() => {
+    const balance = token.balance[netwrok];
+
+    return toConversion(balance, rate, token.decimals);
+  }, [token.balance, netwrok, rate]);
+
   return (
     <View style={styles.container}>
       <SvgXml
@@ -45,18 +71,18 @@ export const HomeAccount: React.FC<Prop> = ({
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
         <AccountMenu
-          accountName={name}
+          accountName={account.name}
           onCreate={onCreateAccount}
         />
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>
-            25,040
+            {amount}
             <Text style={styles.symbol}>
-              ZIL
+              {token.symbol}
             </Text>
           </Text>
           <Text style={styles.convertedAmount}>
-            $ 105,250
+            {conversion} {currency.toUpperCase()}
           </Text>
         </View>
         <View style={styles.buttons}>

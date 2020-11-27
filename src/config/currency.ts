@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 export const DEFAULT_CURRENCIES = [
-  'USD',
-  'BTC',
-  'ETH'
+  'usd',
+  'btc',
+  'eth'
 ];

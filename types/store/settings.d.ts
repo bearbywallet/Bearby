@@ -10,5 +10,7 @@ import { ZILLIQA, AddressFormats } from 'src/config/app-constants';
 
 export interface Settings {
   addressFormat: AddressFormats;
-  rate: number;
+  rate: {
+    [key: string]: number;
+  };
 }

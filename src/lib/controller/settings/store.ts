@@ -8,17 +8,23 @@
  */
 import { createDomain, createEvent } from 'effector';
 import { Settings } from 'types';
-import { ADDRESS_FORMATS } from 'app/config';
+import { ADDRESS_FORMATS, DEFAULT_CURRENCIES } from 'app/config';
 
 export const settingsStoreUpdate = createEvent<Settings>();
 export const settingsStoreSetAddressFormat = createEvent<string>();
-export const settingsStoreSetRate = createEvent<number>();
+export const settingsStoreSetRate = createEvent<{
+  [key: string]: number;
+}>();
 export const settingsStoreReset = createEvent();
 
 const SettingsDomain = createDomain();
 const initalState: Settings = {
   addressFormat: ADDRESS_FORMATS[0],
-  rate: 0.43243
+  rate: {
+    [DEFAULT_CURRENCIES[0].toLowerCase()]: 0,
+    [DEFAULT_CURRENCIES[1].toLowerCase()]: 0,
+    [DEFAULT_CURRENCIES[2].toLowerCase()]: 0,
+  }
 };
 export const settingsStore = SettingsDomain
   .store(initalState)

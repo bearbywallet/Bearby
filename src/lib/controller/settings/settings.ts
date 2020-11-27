@@ -15,7 +15,9 @@ import {
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
   STORAGE_FIELDS,
-  ADDRESS_FORMATS
+  ADDRESS_FORMATS,
+  API_COINGECKO,
+  DEFAULT_CURRENCIES
 } from 'app/config';
 
 export class SettingsControler {
@@ -28,7 +30,12 @@ export class SettingsControler {
   }
 
   public async rateUpdate() {
-    const rate = 0;
+    const currencies = DEFAULT_CURRENCIES.join();
+    const url = `${API_COINGECKO}?ids=zilliqa&vs_currencies=${currencies}`;
+
+    const response = await fetch(url);
+    const data = await response.json();
+    const rate = data.zilliqa;
 
     settingsStoreSetRate(rate);
 
@@ -66,10 +73,14 @@ export class SettingsControler {
       return null;
     }
 
-    if (data[STORAGE_FIELDS.RATE]) {
-      const rate = Number(data[STORAGE_FIELDS.RATE]);
+    try {
+      if (data[STORAGE_FIELDS.RATE]) {
+        const rate = JSON.parse(data[STORAGE_FIELDS.RATE]);
 
-      settingsStoreSetRate(rate);
+        settingsStoreSetRate(rate);
+      }
+    } catch {
+      //
     }
 
     if (data[STORAGE_FIELDS.ADDRESS_FORMAT]) {

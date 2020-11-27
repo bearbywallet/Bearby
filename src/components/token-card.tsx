@@ -24,6 +24,7 @@ export type Prop = {
   token: Token;
   net: string;
   rate: number;
+  currency: string;
   style?: ViewStyle;
   onPress?: () => void;
 };
@@ -32,6 +33,7 @@ export const TokenCard: React.FC<Prop> = ({
   token,
   net,
   rate,
+  currency,
   style,
   onPress = () => null
 }) => {
@@ -71,7 +73,7 @@ export const TokenCard: React.FC<Prop> = ({
           {toLocaleString(amount)}
         </Text>
         <Text style={styles.convertedAmount}>
-          ${toLocaleString(conversion)}
+          {toLocaleString(conversion)} {currency.toUpperCase()}
         </Text>
       </View>
     </TouchableOpacity>

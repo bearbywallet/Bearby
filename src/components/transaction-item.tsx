@@ -122,7 +122,7 @@ export const TransactionItem: React.FC<Prop> = ({
           15:00
         </Text>
         <Text style={styles.second}>
-          {amount.converted} {currency}
+          {amount.converted} {currency.toUpperCase()}
         </Text>
       </View>
     </TouchableOpacity>

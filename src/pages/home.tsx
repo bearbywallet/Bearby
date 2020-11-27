@@ -28,6 +28,10 @@ type Prop = {
 
 export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = useStore(keystore.account.store);
+  const settingsState = useStore(keystore.settings.store);
+  const currencyState = useStore(keystore.currency.store);
+  const netwrokState = useStore(keystore.network.store);
+  const tokensState = useStore(keystore.token.store);
 
   const [isReceiveModal, setIsReceiveModal] = React.useState(false);
 
@@ -45,7 +49,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <HomeAccount
-        name={accountState.identities[accountState.selectedAddress].name}
+        token={tokensState.identities[0]}
+        rate={settingsState.rate[currencyState]}
+        currency={currencyState}
+        netwrok={netwrokState.selected}
+        account={accountState.identities[accountState.selectedAddress]}
         onCreateAccount={handleCreateAccount}
         onReceive={() => setIsReceiveModal(true)}
         onSend={handleSend}

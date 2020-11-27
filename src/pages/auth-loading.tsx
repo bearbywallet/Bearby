@@ -34,7 +34,9 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
         return navigation.navigate('Unauthorized', { screen: 'Lock' });
       }
 
-      return navigation.navigate('App', { screen: 'Home' });
+      navigation.navigate('App', { screen: 'Home' });
+
+      return keystore.settings.rateUpdate();
     });
   });
 
