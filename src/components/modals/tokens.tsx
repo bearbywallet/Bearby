@@ -19,8 +19,10 @@ import {
 import Modal from 'react-native-modal';
 import { SvgXml, SvgCssUri } from 'react-native-svg';
 
-import { DeleteIconSVG, OKIconSVG } from 'app/components/svg';
+import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
+import { ModalTitle } from 'app/components/modal-title';
+import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
@@ -64,16 +66,11 @@ export const TokensModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <View style={[styles.modalContainer, style]}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.title}>
-            {title}
-          </Text>
-          <TouchableOpacity onPress={onTriggered}>
-            <SvgXml xml={DeleteIconSVG}/>
-          </TouchableOpacity>
-        </View>
-        <ScrollView>
+      <ModalWrapper style={style}>
+        <ModalTitle onClose={onTriggered}>
+          {title}
+        </ModalTitle>
+        <ScrollView style={styles.main}>
           {tokens.map((token, index) => (
             <TouchableOpacity
               key={index}
@@ -101,31 +98,12 @@ export const TokensModal: React.FC<Prop> = ({
             </TouchableOpacity>
           ))}
         </ScrollView>
-      </View>
+      </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  modalContainer: {
-    paddingHorizontal: 15,
-    borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
-    justifyContent: 'space-between',
-    paddingVertical: 15
-  },
-  title: {
-    color: theme.colors.white,
-    fontSize: 17,
-    lineHeight: 22
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 15
-  },
   symbol: {
     color: theme.colors.white,
     fontSize: 17,
@@ -148,5 +126,8 @@ const styles = StyleSheet.create({
     color: '#8A8A8F',
     fontSize: 13,
     lineHeight: 17
+  },
+  main: {
+    marginTop: 15
   }
 });
