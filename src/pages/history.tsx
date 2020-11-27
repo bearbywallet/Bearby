@@ -69,6 +69,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     // const selected = accountsState.identities[accountsState.selectedAddress];
 
     // keystore
+    //   .zilliqa
+    //   .getSmartContractSubState('0x735FC0671B4e199aea4597aC83D9380B3B290010', 'balances')
+    //   .then(console.log);
+
+    // keystore
     //   .viewblock
     //   .getAddress(selected.bech32)
     //   .then((info) => console.log(JSON.stringify(info, null, 4)))
