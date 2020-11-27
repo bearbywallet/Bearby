@@ -12,14 +12,13 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  TouchableOpacity,
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { SvgXml } from 'react-native-svg';
 
 import { CustomButton } from 'app/components/custom-button';
-import { DeleteIconSVG } from 'app/components/svg';
+import { ModalTitle } from 'app/components/modal-title';
+import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -83,15 +82,10 @@ export const PasswordModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <View style={[styles.container, style]}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.title}>
-            {title}
-          </Text>
-          <TouchableOpacity onPress={onTriggered}>
-            <SvgXml xml={DeleteIconSVG}/>
-          </TouchableOpacity>
-        </View>
+      <ModalWrapper style={{ ...style, ...styles.container }}>
+        <ModalTitle onClose={onTriggered}>
+          {title}
+        </ModalTitle>
         <View>
           <TextInput
             style={styles.textInput}
@@ -109,25 +103,13 @@ export const PasswordModal: React.FC<Prop> = ({
           title={btnTitle}
           onPress={hanldeConfirm}
         />
-      </View>
+      </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 15,
-    borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: theme.colors.gray,
-    height: '30%',
-    justifyContent: 'space-between',
-    paddingVertical: 15
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
   },
   inputLable: {
     color: '#8A8A8F'
@@ -145,10 +127,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     color: theme.colors.white,
     width: '90%'
-  },
-  title: {
-    color: theme.colors.white,
-    fontSize: 20,
-    lineHeight: 26
   }
 });
