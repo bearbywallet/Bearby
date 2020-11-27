@@ -13,7 +13,7 @@ import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 export class TransactionsContoller {
   private _viewblock: ViewBlockControler;
   private _zilliqa: ZilliqaControl;
-  private _storage: MobileStorage
+  private _storage: MobileStorage;
 
   constructor(
     viewblock: ViewBlockControler,
@@ -24,8 +24,7 @@ export class TransactionsContoller {
     this._zilliqa = zilliqa;
     this._storage = storage;
   }
+  // public sync() {}
 
-  public sync() {}
-
-  public reset() {}
+  // public reset() {}
 }
