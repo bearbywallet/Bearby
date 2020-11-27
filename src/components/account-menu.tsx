@@ -19,9 +19,8 @@ import {
 import { useStore } from 'effector-react';
 import { SvgXml } from 'react-native-svg';
 
-import Modal from 'react-native-modal';
-import { AccountItem } from 'app/components/account-item';
-import { ArrowIconSVG, DeleteIconSVG } from 'app/components/svg';
+import { DropDownItem } from 'app/components/drop-down-item';
+import { ArrowIconSVG } from 'app/components/svg';
 import { AccountsModal } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
@@ -48,18 +47,12 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
     <View
       style={[styles.container, style]}
     >
-      <TouchableOpacity
-        style={styles.wrapper}
+      <DropDownItem
+        color={theme.colors.white}
         onPress={() => setIsModal(true)}
       >
-        <Text style={styles.title}>
-          {accountName}
-        </Text>
-        <SvgXml
-          style={{ marginLeft: 5 }}
-          xml={ArrowIconSVG}
-        />
-      </TouchableOpacity>
+        {accountName}
+      </DropDownItem>
       <AccountsModal
         accounts={accountState.identities}
         selected={accountState.selectedAddress}
