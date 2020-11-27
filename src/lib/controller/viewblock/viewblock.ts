@@ -15,7 +15,7 @@ const methods = {
   txns: 'txs'
 };
 
-export class ViewBlock {
+export class ViewBlockControler {
   private _network: NetworkControll;
   private _headers: Headers;
 
@@ -29,7 +29,7 @@ export class ViewBlock {
   public async getAddress(address: string) {
     const netwrok = this._network.selected;
     const params = `?network=${netwrok}`;
-    const url = `${VIEW_BLOCK_API}/${methods.addresses}/${address}/${params}`;
+    const url = `${VIEW_BLOCK_API}/${methods.addresses}/${address}${params}`;
     const settings = {
       method: 'GET',
       headers: this._headers

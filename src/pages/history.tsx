@@ -66,12 +66,17 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   }, [setTransactionIndex, setTransactionModal]);
 
   React.useEffect(() => {
-    const selected = accountsState.identities[accountsState.selectedAddress];
+    // const selected = accountsState.identities[accountsState.selectedAddress];
 
-    keystore
-      .viewblock
-      .getTransactions(selected.bech32)
-      .then((txns) => setTransactions(txns));
+    // keystore
+    //   .viewblock
+    //   .getAddress(selected.bech32)
+    //   .then((info) => console.log(JSON.stringify(info, null, 4)))
+
+    // keystore
+    //   .viewblock
+    //   .getTransactions(selected.bech32)
+    //   .then((txns) => setTransactions(txns));
   }, [setTransactions]);
 
   return (

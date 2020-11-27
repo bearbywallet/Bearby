@@ -18,7 +18,8 @@ import { ThemeControler } from 'app/lib/controller/theme';
 import { ContactsControler } from 'app/lib/controller/contacts';
 import { SettingsControler } from 'app/lib/controller/settings';
 import { GasControler } from 'app/lib/controller/gas';
-import { ViewBlock } from 'app/lib/controller/viewblock';
+import { ViewBlockControler } from 'app/lib/controller/viewblock';
+import { TransactionsContoller } from 'app/lib/controller/transaction';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -35,7 +36,12 @@ export class WalletControler extends Mnemonic {
   public readonly contacts = new ContactsControler(_storage);
   public readonly gas = new GasControler(_storage);
   public readonly zilliqa = new ZilliqaControl(this.network);
-  public readonly viewblock = new ViewBlock(this.network);
+  public readonly viewblock = new ViewBlockControler(this.network);
+  public readonly transaction = new TransactionsContoller(
+    this.viewblock,
+    this.zilliqa,
+    _storage
+  );
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
 
   public async initWallet(password: string, mnemonic: string) {
