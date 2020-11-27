@@ -13,3 +13,4 @@ export * from './accounts';
 export * from './contacts';
 export * from './qr-scaner';
 export * from './history-status';
+export * from './transaction';

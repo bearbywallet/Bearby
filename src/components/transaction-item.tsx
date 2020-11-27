@@ -81,7 +81,7 @@ export const TransactionItem: React.FC<Prop> = ({
       value: toLocaleString(value),
       symbol: zilliqa.symbol
     };
-  },[transaction, tokens, rate]);
+  }, [transaction, tokens, rate]);
   const vname = React.useMemo(() => {
     if (typeof transaction.data === 'string') {
       try {
@@ -92,7 +92,7 @@ export const TransactionItem: React.FC<Prop> = ({
         }
 
         return data._tag;
-      } catch(err) {
+      } catch (err) {
         return 'Unexpected';
       }
     }
