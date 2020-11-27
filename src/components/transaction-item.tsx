@@ -16,24 +16,89 @@ import {
 } from 'react-native';
 
 import { theme } from 'app/styles';
-import { TxStatsues } from 'app/config';
+import { TX_DIRECTION } from 'app/config';
+import { Token, Transaction } from 'types';
+import { fromZil, toLocaleString, toConversion } from 'app/filters';
 
 type Prop = {
   style?: ViewStyle;
-  status: TxStatsues;
-  onPress?: () => void;
+  status: number;
+  tokens: Token[];
+  rate: number;
+  currency: string;
+  transaction: Transaction;
+  onSelect: () => void;
 };
 
-export const TransactionItem: React.FC<Prop> = ({ status, style, onPress }) => {
+export const TransactionItem: React.FC<Prop> = ({
+  transaction,
+  tokens,
+  rate,
+  currency,
+  style,
+  onSelect
+}) => {
   const statusColor = React.useMemo(() => {
-    if (status === TxStatsues.pending) {
+    if (transaction.receiptSuccess) {
+      return theme.colors.success;
+    } else if (transaction.receiptSuccess === undefined) {
       return theme.colors.info;
-    } else if (status === TxStatsues.rejected) {
+    } else if (!transaction.receiptSuccess) {
       return theme.colors.danger;
     }
 
-    return theme.colors.success;
-  }, [status]);
+    return theme.colors.warning;
+  }, [transaction]);
+  const recipient = React.useMemo(() => {
+    let t = '';
+    let color = theme.colors.danger;
+
+    if (transaction.direction === TX_DIRECTION.in) {
+      t = '+';
+    } else if (transaction.direction === TX_DIRECTION.out) {
+      t = '-';
+    }
+
+    if (Number(transaction.value) === 0) {
+      color = theme.colors.white;
+      t = '';
+    } else if (transaction.direction === TX_DIRECTION.in) {
+      color = theme.colors.success;
+    }
+
+    return {
+      t,
+      color
+    };
+  }, [transaction]);
+  const amount = React.useMemo(() => {
+    const [zilliqa] = tokens;
+    const value = fromZil(transaction.value, zilliqa.decimals);
+    const converted = toConversion(transaction.value, rate, zilliqa.decimals);
+
+    return {
+      converted,
+      value: toLocaleString(value),
+      symbol: zilliqa.symbol
+    };
+  },[transaction, tokens, rate]);
+  const vname = React.useMemo(() => {
+    if (typeof transaction.data === 'string') {
+      try {
+        const data = JSON.parse(transaction.data);
+
+        if (!data._tag && Array.isArray(data)) {
+          return 'Deployed';
+        }
+
+        return data._tag;
+      } catch(err) {
+        return 'Unexpected';
+      }
+    }
+
+    return 'Payment';
+  }, [transaction]);
 
   return (
     <TouchableOpacity
@@ -42,14 +107,14 @@ export const TransactionItem: React.FC<Prop> = ({ status, style, onPress }) => {
         style,
         { borderLeftColor: statusColor }
       ]}
-      onPress={onPress}
+      onPress={onSelect}
     >
       <View style={styles.wrapper}>
         <Text style={styles.first}>
-          Deployed
+          {vname}
         </Text>
-        <Text style={styles.first}>
-          25,040 ZIL
+        <Text style={[styles.first, { color: recipient.color }]}>
+          {recipient.t}{amount.value} {amount.symbol}
         </Text>
       </View>
       <View style={styles.wrapper}>
@@ -57,7 +122,7 @@ export const TransactionItem: React.FC<Prop> = ({ status, style, onPress }) => {
           15:00
         </Text>
         <Text style={styles.second}>
-          $ 105,250
+          {amount.converted} {currency}
         </Text>
       </View>
     </TouchableOpacity>
