@@ -25,11 +25,12 @@ import { SvgXml } from 'react-native-svg';
 import QRCode from 'react-native-qrcode-svg';
 import { CustomButton } from 'app/components/custom-button';
 import {
-  DeleteIconSVG,
   ProfileSVG,
   ViewBlockIconSVG,
   ShareIconSVG
 } from 'app/components/svg';
+import { ModalTitle } from 'app/components/modal-title';
+import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -123,15 +124,10 @@ export const ReceiveModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <View style={[styles.container, style]}>
-        <View style={styles.titleWrapper}>
-          <Text style={styles.title}>
-            {i18n.t('receive')}
-          </Text>
-          <TouchableOpacity onPress={onTriggered}>
-            <SvgXml xml={DeleteIconSVG}/>
-          </TouchableOpacity>
-        </View>
+      <ModalWrapper style={style}>
+        <ModalTitle onClose={onTriggered}>
+          {i18n.t('receive')}
+        </ModalTitle>
         <View style={styles.qrcodeWrapper}>
           <QRCode
             value={`zilliqa://${selected.bech32}`}
@@ -180,29 +176,12 @@ export const ReceiveModal: React.FC<Prop> = ({
             onPress={handleGetZil}
           />
         </View>
-      </View>
+      </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    padding: 20,
-    paddingHorizontal: 15,
-    borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: theme.colors.gray
-  },
-  titleWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center'
-  },
-  title: {
-    color: theme.colors.white,
-    fontSize: 20,
-    lineHeight: 26
-  },
   qrcodeWrapper: {
     paddingVertical: 15,
     alignItems: 'center'
