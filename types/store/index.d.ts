@@ -15,3 +15,4 @@ export * from './network';
 export * from './gas';
 export * from './connect';
 export * from './auth';
+export * from './transaction';

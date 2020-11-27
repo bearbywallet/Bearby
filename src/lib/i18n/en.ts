@@ -36,6 +36,7 @@ export default {
   copy_address: 'Copy address',
   view_block: 'View on ViewBlock',
   history_btn0: 'Clear all',
+  history_tx_details: 'Transaction details',
   sorting_item0: 'Status',
   sorting_item1: 'Token',
   sorting_item2: 'Date',

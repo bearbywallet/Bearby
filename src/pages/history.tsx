@@ -15,16 +15,14 @@ import {
   Button,
   Dimensions,
   ScrollView,
-  TouchableOpacity,
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
 import { TransactionItem } from 'app/components/transaction-item';
-import { DropDownItem } from 'app/components/drop-down-item';
 import { SortingWrapper } from 'app/components/history/sort-wrapper';
+import { TransactionModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -37,21 +35,19 @@ type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
-const TEST = [
-  0,
-  1,
-  2,
-  3,
-  4
-];
-
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const accountsState = useStore(keystore.account.store);
   const tokensState = useStore(keystore.token.store);
+  const settingsState = useStore(keystore.settings.store);
+  const currencyState = useStore(keystore.currency.store);
 
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedStatus, setSelectedStatus] = React.useState(0);
+
+  const [transactions, setTransactions] = React.useState([]);
+  const [transactionModal, setTransactionModal] = React.useState(false);
+  const [transactionIndex, setTransactionIndex] = React.useState(0);
 
   const account = React.useMemo(
     () => accountsState.identities[accountsState.selectedAddress],
@@ -63,6 +59,20 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       screen: 'CreateAccount'
     });
   }, []);
+
+  const showTxDetails = React.useCallback((index) => {
+    setTransactionIndex(index);
+    setTransactionModal(true);
+  }, [setTransactionIndex, setTransactionModal]);
+
+  React.useEffect(() => {
+    const selected = accountsState.identities[accountsState.selectedAddress];
+
+    keystore
+      .viewblock
+      .getTransactions(selected.bech32)
+      .then((txns) => setTransactions(txns));
+  }, [setTransactions]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -94,14 +104,24 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           <Text style={styles.date}>
             25.10.2020
           </Text>
-          {TEST.map((tx, index) => (
+          {transactions.map((tx, index) => (
             <TransactionItem
+              transaction={tx}
+              currency={currencyState}
+              rate={settingsState.rate}
+              tokens={tokensState.identities}
               status={TxStatsues.success}
               key={index}
+              onSelect={() => showTxDetails(index)}
             />
           ))}
         </ScrollView>
       </View>
+      <TransactionModal
+        visible={transactionModal}
+        transaction={transactions[transactionIndex]}
+        onTriggered={() => setTransactionModal(false)}
+      />
     </SafeAreaView>
   );
 };

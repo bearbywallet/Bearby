@@ -6,8 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-
-export enum ContactTypes {
-  Normal,
-  Unstoppabledomains
-}
+export * from './viewblock';

@@ -18,7 +18,7 @@ export const settingsStoreReset = createEvent();
 const SettingsDomain = createDomain();
 const initalState: Settings = {
   addressFormat: ADDRESS_FORMATS[0],
-  rate: 0
+  rate: 0.43243
 };
 export const settingsStore = SettingsDomain
   .store(initalState)
