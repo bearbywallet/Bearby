@@ -35,7 +35,7 @@ type Prop = {
 
 export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
-  const authState = useStore(keystore.guard.auth.store);
+  const authState = keystore.guard.auth.store.useValue();
 
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');

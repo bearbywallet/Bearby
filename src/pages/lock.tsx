@@ -34,7 +34,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const LockPage: React.FC<Prop> = ({ navigation }) => {
-  const authState = useStore(keystore.guard.auth.store);
+  const authState = keystore.guard.auth.store.useValue();
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
 

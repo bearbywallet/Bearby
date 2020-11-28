@@ -37,7 +37,7 @@ type Prop = {
 };
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
-  const authState = useStore(keystore.guard.auth.store);
+  const authState = keystore.guard.auth.store.useValue();
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
   const [accountName, setAccountName] = React.useState('');
   const [password, setPassword] = React.useState('');

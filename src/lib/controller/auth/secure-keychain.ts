@@ -85,7 +85,7 @@ export class SecureKeychain {
    * @param password - User password.
    */
   public async createKeychain(password: string) {
-    const { accessControl } = authStore.getState();
+    const { accessControl } = authStore.get();
 
     const name = DeviceInfo.getApplicationName();
     const encrypted = await this._encryptPassword(password);
@@ -107,7 +107,7 @@ export class SecureKeychain {
    * Get content from secure storage and decrypt it.
    */
   public async getGenericPassword() {
-    const { accessControl } = authStore.getState();
+    const { accessControl } = authStore.get();
     const options = {
       ..._options,
       accessControl

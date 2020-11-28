@@ -6,35 +6,40 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
 import Keychain from 'react-native-keychain';
+import { newRidgeState } from 'react-ridge-state';
 import { AuthState } from 'types';
 
-export const authStoreUpdate = createEvent<AuthState>();
-export const setAuthStoreAccessControl = createEvent<Keychain.ACCESS_CONTROL>();
-export const setAuthStoreBiometricEnable = createEvent<boolean>();
-export const setAuthStoreSupportedBiometryType = createEvent<Keychain.BIOMETRY_TYPE>();
-export const authStoreReset = createEvent();
-
-const AuthDomain = createDomain();
 const initalState: AuthState = {
   accessControl: Keychain.ACCESS_CONTROL.BIOMETRY_ANY_OR_DEVICE_PASSCODE,
   biometricEnable: false,
   supportedBiometryType: null
 };
-export const authStore = AuthDomain
-  .store<AuthState>(initalState)
-  .on(authStoreUpdate, (_, payload) => payload)
-  .on(setAuthStoreAccessControl, (state, accessControl) => ({
-    ...state,
+export const authStore = newRidgeState<AuthState>(initalState);
+
+export function authStoreUpdate(payload: AuthState) {
+  authStore.set(() => payload);
+}
+export function setAuthStoreAccessControl(accessControl: Keychain.ACCESS_CONTROL) {
+  authStore.set((prevState) => ({
+    ...prevState,
     accessControl
-  }))
-  .on(setAuthStoreBiometricEnable, (state, biometricEnable) => ({
-    ...state,
+  }));
+}
+export function setAuthStoreBiometricEnable(biometricEnable: boolean) {
+  authStore.set((prevState) => ({
+    ...prevState,
     biometricEnable
-  }))
-  .on(setAuthStoreSupportedBiometryType, (state, supportedBiometryType) => ({
-    ...state,
+  }));
+}
+export function setAuthStoreSupportedBiometryType(
+  supportedBiometryType: Keychain.BIOMETRY_TYPE
+) {
+  authStore.set((prevState) => ({
+    ...prevState,
     supportedBiometryType
-  }))
-  .reset(authStoreReset);
+  }));
+}
+export function authStoreReset() {
+  authStore.reset();
+}

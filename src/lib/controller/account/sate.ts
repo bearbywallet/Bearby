@@ -7,7 +7,6 @@
  * Copyright (c) 2020 ZilPay
  */
 import { newRidgeState } from 'react-ridge-state';
-import { createDomain, createEvent } from 'effector';
 import { AccountState } from 'types';
 
 const initalState: AccountState = {

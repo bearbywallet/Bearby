@@ -47,7 +47,7 @@ const times = [
   },
 ];
 export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
-  const authState = useStore(keystore.guard.auth.store);
+  const authState = keystore.guard.auth.store.useValue();
   const accountState = keystore.account.store.useValue();
 
   const [hour, sethour] = React.useState(0);
