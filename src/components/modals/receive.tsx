@@ -54,7 +54,7 @@ export const ReceiveModal: React.FC<Prop> = ({
 }) => {
   const accountState = keystore.account.store.useValue();
   const settings = useStore(keystore.settings.store);
-  const netwrokState = useStore(keystore.network.store);
+  const networkState = keystore.network.store.useValue();
 
   const [qrcodeRef, setQrcodeRef] = React.useState<QrcodeType | null>(null);
 
@@ -63,14 +63,14 @@ export const ReceiveModal: React.FC<Prop> = ({
     []
   );
   const btnTitle = React.useMemo(() => {
-    const [mainnet] = Object.keys(netwrokState.config);
+    const [mainnet] = Object.keys(networkState.config);
 
-    if (netwrokState.selected === mainnet) {
+    if (networkState.selected === mainnet) {
       return i18n.t('buy');
     }
 
     return i18n.t('faucet');
-  }, [netwrokState]);
+  }, [networkState]);
 
   /**
    * Copy address.
@@ -79,10 +79,10 @@ export const ReceiveModal: React.FC<Prop> = ({
     Clipboard.setString(selected[settings.addressFormat]);
   }, [selected, settings]);
   const hanldeViewAddress = React.useCallback(() => {
-    const url = viewAddress(selected.bech32, netwrokState.selected);
+    const url = viewAddress(selected.bech32, networkState.selected);
 
     Linking.openURL(url);
-  }, [selected, netwrokState]);
+  }, [selected, networkState]);
   /**
    * Open share qrcode image.
    */
@@ -103,16 +103,16 @@ export const ReceiveModal: React.FC<Prop> = ({
     });
   }, [qrcodeRef, selected]);
   const handleGetZil = React.useCallback(() => {
-    const [mainnet] = Object.keys(netwrokState.config);
+    const [mainnet] = Object.keys(networkState.config);
 
-    if (netwrokState.selected === mainnet) {
+    if (networkState.selected === mainnet) {
       Linking.openURL(ORDERS.TRANSAK_URL);
 
       return null;
     }
 
     Linking.openURL(ORDERS.FAUCET);
-  }, [netwrokState]);
+  }, [networkState]);
 
   return (
     <Modal

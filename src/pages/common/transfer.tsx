@@ -40,7 +40,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = useStore(keystore.token.store);
-  const networkState = useStore(keystore.network.store);
+  const networkState = keystore.network.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);

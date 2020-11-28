@@ -6,24 +6,33 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
+import { newRidgeState } from 'react-ridge-state';
+
 import { ZILLIQA } from 'app/config';
 import { NetwrokState } from 'types';
 
-export const networkStoreUpdate = createEvent<NetwrokState>();
-export const setNetworkStore = createEvent<string>();
-export const setConfigNetworkStore = createEvent<typeof ZILLIQA>();
-export const networkStoreReset = createEvent();
-
 const [mainnet] = Object.keys(ZILLIQA);
-const networkDomain = createDomain();
 const initalState: NetwrokState = {
   selected: mainnet,
   config: ZILLIQA
 };
-export const networkStore = networkDomain
-  .store<NetwrokState>(initalState)
-  .on(networkStoreUpdate, (_, payload) => payload)
-  .on(setNetworkStore, (state, selected) => ({ ...state, selected }))
-  .on(setConfigNetworkStore, (state, config) => ({ ...state, config }))
-  .reset(networkStoreReset);
+export const networkStore = newRidgeState<NetwrokState>(initalState);
+
+export function networkStoreUpdate(payload: NetwrokState) {
+  networkStore.set(() => payload);
+}
+export function setNetworkStore(selected: string) {
+  networkStore.set((prevState) => ({
+    ...prevState,
+    selected
+  }));
+}
+export function setConfigNetworkStore(config: typeof ZILLIQA) {
+  networkStore.set((prevState) => ({
+    ...prevState,
+    config
+  }));
+}
+export function networkStoreReset() {
+  networkStore.reset();
+}

@@ -25,7 +25,7 @@ import { keystore } from 'app/keystore';
 
 const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
-  const netwrokState = useStore(keystore.network.store);
+  const networkState = keystore.network.store.useValue();
 
   const handleReset = React.useCallback(() => {
     keystore.network.reset();
@@ -47,12 +47,12 @@ export const NetworkPage = () => {
         style={{ marginVertical: 16 }}
         title={i18n.t('netwrok_options')}
         items={netwroks}
-        selected={netwrokState.selected}
+        selected={networkState.selected}
         onSelect={(net) => keystore.network.changeNetwork(net)}
       />
       <NetwrokConfig
-        config={netwrokState.config}
-        selected={netwrokState.selected}
+        config={networkState.config}
+        selected={networkState.selected}
         onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
       />
     </SafeAreaView>

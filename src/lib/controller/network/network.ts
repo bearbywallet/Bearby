@@ -34,11 +34,11 @@ export class NetworkControll {
   }
 
   public get selected() {
-    return this.store.getState().selected;
+    return this.store.get().selected;
   }
 
   public get config(): typeof ZILLIQA {
-    return this.store.getState().config;
+    return this.store.get().config;
   }
 
   public get http() {
@@ -124,7 +124,7 @@ export class NetworkControll {
   public async reset() {
     networkStoreReset();
 
-    const { selected, config } = this.store.getState();
+    const { selected, config } = this.store.get();
 
     await this._storage.set(
       buildObject(STORAGE_FIELDS.CONFIG, config),

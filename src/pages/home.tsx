@@ -30,7 +30,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
   const settingsState = useStore(keystore.settings.store);
   const currencyState = keystore.currency.store.useValue();
-  const netwrokState = useStore(keystore.network.store);
+  const networkState = keystore.network.store.useValue();
   const tokensState = useStore(keystore.token.store);
 
   const [isReceiveModal, setIsReceiveModal] = React.useState(false);
@@ -52,7 +52,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         token={tokensState.identities[0]}
         rate={settingsState.rate[currencyState]}
         currency={currencyState}
-        netwrok={netwrokState.selected}
+        netwrok={networkState.selected}
         account={accountState.identities[accountState.selectedAddress]}
         onCreateAccount={handleCreateAccount}
         onReceive={() => setIsReceiveModal(true)}

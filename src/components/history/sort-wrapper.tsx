@@ -39,7 +39,7 @@ export const SortingWrapper: React.FC<Prop> = ({
   onSelectStatus,
   onSelectToken
 }) => {
-  const netwrokState = useStore(keystore.network.store);
+  const netwrokState = keystore.network.store.useValue();
 
   const [statusModal, setStatusModal] = React.useState(false);
   const [tokenModal, setTokenModal] = React.useState(false);

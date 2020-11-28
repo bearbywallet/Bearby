@@ -30,7 +30,7 @@ export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
   const currencyState = keystore.currency.store.useValue();
-  const netwrokState = useStore(keystore.network.store);
+  const netwrokState = keystore.network.store.useValue();
 
   const tokensList = React.useMemo(
     () => tokensState.identities.filter(
