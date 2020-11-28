@@ -6,48 +6,43 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { VIEW_BLOCK_API, API_KEY } from 'app/config';
+import { API_KEY, VIEW_BLOCK_API_V1 } from 'app/config';
 import { NetworkControll } from 'app/lib/controller/network';
-import { Headers } from 'react-native-fs';
-
-const methods = {
-  addresses: 'addresses',
-  txns: 'txs'
-};
+import { ViewBlockMethods } from './methods';
 
 export class ViewBlockControler {
   private _network: NetworkControll;
-  private _headers: Headers;
+  private _options: RequestInit;
 
   constructor(network: NetworkControll) {
     this._network = network;
-    this._headers = {
-      'X-APIKEY': API_KEY
+    this._options = {
+      method: 'GET',
+      headers: {
+        'X-APIKEY': API_KEY
+      }
     };
   }
 
+  private get _netwrokParam() {
+    return `network=${this._network.selected}`;
+  }
+
   public async getAddress(address: string) {
-    const netwrok = this._network.selected;
-    const params = `?network=${netwrok}`;
-    const url = `${VIEW_BLOCK_API}/${methods.addresses}/${address}${params}`;
-    const settings = {
-      method: 'GET',
-      headers: this._headers
-    };
-    const response = await fetch(url, settings);
+    const params = `?${this._netwrokParam}`;
+    const method = ViewBlockMethods.Addresses;
+    const url = `${VIEW_BLOCK_API_V1}/${method}/${address}${params}`;
+    const response = await fetch(url, this._options);
 
     return response.json();
   }
 
   public async getTransactions(address: string, page: number = 1) {
-    const netwrok = this._network.selected;
-    const params = `?page=${page}&network=${netwrok}`;
-    const url = `${VIEW_BLOCK_API}/${methods.addresses}/${address}/${methods.txns}${params}`;
-    const settings = {
-      method: 'GET',
-      headers: this._headers
-    };
-    const response = await fetch(url, settings);
+    const params = `?page=${page}&${this._netwrokParam}`;
+    const method = ViewBlockMethods.Addresses;
+    const txns = ViewBlockMethods.Txns;
+    const url = `${VIEW_BLOCK_API_V1}/${method}/${address}/${txns}${params}`;
+    const response = await fetch(url, this._options);
 
     return response.json();
   }

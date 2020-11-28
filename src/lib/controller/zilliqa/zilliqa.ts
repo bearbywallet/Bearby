@@ -76,6 +76,7 @@ export class ZilliqaControl {
     params: string[] | number[] = []
   ) {
     contract = tohexString(contract);
+
     const request = this._json(
       Methods.GetSmartContractSubState,
       [contract, field, params]
@@ -101,7 +102,7 @@ export class ZilliqaControl {
         params,
         id: '1',
         jsonrpc: '2.0'
-      })
+      }, null, '')
     };
   }
 }

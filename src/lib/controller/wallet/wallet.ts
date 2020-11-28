@@ -40,7 +40,9 @@ export class WalletControler extends Mnemonic {
   public readonly transaction = new TransactionsContoller(
     this.viewblock,
     this.zilliqa,
-    _storage
+    _storage,
+    this.account,
+    this.network
   );
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
 

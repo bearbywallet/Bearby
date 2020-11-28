@@ -41,11 +41,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
   const currencyState = useStore(keystore.currency.store);
+  const transactionState = useStore(keystore.transaction.store);
 
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedStatus, setSelectedStatus] = React.useState(0);
 
-  const [transactions, setTransactions] = React.useState([]);
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
 
@@ -65,24 +65,30 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     setTransactionModal(true);
   }, [setTransactionIndex, setTransactionModal]);
 
+  const dateTransactions = React.useMemo(() => {
+    let lasDate: Date | null = null;
+
+    return transactionState.map((tx) => {
+      let date: Date | null = new Date(tx.timestamp);
+
+      if (!lasDate) {
+        lasDate = date;
+      } else if (lasDate.getDay() >= date.getDay()) {
+        date = null;
+      } else if (lasDate.getDay() < date.getDay()) {
+        lasDate = date;
+      }
+
+      return {
+        tx,
+        date
+      };
+    });
+  }, [transactionState]);
+
   React.useEffect(() => {
-    // const selected = accountsState.identities[accountsState.selectedAddress];
-
-    // keystore
-    //   .zilliqa
-    //   .getSmartContractSubState('0x735FC0671B4e199aea4597aC83D9380B3B290010', 'balances')
-    //   .then(console.log);
-
-    // keystore
-    //   .viewblock
-    //   .getAddress(selected.bech32)
-    //   .then((info) => console.log(JSON.stringify(info, null, 4)))
-
-    // keystore
-    //   .viewblock
-    //   .getTransactions(selected.bech32)
-    //   .then((txns) => setTransactions(txns));
-  }, [setTransactions]);
+    keystore.transaction.sync();
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -98,7 +104,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           <Button
             title={i18n.t('history_btn0')}
             color={theme.colors.primary}
-            onPress={() => null}
+            onPress={() => keystore.transaction.reset()}
           />
         </View>
       </View>
@@ -111,25 +117,28 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           onSelectToken={setSelectedToken}
         />
         <ScrollView style={styles.list}>
-          <Text style={styles.date}>
-            25.10.2020
-          </Text>
-          {transactions.map((tx, index) => (
-            <TransactionItem
-              transaction={tx}
-              currency={currencyState}
-              rate={settingsState.rate[currencyState]}
-              tokens={tokensState.identities}
-              status={TxStatsues.success}
-              key={index}
-              onSelect={() => showTxDetails(index)}
-            />
+          {dateTransactions.map((data, index) => (
+            <React.Fragment key={index}>
+              {data.date ? (
+                 <Text style={styles.date}>
+                  {data.date.toDateString()}
+                </Text>
+              ) : null}
+              <TransactionItem
+                transaction={data.tx}
+                currency={currencyState}
+                rate={settingsState.rate[currencyState]}
+                tokens={tokensState.identities}
+                status={TxStatsues.success}
+                onSelect={() => showTxDetails(index)}
+              />
+            </React.Fragment>
           ))}
         </ScrollView>
       </View>
       <TransactionModal
         visible={transactionModal}
-        transaction={transactions[transactionIndex]}
+        transaction={transactionState[transactionIndex]}
         onTriggered={() => setTransactionModal(false)}
       />
     </SafeAreaView>
