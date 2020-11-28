@@ -6,17 +6,16 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
-
-import { GasState } from 'types';
 import { DEFAULT_GAS } from 'app/config';
+import { newRidgeState } from 'react-ridge-state';
+import { GasState } from 'types';
 
-export const gasStoreUpdate = createEvent<GasState>();
-export const GasStoreReset = createEvent();
-
-const GasDomain = createDomain();
 const initalState: GasState = DEFAULT_GAS;
-export const gasStore = GasDomain
-  .store<GasState>(initalState)
-  .reset(GasStoreReset)
-  .on(gasStoreUpdate, (_, value) => value);
+export const gasStore = newRidgeState<GasState>(initalState);
+
+export function gasStoreUpdate(payload: GasState) {
+  gasStore.set(() => payload);
+}
+export function gasStoreReset() {
+  gasStore.reset();
+}

@@ -10,7 +10,7 @@ import { MobileStorage, buildObject } from 'app/lib';
 import {
   gasStore,
   gasStoreUpdate,
-  GasStoreReset
+  gasStoreReset
 } from './state';
 import { STORAGE_FIELDS, DEFAULT_GAS } from 'app/config';
 import { GasState } from 'types';
@@ -42,10 +42,10 @@ export class GasControler {
   }
 
   public reset() {
-    GasStoreReset();
+    gasStoreReset();
 
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.GAS, this.store.getState())
+      buildObject(STORAGE_FIELDS.GAS, this.store.get())
     );
   }
 
@@ -63,7 +63,7 @@ export class GasControler {
     gasStoreUpdate(gas);
 
     await this._storage.set(
-      buildObject(STORAGE_FIELDS.GAS, this.store.getState())
+      buildObject(STORAGE_FIELDS.GAS, this.store.get())
     );
   }
 }

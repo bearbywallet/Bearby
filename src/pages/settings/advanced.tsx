@@ -25,7 +25,7 @@ import i18n from 'app/lib/i18n';
 
 export const AdvancedPage = () => {
   const settings = useStore(keystore.settings.store);
-  const gasState = useStore(keystore.gas.store);
+  const gasState = keystore.gas.store.useValue();
 
   const hanldeReset = React.useCallback(() => {
     keystore.settings.reset();
