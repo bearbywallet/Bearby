@@ -44,7 +44,7 @@ const checkChar = (elements: Contact[], index: number) => {
 };
 
 export const ContactsPage: React.FC<Prop> = () => {
-  const contactsState = useStore(keystore.contacts.store);
+  const contactsState = keystore.contacts.store.useValue();
 
   const alphabetSorted = React.useMemo(() => {
     return contactsState.sort((a, b) => {

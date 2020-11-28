@@ -38,7 +38,7 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
-  const contactsState = useStore(keystore.contacts.store);
+  const contactsState = keystore.contacts.store.useValue();
   const tokensState = useStore(keystore.token.store);
   const networkState = useStore(keystore.network.store);
 

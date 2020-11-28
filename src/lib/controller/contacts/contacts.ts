@@ -34,7 +34,7 @@ export class ContactsControler {
   }
 
   public add(contact: Contact) {
-    const contacts = this.store.getState();
+    const contacts = this.store.get();
 
     contacts.push(contact);
 
@@ -48,7 +48,7 @@ export class ContactsControler {
   public rm(contact: Contact) {
     const contacts = this
       .store
-      .getState()
+      .get()
       .filter((acc) => acc.address === contact.address);
 
     contactsStoreUpdate(contacts);
@@ -62,7 +62,7 @@ export class ContactsControler {
     contactsStoreReset();
 
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.CONTACTS, this.store.getState())
+      buildObject(STORAGE_FIELDS.CONTACTS, this.store.get())
     );
   }
 

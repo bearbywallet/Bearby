@@ -6,13 +6,10 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
 import { Contact } from 'types';
 
-export const contactsStoreUpdate = createEvent<Contact[]>();
-export const contactsStoreReset = createEvent();
+import { newRidgeState } from 'react-ridge-state';
 
-const ContactsDomain = createDomain();
 const initalState: Contact[] = [
   {
     address: 'zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace',
@@ -27,7 +24,17 @@ const initalState: Contact[] = [
     name: 'ledger'
   },
 ];
-export const contactsStore = ContactsDomain
-  .store<Contact[]>(initalState)
-  .on(contactsStoreUpdate, (_, payload) => payload)
-  .reset(contactsStoreReset);
+export const contactsStore = newRidgeState<Contact[]>(initalState);
+
+export function contactsStoreUpdate(payload: Contact[]) {
+  contactsStore.set(() => payload);
+}
+export function accountStoreSelect(selectedAddress: number) {
+  contactsStore.set((prevState) => ({
+    ...prevState,
+    selectedAddress
+  }));
+}
+export function contactsStoreReset() {
+  contactsStore.reset();
+}
