@@ -79,7 +79,7 @@ $ yarn android --device
 	- [x] HomePage.
 	- [ ] BrowserPage.
 	- [x] SettingsPage.
-	- [ ] HistoryPage.
+	- [x] HistoryPage.
 - [ ] Common.
 	- [x] CreateAccountPage.
 	- [ ] TransferPage.
