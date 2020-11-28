@@ -29,12 +29,6 @@ export const contactsStore = newRidgeState<Contact[]>(initalState);
 export function contactsStoreUpdate(payload: Contact[]) {
   contactsStore.set(() => payload);
 }
-export function accountStoreSelect(selectedAddress: number) {
-  contactsStore.set((prevState) => ({
-    ...prevState,
-    selectedAddress
-  }));
-}
 export function contactsStoreReset() {
   contactsStore.reset();
 }

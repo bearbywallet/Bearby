@@ -29,7 +29,7 @@ const { width } = Dimensions.get('window');
 export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
-  const currencyState = useStore(keystore.currency.store);
+  const currencyState = keystore.currency.store.useValue();
   const netwrokState = useStore(keystore.network.store);
 
   const tokensList = React.useMemo(

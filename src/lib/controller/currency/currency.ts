@@ -9,7 +9,7 @@
 import {
   currenciesStore,
   currenciesStoreUpdate,
-  CurrenciesStoreReset
+  currenciesStoreReset
 } from './store';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
@@ -37,10 +37,10 @@ export class CurrencyControler {
   }
 
   public reset() {
-    CurrenciesStoreReset();
+    currenciesStoreReset();
 
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.CURRENCY, this.store.getState())
+      buildObject(STORAGE_FIELDS.CURRENCY, this.store.get())
     );
   }
 

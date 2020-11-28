@@ -6,15 +6,15 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
 import { DEFAULT_CURRENCIES } from 'app/config';
+import { newRidgeState } from 'react-ridge-state';
 
-export const currenciesStoreUpdate = createEvent<string>();
-export const CurrenciesStoreReset = createEvent();
-
-const CurrenciesDomain = createDomain();
 const [initalState] = DEFAULT_CURRENCIES;
-export const currenciesStore = CurrenciesDomain
-  .store<string>(initalState)
-  .reset(CurrenciesStoreReset)
-  .on(currenciesStoreUpdate, (_, value) => value);
+export const currenciesStore = newRidgeState<string>(initalState);
+
+export function currenciesStoreUpdate(payload: string) {
+  currenciesStore.set(() => payload);
+}
+export function currenciesStoreReset() {
+  currenciesStore.reset();
+}

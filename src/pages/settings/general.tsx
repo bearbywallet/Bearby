@@ -22,7 +22,7 @@ import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 
 export const GeneralPage = () => {
-  const currencyState = useStore(keystore.currency.store);
+  const currencyState = keystore.currency.store.useValue();
   const themeState = useStore(keystore.theme.store);
 
   const hanldeReset = React.useCallback(() => {
