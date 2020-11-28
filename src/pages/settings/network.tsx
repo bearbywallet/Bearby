@@ -27,8 +27,13 @@ const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
   const networkState = keystore.network.store.useValue();
 
-  const handleReset = React.useCallback(() => {
-    keystore.network.reset();
+  const handleReset = React.useCallback(async() => {
+    await keystore.network.reset();
+    await keystore.transaction.sync();
+  }, []);
+  const handleNetwrokChange = React.useCallback(async(net) => {
+    await keystore.network.changeNetwork(net);
+    await keystore.transaction.sync();
   }, []);
 
   return (
@@ -49,7 +54,7 @@ export const NetworkPage = () => {
           title={i18n.t('netwrok_options')}
           items={netwroks}
           selected={networkState.selected}
-          onSelect={(net) => keystore.network.changeNetwork(net)}
+          onSelect={handleNetwrokChange}
         />
         <NetwrokConfig
           config={networkState.config}
