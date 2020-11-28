@@ -12,7 +12,7 @@ import { NetworkControll } from 'app/lib/controller/network';
 
 import { STORAGE_FIELDS } from 'app/config';
 import { Token } from 'types';
-import { store } from './state';
+import { tokensStore } from './state';
 
 export class TokenControll {
 
@@ -32,7 +32,7 @@ export class TokenControll {
     }
   }
 
-  public store = store;
+  public store = tokensStore;
 
   private _network: NetworkControll;
   private _zilliqa: ZilliqaControl;

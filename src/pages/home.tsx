@@ -31,7 +31,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const networkState = keystore.network.store.useValue();
-  const tokensState = useStore(keystore.token.store);
+  const tokensState = keystore.token.store.useValue();
 
   const [isReceiveModal, setIsReceiveModal] = React.useState(false);
 

@@ -39,7 +39,7 @@ const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
-  const tokensState = useStore(keystore.token.store);
+  const tokensState = keystore.token.store.useValue();
   const networkState = keystore.network.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);

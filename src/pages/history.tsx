@@ -38,7 +38,7 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
-  const tokensState = useStore(keystore.token.store);
+  const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const transactionState = useStore(keystore.transaction.store);

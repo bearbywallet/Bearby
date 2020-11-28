@@ -45,7 +45,8 @@ export const GasSelector: React.FC<Prop> = ({
   gasPrice,
   onChange = () => null
 }) => {
-  const tokensState = useStore(keystore.token.store);
+  const tokensState = keystore.token.store.useValue();
+
   const amountGas = (increse: number) => {
     const incresedGasPrice = Number(DEFAULT_GAS.gasPrice) * increse;
     const { fee } = gasToFee(gasLimit, String(incresedGasPrice));

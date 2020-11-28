@@ -6,12 +6,12 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain } from 'effector';
+import { newRidgeState } from 'react-ridge-state';
+
 import { Token } from 'types';
 import { ZILLIQA, NIL_ADDRESS } from 'app/config';
 
 const [mainnet, testnet, privatenet] = Object.keys(ZILLIQA);
-const TokenDomain = createDomain();
 const identities: Token[] = [
   {
     address: {
@@ -75,5 +75,11 @@ const identities: Token[] = [
 const initalState = {
   identities
 };
-export const store = TokenDomain
-  .store(initalState);
+export const tokensStore = newRidgeState(initalState);
+
+export function tokensStoreUpdate(payload: typeof initalState) {
+  tokensStore.set(() => payload);
+}
+export function tokensStoreReset() {
+  tokensStore.reset();
+}
