@@ -6,15 +6,15 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
 import { DEFAULT_THEMES } from 'app/config';
+import { newRidgeState } from 'react-ridge-state';
 
-export const themesStoreUpdate = createEvent<string>();
-export const themesStoreReset = createEvent();
-
-const ThemeDomain = createDomain();
 const [initalState] = DEFAULT_THEMES;
-export const themesStore = ThemeDomain
-  .store<string>(initalState)
-  .reset(themesStoreReset)
-  .on(themesStoreUpdate, (_, value) => value);
+export const themesStore = newRidgeState<string>(initalState);
+
+export function themesStoreUpdate(selected: string) {
+  themesStore.set(() => selected);
+}
+export function themesStoreReset() {
+  themesStore.reset();
+}

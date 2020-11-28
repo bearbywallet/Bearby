@@ -13,7 +13,6 @@ import {
   Button,
   StyleSheet
 } from 'react-native';
-import { useStore } from 'effector-react';
 
 import { Selector } from 'app/components/selector';
 
@@ -23,7 +22,7 @@ import { keystore } from 'app/keystore';
 
 export const GeneralPage = () => {
   const currencyState = keystore.currency.store.useValue();
-  const themeState = useStore(keystore.theme.store);
+  const themeState = keystore.theme.store.useValue();
 
   const hanldeReset = React.useCallback(() => {
     keystore.currency.reset();

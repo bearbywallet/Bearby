@@ -38,7 +38,7 @@ export class ThemeControler {
     themesStoreReset();
 
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.THEME, this.store.getState())
+      buildObject(STORAGE_FIELDS.THEME, this.store.get())
     );
   }
 
