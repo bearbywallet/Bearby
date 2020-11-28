@@ -28,7 +28,7 @@ import { keystore } from 'app/keystore';
 const { width } = Dimensions.get('window');
 export const HomeTokens: React.FC = () => {
   const tokensState = useStore(keystore.token.store);
-  const settingsState = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
 

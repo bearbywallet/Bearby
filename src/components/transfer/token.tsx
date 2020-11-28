@@ -45,7 +45,7 @@ export const TransferToken: React.FC<Prop> = ({
   netwrok,
   onSelect
 }) => {
-  const settingsState = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
   const [tokenModal, setTokenModal] = React.useState(false);

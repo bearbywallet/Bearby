@@ -36,7 +36,7 @@ type Prop = {
 };
 
 export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }) => {
-  const settingsState = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
 
   const [isAccountModal, setIsAccountModal] = React.useState(false);
 

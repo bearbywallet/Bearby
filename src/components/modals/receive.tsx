@@ -53,7 +53,7 @@ export const ReceiveModal: React.FC<Prop> = ({
   onTriggered
 }) => {
   const accountState = keystore.account.store.useValue();
-  const settings = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
   const networkState = keystore.network.store.useValue();
 
   const [qrcodeRef, setQrcodeRef] = React.useState<QrcodeType | null>(null);
@@ -76,8 +76,8 @@ export const ReceiveModal: React.FC<Prop> = ({
    * Copy address.
    */
   const hanldeCopy = React.useCallback(() => {
-    Clipboard.setString(selected[settings.addressFormat]);
-  }, [selected, settings]);
+    Clipboard.setString(selected[settingsState.addressFormat]);
+  }, [selected, settingsState]);
   const hanldeViewAddress = React.useCallback(() => {
     const url = viewAddress(selected.bech32, networkState.selected);
 
@@ -139,7 +139,7 @@ export const ReceiveModal: React.FC<Prop> = ({
           {selected.name}
         </Text>
         <Text style={styles.accountAddress}>
-          {trim(selected[settings.addressFormat])}
+          {trim(selected[settingsState.addressFormat])}
         </Text>
         <View style={styles.linkWrapper}>
           <TouchableOpacity

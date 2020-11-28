@@ -55,7 +55,7 @@ export class SettingsControler {
   public reset() {
     settingsStoreReset();
 
-    const { rate, addressFormat } = this.store.getState();
+    const { rate, addressFormat } = this.store.get();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.RATE, String(rate)),

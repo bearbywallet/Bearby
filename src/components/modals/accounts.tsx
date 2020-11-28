@@ -46,7 +46,7 @@ export const AccountsModal: React.FC<Prop> = ({
   onAdd,
   onSelected
 }) => {
-  const settings = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
 
   const handleSelected = React.useCallback((index) => {
     onSelected(index);
@@ -72,7 +72,7 @@ export const AccountsModal: React.FC<Prop> = ({
             <AccountItem
               key={index}
               account={account}
-              format={settings.addressFormat}
+              format={settingsState.addressFormat}
               selected={selected === index}
               onPress={() => handleSelected(index)}
             />

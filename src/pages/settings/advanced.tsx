@@ -24,7 +24,7 @@ import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 
 export const AdvancedPage = () => {
-  const settings = useStore(keystore.settings.store);
+  const settingsState = keystore.settings.store.useValue();
   const gasState = keystore.gas.store.useValue();
 
   const hanldeReset = React.useCallback(() => {
@@ -54,7 +54,7 @@ export const AdvancedPage = () => {
         style={{ marginVertical: 16 }}
         title={i18n.t('advanced_selector_title')}
         items={keystore.settings.formats}
-        selected={settings.addressFormat}
+        selected={settingsState.addressFormat}
         onSelect={(format) => keystore.settings.setFormat(format)}
       />
     </SafeAreaView>

@@ -6,18 +6,10 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
-import { Settings } from 'types';
 import { ADDRESS_FORMATS, DEFAULT_CURRENCIES } from 'app/config';
+import { newRidgeState } from 'react-ridge-state';
+import { Settings } from 'types';
 
-export const settingsStoreUpdate = createEvent<Settings>();
-export const settingsStoreSetAddressFormat = createEvent<string>();
-export const settingsStoreSetRate = createEvent<{
-  [key: string]: number;
-}>();
-export const settingsStoreReset = createEvent();
-
-const SettingsDomain = createDomain();
 const initalState: Settings = {
   addressFormat: ADDRESS_FORMATS[0],
   rate: {
@@ -26,9 +18,23 @@ const initalState: Settings = {
     [DEFAULT_CURRENCIES[2].toLowerCase()]: 0,
   }
 };
-export const settingsStore = SettingsDomain
-  .store(initalState)
-  .reset(settingsStoreReset)
-  .on(settingsStoreUpdate, (_, payload) => payload)
-  .on(settingsStoreSetRate, (state, rate) => ({ ...state, rate }))
-  .on(settingsStoreSetAddressFormat, (state, addressFormat) => ({ ...state, addressFormat }));
+export const settingsStore = newRidgeState<Settings>(initalState);
+
+export function settingsStoreUpdate(payload: Settings) {
+  settingsStore.set(() => payload);
+}
+export function settingsStoreSetAddressFormat(addressFormat: string) {
+  settingsStore.set((prevState) => ({
+    ...prevState,
+    addressFormat
+  }));
+}
+export function settingsStoreSetRate(rate: { [key: string]: number; }) {
+  settingsStore.set((prevState) => ({
+    ...prevState,
+    rate
+  }));
+}
+export function settingsStoreReset() {
+  settingsStore.reset();
+}
