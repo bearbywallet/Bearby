@@ -27,7 +27,6 @@ import { TransactionModal } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
-import { useStore } from 'effector-react';
 import { keystore } from 'app/keystore';
 import { TxStatsues } from 'app/config';
 
@@ -41,7 +40,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
-  const transactionState = useStore(keystore.transaction.store);
+  const transactionState = keystore.transaction.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedStatus, setSelectedStatus] = React.useState(0);

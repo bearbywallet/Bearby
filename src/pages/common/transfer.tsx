@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useStore } from 'effector-react';
 
 import { CustomButton } from 'app/components/custom-button';
 import {

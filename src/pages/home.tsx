@@ -13,7 +13,6 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useStore } from 'effector-react';
 
 import { HomeAccount, HomeTokens } from 'app/components/home';
 import { ReceiveModal } from 'app/components/modals';

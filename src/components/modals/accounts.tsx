@@ -13,7 +13,6 @@ import {
   Button,
   ViewStyle
 } from 'react-native';
-import { useStore } from 'effector-react';
 
 import Modal from 'react-native-modal';
 import { AccountItem } from 'app/components/account-item';

@@ -6,15 +6,15 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { createDomain, createEvent } from 'effector';
+import { newRidgeState } from 'react-ridge-state';
 import { Transaction } from 'types';
 
-export const transactionStoreUpdate = createEvent<Transaction[]>();
-export const transactionStoreReset = createEvent();
-
-const transactionDomain = createDomain();
 const initalState: Transaction[] = [];
-export const transactionStore = transactionDomain
-  .store<Transaction[]>(initalState)
-  .on(transactionStoreUpdate, (_, payload) => payload)
-  .reset(transactionStoreReset);
+export const transactionStore = newRidgeState<Transaction[]>(initalState);
+
+export function transactionStoreUpdate(txns: Transaction[]) {
+  transactionStore.set(() => txns);
+}
+export function transactionStoreReset() {
+  transactionStore.reset();
+}

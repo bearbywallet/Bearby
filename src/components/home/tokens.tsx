@@ -18,7 +18,6 @@ import {
 
 import I18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { useStore } from 'effector-react';
 
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';

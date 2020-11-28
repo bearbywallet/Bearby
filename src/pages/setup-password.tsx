@@ -19,7 +19,6 @@ import {
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useStore } from 'effector-react';
 import { RouteProp } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';

@@ -15,7 +15,6 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import { useStore } from 'effector-react';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Selector } from 'app/components/selector';

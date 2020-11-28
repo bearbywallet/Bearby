@@ -28,7 +28,6 @@ import i18n from 'app/lib/i18n';
 import { GasState } from 'types';
 import { gasToFee } from 'app/filters';
 import { keystore } from 'app/keystore';
-import { useStore } from 'effector-react';
 import { DEFAULT_GAS } from 'app/config';
 
 type Prop = {

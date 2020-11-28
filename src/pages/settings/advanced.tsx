@@ -14,7 +14,6 @@ import {
   Button,
   SafeAreaView
 } from 'react-native';
-import { useStore } from 'effector-react';
 
 import { GasSelector } from 'app/components/gas-selector';
 import { Selector } from 'app/components/selector';

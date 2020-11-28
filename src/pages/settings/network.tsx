@@ -14,7 +14,6 @@ import {
   Button,
   SafeAreaView
 } from 'react-native';
-import { useStore } from 'effector-react';
 
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';

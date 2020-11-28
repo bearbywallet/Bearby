@@ -19,7 +19,6 @@ import {
 import Clipboard from '@react-native-community/clipboard';
 import Modal from 'react-native-modal';
 import Share from 'react-native-share';
-import { useStore } from 'effector-react';
 import { SvgXml } from 'react-native-svg';
 
 import QRCode from 'react-native-qrcode-svg';

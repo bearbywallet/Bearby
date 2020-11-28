@@ -16,7 +16,6 @@ import {
   Button,
   ViewStyle
 } from 'react-native';
-import { useStore } from 'effector-react';
 import { SvgXml } from 'react-native-svg';
 
 import { DropDownItem } from 'app/components/drop-down-item';

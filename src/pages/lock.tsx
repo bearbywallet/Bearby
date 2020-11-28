@@ -15,7 +15,6 @@ import {
   Button,
   Dimensions
 } from 'react-native';
-import { useStore } from 'effector-react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SvgXml } from 'react-native-svg';

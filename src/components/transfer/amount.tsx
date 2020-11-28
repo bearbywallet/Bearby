@@ -17,7 +17,6 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgXml, SvgCssUri } from 'react-native-svg';
-import { useStore } from 'effector-react';
 
 import {
   ArrowIconSVG,

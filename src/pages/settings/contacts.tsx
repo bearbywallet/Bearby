@@ -16,7 +16,6 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useStore } from 'effector-react';
 
 import { ContactItem } from 'app/components/contact-item';
 

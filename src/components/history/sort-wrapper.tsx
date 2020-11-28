@@ -18,7 +18,6 @@ import { DropDownItem } from 'app/components/drop-down-item';
 import { HistoryStatus, TokensModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
-import { useStore } from 'effector-react';
 import { keystore } from 'app/keystore';
 import { Token } from 'types';
 

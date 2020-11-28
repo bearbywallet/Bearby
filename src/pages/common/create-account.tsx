@@ -19,7 +19,6 @@ import {
 import { SvgXml } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { useStore } from 'effector-react';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 
