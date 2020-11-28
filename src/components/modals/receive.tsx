@@ -36,12 +36,13 @@ import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { trim } from 'app/filters';
 import { viewAddress } from 'app/utils';
-import { QrcodeType } from 'types';
+import { QrcodeType, Account } from 'types';
 import { ORDERS } from 'app/config';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
+  account: Account;
   onTriggered: () => void;
 };
 
@@ -49,18 +50,14 @@ const { width } = Dimensions.get('window');
 export const ReceiveModal: React.FC<Prop> = ({
   style,
   visible,
+  account,
   onTriggered
 }) => {
-  const accountState = keystore.account.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const networkState = keystore.network.store.useValue();
 
   const [qrcodeRef, setQrcodeRef] = React.useState<QrcodeType | null>(null);
 
-  const selected = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    []
-  );
   const btnTitle = React.useMemo(() => {
     const [mainnet] = Object.keys(networkState.config);
 
@@ -75,13 +72,13 @@ export const ReceiveModal: React.FC<Prop> = ({
    * Copy address.
    */
   const hanldeCopy = React.useCallback(() => {
-    Clipboard.setString(selected[settingsState.addressFormat]);
-  }, [selected, settingsState]);
+    Clipboard.setString(account[settingsState.addressFormat]);
+  }, [account, settingsState]);
   const hanldeViewAddress = React.useCallback(() => {
-    const url = viewAddress(selected.bech32, networkState.selected);
+    const url = viewAddress(account.bech32, networkState.selected);
 
     Linking.openURL(url);
-  }, [selected, networkState]);
+  }, [account, networkState]);
   /**
    * Open share qrcode image.
    */
@@ -94,13 +91,13 @@ export const ReceiveModal: React.FC<Prop> = ({
       const shareOptions = {
         url: `data:image/png;base64,${url}`,
         type: 'image/png',
-        title: selected.bech32
+        title: account.bech32
       };
       Share.open(shareOptions)
         .then(res => null)
         .catch(err => null);
     });
-  }, [qrcodeRef, selected]);
+  }, [qrcodeRef, account]);
   const handleGetZil = React.useCallback(() => {
     const [mainnet] = Object.keys(networkState.config);
 
@@ -129,16 +126,16 @@ export const ReceiveModal: React.FC<Prop> = ({
         </ModalTitle>
         <View style={styles.qrcodeWrapper}>
           <QRCode
-            value={`zilliqa://${selected.bech32}`}
+            value={`zilliqa://${account.bech32}`}
             size={width / 2}
             getRef={setQrcodeRef}
           />
         </View>
         <Text style={styles.accountName}>
-          {selected.name}
+          {account.name}
         </Text>
         <Text style={styles.accountAddress}>
-          {trim(selected[settingsState.addressFormat])}
+          {trim(account[settingsState.addressFormat])}
         </Text>
         <View style={styles.linkWrapper}>
           <TouchableOpacity

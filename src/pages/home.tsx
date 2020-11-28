@@ -59,6 +59,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       />
       <HomeTokens />
       <ReceiveModal
+        account={accountState.identities[accountState.selectedAddress]}
         visible={isReceiveModal}
         onTriggered={() => setIsReceiveModal(false)}
       />
