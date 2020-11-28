@@ -11,6 +11,7 @@ import {
   View,
   StyleSheet,
   Text,
+  ScrollView,
   Button,
   SafeAreaView
 } from 'react-native';
@@ -42,18 +43,20 @@ export const NetworkPage = () => {
           onPress={handleReset}
         />
       </View>
-      <Selector
-        style={{ marginVertical: 16 }}
-        title={i18n.t('netwrok_options')}
-        items={netwroks}
-        selected={networkState.selected}
-        onSelect={(net) => keystore.network.changeNetwork(net)}
-      />
-      <NetwrokConfig
-        config={networkState.config}
-        selected={networkState.selected}
-        onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
-      />
+      <ScrollView>
+        <Selector
+          style={{ marginVertical: 16 }}
+          title={i18n.t('netwrok_options')}
+          items={netwroks}
+          selected={networkState.selected}
+          onSelect={(net) => keystore.network.changeNetwork(net)}
+        />
+        <NetwrokConfig
+          config={networkState.config}
+          selected={networkState.selected}
+          onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };

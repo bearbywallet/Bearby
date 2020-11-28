@@ -11,6 +11,8 @@ import {
   View,
   Text,
   Button,
+  ScrollView,
+  SafeAreaView,
   StyleSheet
 } from 'react-native';
 
@@ -30,7 +32,7 @@ export const GeneralPage = () => {
   }, []);
 
   return (
-    <View style={styles.container}>
+    <SafeAreaView style={styles.container}>
       <View style={styles.titleWrapper}>
         <Text style={styles.title}>
           {i18n.t('general_title')}
@@ -41,21 +43,23 @@ export const GeneralPage = () => {
           onPress={hanldeReset}
         />
       </View>
-      <Selector
-        style={styles.selector}
-        items={keystore.currency.currencies}
-        selected={currencyState}
-        title={i18n.t('currency')}
-        onSelect={(item) => keystore.currency.set(item)}
-      />
-      <Selector
-        style={styles.selector}
-        items={keystore.theme.themes}
-        selected={themeState}
-        title={i18n.t('theme')}
-        onSelect={(item) => keystore.theme.set(item)}
-      />
-    </View>
+      <ScrollView>
+        <Selector
+          style={styles.selector}
+          items={keystore.currency.currencies}
+          selected={currencyState}
+          title={i18n.t('currency')}
+          onSelect={(item) => keystore.currency.set(item)}
+        />
+        <Selector
+          style={styles.selector}
+          items={keystore.theme.themes}
+          selected={themeState}
+          title={i18n.t('theme')}
+          onSelect={(item) => keystore.theme.set(item)}
+        />
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 

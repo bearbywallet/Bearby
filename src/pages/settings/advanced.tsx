@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Text,
   Button,
+  ScrollView,
   SafeAreaView
 } from 'react-native';
 
@@ -43,19 +44,21 @@ export const AdvancedPage = () => {
           onPress={hanldeReset}
         />
       </View>
-      <GasSelector
-        style={{ marginVertical: 16 }}
-        gasLimit={gasState.gasLimit}
-        gasPrice={gasState.gasPrice}
-        onChange={(gas) => keystore.gas.changeGas(gas)}
-      />
-      <Selector
-        style={{ marginVertical: 16 }}
-        title={i18n.t('advanced_selector_title')}
-        items={keystore.settings.formats}
-        selected={settingsState.addressFormat}
-        onSelect={(format) => keystore.settings.setFormat(format)}
-      />
+      <ScrollView>
+        <GasSelector
+          style={{ marginVertical: 16 }}
+          gasLimit={gasState.gasLimit}
+          gasPrice={gasState.gasPrice}
+          onChange={(gas) => keystore.gas.changeGas(gas)}
+        />
+        <Selector
+          style={{ marginVertical: 16 }}
+          title={i18n.t('advanced_selector_title')}
+          items={keystore.settings.formats}
+          selected={settingsState.addressFormat}
+          onSelect={(format) => keystore.settings.setFormat(format)}
+        />
+      </ScrollView>
     </SafeAreaView>
   );
 };
