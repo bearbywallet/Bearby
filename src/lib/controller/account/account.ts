@@ -43,7 +43,7 @@ export class AccountControler {
       //
     }
 
-    return this.store.getState();
+    return this.store.get();
   }
 
   public fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Account {
@@ -61,7 +61,7 @@ export class AccountControler {
   }
 
   public getCurrentAccount() {
-    const { identities, selectedAddress } = this.store.getState();
+    const { identities, selectedAddress } = this.store.get();
 
     return identities[selectedAddress];
   }
@@ -100,7 +100,7 @@ export class AccountControler {
   }
 
   public async selectAccount(index: number) {
-    const { identities } = this.store.getState();
+    const { identities } = this.store.get();
 
     if (identities.length < index) {
       return null;
@@ -108,7 +108,7 @@ export class AccountControler {
 
     accountStoreSelect(index);
 
-    await this.update(this.store.getState());
+    await this.update(this.store.get());
   }
 
   private async _checkAccount(account: Account) {

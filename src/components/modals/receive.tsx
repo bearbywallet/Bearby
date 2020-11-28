@@ -52,7 +52,7 @@ export const ReceiveModal: React.FC<Prop> = ({
   visible,
   onTriggered
 }) => {
-  const accountState = useStore(keystore.account.store);
+  const accountState = keystore.account.store.useValue();
   const settings = useStore(keystore.settings.store);
   const netwrokState = useStore(keystore.network.store);
 

@@ -27,7 +27,7 @@ type Prop = {
 };
 
 export const HomePage: React.FC<Prop> = ({ navigation }) => {
-  const accountState = useStore(keystore.account.store);
+  const accountState = keystore.account.store.useValue();
   const settingsState = useStore(keystore.settings.store);
   const currencyState = useStore(keystore.currency.store);
   const netwrokState = useStore(keystore.network.store);

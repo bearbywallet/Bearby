@@ -34,7 +34,7 @@ type Prop = {
 };
 
 export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) => {
-  const accountState = useStore(keystore.account.store);
+  const accountState = keystore.account.store.useValue();
 
   const [isModal, setIsModal] = React.useState(false);
 

@@ -6,23 +6,25 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { newRidgeState } from 'react-ridge-state';
 import { createDomain, createEvent } from 'effector';
 import { AccountState } from 'types';
 
-export const accountStoreUpdate = createEvent<AccountState>();
-export const accountStoreSelect = createEvent<number>();
-export const accountStoreReset = createEvent();
-
-const AccountDomain = createDomain();
 const initalState: AccountState = {
   identities: [],
   selectedAddress: 0
 };
-export const accountStore = AccountDomain
-  .store<AccountState>(initalState)
-  .on(accountStoreUpdate, (_, payload) => payload)
-  .on(accountStoreSelect, (state, selectedAddress) => ({
-    ...state,
+export const accountStore = newRidgeState<AccountState>(initalState);
+
+export function accountStoreUpdate(payload: AccountState) {
+  accountStore.set(() => payload);
+}
+export function accountStoreSelect(selectedAddress: number) {
+  accountStore.set((prevState) => ({
+    ...prevState,
     selectedAddress
-  }))
-  .reset(accountStoreReset);
+  }));
+}
+export function accountStoreReset() {
+  accountStore.reset();
+}

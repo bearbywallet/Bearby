@@ -48,7 +48,7 @@ const times = [
 ];
 export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const authState = useStore(keystore.guard.auth.store);
-  const accountStore = useStore(keystore.account.store);
+  const accountState = keystore.account.store.useValue();
 
   const [hour, sethour] = React.useState(0);
   const [modaltitle, setModalTitle] = React.useState('');
@@ -57,8 +57,8 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
 
   const selectedAccount = React.useMemo(
-    () => accountStore.identities[accountStore.selectedAddress],
-    [accountStore]
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
   );
 
   /**

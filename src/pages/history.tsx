@@ -37,7 +37,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
-  const accountsState = useStore(keystore.account.store);
+  const accountState = keystore.account.store.useValue();
   const tokensState = useStore(keystore.token.store);
   const settingsState = useStore(keystore.settings.store);
   const currencyState = useStore(keystore.currency.store);
@@ -50,8 +50,8 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const [transactionIndex, setTransactionIndex] = React.useState(0);
 
   const account = React.useMemo(
-    () => accountsState.identities[accountsState.selectedAddress],
-    [accountsState]
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
   );
 
   const handleCreateAccount = React.useCallback(() => {
