@@ -42,6 +42,10 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
     setIsModal(false);
     onCreate();
   }, [setIsModal]);
+  const handleChangeAccount = React.useCallback(async(index) => {
+    await keystore.account.selectAccount(index);
+    await keystore.transaction.sync();
+  }, []);
 
   return (
     <View
@@ -59,7 +63,7 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
         visible={isModal}
         title={i18n.t('accounts')}
         onTriggered={() => setIsModal(false)}
-        onSelected={(index) => keystore.account.selectAccount(index)}
+        onSelected={handleChangeAccount}
         onAdd={handleCreateAccount}
       />
     </View>

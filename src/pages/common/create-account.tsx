@@ -54,6 +54,7 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
 
     try {
       await keystore.addNextAccount(name, password);
+      await keystore.transaction.sync();
 
       return navigation.navigate('App', {
         screen: 'Home'
