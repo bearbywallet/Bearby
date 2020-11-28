@@ -99,6 +99,11 @@ export const TransactionItem: React.FC<Prop> = ({
 
     return 'Payment';
   }, [transaction]);
+  const time = React.useMemo(() => {
+    const date = new Date(transaction.timestamp);
+
+    return `${date.getHours()}:${date.getMinutes()}`;
+  }, [transaction]);
 
   return (
     <TouchableOpacity
@@ -119,7 +124,7 @@ export const TransactionItem: React.FC<Prop> = ({
       </View>
       <View style={styles.wrapper}>
         <Text style={styles.second}>
-          15:00
+          {time}
         </Text>
         <Text style={styles.second}>
           {amount.converted} {currency.toUpperCase()}
