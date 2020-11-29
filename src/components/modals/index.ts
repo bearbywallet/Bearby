@@ -15,3 +15,4 @@ export * from './qr-scaner';
 export * from './history-status';
 export * from './transaction';
 export * from './add-token';
+export * from './add-contact';

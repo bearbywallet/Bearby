@@ -9,6 +9,7 @@
 import React from 'react';
 import {
   View,
+  Text,
   TextInput,
   TouchableOpacity,
   StyleSheet,
@@ -20,11 +21,12 @@ import { SvgXml } from 'react-native-svg';
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { QrcodeIconSVG } from 'app/components/svg';
 
-import { theme } from 'app/styles';
+import { colors, theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
   label?: string;
+  error?: string;
   placeholder?: string;
   value: string;
   onChange?: (address: string) => void;
@@ -35,6 +37,7 @@ export const QrCodeInput: React.FC<Prop> = ({
   style,
   label,
   value,
+  error,
   placeholder,
   onChange = () => null
 }) => {
@@ -48,9 +51,13 @@ export const QrCodeInput: React.FC<Prop> = ({
 
   return (
     <React.Fragment>
-      <View style={[styles.container, style]}>
+      <View style={[styles.container, style, {
+        borderBottomColor: error ? theme.colors.danger : '#8A8A8F'
+      }]}>
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, {
+            color: error ? theme.colors.danger : theme.colors.white
+          }]}
           placeholder={placeholder}
           value={value}
           placeholderTextColor="#8A8A8F"
@@ -61,6 +68,9 @@ export const QrCodeInput: React.FC<Prop> = ({
           <SvgXml xml={QrcodeIconSVG}/>
         </TouchableOpacity>
       </View>
+      <Text style={styles.error}>
+        {error}
+      </Text>
       <QRScaner
         visible={qrcodeModal}
         onTriggered={() => setQrcodeModal(false)}
@@ -72,7 +82,6 @@ export const QrCodeInput: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1,
     flexDirection: 'row',
     alignItems: 'center',
@@ -82,7 +91,11 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white,
     width: width - 100
+  },
+  error: {
+    fontSize: 13,
+    lineHeight: 17,
+    color: theme.colors.danger
   }
 });

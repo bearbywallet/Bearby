@@ -18,6 +18,7 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { ContactItem } from 'app/components/contact-item';
+import { AddContactModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -44,6 +45,8 @@ const checkChar = (elements: Contact[], index: number) => {
 
 export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
   const contactsState = keystore.contacts.store.useValue();
+
+  const [contactModal, setContactModal] = React.useState(false);
 
   const alphabetSorted = React.useMemo(() => {
     return contactsState.sort((a, b) => {
@@ -76,7 +79,7 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
         <Button
           title={i18n.t('contacts_btn')}
           color={theme.colors.primary}
-          onPress={() => null}
+          onPress={() => setContactModal(true)}
         />
       </View>
       <ScrollView style={styles.list}>
@@ -92,6 +95,12 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
           />
         ))}
       </ScrollView>
+      <AddContactModal
+        title={i18n.t('contacts_btn')}
+        visible={contactModal}
+        onTriggered={() => setContactModal(false)}
+        onAdd={(contact) => keystore.contacts.add(contact)}
+      />
     </SafeAreaView>
   );
 };

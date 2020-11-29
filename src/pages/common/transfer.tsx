@@ -47,7 +47,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
-  const [recipient, setRecipient] = React.useState<string>(route.params.recipient || '');
+  const [recipient, setRecipient] = React.useState<string>((route.params && route.params.recipient) || '');
 
   const token = React.useMemo(
     () => tokensState.identities[selectedToken],
