@@ -13,27 +13,34 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
+
+import { AddTokenModal } from 'app/components/modals';
+
 import { theme } from 'app/styles';
+import i18n from 'app/lib/i18n';
 
 export type Prop = {
   style?: ViewStyle;
-
-  onSelect?: () => void;
 };
 
-export const AddToken: React.FC<Prop> = ({
-  style,
-  onSelect
-}) => {
+export const AddToken: React.FC<Prop> = ({ style }) => {
+  const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
-    <TouchableOpacity
-      style={[styles.container, style]}
-      onPress={onSelect}
-    >
-      <View style={[styles.line, styles.line0]}/>
-      <View style={styles.line}/>
-    </TouchableOpacity>
+    <React.Fragment>
+      <TouchableOpacity
+        style={[styles.container, style]}
+        onPress={() => setModalVisible(true)}
+      >
+        <View style={[styles.line, styles.line0]}/>
+        <View style={styles.line}/>
+      </TouchableOpacity>
+      <AddTokenModal
+        title={i18n.t('add_token')}
+        visible={modalVisible}
+        onTriggered={() => setModalVisible(false)}
+      />
+    </React.Fragment>
   );
 };
 

@@ -57,3 +57,7 @@ export const getAddressFromPublicKey = (publicKey: string) => {
 
   return toChecksumAddress(hash);
 };
+
+export const isBech32 = (raw: string) => {
+  return !!raw.match(/^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$/);
+};

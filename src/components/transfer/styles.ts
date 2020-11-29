@@ -72,13 +72,6 @@ export default StyleSheet.create({
     transform: [{ rotate: '-90deg'}],
     alignSelf: 'center'
   },
-  textInput: {
-    fontSize: 17,
-    lineHeight: 22,
-    padding: 10,
-    color: theme.colors.white,
-    width: width - 100
-  },
   nameAmountText: {
     fontSize: 17,
     lineHeight: 22,

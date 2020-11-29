@@ -11,24 +11,21 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
-  TextInput,
   View,
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
 import {
-  ArrowIconSVG,
   ReceiveIconSVG,
   ProfileSVG,
-  BookIconSVG,
-  QrcodeIconSVG
+  BookIconSVG
 } from 'app/components/svg';
 import {
   AccountsModal,
-  ContactsModal,
-  QRScaner
+  ContactsModal
 } from 'app/components/modals';
+import { QrCodeInput } from 'app/components/qr-code-input';
 
 import i18n from 'app/lib/i18n';
 import coomonStyles from './styles';
@@ -52,31 +49,16 @@ export const TransferRecipient: React.FC<Prop> = ({
 }) => {
   const [accountModal, setAccountModal] = React.useState(false);
   const [contactModal, setContactModal] = React.useState(false);
-  const [qrcodeModal, setQrcode] = React.useState(false);
-
-  const handleQrcode = React.useCallback((qrcode) => {
-    const address = String(qrcode).replace('zilliqa://', '');
-
-    onSelect(address);
-  }, [onSelect]);
 
   return (
     <React.Fragment>
       <View style={style}>
         <View style={coomonStyles.receiving}>
           <SvgXml xml={ReceiveIconSVG} />
-          <TextInput
-            style={[coomonStyles.textInput, styles.input]}
-            value={recipient}
-            keyboardType={'numeric'}
+          <QrCodeInput
             placeholder={i18n.t('transfer_view0')}
-            placeholderTextColor="#8A8A8F"
-            onChangeText={() => null}
-          />
-          <SvgXml
-            xml={ArrowIconSVG}
-            fill="#666666"
-            style={coomonStyles.arrowIcon}
+            value={recipient}
+            onChange={onSelect}
           />
         </View>
         <View style={styles.itemsWrapper}>
@@ -98,15 +80,6 @@ export const TransferRecipient: React.FC<Prop> = ({
               {i18n.t('my_contacts')}
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => setQrcode(true)}
-          >
-            <SvgXml xml={QrcodeIconSVG} />
-            <Text style={styles.textItem}>
-              {i18n.t('scan_qr')}
-            </Text>
-          </TouchableOpacity>
         </View>
       </View>
       <AccountsModal
@@ -123,11 +96,6 @@ export const TransferRecipient: React.FC<Prop> = ({
         onTriggered={() => setContactModal(false)}
         onSelected={(index) => onSelect(contacts[index].address)}
       />
-      <QRScaner
-        visible={qrcodeModal}
-        onTriggered={() => setQrcode(false)}
-        onScan={handleQrcode}
-      />
     </React.Fragment>
   );
 };
@@ -135,7 +103,7 @@ export const TransferRecipient: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   itemsWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-around',
+    justifyContent: 'space-evenly',
     padding: 10
   },
   item: {
@@ -146,10 +114,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     borderRadius: 8,
     backgroundColor: '#2B2E33'
-  },
-  input: {
-    borderBottomWidth: 1,
-    borderColor: theme.colors.black
   },
   textItem: {
     textAlign: 'center',
