@@ -19,7 +19,9 @@ import i18n from 'app/lib/i18n';
 
 export type CommonStackParamList = {
   CreateAccount: undefined;
-  Transfer: undefined;
+  Transfer: {
+    recipient?: string;
+  };
 };
 
 const CommonStack = createStackNavigator<CommonStackParamList>();

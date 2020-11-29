@@ -31,7 +31,7 @@ import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
 
 type Prop = {
-  navigation: StackNavigationProp<UnauthorizedStackParamList, 'SetupPassword'>;
+  navigation: StackNavigationProp<UnauthorizedStackParamList>;
   route: RouteProp<UnauthorizedStackParamList, 'SetupPassword'>;
 };
 

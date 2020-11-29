@@ -42,7 +42,7 @@ const checkChar = (elements: Contact[], index: number) => {
   return previous.toLowerCase() === next.toLowerCase();
 };
 
-export const ContactsPage: React.FC<Prop> = () => {
+export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
   const contactsState = keystore.contacts.store.useValue();
 
   const alphabetSorted = React.useMemo(() => {
@@ -57,6 +57,15 @@ export const ContactsPage: React.FC<Prop> = () => {
       return 0;
     });
   }, [contactsState]);
+
+  const handleSelectContect = React.useCallback((address) => {
+    navigation.navigate('Common', {
+      screen: 'Transfer',
+      params: {
+        recipient: address
+      }
+    });
+  }, []);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -79,6 +88,7 @@ export const ContactsPage: React.FC<Prop> = () => {
             last={index === alphabetSorted.length - 1}
             bech32={item.address}
             onRemove={() => keystore.contacts.rm(item)}
+            onSelect={() => handleSelectContect(item.address)}
           />
         ))}
       </ScrollView>

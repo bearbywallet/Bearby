@@ -58,6 +58,9 @@ export default () => (
     <Stack.Screen
       name="SettingsPages"
       component={Settings}
+      options={{
+        title: ''
+      }}
     />
   </Stack.Navigator>
 );

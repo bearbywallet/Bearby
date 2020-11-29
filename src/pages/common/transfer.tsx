@@ -29,13 +29,16 @@ import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
+import { RouteProp } from '@react-navigation/native';
+import { CommonStackParamList } from 'app/navigator/common';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
+  route: RouteProp<CommonStackParamList, 'Transfer'>;
 };
 
 const { width } = Dimensions.get('window');
-export const TransferPage: React.FC<Prop> = ({ navigation }) => {
+export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
@@ -44,7 +47,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation }) => {
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
-  const [recipient, setRecipient] = React.useState<string>('');
+  const [recipient, setRecipient] = React.useState<string>(route.params.recipient || '');
 
   const token = React.useMemo(
     () => tokensState.identities[selectedToken],

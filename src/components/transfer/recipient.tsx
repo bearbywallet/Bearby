@@ -103,8 +103,7 @@ export const TransferRecipient: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   itemsWrapper: {
     flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    padding: 10
+    justifyContent: 'space-evenly'
   },
   item: {
     padding: 10,
@@ -113,7 +112,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 8,
-    backgroundColor: '#2B2E33'
+    backgroundColor: '#2B2E33',
+    marginBottom: 5
   },
   textItem: {
     textAlign: 'center',

@@ -12,26 +12,24 @@ import {
   View,
   Text,
   TouchableOpacity,
-  Dimensions,
   TextInput,
-  ViewStyle
+  StyleSheet,
+  ViewStyle,
+  Dimensions
 } from 'react-native';
-import { SvgXml, SvgCssUri } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import {
-  ArrowIconSVG,
-  ReceiveIconSVG,
-  WalletIconSVG
+  AmountIconSVG
 } from 'app/components/svg';
-import { TokensModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { fromZil, amountFromPercent } from 'app/filters';
 import { Token } from 'types';
-import { TOKEN_ICONS } from 'app/config';
 
 import styles from './styles';
+import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -42,6 +40,7 @@ type Prop = {
 };
 
 const percents = [0, 25, 50, 75, 100];
+const { width } = Dimensions.get('window');
 export const TransferAmount: React.FC<Prop> = ({
   style,
   token,
@@ -55,18 +54,17 @@ export const TransferAmount: React.FC<Prop> = ({
   );
 
   const handleChnage = React.useCallback((amount) => {
-    const numberic = Number(String(amount).replace(/[^0-9]/g, ''));
-
-    onChange(String(numberic));
-  }, [onChange]);
+    onChange(Number(amount).toString());
+  }, [onChange, token]);
   /**
    * Useing percents for calculate amount.
    */
   const handlePercentSelect = React.useCallback((percent) => {
     const newAmount = amountFromPercent(balance, percent);
+    const zils = fromZil(newAmount, token.decimals, false);
 
-    onChange(newAmount);
-  }, [balance, onChange]);
+    onChange(zils);
+  }, [balance, onChange, token]);
 
   return (
     <React.Fragment>
@@ -76,13 +74,12 @@ export const TransferAmount: React.FC<Prop> = ({
       }]}>
         <View style={{
           flexDirection: 'row',
-          alignItems: 'center',
-          justifyContent: 'space-between'
+          alignItems: 'center'
         }}>
-          <SvgXml xml={ReceiveIconSVG} />
+          <SvgXml xml={AmountIconSVG} />
           <View style={styles.inputWrapper}>
             <TextInput
-              style={styles.textInput}
+              style={commonStyles.input}
               keyboardType={'numeric'}
               placeholder={i18n.t('transfer_amount')}
               placeholderTextColor="#8A8A8F"
@@ -112,3 +109,11 @@ export const TransferAmount: React.FC<Prop> = ({
     </React.Fragment>
   );
 };
+
+const commonStyles = StyleSheet.create({
+  input: {
+    color: theme.colors.white,
+    width: width - 80,
+    padding: 10
+  }
+});
