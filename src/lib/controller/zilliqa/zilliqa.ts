@@ -97,6 +97,7 @@ export class ZilliqaControl {
       headers: {
         'Content-Type': 'application/json'
       },
+      cache: 'no-cache',
       body: JSON.stringify({
         method,
         params,

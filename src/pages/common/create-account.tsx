@@ -45,6 +45,7 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   const handleCreate = React.useCallback(async() => {
     if (authState.biometricEnable) {
       await keystore.addNextAccount(name);
+      await keystore.transaction.sync();
 
       return navigation.navigate('App', {
         screen: 'Home'
