@@ -40,7 +40,3 @@ export function toZRC1(init: InitItem[]) {
     address
   };
 }
-
-export function isZRC2() {
-  
-}

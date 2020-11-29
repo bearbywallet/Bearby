@@ -46,9 +46,8 @@ export const AddTokenModal: React.FC<Prop> = ({
   const [address, setAddress] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string>(' ');
 
-  const hanldeGetContract = React.useCallback((address) => {
-    
-  }, []);
+  // const hanldeGetContract = React.useCallback((address) => {
+  // }, []);
   const handleAddressPass = React.useCallback(async(addr) => {
     setAddress(addr);
 
@@ -60,7 +59,7 @@ export const AddTokenModal: React.FC<Prop> = ({
     const init = await keystore.zilliqa.getSmartContractInit(base16);
     const zrc = toZRC1(init);
 
-    console.log(JSON.stringify(zrc, null, 4));
+    // console.log(JSON.stringify(zrc, null, 4));
   }, [setAddress, address]);
 
   return (
