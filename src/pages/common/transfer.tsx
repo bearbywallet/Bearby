@@ -64,6 +64,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             onSelect={setSelectedAccount}
           />
           <TransferToken
+            account={accountState.identities[selectedAccount]}
             tokens={tokensState.identities}
             selected={selectedToken}
             netwrok={networkState.selected}
@@ -79,6 +80,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
         />
         <TransferAmount
           style={styles.wrapper}
+          account={accountState.identities[selectedAccount]}
           token={token}
           netwrok={networkState.selected}
           value={amount}

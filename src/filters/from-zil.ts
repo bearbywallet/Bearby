@@ -20,7 +20,7 @@ export function fromZil(value: string, decimals: number, isRound = true): string
   const result = _amount.div(_decimals).toString();
 
   if (isRound) {
-    return Big(result).toFixed(3);
+    return Big(result).toString();
   }
 
   return result;

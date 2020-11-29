@@ -36,7 +36,8 @@ export const ZILLIQA: ZilliqaNetwork = {
     MSG_VERSION: 1
   }
 };
-const [mainnet, testnet] = Object.keys(ZILLIQA);
+export const ZILLIQA_KEYS = Object.keys(ZILLIQA);
+const [mainnet, testnet] = ZILLIQA_KEYS;
 
 export const ZIL_SWAP_CONTRACTS = {
   [mainnet]: '0xBa11eB7bCc0a02e947ACF03Cc651Bfaf19C9EC00',

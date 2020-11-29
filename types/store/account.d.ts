@@ -17,7 +17,12 @@ export interface Account {
   base16: string;
   bech32: string;
   privKey?: string;
-  [key: string]: string;
+  balance: {
+    [key: string]: {
+      [key: string]: string;
+    };
+  };
+  [key: string | undefined]: string;
 }
 export interface AccountState {
   identities: Account[];

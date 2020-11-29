@@ -25,13 +25,14 @@ import { TokensModal } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { fromZil, toConversion } from 'app/filters';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 import { TOKEN_ICONS } from 'app/config';
 
 import styles from './styles';
 
 type Prop = {
   tokens: Token[];
+  account: Account;
   selected: number;
   netwrok: string;
   onSelect: (index: number) => void;
@@ -41,6 +42,7 @@ const { width } = Dimensions.get('window');
 export const TransferToken: React.FC<Prop> = ({
   tokens,
   selected,
+  account,
   netwrok,
   onSelect
 }) => {
@@ -54,9 +56,10 @@ export const TransferToken: React.FC<Prop> = ({
     [tokens, selected]
   );
   const converted = React.useMemo(() => {
-    const { balance, decimals } = token;
+    const { decimals, symbol } = token;
+    const balance = account.balance[netwrok][symbol];
     const rate = settingsState.rate[currencyState];
-    const convert = toConversion(balance[netwrok], rate, decimals);
+    const convert = toConversion(balance, rate, decimals);
 
     return `${convert} ${currencyState}`;
   }, [token, selected, netwrok, currencyState]);
@@ -84,7 +87,7 @@ export const TransferToken: React.FC<Prop> = ({
                   {token.symbol}
                 </Text>
                 <Text style={styles.nameAmountText}>
-                  {fromZil(token.balance[netwrok], token.decimals)}
+                  {fromZil(account.balance[netwrok][token.symbol], token.decimals)}
                 </Text>
               </View>
               <View style={[styles.infoWrapper, {
@@ -111,6 +114,7 @@ export const TransferToken: React.FC<Prop> = ({
         title={i18n.t('transfer_modal_title0')}
         visible={tokenModal}
         network={netwrok}
+        account={account}
         tokens={tokens}
         selected={selected}
         onTriggered={() => setTokenModal(false)}

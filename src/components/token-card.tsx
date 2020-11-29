@@ -15,13 +15,14 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgCssUri } from 'react-native-svg';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
 
 export type Prop = {
   token: Token;
+  account: Account;
   net: string;
   rate: number;
   currency: string;
@@ -33,6 +34,7 @@ export const TokenCard: React.FC<Prop> = ({
   token,
   net,
   rate,
+  account,
   currency,
   style,
   onPress = () => null
@@ -41,17 +43,17 @@ export const TokenCard: React.FC<Prop> = ({
    * ZIL(Default token) amount in float.
    */
   const amount = React.useMemo(
-    () => fromZil(token.balance[net], token.decimals),
-    [token.balance, net]
+    () => fromZil(account.balance[net][token.symbol], token.decimals),
+    [token, account, net]
   );
   /**
    * Converted to BTC/USD/ETH.
    */
   const conversion = React.useMemo(() => {
-    const balance = token.balance[net];
+    const balance = account.balance[net][token.symbol];
 
     return toConversion(balance, rate, token.decimals);
-  }, [token.balance, net, rate]);
+  }, [token, account, net, rate]);
 
   return (
     <TouchableOpacity

@@ -29,7 +29,6 @@ const _storage = new MobileStorage();
 export class WalletControler extends Mnemonic {
   public readonly guard = new GuardControler(_storage);
   public readonly network = new NetworkControll(_storage);
-  public readonly account = new AccountControler(_storage);
   public readonly currency = new CurrencyControler(_storage);
   public readonly theme = new ThemeControler(_storage);
   public readonly settings = new SettingsControler(_storage);
@@ -37,6 +36,8 @@ export class WalletControler extends Mnemonic {
   public readonly gas = new GasControler(_storage);
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly viewblock = new ViewBlockControler(this.network);
+  public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
+  public readonly account = new AccountControler(_storage, this.token);
   public readonly transaction = new TransactionsContoller(
     this.viewblock,
     this.zilliqa,
@@ -44,7 +45,6 @@ export class WalletControler extends Mnemonic {
     this.account,
     this.network
   );
-  public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
@@ -63,7 +63,7 @@ export class WalletControler extends Mnemonic {
   }
 
   public async addNextAccount(name: string, password?: string) {
-    const { identities } = this.account.store.getState();
+    const { identities } = this.account.store.get();
     const nextIndex = identities.length + 1;
     const mnemonic = await this.guard.getMnemonic(password);
     const keyPairs = await this.getKeyPair(mnemonic, nextIndex);

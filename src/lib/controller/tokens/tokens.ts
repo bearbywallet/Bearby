@@ -57,25 +57,11 @@ export class TokenControll {
   }
 
   public async addToken(token: Token) {
-    let tokens = await this.getTokensList();
+    const tokens = await this.getTokensList();
 
     TokenControll.isUnique(token, tokens);
-    const hasSymbol = tokens.some(
-      (t) => t.symbol === token.symbol
-    );
 
-    if (hasSymbol) {
-      tokens = tokens.map((t) => {
-        const { selected } = this._network;
-
-        t.address[selected] = token.address[selected];
-        t.balance[selected] = token.balance[selected];
-
-        return t;
-      });
-    } else {
-      tokens.push(token);
-    }
+    tokens.push(token);
 
     await this._update(tokens);
 

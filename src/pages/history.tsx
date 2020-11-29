@@ -110,6 +110,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       <View style={styles.main}>
         <SortingWrapper
           tokens={tokensState.identities}
+          account={account}
           selectedToken={selectedToken}
           selectedStatus={selectedStatus}
           onSelectStatus={setSelectedStatus}

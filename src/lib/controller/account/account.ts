@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
-import { STORAGE_FIELDS, AccountTypes } from 'app/config';
+import { STORAGE_FIELDS, AccountTypes, ZILLIQA_KEYS } from 'app/config';
 import {
   getAddressFromPublicKey,
   toBech32Address
@@ -19,13 +19,16 @@ import {
   accountStoreSelect
 } from './sate';
 import { AccountState, Account, KeyPair } from 'types';
+import { TokenControll } from 'app/lib/controller/tokens';
 
 export class AccountControler {
   public store = accountStore;
   private _storage: MobileStorage;
+  private _token: TokenControll;
 
-  constructor(storage: MobileStorage) {
+  constructor(storage: MobileStorage, token: TokenControll) {
     this._storage = storage;
+    this._token = token;
   }
 
   public async sync(): Promise<AccountState> {
@@ -49,12 +52,18 @@ export class AccountControler {
   public fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Account {
     const base16 = getAddressFromPublicKey(acc.publicKey);
     const bech32 = toBech32Address(base16);
+    const tokens = this._token.store.get().identities.map(
+      (t) => [t.symbol, '0']
+    );
+    const entries = ZILLIQA_KEYS.map((net) => [net, Object.fromEntries(tokens)]);
+    const balance = Object.fromEntries(entries);
 
     return {
       base16,
       bech32,
       name,
       type,
+      balance,
       index: Number(acc.index),
       nonce: 0 // TODO: check and update nonce.
     };

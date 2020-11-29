@@ -24,9 +24,8 @@ import {
 } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
-import { keystore } from 'app/keystore';
 import { fromZil, amountFromPercent } from 'app/filters';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 
 import styles from './styles';
 import { theme } from 'app/styles';
@@ -34,6 +33,7 @@ import { theme } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   token: Token;
+  account: Account;
   netwrok: string;
   value: string;
   onChange: (amount: string) => void;
@@ -45,12 +45,13 @@ export const TransferAmount: React.FC<Prop> = ({
   style,
   token,
   netwrok,
+  account,
   value,
   onChange
 }) => {
   const balance = React.useMemo(
-    () => token.balance[netwrok],
-    [token, netwrok]
+    () => account.balance[netwrok][token.symbol],
+    [token, netwrok, account]
   );
 
   const handleChnage = React.useCallback((amount) => {

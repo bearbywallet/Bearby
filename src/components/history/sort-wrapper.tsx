@@ -19,11 +19,12 @@ import { HistoryStatus, TokensModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 
 type Prop = {
   style?: ViewStyle;
   tokens: Token[];
+  account: Account;
   selectedToken: number;
   selectedStatus: number;
   onSelectStatus: (status: number) => void;
@@ -33,6 +34,7 @@ type Prop = {
 export const SortingWrapper: React.FC<Prop> = ({
   style,
   tokens,
+  account,
   selectedToken,
   selectedStatus,
   onSelectStatus,
@@ -77,6 +79,7 @@ export const SortingWrapper: React.FC<Prop> = ({
         title={i18n.t('token')}
         visible={tokenModal}
         tokens={tokens}
+        account={account}
         network={netwrokState.selected}
         selected={selectedToken}
         onTriggered={() => setTokenModal(false)}

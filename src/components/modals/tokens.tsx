@@ -26,7 +26,7 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 import { fromZil } from 'app/filters';
 
 type Prop = {
@@ -35,6 +35,7 @@ type Prop = {
   title: string;
   network: string;
   tokens: Token[];
+  account: Account;
   selected?: number;
   onTriggered: () => void;
   onSelect: (index: number) => void;
@@ -46,6 +47,7 @@ export const TokensModal: React.FC<Prop> = ({
   visible,
   title,
   selected,
+  account,
   tokens,
   network,
   onTriggered,
@@ -87,7 +89,7 @@ export const TokensModal: React.FC<Prop> = ({
                   {token.name}
                 </Text>
                 <Text style={styles.amount}>
-                  {fromZil(token.balance[network], token.decimals)} {token.symbol}
+                  {fromZil(account.balance[network][token.symbol], token.decimals)} {token.symbol}
                 </Text>
               </View>
               {selected === index ? (

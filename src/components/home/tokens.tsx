@@ -30,6 +30,7 @@ export const HomeTokens: React.FC = () => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
+  const accountState = keystore.account.store.useValue();
 
   const tokensList = React.useMemo(
     () => tokensState.identities.filter(
@@ -56,6 +57,7 @@ export const HomeTokens: React.FC = () => {
           {tokensList.map((token, index) => (
             <TokenCard
               key={index}
+              account={accountState.identities[accountState.selectedAddress]}
               token={token}
               currency={currencyState}
               net={netwrokState.selected}

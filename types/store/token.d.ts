@@ -7,13 +7,8 @@
  * Copyright (c) 2020 ZilPay
  */
 
-export type KeyValue = {
-  [key: string]: string;
-};
-
 export interface Token {
   address: KeyValue;
-  balance: KeyValue;
   decimals: number;
   default?: boolean;
   name: string;

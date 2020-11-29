@@ -41,7 +41,10 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, []);
   const handleSend = React.useCallback(() => {
     navigation.navigate('Common', {
-      screen: 'Transfer'
+      screen: 'Transfer',
+      params: {
+        recipient: ''
+      }
     });
   }, []);
 

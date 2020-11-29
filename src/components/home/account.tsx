@@ -50,17 +50,17 @@ export const HomeAccount: React.FC<Prop> = ({
    * ZIL(Default token) amount in float.
    */
   const amount = React.useMemo(
-    () => fromZil(token.balance[netwrok], token.decimals),
-    [token.balance, netwrok]
+    () => fromZil(account.balance[netwrok][token.symbol], token.decimals),
+    [token, account, netwrok]
   );
   /**
    * Converted to BTC/USD/ETH.
    */
   const conversion = React.useMemo(() => {
-    const balance = token.balance[netwrok];
+    const balance = account.balance[netwrok][token.symbol];
 
     return toConversion(balance, rate, token.decimals);
-  }, [token.balance, netwrok, rate]);
+  }, [token, account, netwrok, rate]);
 
   return (
     <View style={styles.container}>
