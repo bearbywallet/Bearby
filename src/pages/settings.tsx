@@ -144,7 +144,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
         onPress={() => navigation.navigate('SettingsPages', { screen: 'About' })}
       >
         <SvgXml xml={AboutIconSVG} />
-        <View style={styles.listItem}>
+        <View style={[styles.listItem, { borderBottomWidth: 0 }]}>
           <Text style={styles.listTextItem}>
             {i18n.t('settings_item6')}
           </Text>

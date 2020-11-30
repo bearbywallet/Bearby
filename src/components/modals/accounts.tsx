@@ -47,11 +47,6 @@ export const AccountsModal: React.FC<Prop> = ({
 }) => {
   const settingsState = keystore.settings.store.useValue();
 
-  const handleSelected = React.useCallback((index) => {
-    onSelected(index);
-    onTriggered();
-  }, [onTriggered, onSelected]);
-
   return (
     <Modal
       isVisible={visible}
@@ -74,7 +69,7 @@ export const AccountsModal: React.FC<Prop> = ({
               account={account}
               format={settingsState.addressFormat}
               selected={selected === index}
-              onPress={() => handleSelected(index)}
+              onPress={() => onSelected(index)}
             />
           ))}
         </ScrollView>
