@@ -10,7 +10,8 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import { STORAGE_FIELDS, AccountTypes, ZILLIQA_KEYS } from 'app/config';
 import {
   getAddressFromPublicKey,
-  toBech32Address
+  toBech32Address,
+  deppUnlink
 } from 'app/utils';
 import {
   accountStore,
@@ -21,21 +22,29 @@ import {
 import { AccountState, Account, KeyPair } from 'types';
 import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
+import { NetworkControll } from 'app/lib/controller/network';
+import { ViewBlockControler } from 'app/lib/controller/viewblock';
 
 export class AccountControler {
   public store = accountStore;
   private _storage: MobileStorage;
   private _token: TokenControll;
   private _zilliqa: ZilliqaControl;
+  private _netwrok: NetworkControll;
+  private _viewblock: ViewBlockControler;
 
   constructor(
     storage: MobileStorage,
     token: TokenControll,
-    zilliqa: ZilliqaControl
+    zilliqa: ZilliqaControl,
+    netwrok: NetworkControll,
+    viewblock: ViewBlockControler
   ) {
     this._storage = storage;
     this._token = token;
     this._zilliqa = zilliqa;
+    this._netwrok = netwrok;
+    this._viewblock = viewblock;
   }
 
   public async sync(): Promise<AccountState> {
@@ -131,7 +140,7 @@ export class AccountControler {
 
     account.balance = await this._tokenBalance(account.base16);
 
-    await this.update(accounts);
+    await this.update(deppUnlink(accounts));
   }
 
   private async _checkAccount(account: Account) {
@@ -153,18 +162,15 @@ export class AccountControler {
   }
 
   private async _tokenBalance(base16: string) {
-    const promiseTokens = this._token.store.get().identities.map(async(t) => {
-      try {
-        const bl = await this._zilliqa.handleBalance(base16, t);
+    const net = this._netwrok.selected;
+    const tokens = this._token.store.get().identities.map((t) => [t.symbol, '0']);
+    const entries = ZILLIQA_KEYS.map((n) => [n, Object.fromEntries(tokens)]);
+    const balances = Object.fromEntries(entries);
 
-        return [t.symbol, bl];
-      } catch (err) {
-        return [t.symbol, '0'];
-      }
-    });
-    const tokens = await Promise.all(promiseTokens);
-    const entries = ZILLIQA_KEYS.map((net) => [net, Object.fromEntries(tokens)]);
+    for (const t of this._token.store.get().identities) {
+      balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+    }
 
-    return Object.fromEntries(entries);
+    return balances;
   }
 }
