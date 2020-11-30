@@ -14,3 +14,4 @@ export * from './array-chunk';
 export * from './shuffle';
 export * from './view-block';
 export * from './token';
+export * from './deep-unlink';
