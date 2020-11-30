@@ -36,8 +36,6 @@ export const NetworkPage = () => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
     await keystore.account.balanceUpdate();
-
-    // console.log(JSON.stringify(keystore.account.store.get(), null, 4));
   }, []);
 
   return (

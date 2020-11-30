@@ -61,7 +61,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     } else {
       keystore.settings.reset();
     }
-  }, [networkState]);
+  }, []);
 
   return (
     <View style={styles.container}>
