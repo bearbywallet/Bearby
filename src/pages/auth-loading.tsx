@@ -35,8 +35,6 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
       }
 
       navigation.navigate('App', { screen: 'Home' });
-
-      return keystore.settings.rateUpdate();
     });
   });
 

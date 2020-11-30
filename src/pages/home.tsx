@@ -20,6 +20,7 @@ import { ReceiveModal } from 'app/components/modals';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
+import { ZILLIQA_KEYS } from 'app/config';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -50,7 +51,17 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
 
   React.useEffect(() => {
     keystore.account.balanceUpdate();
-  });
+  }, []);
+
+  React.useEffect(() => {
+    const [mainnet] = ZILLIQA_KEYS;
+
+    if (networkState.selected === mainnet) {
+      keystore.settings.rateUpdate();
+    } else {
+      keystore.settings.reset();
+    }
+  }, [networkState]);
 
   return (
     <View style={styles.container}>

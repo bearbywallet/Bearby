@@ -17,6 +17,7 @@ import {
   transactionStoreReset,
   transactionStoreUpdate
 } from './store';
+import { ZILLIQA_KEYS } from 'app/config';
 
 export class TransactionsContoller {
   public store = transactionStore;
@@ -52,6 +53,10 @@ export class TransactionsContoller {
   }
 
   public async sync() {
+    if (this._netwrok.selected === ZILLIQA_KEYS[2]) {
+      return null;
+    }
+
     const { field } = this._field;
     const txns = await this._storage.get<Transaction[]>(field);
 

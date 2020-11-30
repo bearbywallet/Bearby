@@ -30,10 +30,14 @@ export const NetworkPage = () => {
   const handleReset = React.useCallback(async() => {
     await keystore.network.reset();
     await keystore.transaction.sync();
+    await keystore.account.balanceUpdate();
   }, []);
   const handleNetwrokChange = React.useCallback(async(net) => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
+    await keystore.account.balanceUpdate();
+
+    // console.log(JSON.stringify(keystore.account.store.get(), null, 4));
   }, []);
 
   return (
