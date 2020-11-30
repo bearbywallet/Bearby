@@ -7,18 +7,21 @@
  * Copyright (c) 2020 ZilPay
  */
 import { NetworkControll } from 'app/lib/controller/network';
+import { TokenControll } from 'app/lib/controller/tokens';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-
+import { Token } from 'types';
 import { tohexString } from 'app/utils/address';
 
 type Params = string[] | number[] | (string | string[] | number[])[];
 
 export class ZilliqaControl {
   private _network: NetworkControll;
+  private _token: TokenControll;
 
-  constructor(network: NetworkControll) {
+  constructor(network: NetworkControll, token: TokenControll) {
     this._network = network;
+    this._token = token;
   }
 
   /**
@@ -44,6 +47,24 @@ export class ZilliqaControl {
     }
 
     throw new Error(data.error.message);
+  }
+
+  public async handlebalance(address: string, token: Token) {
+    const [zilliqa] = this._token.store.get().identities;
+
+    if (token.symbol === zilliqa.symbol) {
+      return this.getBalance(address);
+    }
+
+    const field = 'balances';
+    const net = this._network.selected;
+    const res = await this.getSmartContractSubState(
+      token.address[net],
+      field,
+      [address]
+    );
+
+    // console.log(res);
   }
 
   /**
@@ -97,7 +118,6 @@ export class ZilliqaControl {
       headers: {
         'Content-Type': 'application/json'
       },
-      cache: 'no-cache',
       body: JSON.stringify({
         method,
         params,

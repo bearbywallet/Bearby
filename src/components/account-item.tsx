@@ -27,6 +27,7 @@ type Prop = {
   style?: ViewStyle;
   onPress?: (account: Account) => void;
   account: Account;
+  last: boolean;
   selected: boolean;
   format: string;
 };
@@ -35,11 +36,14 @@ export const AccountItem: React.FC<Prop> = ({
   selected,
   account,
   format,
+  last,
   style,
   onPress = () => null
 }) => (
   <TouchableOpacity
-    style={[styles.accountItemWrapper, style]}
+    style={[styles.accountItemWrapper, style, {
+      borderBottomWidth: last ? 0 : 1
+    }]}
     onPress={() => onPress(account)}
   >
     <View>
@@ -73,7 +77,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     paddingVertical: 20,
-    borderBottomColor: theme.colors.black,
-    borderBottomWidth: 1
+    borderBottomColor: theme.colors.black
   }
 });

@@ -70,6 +70,7 @@ export const AccountsModal: React.FC<Prop> = ({
           {accounts.map((account, index) => (
             <AccountItem
               key={index}
+              last={index === accounts.length - 1}
               account={account}
               format={settingsState.addressFormat}
               selected={selected === index}

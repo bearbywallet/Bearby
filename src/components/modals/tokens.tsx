@@ -76,7 +76,9 @@ export const TokensModal: React.FC<Prop> = ({
           {tokens.map((token, index) => (
             <TouchableOpacity
               key={index}
-              style={styles.item}
+              style={[styles.item, {
+                borderBottomWidth: index === tokens.length - 1 ? 0 : 1
+              }]}
               onPress={() => handleSelected(index)}
             >
               <SvgCssUri
@@ -121,8 +123,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingVertical: 15,
-    borderBottomColor: theme.colors.black,
-    borderBottomWidth: 1
+    borderBottomColor: theme.colors.black
   },
   amount: {
     color: '#8A8A8F',

@@ -16,7 +16,8 @@
     "resolveJsonModule": true,
     "strict": true,
     "experimentalDecorators": true,
-    "removeComments": true
+    "removeComments": true,
+    "suppressImplicitAnyIndexErrors": true
   },
   "include": ["src", "types/*"],
   "exclude": [

@@ -8,7 +8,9 @@
  */
 
 export interface Token {
-  address: KeyValue;
+  address: {
+    [netwrok: string]: string;
+  };
   decimals: number;
   default?: boolean;
   name: string;
