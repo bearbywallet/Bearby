@@ -48,6 +48,10 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     });
   }, []);
 
+  React.useEffect(() => {
+    keystore.account.balanceUpdate();
+  });
+
   return (
     <View style={styles.container}>
       <HomeAccount

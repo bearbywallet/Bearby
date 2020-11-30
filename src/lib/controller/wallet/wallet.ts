@@ -37,7 +37,7 @@ export class WalletControler extends Mnemonic {
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly viewblock = new ViewBlockControler(this.network);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
-  public readonly account = new AccountControler(_storage, this.token);
+  public readonly account = new AccountControler(_storage, this.token, this.zilliqa);
   public readonly transaction = new TransactionsContoller(
     this.viewblock,
     this.zilliqa,
@@ -53,7 +53,7 @@ export class WalletControler extends Mnemonic {
 
   public async addAccount(mnemonic: string, name: string) {
     const keyPairs = await this.getKeyPair(mnemonic);
-    const account = this.account.fromKeyPairs(
+    const account = await this.account.fromKeyPairs(
       keyPairs,
       AccountTypes.Seed,
       name
@@ -68,7 +68,7 @@ export class WalletControler extends Mnemonic {
     const mnemonic = await this.guard.getMnemonic(password);
     const keyPairs = await this.getKeyPair(mnemonic, nextIndex);
 
-    const account = this.account.fromKeyPairs(
+    const account = await this.account.fromKeyPairs(
       keyPairs,
       AccountTypes.Seed,
       name

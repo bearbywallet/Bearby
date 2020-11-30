@@ -9,17 +9,12 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  ScrollView,
-  TouchableOpacity,
-  Button,
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
 import { DropDownItem } from 'app/components/drop-down-item';
-import { ArrowIconSVG } from 'app/components/svg';
 import { AccountsModal } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
@@ -43,6 +38,7 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
   }, [setIsModal]);
   const handleChangeAccount = React.useCallback(async(index) => {
     await keystore.account.selectAccount(index);
+    await keystore.account.balanceUpdate();
     await keystore.transaction.sync();
   }, []);
 
