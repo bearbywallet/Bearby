@@ -13,8 +13,9 @@ import {
   SafeAreaView,
   Text,
   Button,
+  FlatList,
   Dimensions,
-  ScrollView,
+  RefreshControl,
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -48,22 +49,12 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
 
+  const [refreshing, setRefreshing] = React.useState(false);
+
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
-
-  const handleCreateAccount = React.useCallback(() => {
-    navigation.navigate('Common', {
-      screen: 'CreateAccount'
-    });
-  }, []);
-
-  const showTxDetails = React.useCallback((index) => {
-    setTransactionIndex(index);
-    setTransactionModal(true);
-  }, [setTransactionIndex, setTransactionModal]);
-
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
 
@@ -84,6 +75,23 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       };
     });
   }, [transactionState]);
+
+  const handleCreateAccount = React.useCallback(() => {
+    navigation.navigate('Common', {
+      screen: 'CreateAccount'
+    });
+  }, []);
+
+  const showTxDetails = React.useCallback((index) => {
+    setTransactionIndex(index);
+    setTransactionModal(true);
+  }, [setTransactionIndex, setTransactionModal]);
+
+  const hanldeRefresh = React.useCallback(async() => {
+    setRefreshing(true);
+    await keystore.transaction.forceUpdate();
+    setRefreshing(false);
+  }, [setRefreshing]);
 
   React.useEffect(() => {
     keystore.transaction.sync();
@@ -116,16 +124,17 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           onSelectStatus={setSelectedStatus}
           onSelectToken={setSelectedToken}
         />
-        <ScrollView style={styles.list}>
-          {dateTransactions.map((data, index) => (
-            <React.Fragment key={index}>
-              {data.date ? (
+        <FlatList
+          data={dateTransactions}
+          renderItem={({ item, index }) => (
+            <React.Fragment>
+              {item.date ? (
                  <Text style={styles.date}>
-                  {data.date.toDateString()}
+                  {item.date.toDateString()}
                 </Text>
               ) : null}
               <TransactionItem
-                transaction={data.tx}
+                transaction={item.tx}
                 currency={currencyState}
                 rate={settingsState.rate[currencyState]}
                 tokens={tokensState.identities}
@@ -133,8 +142,16 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
                 onSelect={() => showTxDetails(index)}
               />
             </React.Fragment>
-          ))}
-        </ScrollView>
+          )}
+          refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                tintColor={theme.colors.primary}
+                onRefresh={hanldeRefresh}
+            />
+          }
+          keyExtractor={(_, index) => String(index)}
+        />
       </View>
       <TransactionModal
         visible={transactionModal}

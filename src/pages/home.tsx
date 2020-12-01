@@ -78,6 +78,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         refreshControl={
           <RefreshControl
               refreshing={refreshing}
+              tintColor={theme.colors.primary}
               onRefresh={hanldeRefresh}
           />
         }

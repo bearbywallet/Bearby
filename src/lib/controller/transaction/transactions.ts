@@ -73,6 +73,14 @@ export class TransactionsContoller {
     transactionStoreUpdate(parsed);
   }
 
+  public async forceUpdate() {
+    if (this._netwrok.selected === ZILLIQA_KEYS[2]) {
+      return null;
+    }
+
+    return this._update();
+  }
+
   public async reset() {
     const { field } = this._field;
 
