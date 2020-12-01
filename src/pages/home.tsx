@@ -12,7 +12,8 @@ import {
   View,
   StyleSheet,
   FlatList,
-  RefreshControl
+  RefreshControl,
+  SafeAreaView
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -73,31 +74,33 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
 
   return (
     <React.Fragment>
-      <FlatList
-        data={[{ key: 'Home' }]}
-        refreshControl={
-          <RefreshControl
-              refreshing={refreshing}
-              tintColor={theme.colors.primary}
-              onRefresh={hanldeRefresh}
-          />
-        }
-        renderItem={() => (
-          <View>
-            <HomeAccount
-              token={tokensState.identities[0]}
-              rate={settingsState.rate[currencyState]}
-              currency={currencyState}
-              netwrok={networkState.selected}
-              account={accountState.identities[accountState.selectedAddress]}
-              onCreateAccount={handleCreateAccount}
-              onReceive={() => setIsReceiveModal(true)}
-              onSend={handleSend}
+      <SafeAreaView>
+        <FlatList
+          data={[{ key: 'Home' }]}
+          refreshControl={
+            <RefreshControl
+                refreshing={refreshing}
+                tintColor={theme.colors.primary}
+                onRefresh={hanldeRefresh}
             />
-            <HomeTokens />
-          </View>
-        )}
-      />
+          }
+          renderItem={() => (
+            <View>
+              <HomeAccount
+                token={tokensState.identities[0]}
+                rate={settingsState.rate[currencyState]}
+                currency={currencyState}
+                netwrok={networkState.selected}
+                account={accountState.identities[accountState.selectedAddress]}
+                onCreateAccount={handleCreateAccount}
+                onReceive={() => setIsReceiveModal(true)}
+                onSend={handleSend}
+              />
+              <HomeTokens />
+            </View>
+          )}
+        />
+      </SafeAreaView>
       <ReceiveModal
         account={accountState.identities[accountState.selectedAddress]}
         visible={isReceiveModal}

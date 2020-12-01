@@ -6,7 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './logo';
 export * from './home';
 export * from './timer';
 export * from './browser';

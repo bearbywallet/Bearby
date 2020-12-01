@@ -38,7 +38,6 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
   }, [setIsModal]);
   const handleChangeAccount = React.useCallback(async(index) => {
     await keystore.account.selectAccount(index);
-    keystore.account.balanceUpdate();
     keystore.transaction.sync();
 
     setIsModal(false);

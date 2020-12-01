@@ -17,7 +17,7 @@ import {
 import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
-import { LogoSVG } from 'app/components/svg';
+import CreateBackground from 'app/assets/get_started_1.svg';
 
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
@@ -35,7 +35,7 @@ type Prop = {
   onSend: () => void;
 };
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export const HomeAccount: React.FC<Prop> = ({
   account,
   token,
@@ -64,11 +64,10 @@ export const HomeAccount: React.FC<Prop> = ({
 
   return (
     <View style={styles.container}>
-      <SvgXml
-        xml={LogoSVG}
-        width={width}
-        viewBox="50 0 320 220"
-      />
+      <CreateBackground
+          width={width + width / 2}
+          height={width + width / 1.5}
+        />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
         <AccountMenu
           accountName={account.name}
@@ -106,7 +105,7 @@ export const HomeAccount: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: 300,
+    height: height / 3,
     alignItems: 'center',
     justifyContent: 'center'
   },
@@ -114,12 +113,10 @@ const styles = StyleSheet.create({
     top: 0,
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingBottom: 15,
-    paddingTop: 50
+    paddingBottom: 15
   },
   amountWrapper: {
-    alignItems: 'center',
-    // minHeight: 50
+    alignItems: 'center'
   },
   amount: {
     color: theme.colors.white,

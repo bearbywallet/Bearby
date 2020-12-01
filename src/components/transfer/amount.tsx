@@ -87,7 +87,7 @@ export const TransferAmount: React.FC<Prop> = ({
               value={value}
               onChangeText={handleChnage}
             />
-            <Text>
+            <Text style={{ minWidth: 50, textAlign: 'center' }}>
               <Text style={[styles.nameAmountText, { color: '#8A8A8F' }]}>
                 {token.symbol}
               </Text>
@@ -114,7 +114,7 @@ export const TransferAmount: React.FC<Prop> = ({
 const commonStyles = StyleSheet.create({
   input: {
     color: theme.colors.white,
-    width: width - 80,
+    width: width - 100,
     padding: 10
   }
 });

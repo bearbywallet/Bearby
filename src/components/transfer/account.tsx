@@ -44,6 +44,11 @@ export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }
     [accounts, selected]
   );
 
+  const hanldeSelectAccount = React.useCallback((index) => {
+    setIsAccountModal(false);
+    onSelect(index);
+  }, [setIsAccountModal]);
+
   return (
     <React.Fragment>
       <TouchableOpacity
@@ -78,7 +83,7 @@ export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }
         selected={selected}
         onTriggered={() => setIsAccountModal(false)}
         accounts={accounts}
-        onSelected={onSelect}
+        onSelected={hanldeSelectAccount}
       />
     </React.Fragment>
   );
