@@ -62,6 +62,7 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
         onTriggered={() => setIsModal(false)}
         onSelected={handleChangeAccount}
         onAdd={handleCreateAccount}
+        onRemove={() => null}
       />
     </View>
   );

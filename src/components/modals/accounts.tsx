@@ -11,7 +11,8 @@ import {
   StyleSheet,
   ScrollView,
   Button,
-  ViewStyle
+  ViewStyle,
+  View
 } from 'react-native';
 
 import Modal from 'react-native-modal';
@@ -33,6 +34,7 @@ type Prop = {
   onTriggered: () => void;
   onSelected: (index: number) => void;
   onAdd?: () => void;
+  onRemove?: () => void;
 };
 
 export const AccountsModal: React.FC<Prop> = ({
@@ -43,7 +45,8 @@ export const AccountsModal: React.FC<Prop> = ({
   selected,
   onTriggered,
   onAdd,
-  onSelected
+  onSelected,
+  onRemove
 }) => {
   const settingsState = keystore.settings.store.useValue();
 
@@ -73,17 +76,32 @@ export const AccountsModal: React.FC<Prop> = ({
             />
           ))}
         </ScrollView>
-        {onAdd ? (
-          <Button
-            title={i18n.t('account_menu_add')}
-            color={theme.colors.primary}
-            onPress={onAdd}
-          />
-        ) : null}
+        <View style={styles.actionsWrapper}>
+          {onAdd ? (
+            <Button
+              title={i18n.t('account_menu_add')}
+              color={theme.colors.primary}
+              onPress={onAdd}
+            />
+          ) : null}
+          {onRemove ? (
+            <Button
+              title={i18n.t('account_menu_rm')}
+              color={theme.colors.danger}
+              onPress={onRemove}
+            />
+          ) : null}
+        </View>
       </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
+  actionsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginBottom: 30
+  }
 });

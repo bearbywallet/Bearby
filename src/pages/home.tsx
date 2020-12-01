@@ -10,7 +10,9 @@
 import React from 'react';
 import {
   View,
-  StyleSheet
+  StyleSheet,
+  FlatList,
+  RefreshControl
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -34,6 +36,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const tokensState = keystore.token.store.useValue();
 
   const [isReceiveModal, setIsReceiveModal] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
 
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
@@ -48,6 +51,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       }
     });
   }, []);
+  const hanldeRefresh = React.useCallback(async() => {
+    setRefreshing(true);
+    await keystore.account.balanceUpdate();
+    setRefreshing(false);
+  }, [setRefreshing]);
 
   React.useEffect(() => {
     keystore.account.balanceUpdate();
@@ -64,32 +72,41 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <HomeAccount
-        token={tokensState.identities[0]}
-        rate={settingsState.rate[currencyState]}
-        currency={currencyState}
-        netwrok={networkState.selected}
-        account={accountState.identities[accountState.selectedAddress]}
-        onCreateAccount={handleCreateAccount}
-        onReceive={() => setIsReceiveModal(true)}
-        onSend={handleSend}
+    <React.Fragment>
+      <FlatList
+        data={[{ key: 'Home' }]}
+        refreshControl={
+          <RefreshControl
+              refreshing={refreshing}
+              onRefresh={hanldeRefresh}
+          />
+        }
+        renderItem={() => (
+          <View>
+            <HomeAccount
+              token={tokensState.identities[0]}
+              rate={settingsState.rate[currencyState]}
+              currency={currencyState}
+              netwrok={networkState.selected}
+              account={accountState.identities[accountState.selectedAddress]}
+              onCreateAccount={handleCreateAccount}
+              onReceive={() => setIsReceiveModal(true)}
+              onSend={handleSend}
+            />
+            <HomeTokens />
+          </View>
+        )}
       />
-      <HomeTokens />
       <ReceiveModal
         account={accountState.identities[accountState.selectedAddress]}
         visible={isReceiveModal}
         onTriggered={() => setIsReceiveModal(false)}
       />
-    </View>
+    </React.Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
-  }
 });
 
 export default HomePage;

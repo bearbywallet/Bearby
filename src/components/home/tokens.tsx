@@ -24,7 +24,7 @@ import { AddToken } from 'app/components/add-token';
 
 import { keystore } from 'app/keystore';
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export const HomeTokens: React.FC = () => {
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();

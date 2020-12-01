@@ -9,9 +9,9 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
   StyleSheet
 } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 import { theme } from 'app/styles';
 
@@ -19,9 +19,15 @@ const INJECTED_JAVASCRIPT = `(function() {
   // window.alert('dasdsa')
 })();`;
 
-export const BrowserPage = () => {
+export const WebViewPage = () => {
   return (
-    <SafeAreaView style={styles.container} />
+    <WebView
+        source={{
+          uri: 'https://zilpay.xyz'
+        }}
+        injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
+        style={styles.container}
+      />
   );
 };
 
@@ -33,4 +39,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default BrowserPage;
+export default WebViewPage;
