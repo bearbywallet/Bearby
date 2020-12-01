@@ -12,13 +12,23 @@ import {
   View,
   StyleSheet
 } from 'react-native';
-import { HomeAccount, HomeTokens } from 'app/components/home';
+import { WebView } from 'react-native-webview';
 
 import { theme } from 'app/styles';
 
+const INJECTED_JAVASCRIPT = `(function() {
+  // window.alert('dasdsa')
+})();`;
+
 export const BrowserPage = () => {
   return (
-    <View style={styles.container} />
+    <WebView
+        source={{
+          uri: 'https://zilpay.xyz'
+        }}
+        injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
+        style={styles.container}
+      />
   );
 };
 
