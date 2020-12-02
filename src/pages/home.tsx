@@ -117,7 +117,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
           name: accountState.identities[accountState.selectedAddress].name
         })}
         description={i18n.t('remove_seed_acc_des')}
-        btns={['reject', 'confirm']}
+        btns={[i18n.t('reject'), i18n.t('confirm')]}
         visible={isConfirmModal}
         onConfirmed={handleRemoveAccount}
         onTriggered={() => setIsConfirmModal(false)}

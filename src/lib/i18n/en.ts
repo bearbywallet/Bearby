@@ -21,6 +21,8 @@ export default {
   pending: 'Pending',
   rejected: 'Rejected',
   success: 'Success',
+  reject: 'Reject',
+  confirm: 'Confirm',
   nonce: 'Nonce',
   tx_hash: 'Transaction hash',
   add_token: 'Add token',

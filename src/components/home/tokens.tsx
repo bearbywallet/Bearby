@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
 
     backgroundColor: theme.colors.background,
-    minHeight: height / 1.5,
+    minHeight: height / 1.7,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16
