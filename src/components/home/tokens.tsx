@@ -52,7 +52,6 @@ export const HomeTokens: React.FC = () => {
           onPress={() => null}
         />
       </View>
-      <ScrollView>
         <View style={styles.list}>
           {tokensList.map((token, index) => (
             <TokenCard
@@ -67,19 +66,18 @@ export const HomeTokens: React.FC = () => {
           ))}
           <AddToken style={styles.token}/>
         </View>
-      </ScrollView>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    flex: 2,
     flexDirection: 'column',
     alignItems: 'center',
 
     backgroundColor: theme.colors.background,
-
+    minHeight: height / 1.5,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16
