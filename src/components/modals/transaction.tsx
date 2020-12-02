@@ -12,6 +12,7 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
+  Linking,
   ScrollView,
   ViewStyle
 } from 'react-native';
@@ -24,12 +25,13 @@ import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { Transaction } from 'types';
-import { trim } from 'app/filters';
+import { trim, fromZil, toConversion } from 'app/filters';
+import { viewAddress, viewBlockNumber, viewTransaction } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
-  transaction: Transaction;
+  transaction?: Transaction;
   onTriggered: () => void;
 };
 
@@ -39,6 +41,49 @@ export const TransactionModal: React.FC<Prop> = ({
   visible,
   onTriggered
 }) => {
+  if (!transaction) {
+    return null;
+  }
+
+  const tokenState = keystore.token.store.useValue();
+  const settingsState = keystore.settings.store.useValue();
+  const currencyState = keystore.currency.store.useValue();
+
+  const zilliqaToken = React.useMemo(
+    () => tokenState.identities[0],
+    [tokenState]
+  );
+  const conversion = React.useMemo(() => {
+    const amount = transaction.value;
+    const rate = settingsState.rate[currencyState];
+
+    return toConversion(amount, rate, zilliqaToken.decimals);
+  }, [zilliqaToken, transaction, settingsState, currencyState]);
+
+  const hanldeViewFrom = React.useCallback(() => {
+    const url = viewAddress(transaction.from, keystore.network.selected);
+
+    Linking.openURL(url);
+  }, [transaction]);
+
+  const hanldeViewTo = React.useCallback(() => {
+    const url = viewAddress(transaction.to, keystore.network.selected);
+
+    Linking.openURL(url);
+  }, [transaction]);
+
+  const hanldeViewBlock = React.useCallback(() => {
+    const url = viewBlockNumber(transaction.blockHeight, keystore.network.selected);
+
+    Linking.openURL(url);
+  }, [transaction]);
+
+  const hanldeViewTx = React.useCallback(() => {
+    const url = viewTransaction(transaction.hash, keystore.network.selected);
+
+    Linking.openURL(url);
+  }, [transaction]);
+
   return (
     <Modal
       isVisible={visible}
@@ -54,16 +99,69 @@ export const TransactionModal: React.FC<Prop> = ({
           {i18n.t('history_tx_details')}
         </ModalTitle>
         <ScrollView>
-          <TouchableOpacity style={styles.txItem}>
+          <TouchableOpacity
+            style={styles.txItem}
+            onPress={hanldeViewBlock}
+          >
+            <Text style={styles.txLable}>
+              {i18n.t('block_height')}
+            </Text>
+            <Text style={styles.txValue}>
+              {transaction.blockHeight}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.txItem}
+            onPress={hanldeViewTx}
+          >
+            <Text style={styles.txLable}>
+              {i18n.t('tx_hash')}
+            </Text>
+            <Text style={styles.txValue}>
+              {transaction.hash}
+            </Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.txItem}
+            onPress={hanldeViewFrom}
+          >
             <Text style={styles.txLable}>
               {i18n.t('transfer_account')}
             </Text>
-            {transaction ? (
-              <Text style={styles.txValue}>
-                {trim(transaction.from)}
-              </Text>
-            ) : null}
+            <Text style={styles.txValue}>
+              {trim(transaction.from)}
+            </Text>
           </TouchableOpacity>
+          <TouchableOpacity
+            style={styles.txItem}
+            onPress={hanldeViewTo}
+          >
+            <Text style={styles.txLable}>
+              {i18n.t('recipient_account')}
+            </Text>
+            <Text style={styles.txValue}>
+              {trim(transaction.to)}
+            </Text>
+          </TouchableOpacity>
+          <View style={styles.txItem}>
+            <Text style={styles.txLable}>
+              {i18n.t('transfer_amount')}
+            </Text>
+            <Text style={styles.txValue}>
+              {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
+            </Text>
+            <Text style={styles.txValeuLabel}>
+              {conversion} {currencyState}
+            </Text>
+          </View>
+          <View style={styles.txItem}>
+            <Text style={styles.txLable}>
+              {i18n.t('nonce')}
+            </Text>
+            <Text style={styles.txValue}>
+              {transaction.nonce}
+            </Text>
+          </View>
         </ScrollView>
       </ModalWrapper>
     </Modal>
@@ -84,5 +182,10 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
+  },
+  txValeuLabel: {
+    color: theme.colors.muted,
+    fontSize: 13,
+    lineHeight: 17
   }
 });

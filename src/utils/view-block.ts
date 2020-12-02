@@ -25,7 +25,7 @@ export function viewTransaction(hash: string, netwrok: string) {
   return `${url}/${type}/${hash}?network=${netwrok}`;
 }
 
-export function viewBlockNumber(blockNumber: string, netwrok: string) {
+export function viewBlockNumber(blockNumber: string | number, netwrok: string) {
   const url = VIEW_BLOCK_URL;
   const type = VIEW_BLOCK_METHODS.block;
 
