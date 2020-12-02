@@ -50,6 +50,11 @@ export const TransferRecipient: React.FC<Prop> = ({
   const [accountModal, setAccountModal] = React.useState(false);
   const [contactModal, setContactModal] = React.useState(false);
 
+  const handleSelect = React.useCallback((address) => {
+    onSelect(address);
+    setAccountModal(false);
+  }, [onSelect]);
+
   return (
     <React.Fragment>
       <View style={style}>
@@ -87,7 +92,7 @@ export const TransferRecipient: React.FC<Prop> = ({
         visible={accountModal}
         onTriggered={() => setAccountModal(false)}
         accounts={accounts}
-        onSelected={(index) => onSelect(accounts[index].bech32)}
+        onSelected={(index) => handleSelect(accounts[index].bech32)}
       />
       <ContactsModal
         title={i18n.t('transfer_modal_title2')}
