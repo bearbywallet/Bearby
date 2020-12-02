@@ -10,7 +10,6 @@ import React from 'react';
 import {
   StyleSheet,
   ScrollView,
-  Button,
   ViewStyle,
   View
 } from 'react-native';
@@ -19,6 +18,7 @@ import Modal from 'react-native-modal';
 import { AccountItem } from 'app/components/account-item';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { CustomButton } from 'app/components/custom-button';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
@@ -76,18 +76,19 @@ export const AccountsModal: React.FC<Prop> = ({
             />
           ))}
         </ScrollView>
-        <View style={styles.actionsWrapper}>
+        <View style={[styles.actionsWrapper, {
+          height: selected !== 0 ? 100 : undefined,
+        }]}>
           {onAdd ? (
-            <Button
+            <CustomButton
               title={i18n.t('account_menu_add')}
-              color={theme.colors.primary}
               onPress={onAdd}
             />
           ) : null}
-          {onRemove ? (
-            <Button
+          {onRemove && selected !== 0 ? (
+            <CustomButton
               title={i18n.t('account_menu_rm')}
-              color={theme.colors.danger}
+              style={styles.removeBtn}
               onPress={onRemove}
             />
           ) : null}
@@ -99,9 +100,10 @@ export const AccountsModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   actionsWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 30
+    marginBottom: 15
+  },
+  removeBtn: {
+    backgroundColor: theme.colors.danger
   }
 });

@@ -14,7 +14,6 @@ import {
   Button,
   Dimensions
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -33,6 +32,7 @@ type Prop = {
   onCreateAccount: () => void;
   onReceive: () => void;
   onSend: () => void;
+  onRemove: () => void;
 };
 
 const { width, height } = Dimensions.get('window');
@@ -44,7 +44,8 @@ export const HomeAccount: React.FC<Prop> = ({
   currency,
   onCreateAccount,
   onReceive,
-  onSend
+  onSend,
+  onRemove
 }) => {
   /**
    * ZIL(Default token) amount in float.
@@ -72,6 +73,7 @@ export const HomeAccount: React.FC<Prop> = ({
         <AccountMenu
           accountName={account.name}
           onCreate={onCreateAccount}
+          onRemove={onRemove}
         />
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>

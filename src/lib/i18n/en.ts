@@ -28,6 +28,8 @@ export default {
   contract_address: 'Contract address',
   address_zns: 'Address(zil1) or ZNS',
   incorect_address_format: 'Incorect address formating',
+  remove_acc_title: 'Remove %{name}',
+  remove_seed_acc_des: 'If you remove this account you can create it again by your secret phrase',
   back: 'Back',
   send: 'Send',
   use: 'Use',

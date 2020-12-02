@@ -16,3 +16,4 @@ export * from './history-status';
 export * from './transaction';
 export * from './add-token';
 export * from './add-contact';
+export * from './simple-confirm';

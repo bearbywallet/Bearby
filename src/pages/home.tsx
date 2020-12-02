@@ -18,8 +18,9 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { HomeAccount, HomeTokens } from 'app/components/home';
-import { ReceiveModal } from 'app/components/modals';
+import { ReceiveModal, SimpleConfirm } from 'app/components/modals';
 
+import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
@@ -37,6 +38,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const tokensState = keystore.token.store.useValue();
 
   const [isReceiveModal, setIsReceiveModal] = React.useState(false);
+  const [isConfirmModal, setIsConfirmModal] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const handleCreateAccount = React.useCallback(() => {
@@ -57,6 +59,9 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     await keystore.account.balanceUpdate();
     setRefreshing(false);
   }, [setRefreshing]);
+  const handleRemoveAccount = React.useCallback(() => {
+    setIsConfirmModal(false);
+  }, [setIsConfirmModal]);
 
   React.useEffect(() => {
     keystore.account.balanceUpdate();
@@ -95,6 +100,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onCreateAccount={handleCreateAccount}
                 onReceive={() => setIsReceiveModal(true)}
                 onSend={handleSend}
+                onRemove={() => setIsConfirmModal(true)}
               />
               <HomeTokens />
             </View>
@@ -105,6 +111,16 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         account={accountState.identities[accountState.selectedAddress]}
         visible={isReceiveModal}
         onTriggered={() => setIsReceiveModal(false)}
+      />
+      <SimpleConfirm
+        title={i18n.t('remove_acc_title', {
+          name: accountState.identities[accountState.selectedAddress].name
+        })}
+        description={i18n.t('remove_seed_acc_des')}
+        btns={['reject', 'confirm']}
+        visible={isConfirmModal}
+        onConfirmed={handleRemoveAccount}
+        onTriggered={() => setIsConfirmModal(false)}
       />
     </React.Fragment>
   );

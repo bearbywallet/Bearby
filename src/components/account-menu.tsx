@@ -12,7 +12,6 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 import { DropDownItem } from 'app/components/drop-down-item';
 import { AccountsModal } from 'app/components/modals';
@@ -25,9 +24,15 @@ type Prop = {
   style?: ViewStyle;
   accountName: string;
   onCreate: () => void;
+  onRemove: () => void;
 };
 
-export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) => {
+export const AccountMenu: React.FC<Prop> = ({
+  accountName,
+  style,
+  onCreate,
+  onRemove
+}) => {
   const accountState = keystore.account.store.useValue();
 
   const [isModal, setIsModal] = React.useState(false);
@@ -42,6 +47,10 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
 
     setIsModal(false);
   }, [setIsModal]);
+  const hanldeRemove = React.useCallback(() => {
+    setIsModal(false);
+    setTimeout(() => onRemove(), 500);
+  }, [setIsModal, onRemove]);
 
   return (
     <View
@@ -61,7 +70,7 @@ export const AccountMenu: React.FC<Prop> = ({ accountName, style, onCreate }) =>
         onTriggered={() => setIsModal(false)}
         onSelected={handleChangeAccount}
         onAdd={handleCreateAccount}
-        onRemove={() => null}
+        onRemove={hanldeRemove}
       />
     </View>
   );

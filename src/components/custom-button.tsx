@@ -18,11 +18,18 @@ import { theme } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   title: string;
+  color?: string;
   disabled?: boolean;
   onPress?: () => void;
 };
 
-export const CustomButton: React.FC<Prop> = ({ title, disabled, style, onPress }) => {
+export const CustomButton: React.FC<Prop> = ({
+  title,
+  disabled,
+  style,
+  color,
+  onPress
+}) => {
   return (
     <TouchableOpacity
       style={[styles.container, style, {
@@ -31,7 +38,7 @@ export const CustomButton: React.FC<Prop> = ({ title, disabled, style, onPress }
       disabled={disabled}
       onPress={onPress}
     >
-      <Text style={styles.text}>
+      <Text style={[styles.text, { color }]}>
         {title}
       </Text>
     </TouchableOpacity>
