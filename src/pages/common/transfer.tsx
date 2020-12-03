@@ -32,6 +32,7 @@ import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
 import { RouteProp } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
+import { toQA } from 'app/filters';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -105,7 +106,12 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
         </KeyboardAwareScrollView>
       </SafeAreaView>
       <ConfirmPopup
+        token={token}
+        recipient={recipient}
+        amount={toQA(amount, token.decimals)}
+        account={accountState.identities[selectedAccount]}
         title={i18n.t('confirm')}
+        netwrok={networkState.selected}
         visible={confirmModal}
         onTriggered={() => setConfirmModal(false)}
       />

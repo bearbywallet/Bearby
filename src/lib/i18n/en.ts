@@ -19,6 +19,7 @@ export default {
   settings: 'Settings',
   accounts: 'Accounts',
   pending: 'Pending',
+  send_to_ds: 'Send to DS',
   rejected: 'Rejected',
   success: 'Success',
   reject: 'Reject',
