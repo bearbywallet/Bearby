@@ -196,8 +196,7 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     flexDirection: 'row',
-    maxWidth: 400,
-    width: width - 20
+    maxWidth: 400
   },
   item: {
     justifyContent: 'center',
