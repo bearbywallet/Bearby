@@ -42,7 +42,7 @@ $ yarn android --device
 - [x] crypto.
 - [x] account.
 - [x] auth.
-- [ ] contacts.
+- [x] contacts.
 - [x] currency.
 - [x] gas.
 - [x] guard.
@@ -52,7 +52,7 @@ $ yarn android --device
 - [x] theme.
 - [x] tokens.
 - [x] wallet.
-- [ ] zilliqa.
+- [x] zilliqa.
 
 
 ### Pages:
@@ -82,9 +82,9 @@ $ yarn android --device
 	- [x] HistoryPage.
 - [ ] Common.
 	- [x] CreateAccountPage.
-	- [ ] TransferPage.
+	- [x] TransferPage.
 	- [ ] ConnectDApp.
 	- [ ] SignMessage.
-	- [ ] confirmTransaction.
+	- [x] confirmTransaction.
 	- [x] AuthLoading.
 
