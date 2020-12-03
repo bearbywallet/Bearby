@@ -31,10 +31,14 @@ import styles from './styles';
 type Prop = {
   accounts: Account[];
   selected: number;
-  onSelect: (index: number) => void;
+  onSelect?: (index: number) => void;
 };
 
-export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }) => {
+export const TransferAccount: React.FC<Prop> = ({
+  accounts,
+  selected,
+  onSelect
+}) => {
   const settingsState = keystore.settings.store.useValue();
 
   const [isAccountModal, setIsAccountModal] = React.useState(false);
@@ -46,8 +50,10 @@ export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }
 
   const hanldeSelectAccount = React.useCallback((index) => {
     setIsAccountModal(false);
-    onSelect(index);
-  }, [setIsAccountModal]);
+    if (onSelect) {
+      onSelect(index);
+    }
+  }, [setIsAccountModal, onSelect]);
 
   return (
     <React.Fragment>
@@ -77,14 +83,16 @@ export const TransferAccount: React.FC<Prop> = ({ accounts, selected, onSelect }
           style={styles.arrowIcon}
         />
       </TouchableOpacity>
-      <AccountsModal
-        title={i18n.t('transfer_modal_title1')}
-        visible={isAccountModal}
-        selected={selected}
-        onTriggered={() => setIsAccountModal(false)}
-        accounts={accounts}
-        onSelected={hanldeSelectAccount}
-      />
+      {onSelect ? (
+        <AccountsModal
+          title={i18n.t('transfer_modal_title1')}
+          visible={isAccountModal}
+          selected={selected}
+          onTriggered={() => setIsAccountModal(false)}
+          accounts={accounts}
+          onSelected={hanldeSelectAccount}
+        />
+      ) : null}
     </React.Fragment>
   );
 };
