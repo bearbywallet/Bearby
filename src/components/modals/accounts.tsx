@@ -77,7 +77,7 @@ export const AccountsModal: React.FC<Prop> = ({
           ))}
         </ScrollView>
         <View style={[styles.actionsWrapper, {
-          height: selected !== 0 ? 100 : undefined,
+          height: selected && selected !== 0 ? 100 : undefined,
         }]}>
           {onAdd ? (
             <CustomButton

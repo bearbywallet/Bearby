@@ -24,6 +24,7 @@ import {
   TransferAmount,
   TransferRecipient
 } from 'app/components/transfer';
+import { ConfirmPopup } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
@@ -44,10 +45,13 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const tokensState = keystore.token.store.useValue();
   const networkState = keystore.network.store.useValue();
 
+  const [confirmModal, setConfirmModal] = React.useState(false);
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
-  const [recipient, setRecipient] = React.useState<string>((route.params && route.params.recipient) || '');
+  const [recipient, setRecipient] = React.useState<string>(
+    (route.params && route.params.recipient) || ''
+  );
 
   const token = React.useMemo(
     () => tokensState.identities[selectedToken],
@@ -55,49 +59,57 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   );
 
   return (
-    <SafeAreaView style={styles.container}>
-      <KeyboardAwareScrollView>
-        <View style={styles.wrapper}>
-          <TransferAccount
+    <React.Fragment>
+      <SafeAreaView style={styles.container}>
+        <KeyboardAwareScrollView>
+          <View style={styles.wrapper}>
+            <TransferAccount
+              accounts={accountState.identities}
+              selected={selectedAccount}
+              onSelect={setSelectedAccount}
+            />
+            <TransferToken
+              account={accountState.identities[selectedAccount]}
+              tokens={tokensState.identities}
+              selected={selectedToken}
+              netwrok={networkState.selected}
+              onSelect={setSelectedToken}
+            />
+          </View>
+          <TransferRecipient
+            style={{ ...styles.wrapper, marginTop: 30 }}
             accounts={accountState.identities}
-            selected={selectedAccount}
-            onSelect={setSelectedAccount}
+            recipient={recipient}
+            contacts={contactsState}
+            onSelect={setRecipient}
           />
-          <TransferToken
+          <TransferAmount
+            style={styles.wrapper}
             account={accountState.identities[selectedAccount]}
-            tokens={tokensState.identities}
-            selected={selectedToken}
+            token={token}
             netwrok={networkState.selected}
-            onSelect={setSelectedToken}
+            value={amount}
+            onChange={setAmount}
           />
-        </View>
-        <TransferRecipient
-          style={{ ...styles.wrapper, marginTop: 30 }}
-          accounts={accountState.identities}
-          recipient={recipient}
-          contacts={contactsState}
-          onSelect={setRecipient}
-        />
-        <TransferAmount
-          style={styles.wrapper}
-          account={accountState.identities[selectedAccount]}
-          token={token}
-          netwrok={networkState.selected}
-          value={amount}
-          onChange={setAmount}
-        />
-        <View style={{
-          width: '100%',
-          alignItems: 'center',
-          marginTop: '10%'
-        }}>
-          <CustomButton
-            style={{ width: width / 1.5 }}
-            title={i18n.t('restore_btn')}
-          />
-        </View>
-      </KeyboardAwareScrollView>
-    </SafeAreaView>
+          <View style={{
+            width: '100%',
+            alignItems: 'center',
+            marginTop: '10%'
+          }}>
+            <CustomButton
+              style={{ width: width / 1.5 }}
+              title={i18n.t('restore_btn')}
+              onPress={() => setConfirmModal(true)}
+            />
+          </View>
+        </KeyboardAwareScrollView>
+      </SafeAreaView>
+      <ConfirmPopup
+        title={i18n.t('confirm')}
+        visible={confirmModal}
+        onTriggered={() => setConfirmModal(false)}
+      />
+    </React.Fragment>
   );
 };
 
