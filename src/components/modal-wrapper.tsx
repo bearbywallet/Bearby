@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  Dimensions,
   ViewStyle
 } from 'react-native';
 
@@ -17,6 +18,7 @@ type Prop = {
   style?: ViewStyle;
 };
 
+const { height } = Dimensions.get('window');
 export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
   return (
     <View style={[styles.container, style]}>
@@ -32,6 +34,7 @@ const styles = StyleSheet.create({
     borderTopStartRadius: 16,
     backgroundColor: '#18191D',
     justifyContent: 'space-between',
-    paddingVertical: 15
+    paddingVertical: 15,
+    maxHeight: height
   }
 });
