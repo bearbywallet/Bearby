@@ -48,6 +48,8 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const [selectedToken, setSelectedToken] = React.useState(-1);
   const [selectedStatus, setSelectedStatus] = React.useState(0);
 
+  const [isDate, setIsDate] = React.useState(false);
+
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
 
@@ -61,6 +63,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
     let tokenAddress: string;
+    const [zilliqa] = tokensState.identities;
     const token = tokensState.identities[selectedToken];
 
     if (token) {
@@ -100,9 +103,20 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         return true;
       }
 
+      if (token.symbol === zilliqa.symbol && !tx.data) {
+        return true;
+      }
+
       return tokenAddress === tx.to;
+    }).sort((a, b) => {
+      if (isDate && a.tx.timestamp < b.tx.timestamp) {
+        return -1;
+      }
+
+      return 1;
     });
   }, [
+    isDate,
     transactionState,
     selectedStatus,
     selectedToken,
@@ -153,10 +167,12 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         <SortingWrapper
           tokens={tokensState.identities}
           account={account}
+          isDate={isDate}
           selectedToken={selectedToken}
           selectedStatus={selectedStatus}
           onSelectStatus={setSelectedStatus}
           onSelectToken={setSelectedToken}
+          onSelectDate={setIsDate}
         />
         <FlatList
           data={dateTransactions}

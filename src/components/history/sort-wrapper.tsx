@@ -27,8 +27,10 @@ type Prop = {
   account: Account;
   selectedToken: number;
   selectedStatus: number;
+  isDate: boolean;
   onSelectStatus: (status: number) => void;
   onSelectToken: (index: number) => void;
+  onSelectDate: (isDate: boolean) => void;
 };
 
 export const SortingWrapper: React.FC<Prop> = ({
@@ -37,14 +39,15 @@ export const SortingWrapper: React.FC<Prop> = ({
   account,
   selectedToken,
   selectedStatus,
+  isDate,
   onSelectStatus,
+  onSelectDate,
   onSelectToken
 }) => {
   const netwrokState = keystore.network.store.useValue();
 
   const [statusModal, setStatusModal] = React.useState(false);
   const [tokenModal, setTokenModal] = React.useState(false);
-  const [dateModal, setdateModal] = React.useState(false);
 
   return (
     <React.Fragment>
@@ -63,7 +66,7 @@ export const SortingWrapper: React.FC<Prop> = ({
         </DropDownItem>
         <DropDownItem
           color="#666666"
-          onPress={() => setdateModal(true)}
+          onPress={() => onSelectDate(!isDate)}
         >
           {i18n.t('sorting_item2')}
         </DropDownItem>
