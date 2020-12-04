@@ -23,15 +23,15 @@ import { theme } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   accountName: string;
-  onCreate: () => void;
-  onRemove: () => void;
+  onCreate?: () => void;
+  onRemove?: () => void;
 };
 
 export const AccountMenu: React.FC<Prop> = ({
   accountName,
   style,
-  onCreate,
-  onRemove
+  onCreate = () => null,
+  onRemove = () => null
 }) => {
   const accountState = keystore.account.store.useValue();
 
