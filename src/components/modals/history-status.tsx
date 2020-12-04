@@ -35,9 +35,7 @@ type Prop = {
   onSelect: (status: number) => void;
 };
 
-export const statuses = Object.keys(TxStatsues);
-statuses.push('all');
-
+export const statuses = ['all', ...Object.keys(TxStatsues)];
 export const HistoryStatus: React.FC<Prop> = ({
   style,
   visible,
@@ -46,8 +44,8 @@ export const HistoryStatus: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
-  const handleSelected = React.useCallback((status) => {
-    onSelect(TxStatsues[status]);
+  const handleSelected = React.useCallback((index) => {
+    onSelect(index);
     onTriggered();
   }, [onSelect, onTriggered]);
 

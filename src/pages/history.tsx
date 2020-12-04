@@ -44,7 +44,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const transactionState = keystore.transaction.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);
-  const [selectedStatus, setSelectedStatus] = React.useState(3);
+  const [selectedStatus, setSelectedStatus] = React.useState(0);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
@@ -75,8 +75,12 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       };
     }).filter((tx) => {
       switch (selectedStatus) {
-        case 0:
-          break;
+        case 1:
+          return tx.tx.receiptSuccess === null;
+        case 2:
+          return !tx.tx.receiptSuccess;
+        case 3:
+          return tx.tx.receiptSuccess;
         default:
           break;
       }
