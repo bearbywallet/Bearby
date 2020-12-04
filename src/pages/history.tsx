@@ -44,7 +44,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const transactionState = keystore.transaction.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);
-  const [selectedStatus, setSelectedStatus] = React.useState(2);
+  const [selectedStatus, setSelectedStatus] = React.useState(0);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
@@ -57,9 +57,8 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   );
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
-    let filtred = transactionState;
 
-    return filtred.map((tx) => {
+    return transactionState.map((tx) => {
       let date: Date | null = new Date(tx.timestamp);
 
       if (!lasDate) {
