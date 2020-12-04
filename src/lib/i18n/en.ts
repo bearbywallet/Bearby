@@ -11,6 +11,7 @@ export default {
   my_accounts: 'My accounts',
   my_contacts: 'My contacts',
   token: 'Token',
+  all: 'All',
   close: 'Close',
   manage: 'Manage',
   home: 'Home',

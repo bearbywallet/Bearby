@@ -35,7 +35,9 @@ type Prop = {
   onSelect: (status: number) => void;
 };
 
-const statuses = Object.keys(TxStatsues);
+export const statuses = Object.keys(TxStatsues);
+statuses.push('all');
+
 export const HistoryStatus: React.FC<Prop> = ({
   style,
   visible,
@@ -73,12 +75,12 @@ export const HistoryStatus: React.FC<Prop> = ({
                 styles.statusItem,
                 { borderBottomWidth: (index !== statuses.length - 1) ? 1 : 0 }
               ]}
-              onPress={() => handleSelected(status)}
+              onPress={() => handleSelected(index)}
             >
               <Text style={styles.textItem}>
                 {i18n.t(status)}
               </Text>
-              {selected === TxStatsues[status] ? (
+              {selected === index ? (
                 <SvgXml xml={OKIconSVG}/>
               ) : (
                 <Unselected />

@@ -44,7 +44,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const transactionState = keystore.transaction.store.useValue();
 
   const [selectedToken, setSelectedToken] = React.useState(0);
-  const [selectedStatus, setSelectedStatus] = React.useState(0);
+  const [selectedStatus, setSelectedStatus] = React.useState(3);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transactionIndex, setTransactionIndex] = React.useState(0);
@@ -73,8 +73,17 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         tx,
         date
       };
+    }).filter((tx) => {
+      switch (selectedStatus) {
+        case 0:
+          break;
+        default:
+          break;
+      }
+
+      return true;
     });
-  }, [transactionState]);
+  }, [transactionState, selectedStatus]);
 
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
