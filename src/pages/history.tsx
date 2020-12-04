@@ -30,6 +30,7 @@ import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
 import { TxStatsues } from 'app/config';
+import { toBech32Address } from 'app/utils';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -42,8 +43,9 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const transactionState = keystore.transaction.store.useValue();
+  const networkState = keystore.network.store.useValue();
 
-  const [selectedToken, setSelectedToken] = React.useState(0);
+  const [selectedToken, setSelectedToken] = React.useState(-1);
   const [selectedStatus, setSelectedStatus] = React.useState(0);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
@@ -55,8 +57,15 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
+    let tokenAddress: string;
+    const token = tokensState.identities[selectedToken];
+
+    if (token) {
+      tokenAddress = toBech32Address(token.address[networkState.selected]);
+    }
 
     return transactionState.map((tx) => {
       let date: Date | null = new Date(tx.timestamp);
@@ -73,21 +82,33 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         tx,
         date
       };
-    }).filter((tx) => {
+    }).filter(({ tx }) => {
       switch (selectedStatus) {
         case 1:
-          return tx.tx.receiptSuccess === null;
+          return tx.receiptSuccess === null;
         case 2:
-          return !tx.tx.receiptSuccess;
+          return !tx.receiptSuccess;
         case 3:
-          return tx.tx.receiptSuccess;
+          return tx.receiptSuccess;
         default:
           break;
       }
 
       return true;
+    }).filter(({ tx }) => {
+      if (!tokenAddress) {
+        return true;
+      }
+
+      return tokenAddress === tx.to;
     });
-  }, [transactionState, selectedStatus]);
+  }, [
+    transactionState,
+    selectedStatus,
+    selectedToken,
+    networkState,
+    tokensState
+  ]);
 
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
