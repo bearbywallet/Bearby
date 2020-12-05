@@ -62,6 +62,14 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const handleRemoveAccount = React.useCallback(() => {
     setIsConfirmModal(false);
   }, [setIsConfirmModal]);
+  const hanldeSelectToken = React.useCallback((tokenIndex) => {
+    navigation.navigate('App', {
+      screen: 'History',
+      params: {
+        tokenIndex
+      }
+    });
+  }, [navigation]);
 
   React.useEffect(() => {
     keystore.account.balanceUpdate();
@@ -102,7 +110,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onSend={handleSend}
                 onRemove={() => setIsConfirmModal(true)}
               />
-              <HomeTokens />
+              <HomeTokens onSelectToken={hanldeSelectToken}/>
             </View>
           )}
         />
