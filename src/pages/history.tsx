@@ -89,7 +89,36 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
       tokenAddress = toBech32Address(token.address[networkState.selected]);
     }
 
-    return transactionState.map((tx) => {
+    return transactionState.filter((tx) => {
+      switch (selectedStatus) {
+        case 1:
+          return tx.receiptSuccess === null;
+        case 2:
+          return !tx.receiptSuccess;
+        case 3:
+          return tx.receiptSuccess;
+        default:
+          break;
+      }
+
+      return true;
+    }).filter((tx) => {
+      if (!tokenAddress || selectedToken === 0) {
+        return true;
+      }
+
+      if (token.symbol === zilliqa.symbol && !tx.data) {
+        return true;
+      }
+
+      return tokenAddress === tx.to;
+    }).sort((a, b) => {
+      if (isDate && a.timestamp < b.timestamp) {
+        return -1;
+      }
+
+      return 1;
+    }).map((tx) => {
       let date: Date | null = new Date(tx.timestamp);
 
       if (!lasDate) {
@@ -104,35 +133,6 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
         tx,
         date
       };
-    }).filter(({ tx }) => {
-      switch (selectedStatus) {
-        case 1:
-          return tx.receiptSuccess === null;
-        case 2:
-          return !tx.receiptSuccess;
-        case 3:
-          return tx.receiptSuccess;
-        default:
-          break;
-      }
-
-      return true;
-    }).filter(({ tx }) => {
-      if (!tokenAddress || selectedToken === 0) {
-        return true;
-      }
-
-      if (token.symbol === zilliqa.symbol && !tx.data) {
-        return true;
-      }
-
-      return tokenAddress === tx.to;
-    }).sort((a, b) => {
-      if (isDate && a.tx.timestamp < b.tx.timestamp) {
-        return -1;
-      }
-
-      return 1;
     });
   }, [
     isDate,
@@ -210,6 +210,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
               ) : null}
               <TransactionItem
                 transaction={item.tx}
+                netwrok={networkState.selected}
                 currency={currencyState}
                 rate={settingsState.rate[currencyState]}
                 tokens={tokensState.identities}
