@@ -24,8 +24,12 @@ import { AddToken } from 'app/components/add-token';
 
 import { keystore } from 'app/keystore';
 
+type Prop = {
+  onSelectToken: (index: number) => void;
+};
+
 const { width, height } = Dimensions.get('window');
-export const HomeTokens: React.FC = () => {
+export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
@@ -62,6 +66,7 @@ export const HomeTokens: React.FC = () => {
               net={netwrokState.selected}
               rate={settingsState.rate[currencyState]}
               style={styles.token}
+              onPress={() => onSelectToken(index + 1)}
             />
           ))}
           <AddToken style={styles.token}/>
