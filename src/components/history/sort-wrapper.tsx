@@ -11,6 +11,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  Button,
   ViewStyle
 } from 'react-native';
 
@@ -20,6 +21,7 @@ import { HistoryStatus, TokensModal } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { Token, Account } from 'types';
+import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -49,6 +51,12 @@ export const SortingWrapper: React.FC<Prop> = ({
   const [statusModal, setStatusModal] = React.useState(false);
   const [tokenModal, setTokenModal] = React.useState(false);
 
+  const handleReset = React.useCallback(() => {
+    onSelectDate(false);
+    onSelectStatus(0);
+    onSelectToken(0);
+  }, [onSelectDate, onSelectStatus, onSelectToken]);
+
   return (
     <React.Fragment>
       <View style={[styles.container, style]}>
@@ -70,6 +78,11 @@ export const SortingWrapper: React.FC<Prop> = ({
         >
           {i18n.t('sorting_item2')}
         </DropDownItem>
+        <Button
+          title={i18n.t('reset')}
+          color={theme.colors.primary}
+          onPress={handleReset}
+        />
       </View>
       <HistoryStatus
         title={i18n.t('sort_status')}
@@ -95,6 +108,8 @@ export const SortingWrapper: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     paddingHorizontal: 30
   }
 });
