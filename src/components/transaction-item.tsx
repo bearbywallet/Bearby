@@ -19,12 +19,14 @@ import { theme } from 'app/styles';
 import { TX_DIRECTION } from 'app/config';
 import { Token, Transaction } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
+import { fromBech32Address, tohexString } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   status: number;
   tokens: Token[];
   rate: number;
+  netwrok: string;
   currency: string;
   transaction: Transaction;
   onSelect: () => void;
@@ -35,9 +37,17 @@ export const TransactionItem: React.FC<Prop> = ({
   tokens,
   rate,
   currency,
+  netwrok,
   style,
   onSelect
 }) => {
+  const token = React.useMemo(() => {
+    const toAddressbase16 = fromBech32Address(transaction.to).toLowerCase();
+
+    return tokens.find(
+      (t) => t.address[netwrok] === toAddressbase16
+    );
+  }, [transaction, tokens, netwrok]);
   const statusColor = React.useMemo(() => {
     if (transaction.receiptSuccess) {
       return theme.colors.success;
@@ -59,7 +69,7 @@ export const TransactionItem: React.FC<Prop> = ({
       t = '-';
     }
 
-    if (Number(transaction.value) === 0) {
+    if (Number(transaction.value) === 0 && !token) {
       color = theme.colors.white;
       t = '';
     } else if (transaction.direction === TX_DIRECTION.in) {
@@ -70,9 +80,21 @@ export const TransactionItem: React.FC<Prop> = ({
       t,
       color
     };
-  }, [transaction]);
+  }, [transaction, token]);
   const amount = React.useMemo(() => {
     const [zilliqa] = tokens;
+
+    if (token && transaction.data) {
+      const data = JSON.parse(transaction.data);
+      const [_, amt] = data.params;
+      const v = fromZil(amt.value, token.decimals);
+
+      return {
+        converted: 0,
+        value: toLocaleString(v),
+        symbol: token.symbol
+      };
+    }
     const value = fromZil(transaction.value, zilliqa.decimals);
     const converted = toConversion(transaction.value, rate, zilliqa.decimals);
 
@@ -81,7 +103,7 @@ export const TransactionItem: React.FC<Prop> = ({
       value: toLocaleString(value),
       symbol: zilliqa.symbol
     };
-  }, [transaction, tokens, rate]);
+  }, [transaction, tokens, rate, token]);
   const vname = React.useMemo(() => {
     if (typeof transaction.data === 'string') {
       try {
