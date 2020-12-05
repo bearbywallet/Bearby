@@ -27,7 +27,9 @@ import { theme } from 'app/styles';
 
 export type TabStackParamList = {
   Home: undefined;
-  History: undefined;
+  History: {
+    tokenIndex?: number;
+  };
   Browser: undefined;
   Settings: undefined;
 };

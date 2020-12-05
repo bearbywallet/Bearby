@@ -81,18 +81,22 @@ export const TokensModal: React.FC<Prop> = ({
               }]}
               onPress={() => handleSelected(index)}
             >
-              <SvgCssUri
-                height="30"
-                width="30"
-                uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
-              />
+              {token.symbol ? (
+                <SvgCssUri
+                  height="30"
+                  width="30"
+                  uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
+                />
+              ) : null}
               <View style={styles.wrapper}>
                 <Text style={styles.symbol}>
                   {token.name}
                 </Text>
-                <Text style={styles.amount}>
-                  {fromZil(account.balance[network][token.symbol], token.decimals)} {token.symbol}
-                </Text>
+                {token.decimals ? (
+                  <Text style={styles.amount}>
+                    {fromZil(account.balance[network][token.symbol], token.decimals)} {token.symbol}
+                  </Text>
+                ) : null}
               </View>
               {selected === index ? (
                 <SvgXml xml={OKIconSVG}/>
@@ -121,6 +125,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignSelf: 'flex-start',
     alignItems: 'center',
+    width: '100%',
     justifyContent: 'space-between',
     paddingVertical: 15,
     borderBottomColor: theme.colors.black
