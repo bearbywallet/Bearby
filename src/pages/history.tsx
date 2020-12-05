@@ -19,6 +19,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 
 import { AccountMenu } from 'app/components/account-menu';
 import { TransactionItem } from 'app/components/transaction-item';
@@ -28,16 +29,19 @@ import { TransactionModal } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
+import { TabStackParamList } from 'app/navigator/tab-navigator';
 import { keystore } from 'app/keystore';
-import { TxStatsues } from 'app/config';
+import { TxStatsues, ZILLIQA_KEYS } from 'app/config';
 import { toBech32Address } from 'app/utils';
+import { Transaction } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
+  route: RouteProp<TabStackParamList, 'History'>;
 };
 
 const { width } = Dimensions.get('window');
-export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
+export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   const accountState = keystore.account.store.useValue();
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
@@ -45,13 +49,15 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const transactionState = keystore.transaction.store.useValue();
   const networkState = keystore.network.store.useValue();
 
-  const [selectedToken, setSelectedToken] = React.useState(-1);
+  const [selectedToken, setSelectedToken] = React.useState(
+    route.params?.tokenIndex || 0
+  );
   const [selectedStatus, setSelectedStatus] = React.useState(0);
 
   const [isDate, setIsDate] = React.useState(false);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
-  const [transactionIndex, setTransactionIndex] = React.useState(0);
+  const [transaction, setTransaction] = React.useState<null | Transaction>();
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -59,14 +65,27 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+  const cusstomTokens = React.useMemo(() => {
+    const cusstomToken = {
+      address: {
+        [ZILLIQA_KEYS[0]]: '',
+        [ZILLIQA_KEYS[1]]: '',
+        [ZILLIQA_KEYS[2]]: ''
+      },
+      decimals: 0,
+      name: 'All',
+      symbol: ''
+    };
+    return [cusstomToken, ...tokensState.identities];
+  }, [tokensState]);
 
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
     let tokenAddress: string;
     const [zilliqa] = tokensState.identities;
-    const token = tokensState.identities[selectedToken];
+    const token = cusstomTokens[selectedToken];
 
-    if (token) {
+    if (token && selectedToken !== 0) {
       tokenAddress = toBech32Address(token.address[networkState.selected]);
     }
 
@@ -99,7 +118,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
 
       return true;
     }).filter(({ tx }) => {
-      if (!tokenAddress) {
+      if (!tokenAddress || selectedToken === 0) {
         return true;
       }
 
@@ -121,7 +140,8 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     selectedStatus,
     selectedToken,
     networkState,
-    tokensState
+    tokensState,
+    cusstomTokens
   ]);
 
   const handleCreateAccount = React.useCallback(() => {
@@ -130,10 +150,10 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     });
   }, []);
 
-  const showTxDetails = React.useCallback((index) => {
-    setTransactionIndex(index);
+  const showTxDetails = React.useCallback((tx) => {
+    setTransaction(tx);
     setTransactionModal(true);
-  }, [setTransactionIndex, setTransactionModal]);
+  }, [setTransaction, setTransactionModal]);
 
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
@@ -144,6 +164,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   React.useEffect(() => {
     keystore.transaction.sync();
   }, []);
+  React.useEffect(() => {
+    if (route.params && route.params.tokenIndex) {
+      setSelectedToken(route.params.tokenIndex + 1);
+    }
+  }, [setSelectedToken, route.params]);
 
   return (
     <SafeAreaView style={styles.container}>
@@ -165,7 +190,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       </View>
       <View style={styles.main}>
         <SortingWrapper
-          tokens={tokensState.identities}
+          tokens={cusstomTokens}
           account={account}
           isDate={isDate}
           selectedToken={selectedToken}
@@ -176,7 +201,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         />
         <FlatList
           data={dateTransactions}
-          renderItem={({ item, index }) => (
+          renderItem={({ item }) => (
             <React.Fragment>
               {item.date ? (
                  <Text style={styles.date}>
@@ -189,7 +214,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
                 rate={settingsState.rate[currencyState]}
                 tokens={tokensState.identities}
                 status={TxStatsues.success}
-                onSelect={() => showTxDetails(index)}
+                onSelect={() => showTxDetails(item.tx)}
               />
             </React.Fragment>
           )}
@@ -203,11 +228,13 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           keyExtractor={(_, index) => String(index)}
         />
       </View>
-      <TransactionModal
-        visible={transactionModal}
-        transaction={transactionState[transactionIndex]}
-        onTriggered={() => setTransactionModal(false)}
-      />
+      {transaction ? (
+        <TransactionModal
+          visible={transactionModal}
+          transaction={transaction}
+          onTriggered={() => setTransactionModal(false)}
+        />
+      ) : null}
     </SafeAreaView>
   );
 };
