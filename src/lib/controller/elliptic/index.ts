@@ -6,12 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './account';
-export * from './wallet';
-export * from './zilliqa';
-export * from './auth';
-export * from './guard';
-export * from './mnemonic';
-export * from './network';
-export * from './tokens';
 export * from './elliptic';

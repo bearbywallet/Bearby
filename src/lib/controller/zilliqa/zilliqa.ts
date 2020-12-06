@@ -12,11 +12,13 @@ import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
 import { Token } from 'types';
 import { tohexString } from 'app/utils/address';
+import { EllipticControl } from 'app/lib/controller';
 
 type Params = string[] | number[] | (string | string[] | number[])[];
 
 export class ZilliqaControl {
   private _network: NetworkControll;
+  private _elliptic: EllipticControl;
 
   constructor(network: NetworkControll) {
     this._network = network;
