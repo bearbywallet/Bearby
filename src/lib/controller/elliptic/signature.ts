@@ -23,8 +23,8 @@ interface SignatureOpt {
 }
 
 export class Signature {
-  r: BN;
-  s: BN;
+  public r: BN;
+  public s: BN;
 
   constructor(options: SignatureOpt) {
     this.r = typeof options.r === 'string' ? new BN(options.r, 16) : options.r;
