@@ -62,6 +62,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const currencyState = keystore.currency.store.useValue();
   const gasState = keystore.gas.store.useValue();
 
+  const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(false);
   const [gas, setGas] = React.useState(gasState);
 
@@ -72,6 +73,18 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
     return toLocaleString(value);
   }, [token, account, netwrok, settingsState, currencyState]);
+
+  const handleSend = React.useCallback(async() => {
+    setIsLoading(true);
+    await keystore.zilliqa.send(
+      amount,
+      recipient,
+      token,
+      account
+    );
+    setIsLoading(false);
+    onTriggered();
+  }, [account, token, amount, recipient, setIsLoading, onTriggered]);
 
   return (
     <Modal
@@ -154,7 +167,8 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <CustomButton
             title={i18n.t('send')}
             style={styles.sendBtn}
-            onPress={() => null}
+            isLoading={isLoading}
+            onPress={handleSend}
           />
         </ScrollView>
       </ModalWrapper>
