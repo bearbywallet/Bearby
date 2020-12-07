@@ -31,7 +31,7 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import { Token, Account } from 'types';
 import { TOKEN_ICONS } from 'app/config';
 import i18n from 'app/lib/i18n';
-import { fromZil, toConversion, trim } from 'app/filters';
+import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 
@@ -68,8 +68,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[currencyState];
     const balance = account.balance[netwrok][token.symbol];
+    const value = toConversion(balance, rate, token.decimals);
 
-    return toConversion(balance, rate, token.decimals);
+    return toLocaleString(value);
   }, [token, account, netwrok, settingsState, currencyState]);
 
   return (
@@ -123,7 +124,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
               </Text>
               <View style={commonStyles.infoWrapper}>
                 <Text style={commonStyles.nameAmountText}>
-                  {fromZil(amount, token.decimals)}
+                  {toLocaleString(fromZil(amount, token.decimals))}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}
