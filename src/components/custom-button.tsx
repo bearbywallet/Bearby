@@ -11,6 +11,7 @@ import {
   Text,
   TouchableOpacity,
   StyleSheet,
+  ActivityIndicator,
   ViewStyle
 } from 'react-native';
 import { theme } from 'app/styles';
@@ -20,6 +21,7 @@ type Prop = {
   title: string;
   color?: string;
   disabled?: boolean;
+  isLoading?: boolean;
   onPress?: () => void;
 };
 
@@ -28,19 +30,27 @@ export const CustomButton: React.FC<Prop> = ({
   disabled,
   style,
   color,
-  onPress
+  isLoading = false,
+  onPress = () => null
 }) => {
   return (
     <TouchableOpacity
       style={[styles.container, style, {
-        opacity: disabled ? 0.5 : 1
+        opacity: (disabled || isLoading) ? 0.5 : 1
       }]}
-      disabled={disabled}
+      disabled={disabled || isLoading}
       onPress={onPress}
     >
-      <Text style={[styles.text, { color }]}>
-        {title}
-      </Text>
+      {isLoading ? (
+        <ActivityIndicator
+          animating={isLoading}
+          color={theme.colors.black}
+        />
+      ) : (
+        <Text style={[styles.text, { color }]}>
+          {title}
+        </Text>
+      )}
     </TouchableOpacity>
   );
 };
