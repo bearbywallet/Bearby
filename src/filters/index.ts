@@ -11,5 +11,4 @@ export * from './to-conversion';
 export * from './from-zil';
 export * from './gas-to-fee';
 export * from './trim';
-export * from './amount-percent';
 export * from './to-qa';

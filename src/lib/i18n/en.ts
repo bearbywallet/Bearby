@@ -62,6 +62,7 @@ export default {
   transfer_modal_title0: 'Select token',
   transfer_modal_title1: 'Select account',
   transfer_modal_title2: 'Select contact',
+  transfer_insufficient_funds: 'Insufficient funds',
   create_account_title: 'New Account',
   create_account_btn: 'Create',
   create_account_name: 'Account %{number}',

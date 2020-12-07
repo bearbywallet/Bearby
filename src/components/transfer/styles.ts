@@ -25,7 +25,6 @@ export default StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1
   },
   percentWrapper: {
