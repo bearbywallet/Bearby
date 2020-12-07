@@ -30,6 +30,7 @@ import { QrCodeInput } from 'app/components/qr-code-input';
 import i18n from 'app/lib/i18n';
 import coomonStyles from './styles';
 import { theme } from 'app/styles';
+import { isBech32 } from 'app/utils/address';
 import { Account, Contact } from 'types';
 
 type Prop = {
@@ -38,6 +39,7 @@ type Prop = {
   contacts: Contact[];
   recipient: string;
   onSelect: (address: string) => void;
+  onError: (error: boolean) => void;
 };
 
 export const TransferRecipient: React.FC<Prop> = ({
@@ -45,15 +47,22 @@ export const TransferRecipient: React.FC<Prop> = ({
   recipient,
   accounts,
   contacts,
-  onSelect
+  onSelect,
+  onError
 }) => {
+  const [error, setError] = React.useState(false);
   const [accountModal, setAccountModal] = React.useState(false);
   const [contactModal, setContactModal] = React.useState(false);
 
   const handleSelect = React.useCallback((address) => {
+    if (!address || !isBech32(address)) {
+      setError(true);
+    }
+
     onSelect(address);
     setAccountModal(false);
-  }, [onSelect]);
+    onError(error);
+  }, [onSelect, setError, error]);
 
   return (
     <React.Fragment>
