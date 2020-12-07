@@ -33,6 +33,7 @@ import { TOKEN_ICONS } from 'app/config';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim } from 'app/filters';
 import { keystore } from 'app/keystore';
+import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -86,12 +87,16 @@ export const ConfirmPopup: React.FC<Prop> = ({
           style={{ padding: 15 }}
           onClose={onTriggered}
         >
-          <SvgCssUri
-            height="30"
-            width="30"
-            uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
-          />
-          {title}
+          <View style={styles.topWrapper}>
+            <SvgCssUri
+              height="30"
+              width="30"
+              uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
+            />
+            <Text style={styles.toptext}>
+              {title}
+            </Text>
+          </View>
         </ModalTitle>
         <ScrollView style={{ marginBottom: 15 }}>
           <View style={commonStyles.item}>
@@ -162,5 +167,16 @@ const styles = StyleSheet.create({
   },
   sendBtn: {
     marginVertical: 15
+  },
+  topWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  toptext: {
+    paddingLeft: 5,
+    fontSize: 20,
+    lineHeight: 26,
+    fontWeight: 'bold',
+    color: theme.colors.white
   }
 });
