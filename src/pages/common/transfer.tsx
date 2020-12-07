@@ -45,6 +45,10 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
   const networkState = keystore.network.store.useValue();
+  const gasState = keystore.gas.store.useValue();
+
+  const [amountErr, setAmountErr] = React.useState(true);
+  const [recipientErr, setRecipientErr] = React.useState(true);
 
   const [confirmModal, setConfirmModal] = React.useState(false);
   const [selectedToken, setSelectedToken] = React.useState(0);
@@ -83,14 +87,17 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             recipient={recipient}
             contacts={contactsState}
             onSelect={setRecipient}
+            onError={setRecipientErr}
           />
           <TransferAmount
             style={styles.wrapper}
             account={accountState.identities[selectedAccount]}
             token={token}
+            gas={gasState}
             netwrok={networkState.selected}
             value={amount}
             onChange={setAmount}
+            onError={setAmountErr}
           />
           <View style={{
             width: '100%',
@@ -98,6 +105,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             marginTop: '10%'
           }}>
             <CustomButton
+              disabled={amountErr || recipientErr}
               style={{ width: width / 1.5 }}
               title={i18n.t('restore_btn')}
               onPress={() => setConfirmModal(true)}
