@@ -101,6 +101,8 @@ export default {
   netwrok_ws: 'Sokcet',
   netwrok_msg: 'MSG version',
   netwrok_btn: 'Update',
+  browser_title: 'Browser',
+  browser_placeholder_input: 'Search or ZNS',
   lock_title: 'Welcome back',
   lock_btn: 'Unlock',
   lock_error: 'Password is incorrect!',
