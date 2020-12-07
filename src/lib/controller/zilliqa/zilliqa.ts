@@ -10,15 +10,15 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { tokensStore } from 'app/lib/controller/tokens/state';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 import { tohexString } from 'app/utils/address';
-import { EllipticControl } from 'app/lib/controller';
+import { SchnorrControl } from 'app/lib/controller';
 
 type Params = string[] | number[] | (string | string[] | number[])[];
 
 export class ZilliqaControl {
   private _network: NetworkControll;
-  private _elliptic: EllipticControl;
+  private _schnorr: SchnorrControl;
 
   constructor(network: NetworkControll) {
     this._network = network;
@@ -118,6 +118,13 @@ export class ZilliqaControl {
     }
 
     return data.result;
+  }
+
+  public async send(amount: string, to: string, token: Token, account: Account) {
+    // TODO: make sender with sign method.
+    return new Promise((resolve) => {
+      setTimeout(() => resolve(true), 2000);
+    });
   }
 
   private _json(method: string, params: Params) {
