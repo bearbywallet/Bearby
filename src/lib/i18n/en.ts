@@ -17,6 +17,8 @@ export default {
   home: 'Home',
   history: 'History',
   browser: 'Browser',
+  acc_name_key: 'Imported %{index}',
+  acc_name_ledger: 'Ledger %{index}',
   settings: 'Settings',
   accounts: 'Accounts',
   pending: 'Pending',
