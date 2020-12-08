@@ -11,7 +11,8 @@ import { STORAGE_FIELDS, AccountTypes, ZILLIQA_KEYS } from 'app/config';
 import {
   getAddressFromPublicKey,
   toBech32Address,
-  deppUnlink
+  deppUnlink,
+  getPubKeyFromPrivateKey
 } from 'app/utils';
 import {
   accountStore,
@@ -47,6 +48,33 @@ export class AccountControler {
     this._viewblock = viewblock;
   }
 
+  public get lastIndexPrivKey() {
+    return this
+      .store
+      .get()
+      .identities
+      .filter((acc) => acc.type === AccountTypes.privateKey)
+      .length;
+  }
+
+  public get lastIndexSeed() {
+    return this
+      .store
+      .get()
+      .identities
+      .filter((acc) => acc.type === AccountTypes.Seed)
+      .length;
+  }
+
+  public get lastIndexLedger() {
+    return this
+      .store
+      .get()
+      .identities
+      .filter((acc) => acc.type === AccountTypes.Ledger)
+      .length;
+  }
+
   public async sync(): Promise<AccountState> {
     try {
       const accounts = await this._storage.get<string>(
@@ -65,10 +93,9 @@ export class AccountControler {
     return this.store.get();
   }
 
-
-
   public async fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Promise<Account> {
-    const base16 = getAddressFromPublicKey(acc.publicKey);
+    const pubKey = acc.publicKey;
+    const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
 
@@ -77,6 +104,7 @@ export class AccountControler {
       bech32,
       name,
       type,
+      pubKey,
       balance,
       index: Number(acc.index),
       nonce: 0 // TODO: check and update nonce.
@@ -90,14 +118,9 @@ export class AccountControler {
   }
 
   public reset() {
-    const accountsState = {
-      identities: [],
-      selectedAddress: -1
-    };
-
     accountStoreReset();
 
-    return this.update(accountsState);
+    return this.update(this.store.get());
   }
 
   public update(accountState: AccountState): Promise<void> {
@@ -120,6 +143,26 @@ export class AccountControler {
     await this.update(accounts);
 
     return accounts;
+  }
+
+  public async fromPrivateKey(privatekey: string, name: string): Promise<Account> {
+    const pubKey = getPubKeyFromPrivateKey(privatekey);
+    const type = AccountTypes.privateKey;
+    const base16 = getAddressFromPublicKey(pubKey);
+    const bech32 = toBech32Address(base16);
+    const balance = await this._tokenBalance(base16);
+    const index = this.lastIndexPrivKey;
+
+    return {
+      base16,
+      bech32,
+      name,
+      pubKey,
+      type,
+      balance,
+      index,
+      nonce: 0 // TODO: check and update nonce.
+    };
   }
 
   public async selectAccount(index: number) {
