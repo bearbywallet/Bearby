@@ -44,7 +44,6 @@ enum Tabs {
 }
 
 export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
-  const accountState = keystore.account.store.useValue();
   const authState = keystore.guard.auth.store.useValue();
 
   const [index, setIndex] = React.useState(0);
@@ -63,11 +62,13 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
     [Tabs.add]: () => (
       <AddAccount
         biometricEnable={authState.biometricEnable}
-        newIndex={accountState.identities.length}
+        newIndex={keystore.account.lastIndexSeed}
         onAdded={handleCreate}
       />
     ),
-    [Tabs.import]: ImportAccount
+    [Tabs.import]: () => (
+      <ImportAccount onImported={handleCreate}/>
+    )
   });
 
   return (
