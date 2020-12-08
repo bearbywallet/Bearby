@@ -330,6 +330,8 @@ PODS:
     - React
   - RNPermissions (3.0.0-beta.2):
     - React-Core
+  - RNReanimated (1.13.2):
+    - React-Core
   - RNScreens (2.15.0):
     - React-Core
   - RNShare (4.1.0):
@@ -402,6 +404,7 @@ DEPENDENCIES:
   - RNI18n (from `../node_modules/react-native-i18n`)
   - RNKeychain (from `../node_modules/react-native-keychain`)
   - RNPermissions (from `../node_modules/react-native-permissions`)
+  - RNReanimated (from `../node_modules/react-native-reanimated`)
   - RNScreens (from `../node_modules/react-native-screens`)
   - RNShare (from `../node_modules/react-native-share`)
   - RNSVG (from `../node_modules/react-native-svg`)
@@ -503,6 +506,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-keychain"
   RNPermissions:
     :path: "../node_modules/react-native-permissions"
+  RNReanimated:
+    :path: "../node_modules/react-native-reanimated"
   RNScreens:
     :path: "../node_modules/react-native-screens"
   RNShare:
@@ -563,6 +568,7 @@ SPEC CHECKSUMS:
   RNI18n: e2f7e76389fcc6e84f2c8733ea89b92502351fd8
   RNKeychain: b8e0711b959a19c5b057d1e970d3c83d159b6da5
   RNPermissions: 9e7561bcbab267e3f64a4f6509edc00ae0de1519
+  RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
   RNScreens: 2ad555d4d9fa10b91bb765ca07fe9b29d59573f0
   RNShare: 106a76243ac90f43ddb9028dcb78ade406b8adff
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
