@@ -20,6 +20,7 @@ import { SvgXml } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
+import { CustomButton } from 'app/components/custom-button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -62,49 +63,44 @@ export const AddAccount: React.FC<Prop> = ({
   }, [password, name, biometricEnable, onAdded]);
 
   return (
-    <View>
-      <KeyboardAwareScrollView style={styles.wrapper}>
+    <KeyboardAwareScrollView style={styles.wrapper}>
+      <View style={styles.elementWrapper}>
+        <View style={styles.inputWrapper}>
+          <SvgXml xml={ProfileSVG} />
+          <TextInput
+            style={styles.textInput}
+            placeholder={i18n.t('pass_setup_input0')}
+            defaultValue={name}
+            placeholderTextColor="#2B2E33"
+            onChangeText={setName}
+          />
+        </View>
+        <Text style={styles.label}>
+          {i18n.t('pass_setup_label0')}
+        </Text>
+      </View>
+      {!biometricEnable ? (
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
-            <SvgXml xml={ProfileSVG} />
+            <SvgXml xml={LockSVG} />
             <TextInput
               style={styles.textInput}
-              placeholder={i18n.t('pass_setup_input0')}
-              defaultValue={name}
+              secureTextEntry={true}
+              placeholder={i18n.t('pass_setup_input1')}
               placeholderTextColor="#2B2E33"
-              onChangeText={setName}
+              onChangeText={setPassword}
             />
+            <Text style={styles.errorMessage}>
+              {passwordError}
+            </Text>
           </View>
-          <Text style={styles.label}>
-            {i18n.t('pass_setup_label0')}
-          </Text>
         </View>
-        {!biometricEnable ? (
-          <View style={styles.elementWrapper}>
-            <View style={styles.inputWrapper}>
-              <SvgXml xml={LockSVG} />
-              <TextInput
-                style={styles.textInput}
-                secureTextEntry={true}
-                placeholder={i18n.t('pass_setup_input1')}
-                placeholderTextColor="#2B2E33"
-                onChangeText={setPassword}
-              />
-              <Text style={styles.errorMessage}>
-                {passwordError}
-              </Text>
-            </View>
-          </View>
-        ) : null}
-      </KeyboardAwareScrollView>
-      <View style={{ marginBottom: '10%' }}>
-        <Button
-          title={i18n.t('create_account_btn')}
-          color={theme.colors.primary}
-          onPress={handleCreate}
-        />
-      </View>
-    </View>
+      ) : null}
+      <CustomButton
+        title={i18n.t('create_account_btn')}
+        onPress={handleCreate}
+      />
+    </KeyboardAwareScrollView>
   );
 };
 

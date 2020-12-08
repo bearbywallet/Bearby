@@ -86,7 +86,6 @@ export const ImportAccount: React.FC = ({
 const styles = StyleSheet.create({
   wrapper: {
     paddingHorizontal: 15,
-    minHeight: height / 4,
     justifyContent: 'space-around'
   },
   text: {
@@ -97,6 +96,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     color: theme.colors.white,
     padding: 20,
-    fontSize: 23
+    fontSize: 23,
+    marginBottom: 30
   }
 });
