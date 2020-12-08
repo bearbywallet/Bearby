@@ -21,6 +21,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 import { CustomButton } from 'app/components/custom-button';
+import { AccountName } from 'app/components/account-name';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -64,21 +65,11 @@ export const AddAccount: React.FC<Prop> = ({
 
   return (
     <KeyboardAwareScrollView style={styles.wrapper}>
-      <View style={styles.elementWrapper}>
-        <View style={styles.inputWrapper}>
-          <SvgXml xml={ProfileSVG} />
-          <TextInput
-            style={styles.textInput}
-            placeholder={i18n.t('pass_setup_input0')}
-            defaultValue={name}
-            placeholderTextColor="#2B2E33"
-            onChangeText={setName}
-          />
-        </View>
-        <Text style={styles.label}>
-          {i18n.t('pass_setup_label0')}
-        </Text>
-      </View>
+      <AccountName
+        style={styles.elementWrapper}
+        name={name}
+        setName={setName}
+      />
       {!biometricEnable ? (
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
