@@ -23,7 +23,7 @@ import { theme } from 'app/styles';
 
 type Prop = {
   items: string[];
-  title: string;
+  title?: string;
   selected: number | string;
   style?: ViewStyle;
   onSelect?: (item: string, index: number) => void;
