@@ -17,6 +17,7 @@ export interface Account {
   base16: string;
   bech32: string;
   privKey?: string;
+  pubKey: string;
   balance: {
     [key: string]: {
       [key: string]: string;
