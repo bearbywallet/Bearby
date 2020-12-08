@@ -8,6 +8,9 @@
  */
 import BN from 'bn.js';
 import hashjs from 'hash.js';
+import elliptic from 'elliptic';
+
+const secp256k1 = new elliptic.ec('secp256k1');
 
 export function tohexString(hex: string) {
   return String(hex).toLowerCase().replace('0x', '');
@@ -60,4 +63,20 @@ export const getAddressFromPublicKey = (publicKey: string) => {
 
 export const isBech32 = (raw: string) => {
   return !!raw.match(/^zil1[qpzry9x8gf2tvdw0s3jn54khce6mua7l]{38}$/);
+};
+
+/**
+ * getPubKeyFromPrivateKey
+ *
+ * takes a hex-encoded string (private key) and returns its corresponding
+ * hex-encoded 33-byte public key.
+ *
+ * @param {string} privateKey
+ * @returns {string}
+ */
+export const getPubKeyFromPrivateKey = (privateKey: string) => {
+  const normalizedPrviateKey = tohexString(privateKey);
+  const keyPair = secp256k1.keyFromPrivate(normalizedPrviateKey, 'hex');
+
+  return keyPair.getPublic(true, 'hex');
 };
