@@ -39,11 +39,18 @@ export class KeychainControler {
     await this.secureKeychain.createKeychain(hashSum);
   }
 
-  public async encryptVault(decrypted: string, password: string) {
-    const hashSum = await sha256(password);
-    const encrypted = await this._encryptor.encrypt(hashSum, decrypted);
+  public async encryptVault(decrypted: string, password?: string) {
+    let hashSum: string;
 
-    return encrypted;
+    if (!password) {
+      hashSum = await this.secureKeychain.getGenericPassword();
+
+      return this._encryptor.encrypt(hashSum, decrypted);
+    }
+
+    hashSum = await sha256(password);
+
+    return this._encryptor.encrypt(hashSum, decrypted);
   }
 
   public async decryptVault(encrypted: EncryptedType, password?: string) {
