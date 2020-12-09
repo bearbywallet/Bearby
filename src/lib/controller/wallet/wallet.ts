@@ -85,6 +85,17 @@ export class WalletControler extends Mnemonic {
     return account;
   }
 
+  public async addPrivateKeyAccount(privatekey: string, name: string, password?: string) {
+    const account = await this.account.fromPrivateKey(privatekey, name);
+    const encryptedPrivateKey = await this.guard.auth.encryptVault(
+      privatekey, password
+    );
+
+    account.privKey = JSON.stringify(encryptedPrivateKey);
+
+    await this.account.add(account);
+  }
+
   public async getkeyPairs(account: Account, password?: string) {
     const mnemonic = await this.guard.getMnemonic(password);
     const keyPairs = await this.getKeyPair(mnemonic, account.index);
