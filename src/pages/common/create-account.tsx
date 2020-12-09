@@ -67,7 +67,10 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
       />
     ),
     [Tabs.import]: () => (
-      <ImportAccount onImported={handleCreate}/>
+      <ImportAccount
+        biometricEnable={authState.biometricEnable}
+        onImported={handleCreate}
+      />
     )
   });
 
