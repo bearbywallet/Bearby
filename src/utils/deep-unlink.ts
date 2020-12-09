@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export function deppUnlink(object: object) {
+export function deppUnlink<T>(object: object): T {
   return JSON.parse(
     JSON.stringify(object)
   );
