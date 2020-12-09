@@ -15,6 +15,7 @@ import {
   Button,
   Keyboard,
   ScrollView,
+  ActivityIndicator,
   StyleSheet
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
@@ -37,10 +38,13 @@ type Prop = {
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const authState = keystore.guard.auth.store.useValue();
+
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
+  const [loading, setLoading] = React.useState(false);
+
   const [accountName, setAccountName] = React.useState('');
-  const [password, setPassword] = React.useState('');
-  const [passwordConfirm, setPasswordConfirm] = React.useState('');
+  const [password, setPassword] = React.useState('qazqaz');
+  const [passwordConfirm, setPasswordConfirm] = React.useState('qazqaz');
   const [isBiometric, setIsBiometric] = React.useState(true);
   const [biometric, setBiometric] = React.useState<string>();
 
@@ -60,6 +64,8 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
    * Create Keystore and account by KeyPairs.
    */
   const handleCreate = React.useCallback(async() => {
+    setLoading(true);
+
     try {
       await keystore.initWallet(password, mnemonicPhrase);
       await keystore.account.reset();
@@ -73,7 +79,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
     } catch (err) {
       console.error(err);
     }
-  }, [password, mnemonicPhrase, accountName, isBiometric]);
+
+    setLoading(false);
+  }, [password, mnemonicPhrase, accountName, isBiometric, setLoading]);
 
   React.useEffect(() => {
     const { accessControl } = authState;
@@ -147,12 +155,19 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           </Text>
         </View>
       </View>
-      <Button
-        title={i18n.t('pass_setup_btn')}
-        color={theme.colors.primary}
-        disabled={disabledContinue}
-        onPress={handleCreate}
-      />
+      {loading ? (
+        <ActivityIndicator
+          animating={loading}
+          color={theme.colors.primary}
+        />
+      ) : (
+        <Button
+          title={i18n.t('pass_setup_btn')}
+          color={theme.colors.primary}
+          disabled={disabledContinue}
+          onPress={handleCreate}
+        />
+      )}
     </ScrollView>
   );
 };
