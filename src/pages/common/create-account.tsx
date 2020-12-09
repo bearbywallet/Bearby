@@ -9,10 +9,7 @@
 
 import React from 'react';
 import {
-  View,
   Text,
-  TextInput,
-  Button,
   Dimensions,
   SafeAreaView,
   StyleSheet
