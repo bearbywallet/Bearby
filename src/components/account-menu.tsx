@@ -49,7 +49,7 @@ export const AccountMenu: React.FC<Prop> = ({
   }, [setIsModal]);
   const hanldeRemove = React.useCallback(() => {
     setIsModal(false);
-    setTimeout(() => onRemove(), 500);
+    setTimeout(() => onRemove(), 350);
   }, [setIsModal, onRemove]);
 
   return (
