@@ -41,6 +41,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   const [isConfirmModal, setIsConfirmModal] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
 
+  const account = React.useMemo(
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
+  );
+
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
       screen: 'CreateAccount'
@@ -59,9 +64,10 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     await keystore.account.balanceUpdate();
     setRefreshing(false);
   }, [setRefreshing]);
-  const handleRemoveAccount = React.useCallback(() => {
+  const handleRemoveAccount = React.useCallback(async() => {
+    await keystore.account.removeAccount(account);
     setIsConfirmModal(false);
-  }, [setIsConfirmModal]);
+  }, [account, setIsConfirmModal]);
   const hanldeSelectToken = React.useCallback((tokenIndex) => {
     navigation.navigate('App', {
       screen: 'History',
@@ -104,7 +110,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 rate={settingsState.rate[currencyState]}
                 currency={currencyState}
                 netwrok={networkState.selected}
-                account={accountState.identities[accountState.selectedAddress]}
+                account={account}
                 onCreateAccount={handleCreateAccount}
                 onReceive={() => setIsReceiveModal(true)}
                 onSend={handleSend}
@@ -116,13 +122,13 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         />
       </SafeAreaView>
       <ReceiveModal
-        account={accountState.identities[accountState.selectedAddress]}
+        account={account}
         visible={isReceiveModal}
         onTriggered={() => setIsReceiveModal(false)}
       />
       <SimpleConfirm
         title={i18n.t('remove_acc_title', {
-          name: accountState.identities[accountState.selectedAddress].name
+          name: account.name || ''
         })}
         description={i18n.t('remove_seed_acc_des')}
         btns={[i18n.t('reject'), i18n.t('confirm')]}
