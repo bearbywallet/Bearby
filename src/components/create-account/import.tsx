@@ -20,12 +20,14 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { CustomButton } from 'app/components/custom-button';
 import { Selector } from 'app/components/selector';
 import { AccountName } from 'app/components/account-name';
+import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 
 type Prop = {
+  biometricEnable: boolean;
   onImported: () => void;
 };
 
@@ -35,6 +37,7 @@ const variants = [
   'Ledger'
 ];
 export const ImportAccount: React.FC<Prop> = ({
+  biometricEnable,
   onImported
 }) => {
   const [loading, setLoading] = React.useState(false);
@@ -45,6 +48,8 @@ export const ImportAccount: React.FC<Prop> = ({
   );
   const [privateKey, setPrivateKey] = React.useState<string | null>(null);
   const [privKeyErr, setPrivKeyErr] = React.useState('');
+  const [password, setPassword] = React.useState<string | undefined>();
+  const [passwordError, setPasswordError] = React.useState(' ');
 
   const disabled = React.useMemo(() => {
     if (variants[0] === selected) {
@@ -58,11 +63,11 @@ export const ImportAccount: React.FC<Prop> = ({
     setLoading(true);
     if (variants[0] === selected && privateKey) {
       try {
-        const account = await keystore
-          .account
-          .fromPrivateKey(privateKey, accName);
-        await keystore.account.add(account);
-
+        await keystore.addPrivateKeyAccount(
+          privateKey,
+          accName,
+          password
+        );
         onImported();
       } catch (err) {
         setPrivKeyErr(err.message);
@@ -74,7 +79,7 @@ export const ImportAccount: React.FC<Prop> = ({
     }
 
     setLoading(false);
-  }, [privateKey, selected, accName, onImported, setPrivKeyErr]);
+  }, [password, privateKey, selected, accName, onImported, setPrivKeyErr]);
   const hanldeLedgerChange = React.useCallback((num) => {
     const index = Number(num);
 
@@ -128,6 +133,14 @@ export const ImportAccount: React.FC<Prop> = ({
             <Text style={styles.errorMessage}>
               {privKeyErr}
             </Text>
+            {!biometricEnable ? (
+              <Passwordinput
+                style={{ marginVertical: 15 }}
+                passwordError={passwordError}
+                placeholder={i18n.t('pass_setup_input1')}
+                onChange={setPassword}
+              />
+            ) : null}
           </View>
         ) : null}
         {variants[1] === selected ? (
