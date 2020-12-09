@@ -123,6 +123,17 @@ export class AccountControler {
     return this.update(this.store.get());
   }
 
+  public async removeAccount(account: Account) {
+    const state = deppUnlink<AccountState>(this.store.get());
+
+    state.identities = state.identities.filter(
+      (acc) => account.base16 !== acc.base16
+    );
+    state.selectedAddress = state.identities.length - 1;
+
+    await this.update(state);
+  }
+
   public update(accountState: AccountState): Promise<void> {
     accountStoreUpdate(accountState);
 

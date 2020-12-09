@@ -68,13 +68,13 @@ export const SimpleConfirm: React.FC<Prop> = ({
           <CustomButton
             title={btns[0]}
             style={styles.btn}
-            onPress={onConfirmed}
+            onPress={onTriggered}
           />
           <CustomButton
             title={btns[1]}
             color={theme.colors.danger}
             style={{ ...styles.btn, ...styles.btnConfirm }}
-            onPress={onTriggered}
+            onPress={onConfirmed}
           />
         </View>
       </ModalWrapper>
