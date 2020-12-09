@@ -19,9 +19,10 @@ import {
 import { SvgXml } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { ProfileSVG, LockSVG } from 'app/components/svg';
+import { LockSVG } from 'app/components/svg';
 import { CustomButton } from 'app/components/custom-button';
 import { AccountName } from 'app/components/account-name';
+import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -39,6 +40,7 @@ export const AddAccount: React.FC<Prop> = ({
   newIndex,
   onAdded
 }) => {
+  const [loading, setLoading] = React.useState(false);
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
   const [name, setName] = React.useState(i18n.t('create_account_name', {
@@ -46,10 +48,12 @@ export const AddAccount: React.FC<Prop> = ({
   }));
 
   const handleCreate = React.useCallback(async() => {
+    setLoading(true);
     if (biometricEnable) {
       await keystore.addNextAccount(name);
       await keystore.transaction.sync();
 
+      setLoading(false);
       return onAdded();
     }
 
@@ -57,10 +61,11 @@ export const AddAccount: React.FC<Prop> = ({
       await keystore.addNextAccount(name, password);
       await keystore.transaction.sync();
 
-      return onAdded();
+      onAdded();
     } catch (err) {
       setPasswordError(i18n.t('lock_error'));
     }
+    setLoading(false);
   }, [password, name, biometricEnable, onAdded]);
 
   return (
@@ -71,23 +76,15 @@ export const AddAccount: React.FC<Prop> = ({
         setName={setName}
       />
       {!biometricEnable ? (
-        <View style={styles.elementWrapper}>
-          <View style={styles.inputWrapper}>
-            <SvgXml xml={LockSVG} />
-            <TextInput
-              style={styles.textInput}
-              secureTextEntry={true}
-              placeholder={i18n.t('pass_setup_input1')}
-              placeholderTextColor="#2B2E33"
-              onChangeText={setPassword}
-            />
-            <Text style={styles.errorMessage}>
-              {passwordError}
-            </Text>
-          </View>
-        </View>
+        <Passwordinput
+          style={styles.elementWrapper}
+          passwordError={passwordError}
+          placeholder={i18n.t('pass_setup_input1')}
+          onChange={setPassword}
+        />
       ) : null}
       <CustomButton
+        isLoading={loading}
         title={i18n.t('create_account_btn')}
         onPress={handleCreate}
       />
