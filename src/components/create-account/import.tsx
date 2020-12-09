@@ -40,9 +40,12 @@ export const ImportAccount: React.FC<Prop> = ({
   biometricEnable,
   onImported
 }) => {
+  const accountState = keystore.account.store.useValue();
+
   const [loading, setLoading] = React.useState(false);
   const [selected, setSelected] = React.useState(variants[0]);
-  const [accName, setAccName] = React.useState(`Imported ${keystore.account.lastIndexLedger}`);
+  const [lastindex, setlastindex] = React.useState(keystore.account.lastIndexLedger);
+  const [accName, setAccName] = React.useState(`Imported ${lastindex}`);
   const [ledgerIndex, setLedgerIndex] = React.useState(
     keystore.account.lastIndexLedger
   );
@@ -90,21 +93,23 @@ export const ImportAccount: React.FC<Prop> = ({
   const handleChangeType = React.useCallback((value) => {
     setSelected(value);
     setPrivKeyErr('');
-
-    if (value === variants[0]) {
-      setAccName(i18n.t('acc_name_key', {
-        index: keystore.account.lastIndexPrivKey
-      }));
-    } else if (value === variants[1]) {
-      setAccName(i18n.t('acc_name_ledger', {
-        index: keystore.account.lastIndexLedger
-      }));
-    }
   }, [setSelected, setAccName]);
   const hanldeChangePrivKey = React.useCallback((value) => {
     setPrivKeyErr('');
     setPrivateKey(value);
   }, [setPrivateKey, setPrivKeyErr]);
+
+  React.useEffect(() => {
+    if (selected === variants[0]) {
+      setAccName(i18n.t('acc_name_key', {
+        index: keystore.account.lastIndexPrivKey
+      }));
+    } else if (selected === variants[1]) {
+      setAccName(i18n.t('acc_name_ledger', {
+        index: keystore.account.lastIndexLedger
+      }));
+    }
+  }, [selected, accountState, setlastindex]);
 
   return (
     <KeyboardAwareScrollView>
