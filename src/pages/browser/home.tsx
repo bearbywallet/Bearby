@@ -45,7 +45,7 @@ enum Tabs {
 
 const { height, width } = Dimensions.get('window');
 const initialLayout = { width };
-export const BrowserPage: React.FC<Prop> = ({ navigation }) => {
+export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
 
   const [isConfirmModal, setIsConfirmModal] = React.useState(false);
@@ -174,4 +174,4 @@ const styles = StyleSheet.create({
   }
 });
 
-export default BrowserPage;
+export default BrowserHomePage;

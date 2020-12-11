@@ -18,7 +18,7 @@ import {
 } from 'app/components/svg';
 
 import HomePage from 'app/pages/home';
-import { BrowserPage } from 'app/pages/browser';
+import { browserNav } from 'app/navigator/browser';
 import { SettingsPage } from 'app/pages/settings';
 import { HistoryPage } from 'app/pages/history';
 
@@ -80,7 +80,7 @@ export const TabNavigator: React.FC = () => {
       />
       <TabStack.Screen
         name="Browser"
-        component={BrowserPage}
+        component={browserNav}
         options={{
           tabBarLabel: I18n.t('browser'),
           tabBarIcon: ({ color }) => (
