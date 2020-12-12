@@ -8,7 +8,6 @@
  */
 import React from 'react';
 import {
-  View,
   TouchableOpacity,
   Text,
   StyleSheet,
@@ -18,7 +17,6 @@ import { SvgXml } from 'react-native-svg';
 
 import { ArrowIconSVG } from './svg';
 
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;

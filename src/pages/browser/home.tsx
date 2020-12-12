@@ -20,7 +20,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
-import { SimpleConfirm } from 'app/components/modals';
 import { SearchIconSVG } from 'app/components/svg';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
@@ -31,11 +30,13 @@ import {
 
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
+import { onUrlSubmit } from 'app/utils';
 import i18n from 'app/lib/i18n';
-import { RootParamList } from 'app/navigator';
+import { BrwoserStackParamList } from 'app/navigator/browser';
+// import { RootParamList } from 'app/navigator';
 
 type Prop = {
-  navigation: StackNavigationProp<RootParamList>;
+  navigation: StackNavigationProp<BrwoserStackParamList>;
 };
 
 enum Tabs {
@@ -48,7 +49,8 @@ const initialLayout = { width };
 export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
 
-  const [isConfirmModal, setIsConfirmModal] = React.useState(false);
+  const [search, setSearch] = React.useState<string>('');
+
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: Tabs.apps, title: i18n.t('apps') },
@@ -60,15 +62,13 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     [accountState]
   );
 
-  const handleRemoveAccount = React.useCallback(async() => {
-    await keystore.account.removeAccount(account);
-    setIsConfirmModal(false);
-  }, [account, setIsConfirmModal]);
-  const handleCreateAccount = React.useCallback(() => {
-    navigation.navigate('Common', {
-      screen: 'CreateAccount'
+  const hanldeSearch = React.useCallback(() => {
+    const url = onUrlSubmit(search);
+
+    navigation.navigate('Web', {
+      url
     });
-  }, []);
+  }, [search]);
 
   const renderScene = SceneMap({
     [Tabs.apps]: () => (
@@ -83,11 +83,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     <React.Fragment>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <AccountMenu
-            accountName={account.name}
-            onCreate={handleCreateAccount}
-            onRemove={() => setIsConfirmModal(true)}
-          />
+          <AccountMenu accountName={account.name} />
           <View style={styles.headerWraper}>
             <Text style={styles.headerTitle}>
               {i18n.t('browser_title')}
@@ -99,9 +95,11 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
             <SvgXml xml={SearchIconSVG} />
             <TextInput
               style={styles.textInput}
+              textContentType={'URL'}
               placeholder={i18n.t('browser_placeholder_input')}
               placeholderTextColor="#8A8A8F"
-              onChangeText={() => null}
+              onChangeText={setSearch}
+              onSubmitEditing={hanldeSearch}
             />
           </View>
           <TabView
@@ -114,16 +112,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           />
         </View>
       </SafeAreaView>
-      <SimpleConfirm
-        title={i18n.t('remove_acc_title', {
-          name: account.name || ''
-        })}
-        description={i18n.t('remove_seed_acc_des')}
-        btns={[i18n.t('reject'), i18n.t('confirm')]}
-        visible={isConfirmModal}
-        onConfirmed={handleRemoveAccount}
-        onTriggered={() => setIsConfirmModal(false)}
-      />
     </React.Fragment>
   );
 };
