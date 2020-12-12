@@ -18,7 +18,7 @@ import {
 } from 'app/components/svg';
 
 import HomePage from 'app/pages/home';
-import { browserNav } from 'app/navigator/browser';
+import { browserNav, BrwoserStackParamList } from 'app/navigator/browser';
 import { SettingsPage } from 'app/pages/settings';
 import { HistoryPage } from 'app/pages/history';
 
@@ -30,7 +30,7 @@ export type TabStackParamList = {
   History: {
     tokenIndex?: number;
   };
-  Browser: undefined;
+  Browser: BrwoserStackParamList;
   Settings: undefined;
 };
 
