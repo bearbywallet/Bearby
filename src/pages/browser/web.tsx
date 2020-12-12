@@ -9,25 +9,141 @@
 
 import React from 'react';
 import {
-  StyleSheet
+  StyleSheet,
+  Text,
+  Dimensions,
+  SafeAreaView,
+  TouchableOpacity,
+  View
 } from 'react-native';
+import URL from 'url-parse';
 import { WebView } from 'react-native-webview';
+import { SvgXml } from 'react-native-svg';
+import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
+
+import {
+  ArrowIconSVG,
+  HomeIconSVG,
+  LockSVG
+} from 'app/components/svg';
 
 import { theme } from 'app/styles';
+import { RouteProp } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
+import { BrwoserStackParamList } from 'app/navigator/browser';
+
+type Prop = {
+  navigation: StackNavigationProp<BrwoserStackParamList>;
+  route: RouteProp<BrwoserStackParamList, 'Web'>;
+};
 
 const INJECTED_JAVASCRIPT = `(function() {
   // window.alert('dasdsa')
 })();`;
 
-export const WebViewPage = () => {
+const { width, height } = Dimensions.get('window');
+export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
+  const webViewRef = React.useRef<null | WebView>(null);
+
+  const [url, setUrl] = React.useState(new URL(route.params.url));
+  const [loadingProgress, setLoadingProgress] = React.useState(0);
+  const [canGoBack, setCanGoBack] = React.useState(false);
+  const [canGoForward, setCanGoForward] = React.useState(false);
+
+  const hanldeback = React.useCallback(() => {
+    if (!canGoBack) {
+      return navigation.goBack();
+    } else if (webViewRef && webViewRef.current) {
+      webViewRef.current.goBack();
+    }
+  }, [canGoBack, webViewRef]);
+  const hanldeGoForward = React.useCallback(() => {
+    if (webViewRef && webViewRef.current) {
+      webViewRef.current.goForward();
+    }
+  }, [canGoBack]);
+
+  const handleLoaded = React.useCallback(({ nativeEvent }: WebViewProgressEvent) => {
+    setLoadingProgress(nativeEvent.progress);
+    setCanGoBack(nativeEvent.canGoBack);
+    setCanGoForward(nativeEvent.canGoForward);
+  }, [setLoadingProgress, setCanGoBack, setCanGoForward]);
+
+  const handleMessage = React.useCallback((event) => {
+    //
+  }, []);
+
   return (
-    <WebView
+    <SafeAreaView style={styles.container}>
+      <View style={styles.nav}>
+        <View style={styles.navBtns}>
+          <TouchableOpacity onPress={hanldeback}>
+            <SvgXml
+              xml={ArrowIconSVG}
+              height="30"
+              width="30"
+              fill={theme.colors.primary}
+              style={{
+                transform: [{ rotate: '90deg' }]
+              }}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity
+            disabled={!canGoForward}
+            onPress={hanldeGoForward}
+          >
+            <SvgXml
+              xml={ArrowIconSVG}
+              height="30"
+              width="30"
+              fill={canGoForward ? theme.colors.primary : theme.colors.muted}
+              style={{
+                transform: [{ rotate: '-90deg' }],
+                marginLeft: 15
+              }}
+            />
+          </TouchableOpacity>
+        </View>
+        <View style={styles.hostWrapper}>
+          <SvgXml
+            xml={LockSVG}
+            height="15"
+            width="15"
+            fill={url.protocol.includes('https') ? theme.colors.white : theme.colors.danger}
+          />
+          <Text style={styles.host}>
+            {url.hostname}
+          </Text>
+        </View>
+        <TouchableOpacity
+          style={styles.tabs}
+        >
+          <Text style={styles.tabsAmount}>
+            5
+          </Text>
+        </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.dotsWrapper}
+        >
+          <View style={styles.dot}/>
+          <View style={styles.dot}/>
+          <View style={styles.dot}/>
+        </TouchableOpacity>
+      </View>
+      {loadingProgress !== 1 ? (
+        <View style={[styles.loading, { width: width * loadingProgress }]}/>
+      ) : null}
+      <WebView
+        ref={webViewRef}
         source={{
-          uri: 'https://zilpay.xyz'
+          uri: route.params.url
         }}
+        style={{ zIndex: 99 }}
         injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
-        style={styles.container}
+        onMessage={handleMessage}
+        onLoadProgress={handleLoaded}
       />
+    </SafeAreaView>
   );
 };
 
@@ -35,7 +151,62 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
+    zIndex: 1,
     backgroundColor: theme.colors.black
+  },
+  nav: {
+    height: 50,
+    backgroundColor: theme.colors.black,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-around',
+    paddingHorizontal: 15
+  },
+  navBtns: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
+  },
+  loading: {
+    height: 3,
+    backgroundColor: theme.colors.primary
+  },
+  hostWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center'
+  },
+  host: {
+    color: theme.colors.white,
+    fontWeight: 'bold',
+    fontSize: 17,
+    lineHeight: 22
+  },
+  tabs: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 2,
+    height: 30,
+    width: 30,
+    borderWidth: 1,
+    borderColor: theme.colors.primary
+  },
+  tabsAmount: {
+    color: theme.colors.primary,
+    fontWeight: 'bold',
+    fontSize: 17,
+    lineHeight: 22
+  },
+  dotsWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    height: '100%',
+    width: 15
+  },
+  dot: {
+    backgroundColor: theme.colors.primary,
+    borderRadius: 100,
+    height: 5,
+    width: 5,
+    marginLeft: 3
   }
 });
 
