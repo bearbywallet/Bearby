@@ -6,10 +6,17 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import hashjs from 'hash.js';
-import { Buffer } from 'buffer';
-import BN from 'bn.js';
+import { eddsa } from 'elliptic';
 
-import { Signature } from './signature';
+export class SchnorrControl {
+  private _ed25519 = new eddsa('ed25519');
+  private _key: eddsa.KeyPair;
 
-export class SchnorrControl {}
+  constructor(privateKey: string) {
+    this._key = this._ed25519.keyFromSecret(privateKey);
+  }
+
+  public sign(msg: string) {
+    return this._key.sign(msg).toHex();
+  }
+}
