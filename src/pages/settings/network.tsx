@@ -12,9 +12,9 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  Button,
-  SafeAreaView
+  Button
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';

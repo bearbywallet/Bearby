@@ -9,9 +9,10 @@
 import React from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
-  StatusBar,
-  SafeAreaView
+  StatusBar
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
+
 import LottieView from 'lottie-react-native';
 
 import { keystore } from 'app/keystore';

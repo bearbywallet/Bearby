@@ -12,11 +12,11 @@ import {
   StyleSheet,
   Text,
   Dimensions,
-  SafeAreaView,
   TouchableOpacity,
   View
 } from 'react-native';
 import URL from 'url-parse';
+import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
 import { SvgXml } from 'react-native-svg';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
@@ -40,7 +40,7 @@ const INJECTED_JAVASCRIPT = `(function() {
   // window.alert('dasdsa')
 })();`;
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const webViewRef = React.useRef<null | WebView>(null);
 
@@ -144,11 +144,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     backgroundColor: theme.colors.black
   },
   nav: {

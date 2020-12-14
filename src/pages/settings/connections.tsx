@@ -12,9 +12,9 @@ import {
   Text,
   Button,
   ScrollView,
-  StyleSheet,
-  SafeAreaView
+  StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { ConnectItem } from 'app/components/connect-item';
 

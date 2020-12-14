@@ -13,9 +13,9 @@ import {
   Text,
   Linking,
   Button,
-  Dimensions,
-  SafeAreaView
+  Dimensions
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 

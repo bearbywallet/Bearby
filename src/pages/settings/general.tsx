@@ -12,9 +12,9 @@ import {
   Text,
   Button,
   ScrollView,
-  SafeAreaView,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
 

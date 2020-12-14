@@ -11,11 +11,11 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   Dimensions,
   Text,
   Button
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { theme } from 'app/styles';

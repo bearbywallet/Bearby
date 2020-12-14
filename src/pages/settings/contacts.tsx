@@ -12,9 +12,9 @@ import {
   Text,
   Button,
   ScrollView,
-  SafeAreaView,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { ContactItem } from 'app/components/contact-item';

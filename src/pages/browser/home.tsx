@@ -9,13 +9,13 @@
 
 import React from 'react';
 import {
-  SafeAreaView,
   View,
   Text,
   Dimensions,
   TextInput,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { SvgXml } from 'react-native-svg';
 

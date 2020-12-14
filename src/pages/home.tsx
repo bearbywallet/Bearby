@@ -12,9 +12,9 @@ import {
   View,
   StyleSheet,
   FlatList,
-  RefreshControl,
-  SafeAreaView
+  RefreshControl
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { HomeAccount, HomeTokens } from 'app/components/home';

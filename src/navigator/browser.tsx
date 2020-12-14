@@ -14,9 +14,6 @@ import {
   WebViewPage
 } from 'app/pages/browser';
 
-import { headerOptions } from 'app/config';
-import i18n from 'app/lib/i18n';
-
 export type BrwoserStackParamList = {
   Browser: undefined;
   Web: {
@@ -26,12 +23,11 @@ export type BrwoserStackParamList = {
 
 const BrowserStack = createStackNavigator<BrwoserStackParamList>();
 export const browserNav: React.FC = () => (
-  <BrowserStack.Navigator>
+  <BrowserStack.Navigator headerMode="none">
     <BrowserStack.Screen
       name="Browser"
       component={BrowserHomePage}
       options={{
-        header: () => null,
         title: ''
       }}
     />
@@ -39,7 +35,6 @@ export const browserNav: React.FC = () => (
       name="Web"
       component={WebViewPage}
       options={{
-        header: () => null,
         title: ''
       }}
     />

@@ -9,12 +9,12 @@
 import React from 'react';
 import {
   View,
-  SafeAreaView,
   Text,
   Button,
   ScrollView,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Selector } from 'app/components/selector';

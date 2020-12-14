@@ -10,7 +10,6 @@
 import React from 'react';
 import {
   View,
-  SafeAreaView,
   Text,
   Button,
   FlatList,
@@ -18,6 +17,7 @@ import {
   RefreshControl,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 

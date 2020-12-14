@@ -78,7 +78,6 @@ export const AccountMenu: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
-    padding: 10
   },
   wrapper: {
     flexDirection: 'row',

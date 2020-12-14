@@ -11,10 +11,10 @@ import React from 'react';
 import {
   View,
   Dimensions,
-  SafeAreaView,
   StyleSheet
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { CustomButton } from 'app/components/custom-button';

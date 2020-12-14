@@ -10,12 +10,12 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  SafeAreaView,
   Text,
   ScrollView,
   Dimensions,
   Button
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import i18n from 'app/lib/i18n';

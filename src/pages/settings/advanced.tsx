@@ -12,9 +12,9 @@ import {
   StyleSheet,
   Text,
   Button,
-  ScrollView,
-  SafeAreaView
+  ScrollView
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { GasSelector } from 'app/components/gas-selector';
 import { Selector } from 'app/components/selector';

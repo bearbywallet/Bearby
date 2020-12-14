@@ -11,9 +11,9 @@ import React from 'react';
 import {
   Text,
   Dimensions,
-  SafeAreaView,
   StyleSheet
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TabView, SceneMap } from 'react-native-tab-view';
 

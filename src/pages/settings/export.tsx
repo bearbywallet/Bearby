@@ -10,10 +10,9 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text,
-  Button,
-  SafeAreaView
+  Text
 } from 'react-native';
+import SafeAreaView from 'react-native-safe-area-view';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 

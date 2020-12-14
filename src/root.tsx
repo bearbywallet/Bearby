@@ -10,6 +10,7 @@ import React from 'react';
 import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
 
 import Navigator from './navigator';
 import { theme } from './styles';
@@ -17,7 +18,9 @@ import { theme } from './styles';
 export default function Root() {
   return (
     <NavigationContainer theme={theme}>
-      <Navigator />
+      <SafeAreaProvider>
+        <Navigator />
+      </SafeAreaProvider>
       <StatusBar barStyle="light-content"/>
     </NavigationContainer>
   );
