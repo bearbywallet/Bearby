@@ -22,7 +22,7 @@ import { theme } from 'app/styles';
 
 type Prop = {
 };
-const categories = [
+export const categories = [
   'games',
   'finance',
   'social',
@@ -48,6 +48,7 @@ export const BrowserApps: React.FC<Prop> = ({}) => {
           <BrowserCarditem
             style={{ marginTop: 15 }}
             key={index}
+            el={c}
             title={i18n.t(c)}
           />
         ))}
