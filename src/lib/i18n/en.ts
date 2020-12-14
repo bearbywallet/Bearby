@@ -122,6 +122,7 @@ export default {
   browser_placeholder_input: 'Search or ZNS',
   lock_title: 'Welcome back',
   lock_btn: 'Unlock',
+  lock_btn1: 'New wallet',
   lock_error: 'Password is incorrect!',
   restore_title: 'Restore wallet',
   successfully_title: 'Your wallet was successfully created!',

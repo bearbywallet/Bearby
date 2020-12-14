@@ -31,7 +31,7 @@ type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export const LockPage: React.FC<Prop> = ({ navigation }) => {
   const authState = keystore.guard.auth.store.useValue();
   const [password, setPassword] = React.useState('');
@@ -109,11 +109,20 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
             {passwordError}
           </Text>
         </View>
-        <Button
-          title={i18n.t('lock_btn')}
-          color={theme.colors.primary}
-          onPress={hanldeUnlock}
-        />
+        <View style={styles.btnsWrapper}>
+          <Button
+            title={i18n.t('lock_btn1')}
+            color={theme.colors.muted}
+            onPress={() => navigation.navigate('Unauthorized', {
+              screen: 'LetStart'
+            })}
+          />
+          <Button
+            title={i18n.t('lock_btn')}
+            color={theme.colors.primary}
+            onPress={hanldeUnlock}
+          />
+        </View>
       </View>
     </KeyboardAwareScrollView>
   );
@@ -127,7 +136,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: '50%'
+    marginBottom: 190
   },
   textInput: {
     fontSize: 17,
@@ -147,14 +156,19 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1
   },
   pageContainer: {
-    paddingTop: '100%',
-    padding: 60
+    height,
+    padding: 60,
+    justifyContent: 'flex-end'
   },
   title: {
     fontWeight: 'bold',
     color: theme.colors.white,
     lineHeight: 41,
     fontSize: 34
+  },
+  btnsWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between'
   }
 });
 

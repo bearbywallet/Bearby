@@ -9,14 +9,13 @@
 import React from 'react';
 import { StackNavigationProp } from '@react-navigation/stack';
 import {
-  ActivityIndicator,
   StatusBar,
-  View,
+  SafeAreaView
 } from 'react-native';
+import LottieView from 'lottie-react-native';
 
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
-import { theme } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -39,14 +38,19 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <View style={{
-      flex: 1,
-      justifyContent: 'center',
-      backgroundColor: theme.colors.black
-    }}>
-      <ActivityIndicator />
-      <StatusBar barStyle="default" />
-    </View>
+    <React.Fragment>
+      <StatusBar barStyle="light-content" />
+      <SafeAreaView style={{
+        flex: 1,
+        backgroundColor: '#09090c'
+      }}>
+        <LottieView
+          source={require('app/assets/loader')}
+          autoPlay
+          loop
+        />
+      </SafeAreaView>
+    </React.Fragment>
   );
 };
 

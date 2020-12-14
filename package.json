@@ -27,6 +27,8 @@
     "elliptic": "^6.5.3",
     "expo-asset": "^8.2.0",
     "hash.js": "^1.1.7",
+    "lottie-ios": "^3.1.9",
+    "lottie-react-native": "^3.5.0",
     "process": "^0.11.10",
     "react": "17.0.1",
     "react-native": "^0.63.3",

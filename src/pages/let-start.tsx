@@ -33,8 +33,8 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
-          width={width + width / 5}
-          height={width + width / 5}
+          width={width + width / 6}
+          height={width + width / 6}
         />
       </View>
       <View style={styles.pageContainer}>
