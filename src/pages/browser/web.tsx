@@ -23,7 +23,6 @@ import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
 import {
   ArrowIconSVG,
-  HomeIconSVG,
   LockSVG
 } from 'app/components/svg';
 
@@ -138,7 +137,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         source={{
           uri: route.params.url
         }}
-        style={{ zIndex: 99 }}
         injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
@@ -151,7 +149,6 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     flexDirection: 'column',
-    zIndex: 1,
     backgroundColor: theme.colors.black
   },
   nav: {

@@ -76,8 +76,8 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
     <KeyboardAwareScrollView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
-          width={width + width / 2}
-          height={width + width / 2}
+          width={width + width / 6}
+          height={width + width / 6}
         />
       </View>
       <View style={styles.pageContainer}>

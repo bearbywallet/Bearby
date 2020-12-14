@@ -16,7 +16,7 @@ import {
 } from 'react-native';
 
 import { AccountMenu } from 'app/components/account-menu';
-import CreateBackground from 'app/assets/get_started_1.svg';
+import CreateBackground from 'app/assets/logo.svg';
 
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
@@ -66,9 +66,9 @@ export const HomeAccount: React.FC<Prop> = ({
   return (
     <View style={styles.container}>
       <CreateBackground
-          width={width + width / 2}
-          height={width + width / 1.5}
-        />
+        width={width + width / 2}
+        height={width + width / 1.5}
+      />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
         <AccountMenu
           accountName={account.name}
@@ -109,10 +109,11 @@ const styles = StyleSheet.create({
     width: '100%',
     height: height / 3,
     alignItems: 'center',
-    justifyContent: 'center'
+    justifyContent: 'center',
+    paddingTop: '10%'
   },
   content: {
-    top: 0,
+    top: '10%',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingBottom: 15

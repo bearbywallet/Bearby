@@ -33,8 +33,8 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
     <SafeAreaView style={styles.container}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
-          width={width + width / 2}
-          height={width + width / 2}
+          width={width + width / 5}
+          height={width + width / 5}
         />
       </View>
       <View style={styles.pageContainer}>
@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
   },
   backgroundImage: {
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
+    marginBottom: 200
   },
   pageContainer: {
     justifyContent: 'flex-end',

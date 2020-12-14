@@ -43,8 +43,8 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [loading, setLoading] = React.useState(false);
 
   const [accountName, setAccountName] = React.useState('');
-  const [password, setPassword] = React.useState('qazqaz');
-  const [passwordConfirm, setPasswordConfirm] = React.useState('qazqaz');
+  const [password, setPassword] = React.useState('');
+  const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [isBiometric, setIsBiometric] = React.useState(true);
   const [biometric, setBiometric] = React.useState<string>();
 
