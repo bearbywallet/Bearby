@@ -12,13 +12,11 @@ import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
 import { Token, Account } from 'types';
 import { tohexString } from 'app/utils/address';
-import { SchnorrControl } from 'app/lib/controller';
 
 type Params = string[] | number[] | (string | string[] | number[])[];
 
 export class ZilliqaControl {
   private _network: NetworkControll;
-  private _schnorr: SchnorrControl;
 
   constructor(network: NetworkControll) {
     this._network = network;
@@ -120,8 +118,27 @@ export class ZilliqaControl {
     return data.result;
   }
 
+  public async getNetworkId() {
+
+    const request = this._json(Methods.GetNetworkId, []);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return Number(data.result);
+  }
+
   public async send(amount: string, to: string, token: Token, account: Account) {
     // TODO: make sender with sign method.
+    // const params = {
+    //   amount,
+    //   code: '',
+    //   data: '',
+    //   gasLimit
+    // };
     return new Promise((resolve) => {
       setTimeout(() => resolve(true), 2000);
     });
