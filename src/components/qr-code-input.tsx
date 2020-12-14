@@ -25,7 +25,6 @@ import { colors, theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
-  label?: string;
   error?: string;
   placeholder?: string;
   value: string;
@@ -35,7 +34,6 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const QrCodeInput: React.FC<Prop> = ({
   style,
-  label,
   value,
   error,
   placeholder,

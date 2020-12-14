@@ -26,8 +26,7 @@ import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import {
   isBech32,
-  fromBech32Address,
-  toZRC1
+  fromBech32Address
 } from 'app/utils';
 
 type Prop = {
@@ -44,11 +43,18 @@ export const AddTokenModal: React.FC<Prop> = ({
   onTriggered
 }) => {
   const [address, setAddress] = React.useState<string>('');
-  const [errorMessage, setErrorMessage] = React.useState<string>(' ');
+  const [errorMessage, setErrorMessage] = React.useState<string | undefined>();
 
-  // const hanldeGetContract = React.useCallback((address) => {
-  // }, []);
+  const handleClose = React.useCallback(() => {
+    onTriggered();
+    setErrorMessage(undefined);
+    setAddress('');
+  }, [setErrorMessage, setAddress, onTriggered]);
+  const hanldeGetContract = React.useCallback(() => {
+    //
+  }, []);
   const handleAddressPass = React.useCallback(async(addr) => {
+    setErrorMessage(undefined);
     setAddress(addr);
 
     if (!isBech32(addr)) {
@@ -56,10 +62,12 @@ export const AddTokenModal: React.FC<Prop> = ({
     }
 
     const base16 = fromBech32Address(addr);
-    const init = await keystore.zilliqa.getSmartContractInit(base16);
-    const zrc = toZRC1(init);
 
-    // console.log(JSON.stringify(zrc, null, 4));
+    try {
+      await keystore.token.getToken(base16);
+    } catch (err) {
+      setErrorMessage(err.message);
+    }
   }, [setAddress, address]);
 
   return (
@@ -70,22 +78,26 @@ export const AddTokenModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
-      onBackdropPress={onTriggered}
+      onBackdropPress={handleClose}
     >
       <ModalWrapper style={{ ...style, ...styles.container }}>
-        <ModalTitle onClose={onTriggered}>
+        <ModalTitle onClose={handleClose}>
           {title}
         </ModalTitle>
-        <QrCodeInput
-          style={styles.input}
-          value={address}
-          placeholder={i18n.t('contract_address')}
-          onChange={handleAddressPass}
-        />
-        {/* <CustomButton
+        <View style={{
+          minHeight: 100
+        }}>
+          <QrCodeInput
+            value={address}
+            error={errorMessage}
+            placeholder={i18n.t('contract_address')}
+            onChange={handleAddressPass}
+          />
+        </View>
+        <CustomButton
           title={i18n.t('add_token')}
           onPress={hanldeGetContract}
-        /> */}
+        />
       </ModalWrapper>
     </Modal>
   );
@@ -96,13 +108,5 @@ const styles = StyleSheet.create({
   },
   inputLable: {
     color: '#8A8A8F'
-  },
-  error: {
-    color: theme.colors.danger,
-    marginTop: 4,
-    lineHeight: 22
-  },
-  input: {
-    marginVertical: 30
   }
 });

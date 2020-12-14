@@ -13,6 +13,7 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { STORAGE_FIELDS } from 'app/config';
 import { Token } from 'types';
 import { tokensStore } from './state';
+import { toZRC1 } from 'app/utils';
 
 export class TokenControll {
 
@@ -54,6 +55,14 @@ export class TokenControll {
     }
 
     return [];
+  }
+
+  public async getToken(address: string) {
+    const init = await this._zilliqa.getSmartContractInit(address);
+    const zrc = toZRC1(init);
+
+    return zrc;
+    // console.log(zrc);
   }
 
   public async addToken(token: Token) {
