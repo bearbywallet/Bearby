@@ -11,11 +11,16 @@ import { createStackNavigator } from '@react-navigation/stack';
 
 import {
   BrowserHomePage,
-  WebViewPage
+  WebViewPage,
+  BrowserCategoryPage
 } from 'app/pages/browser';
+import { headerOptions } from 'app/config';
 
 export type BrwoserStackParamList = {
   Browser: undefined;
+  Category: {
+    category: string;
+  },
   Web: {
     url: string;
   };
@@ -23,18 +28,28 @@ export type BrwoserStackParamList = {
 
 const BrowserStack = createStackNavigator<BrwoserStackParamList>();
 export const browserNav: React.FC = () => (
-  <BrowserStack.Navigator headerMode="none">
+  <BrowserStack.Navigator>
     <BrowserStack.Screen
       name="Browser"
       component={BrowserHomePage}
       options={{
-        title: ''
+        title: '',
+        header: () => null
       }}
     />
     <BrowserStack.Screen
       name="Web"
       component={WebViewPage}
       options={{
+        title: '',
+        header: () => null
+      }}
+    />
+    <BrowserStack.Screen
+      name="Category"
+      component={BrowserCategoryPage}
+      options={{
+        ...headerOptions,
         title: ''
       }}
     />

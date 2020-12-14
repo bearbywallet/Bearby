@@ -8,3 +8,4 @@
  */
 export * from './home';
 export * from './web';
+export * from './category';

@@ -69,10 +69,15 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
       url
     });
   }, [search]);
+  const hanldeSelectCategory = React.useCallback((category) => {
+    navigation.navigate('Category', {
+      category
+    });
+  }, [search]);
 
   const renderScene = SceneMap({
     [Tabs.apps]: () => (
-      <BrowserApps />
+      <BrowserApps onSelect={hanldeSelectCategory} />
     ),
     [Tabs.favorites]: () => (
       <BrowserFavorites />

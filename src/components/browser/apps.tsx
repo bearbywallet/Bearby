@@ -21,6 +21,7 @@ import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 
 type Prop = {
+  onSelect: (name: string) => void;
 };
 export const categories = [
   'games',
@@ -37,7 +38,7 @@ const topAps = [
   'SocialPay'
 ];
 
-export const BrowserApps: React.FC<Prop> = ({}) => {
+export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.namePlace}>
@@ -50,6 +51,7 @@ export const BrowserApps: React.FC<Prop> = ({}) => {
             key={index}
             el={c}
             title={i18n.t(c)}
+            onPress={() => onSelect(c)}
           />
         ))}
       </View>
