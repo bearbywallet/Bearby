@@ -64,6 +64,7 @@ export default {
   recipient_account: 'Recipient account',
   block_height: 'Block Height',
   copy_address: 'Copy address',
+  copy: 'Copy',
   view_block: 'View on ViewBlock',
   history_btn0: 'Clear all',
   history_tx_details: 'Transaction details',

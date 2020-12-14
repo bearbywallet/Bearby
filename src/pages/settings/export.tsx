@@ -14,7 +14,10 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { RouteProp } from '@react-navigation/native';
+import Clipboard from '@react-native-community/clipboard';
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { CustomButton } from 'app/components/custom-button';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
@@ -33,6 +36,10 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
     } else if (route.params.type === SecureTypes.seed) {
       return i18n.t('export_seed_danger');
     }
+  }, [route]);
+
+  const hanldeCopy = React.useCallback(() => {
+    Clipboard.setString(route.params.content);
   }, [route]);
 
   React.useEffect(() => {
@@ -60,6 +67,12 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
         <Text style={styles.contentText}>
           {route.params.content}
         </Text>
+        <CustomButton
+          title={i18n.t('copy')}
+          style={styles.btn}
+          color={theme.colors.white}
+          onPress={hanldeCopy}
+        />
       </View>
     </SafeAreaView>
   );
@@ -91,6 +104,10 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
+  },
+  btn: {
+    marginTop: 20,
+    backgroundColor: theme.colors.danger
   }
 });
 
