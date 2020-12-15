@@ -55,10 +55,10 @@ export const AddTokenModal: React.FC<Prop> = ({
   const [errorMessage, setErrorMessage] = React.useState<string>();
 
   const handleClose = React.useCallback(() => {
-    onTriggered();
     setErrorMessage(undefined);
     setAddress('');
     setToken(undefined);
+    onTriggered();
   }, [setErrorMessage, setAddress, onTriggered, setToken]);
   const handleAddToken = React.useCallback(() => {
     if (!token) {
@@ -68,6 +68,9 @@ export const AddTokenModal: React.FC<Prop> = ({
     setLoading(true);
     onAddToken(token, () => {
       setLoading(false);
+      setErrorMessage(undefined);
+      setAddress('');
+      setToken(undefined);
       onTriggered();
     });
   }, [token, setErrorMessage, setLoading, onTriggered]);
