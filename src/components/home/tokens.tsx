@@ -43,6 +43,10 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
     ),
     [netwrokState.selected]
   );
+  const account = React.useMemo(
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
+  );
 
   return (
     <View style={styles.container}>
@@ -60,7 +64,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
           {tokensList.map((token, index) => (
             <TokenCard
               key={index}
-              account={accountState.identities[accountState.selectedAddress]}
+              account={account}
               token={token}
               currency={currencyState}
               net={netwrokState.selected}
@@ -69,7 +73,10 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
               onPress={() => onSelectToken(index + 1)}
             />
           ))}
-          <AddToken style={styles.token}/>
+          <AddToken
+            style={styles.token}
+            account={account}
+          />
         </View>
     </View>
   );

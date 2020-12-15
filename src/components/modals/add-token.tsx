@@ -9,9 +9,8 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
-  TextInput,
+  Dimensions,
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
@@ -20,36 +19,45 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { QrCodeInput } from 'app/components/qr-code-input';
+import { TokenInfo } from 'app/components/token-info';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import {
   isBech32,
   fromBech32Address
 } from 'app/utils';
+import { Account, Token } from 'types';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
   title: string;
+  account: Account;
   onTriggered: () => void;
 };
 
+const { width } = Dimensions.get('window');
 export const AddTokenModal: React.FC<Prop> = ({
   style,
   visible,
+  account,
   title,
   onTriggered
 }) => {
+  const settingsState = keystore.settings.store.useValue();
+  const currencyState = keystore.currency.store.useValue();
+
   const [address, setAddress] = React.useState<string>('');
-  const [errorMessage, setErrorMessage] = React.useState<string | undefined>();
+  const [token, setToken] = React.useState<Token>();
+  const [errorMessage, setErrorMessage] = React.useState<string>();
 
   const handleClose = React.useCallback(() => {
     onTriggered();
     setErrorMessage(undefined);
     setAddress('');
-  }, [setErrorMessage, setAddress, onTriggered]);
+    setToken(undefined);
+  }, [setErrorMessage, setAddress, onTriggered, setToken]);
   const hanldeGetContract = React.useCallback(() => {
     //
   }, []);
@@ -64,11 +72,13 @@ export const AddTokenModal: React.FC<Prop> = ({
     const base16 = fromBech32Address(addr);
 
     try {
-      await keystore.token.getToken(base16);
+      const tokenInfo = await keystore.token.getToken(base16, account);
+
+      setToken(tokenInfo);
     } catch (err) {
       setErrorMessage(err.message);
     }
-  }, [setAddress, address]);
+  }, [setAddress, address, account, setToken]);
 
   return (
     <Modal
@@ -80,24 +90,36 @@ export const AddTokenModal: React.FC<Prop> = ({
       }}
       onBackdropPress={handleClose}
     >
-      <ModalWrapper style={{ ...style, ...styles.container }}>
+      <ModalWrapper style={style}>
         <ModalTitle onClose={handleClose}>
           {title}
         </ModalTitle>
-        <View style={{
-          minHeight: 100
-        }}>
+        <View style={styles.container}>
           <QrCodeInput
             value={address}
             error={errorMessage}
             placeholder={i18n.t('contract_address')}
             onChange={handleAddressPass}
           />
+          {token ? (
+            <React.Fragment>
+              <TokenInfo
+                style={{ marginVertical: 30 }}
+                decimals={token.decimals}
+                name={token.name}
+                symbol={token.symbol}
+                balance={token.balance}
+                totalSupply={token.totalSupply}
+                rate={settingsState.rate[currencyState]}
+                currency={currencyState}
+              />
+              <CustomButton
+                title={i18n.t('add_token')}
+                onPress={hanldeGetContract}
+              />
+            </React.Fragment>
+          ) : null}
         </View>
-        <CustomButton
-          title={i18n.t('add_token')}
-          onPress={hanldeGetContract}
-        />
       </ModalWrapper>
     </Modal>
   );
@@ -105,6 +127,7 @@ export const AddTokenModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
+    paddingBottom: 30
   },
   inputLable: {
     color: '#8A8A8F'
