@@ -13,7 +13,7 @@ import {
   StyleSheet,
   ActivityIndicator
 } from 'react-native';
-import { SvgCssUri, SvgXml } from 'react-native-svg';
+import { SvgCss } from 'react-native-svg';
 
 import { HelpIconSVG } from 'app/components/svg';
 
@@ -28,31 +28,45 @@ type Prop = {
 
 export const LoadSVG: React.FC<Prop> = ({ url, height, width }) => {
   const [isLoading, setIsLoading] = React.useState(true);
-  const [error, setError] = React.useState(false);
+  const [svg, setSvg] = React.useState<string>();
 
   React.useEffect(() => {
-    fetch(url).then((res) => {
-      if (res.status !== 200) {
-        setError(true);
-      }
+    setIsLoading(true);
+    fetch(url)
+      .then((res) => {
+        if (res.ok) {
+          return res.text();
+        }
 
-      setIsLoading(false);
-    });
-  }, []);
+        return undefined;
+      })
+      .then((content) => {
+        setSvg(content);
+        setIsLoading(false);
+      });
+  }, [url, setSvg]);
 
-  return isLoading ? (
-    <ActivityIndicator
-      animating={isLoading}
-      color={theme.colors.primary}
-    />
-  ) : !error ? (
-    <SvgCssUri
-      width={width}
-      height={height}
-      uri={url}
-    />
-  ) : (
-    <SvgXml
+  if (isLoading) {
+    return (
+      <ActivityIndicator
+        animating={isLoading}
+        color={theme.colors.primary}
+      />
+    );
+  }
+
+  if (svg) {
+    return (
+      <SvgCss
+        xml={svg}
+        width={width}
+        height={height}
+      />
+    );
+  }
+
+  return (
+    <SvgCss
       xml={HelpIconSVG}
       width={width}
       height={height}
