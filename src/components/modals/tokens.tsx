@@ -17,12 +17,13 @@ import {
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
-import { SvgXml, SvgCssUri } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { LoadSVG } from 'app/components/load-svg';
 
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
@@ -82,10 +83,10 @@ export const TokensModal: React.FC<Prop> = ({
               onPress={() => handleSelected(index)}
             >
               {token.symbol ? (
-                <SvgCssUri
+                <LoadSVG
                   height="30"
                   width="30"
-                  uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
+                  url={`${TOKEN_ICONS}/${token.symbol}.svg`}
                 />
               ) : null}
               <View style={styles.wrapper}>
