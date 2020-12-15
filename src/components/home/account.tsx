@@ -107,10 +107,10 @@ export const HomeAccount: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: height / 3,
+    height: height / 4,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingTop: '10%'
+    marginTop: '5%'
   },
   content: {
     top: '10%',
