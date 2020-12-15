@@ -10,8 +10,8 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 
-import { STORAGE_FIELDS } from 'app/config';
-import { Token } from 'types';
+import { STORAGE_FIELDS, TokenTypes } from 'app/config';
+import { Token, Account } from 'types';
 import { tokensStore } from './state';
 import { toZRC1 } from 'app/utils';
 
@@ -57,12 +57,41 @@ export class TokenControll {
     return [];
   }
 
-  public async getToken(address: string) {
+  public async getToken(address: string, acc: Account): Promise<Token> {
+    const type = TokenTypes.ZRC2;
     const init = await this._zilliqa.getSmartContractInit(address);
     const zrc = toZRC1(init);
+    const userAddress = acc.base16.toLowerCase();
+    const field = 'balances';
+    const totalSupplyField = 'total_supply';
+    let totalSupply = await this._zilliqa.getSmartContractSubState(
+      address,
+      totalSupplyField
+    );
+    let balance = await this._zilliqa.getSmartContractSubState(
+      address,
+      field,
+      [userAddress]
+    );
 
-    return zrc;
-    // console.log(zrc);
+    try {
+      balance = balance[field][userAddress];
+      totalSupply = totalSupply[totalSupplyField];
+    } catch {
+      balance = '0';
+    }
+
+    return {
+      type,
+      totalSupply,
+      balance,
+      name: zrc.name,
+      symbol: zrc.symbol,
+      decimals: zrc.decimals,
+      address: {
+        [this._network.selected]: zrc.address
+      }
+    };
   }
 
   public async addToken(token: Token) {

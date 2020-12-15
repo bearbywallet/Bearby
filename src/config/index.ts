@@ -20,3 +20,4 @@ export * from './gas';
 export * from './secure-types';
 export * from './explorer';
 export * from './tx-statuses';
+export * from './token-type';
