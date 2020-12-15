@@ -93,7 +93,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
 
   return (
     <React.Fragment>
-      <SafeAreaView>
+      <View>
         <FlatList
           data={[{ key: 'Home' }]}
           refreshControl={
@@ -120,7 +120,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
             </View>
           )}
         />
-      </SafeAreaView>
+      </View>
       <ReceiveModal
         account={account}
         visible={isReceiveModal}

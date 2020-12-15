@@ -14,6 +14,7 @@ export default {
   all: 'All',
   close: 'Close',
   manage: 'Manage',
+  total_supply: 'Token Supply',
   home: 'Home',
   history: 'History',
   browser: 'Browser',
