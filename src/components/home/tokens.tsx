@@ -16,7 +16,7 @@ import {
   ScrollView
 } from 'react-native';
 
-import I18n from 'app/lib/i18n';
+import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 
 import { TokenCard } from 'app/components/token-card';
@@ -78,11 +78,11 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
     <View style={styles.container}>
       <View style={styles.header}>
         <Text style={styles.title}>
-          {I18n.t('my_tokens')}
+          {i18n.t('my_tokens')}
         </Text>
         {hasNonDefault ? (
           <Button
-            title={I18n.t('manage')}
+            title={i18n.t('manage')}
             color={theme.colors.primary}
             onPress={() => setIsRemove(!isRemove)}
           />
