@@ -50,7 +50,7 @@ export const TransactionModal: React.FC<Prop> = ({
   const currencyState = keystore.currency.store.useValue();
 
   const zilliqaToken = React.useMemo(
-    () => tokenState.identities[0],
+    () => tokenState[0],
     [tokenState]
   );
   const conversion = React.useMemo(() => {
