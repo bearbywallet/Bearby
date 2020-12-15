@@ -15,6 +15,9 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgCssUri } from 'react-native-svg';
+
+import { LoadSVG } from 'app/components/load-svg';
+
 import { Token, Account } from 'types';
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
@@ -64,10 +67,10 @@ export const TokenCard: React.FC<Prop> = ({
         <Text style={styles.symbol}>
           {token.symbol}
         </Text>
-        <SvgCssUri
+        <LoadSVG
           height="30"
           width="30"
-          uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
+          url={`${TOKEN_ICONS}/${token.symbol}.svg`}
         />
       </View>
       <View>
