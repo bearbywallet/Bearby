@@ -18,14 +18,15 @@ import { AddTokenModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
-import { Account } from 'types';
+import { Account, Token } from 'types';
 
 export type Prop = {
   style?: ViewStyle;
   account: Account;
+  onAddToken: (token: Token, cb: () => void) => void;
 };
 
-export const AddToken: React.FC<Prop> = ({ style, account }) => {
+export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
   const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
@@ -42,6 +43,7 @@ export const AddToken: React.FC<Prop> = ({ style, account }) => {
         title={i18n.t('add_token')}
         visible={modalVisible}
         onTriggered={() => setModalVisible(false)}
+        onAddToken={onAddToken}
       />
     </React.Fragment>
   );
