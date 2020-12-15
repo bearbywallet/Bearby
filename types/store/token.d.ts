@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { TokenTypes } from 'app/config';
 
 export interface Token {
   address: {
@@ -15,4 +16,7 @@ export interface Token {
   default?: boolean;
   name: string;
   symbol: string;
+  type: TokenTypes;
+  totalSupply?: string;
+  balance?: string;
 }
