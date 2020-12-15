@@ -21,6 +21,7 @@ import { theme } from 'app/styles';
 
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
+import { SimpleConfirm } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
 import { Token } from 'types';
@@ -37,6 +38,9 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
   const accountState = keystore.account.store.useValue();
   const tokens = keystore.token.store.useValue();
 
+  const [tokenForRemove, setTokenForRemove] = React.useState<Token>();
+  const [isRemove, setIsRemove] = React.useState(false);
+
   const tokensList = React.useMemo(
     () => tokens.filter(
       // Filtering the only selected netwrok tokens.
@@ -48,6 +52,10 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+  const hasNonDefault = React.useMemo(
+    () => tokensList.filter((t) => !t.default).length > 0,
+    [tokensList]
+  );
 
   const hanldeAddtoken = React.useCallback(async(token, cb) => {
     try {
@@ -58,6 +66,13 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
       //
     }
   }, []);
+  const hanldeRemoveToken = React.useCallback(async() => {
+    if (tokenForRemove) {
+      await keystore.token.removeToken(tokenForRemove);
+    }
+
+    setTokenForRemove(undefined);
+  }, [tokenForRemove, setTokenForRemove]);
 
   return (
     <View style={styles.container}>
@@ -65,23 +80,27 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
         <Text style={styles.title}>
           {I18n.t('my_tokens')}
         </Text>
-        <Button
-          title={I18n.t('manage')}
-          color={theme.colors.primary}
-          onPress={() => null}
-        />
+        {hasNonDefault ? (
+          <Button
+            title={I18n.t('manage')}
+            color={theme.colors.primary}
+            onPress={() => setIsRemove(!isRemove)}
+          />
+        ) : null}
       </View>
         <View style={styles.list}>
           {tokensList.map((token, index) => (
             <TokenCard
               key={index}
               account={account}
+              canRemove={isRemove}
               token={token}
               currency={currencyState}
               net={netwrokState.selected}
               rate={settingsState.rate[currencyState]}
               style={styles.token}
               onPress={() => onSelectToken(index + 1)}
+              onRemove={setTokenForRemove}
             />
           ))}
           <AddToken
@@ -90,6 +109,14 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
             onAddToken={hanldeAddtoken}
           />
         </View>
+        <SimpleConfirm
+          visible={Boolean(tokenForRemove)}
+          title={i18n.t('remove_token', { name: tokenForRemove?.symbol })}
+          btns={[i18n.t('reject'), i18n.t('confirm')]}
+          description={i18n.t('remove_token_description')}
+          onTriggered={() => setTokenForRemove(undefined)}
+          onConfirmed={hanldeRemoveToken}
+        />
     </View>
   );
 };

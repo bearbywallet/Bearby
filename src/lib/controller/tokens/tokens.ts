@@ -106,6 +106,19 @@ export class TokenControll {
     await this._update(tokens);
   }
 
+  public removeToken(token: Token) {
+    if (token.default) {
+      throw new Error('cannot remove default token.');
+    }
+
+    const tokens = this
+      .store
+      .get()
+      .filter((t) => t.symbol !== token.symbol);
+
+    return this._update(tokens);
+  }
+
   private async _update(tokens: Token[]) {
     tokensStoreUpdate(deppUnlink(tokens));
 

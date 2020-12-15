@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
-import { SvgCssUri } from 'react-native-svg';
 
 import { LoadSVG } from 'app/components/load-svg';
 
@@ -29,8 +28,10 @@ export type Prop = {
   net: string;
   rate: number;
   currency: string;
+  canRemove: boolean;
   style?: ViewStyle;
   onPress?: () => void;
+  onRemove?: (token: Token) => void;
 };
 
 export const TokenCard: React.FC<Prop> = ({
@@ -38,9 +39,11 @@ export const TokenCard: React.FC<Prop> = ({
   net,
   rate,
   account,
+  canRemove,
   currency,
   style,
-  onPress = () => null
+  onPress = () => null,
+  onRemove = () => null
 }) => {
   /**
    * ZIL(Default token) amount in float.
@@ -58,10 +61,20 @@ export const TokenCard: React.FC<Prop> = ({
     return toConversion(balance, rate, token.decimals);
   }, [token, account, net, rate]);
 
+  const handlePress = React.useCallback(() => {
+    if (canRemove) {
+      return onRemove(token);
+    }
+
+    return onPress();
+  }, [canRemove, token, onRemove, onPress]);
+
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
-      onPress={onPress}
+      style={[styles.container, style, {
+        borderColor: canRemove && !token.default ? theme.colors.danger : theme.colors.gray
+      }]}
+      onPress={handlePress}
     >
       <View style={styles.header}>
         <Text style={styles.symbol}>
@@ -92,8 +105,7 @@ const styles = StyleSheet.create({
     width: '47%',
     backgroundColor: theme.colors.gray,
     padding: 10,
-    borderWidth: 0.9,
-    borderColor: theme.colors.gray
+    borderWidth: 1
   },
   header: {
     width: '100%',

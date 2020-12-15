@@ -11,7 +11,6 @@ import {
   View,
   Text,
   StyleSheet,
-  TextInput,
   Dimensions,
   ViewStyle
 } from 'react-native';
@@ -21,9 +20,7 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
-import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { keystore } from 'app/keystore';
 
 type Prop = {
   style?: ViewStyle;
