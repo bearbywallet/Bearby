@@ -49,7 +49,7 @@ export const GasSelector: React.FC<Prop> = ({
   const amountGas = (increse: number) => {
     const incresedGasPrice = Number(DEFAULT_GAS.gasPrice) * increse;
     const { fee } = gasToFee(gasLimit, String(incresedGasPrice));
-    const [zilliqa] = tokensState.identities;
+    const [zilliqa] = tokensState;
 
     return `${fee} ${zilliqa.symbol}`;
   };
