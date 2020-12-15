@@ -16,24 +16,23 @@ enum Fields {
   ContractOwner = 'contract_owner',
   Name = 'name',
   Symbol = 'symbol',
+  Decimals = 'decimals',
   Address = '_this_address'
 }
 
 export function toZRC1(init: InitItem[]) {
-  const vnames = init.map((el) => el.vname);
-
-  [Fields.ContractOwner, Fields.Name, Fields.Symbol].forEach((field) => {
-    if (!vnames.some((el) => el === field)) {
-      throw new Error('not found vname ' + field);
-    }
-  });
-
   const contractOwner = init.find((el) => el.vname === Fields.ContractOwner)?.value;
   const name = init.find((el) => el.vname === Fields.Name)?.value;
   const symbol = init.find((el) => el.vname === Fields.Symbol)?.value;
   const address = init.find((el) => el.vname === Fields.Address)?.value;
+  const decimals = init.find((el) => el.vname === Fields.Decimals)?.value;
+
+  if (!contractOwner || !name || !symbol || !address || !decimals) {
+    throw new Error('Is not ZRC');
+  }
 
   return {
+    decimals: Number(decimals),
     contractOwner,
     name,
     symbol,
