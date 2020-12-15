@@ -108,6 +108,7 @@ export class WalletControler extends Mnemonic {
     await this.guard.sync();
     await this.network.sync();
     await this.account.sync();
+    await this.token.sync();
     await this.settings.sync();
     await this.currency.sync();
     await this.contacts.sync();

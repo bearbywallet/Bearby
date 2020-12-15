@@ -59,12 +59,9 @@ const identities: Token[] = [
     symbol: 'gZIL'
   }
 ];
-const initalState = {
-  identities
-};
-export const tokensStore = newRidgeState(initalState);
+export const tokensStore = newRidgeState(identities);
 
-export function tokensStoreUpdate(payload: typeof initalState) {
+export function tokensStoreUpdate(payload: typeof identities) {
   tokensStore.set(() => payload);
 }
 export function tokensStoreReset() {

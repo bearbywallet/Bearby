@@ -50,7 +50,7 @@ export class ZilliqaControl {
   public async handleBalance(address: string, token: Token) {
     address = String(address).toLowerCase();
 
-    const [zilliqa] = tokensStore.get().identities;
+    const [zilliqa] = tokensStore.get();
 
     if (token.symbol === zilliqa.symbol) {
       const result = await this.getBalance(address);

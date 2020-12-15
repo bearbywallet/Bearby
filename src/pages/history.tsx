@@ -76,13 +76,13 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
       name: 'All',
       symbol: ''
     };
-    return [cusstomToken, ...tokensState.identities];
+    return [cusstomToken, ...tokensState];
   }, [tokensState]);
 
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
     let tokenAddress: string;
-    const [zilliqa] = tokensState.identities;
+    const [zilliqa] = tokensState;
     const token = cusstomTokens[selectedToken];
 
     if (token && selectedToken !== 0) {
@@ -213,7 +213,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
                 netwrok={networkState.selected}
                 currency={currencyState}
                 rate={settingsState.rate[currencyState]}
-                tokens={tokensState.identities}
+                tokens={tokensState}
                 status={TxStatsues.success}
                 onSelect={() => showTxDetails(item.tx)}
               />

@@ -106,7 +106,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
           renderItem={() => (
             <View>
               <HomeAccount
-                token={tokensState.identities[0]}
+                token={tokensState[0]}
                 rate={settingsState.rate[currencyState]}
                 currency={currencyState}
                 netwrok={networkState.selected}
@@ -116,7 +116,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onSend={handleSend}
                 onRemove={() => setIsConfirmModal(true)}
               />
-              <HomeTokens onSelectToken={hanldeSelectToken}/>
+              <HomeTokens onSelectToken={hanldeSelectToken} />
             </View>
           )}
         />

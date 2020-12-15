@@ -35,18 +35,21 @@ type Prop = {
   title: string;
   account: Account;
   onTriggered: () => void;
+  onAddToken: (token: Token, cb: () => void) => void;
 };
 
-const { width } = Dimensions.get('window');
 export const AddTokenModal: React.FC<Prop> = ({
   style,
   visible,
   account,
   title,
-  onTriggered
+  onTriggered,
+  onAddToken
 }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
+
+  const [loading, setLoading] = React.useState(false);
 
   const [address, setAddress] = React.useState<string>('');
   const [token, setToken] = React.useState<Token>();
@@ -58,9 +61,17 @@ export const AddTokenModal: React.FC<Prop> = ({
     setAddress('');
     setToken(undefined);
   }, [setErrorMessage, setAddress, onTriggered, setToken]);
-  const hanldeGetContract = React.useCallback(() => {
-    //
-  }, []);
+  const handleAddToken = React.useCallback(() => {
+    if (!token) {
+      return null;
+    }
+
+    setLoading(true);
+    onAddToken(token, () => {
+      setLoading(false);
+      onTriggered();
+    });
+  }, [token, setErrorMessage, setLoading, onTriggered]);
   const handleAddressPass = React.useCallback(async(addr) => {
     setErrorMessage(undefined);
     setAddress(addr);
@@ -115,7 +126,8 @@ export const AddTokenModal: React.FC<Prop> = ({
               />
               <CustomButton
                 title={i18n.t('add_token')}
-                onPress={hanldeGetContract}
+                isLoading={loading}
+                onPress={handleAddToken}
               />
             </React.Fragment>
           ) : null}

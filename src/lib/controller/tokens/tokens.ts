@@ -12,8 +12,8 @@ import { NetworkControll } from 'app/lib/controller/network';
 
 import { STORAGE_FIELDS, TokenTypes } from 'app/config';
 import { Token, Account } from 'types';
-import { tokensStore } from './state';
-import { toZRC1 } from 'app/utils';
+import { tokensStore, tokensStoreUpdate } from './state';
+import { toZRC1, deppUnlink } from 'app/utils';
 
 export class TokenControll {
 
@@ -45,16 +45,18 @@ export class TokenControll {
     this._zilliqa = zilliqa;
   }
 
-  public async getTokensList(): Promise<Token[]> {
-    const tokens = await this._storage.get(
-      STORAGE_FIELDS.TOKENS
-    );
+  public async sync() {
+    const tokens = await this._storage.get<string>(STORAGE_FIELDS.TOKENS);
 
-    if (Array.isArray(tokens)) {
-      return tokens;
+    if (typeof tokens !== 'string') {
+      return this._update(this.store.get());
     }
 
-    return [];
+    try {
+      tokensStoreUpdate(JSON.parse(tokens));
+    } catch {
+      await this._update(this.store.get());
+    }
   }
 
   public async getToken(address: string, acc: Account): Promise<Token> {
@@ -95,18 +97,18 @@ export class TokenControll {
   }
 
   public async addToken(token: Token) {
-    const tokens = await this.getTokensList();
+    const tokens = this.store.get();
 
     TokenControll.isUnique(token, tokens);
 
     tokens.push(token);
 
     await this._update(tokens);
-
-    return tokens;
   }
 
   private async _update(tokens: Token[]) {
+    tokensStoreUpdate(deppUnlink(tokens));
+
     await this._storage.set(
       buildObject(STORAGE_FIELDS.TOKENS, tokens)
     );

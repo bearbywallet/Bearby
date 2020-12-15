@@ -37,7 +37,7 @@ export class Amount {
   }
 
   public insufficientFunds(amount: string, token: Token) {
-    const [zilliqa] = keystore.token.store.get().identities;
+    const [zilliqa] = keystore.token.store.get();
 
     const _amount = token.symbol === zilliqa.symbol ?
       Big(amount).add(this._fee) : Big(amount);
@@ -46,7 +46,7 @@ export class Amount {
   }
 
   public fromPercent(percent: number, token: Token): Big {
-    const [zilliqa] = keystore.token.store.get().identities;
+    const [zilliqa] = keystore.token.store.get();
     const _amount = token.symbol === zilliqa.symbol ?
       Big(this._balance).sub(this._fee) : Big(this._balance);
 

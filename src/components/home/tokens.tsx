@@ -23,6 +23,7 @@ import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
 
 import { keystore } from 'app/keystore';
+import { Token } from 'types';
 
 type Prop = {
   onSelectToken: (index: number) => void;
@@ -30,23 +31,33 @@ type Prop = {
 
 const { width, height } = Dimensions.get('window');
 export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
-  const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
   const accountState = keystore.account.store.useValue();
+  const tokens = keystore.token.store.useValue();
 
   const tokensList = React.useMemo(
-    () => tokensState.identities.filter(
+    () => tokens.filter(
       // Filtering the only selected netwrok tokens.
       (token) => Boolean(token.address[netwrokState.selected] && token.symbol !== 'ZIL')
     ),
-    [netwrokState.selected]
+    [tokens, netwrokState.selected]
   );
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+
+  const hanldeAddtoken = React.useCallback(async(token, cb) => {
+    try {
+      await keystore.token.addToken(token);
+
+      cb();
+    } catch {
+      //
+    }
+  }, []);
 
   return (
     <View style={styles.container}>
@@ -76,6 +87,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
           <AddToken
             style={styles.token}
             account={account}
+            onAddToken={hanldeAddtoken}
           />
         </View>
     </View>

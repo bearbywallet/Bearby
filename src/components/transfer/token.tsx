@@ -14,13 +14,14 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import { SvgXml, SvgCssUri } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import {
   ArrowIconSVG,
   WalletIconSVG
 } from 'app/components/svg';
 import { TokensModal } from 'app/components/modals';
+import { LoadSVG } from 'app/components/load-svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -85,10 +86,10 @@ export const TransferToken: React.FC<Prop> = ({
             {i18n.t('token')}
           </Text>
           <View style={{ flexDirection: 'row' }}>
-            <SvgCssUri
+            <LoadSVG
               height="30"
               width="30"
-              uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
+              url={`${TOKEN_ICONS}/${token.symbol}.svg`}
             />
             <View style={{ marginLeft: 5 }}>
               <View style={[styles.infoWrapper, { width: width - 120 }]}>

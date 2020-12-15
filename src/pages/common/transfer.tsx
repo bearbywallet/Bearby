@@ -59,7 +59,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   );
 
   const token = React.useMemo(
-    () => tokensState.identities[selectedToken],
+    () => tokensState[selectedToken],
     [selectedToken, tokensState]
   );
 
@@ -75,7 +75,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             />
             <TransferToken
               account={accountState.identities[selectedAccount]}
-              tokens={tokensState.identities}
+              tokens={tokensState}
               selected={selectedToken}
               netwrok={networkState.selected}
               onSelect={setSelectedToken}

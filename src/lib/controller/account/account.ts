@@ -217,11 +217,11 @@ export class AccountControler {
 
   private async _tokenBalance(base16: string) {
     const net = this._netwrok.selected;
-    const tokens = this._token.store.get().identities.map((t) => [t.symbol, '0']);
+    const tokens = this._token.store.get().map((t) => [t.symbol, '0']);
     const entries = ZILLIQA_KEYS.map((n) => [n, Object.fromEntries(tokens)]);
     const balances = Object.fromEntries(entries);
 
-    for (const t of this._token.store.get().identities) {
+    for (const t of this._token.store.get()) {
       balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
     }
 
