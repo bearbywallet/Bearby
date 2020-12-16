@@ -20,6 +20,7 @@ import { SettingsControler } from 'app/lib/controller/settings';
 import { GasControler } from 'app/lib/controller/gas';
 import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { TransactionsContoller } from 'app/lib/controller/transaction';
+import { SearchController } from 'app/lib/controller/search-engine';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -33,6 +34,7 @@ export class WalletControler extends Mnemonic {
   public readonly theme = new ThemeControler(_storage);
   public readonly settings = new SettingsControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
+  public readonly searchEngine = new SearchController(_storage);
   public readonly gas = new GasControler(_storage);
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly viewblock = new ViewBlockControler(this.network);
@@ -113,5 +115,6 @@ export class WalletControler extends Mnemonic {
     await this.currency.sync();
     await this.contacts.sync();
     await this.gas.sync();
+    await this.searchEngine.sync();
   }
 }
