@@ -145,6 +145,7 @@ export default {
   settings_item4: 'Connections',
   settings_item5: 'Security',
   settings_item6: 'About',
+  settings_item7: 'Browser',
   general_title: 'General',
   pass_setup_btn: 'Continue',
   pass_setup_input0: 'Name of account',
@@ -208,5 +209,9 @@ export default {
   privacy_33: 'We accept no liability for the loss of your finances. Also, if someone wants to receive your data such as (initial passphrase or private keys), do not in any case pass this information to third parties.',
   create_sub: 'Create or Import your Zilliqa account',
   create: 'Create',
-  restore: 'Restore'
+  restore: 'Restore',
+  browser_settings_title: 'Browser settings',
+  browser_settings_selector_title: 'Search engine',
+  d_web: 'DWeb',
+  d_web_description: 'Support for decentralized domain protocols.'
 };

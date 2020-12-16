@@ -17,6 +17,7 @@ import { SecurityPage } from 'app/pages/settings/security';
 import { NetworkPage } from 'app/pages/settings/network';
 import { GeneralPage } from 'app/pages/settings/general';
 import { ExportPage } from 'app/pages/settings/export';
+import { BrowserSettingsPage } from 'app/pages/settings/browser';
 
 import { headerOptions, SecureTypes } from 'app/config';
 
@@ -28,6 +29,7 @@ export type SettingsStackParamList = {
   Security: undefined;
   Network: undefined;
   General: undefined;
+  BrowserSettings: undefined;
   Export: {
     type: SecureTypes;
     content: string;
@@ -96,6 +98,14 @@ export const Settings: React.FC = () => (
     <SettingsStack.Screen
       name="General"
       component={GeneralPage}
+      options={{
+        ...headerOptions,
+        title: ''
+      }}
+    />
+    <SettingsStack.Screen
+      name="BrowserSettings"
+      component={BrowserSettingsPage}
       options={{
         ...headerOptions,
         title: ''

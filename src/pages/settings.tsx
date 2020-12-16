@@ -109,6 +109,22 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
       </TouchableOpacity>
       <TouchableOpacity
         style={styles.listItemWrapper}
+        onPress={() => navigation.navigate('SettingsPages', { screen: 'BrowserSettings' })}
+      >
+        <SvgXml xml={ConnectIconSVG} />
+        <View style={styles.listItem}>
+          <Text style={styles.listTextItem}>
+            {i18n.t('settings_item7')}
+          </Text>
+          <SvgXml
+            xml={ArrowIconSVG}
+            fill={'#666666'}
+            style={styles.arrow}
+          />
+        </View>
+      </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.listItemWrapper}
         onPress={() => navigation.navigate('SettingsPages', { screen: 'Connections' })}
       >
         <SvgXml xml={ConnectIconSVG} />
