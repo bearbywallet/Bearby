@@ -14,6 +14,7 @@ import {
 import { STORAGE_FIELDS } from 'app/config';
 import { buildObject, MobileStorage } from 'app/lib';
 import { SearchEngineStoreType } from 'types';
+import { deppUnlink } from 'app/utils';
 
 export class SearchController {
   public readonly store = searchEngineStore;
@@ -45,8 +46,28 @@ export class SearchController {
     }
   }
 
+  public async changeEngine(index: number) {
+    if (index < 0) {
+      throw new Error('index < 0');
+    }
+
+    const state = this.store.get();
+
+    state.selected = index;
+
+    return this._update(state);
+  }
+
+  public toggleDweb(value: boolean) {
+    const state = this.store.get();
+
+    state.dweb = value;
+
+    return this._update(state);
+  }
+
   private async _update(state: SearchEngineStoreType) {
-    searchEngineStoreUpdate(state);
+    searchEngineStoreUpdate(deppUnlink(state));
 
     await this._storage.set(
       buildObject(STORAGE_FIELDS.SEARCH_ENGINE, state)
