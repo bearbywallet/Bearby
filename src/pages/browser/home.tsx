@@ -13,7 +13,8 @@ import {
   Text,
   Dimensions,
   TextInput,
-  StyleSheet
+  StyleSheet,
+  ActivityIndicator
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -32,7 +33,6 @@ import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
-// import { RootParamList } from 'app/navigator';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -49,6 +49,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
 
   const [search, setSearch] = React.useState<string>('');
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
@@ -62,12 +63,13 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   );
 
   const hanldeSearch = React.useCallback(async() => {
+    setIsLoading(true);
     const url = await keystore.searchEngine.onUrlSubmit(search);
-
+    setIsLoading(false);
     navigation.navigate('Web', {
       url
     });
-  }, [search]);
+  }, [search, setIsLoading]);
   const hanldeSelectCategory = React.useCallback((category) => {
     navigation.navigate('Category', {
       category
@@ -96,7 +98,14 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
         </View>
         <View style={styles.main}>
           <View style={styles.inputWrapper}>
-            <SvgXml xml={SearchIconSVG} />
+            {isLoading ? (
+              <ActivityIndicator
+                animating={isLoading}
+                color={theme.colors.primary}
+              />
+            ) : (
+              <SvgXml xml={SearchIconSVG} />
+            )}
             <TextInput
               style={styles.textInput}
               textContentType={'URL'}
@@ -157,9 +166,9 @@ const styles = StyleSheet.create({
     width: width - 60
   },
   inputWrapper: {
-    width: '100%',
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    justifyContent: 'space-between'
   },
   tabView: {
     marginTop: 15

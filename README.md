@@ -41,10 +41,10 @@ $ yarn android --device
 - [ ] meesage beetween app and inject script.
 
 ### DWeb
-- [ ] unstoppabledomains controller.
-	- [ ] Contract parser.
-	- [ ] get Contract State.
-- [ ] patterns nad parsing URL.
+- [x] unstoppabledomains controller.
+	- [x] Contract parser.
+	- [x] get Contract State.
+- [x] patterns nad parsing URL.
 
 ### Tokens
 - [x] Send tokens.

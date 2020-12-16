@@ -28,12 +28,18 @@ export class NetworkControll {
 
   public readonly store = networkStore;
   private _storage: MobileStorage;
+  private _onlyMainnet: boolean;
 
-  constructor(storage: MobileStorage) {
+  constructor(storage: MobileStorage, onlyMainnet = false) {
     this._storage = storage;
+    this._onlyMainnet = onlyMainnet;
   }
 
   public get selected() {
+    if (this._onlyMainnet) {
+      return mainnet;
+    }
+
     return this.store.get().selected;
   }
 

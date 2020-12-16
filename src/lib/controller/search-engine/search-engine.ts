@@ -88,9 +88,13 @@ export class SearchController {
   public async onUrlSubmit(input: string, defaultProtocol = 'https://') {
     input = input.toLowerCase();
 
-    // if (this.store.get().dweb) {
-    //   const cryptoDomain = await this._ud.tryResolveDweb(input);
-    // }
+    if (this.store.get().dweb) {
+      const cryptoDomain = await this._ud.tryResolveDweb(input);
+
+      if (cryptoDomain) {
+        return cryptoDomain;
+      }
+    }
     // Check if it's a url or a keyword
     const res = input.match(/^(?:http(s)?:\/\/)?[\w.-]+(?:\.[\w.-]+)+[\w\-._~:/?#[\]@!&',;=.+]+$/g);
 

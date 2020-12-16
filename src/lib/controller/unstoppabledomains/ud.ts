@@ -6,13 +6,11 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import URL from 'url-parse';
+import namehash from '@unstoppabledomains/resolution/build/zns/namehash';
 import { PINTA, NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
 
-
-const namehash = (domain: string) => domain;
 /**
  * Unstoppabledomains service domain resolver.
  * [more info](http://unstoppabledomains.com/)
@@ -23,7 +21,7 @@ export class UnstoppableDomains {
   private _netwrok: NetworkControll;
 
   constructor(storage: MobileStorage) {
-    this._netwrok = new NetworkControll(storage);
+    this._netwrok = new NetworkControll(storage, true);
     this._zilliqa = new ZilliqaControl(this._netwrok);
   }
 
@@ -62,6 +60,7 @@ export class UnstoppableDomains {
 
   public async resolve(domain: string) {
     const domainHash = namehash(domain);
+
     const { records } = await this._zilliqa.getSmartContractSubState(
       UD_CONTRACT_ADDRESS,
       this._field,

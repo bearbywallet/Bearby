@@ -115,13 +115,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           </Text>
         </View>
         <TouchableOpacity
-          style={styles.tabs}
-        >
-          <Text style={styles.tabsAmount}>
-            5
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
           style={styles.dotsWrapper}
         >
           <View style={styles.dot}/>
@@ -171,21 +164,6 @@ const styles = StyleSheet.create({
   },
   host: {
     color: theme.colors.white,
-    fontWeight: 'bold',
-    fontSize: 17,
-    lineHeight: 22
-  },
-  tabs: {
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 2,
-    height: 30,
-    width: 30,
-    borderWidth: 1,
-    borderColor: theme.colors.primary
-  },
-  tabsAmount: {
-    color: theme.colors.primary,
     fontWeight: 'bold',
     fontSize: 17,
     lineHeight: 22

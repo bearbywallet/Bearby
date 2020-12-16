@@ -26,6 +26,7 @@ import {
   BookIconSVG,
   AboutIconSVG,
   SecureIconSVG,
+  SearchIconSVG,
   ConnectIconSVG
 } from 'app/components/svg';
 
@@ -111,7 +112,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => (
         style={styles.listItemWrapper}
         onPress={() => navigation.navigate('SettingsPages', { screen: 'BrowserSettings' })}
       >
-        <SvgXml xml={ConnectIconSVG} />
+        <SvgXml xml={SearchIconSVG} />
         <View style={styles.listItem}>
           <Text style={styles.listTextItem}>
             {i18n.t('settings_item7')}
