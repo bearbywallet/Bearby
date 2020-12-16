@@ -24,7 +24,7 @@ export const BrowserFavorites: React.FC<Prop> = ({}) => {
   return (
     <ScrollView style={styles.container}>
       <Text style={styles.havent}>
-        {i18n.t('havent_favorites')}
+        {i18n.t('havent_connections')}
       </Text>
     </ScrollView>
   );

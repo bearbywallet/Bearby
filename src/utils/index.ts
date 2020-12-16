@@ -16,5 +16,4 @@ export * from './view-block';
 export * from './token';
 export * from './deep-unlink';
 export * from './amount';
-export * from './browser';
 export * from './bytes';

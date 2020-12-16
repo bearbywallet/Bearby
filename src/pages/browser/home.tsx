@@ -30,7 +30,6 @@ import {
 
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
-import { onUrlSubmit } from 'app/utils';
 import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 // import { RootParamList } from 'app/navigator';
@@ -54,7 +53,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
     { key: Tabs.apps, title: i18n.t('apps') },
-    { key: Tabs.favorites, title: i18n.t('favorites') }
+    { key: Tabs.favorites, title: i18n.t('connections_title') }
   ]);
 
   const account = React.useMemo(
@@ -62,8 +61,8 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     [accountState]
   );
 
-  const hanldeSearch = React.useCallback(() => {
-    const url = onUrlSubmit(search);
+  const hanldeSearch = React.useCallback(async() => {
+    const url = await keystore.searchEngine.onUrlSubmit(search);
 
     navigation.navigate('Web', {
       url

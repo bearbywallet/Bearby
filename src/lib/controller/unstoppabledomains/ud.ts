@@ -8,7 +8,8 @@
  */
 import URL from 'url-parse';
 import { PINTA, NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
-import { ZilliqaControl } from 'app/lib/controller';
+import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
+import { MobileStorage } from 'app/lib';
 
 
 const namehash = (domain: string) => domain;
@@ -19,9 +20,11 @@ const namehash = (domain: string) => domain;
 export class UnstoppableDomains {
   private _field = 'records';
   private _zilliqa: ZilliqaControl;
+  private _netwrok: NetworkControll;
 
-  constructor(zilliqa: ZilliqaControl) {
-    this._zilliqa = zilliqa;
+  constructor(storage: MobileStorage) {
+    this._netwrok = new NetworkControll(storage);
+    this._zilliqa = new ZilliqaControl(this._netwrok);
   }
 
   public async getAddressByDomain(domain: string) {

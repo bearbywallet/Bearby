@@ -21,6 +21,7 @@ import { GasControler } from 'app/lib/controller/gas';
 import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { TransactionsContoller } from 'app/lib/controller/transaction';
 import { SearchController } from 'app/lib/controller/search-engine';
+import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -28,15 +29,16 @@ import { Account } from 'types';
 const _storage = new MobileStorage();
 
 export class WalletControler extends Mnemonic {
+  public readonly ud = new UnstoppableDomains();
   public readonly guard = new GuardControler(_storage);
   public readonly network = new NetworkControll(_storage);
   public readonly currency = new CurrencyControler(_storage);
   public readonly theme = new ThemeControler(_storage);
   public readonly settings = new SettingsControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
-  public readonly searchEngine = new SearchController(_storage);
   public readonly gas = new GasControler(_storage);
   public readonly zilliqa = new ZilliqaControl(this.network);
+  public readonly searchEngine = new SearchController(_storage, this.ud);
   public readonly viewblock = new ViewBlockControler(this.network);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
   public readonly account = new AccountControler(
