@@ -16,3 +16,4 @@ export * from './gas';
 export * from './connect';
 export * from './auth';
 export * from './transaction';
+export * from './search-engine';
