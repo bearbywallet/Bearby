@@ -6,13 +6,13 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { Messages } from 'app/config/messages';
 export interface MessagePayload {
   origin: string;
+  title?: string;
   icon?: string;
   data?: object;
 }
 export interface MessageType {
-  type: Messages;
+  type: string;
   payload: MessagePayload;
 }

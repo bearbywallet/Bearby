@@ -21,7 +21,7 @@ import CreateBackground from 'app/assets/logo.svg';
 import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
-import { fromZil, toConversion } from 'app/filters';
+import { fromZil, toConversion, toLocaleString } from 'app/filters';
 
 type Prop = {
   account: Account;
@@ -77,13 +77,13 @@ export const HomeAccount: React.FC<Prop> = ({
         />
         <View style={styles.amountWrapper}>
           <Text style={styles.amount}>
-            {amount}
+            {toLocaleString(amount)}
             <Text style={styles.symbol}>
               {token.symbol}
             </Text>
           </Text>
           <Text style={styles.convertedAmount}>
-            {conversion} {currency.toUpperCase()}
+            {toLocaleString(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
         <View style={styles.buttons}>

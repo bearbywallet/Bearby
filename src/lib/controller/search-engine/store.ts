@@ -12,6 +12,7 @@ import { SearchEngineStoreType } from 'types';
 const initalState: SearchEngineStoreType = {
   selected: 0,
   dweb: true,
+  incognito: false,
   identities: [
     {
       name: 'DuckDuckGo',

@@ -6,7 +6,18 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export enum Messages {
-  init = '@/init',
-  walletInfo = '@/wallet_info'
-}
+export const Messages = {
+  init: '@/init',
+  wallet: '@/wallet',
+  account: '@/account',
+  netwrok: '@/network',
+  block: '@/block',
+  status: '@/status',
+  signResult: '@/res-sign-result',
+  signTx: '@/sign-tx',
+  signMessage: '@/sign-message',
+  appConnect: '@/app_connect',
+  resConnect: '@/res_connect',
+  reqProxy: '@/req-proxy',
+  resProxy: '@/res-proxy'
+};

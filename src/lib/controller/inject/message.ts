@@ -12,7 +12,7 @@ import { Messages } from 'app/config';
 export class Message {
   private _message: MessageType;
 
-  constructor(type: Messages, payload: MessagePayload) {
+  constructor(type: string, payload: MessagePayload) {
     this._message = {
       type,
       payload

@@ -16,4 +16,5 @@ export interface SearchEngineStoreType {
   identities: SearchEngineType[];
   selected: number;
   dweb: boolean;
+  incognito: boolean;
 }

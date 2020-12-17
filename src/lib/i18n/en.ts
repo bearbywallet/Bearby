@@ -16,6 +16,8 @@ export default {
   manage: 'Manage',
   total_supply: 'Token Supply',
   home: 'Home',
+  incognito: 'Incognito mode',
+  incognito_des: 'Private browsing, disable cache',
   history: 'History',
   remove_token_description: 'You can re-add this token back by clicking on “Add token” in your tokens menu.',
   remove_token: 'Hide %{name} token',

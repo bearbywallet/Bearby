@@ -26,6 +26,7 @@ import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { keystore } from 'app/keystore';
+import { version } from '../../../package.json';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -35,6 +36,7 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const inpageJS = keystore.inpage.store.useValue();
+  const searchEngineState = keystore.searchEngine.store.useValue();
   const webViewRef = React.useRef<null | WebView>(null);
 
   const [url] = React.useState(new URL(route.params.url));
@@ -110,6 +112,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         source={{
           uri: route.params.url
         }}
+        applicationNameForUserAgent={`ZilPay/${version}`}
+        incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}

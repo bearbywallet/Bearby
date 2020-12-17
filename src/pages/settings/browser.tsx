@@ -80,6 +80,20 @@ export const BrowserSettingsPage = () => {
             </Text>
           </View>
         </Switcher>
+        <Switcher
+          style={styles.switcherContainer}
+          enabled={searchEngineState.incognito}
+          onChange={() => keystore.searchEngine.toggleIncognito(!searchEngineState.incognito)}
+        >
+          <View>
+            <Text style={styles.someText}>
+              {i18n.t('incognito')}
+            </Text>
+            <Text style={styles.someLable}>
+              {i18n.t('incognito_des')}
+            </Text>
+          </View>
+        </Switcher>
       </ScrollView>
     </SafeAreaView>
   );

@@ -45,7 +45,7 @@ export class InjectScript {
 	public async onMessage(message: MessageType, bridges: WebView<{}>) {
 		switch (message.type) {
 			case Messages.init:
-				const m = new Message(Messages.walletInfo, {
+				const m = new Message(Messages.wallet, {
 					origin: message.payload.origin,
 					data: {
 						accounts: this._account.selectAccount,
