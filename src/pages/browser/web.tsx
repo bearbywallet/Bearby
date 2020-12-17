@@ -17,7 +17,6 @@ import LottieView from 'lottie-react-native';
 import URL from 'url-parse';
 import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
-import { InjectScript } from 'app/lib/controller';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
 import { BrowserViewBar } from 'app/components/browser';
@@ -26,15 +25,16 @@ import { theme } from 'app/styles';
 import { RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BrwoserStackParamList } from 'app/navigator/browser';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
   route: RouteProp<BrwoserStackParamList, 'Web'>;
 };
 
-const INJECT = new InjectScript();
 const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
+  const inpageJS = keystore.inpage.store.useValue();
   const webViewRef = React.useRef<null | WebView>(null);
 
   const [url] = React.useState(new URL(route.params.url));
@@ -61,11 +61,25 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     setCanGoForward(nativeEvent.canGoForward);
   }, [setLoadingProgress, setCanGoBack, setCanGoForward]);
 
-  const handleMessage = React.useCallback((event) => {
-    //
-  }, []);
+  const handleMessage = React.useCallback(({ nativeEvent }) => {
+    try {
+      const message = JSON.parse(nativeEvent.data);
 
-  if (!INJECT.entryScrip) {
+      if (webViewRef.current) {
+        keystore.inpage.onMessage(message, webViewRef.current);
+      }
+    } catch {
+      //
+    }
+  }, [webViewRef]);
+
+  React.useEffect(() => {
+    if (!inpageJS) {
+      keystore.inpage.sync();
+    }
+  }, [inpageJS]);
+
+  if (!inpageJS) {
     return (
       <SafeAreaView style={{
         flex: 1,
@@ -96,7 +110,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         source={{
           uri: route.params.url
         }}
-        injectedJavaScriptBeforeContentLoaded={INJECT.entryScrip}
+        injectedJavaScriptBeforeContentLoaded={inpageJS}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />

@@ -22,6 +22,7 @@ import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { TransactionsContoller } from 'app/lib/controller/transaction';
 import { SearchController } from 'app/lib/controller/search-engine';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
+import { InjectScript } from 'app/lib/controller';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -29,7 +30,7 @@ import { Account } from 'types';
 const _storage = new MobileStorage();
 
 export class WalletControler extends Mnemonic {
-  public readonly ud = new UnstoppableDomains();
+  public readonly ud = new UnstoppableDomains(_storage);
   public readonly guard = new GuardControler(_storage);
   public readonly network = new NetworkControll(_storage);
   public readonly currency = new CurrencyControler(_storage);
@@ -55,6 +56,7 @@ export class WalletControler extends Mnemonic {
     this.account,
     this.network
   );
+  public readonly inpage = new InjectScript(this.account, this.network);
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
@@ -118,5 +120,6 @@ export class WalletControler extends Mnemonic {
     await this.contacts.sync();
     await this.gas.sync();
     await this.searchEngine.sync();
+    await this.inpage.sync();
   }
 }

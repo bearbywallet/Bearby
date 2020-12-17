@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 export * from './store';
+export * from './inpage';
 
 declare module "*.svg" {
   const content: any;

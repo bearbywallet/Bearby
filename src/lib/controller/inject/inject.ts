@@ -7,22 +7,55 @@
  * Copyright (c) 2020 ZilPay
  */
 import RNFS from 'react-native-fs';
+import WebView from 'react-native-webview';
 
+import { inpageStore, inpageStoreUpdate } from './store';
 import { Device } from 'app/utils';
+import { MessageType } from 'types';
+import { Messages } from 'app/config';
+import { Message } from './message';
+import { NetworkControll } from 'app/lib/controller/network';
+import { AccountControler } from 'app/lib/controller/account';
 
 export class InjectScript {
-	public entryScrip: string | null = null;
+	public store = inpageStore;
 
-	constructor() {
-		this.init();
+	private _account: AccountControler;
+	private _netwrok: NetworkControll;
+
+	constructor(account: AccountControler, netwrok: NetworkControll) {
+		this._account = account;
+		this._netwrok = netwrok;
 	}
 
-	// Cache inpage.js so that it is immediately available
-	private async init() {
-		this.entryScrip = Device.isIos()
-			? await RNFS.readFile(`${RNFS.MainBundlePath}/inpage.js`, 'utf8')
-			: await RNFS.readFileAssets(`inpage.js`);
+	public async sync() {
+		if (Device.isIos()) {
+			const entryScrip = await RNFS.readFile(`${RNFS.MainBundlePath}/inpage.js`, 'utf8');
 
-		return this.entryScrip;
+			inpageStoreUpdate(entryScrip);
+		}
+
+		if (Device.isAndroid()) {
+			const entryScrip = await RNFS.readFileAssets(`inpage.js`);
+
+			inpageStoreUpdate(entryScrip);
+		}
+	}
+
+	public async onMessage(message: MessageType, bridges: WebView<{}>) {
+		switch (message.type) {
+			case Messages.init:
+				const m = new Message(Messages.walletInfo, {
+					origin: message.payload.origin,
+					data: {
+						accounts: this._account.selectAccount,
+						netwrok: this._netwrok.selected
+					}
+				});
+				bridges.postMessage(m.serialize);
+				break;
+			default:
+				break;
+		}
 	}
 }
