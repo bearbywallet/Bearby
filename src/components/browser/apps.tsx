@@ -32,12 +32,6 @@ export const categories = [
   'gambling'
 ];
 
-const topAps = [
-  'DragonZIL',
-  'Stake',
-  'SocialPay'
-];
-
 export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
   return (
     <ScrollView style={styles.container}>
@@ -55,21 +49,9 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
           />
         ))}
       </View>
-      <Text style={styles.namePlace}>
+      {/* <Text style={styles.namePlace}>
         {i18n.t('top_aaps')}
-      </Text>
-      <View style={{
-        paddingHorizontal: 15,
-        paddingBottom: 120
-      }}>
-        {topAps.map((app, index) => (
-          <BrowserAppItem
-            style={{ marginTop: 15 }}
-            key={index}
-            title={app}
-          />
-        ))}
-      </View>
+      </Text> */}
     </ScrollView>
   );
 };

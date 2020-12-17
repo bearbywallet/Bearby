@@ -10,21 +10,17 @@
 import React from 'react';
 import {
   StyleSheet,
-  Text,
   Dimensions,
-  TouchableOpacity,
   View
 } from 'react-native';
+import LottieView from 'lottie-react-native';
 import URL from 'url-parse';
 import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
-import { SvgXml } from 'react-native-svg';
+import { InjectScript } from 'app/lib/controller';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
-import {
-  ArrowIconSVG,
-  LockSVG
-} from 'app/components/svg';
+import { BrowserViewBar } from 'app/components/browser';
 
 import { theme } from 'app/styles';
 import { RouteProp } from '@react-navigation/native';
@@ -36,27 +32,24 @@ type Prop = {
   route: RouteProp<BrwoserStackParamList, 'Web'>;
 };
 
-const INJECTED_JAVASCRIPT = `(function() {
-  // window.alert('dasdsa')
-})();`;
-
+const INJECT = new InjectScript();
 const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const webViewRef = React.useRef<null | WebView>(null);
 
-  const [url, setUrl] = React.useState(new URL(route.params.url));
+  const [url] = React.useState(new URL(route.params.url));
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
 
-  const hanldeback = React.useCallback(() => {
+  const handleBack = React.useCallback(() => {
     if (!canGoBack) {
       return navigation.goBack();
     } else if (webViewRef && webViewRef.current) {
       webViewRef.current.goBack();
     }
   }, [canGoBack, webViewRef]);
-  const hanldeGoForward = React.useCallback(() => {
+  const handleGoForward = React.useCallback(() => {
     if (webViewRef && webViewRef.current) {
       webViewRef.current.goForward();
     }
@@ -72,56 +65,29 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     //
   }, []);
 
+  if (!INJECT.entryScrip) {
+    return (
+      <SafeAreaView style={{
+        flex: 1,
+        backgroundColor: '#09090c'
+      }}>
+        <LottieView
+          source={require('app/assets/loader')}
+          autoPlay
+          loop
+        />
+      </SafeAreaView>
+    );
+  }
+
   return (
     <SafeAreaView style={styles.container}>
-      <View style={styles.nav}>
-        <View style={styles.navBtns}>
-          <TouchableOpacity onPress={hanldeback}>
-            <SvgXml
-              xml={ArrowIconSVG}
-              height="30"
-              width="30"
-              fill={theme.colors.primary}
-              style={{
-                transform: [{ rotate: '90deg' }]
-              }}
-            />
-          </TouchableOpacity>
-          <TouchableOpacity
-            disabled={!canGoForward}
-            onPress={hanldeGoForward}
-          >
-            <SvgXml
-              xml={ArrowIconSVG}
-              height="30"
-              width="30"
-              fill={canGoForward ? theme.colors.primary : theme.colors.muted}
-              style={{
-                transform: [{ rotate: '-90deg' }],
-                marginLeft: 15
-              }}
-            />
-          </TouchableOpacity>
-        </View>
-        <View style={styles.hostWrapper}>
-          <SvgXml
-            xml={LockSVG}
-            height="15"
-            width="15"
-            fill={url.protocol.includes('https') ? theme.colors.white : theme.colors.danger}
-          />
-          <Text style={styles.host}>
-            {url.hostname}
-          </Text>
-        </View>
-        <TouchableOpacity
-          style={styles.dotsWrapper}
-        >
-          <View style={styles.dot}/>
-          <View style={styles.dot}/>
-          <View style={styles.dot}/>
-        </TouchableOpacity>
-      </View>
+      <BrowserViewBar
+        url={url}
+        canGoForward={canGoForward}
+        onBack={handleBack}
+        onGoForward={handleGoForward}
+      />
       {loadingProgress !== 1 ? (
         <View style={[styles.loading, { width: width * loadingProgress }]}/>
       ) : null}
@@ -130,7 +96,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         source={{
           uri: route.params.url
         }}
-        injectedJavaScriptBeforeContentLoaded={INJECTED_JAVASCRIPT}
+        injectedJavaScriptBeforeContentLoaded={INJECT.entryScrip}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />
@@ -142,44 +108,9 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.black
   },
-  nav: {
-    height: 50,
-    backgroundColor: theme.colors.black,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 15
-  },
-  navBtns: {
-    flexDirection: 'row',
-    justifyContent: 'space-between'
-  },
   loading: {
     height: 3,
     backgroundColor: theme.colors.primary
-  },
-  hostWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center'
-  },
-  host: {
-    color: theme.colors.white,
-    fontWeight: 'bold',
-    fontSize: 17,
-    lineHeight: 22
-  },
-  dotsWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: '100%',
-    width: 15
-  },
-  dot: {
-    backgroundColor: theme.colors.primary,
-    borderRadius: 100,
-    height: 5,
-    width: 5,
-    marginLeft: 3
   }
 });
 

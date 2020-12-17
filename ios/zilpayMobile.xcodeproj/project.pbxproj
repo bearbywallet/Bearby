@@ -11,6 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		15614DDD258B4AFB00728897 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 15614DDC258B4AFB00728897 /* inpage.js */; };
 		158A2BE02544529800D32C44 /* Data+HexString.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BDF2544529800D32C44 /* Data+HexString.m */; };
 		158A2BE82544530400D32C44 /* HDKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BE72544530400D32C44 /* HDKeyPair.m */; };
 		158A2BF32544536C00D32C44 /* KeyDerivation.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF22544536C00D32C44 /* KeyDerivation.m */; };
@@ -54,6 +55,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = zilpayMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = zilpayMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = zilpayMobile/main.m; sourceTree = "<group>"; };
+		15614DDC258B4AFB00728897 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; path = inpage.js; sourceTree = "<group>"; };
 		158A2BDF2544529800D32C44 /* Data+HexString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Data+HexString.m"; sourceTree = "<group>"; };
 		158A2BE5254452B500D32C44 /* Data+HexString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Data+HexString.h"; sourceTree = "<group>"; };
 		158A2BE6254452DF00D32C44 /* HDKeyPair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDKeyPair.h; sourceTree = "<group>"; };
@@ -136,6 +138,7 @@
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
+				15614DDC258B4AFB00728897 /* inpage.js */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
 				13B07FB61A68108700A75B9A /* Info.plist */,
 				81AB9BB72411601600AC10FF /* LaunchScreen.storyboard */,
@@ -354,6 +357,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
+				15614DDD258B4AFB00728897 /* inpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

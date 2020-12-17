@@ -6,9 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './nav-bar';
-export * from './apps';
-export * from './favorites';
-export * from './card-item';
-export * from './app-itmem';
-export * from './view-bar';
+export * from './inject';
