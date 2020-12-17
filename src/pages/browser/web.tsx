@@ -70,8 +70,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       if (webViewRef.current) {
         keystore.inpage.onMessage(message, webViewRef.current);
       }
-    } catch {
-      //
+    } catch (err) {
+      console.error(err);
     }
   }, [webViewRef]);
 
