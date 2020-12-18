@@ -42,6 +42,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const inpageJS = keystore.inpage.store.useValue();
   const searchEngineState = keystore.searchEngine.store.useValue();
   const connectState = keystore.connect.store.useValue();
+  const accountState = keystore.account.store.useValue();
+  const networkState = keystore.network.store.useValue();
 
   const webViewRef = React.useRef<null | WebView>(null);
 
@@ -116,7 +118,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [webViewRef, isConnect, setAppConnect]);
 
   const handleConnect = React.useCallback((value) => {
-    if (value && appConnect && appConnect.title && appConnect.icon) {
+    if (value && appConnect && appConnect.title && appConnect.icon && appConnect.origin) {
       keystore.connect.add({
         title: appConnect.title,
         domain: new URL(appConnect.origin).hostname,
@@ -147,6 +149,24 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       keystore.inpage.sync();
     }
   }, []);
+
+  React.useEffect(() => {
+    if (webViewRef.current) {
+      const { base16, bech32 } = keystore.account.getCurrentAccount();
+      const m = new Message(Messages.resConnect, {
+        data: {
+          isConnect,
+          account: isConnect ? {
+            base16,
+            bech32
+          } : null,
+          isEnable: keystore.guard.isEnable,
+          netwrok: keystore.network.selected
+        }
+      });
+      webViewRef.current.postMessage(m.serialize);
+    }
+  }, [webViewRef, accountState, networkState]);
 
   if (!inpageJS) {
     return (

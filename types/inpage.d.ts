@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 export interface MessagePayload {
-  origin: string;
+  origin?: string;
   title?: string;
   icon?: string;
   data?: object;

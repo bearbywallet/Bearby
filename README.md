@@ -37,8 +37,8 @@ $ yarn android --device
 
 ### Web3
 - [x] WebView.
-- [ ] Create JS injector.
-- [ ] meesage beetween app and inject script.
+- [x] Create JS injector.
+- [x] meesage beetween app and inject script.
 
 ### DWeb
 - [x] unstoppabledomains controller.
@@ -52,9 +52,9 @@ $ yarn android --device
 - [x] Add token card.
 - [x] add token form.
 - [x] add token modal.
-- [ ] Token ZRC parser.
+- [x] Token ZRC parser.
 	- [ ] parser ZRC-1.
-	- [ ] parser ZRC-2.
+	- [x] parser ZRC-2.
 	- [ ] parser ZRC-3.
 
 ### Controller Core librarys:
@@ -96,15 +96,15 @@ $ yarn android --device
 	- [x] MnemonicVerifyPage.
 	- [x] SetupPasswordPage.
 	- [x] InitSuccessfullyPage.
-- [ ] Tabs.
+- [x] Tabs.
 	- [x] HomePage.
-	- [ ] BrowserPage.
+	- [x] BrowserPage.
 	- [x] SettingsPage.
 	- [x] HistoryPage.
 - [ ] Common.
 	- [x] CreateAccountPage.
 	- [x] TransferPage.
-	- [ ] ConnectDApp.
+	- [x] ConnectDApp.
 	- [ ] SignMessage.
 	- [x] confirmTransaction.
 	- [x] AuthLoading.
