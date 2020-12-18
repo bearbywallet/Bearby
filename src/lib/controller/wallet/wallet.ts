@@ -23,6 +23,7 @@ import { TransactionsContoller } from 'app/lib/controller/transaction';
 import { SearchController } from 'app/lib/controller/search-engine';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { InjectScript } from 'app/lib/controller';
+import { ConnectController } from 'app/lib/controller/connect';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -57,6 +58,7 @@ export class WalletControler extends Mnemonic {
     this.network
   );
   public readonly inpage = new InjectScript(this.account, this.network);
+  public readonly connect = new ConnectController(_storage);
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
@@ -120,6 +122,7 @@ export class WalletControler extends Mnemonic {
     await this.contacts.sync();
     await this.gas.sync();
     await this.searchEngine.sync();
+    await this.connect.sync();
     await this.inpage.sync();
   }
 }
