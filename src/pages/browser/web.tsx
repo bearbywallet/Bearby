@@ -20,6 +20,7 @@ import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
 import { BrowserViewBar } from 'app/components/browser';
+import { ConnectModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import { RouteProp } from '@react-navigation/native';
@@ -27,6 +28,9 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { keystore } from 'app/keystore';
 import { version } from '../../../package.json';
+import { Messages } from 'app/config';
+import { Message } from 'app/lib/controller/inject/message';
+import { MessagePayload } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -37,12 +41,15 @@ const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const inpageJS = keystore.inpage.store.useValue();
   const searchEngineState = keystore.searchEngine.store.useValue();
+
   const webViewRef = React.useRef<null | WebView>(null);
 
   const [url] = React.useState(new URL(route.params.url));
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
+
+  const [appConnect, setAppConnect] = React.useState<MessagePayload>();
 
   const handleBack = React.useCallback(() => {
     if (!canGoBack) {
@@ -64,16 +71,56 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [setLoadingProgress, setCanGoBack, setCanGoForward]);
 
   const handleMessage = React.useCallback(({ nativeEvent }) => {
+    if (!webViewRef.current) {
+      return null;
+    }
+
     try {
       const message = JSON.parse(nativeEvent.data);
 
-      if (webViewRef.current) {
-        keystore.inpage.onMessage(message, webViewRef.current);
+      switch (message.type) {
+        case Messages.init:
+          const { base16, bech32 } = keystore.account.getCurrentAccount();
+          const m = new Message(Messages.wallet, {
+            origin: message.payload.origin,
+            data: {
+              account: null,
+              isConnect: false,
+              isEnable: keystore.guard.isEnable,
+              netwrok: keystore.network.selected
+            }
+          });
+          webViewRef.current.postMessage(m.serialize);
+          break;
+        case Messages.appConnect:
+          setAppConnect(message.payload);
+          break;
+        default:
+          break;
       }
     } catch (err) {
       console.error(err);
     }
-  }, [webViewRef]);
+  }, [webViewRef, setAppConnect]);
+
+  const handleConnect = React.useCallback((value) => {
+    if (webViewRef.current && appConnect && appConnect.origin) {
+      const { base16, bech32 } = keystore.account.getCurrentAccount();
+      const m = new Message(Messages.resConnect, {
+        origin: appConnect.origin,
+        uuid: appConnect.uuid,
+        data: {
+          confirm: value,
+          account: value ? {
+            base16,
+            bech32
+          } : null
+        }
+      });
+      webViewRef.current.postMessage(m.serialize);
+    }
+    setAppConnect(undefined);
+  }, [appConnect, webViewRef]);
 
   React.useEffect(() => {
     if (!inpageJS) {
@@ -117,6 +164,13 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         injectedJavaScriptBeforeContentLoaded={inpageJS}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
+      />
+      <ConnectModal
+        app={appConnect}
+        visible={Boolean(appConnect)}
+        onTriggered={() => handleConnect(false)}
+        onReject={() => handleConnect(false)}
+        onConfirm={() => handleConnect(true)}
       />
     </SafeAreaView>
   );

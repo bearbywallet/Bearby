@@ -11,6 +11,7 @@ export interface MessagePayload {
   title?: string;
   icon?: string;
   data?: object;
+  uuid?: string;
 }
 export interface MessageType {
   type: string;
