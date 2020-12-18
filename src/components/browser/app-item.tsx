@@ -9,6 +9,7 @@
 import React from 'react';
 import {
   View,
+  Image,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -20,19 +21,36 @@ import { theme } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   title: string;
+  icon: string;
+  domain: string;
   onPress?: () => void;
 };
 
 const { width } = Dimensions.get('window');
-export const BrowserAppItem: React.FC<Prop> = ({ title, style, onPress }) => {
+export const BrowserAppItem: React.FC<Prop> = ({
+  title,
+  icon,
+  domain,
+  style,
+  onPress
+}) => {
   return (
     <TouchableOpacity
       style={[styles.container, style]}
       onPress={onPress}
     >
-      <Text style={styles.title}>
-        {title}
-      </Text>
+      <Image
+        style={styles.icon}
+        source={{ uri: icon }}
+      />
+      <View>
+        <Text style={styles.title}>
+          {title}
+        </Text>
+        <Text style={styles.domain}>
+          {domain}
+        </Text>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -40,14 +58,25 @@ export const BrowserAppItem: React.FC<Prop> = ({ title, style, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 10,
-    minHeight: width / 5,
+    minHeight: width / 6,
     borderRadius: 8,
     backgroundColor: theme.colors.gray,
-    justifyContent: 'flex-end'
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center'
   },
   title: {
     fontSize: 17,
     lineHeight: 22,
     color: theme.colors.white
+  },
+  icon: {
+    height: 30,
+    width: 30
+  },
+  domain: {
+    fontSize: 15,
+    lineHeight: 17,
+    color: theme.colors.muted
   }
 });
