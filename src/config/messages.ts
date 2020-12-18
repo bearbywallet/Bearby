@@ -9,10 +9,7 @@
 export const Messages = {
   init: '@/init',
   wallet: '@/wallet',
-  account: '@/account',
-  netwrok: '@/network',
   block: '@/block',
-  status: '@/status',
   signResult: '@/res-sign-result',
   signTx: '@/sign-tx',
   signMessage: '@/sign-message',

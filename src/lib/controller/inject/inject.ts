@@ -41,27 +41,4 @@ export class InjectScript {
 			inpageStoreUpdate(entryScrip);
 		}
 	}
-
-	public async onMessage(message: MessageType, bridges: WebView<{}>) {
-		switch (message.type) {
-			case Messages.init:
-				const { base16, bech32 } = this._account.getCurrentAccount();
-				const m = new Message(Messages.wallet, {
-					origin: message.payload.origin,
-					data: {
-						account: {
-							base16,
-							bech32
-						},
-						isConnect: true,
-						isEnable: true,
-						netwrok: this._netwrok.selected
-					}
-				});
-				bridges.postMessage(m.serialize);
-				break;
-			default:
-				break;
-		}
-	}
 }
