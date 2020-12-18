@@ -10,7 +10,8 @@ import {
   connectStore,
   connectStoreAdd,
   connectStoreReset,
-  connectStoreUpdate
+  connectStoreUpdate,
+  connectStoreRm
 } from './store';
 import { MobileStorage, buildObject } from "app/lib/storage";
 import { Connect } from 'types';
@@ -26,6 +27,14 @@ export class ConnectController {
 
   public async add(connect: Connect) {
     connectStoreAdd(connect);
+
+    await this._storage.set(
+      buildObject(STORAGE_FIELDS.CONNECTIONS, this.store.get())
+    );
+  }
+
+  public async rm(connect: Connect) {
+    connectStoreRm(connect);
 
     await this._storage.set(
       buildObject(STORAGE_FIELDS.CONNECTIONS, this.store.get())

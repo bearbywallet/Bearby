@@ -20,6 +20,10 @@ export function connectStoreAdd(payload: Connect) {
   connectStore.set((state) => ([...state, payload]));
 }
 
+export function connectStoreRm(payload: Connect) {
+  connectStore.set((state) => state.filter((el) => el.domain !== payload.domain));
+}
+
 export function connectStoreReset() {
   connectStore.reset();
 }

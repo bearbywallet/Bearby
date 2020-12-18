@@ -22,6 +22,7 @@ export default {
   connect_btn0: 'Connect',
   connect_btn1: 'Reject',
   connect_title_question: 'Would you like to connect to this application?',
+  remove_connect: 'Remove %{name} connect?',
   history: 'History',
   remove_token_description: 'You can re-add this token back by clicking on “Add token” in your tokens menu.',
   remove_token: 'Hide %{name} token',
