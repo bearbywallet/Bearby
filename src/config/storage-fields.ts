@@ -21,7 +21,7 @@ export const STORAGE_FIELDS = {
   TRANSACTIONS: `${prefix}transactions`,
   CURRENCY: `${prefix}currency`,
   RATE: `${prefix}rate`,
-  CONNECTIONS: `${prefix}rate`,
+  CONNECTIONS: `${prefix}/connections`,
   GAS: `${prefix}gas_config`,
   ADDRESS_FORMAT: `${prefix}address_format`,
 

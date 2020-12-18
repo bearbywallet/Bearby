@@ -10,5 +10,5 @@ export * from './nav-bar';
 export * from './apps';
 export * from './favorites';
 export * from './card-item';
-export * from './app-itmem';
+export * from './app-item';
 export * from './view-bar';

@@ -47,6 +47,7 @@ const { height, width } = Dimensions.get('window');
 const initialLayout = { width };
 export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const accountState = keystore.account.store.useValue();
+  const connectState = keystore.connect.store.useValue();
 
   const [search, setSearch] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -76,12 +77,24 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     });
   }, [search]);
 
+  const handleConnect = React.useCallback(async(connect) => {
+    setIsLoading(true);
+    const url = await keystore.searchEngine.onUrlSubmit(connect.domain);
+    setIsLoading(false);
+    navigation.navigate('Web', {
+      url
+    });
+  }, []);
+
   const renderScene = SceneMap({
     [Tabs.apps]: () => (
       <BrowserApps onSelect={hanldeSelectCategory} />
     ),
     [Tabs.favorites]: () => (
-      <BrowserFavorites />
+      <BrowserFavorites
+        connections={connectState}
+        onGoConnection={handleConnect}
+      />
     )
   });
 

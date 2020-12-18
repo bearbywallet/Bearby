@@ -27,7 +27,9 @@ export class ConnectController {
   public async add(connect: Connect) {
     connectStoreAdd(connect);
 
-    await this.sync();
+    await this._storage.set(
+      buildObject(STORAGE_FIELDS.CONNECTIONS, this.store.get())
+    );
   }
 
   public async reset() {
