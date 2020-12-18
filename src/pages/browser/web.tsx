@@ -41,6 +41,7 @@ const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const inpageJS = keystore.inpage.store.useValue();
   const searchEngineState = keystore.searchEngine.store.useValue();
+  const connectState = keystore.connect.store.useValue();
 
   const webViewRef = React.useRef<null | WebView>(null);
 
@@ -50,6 +51,14 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const [canGoForward, setCanGoForward] = React.useState(false);
 
   const [appConnect, setAppConnect] = React.useState<MessagePayload>();
+
+  const isConnect = React.useMemo(() => {
+    const { hostname } = new URL(route.params.url);
+
+    return connectState.some(
+      (app) => app.domain.toLowerCase() === hostname.toLowerCase()
+    );
+  }, [connectState, route.params.url]);
 
   const handleBack = React.useCallback(() => {
     if (!canGoBack) {
@@ -84,8 +93,11 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           const m = new Message(Messages.wallet, {
             origin: message.payload.origin,
             data: {
-              account: null,
-              isConnect: false,
+              isConnect,
+              account: isConnect ? {
+                base16,
+                bech32
+              } : null,
               isEnable: keystore.guard.isEnable,
               netwrok: keystore.network.selected
             }
@@ -101,10 +113,18 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     } catch (err) {
       console.error(err);
     }
-  }, [webViewRef, setAppConnect]);
+  }, [webViewRef, isConnect, setAppConnect]);
 
   const handleConnect = React.useCallback((value) => {
-    if (webViewRef.current && appConnect && appConnect.origin) {
+    if (value && appConnect && appConnect.title && appConnect.icon) {
+      keystore.connect.add({
+        title: appConnect.title,
+        domain: new URL(appConnect.origin).hostname,
+        icon: appConnect.icon
+      });
+    }
+
+    if (webViewRef.current && appConnect) {
       const { base16, bech32 } = keystore.account.getCurrentAccount();
       const m = new Message(Messages.resConnect, {
         origin: appConnect.origin,
