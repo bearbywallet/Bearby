@@ -11,13 +11,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		1568894C258BD15000AB8F2E /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 1568894B258BD15000AB8F2E /* inpage.js */; };
 		158A2BE02544529800D32C44 /* Data+HexString.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BDF2544529800D32C44 /* Data+HexString.m */; };
 		158A2BE82544530400D32C44 /* HDKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BE72544530400D32C44 /* HDKeyPair.m */; };
 		158A2BF32544536C00D32C44 /* KeyDerivation.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF22544536C00D32C44 /* KeyDerivation.m */; };
 		158A2BFA254453C100D32C44 /* KeyIndexPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF9254453C100D32C44 /* KeyIndexPath.m */; };
 		158A2C012544540800D32C44 /* Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2C002544540800D32C44 /* Mnemonic.m */; };
 		1593FFB425404282003A377C /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 1593FFB325404282003A377C /* Crypto.m */; };
+		15DD36AA258CD25B004F678B /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 15DD36A9258CD25B004F678B /* inpage.js */; };
 		2D02E4BC1E0B4A80006451C7 /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		2D02E4BD1E0B4A84006451C7 /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		2D02E4BF1E0B4AB3006451C7 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
@@ -55,7 +55,6 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = zilpayMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = zilpayMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = zilpayMobile/main.m; sourceTree = "<group>"; };
-		1568894B258BD15000AB8F2E /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-inpage/dist/inpage.js"; sourceTree = "<group>"; };
 		158A2BDF2544529800D32C44 /* Data+HexString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Data+HexString.m"; sourceTree = "<group>"; };
 		158A2BE5254452B500D32C44 /* Data+HexString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Data+HexString.h"; sourceTree = "<group>"; };
 		158A2BE6254452DF00D32C44 /* HDKeyPair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDKeyPair.h; sourceTree = "<group>"; };
@@ -68,6 +67,7 @@
 		158A2C002544540800D32C44 /* Mnemonic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Mnemonic.m; sourceTree = "<group>"; };
 		1593FFB225404277003A377C /* Crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
 		1593FFB325404282003A377C /* Crypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
+		15DD36A9258CD25B004F678B /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-inpage/dist/inpage.js"; sourceTree = "<group>"; };
 		29A3322CDD91E2C0522DA163 /* Pods-zilpayMobile.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-zilpayMobile.debug.xcconfig"; path = "Target Support Files/Pods-zilpayMobile/Pods-zilpayMobile.debug.xcconfig"; sourceTree = "<group>"; };
 		2D02E47B1E0B4A5D006451C7 /* zilpayMobile-tvOS.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "zilpayMobile-tvOS.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		2D02E4901E0B4A5D006451C7 /* zilpayMobile-tvOSTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "zilpayMobile-tvOSTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -135,7 +135,7 @@
 		13B07FAE1A68108700A75B9A /* zilpayMobile */ = {
 			isa = PBXGroup;
 			children = (
-				1568894B258BD15000AB8F2E /* inpage.js */,
+				15DD36A9258CD25B004F678B /* inpage.js */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -357,7 +357,7 @@
 			files = (
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
-				1568894C258BD15000AB8F2E /* inpage.js in Resources */,
+				15DD36AA258CD25B004F678B /* inpage.js in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
