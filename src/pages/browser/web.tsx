@@ -126,7 +126,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     if (!inpageJS) {
       keystore.inpage.sync();
     }
-  }, [inpageJS]);
+  }, []);
 
   if (!inpageJS) {
     return (
