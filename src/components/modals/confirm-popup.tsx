@@ -28,12 +28,13 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
-import { Token, Account } from 'types';
+import { Token, Account, GasState } from 'types';
 import { TOKEN_ICONS } from 'app/config';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
+import { deppUnlink } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
@@ -44,27 +45,34 @@ type Prop = {
   amount: string;
   netwrok: string;
   recipient: string;
+  code: string;
+  data: string;
+  gasCost: GasState;
   onTriggered: () => void;
+  onConfirm: () => void;
 };
 
 export const ConfirmPopup: React.FC<Prop> = ({
   title,
   style,
   token,
+  code,
+  data,
   account,
   netwrok,
   amount,
   visible,
   recipient,
-  onTriggered
+  gasCost,
+  onTriggered,
+  onConfirm
 }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
-  const gasState = keystore.gas.store.useValue();
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(false);
-  const [gas, setGas] = React.useState(gasState);
+  const [gas, setGas] = React.useState(gasCost);
 
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[currencyState];
@@ -84,8 +92,17 @@ export const ConfirmPopup: React.FC<Prop> = ({
       account
     );
     setIsLoading(false);
-    onTriggered();
-  }, [account, token, amount, recipient, setIsLoading, onTriggered]);
+    onConfirm();
+  }, [
+    account,
+    token,
+    amount,
+    recipient,
+    data,
+    code,
+    setIsLoading,
+    onConfirm
+  ]);
 
   return (
     <Modal
@@ -162,6 +179,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <AdvacedGas
             gas={gas}
             ds={DS}
+            defaultGas={deppUnlink(gasCost)}
             onDSChanged={setDS}
             onChange={setGas}
           />

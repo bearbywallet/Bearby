@@ -22,8 +22,10 @@ import { Selector } from 'app/components/selector';
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
+import { DEFAULT_GAS } from 'app/config';
 
-export const AdvancedPage = () => {
+
+export const AdvancedPage: React.FC = () => {
   const settingsState = keystore.settings.store.useValue();
   const gasState = keystore.gas.store.useValue();
 
@@ -49,6 +51,7 @@ export const AdvancedPage = () => {
           style={{ marginVertical: 16 }}
           gasLimit={gasState.gasLimit}
           gasPrice={gasState.gasPrice}
+          defaultGas={DEFAULT_GAS}
           onChange={(gas) => keystore.gas.changeGas(gas)}
         />
         <Selector

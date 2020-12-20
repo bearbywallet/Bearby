@@ -26,13 +26,14 @@ import {
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { GasState } from 'types';
-import { gasToFee } from 'app/filters';
+import { gasToFee, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { DEFAULT_GAS } from 'app/config';
 
 type Prop = {
   gasLimit: string;
   gasPrice: string;
+  defaultGas: GasState;
   onChange?: (gas: GasState) => void;
   style?: ViewStyle;
 };
@@ -42,6 +43,7 @@ export const GasSelector: React.FC<Prop> = ({
   style,
   gasLimit,
   gasPrice,
+  defaultGas,
   onChange = () => null
 }) => {
   const tokensState = keystore.token.store.useValue();
@@ -51,20 +53,20 @@ export const GasSelector: React.FC<Prop> = ({
     const { fee } = gasToFee(gasLimit, String(incresedGasPrice));
     const [zilliqa] = tokensState;
 
-    return `${fee} ${zilliqa.symbol}`;
+    return `${toLocaleString(String(fee))} ${zilliqa.symbol}`;
   };
 
   const firstSelected = React.useMemo(
-    () => DEFAULT_GAS.gasPrice === gasPrice,
-    [gasPrice]
+    () => Number(defaultGas.gasPrice) === Number(gasPrice),
+    [gasPrice, defaultGas]
   );
   const secondSelected = React.useMemo(
-    () => (Number(DEFAULT_GAS.gasPrice) * 2) === Number(gasPrice),
-    [gasPrice]
+    () => (Number(defaultGas.gasPrice) * 2) === Number(gasPrice),
+    [gasPrice, defaultGas]
   );
   const threeSelected = React.useMemo(
-    () => (Number(DEFAULT_GAS.gasPrice) * 3) === Number(gasPrice),
-    [gasPrice]
+    () => (Number(defaultGas.gasPrice) * 3) === Number(gasPrice),
+    [gasPrice, defaultGas]
   );
 
   const createTwoButtonAlert = () =>

@@ -121,7 +121,11 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
         title={i18n.t('confirm')}
         netwrok={networkState.selected}
         visible={confirmModal}
+        gasCost={gasState}
+        code=""
+        data=""
         onTriggered={() => setConfirmModal(false)}
+        onConfirm={() => null}
       />
     </React.Fragment>
   );

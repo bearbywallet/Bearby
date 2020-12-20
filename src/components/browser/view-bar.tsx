@@ -11,6 +11,7 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
+  Dimensions,
   Text
 } from 'react-native';
 import URL from 'url-parse';
@@ -26,6 +27,7 @@ type Prop = {
   onGoForward: () => void;
 };
 
+const { width } = Dimensions.get('window');
 export const BrowserViewBar: React.FC<Prop> = ({
   url,
   canGoForward,
@@ -90,8 +92,7 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.black,
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-around',
-    paddingHorizontal: 15
+    justifyContent: 'space-around'
   },
   navBtns: {
     flexDirection: 'row',
@@ -105,7 +106,8 @@ const styles = StyleSheet.create({
     color: theme.colors.white,
     fontWeight: 'bold',
     fontSize: 17,
-    lineHeight: 22
+    lineHeight: 22,
+    minWidth: width / 3
   },
   dotsWrapper: {
     flexDirection: 'row',

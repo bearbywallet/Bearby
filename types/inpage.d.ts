@@ -13,6 +13,7 @@ export interface MessagePayload {
   data?: object;
   uuid?: string;
 }
+
 export interface MessageType {
   type: string;
   payload: MessagePayload;
@@ -31,5 +32,12 @@ export interface TxParams {
   toAddr: string;
   code: string;
   data: string;
-  priority: string;
+  priority: boolean;
+}
+
+export interface TxMessage {
+  params: TxParams;
+  origin: string;
+  icon: string;
+  uuid: string;
 }

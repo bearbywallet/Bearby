@@ -15,8 +15,6 @@ import { tohexString, pack, hexToByteArray } from 'app/utils';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
-
-
 export class Transaction {
 
   public static fromPayload(payload: TxParams, account: Account) {

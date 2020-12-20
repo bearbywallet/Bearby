@@ -9,6 +9,12 @@
 import Big from 'big.js';
 
 Big.PE = 99;
+const _li = Big(10 ** 6);
+
+export function toLi(value: string | number) {
+  const _value = Big(value);
+  return _value.div(_li).toString();
+}
 
 export function gasToFee(gasLimit: string, gasPrice: string) {
   if (isNaN(Number(gasLimit)) || isNaN(Number(gasPrice))) {
@@ -18,7 +24,6 @@ export function gasToFee(gasLimit: string, gasPrice: string) {
     };
   }
 
-  const _li = Big(10 ** 6);
   const _gasPrice = Big(gasPrice).round();
   const _gasLimit = Big(gasLimit).round();
   const _fee = _gasLimit.mul(_gasPrice);

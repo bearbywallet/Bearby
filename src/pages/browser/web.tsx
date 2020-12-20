@@ -20,7 +20,11 @@ import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
 import { BrowserViewBar } from 'app/components/browser';
-import { ConnectModal, SignMessageModal } from 'app/components/modals';
+import {
+  ConnectModal,
+  SignMessageModal,
+  ConfirmPopup
+} from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import { RouteProp } from '@react-navigation/native';
@@ -31,8 +35,9 @@ import { version } from '../../../package.json';
 import { Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
-import { MessagePayload } from 'types';
+import { MessagePayload, TxMessage } from 'types';
 import i18n from 'app/lib/i18n';
+import { toLi } from 'app/filters';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -46,6 +51,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const connectState = keystore.connect.store.useValue();
   const accountState = keystore.account.store.useValue();
   const networkState = keystore.network.store.useValue();
+  const tokenState = keystore.token.store.useValue();
 
   const webViewRef = React.useRef<null | WebView>(null);
 
@@ -56,7 +62,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const [appConnect, setAppConnect] = React.useState<MessagePayload>();
   const [signMessage, setSignMessage] = React.useState<MessagePayload>();
-  const [transaction, setTransaction] = React.useState<MessagePayload>();
+  const [transaction, setTransaction] = React.useState<TxMessage>();
 
   const isConnect = React.useMemo(() => {
     const { hostname } = new URL(route.params.url);
@@ -133,9 +139,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
 
         case Messages.signTx:
-          setTransaction(message.payload);
-          const tx = Transaction.fromPayload(message.payload.data, account);
-          // console.log(tx.encodeTransactionProto());
+          setTransaction({
+            params: message.payload.data,
+            uuid: message.payload.uuid,
+            origin: message.origin,
+            icon: message.icon
+          });
           break;
 
         default:
@@ -200,6 +209,27 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     webViewRef.current.postMessage(m.serialize);
     setSignMessage(undefined);
   }, [webViewRef, signMessage, setSignMessage]);
+  const handleTx = React.useCallback((value) => {
+    if (!webViewRef.current || !transaction) {
+      return null;
+    }
+
+    if (value) {
+      // TODO: signing and send to node.
+      setTransaction(undefined);
+      return null;
+    }
+
+    const m = new Message(Messages.resConnect, {
+      origin: transaction.origin,
+      uuid: transaction.uuid,
+      data: {
+        reject: 'User rejected'
+      }
+    });
+    webViewRef.current.postMessage(m.serialize);
+    setTransaction(undefined);
+  }, [transaction, webViewRef, setTransaction]);
 
   React.useEffect(() => {
     if (!inpageJS) {
@@ -279,6 +309,25 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         onReject={() => handleSignMessage(undefined)}
         onSign={handleSignMessage}
       />
+      {transaction ? (
+        <ConfirmPopup
+          token={tokenState[0]}
+          recipient={transaction.params.toAddr}
+          amount={transaction.params.amount}
+          account={account}
+          data={transaction.params.data}
+          code={transaction.params.code}
+          gasCost={{
+            gasLimit: transaction.params.gasLimit,
+            gasPrice: toLi(transaction.params.gasPrice),
+          }}
+          title={i18n.t('confirm')}
+          netwrok={networkState.selected}
+          visible={Boolean(transaction)}
+          onTriggered={() => handleTx(false)}
+          onConfirm={() => handleTx(true)}
+        />
+      ) : null}
     </SafeAreaView>
   );
 };

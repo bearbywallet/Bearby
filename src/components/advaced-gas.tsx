@@ -21,15 +21,16 @@ import { ArrowIconSVG } from 'app/components/svg';
 import { GasSelector } from 'app/components/gas-selector';
 import { Switcher } from 'app/components/switcher';
 
-import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 import { GasState } from 'types';
 import i18n from 'app/lib/i18n';
+import { deppUnlink } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   gas: GasState;
   ds: boolean;
+  defaultGas: GasState;
   onDSChanged: (value: boolean) => void;
   onChange: (gas: GasState) => void;
 };
@@ -38,6 +39,7 @@ export const AdvacedGas: React.FC<Prop> = ({
   style,
   gas,
   ds,
+  defaultGas,
   onDSChanged,
   onChange
 }) => {
@@ -51,6 +53,7 @@ export const AdvacedGas: React.FC<Prop> = ({
         style={{ backgroundColor: 'transparent' }}
         gasLimit={gas.gasLimit}
         gasPrice={gas.gasPrice}
+        defaultGas={deppUnlink(defaultGas)}
         onChange={onChange}
       />
       <View style={styles.advanced}>

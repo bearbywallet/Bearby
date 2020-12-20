@@ -65,21 +65,33 @@ export const TransferAmount: React.FC<Prop> = ({
   );
 
   const handleChnage = React.useCallback((amount) => {
+    if (isNaN(Number(amount))) {
+      return null;
+    }
+
     setError(false);
 
-    const _amount = toQA(amount, token.decimals);
-    const isInsufficientFunds = new Amount(gas, balance)
-      .insufficientFunds(_amount, token);
+    try {
+      const _amount = toQA(amount, token.decimals);
+      const isInsufficientFunds = new Amount(gas, balance)
+        .insufficientFunds(_amount, token);
 
-    setError(isInsufficientFunds);
-    onError(isInsufficientFunds);
+      setError(isInsufficientFunds);
+      onError(isInsufficientFunds);
 
-    onChange(Big(amount).toString());
+      onChange(Big(amount).toString());
+    } catch {
+      onChange('0');
+    }
   }, [onChange, token, gas, balance, onError]);
   /**
    * Useing percents for calculate amount.
    */
   const handlePercentSelect = React.useCallback((percent) => {
+    if (isNaN(Number(balance)) ||  Number(balance) === 0) {
+      return null;
+    }
+
     setError(false);
 
     const amount = new Amount(gas, balance)
