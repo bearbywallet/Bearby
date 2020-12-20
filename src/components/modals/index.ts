@@ -19,3 +19,4 @@ export * from './add-contact';
 export * from './simple-confirm';
 export * from './confirm-popup';
 export * from './connect';
+export * from './sign-message';
