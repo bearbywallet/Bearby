@@ -17,3 +17,9 @@ export interface MessageType {
   type: string;
   payload: MessagePayload;
 }
+
+export interface Signature {
+  message: string;
+  publicKey: string;
+  signature: string;
+}

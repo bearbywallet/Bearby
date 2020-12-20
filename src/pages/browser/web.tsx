@@ -20,7 +20,7 @@ import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
 import { BrowserViewBar } from 'app/components/browser';
-import { ConnectModal } from 'app/components/modals';
+import { ConnectModal, SignMessageModal } from 'app/components/modals';
 
 import { theme } from 'app/styles';
 import { RouteProp } from '@react-navigation/native';
@@ -31,6 +31,7 @@ import { version } from '../../../package.json';
 import { Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
 import { MessagePayload } from 'types';
+import i18n from 'app/lib/i18n';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -53,6 +54,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const [canGoForward, setCanGoForward] = React.useState(false);
 
   const [appConnect, setAppConnect] = React.useState<MessagePayload>();
+  const [signMessage, setSignMessage] = React.useState<MessagePayload>();
 
   const isConnect = React.useMemo(() => {
     const { hostname } = new URL(route.params.url);
@@ -81,7 +83,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     setCanGoForward(nativeEvent.canGoForward);
   }, [setLoadingProgress, setCanGoBack, setCanGoForward]);
 
-  const handleMessage = React.useCallback(({ nativeEvent }) => {
+  const handleMessage = React.useCallback(async({ nativeEvent }) => {
     if (!webViewRef.current) {
       return null;
     }
@@ -106,16 +108,31 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           });
           webViewRef.current.postMessage(m.serialize);
           break;
+
         case Messages.appConnect:
           setAppConnect(message.payload);
           break;
+
+        case Messages.reqProxy:
+          const { method, params } = message.payload.data;
+          webViewRef.current.postMessage(new Message(Messages.resProxy, {
+            origin: message.payload.origin,
+            uuid: message.payload.uuid,
+            data: await keystore.zilliqa.throughPxoy(method, params)
+          }).serialize);
+          break;
+
+        case Messages.signMessage:
+          setSignMessage(message.payload);
+          break;
+
         default:
           break;
       }
     } catch (err) {
       console.error(err);
     }
-  }, [webViewRef, isConnect, setAppConnect]);
+  }, [webViewRef, isConnect, setAppConnect, setSignMessage]);
 
   const handleConnect = React.useCallback((value) => {
     if (value && appConnect && appConnect.title && appConnect.icon && appConnect.origin) {
@@ -143,6 +160,31 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
     setAppConnect(undefined);
   }, [appConnect, webViewRef]);
+
+  const handleSignMessage = React.useCallback((value) => {
+    if (!webViewRef.current || !signMessage?.origin || !signMessage?.uuid) {
+      return null;
+    }
+
+    const data = {
+      reject: undefined,
+      resolve: undefined
+    };
+
+    if (!value) {
+      data.reject = 'User rejected';
+    } else if (value) {
+      data.resolve = value;
+    }
+
+    const m = new Message(Messages.signResult, {
+      origin: signMessage.origin,
+      uuid: signMessage.uuid,
+      data
+    });
+    webViewRef.current.postMessage(m.serialize);
+    setSignMessage(undefined);
+  }, [webViewRef, signMessage, setSignMessage]);
 
   React.useEffect(() => {
     if (!inpageJS) {
@@ -211,6 +253,16 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         onTriggered={() => handleConnect(false)}
         onReject={() => handleConnect(false)}
         onConfirm={() => handleConnect(true)}
+      />
+      <SignMessageModal
+        title={i18n.t('sign_request')}
+        visible={Boolean(signMessage)}
+        icon={signMessage?.icon}
+        appTitle={signMessage?.title}
+        payload={String(signMessage?.data)}
+        onTriggered={() => setSignMessage(undefined)}
+        onReject={() => handleSignMessage(undefined)}
+        onSign={handleSignMessage}
       />
     </SafeAreaView>
   );

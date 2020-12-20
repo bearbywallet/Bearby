@@ -51,6 +51,7 @@ export class ZilliqaControl {
     address = String(address).toLowerCase();
 
     const [zilliqa] = tokensStore.get();
+    const net = this._network.selected;
 
     if (token.symbol === zilliqa.symbol) {
       const result = await this.getBalance(address);
@@ -58,8 +59,11 @@ export class ZilliqaControl {
       return result.balance;
     }
 
+    if (!token.address[net]) {
+      return '0';
+    }
+
     const field = 'balances';
-    const net = this._network.selected;
     const res = await this.getSmartContractSubState(
       token.address[net],
       field,
@@ -129,6 +133,13 @@ export class ZilliqaControl {
     }
 
     return Number(data.result);
+  }
+
+  public async throughPxoy(method: string, params: Params) {
+    const request = this._json(method, params);
+    const responce = await fetch(this._network.http, request);
+
+    return responce.json();
   }
 
   public async send(amount: string, to: string, token: Token, account: Account) {
