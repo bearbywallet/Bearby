@@ -91,11 +91,11 @@ export class Transaction {
       gaslimit: this.gasLimit,
       code:
         this.code && this.code.length
-          ? Uint8Array.from([...this.code].map((c) => <number>c.charCodeAt(0)))
+          ? Uint8Array.from([...this.code].map((c) => c.charCodeAt(0)))
           : null,
       data:
         this.data && this.data.length
-          ? Uint8Array.from([...this.data].map((c) => <number>c.charCodeAt(0)))
+          ? Uint8Array.from([...this.data].map((c) => c.charCodeAt(0)))
           : null
     };
     const serialised = ZilliqaMessage.ProtoTransactionCoreInfo.create(msg);
