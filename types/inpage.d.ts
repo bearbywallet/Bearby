@@ -23,3 +23,13 @@ export interface Signature {
   publicKey: string;
   signature: string;
 }
+
+export interface TxParams {
+  gasPrice: string;
+  gasLimit: string;
+  amount: string;
+  toAddr: string;
+  code: string;
+  data: string;
+  priority: string;
+}

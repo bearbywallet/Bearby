@@ -7,4 +7,4 @@
  * Copyright (c) 2020 ZilPay
  */
 export * from './transactions';
-export * from './transactions';
+export * from './builder';

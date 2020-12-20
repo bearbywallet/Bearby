@@ -6,17 +6,39 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { GasState, Account } from 'types';
+import { GasState, Account, TxParams } from 'types';
+import { ZilliqaMessage } from '@zilliqa-js/proto';
+import BN from 'bn.js';
+import Long from 'long';
 
-import { tohexString, pack } from 'app/utils';
+import { tohexString, pack, hexToByteArray } from 'app/utils';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
+
+
 export class Transaction {
+
+  public static fromPayload(payload: TxParams, account: Account) {
+    const gas = {
+      gasPrice: payload.gasPrice,
+      gasLimit: payload.gasLimit
+    };
+    return new Transaction(
+      payload.amount,
+      gas,
+      account,
+      payload.toAddr,
+      payload.code,
+      payload.data,
+      payload.priority
+    );
+  }
+
   public amount: string;
   public code: string;
   public data: string;
-  public gasLimit: string;
+  public gasLimit: Long;
   public gasPrice: string;
   public nonce: number;
   public priority: boolean;
@@ -39,7 +61,7 @@ export class Transaction {
     this.amount = amount;
     this.code = code;
     this.data = data;
-    this.gasLimit = gas.gasLimit;
+    this.gasLimit = Long.fromNumber(Number(gas.gasLimit));
     this.gasPrice = gas.gasPrice;
     this.nonce = account.nonce;
     this.priority = priority;
@@ -47,6 +69,40 @@ export class Transaction {
     this.toAddr = tohexString(toAddr);
     this.version = version;
     this.signature = signature;
+  }
+
+  public encodeTransactionProto() {
+    const amount = new BN(this.amount);
+    const gasPrice = new BN(this.gasPrice);
+    const msg = {
+      version: this.version || 0,
+      nonce: this.nonce || 0,
+      // core protocol Schnorr expects lowercase, non-prefixed address.
+      toaddr: hexToByteArray(tohexString(this.toAddr)),
+      senderpubkey: ZilliqaMessage.ByteArray.create({
+        data: hexToByteArray(this.pubKey || '00'),
+      }),
+      amount: ZilliqaMessage.ByteArray.create({
+        data: Uint8Array.from(amount.toArrayLike(Buffer, undefined, 16)),
+      }),
+      gasprice: ZilliqaMessage.ByteArray.create({
+        data: Uint8Array.from(gasPrice.toArrayLike(Buffer, undefined, 16)),
+      }),
+      gaslimit: this.gasLimit,
+      code:
+        this.code && this.code.length
+          ? Uint8Array.from([...this.code].map((c) => <number>c.charCodeAt(0)))
+          : null,
+      data:
+        this.data && this.data.length
+          ? Uint8Array.from([...this.data].map((c) => <number>c.charCodeAt(0)))
+          : null
+    };
+    const serialised = ZilliqaMessage.ProtoTransactionCoreInfo.create(msg);
+
+    return Buffer.from(
+      ZilliqaMessage.ProtoTransactionCoreInfo.encode(serialised).finish()
+    );
   }
 
   public setVersion(chainId: number) {

@@ -76,6 +76,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
+
     await keystore.zilliqa.send(
       amount,
       recipient,

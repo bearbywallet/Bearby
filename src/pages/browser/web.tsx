@@ -30,6 +30,7 @@ import { keystore } from 'app/keystore';
 import { version } from '../../../package.json';
 import { Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
+import { Transaction } from 'app/lib/controller/transaction';
 import { MessagePayload } from 'types';
 import i18n from 'app/lib/i18n';
 
@@ -55,6 +56,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const [appConnect, setAppConnect] = React.useState<MessagePayload>();
   const [signMessage, setSignMessage] = React.useState<MessagePayload>();
+  const [transaction, setTransaction] = React.useState<MessagePayload>();
 
   const isConnect = React.useMemo(() => {
     const { hostname } = new URL(route.params.url);
@@ -63,6 +65,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       (app) => app.domain.toLowerCase() === hostname.toLowerCase()
     );
   }, [connectState, route.params.url]);
+  const account = React.useMemo(
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
+  );
 
   const handleBack = React.useCallback(() => {
     if (!canGoBack) {
@@ -126,13 +132,19 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           setSignMessage(message.payload);
           break;
 
+        case Messages.signTx:
+          setTransaction(message.payload);
+          const tx = Transaction.fromPayload(message.payload.data, account);
+          // console.log(tx.encodeTransactionProto());
+          break;
+
         default:
           break;
       }
     } catch (err) {
       console.error(err);
     }
-  }, [webViewRef, isConnect, setAppConnect, setSignMessage]);
+  }, [webViewRef, isConnect, setAppConnect, setSignMessage, setTransaction]);
 
   const handleConnect = React.useCallback((value) => {
     if (value && appConnect && appConnect.title && appConnect.icon && appConnect.origin) {
@@ -166,7 +178,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       return null;
     }
 
-    const data = {
+    const data: {
+      reject: undefined | string;
+      resolve: undefined | object;
+    } = {
       reject: undefined,
       resolve: undefined
     };
