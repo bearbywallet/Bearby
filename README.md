@@ -24,7 +24,7 @@ $ yarn ios --device
 $ yarn android --device
 ```
 
-## check list:
+## Roadmap check list:
 
 ### Cross platforms:
 - [x] IOS.
