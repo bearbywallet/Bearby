@@ -42,7 +42,7 @@ type Prop = {
   netwrok: string;
   value: string;
   onChange: (amount: string) => void;
-  onError: (error: boolean) => void;
+  onError?: (error: boolean) => void;
 };
 
 const percents = [0, 25, 50, 75, 100];
@@ -55,7 +55,7 @@ export const TransferAmount: React.FC<Prop> = ({
   account,
   value,
   onChange,
-  onError
+  onError = () => null
 }) => {
   const [error, setError] = React.useState(false);
 

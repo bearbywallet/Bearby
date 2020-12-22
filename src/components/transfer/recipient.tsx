@@ -39,7 +39,7 @@ type Prop = {
   contacts: Contact[];
   recipient: string;
   onSelect: (address: string) => void;
-  onError: (error: boolean) => void;
+  onError?: (error: boolean) => void;
 };
 
 export const TransferRecipient: React.FC<Prop> = ({
@@ -48,7 +48,7 @@ export const TransferRecipient: React.FC<Prop> = ({
   accounts,
   contacts,
   onSelect,
-  onError
+  onError = () => null
 }) => {
   const [error, setError] = React.useState(false);
   const [accountModal, setAccountModal] = React.useState(false);
