@@ -59,7 +59,8 @@ export class ConnectController {
 
     try {
       connectStoreUpdate(JSON.parse(data));
-    } catch {
+    } catch (err) {
+      console.error('lib/connect/sync', err);
       await this.reset();
     }
   }

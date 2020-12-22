@@ -113,7 +113,7 @@ export class MobileStorage {
           return reject(err);
         }
 
-        return resolve(result);
+        return resolve(result as string[]);
       });
     });
   }

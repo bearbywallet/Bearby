@@ -39,9 +39,9 @@ export class WalletControler extends Mnemonic {
   public readonly settings = new SettingsControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
   public readonly gas = new GasControler(_storage);
+  public readonly viewblock = new ViewBlockControler(this.network);
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly searchEngine = new SearchController(_storage, this.ud);
-  public readonly viewblock = new ViewBlockControler(this.network);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
   public readonly account = new AccountControler(
     _storage,

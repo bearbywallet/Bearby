@@ -87,6 +87,7 @@ export class AccountControler {
         accountStoreUpdate(parsed);
       }
     } catch (err) {
+      console.error('lib/accounts/sync', err);
       //
     }
 

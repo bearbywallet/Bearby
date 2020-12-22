@@ -11,7 +11,13 @@ import { ZilliqaMessage } from '@zilliqa-js/proto';
 import BN from 'bn.js';
 import Long from 'long';
 
-import { tohexString, pack, hexToByteArray } from 'app/utils';
+import {
+  tohexString,
+  pack,
+  hexToByteArray,
+  toBech32Address,
+  isAddress
+} from 'app/utils';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
@@ -56,6 +62,8 @@ export class Transaction {
     version?: number,
     signature?: string
   ) {
+    isAddress(toAddr);
+
     this.amount = amount;
     this.code = code;
     this.data = data;
@@ -67,6 +75,21 @@ export class Transaction {
     this.toAddr = tohexString(toAddr);
     this.version = version;
     this.signature = signature;
+  }
+
+  public get recipient() {
+    return toBech32Address(this.toAddr);
+  }
+
+  public get fee(): GasState {
+    return {
+      gasPrice: String(this.gasPrice),
+      gasLimit: String(this.gasLimit)
+    };
+  }
+
+  public setPriority(priority: boolean) {
+    this.priority = priority;
   }
 
   public encodeTransactionProto() {
