@@ -9,12 +9,6 @@
 export * from './store';
 export * from './inpage';
 
-declare module "*.svg" {
-  const content: any;
-  export default content;
-}
-declare module 'hmac-drbg';
-
 export interface ZilliqaNetwork {
   [key: string]: {
     PROVIDER: string;
