@@ -14,7 +14,7 @@ import {
   ViewStyle,
   View
 } from 'react-native';
-import { SvgXml, SvgCssUri } from 'react-native-svg';
+import { SvgXml } from 'react-native-svg';
 
 import {
   ProfileSVG,
@@ -28,26 +28,21 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
-import { Token, Account, GasState } from 'types';
-import { TOKEN_ICONS } from 'app/config';
+import { Account, GasState } from 'types';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { theme } from 'app/styles';
 import { deppUnlink } from 'app/utils';
+import { Transaction } from 'app/lib/controller/transaction';
 
 type Prop = {
   style?: ViewStyle;
-  visible: boolean;
-  token: Token;
   account: Account;
+  transaction: Transaction;
+  decimals: number;
+  visible: boolean;
   title: string;
-  amount: string;
-  netwrok: string;
-  recipient: string;
-  code: string;
-  data: string;
-  gasCost: GasState;
   onTriggered: () => void;
   onConfirm: () => void;
 };
@@ -55,15 +50,11 @@ type Prop = {
 export const ConfirmPopup: React.FC<Prop> = ({
   title,
   style,
-  token,
-  code,
-  data,
   account,
-  netwrok,
-  amount,
+  transaction,
+  decimals,
   visible,
-  recipient,
-  gasCost,
+  children,
   onTriggered,
   onConfirm
 }) => {
@@ -71,38 +62,33 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const currencyState = keystore.currency.store.useValue();
 
   const [isLoading, setIsLoading] = React.useState(false);
-  const [DS, setDS] = React.useState(false);
-  const [gas, setGas] = React.useState(gasCost);
+  const [DS, setDS] = React.useState(transaction.priority);
+  const [gas, setGas] = React.useState<GasState>({
+    gasLimit: String(transaction.gasLimit),
+    gasPrice: transaction.gasPrice
+  });
 
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[currencyState];
-    const balance = account.balance[netwrok][token.symbol];
-    const value = toConversion(balance, rate, token.decimals);
+    const value = toConversion(transaction.amount, rate, decimals);
 
     return toLocaleString(value);
-  }, [token, account, netwrok, settingsState, currencyState]);
+  }, [transaction, settingsState, currencyState, decimals]);
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
 
-    await keystore.zilliqa.send(
-      amount,
-      recipient,
-      token,
-      account
-    );
     setIsLoading(false);
     onConfirm();
   }, [
-    account,
-    token,
-    amount,
-    recipient,
-    data,
-    code,
+    transaction,
     setIsLoading,
     onConfirm
   ]);
+
+  React.useEffect(() => {
+    transaction.setPriority(DS);
+  }, [DS, setDS]);
 
   return (
     <Modal
@@ -120,11 +106,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
           onClose={onTriggered}
         >
           <View style={styles.topWrapper}>
-            <SvgCssUri
-              height="30"
-              width="30"
-              uri={`${TOKEN_ICONS}/${token.symbol}.svg`}
-            />
+            {children}
             <Text style={styles.toptext}>
               {title}
             </Text>
@@ -155,7 +137,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
               </Text>
               <View style={commonStyles.infoWrapper}>
                 <Text style={commonStyles.nameAmountText}>
-                  {toLocaleString(fromZil(amount, token.decimals))}
+                  {toLocaleString(fromZil(transaction.amount, decimals))}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}
@@ -171,7 +153,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
               </Text>
               <View style={commonStyles.infoWrapper}>
                 <Text style={commonStyles.nameAmountText}>
-                  {trim(recipient)}
+                  {trim(transaction.recipient)}
                 </Text>
               </View>
             </View>
@@ -179,7 +161,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <AdvacedGas
             gas={gas}
             ds={DS}
-            defaultGas={deppUnlink(gasCost)}
+            defaultGas={deppUnlink(transaction.fee)}
             onDSChanged={setDS}
             onChange={setGas}
           />
