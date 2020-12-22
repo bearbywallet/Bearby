@@ -24,7 +24,10 @@ import { CustomButton } from 'app/components/custom-button';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
-import { Signature } from 'types';
+import { Signature, Account } from 'types';
+import { sha256 } from 'app/lib/crypto/sha256';
+import { keystore } from 'app/keystore';
+import { SchnorrControl } from 'app/lib/controller';
 
 type Prop = {
   style?: ViewStyle;
@@ -33,6 +36,7 @@ type Prop = {
   icon?: string;
   payload?: string;
   appTitle?: string;
+  account: Account;
   onTriggered: () => void;
   onSign: (sig: Signature) => void;
   onReject: () => void;
@@ -46,11 +50,36 @@ export const SignMessageModal: React.FC<Prop> = ({
   icon,
   payload,
   appTitle,
+  account,
   onTriggered,
   onSign,
   onReject
 }) => {
   const [isHash, setIsHash] = React.useState(false);
+  const [hash, setHash] = React.useState('');
+
+  React.useEffect(() => {
+    if (payload) {
+      sha256(payload).then(setHash);
+    }
+  }, [payload]);
+
+  const handleSign = React.useCallback(async() => {
+    if (!payload || !hash) {
+      return null;
+    }
+
+    const bytes = Buffer.from(hash, 'hex');
+    const keyPair = await keystore.getkeyPairs(account);
+    const schnorrControl = new SchnorrControl(keyPair.privateKey);
+    const signature = schnorrControl.getSignature(bytes);
+
+    onSign({
+      signature,
+      message: payload,
+      publicKey: keyPair.publicKey
+    });
+  }, [onSign, hash, account, payload]);
 
   if (!icon || !payload || !appTitle) {
     return null;
@@ -89,7 +118,7 @@ export const SignMessageModal: React.FC<Prop> = ({
           </Switcher>
           <View style={styles.sigWrapper}>
             <Text style={styles.sig}>
-              {payload}
+              {isHash ? hash : payload}
             </Text>
           </View>
           <View style={styles.btnWrapper}>
@@ -102,7 +131,7 @@ export const SignMessageModal: React.FC<Prop> = ({
               style={styles.signBtn}
               title={i18n.t('sign')}
               color={theme.colors.warning}
-              onPress={() => onSign({ signature: '', message: payload, publicKey: '' })}
+              onPress={handleSign}
             />
           </View>
         </View>

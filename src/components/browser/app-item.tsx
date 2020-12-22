@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white
+    color: theme.colors.white,
+    textAlign: 'right'
   },
   icon: {
     height: 30,

@@ -312,6 +312,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         title={i18n.t('sign_request')}
         visible={Boolean(signMessage)}
         icon={signMessage?.icon}
+        account={account}
         appTitle={signMessage?.title}
         payload={String(signMessage?.data)}
         onTriggered={() => setSignMessage(undefined)}

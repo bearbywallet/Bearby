@@ -74,7 +74,7 @@ $ yarn android --device
 - [x] tokens.
 - [x] wallet.
 - [x] zilliqa.
-
+- [x] nonce counter.
 
 ### Pages:
 - [x] Settings.
@@ -101,11 +101,11 @@ $ yarn android --device
 	- [x] BrowserPage.
 	- [x] SettingsPage.
 	- [x] HistoryPage.
-- [ ] Common.
+- [x] Common.
 	- [x] CreateAccountPage.
 	- [x] TransferPage.
 	- [x] ConnectDApp.
-	- [ ] SignMessage.
+	- [x] SignMessage.
 	- [x] confirmTransaction.
 	- [x] AuthLoading.
 
