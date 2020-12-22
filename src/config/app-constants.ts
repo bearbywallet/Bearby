@@ -17,6 +17,7 @@ export const API_COINGECKO = 'https://api.coingecko.com/api/v3/simple/price';
 export const PINTA = 'https://gateway.pinata.cloud/ipfs';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const UD_CONTRACT_ADDRESS = '0x9611c53be6d1b32058b2747bdececed7e1216793';
+export const SSN_ADDRESS = '0xB780e8095b8BA85A7145965ed632b3B774ac51cE';
 export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;

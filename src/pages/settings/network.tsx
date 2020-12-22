@@ -22,6 +22,7 @@ import { NetwrokConfig } from 'app/components/netwrok-config';
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
+import { SSN_ADDRESS } from 'app/config';
 
 const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
@@ -36,6 +37,14 @@ export const NetworkPage = () => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
     await keystore.account.balanceUpdate();
+  }, []);
+
+  React.useEffect(() => {
+    const field = 'ssnlist';
+    keystore.zilliqa.getSmartContractSubState(
+      SSN_ADDRESS,
+      field
+    );
   }, []);
 
   return (
