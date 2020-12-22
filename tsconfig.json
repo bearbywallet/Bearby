@@ -5,7 +5,7 @@
       "app/*": ["src/*"]
     },
     "baseUrl": ".",
-    "module": "es2015",
+    "module": "commonjs",
     "target": "es6",
     "allowSyntheticDefaultImports": true,
     "jsx": "react-native",
