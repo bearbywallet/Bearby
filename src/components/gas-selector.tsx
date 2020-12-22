@@ -17,6 +17,7 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import Big from 'big.js';
 
 import {
   BigArrowIconSVG,
@@ -38,6 +39,8 @@ type Prop = {
   style?: ViewStyle;
 };
 
+Big.PE = 99;
+
 const { width } = Dimensions.get('window');
 export const GasSelector: React.FC<Prop> = ({
   style,
@@ -48,6 +51,10 @@ export const GasSelector: React.FC<Prop> = ({
 }) => {
   const tokensState = keystore.token.store.useValue();
 
+  const _1 = Big(1);
+  const _2 = Big(2);
+  const _3 = Big(3);
+
   const amountGas = (increse: number) => {
     const incresedGasPrice = Number(DEFAULT_GAS.gasPrice) * increse;
     const { fee } = gasToFee(gasLimit, String(incresedGasPrice));
@@ -57,17 +64,24 @@ export const GasSelector: React.FC<Prop> = ({
   };
 
   const firstSelected = React.useMemo(
-    () => Number(defaultGas.gasPrice) === Number(gasPrice),
+    () => Big(defaultGas.gasPrice).mul(_1).eq(gasPrice),
     [gasPrice, defaultGas]
   );
   const secondSelected = React.useMemo(
-    () => (Number(defaultGas.gasPrice) * 2) === Number(gasPrice),
+    () => Big(defaultGas.gasPrice).mul(_2).eq(gasPrice),
     [gasPrice, defaultGas]
   );
   const threeSelected = React.useMemo(
-    () => (Number(defaultGas.gasPrice) * 3) === Number(gasPrice),
+    () => Big(defaultGas.gasPrice).mul(_3).eq(gasPrice),
     [gasPrice, defaultGas]
   );
+
+  const hanldeChangeGas = React.useCallback((amount: Big) => {
+    onChange({
+      gasLimit,
+      gasPrice: Big(defaultGas.gasPrice).mul(amount).toString()
+    });
+  }, [gasPrice, gasLimit, onChange]);
 
   const createTwoButtonAlert = () =>
     Alert.alert(
@@ -97,7 +111,7 @@ export const GasSelector: React.FC<Prop> = ({
             firstSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onPress={() => onChange({ gasLimit, gasPrice: DEFAULT_GAS.gasPrice })}
+          onPress={() => hanldeChangeGas(_1)}
         >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
@@ -122,7 +136,7 @@ export const GasSelector: React.FC<Prop> = ({
             secondSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onPress={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 2) })}
+          onPress={() => hanldeChangeGas(_2)}
         >
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
@@ -147,7 +161,7 @@ export const GasSelector: React.FC<Prop> = ({
             threeSelected ? { backgroundColor: '#2B2E33' } : null,
             styles.item
           ]}
-          onPress={() => onChange({ gasLimit, gasPrice: String(Number(DEFAULT_GAS.gasPrice) * 3) })}
+          onPress={() => hanldeChangeGas(_3)}
         >
           <View style={{ flexDirection: 'row' }}>
           <SvgXml
