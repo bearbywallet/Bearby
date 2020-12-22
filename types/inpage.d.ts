@@ -6,6 +6,8 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { Transaction } from 'app/lib/controller';
+
 export interface MessagePayload {
   origin?: string;
   title?: string;
@@ -19,12 +21,6 @@ export interface MessageType {
   payload: MessagePayload;
 }
 
-export interface Signature {
-  message: string;
-  publicKey: string;
-  signature: string;
-}
-
 export interface TxParams {
   gasPrice: string;
   gasLimit: string;
@@ -35,8 +31,14 @@ export interface TxParams {
   priority: boolean;
 }
 
+export interface Signature {
+  message: string;
+  publicKey: string;
+  signature: string;
+}
+
 export interface TxMessage {
-  params: TxParams;
+  params: Transaction;
   origin: string;
   icon: string;
   uuid: string;
