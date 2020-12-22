@@ -13,6 +13,7 @@ declare module "*.svg" {
   const content: any;
   export default content;
 }
+declare module 'hmac-drbg';
 
 export interface ZilliqaNetwork {
   [key: string]: {

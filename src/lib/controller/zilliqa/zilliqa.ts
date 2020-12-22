@@ -10,10 +10,11 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { tokensStore } from 'app/lib/controller/tokens/state';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-import { Token, Account } from 'types';
+import { Token, TxParams } from 'types';
 import { tohexString } from 'app/utils/address';
+import { Transaction } from '../transaction';
 
-type Params = string[] | number[] | (string | string[] | number[])[];
+type Params = TxParams[] | string[] | number[] | (string | string[] | number[])[];
 
 export class ZilliqaControl {
   private _network: NetworkControll;
@@ -142,17 +143,13 @@ export class ZilliqaControl {
     return responce.json();
   }
 
-  public async send(amount: string, to: string, token: Token, account: Account) {
-    // TODO: make sender with sign method.
-    // const params = {
-    //   amount,
-    //   code: '',
-    //   data: '',
-    //   gasLimit
-    // };
-    return new Promise((resolve) => {
-      setTimeout(() => resolve(true), 2000);
-    });
+  public async send(tx: Transaction) {
+    const request = this._json(Methods.CreateTransaction, [
+      tx.self
+    ]);
+    const responce = await fetch(this._network.http, request);
+
+    return responce.json();
   }
 
   private _json(method: string, params: Params) {
@@ -164,9 +161,9 @@ export class ZilliqaControl {
       body: JSON.stringify({
         method,
         params,
-        id: '1',
+        id: 1,
         jsonrpc: '2.0'
-      }, null, '')
+      })
     };
   }
 }

@@ -69,6 +69,21 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
     [accountState]
   );
 
+  const handleSiging = React.useCallback(async(transaction: Transaction, cb) => {
+    try {
+      const chainID = await keystore.zilliqa.getNetworkId();
+      const keyPair = await keystore.getkeyPairs(account);
+      transaction.setVersion(chainID);
+      transaction.nonce = 1437;
+      transaction.sign(keyPair.privateKey);
+      await keystore.zilliqa.send(transaction);
+      // console.log(result, JSON.stringify(tx.self, null, 4));
+    } catch (err) {
+      console.error(err);
+    }
+    cb();
+  }, [account]);
+
   React.useEffect(() => {
     try {
       const toAddr = fromBech32Address(recipient);
@@ -149,7 +164,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
           title={i18n.t('confirm')}
           visible={confirmModal}
           onTriggered={() => setConfirmModal(false)}
-          onConfirm={() => null}
+          onConfirm={handleSiging}
         >
           <LoadSVG
             url={`${TOKEN_ICONS}/${token.symbol}.svg`}

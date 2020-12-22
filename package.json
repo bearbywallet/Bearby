@@ -29,6 +29,7 @@
     "elliptic": "^6.5.3",
     "expo-asset": "^8.2.1",
     "hash.js": "^1.1.7",
+    "hmac-drbg": "^1.0.1",
     "long": "^4.0.0",
     "lottie-ios": "^3.1.9",
     "lottie-react-native": "^3.5.0",
@@ -57,6 +58,7 @@
     "react-native-tab-view": "^2.15.2",
     "react-native-webview": "^11.0.2",
     "react-ridge-state": "^4.1.6",
+    "sodium-native": "^3.2.0",
     "url-parse": "^1.4.7"
   },
   "devDependencies": {
@@ -72,6 +74,7 @@
     "@types/react-native-i18n": "^2.0.0",
     "@types/react-native-share": "^3.3.0",
     "@types/react-test-renderer": "^17.0.0",
+    "@types/sodium-native": "^2.3.5",
     "@types/url-parse": "^1.4.3",
     "@typescript-eslint/eslint-plugin": "^4.9.1",
     "@typescript-eslint/parser": "^4.9.1",

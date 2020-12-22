@@ -44,7 +44,7 @@ type Prop = {
   visible: boolean;
   title: string;
   onTriggered: () => void;
-  onConfirm: () => void;
+  onConfirm: (transaction: Transaction, cb: () => void) => void;
 };
 
 export const ConfirmPopup: React.FC<Prop> = ({
@@ -77,9 +77,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
-
-    setIsLoading(false);
-    onConfirm();
+    onConfirm(transaction, () => setIsLoading(false));
   }, [
     transaction,
     setIsLoading,

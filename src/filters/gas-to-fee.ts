@@ -9,11 +9,17 @@
 import Big from 'big.js';
 
 Big.PE = 99;
+
 const _li = Big(10 ** 6);
 
 export function toLi(value: string | number) {
   const _value = Big(value);
   return _value.div(_li).toString();
+}
+
+export function fromLI(value: string | number) {
+  const _value = Big(value);
+  return _value.mul(_li).toString();
 }
 
 export function gasToFee(gasLimit: string, gasPrice: string) {

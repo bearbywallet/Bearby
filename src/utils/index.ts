@@ -16,3 +16,4 @@ export * from './token';
 export * from './deep-unlink';
 export * from './amount';
 export * from './bytes';
+export * from './random';

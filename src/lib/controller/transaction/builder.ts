@@ -16,8 +16,10 @@ import {
   pack,
   hexToByteArray,
   toBech32Address,
-  isAddress
+  isAddress,
+  toChecksumAddress
 } from 'app/utils';
+import { fromLI } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
@@ -72,7 +74,7 @@ export class Transaction {
     this.nonce = account.nonce;
     this.priority = priority;
     this.pubKey = account.pubKey;
-    this.toAddr = tohexString(toAddr);
+    this.toAddr = toChecksumAddress(toAddr);
     this.version = version;
     this.signature = signature;
   }
@@ -88,13 +90,49 @@ export class Transaction {
     };
   }
 
+  public get self(): TxParams {
+    return {
+      amount: this.amount,
+      code: this.code,
+      data: this.data,
+      gasLimit: this.gasLimit.toString(),
+      gasPrice: fromLI(this.gasPrice),
+      nonce: this.nonce,
+      priority: this.priority,
+      pubKey: this.pubKey,
+      signature: this.signature,
+      toAddr: this.toAddr,
+      version: this.version
+    };
+  }
+
+  public get serialize() {
+    return JSON.stringify(this.self);
+  }
+
   public setPriority(priority: boolean) {
     this.priority = priority;
   }
 
-  public encodeTransactionProto() {
+  public setVersion(chainId: number) {
+    const { config, selected } = networkStore.get();
+    const msg = config[selected].MSG_VERSION;
+
+    this.version = pack(chainId, msg);
+
+    return this.version;
+  }
+
+  public sign(privKey: string) {
+    const bytes = this._encodeTransactionProto();
+    const schnorrControl = new SchnorrControl(privKey);
+
+    this.signature = schnorrControl.getSignature(bytes);
+  }
+
+  private _encodeTransactionProto() {
     const amount = new BN(this.amount);
-    const gasPrice = new BN(this.gasPrice);
+    const gasPrice = new BN(fromLI(this.gasPrice));
     const msg = {
       version: this.version || 0,
       nonce: this.nonce || 0,
@@ -124,14 +162,5 @@ export class Transaction {
     return Buffer.from(
       ZilliqaMessage.ProtoTransactionCoreInfo.encode(serialised).finish()
     );
-  }
-
-  public setVersion(chainId: number) {
-    const { config, selected } = networkStore.get();
-    const msg = config[selected].MSG_VERSION;
-
-    this.version = pack(chainId, msg);
-
-    return this.version;
   }
 }

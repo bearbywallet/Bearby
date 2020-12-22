@@ -22,13 +22,17 @@ export interface MessageType {
 }
 
 export interface TxParams {
-  gasPrice: string;
-  gasLimit: string;
-  amount: string;
-  toAddr: string;
+  amount: string
   code: string;
   data: string;
+  gasLimit: string;
+  gasPrice: string;
+  nonce: number;
   priority: boolean;
+  pubKey: string;
+  signature?: string;
+  toAddr: string;
+  version?: number;
 }
 
 export interface Signature {
