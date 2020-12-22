@@ -11,7 +11,8 @@ import React from 'react';
 import {
   StyleSheet,
   Dimensions,
-  View
+  View,
+  Image
 } from 'react-native';
 import LottieView from 'lottie-react-native';
 import URL from 'url-parse';
@@ -140,10 +141,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setTransaction({
-            params: message.payload.data,
+            params: Transaction.fromPayload(message.payload.data, account),
             uuid: message.payload.uuid,
-            origin: message.origin,
-            icon: message.icon
+            origin: message.payload.origin,
+            icon: message.payload.icon
           });
           break;
 
@@ -153,7 +154,14 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     } catch (err) {
       console.error(err);
     }
-  }, [webViewRef, isConnect, setAppConnect, setSignMessage, setTransaction]);
+  }, [
+    webViewRef,
+    account,
+    isConnect,
+    setAppConnect,
+    setSignMessage,
+    setTransaction
+  ]);
 
   const handleConnect = React.useCallback((value) => {
     if (value && appConnect && appConnect.title && appConnect.icon && appConnect.origin) {
@@ -289,6 +297,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         applicationNameForUserAgent={`ZilPay/${version}`}
         incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
+        cacheEnabled={false}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />
@@ -311,22 +320,22 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       />
       {transaction ? (
         <ConfirmPopup
-          token={tokenState[0]}
-          recipient={transaction.params.toAddr}
-          amount={transaction.params.amount}
+          transaction={transaction.params}
+          decimals={tokenState[0].decimals}
           account={account}
-          data={transaction.params.data}
-          code={transaction.params.code}
-          gasCost={{
-            gasLimit: transaction.params.gasLimit,
-            gasPrice: toLi(transaction.params.gasPrice),
-          }}
           title={i18n.t('confirm')}
-          netwrok={networkState.selected}
           visible={Boolean(transaction)}
           onTriggered={() => handleTx(false)}
           onConfirm={() => handleTx(true)}
-        />
+        >
+          <Image
+            style={{
+              height: 30,
+              width: 30
+            }}
+            source={{ uri: transaction.icon }}
+          />
+        </ConfirmPopup>
       ) : null}
     </SafeAreaView>
   );

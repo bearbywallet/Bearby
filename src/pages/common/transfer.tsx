@@ -25,6 +25,7 @@ import {
   TransferRecipient
 } from 'app/components/transfer';
 import { ConfirmPopup } from 'app/components/modals';
+import { LoadSVG } from 'app/components/load-svg';
 
 import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
@@ -33,6 +34,9 @@ import { RootParamList } from 'app/navigator';
 import { RouteProp } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
+import { Transaction } from 'app/lib/controller';
+import { TOKEN_ICONS } from 'app/config';
+import { fromBech32Address } from 'app/utils';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -47,13 +51,11 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const networkState = keystore.network.store.useValue();
   const gasState = keystore.gas.store.useValue();
 
-  const [amountErr, setAmountErr] = React.useState(true);
-  const [recipientErr, setRecipientErr] = React.useState(true);
-
   const [confirmModal, setConfirmModal] = React.useState(false);
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
+  const [tx, setTx] = React.useState<Transaction>();
   const [recipient, setRecipient] = React.useState<string>(
     (route.params && route.params.recipient) || ''
   );
@@ -62,6 +64,34 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
     () => tokensState[selectedToken],
     [selectedToken, tokensState]
   );
+  const account = React.useMemo(
+    () => accountState.identities[accountState.selectedAddress],
+    [accountState]
+  );
+
+  React.useEffect(() => {
+    try {
+      const toAddr = fromBech32Address(recipient);
+      const qa = toQA(amount, token.decimals);
+
+      setTx(new Transaction(
+        qa,
+        gasState,
+        account,
+        toAddr
+      ));
+    } catch (err) {
+      //
+    }
+  }, [
+    setTx,
+    token,
+    account,
+    amount,
+    selectedAccount,
+    recipient,
+    gasState
+  ]);
 
   return (
     <React.Fragment>
@@ -87,7 +117,6 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             recipient={recipient}
             contacts={contactsState}
             onSelect={setRecipient}
-            onError={setRecipientErr}
           />
           <TransferAmount
             style={styles.wrapper}
@@ -97,7 +126,6 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             netwrok={networkState.selected}
             value={amount}
             onChange={setAmount}
-            onError={setAmountErr}
           />
           <View style={{
             width: '100%',
@@ -105,7 +133,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
             marginTop: '10%'
           }}>
             <CustomButton
-              disabled={amountErr || recipientErr}
+              disabled={!tx}
               style={{ width: width / 1.5 }}
               title={i18n.t('restore_btn')}
               onPress={() => setConfirmModal(true)}
@@ -113,20 +141,23 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
           </View>
         </KeyboardAwareScrollView>
       </SafeAreaView>
-      <ConfirmPopup
-        token={token}
-        recipient={recipient}
-        amount={toQA(amount, token.decimals)}
-        account={accountState.identities[selectedAccount]}
-        title={i18n.t('confirm')}
-        netwrok={networkState.selected}
-        visible={confirmModal}
-        gasCost={gasState}
-        code=""
-        data=""
-        onTriggered={() => setConfirmModal(false)}
-        onConfirm={() => null}
-      />
+      {tx ? (
+        <ConfirmPopup
+          transaction={tx}
+          decimals={token.decimals}
+          account={account}
+          title={i18n.t('confirm')}
+          visible={confirmModal}
+          onTriggered={() => setConfirmModal(false)}
+          onConfirm={() => null}
+        >
+          <LoadSVG
+            url={`${TOKEN_ICONS}/${token.symbol}.svg`}
+            height="30"
+            width="30"
+          />
+        </ConfirmPopup>
+      ) : null}
     </React.Fragment>
   );
 };
