@@ -17,9 +17,9 @@ import {
 
 import { theme } from 'app/styles';
 import { TX_DIRECTION } from 'app/config';
-import { Token, Transaction } from 'types';
+import { Token, TransactionType } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
-import { fromBech32Address, tohexString } from 'app/utils';
+import { fromBech32Address } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
@@ -28,7 +28,7 @@ type Prop = {
   rate: number;
   netwrok: string;
   currency: string;
-  transaction: Transaction;
+  transaction: TransactionType;
   onSelect: () => void;
 };
 
@@ -105,7 +105,7 @@ export const TransactionItem: React.FC<Prop> = ({
     };
   }, [transaction, tokens, rate, token]);
   const vname = React.useMemo(() => {
-    if (typeof transaction.data === 'string') {
+    if (transaction.data && typeof transaction.data === 'string') {
       try {
         const data = JSON.parse(transaction.data);
 
