@@ -43,6 +43,7 @@ type Prop = {
   decimals: number;
   visible: boolean;
   title: string;
+  error?: string;
   onTriggered: () => void;
   onConfirm: (transaction: Transaction, cb: () => void) => void;
 };
@@ -55,6 +56,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   decimals,
   visible,
   children,
+  error,
   onTriggered,
   onConfirm
 }) => {
@@ -110,6 +112,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
             </Text>
           </View>
         </ModalTitle>
+        <Text style={styles.errorMessage}>
+          {error}
+        </Text>
         <ScrollView style={{ marginBottom: 15 }}>
           <View style={commonStyles.item}>
             <SvgXml xml={ProfileSVG} />
@@ -178,6 +183,18 @@ export const ConfirmPopup: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   item: {
     paddingBottom: 10
+  },
+  errorMessage: {
+    color: theme.colors.danger,
+    fontSize: 17,
+    lineHeight: 22,
+    textAlign: 'center',
+    textShadowColor: theme.colors.danger,
+    textShadowOffset: {
+      width: -1,
+      height: 1
+    },
+    textShadowRadius: 3
   },
   sendBtn: {
     marginVertical: 15
