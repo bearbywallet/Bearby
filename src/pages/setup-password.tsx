@@ -42,7 +42,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
   const [loading, setLoading] = React.useState(false);
 
-  const [accountName, setAccountName] = React.useState('');
+  const [accountName, setAccountName] = React.useState('Account 0');
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [isBiometric, setIsBiometric] = React.useState(true);
@@ -109,6 +109,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             <SvgXml xml={ProfileSVG} />
             <TextInput
               style={styles.textInput}
+              defaultValue={accountName}
               placeholder={i18n.t('pass_setup_input0')}
               placeholderTextColor="#2B2E33"
               onChangeText={setAccountName}

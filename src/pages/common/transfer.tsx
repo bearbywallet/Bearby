@@ -52,6 +52,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   const gasState = keystore.gas.store.useValue();
 
   const [confirmModal, setConfirmModal] = React.useState(false);
+  const [confirmError, setConfirmError] = React.useState<string>();
   const [selectedToken, setSelectedToken] = React.useState(0);
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
@@ -70,19 +71,26 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
   );
 
   const handleSiging = React.useCallback(async(transaction: Transaction, cb) => {
+    setConfirmError(undefined);
     try {
+      await keystore.account.updateNonce();
       const chainID = await keystore.zilliqa.getNetworkId();
       const keyPair = await keystore.getkeyPairs(account);
+
       transaction.setVersion(chainID);
-      transaction.nonce = 1437;
+      transaction.nonce = account.nonce + 1;
       transaction.sign(keyPair.privateKey);
-      await keystore.zilliqa.send(transaction);
-      // console.log(result, JSON.stringify(tx.self, null, 4));
+      transaction.hash = await keystore.zilliqa.send(transaction);
+
+      await keystore.transaction.add(transaction);
+
+      cb();
+      setConfirmModal(false);
     } catch (err) {
-      console.error(err);
+      cb();
+      setConfirmError(err.message);
     }
-    cb();
-  }, [account]);
+  }, [account, setConfirmModal, setConfirmError]);
 
   React.useEffect(() => {
     try {
@@ -159,6 +167,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
       {tx ? (
         <ConfirmPopup
           transaction={tx}
+          error={confirmError}
           decimals={token.decimals}
           account={account}
           title={i18n.t('confirm')}

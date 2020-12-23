@@ -31,9 +31,9 @@ import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { TabStackParamList } from 'app/navigator/tab-navigator';
 import { keystore } from 'app/keystore';
-import { TxStatsues, ZILLIQA_KEYS } from 'app/config';
+import { TxStatsues, ZILLIQA_KEYS, TokenTypes } from 'app/config';
 import { toBech32Address } from 'app/utils';
-import { Transaction } from 'types';
+import { TransactionType } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -57,7 +57,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   const [isDate, setIsDate] = React.useState(false);
 
   const [transactionModal, setTransactionModal] = React.useState(false);
-  const [transaction, setTransaction] = React.useState<null | Transaction>();
+  const [transaction, setTransaction] = React.useState<null | TransactionType>();
 
   const [refreshing, setRefreshing] = React.useState(false);
 
@@ -72,6 +72,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
         [ZILLIQA_KEYS[1]]: '',
         [ZILLIQA_KEYS[2]]: ''
       },
+      type: TokenTypes.ZRC2,
       decimals: 0,
       name: 'All',
       symbol: ''
