@@ -21,6 +21,7 @@ export const SSN_ADDRESS = '0xB780e8095b8BA85A7145965ed632b3B774ac51cE';
 export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;
+export const NONCE_DIFFICULTY = 10;
 
 export const ZILLIQA: ZilliqaNetwork = {
   mainnet: {
