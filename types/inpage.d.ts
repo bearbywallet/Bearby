@@ -33,6 +33,7 @@ export interface TxParams {
   signature?: string;
   toAddr: string;
   version?: number;
+  hash?: string;
 }
 
 export interface Signature {

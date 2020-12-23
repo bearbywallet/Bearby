@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export interface Transaction {
+export interface TransactionType {
   hash: string;
   blockHeight: number;
   from: string;
@@ -19,5 +19,5 @@ export interface Transaction {
   receiptSuccess?: boolean;
   data: string | null;
   code: string | null;
-  events: object[];
+  events?: object[];
 }
