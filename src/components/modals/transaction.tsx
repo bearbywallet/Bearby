@@ -24,14 +24,14 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
-import { Transaction } from 'types';
+import { TransactionType } from 'types';
 import { trim, fromZil, toConversion } from 'app/filters';
 import { viewAddress, viewBlockNumber, viewTransaction } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
-  transaction?: Transaction;
+  transaction?: TransactionType;
   onTriggered: () => void;
 };
 
