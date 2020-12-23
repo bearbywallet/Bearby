@@ -7,13 +7,16 @@
  * Copyright (c) 2020 ZilPay
  */
 import { newRidgeState } from 'react-ridge-state';
-import { Transaction } from 'types';
+import { TransactionType } from 'types';
 
-const initalState: Transaction[] = [];
-export const transactionStore = newRidgeState<Transaction[]>(initalState);
+const initalState: TransactionType[] = [];
+export const transactionStore = newRidgeState<TransactionType[]>(initalState);
 
-export function transactionStoreUpdate(txns: Transaction[]) {
+export function transactionStoreUpdate(txns: TransactionType[]) {
   transactionStore.set(() => txns);
+}
+export function transactionStoreAdd(txn: TransactionType) {
+  transactionStore.set((state) => [txn, ...state]);
 }
 export function transactionStoreReset() {
   transactionStore.reset();

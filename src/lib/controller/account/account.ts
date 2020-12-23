@@ -7,7 +7,12 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
-import { STORAGE_FIELDS, AccountTypes, ZILLIQA_KEYS } from 'app/config';
+import {
+  STORAGE_FIELDS,
+  AccountTypes,
+  ZILLIQA_KEYS,
+  NONCE_DIFFICULTY
+} from 'app/config';
 import {
   getAddressFromPublicKey,
   toBech32Address,
@@ -187,6 +192,34 @@ export class AccountControler {
     accountStoreSelect(index);
 
     await this.update(this.store.get());
+  }
+
+  public async updateNonce() {
+    const state = this.store.get();
+    const account = state.identities[state.selectedAddress];
+    const { nonce } = await this._zilliqa.getBalance(account.base16);
+
+    if (nonce < account.nonce && NONCE_DIFFICULTY < nonce - account.nonce) {
+      throw new Error('nonce too hight');
+    }
+
+    if (nonce === account.nonce) {
+      return null;
+    }
+
+    if (nonce > account.nonce) {
+      state.identities[state.selectedAddress].nonce = nonce;
+    }
+
+    await this.update(state);
+  }
+
+  public async increaseNonce() {
+    const state = this.store.get();
+
+    state.identities[state.selectedAddress].nonce++;
+
+    await this.update(state);
   }
 
   public async balanceUpdate() {

@@ -15,7 +15,10 @@ import { tohexString } from 'app/utils/address';
 import { Transaction } from '../transaction';
 
 type Params = TxParams[] | string[] | number[] | (string | string[] | number[])[];
-
+type Balance = {
+  nonce: number;
+  balance: string;
+};
 export class ZilliqaControl {
   private _network: NetworkControll;
 
@@ -27,7 +30,7 @@ export class ZilliqaControl {
    * Getting account balance and nonce.
    * @param address - Account address in base16 format.
    */
-  public async getBalance(address: string) {
+  public async getBalance(address: string): Promise<Balance> {
     address = tohexString(address);
 
     const request = this._json(Methods.getBalance, [address]);
@@ -143,13 +146,22 @@ export class ZilliqaControl {
     return responce.json();
   }
 
-  public async send(tx: Transaction) {
+  public async send(tx: Transaction): Promise<string> {
     const request = this._json(Methods.CreateTransaction, [
       tx.self
     ]);
     const responce = await fetch(this._network.http, request);
+    const { error, result } = await responce.json();
 
-    return responce.json();
+    if (error && error.message) {
+      throw new Error(error.message);
+    }
+
+    if (result && result.TranID) {
+      return result.TranID;
+    }
+
+    throw new Error('Netwrok fail');
   }
 
   private _json(method: string, params: Params) {

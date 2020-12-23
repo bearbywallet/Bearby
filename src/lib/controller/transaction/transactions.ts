@@ -11,13 +11,15 @@ import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { AccountControler } from 'app/lib/controller/account';
 import { NetworkControll } from 'app/lib/controller/network';
-import { Transaction } from 'types';
 import {
   transactionStore,
   transactionStoreReset,
-  transactionStoreUpdate
+  transactionStoreUpdate,
+  transactionStoreAdd
 } from './store';
 import { ZILLIQA_KEYS } from 'app/config';
+import { Transaction } from './builder';
+import { toBech32Address } from 'app/utils';
 
 export class TransactionsContoller {
   public store = transactionStore;
@@ -58,7 +60,7 @@ export class TransactionsContoller {
     }
 
     const { field } = this._field;
-    const txns = await this._storage.get<Transaction[]>(field);
+    const txns = await this._storage.get(field);
 
     if (!txns || typeof txns !== 'string') {
       return this._update();
@@ -89,13 +91,42 @@ export class TransactionsContoller {
     transactionStoreReset();
   }
 
+  public async add(tx: Transaction) {
+    if (!tx.hash) {
+      throw new Error('incorect transaction hash.');
+    }
+    const { field } = this._field;
+
+    tx.direction = 'out';
+    tx.timestamp = new Date().getTime();
+
+    transactionStoreAdd({
+      hash: tx.hash,
+      blockHeight: 0,
+      from: tx.from,
+      to: toBech32Address(tx.toAddr),
+      value: tx.amount,
+      fee: tx.feeValue,
+      timestamp: tx.timestamp,
+      direction: tx.direction,
+      nonce: tx.nonce,
+      data: tx.data,
+      code: tx.code
+    });
+
+    await this._storage.set(
+      buildObject(field, this.store.get())
+    );
+  }
+
   private async _update() {
+    const state = this.store.get().filter((t) => t.blockHeight === 0);
     const { account, field } = this._field;
     const gotTxns = await this
       ._viewblock
       .getTransactions(account.bech32);
 
-    transactionStoreUpdate(gotTxns);
+    transactionStoreUpdate([...state, ...gotTxns]);
 
     await this._storage.set(
       buildObject(field, gotTxns)

@@ -19,7 +19,7 @@ import {
   isAddress,
   toChecksumAddress
 } from 'app/utils';
-import { fromLI } from 'app/filters';
+import { fromLI, gasToFee } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
@@ -50,8 +50,12 @@ export class Transaction {
   public priority: boolean;
   public pubKey: string;
   public toAddr: string;
+  public from: string;
   public version?: number;
   public signature?: string;
+  public hash?: string;
+  public direction?: string;
+  public timestamp?: number;
 
   constructor(
     amount: string,
@@ -66,6 +70,7 @@ export class Transaction {
   ) {
     isAddress(toAddr);
 
+    this.from = account.bech32;
     this.amount = amount;
     this.code = code;
     this.data = data;
@@ -90,6 +95,12 @@ export class Transaction {
     };
   }
 
+  public get feeValue(): string {
+    const { fee } = gasToFee(String(this.gasLimit), this.gasPrice);
+
+    return fee.toString();
+  }
+
   public get self(): TxParams {
     return {
       amount: this.amount,
@@ -102,7 +113,8 @@ export class Transaction {
       pubKey: this.pubKey,
       signature: this.signature,
       toAddr: this.toAddr,
-      version: this.version
+      version: this.version,
+      hash: this.hash
     };
   }
 
