@@ -12,6 +12,7 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
+  ActivityIndicator,
   StyleSheet,
   Dimensions,
   ViewStyle
@@ -21,14 +22,18 @@ import { SvgXml } from 'react-native-svg';
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { QrcodeIconSVG } from 'app/components/svg';
 
-import { colors, theme } from 'app/styles';
+import { keystore } from 'app/keystore';
+import { theme } from 'app/styles';
+import { toBech32Address } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   error?: string;
   placeholder?: string;
   value: string;
+  zns?: boolean;
   onChange?: (address: string) => void;
+  onZNS?: (address: string) => void;
 };
 
 const { width } = Dimensions.get('window');
@@ -36,22 +41,57 @@ export const QrCodeInput: React.FC<Prop> = ({
   style,
   value,
   error,
+  zns,
   placeholder,
-  onChange = () => null
+  onChange = () => null,
+  onZNS = () => null
 }) => {
   const [qrcodeModal, setQrcodeModal] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleQrcode = React.useCallback((qrcode) => {
     const address = String(qrcode).replace('zilliqa://', '');
 
     onChange(address);
   }, [onChange]);
+  const hanldeChange = React.useCallback(async(text) => {
+    if (!zns) {
+      return onChange(text);
+    }
+
+    const regExpDomain = /.*\w.zil/gm;
+
+    if (regExpDomain.test(text)) {
+      setIsLoading(true);
+
+      try {
+        const res = await keystore.ud.getAddressByDomain(text);
+        const bech32 = toBech32Address(res.address || res.owner);
+
+        onZNS(res.domain);
+        onChange(bech32);
+      } catch (err) {
+        //
+      }
+      setIsLoading(false);
+
+      return null;
+    }
+
+    onChange(text);
+  }, [onChange, onZNS]);
 
   return (
     <React.Fragment>
       <View style={[styles.container, style, {
         borderBottomColor: error ? theme.colors.danger : '#8A8A8F'
       }]}>
+        {isLoading ? (
+          <ActivityIndicator
+            animating={isLoading}
+            color={theme.colors.primary}
+          />
+        ) : null}
         <TextInput
           style={[styles.textInput, {
             color: error ? theme.colors.danger : theme.colors.white
@@ -60,7 +100,7 @@ export const QrCodeInput: React.FC<Prop> = ({
           value={value}
           placeholderTextColor="#8A8A8F"
           onSubmitEditing={() => null}
-          onChangeText={onChange}
+          onChangeText={hanldeChange}
         />
         <TouchableOpacity onPress={() => setQrcodeModal(true)}>
           <SvgXml xml={QrcodeIconSVG}/>

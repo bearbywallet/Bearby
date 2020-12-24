@@ -10,6 +10,7 @@ import namehash from '@unstoppabledomains/resolution/build/zns/namehash';
 import { PINTA, NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
+import { DomainResolver } from 'types';
 
 /**
  * Unstoppabledomains service domain resolver.
@@ -25,8 +26,10 @@ export class UnstoppableDomains {
     this._zilliqa = new ZilliqaControl(this._netwrok);
   }
 
-  public async getAddressByDomain(domain: string) {
-    const domainHash = namehash(domain);
+  public async getAddressByDomain(domain: string): Promise<DomainResolver> {
+    domain = String(domain).toLowerCase();
+
+    const domainHash: string = namehash(domain);
     const zilRecords = 'crypto.ZIL.address';
     const { records } = await this._zilliqa.getSmartContractSubState(
       UD_CONTRACT_ADDRESS,
@@ -50,10 +53,8 @@ export class UnstoppableDomains {
     }
 
     return {
-      records,
       owner,
       address,
-      domainHash,
       domain
     };
   }

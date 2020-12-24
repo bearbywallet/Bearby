@@ -41,15 +41,11 @@ export const AddContactModal: React.FC<Prop> = ({
 }) => {
   const [address, setAddress] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
-  const [errorMessage, setErrorMessage] = React.useState<string | undefined>();
 
   const handleAddressPass = React.useCallback(async(addr) => {
     setAddress(addr);
-    setErrorMessage(undefined);
 
     if (!isBech32(addr)) {
-      setErrorMessage(i18n.t('incorect_address_format'));
-
       return null;
     }
   }, [setAddress, address]);
@@ -63,6 +59,11 @@ export const AddContactModal: React.FC<Prop> = ({
     setName('');
     setAddress('');
   }, [address, name, onAdd, onTriggered, setAddress, setName]);
+
+  React.useEffect(() => {
+    setAddress('');
+    setName('');
+  }, [visible, setAddress]);
 
   return (
     <Modal
@@ -79,10 +80,11 @@ export const AddContactModal: React.FC<Prop> = ({
           {title}
         </ModalTitle>
         <QrCodeInput
+          zns
           value={address}
-          error={errorMessage}
           placeholder={i18n.t('address_zns')}
           onChange={handleAddressPass}
+          onZNS={setName}
         />
         <TextInput
           style={styles.textInput}
@@ -92,7 +94,7 @@ export const AddContactModal: React.FC<Prop> = ({
           onChangeText={setName}
         />
         <CustomButton
-          disabled={Boolean(errorMessage || !name || !address)}
+          disabled={Boolean(!name || !address)}
           title={i18n.t('add_contact')}
           onPress={handleCreateContact}
         />

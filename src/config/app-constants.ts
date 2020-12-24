@@ -17,7 +17,6 @@ export const API_COINGECKO = 'https://api.coingecko.com/api/v3/simple/price';
 export const PINTA = 'https://gateway.pinata.cloud/ipfs';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const UD_CONTRACT_ADDRESS = '0x9611c53be6d1b32058b2747bdececed7e1216793';
-export const SSN_ADDRESS = '0xB780e8095b8BA85A7145965ed632b3B774ac51cE';
 export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;
@@ -42,7 +41,10 @@ export const ZILLIQA: ZilliqaNetwork = {
 };
 export const ZILLIQA_KEYS = Object.keys(ZILLIQA);
 const [mainnet, testnet] = ZILLIQA_KEYS;
-
+export const SSN_ADDRESS = {
+  [mainnet]: '0xB780e8095b8BA85A7145965ed632b3B774ac51cE',
+  [testnet]: '0x05c2ddec2e4449160436130cb4f9b84de9f7ee5b'
+};
 export const ZIL_SWAP_CONTRACTS = {
   [mainnet]: '0xBa11eB7bCc0a02e947ACF03Cc651Bfaf19C9EC00',
   [testnet]: '0x1a62Dd9C84b0C8948cb51FC664ba143e7A34985c'

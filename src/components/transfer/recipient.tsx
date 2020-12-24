@@ -70,6 +70,7 @@ export const TransferRecipient: React.FC<Prop> = ({
         <View style={coomonStyles.receiving}>
           <SvgXml xml={ReceiveIconSVG} />
           <QrCodeInput
+            zns
             placeholder={i18n.t('transfer_view0')}
             value={recipient}
             onChange={onSelect}

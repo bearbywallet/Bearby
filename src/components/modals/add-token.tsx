@@ -109,6 +109,7 @@ export const AddTokenModal: React.FC<Prop> = ({
         </ModalTitle>
         <View style={styles.container}>
           <QrCodeInput
+            zns
             value={address}
             error={errorMessage}
             placeholder={i18n.t('contract_address')}

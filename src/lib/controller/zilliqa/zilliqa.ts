@@ -127,7 +127,6 @@ export class ZilliqaControl {
   }
 
   public async getNetworkId() {
-
     const request = this._json(Methods.GetNetworkId, []);
     const responce = await fetch(this._network.http, request);
     const data = await responce.json();
