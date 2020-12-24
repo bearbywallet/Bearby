@@ -194,9 +194,9 @@ export class AccountControler {
     await this.update(this.store.get());
   }
 
-  public async updateNonce() {
+  public async updateNonce(selected: number) {
     const state = this.store.get();
-    const account = state.identities[state.selectedAddress];
+    const account = state.identities[selected];
     const { nonce } = await this._zilliqa.getBalance(account.base16);
 
     if (nonce < account.nonce && NONCE_DIFFICULTY < nonce - account.nonce) {
@@ -208,16 +208,16 @@ export class AccountControler {
     }
 
     if (nonce > account.nonce) {
-      state.identities[state.selectedAddress].nonce = nonce;
+      state.identities[selected].nonce = nonce;
     }
 
     await this.update(state);
   }
 
-  public async increaseNonce() {
+  public async increaseNonce(selected: number) {
     const state = this.store.get();
 
-    state.identities[state.selectedAddress].nonce++;
+    state.identities[selected].nonce++;
 
     await this.update(state);
   }

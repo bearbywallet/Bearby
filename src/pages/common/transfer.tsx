@@ -66,14 +66,14 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
     [selectedToken, tokensState]
   );
   const account = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    [accountState]
+    () => accountState.identities[selectedAccount],
+    [accountState, selectedAccount]
   );
 
   const handleSiging = React.useCallback(async(transaction: Transaction, cb) => {
     setConfirmError(undefined);
     try {
-      await keystore.account.updateNonce();
+      await keystore.account.updateNonce(selectedAccount);
       const chainID = await keystore.zilliqa.getNetworkId();
       const keyPair = await keystore.getkeyPairs(account);
 
@@ -82,6 +82,7 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
       transaction.sign(keyPair.privateKey);
       transaction.hash = await keystore.zilliqa.send(transaction);
 
+      await keystore.account.increaseNonce(selectedAccount);
       await keystore.transaction.add(transaction);
 
       cb();
@@ -90,7 +91,10 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
       cb();
       setConfirmError(err.message);
     }
-  }, [account, setConfirmModal, setConfirmError]);
+  }, [
+    selectedAccount,
+    account
+  ]);
 
   React.useEffect(() => {
     try {

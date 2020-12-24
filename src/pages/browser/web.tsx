@@ -38,7 +38,6 @@ import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
 import { MessagePayload, TxMessage } from 'types';
 import i18n from 'app/lib/i18n';
-import { toLi } from 'app/filters';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -60,6 +59,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
+
+  const [confirmError, setConfirmError] = React.useState<string>();
 
   const [appConnect, setAppConnect] = React.useState<MessagePayload>();
   const [signMessage, setSignMessage] = React.useState<MessagePayload>();
@@ -140,6 +141,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
 
         case Messages.signTx:
+          setConfirmError(undefined);
           setTransaction({
             params: Transaction.fromPayload(message.payload.data, account),
             uuid: message.payload.uuid,
@@ -157,10 +159,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [
     webViewRef,
     account,
-    isConnect,
-    setAppConnect,
-    setSignMessage,
-    setTransaction
+    isConnect
   ]);
 
   const handleConnect = React.useCallback((value) => {
@@ -217,18 +216,55 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     webViewRef.current.postMessage(m.serialize);
     setSignMessage(undefined);
   }, [webViewRef, signMessage, setSignMessage]);
-  const handleTx = React.useCallback((value) => {
+  const handleConfirmTransaction = React.useCallback(async(tx: Transaction, cb) => {
+    setConfirmError(undefined);
+
     if (!webViewRef.current || !transaction) {
       return null;
     }
 
-    if (value) {
-      // TODO: signing and send to node.
+    try {
+      await keystore.account.updateNonce(accountState.selectedAddress);
+      const chainID = await keystore.zilliqa.getNetworkId();
+      const keyPair = await keystore.getkeyPairs(account);
+
+      tx.setVersion(chainID);
+      tx.nonce = account.nonce + 1;
+      tx.sign(keyPair.privateKey);
+      tx.hash = await keystore.zilliqa.send(tx);
+  
+      await keystore.account.increaseNonce(accountState.selectedAddress);
+      await keystore.transaction.add(tx);
+  
+      const m = new Message(Messages.signResult, {
+        origin: transaction.origin,
+        uuid: transaction.uuid,
+        data: {
+          resolve: {
+            ID: tx.hash,
+            ...tx.self
+          }
+        }
+      });
+      webViewRef.current.postMessage(m.serialize);
+
+      cb();
       setTransaction(undefined);
+    } catch (err) {
+      cb();
+      setConfirmError(err.message);
+    }
+  }, [
+    accountState,
+    transaction,
+    webViewRef
+  ]);
+  const hanldeRejectTransaction = React.useCallback(() => {
+    if (!webViewRef.current || !transaction) {
       return null;
     }
 
-    const m = new Message(Messages.resConnect, {
+    const m = new Message(Messages.signResult, {
       origin: transaction.origin,
       uuid: transaction.uuid,
       data: {
@@ -237,7 +273,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     });
     webViewRef.current.postMessage(m.serialize);
     setTransaction(undefined);
-  }, [transaction, webViewRef, setTransaction]);
+  }, [transaction]);
 
   React.useEffect(() => {
     if (!inpageJS) {
@@ -324,10 +360,11 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           transaction={transaction.params}
           decimals={tokenState[0].decimals}
           account={account}
+          error={confirmError}
           title={i18n.t('confirm')}
           visible={Boolean(transaction)}
-          onTriggered={() => handleTx(false)}
-          onConfirm={() => handleTx(true)}
+          onTriggered={hanldeRejectTransaction}
+          onConfirm={handleConfirmTransaction}
         >
           <Image
             style={{

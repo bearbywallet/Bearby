@@ -19,7 +19,7 @@ import {
   isAddress,
   toChecksumAddress
 } from 'app/utils';
-import { fromLI, gasToFee } from 'app/filters';
+import { toLi, fromLI, gasToFee } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 
@@ -27,9 +27,10 @@ export class Transaction {
 
   public static fromPayload(payload: TxParams, account: Account) {
     const gas = {
-      gasPrice: payload.gasPrice,
+      gasPrice: toLi(payload.gasPrice),
       gasLimit: payload.gasLimit
     };
+
     return new Transaction(
       payload.amount,
       gas,
