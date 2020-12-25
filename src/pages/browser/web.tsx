@@ -232,10 +232,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       tx.nonce = account.nonce + 1;
       tx.sign(keyPair.privateKey);
       tx.hash = await keystore.zilliqa.send(tx);
-  
+
       await keystore.account.increaseNonce(accountState.selectedAddress);
       await keystore.transaction.add(tx);
-  
+
       const m = new Message(Messages.signResult, {
         origin: transaction.origin,
         uuid: transaction.uuid,

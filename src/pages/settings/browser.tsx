@@ -71,7 +71,7 @@ export const BrowserSettingsPage = () => {
           enabled={searchEngineState.dweb}
           onChange={() => keystore.searchEngine.toggleDweb(!searchEngineState.dweb)}
         >
-          <View>
+          <View style={styles.switcherWrapper}>
             <Text style={styles.someText}>
               {i18n.t('d_web')}
             </Text>
@@ -85,7 +85,7 @@ export const BrowserSettingsPage = () => {
           enabled={searchEngineState.incognito}
           onChange={() => keystore.searchEngine.toggleIncognito(!searchEngineState.incognito)}
         >
-          <View>
+          <View style={styles.switcherWrapper}>
             <Text style={styles.someText}>
               {i18n.t('incognito')}
             </Text>
@@ -116,6 +116,9 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
+  },
+  switcherWrapper: {
+    maxWidth: '70%'
   },
   list: {
     marginTop: 16

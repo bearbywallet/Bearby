@@ -171,7 +171,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
           enabled={authState.biometricEnable}
           onChange={hanldeChangeBiometric}
         >
-          <View>
+          <View style={styles.switcherWrapper}>
             <Text style={styles.biometricText}>
               {i18n.t('use')} {authState.supportedBiometryType}
             </Text>
@@ -244,6 +244,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     lineHeight: 21,
     color: '#8A8A8F'
+  },
+  switcherWrapper: {
+    maxWidth: '70%'
   },
   btnWrapper: {
     marginTop: 32,

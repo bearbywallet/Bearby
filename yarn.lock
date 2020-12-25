@@ -6584,6 +6584,11 @@ react-native-camera@^3.40.0:
   dependencies:
     prop-types "^15.6.2"
 
+react-native-context-menu-view@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/react-native-context-menu-view/-/react-native-context-menu-view-1.2.1.tgz#0faf79127c5242fb852d4ce5cb3c6660c19291db"
+  integrity sha512-p6aslD1mTftJG57RRP2qVHHD/37A6oRN5H90n5UY151cWNfhYx5uCfD6B6Uou0MGuOStMKEWZ6h739AO/pPOOg==
+
 react-native-device-info@^7.3.1:
   version "7.3.1"
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-7.3.1.tgz#6c4b0120d57872a2f7534332323306b386828a3d"

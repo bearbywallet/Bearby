@@ -252,6 +252,8 @@ PODS:
     - React-Core
   - react-native-camera/RN (3.40.0):
     - React-Core
+  - react-native-context-menu-view (1.2.1):
+    - React
   - react-native-safe-area-context (3.1.9):
     - React-Core
   - react-native-webview (11.0.2):
@@ -389,6 +391,7 @@ DEPENDENCIES:
   - React-jsinspector (from `../node_modules/react-native/ReactCommon/jsinspector`)
   - react-native-aes (from `../node_modules/react-native-aes-crypto`)
   - react-native-camera (from `../node_modules/react-native-camera`)
+  - react-native-context-menu-view (from `../node_modules/react-native-context-menu-view`)
   - react-native-safe-area-context (from `../node_modules/react-native-safe-area-context`)
   - react-native-webview (from `../node_modules/react-native-webview`)
   - React-RCTActionSheet (from `../node_modules/react-native/Libraries/ActionSheetIOS`)
@@ -474,6 +477,8 @@ EXTERNAL SOURCES:
     :path: "../node_modules/react-native-aes-crypto"
   react-native-camera:
     :path: "../node_modules/react-native-camera"
+  react-native-context-menu-view:
+    :path: "../node_modules/react-native-context-menu-view"
   react-native-safe-area-context:
     :path: "../node_modules/react-native-safe-area-context"
   react-native-webview:
@@ -559,6 +564,7 @@ SPEC CHECKSUMS:
   React-jsinspector: 58aef7155bc9a9683f5b60b35eccea8722a4f53a
   react-native-aes: c6e4e3ffcff410535e31e161fca95d50e608d4ee
   react-native-camera: 35854c4f764a4a6cf61c1c3525888b92f0fe4b31
+  react-native-context-menu-view: 314d901eb8d8b3d32c2bcc5c5288045c539fe345
   react-native-safe-area-context: b6e0e284002381d2ff29fa4fff42b4d8282e3c94
   react-native-webview: dfd7202ff115c44d3ea401c2f36122fb3ac79f07
   React-RCTActionSheet: 89a0ca9f4a06c1f93c26067af074ccdce0f40336
