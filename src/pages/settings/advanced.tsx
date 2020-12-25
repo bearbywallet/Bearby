@@ -15,17 +15,17 @@ import {
   ScrollView
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
+import { useTheme } from '@react-navigation/native';
 
 import { GasSelector } from 'app/components/gas-selector';
 import { Selector } from 'app/components/selector';
 
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { DEFAULT_GAS } from 'app/config';
 
-
 export const AdvancedPage: React.FC = () => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const gasState = keystore.gas.store.useValue();
 
@@ -35,14 +35,18 @@ export const AdvancedPage: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('advanced_title')}
         </Text>
         <Button
           title={i18n.t('reset')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={hanldeReset}
         />
       </View>
@@ -68,8 +72,7 @@ export const AdvancedPage: React.FC = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   titleWrapper: {
     flexDirection: 'row',
@@ -79,7 +82,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'

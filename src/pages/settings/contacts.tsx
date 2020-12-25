@@ -16,12 +16,12 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import { ContactItem } from 'app/components/contact-item';
 import { AddContactModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { Contact } from 'types';
 import { keystore } from 'app/keystore';
@@ -44,6 +44,7 @@ const checkChar = (elements: Contact[], index: number) => {
 };
 
 export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const contactsState = keystore.contacts.store.useValue();
 
   const [contactModal, setContactModal] = React.useState(false);
@@ -71,18 +72,24 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('contacts_title')}
         </Text>
         <Button
           title={i18n.t('contacts_btn')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => setContactModal(true)}
         />
       </View>
-      <ScrollView style={styles.list}>
+      <ScrollView style={[styles.list, {
+        backgroundColor: colors.background
+      }]}>
         {alphabetSorted.map((item, index) => (
           <ContactItem
             key={index}
@@ -90,7 +97,6 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
             isChar={!checkChar(alphabetSorted, index)}
             last={index === alphabetSorted.length - 1}
             bech32={item.address}
-            onRemove={() => keystore.contacts.rm(item)}
             onSelect={() => handleSelectContect(item.address)}
           />
         ))}
@@ -107,7 +113,6 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.black,
     flex: 1
   },
   titleWrapper: {
@@ -118,13 +123,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
   },
   list: {
-    backgroundColor: theme.colors.black,
     marginTop: 16
   }
 });

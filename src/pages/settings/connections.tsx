@@ -15,16 +15,17 @@ import {
   StyleSheet
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
+import { useTheme } from '@react-navigation/native';
 
 import { BrowserAppItem } from 'app/components/browser';
 import { SimpleConfirm } from 'app/components/modals';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { Connect } from 'types';
 
 export const ConnectionsPage = () => {
+  const { colors } = useTheme();
   const connectState = keystore.connect.store.useValue();
 
   const [rmConnect, setRmConnect] = React.useState<Connect>();
@@ -38,20 +39,28 @@ export const ConnectionsPage = () => {
   }, [rmConnect, setRmConnect]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('connections_title')}
         </Text>
         <Button
           title={i18n.t('connections_remove_all')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => keystore.connect.reset()}
         />
       </View>
-      <ScrollView style={styles.list}>
+      <ScrollView style={[styles.list, {
+        backgroundColor: colors.background
+      }]}>
         {connectState.length === 0 ? (
-          <Text style={styles.noConnect}>
+          <Text style={[styles.noConnect, {
+            color: colors.notification
+          }]}>
             {i18n.t('havent_connections')}
           </Text>
         ) : null}
@@ -84,7 +93,6 @@ export const ConnectionsPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.black,
     flex: 1
   },
   titleWrapper: {
@@ -95,17 +103,14 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
   },
   list: {
-    backgroundColor: theme.colors.black,
     marginTop: 16
   },
   noConnect: {
-    color: theme.colors.muted,
     fontSize: 17,
     lineHeight: 22,
     paddingLeft: 15

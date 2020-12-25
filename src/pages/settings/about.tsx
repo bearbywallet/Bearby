@@ -16,10 +16,10 @@ import {
   Dimensions
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
+import { useTheme } from '@react-navigation/native';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 
 const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
@@ -27,10 +27,15 @@ const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
 const TERMS_URL = 'https://zilpay.xyz/Terms/';
 const { width } = Dimensions.get('window');
 export const AboutPage = () => {
+  const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {i18n.t('about_title')}
       </Text>
       <CreateBackground
@@ -40,17 +45,17 @@ export const AboutPage = () => {
       <View>
         <Button
           title={i18n.t('about_link_0')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => Linking.openURL(GIHTUB_URL)}
         />
         <Button
           title={i18n.t('about_link_1')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => Linking.openURL(PRIVACY_URL)}
         />
         <Button
           title={i18n.t('about_link_2')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => Linking.openURL(TERMS_URL)}
         />
       </View>
@@ -60,12 +65,10 @@ export const AboutPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   title: {
     textAlign: 'center',
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold',

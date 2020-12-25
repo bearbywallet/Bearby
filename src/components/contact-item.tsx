@@ -14,8 +14,7 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
 
 type Prop = {
   style?: ViewStyle;
@@ -23,7 +22,6 @@ type Prop = {
   isChar?: boolean;
   name: string;
   bech32: string;
-  onRemove?: () => void;
   onSelect?: () => void;
 };
 
@@ -33,58 +31,67 @@ export const ContactItem: React.FC<Prop> = ({
   bech32,
   isChar,
   last,
-  onRemove,
   onSelect = () => null
-}) => (
-  <TouchableOpacity
-    style={[styles.container, style]}
-    onPress={onSelect}
-  >
-    <Text style={styles.char}>
-      {isChar ? name[0].toUpperCase() : ''}
-    </Text>
-    <View style={[styles.wrapper, { borderBottomWidth: last ? 0 : 1 }]}>
-      <View>
-        <Text style={styles.name}>
-          {name}
-        </Text>
-        <Text style={styles.address}>
-          {bech32}
-        </Text>
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <TouchableOpacity
+      style={[styles.container, {
+        backgroundColor: colors.card
+      }, style]}
+      onPress={onSelect}
+    >
+      <Text style={[styles.char, {
+        color: colors.notification
+      }]}>
+        {isChar ? name[0].toUpperCase() : ''}
+      </Text>
+      <View style={[styles.wrapper, {
+        borderBottomWidth: last ? 0 : 1,
+        borderBottomColor: colors.background,
+      }]}>
+        <View>
+          <Text style={[styles.name, {
+            color: colors.text
+          }]}>
+            {name}
+          </Text>
+          <Text style={[styles.address, {
+            color: colors.border
+          }]}>
+            {bech32}
+          </Text>
+        </View>
       </View>
-    </View>
-  </TouchableOpacity>
-);
+    </TouchableOpacity>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    backgroundColor: '#18191D'
+    justifyContent: 'space-between'
   },
   wrapper: {
     width: '100%',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    borderBottomColor: '#09090C',
     paddingRight: 20,
     paddingVertical: 20,
     paddingLeft: 15
   },
   name: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   },
   address: {
-    color: '#8A8A8F',
     fontSize: 13,
     lineHeight: 17
   },
   char: {
-    color: '#666666',
     fontSize: 17,
     lineHeight: 22
   }

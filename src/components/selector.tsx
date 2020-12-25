@@ -64,7 +64,8 @@ export const Selector: React.FC<Prop> = ({
         <TouchableOpacity
           key={index}
           style={[styles.item, {
-            borderBottomColor: colors.border
+            borderBottomColor: colors.border,
+            borderBottomWidth: index === items.length - 1 ? 0 : 1
           }]}
           onPress={() => onSelect(item, index)}
         >
@@ -95,7 +96,6 @@ const styles = StyleSheet.create({
     lineHeight: 21
   },
   item: {
-    borderBottomWidth: 1,
     paddingVertical: 13,
     flexDirection: 'row',
     alignItems: 'center'
