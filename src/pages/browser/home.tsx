@@ -62,7 +62,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const hanldeSearch = React.useCallback(async() => {
     setIsLoading(true);
     const url = await keystore.searchEngine.onUrlSubmit(search);
-    setSearch('');
     setIsLoading(false);
     navigation.navigate('Web', {
       url

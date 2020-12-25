@@ -13,6 +13,7 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { AddTokenModal } from 'app/components/modals';
 
@@ -27,16 +28,24 @@ export type Prop = {
 };
 
 export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <React.Fragment>
       <TouchableOpacity
-        style={[styles.container, style]}
+        style={[styles.container, style, {
+          backgroundColor: colors.background,
+          borderColor: colors.background
+        }]}
         onPress={() => setModalVisible(true)}
       >
-        <View style={[styles.line, styles.line0]}/>
-        <View style={styles.line}/>
+        <View style={[styles.line, styles.line0, {
+          backgroundColor: colors.primary
+        }]}/>
+        <View style={[styles.line, {
+          backgroundColor: colors.primary
+        }]}/>
       </TouchableOpacity>
       <AddTokenModal
         account={account}
@@ -54,10 +63,8 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minHeight: 90,
     width: '47%',
-    backgroundColor: theme.colors.gray,
     padding: 10,
     borderWidth: 0.9,
-    borderColor: theme.colors.gray,
 
     justifyContent: 'center',
     alignItems: 'center'
@@ -65,7 +72,6 @@ const styles = StyleSheet.create({
   line: {
     width: 30,
     height: 3,
-    backgroundColor: theme.colors.primary,
     borderRadius: 5
   },
   line0: {

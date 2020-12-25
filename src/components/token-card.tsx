@@ -14,12 +14,12 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { LoadSVG } from 'app/components/load-svg';
 import ContextMenu from 'react-native-context-menu-view';
 
 import { Token, Account } from 'types';
-import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
 import i18n from 'app/lib/i18n';
@@ -51,6 +51,7 @@ export const TokenCard: React.FC<Prop> = ({
   onSend = () => null,
   onView = () => null,
 }) => {
+  const { colors } = useTheme();
   const actions = React.useMemo(() => [
     {
       title: i18n.t('send'),
@@ -105,11 +106,16 @@ export const TokenCard: React.FC<Prop> = ({
       onPress={hanldeSelect}
     >
       <TouchableOpacity
-        style={styles.wrapper}
+        style={[styles.wrapper, {
+          backgroundColor: colors['white'],
+          shadowColor: colors.primary
+        }]}
         onPress={onPress}
       >
         <View style={styles.header}>
-          <Text style={styles.symbol}>
+          <Text style={[styles.symbol, {
+            color: colors.notification
+          }]}>
             {token.symbol}
           </Text>
           <LoadSVG
@@ -119,10 +125,14 @@ export const TokenCard: React.FC<Prop> = ({
           />
         </View>
         <View>
-          <Text style={styles.zilAmount}>
+          <Text style={[styles.zilAmount, {
+            color: colors.text
+          }]}>
             {toLocaleString(amount)}
           </Text>
-          <Text style={styles.convertedAmount}>
+          <Text style={[styles.convertedAmount, {
+            color: colors.notification
+          }]}>
             {toLocaleString(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
@@ -140,8 +150,13 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minHeight: 90,
     maxHeight: 120,
-    backgroundColor: theme.colors.gray,
-    padding: 10
+    padding: 10,
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2
   },
   header: {
     width: '100%',
@@ -150,17 +165,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   symbol: {
-    color: theme.colors.muted,
     fontSize: 17
   },
   zilAmount: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22,
     fontWeight: 'bold'
   },
   convertedAmount: {
-    color: theme.colors.muted,
     fontSize: 13
   }
 });

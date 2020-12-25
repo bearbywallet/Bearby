@@ -124,6 +124,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
 
         case Messages.appConnect:
+          if (isConnect) {
+            handleConnect(isConnect);
+            break;
+          }
           setAppConnect(message.payload);
           break;
 

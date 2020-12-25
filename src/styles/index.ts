@@ -13,8 +13,15 @@
 import { DefaultTheme } from '@react-navigation/native';
 
 /**
- * Map of color names to HEX values
+ * Map of reusable fonts
  */
+export const fontStyles = {
+  // [Fonts.Bold]: require('assets/fonts/SF-Pro-Display-Bold.otf'),
+  // [Fonts.Light]: require('assets/fonts/SF-Pro-Display-Light.otf'),
+  // [Fonts.Medium]: require('assets/fonts/SF-Pro-Display-Medium.otf'),
+  // [Fonts.Regilar]: require('assets/fonts/SF-Pro-Display-Regular.otf')
+};
+
 export const colors = {
   primary: '#FF9500',
   secondary: '#0C0D34',
@@ -29,16 +36,6 @@ export const colors = {
   white: '#fff'
 };
 
-/**
- * Map of reusable fonts
- */
-export const fontStyles = {
-  // [Fonts.Bold]: require('assets/fonts/SF-Pro-Display-Bold.otf'),
-  // [Fonts.Light]: require('assets/fonts/SF-Pro-Display-Light.otf'),
-  // [Fonts.Medium]: require('assets/fonts/SF-Pro-Display-Medium.otf'),
-  // [Fonts.Regilar]: require('assets/fonts/SF-Pro-Display-Regular.otf')
-};
-
 export const theme = {
   ...DefaultTheme,
   colors: {
@@ -48,5 +45,32 @@ export const theme = {
     text: '#000',
     border: '#0c0d3480',
     notification: '#fff'
+  }
+};
+
+export const dark = {
+  ...DefaultTheme,
+  dark: true,
+  colors: {
+    white: colors.white,
+    primary: '#FF9500',
+    background: '#09090C',
+    card: '#2B2E33',
+    text: '#F9F9F9',
+    border: '#8A8A8F',
+    notification: '#666666'
+  }
+};
+export const light = {
+  ...DefaultTheme,
+  dark: false,
+  colors: {
+    white: colors.white,
+    primary: '#21A0B1',
+    background: '#E1E7FF',
+    card: '#F9F9F9',
+    text: '#32335A',
+    border: '#8A8A8F',
+    notification: '#8E8EAE'
   }
 };

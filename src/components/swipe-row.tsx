@@ -66,11 +66,11 @@ export const SwipeRow: React.FC<Prop> = ({
   const animConfig = {
     toValue: new Value(0),
     damping: 20,
-    mass: 0.2,
-    stiffness: 100,
-    overshootClamping: false,
-    restSpeedThreshold: 0.2,
-    restDisplacementThreshold: 0.2,
+    mass: 0.5,
+    stiffness: 50,
+    overshootClamping: true,
+    restSpeedThreshold: 0.6,
+    restDisplacementThreshold: 1
   };
   /**
    * Called whenever gesture state changes.
@@ -104,9 +104,9 @@ export const SwipeRow: React.FC<Prop> = ({
               call([animState.position], () =>
                 onSwipe(index)
               )
-            ),
-          ]),
-        ]),
+            )
+          ])
+        ])
     },
   ]);
 
@@ -122,19 +122,17 @@ export const SwipeRow: React.FC<Prop> = ({
           transform: [{ translateX: animState.position }],
         }}>
         <Animated.Code>
-          {() =>
-            block([
-              // If the clock is running, increment position in next tick by calling spring()
-              cond(clockRunning(clock), [
-                spring(clock, animState, animConfig),
-                // Stop and reset clock when spring is complete
-                cond(animState.finished, [
-                  stopClock(clock),
-                  set(animState.finished, 0),
-                ]),
-              ]),
+          {() => block([
+            // If the clock is running, increment position in next tick by calling spring()
+            cond(clockRunning(clock), [
+              spring(clock, animState, animConfig),
+              // Stop and reset clock when spring is complete
+              cond(animState.finished, [
+                stopClock(clock),
+                set(animState.finished, 0)
+              ])
             ])
-          }
+          ])}
         </Animated.Code>
         {children}
       </Animated.View>

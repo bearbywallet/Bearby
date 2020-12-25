@@ -12,13 +12,13 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { DropDownItem } from 'app/components/drop-down-item';
 import { AccountsModal } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -33,6 +33,8 @@ export const AccountMenu: React.FC<Prop> = ({
   onCreate = () => null,
   onRemove = () => null
 }) => {
+  const { colors } = useTheme();
+
   const accountState = keystore.account.store.useValue();
 
   const [isModal, setIsModal] = React.useState(false);
@@ -57,7 +59,7 @@ export const AccountMenu: React.FC<Prop> = ({
       style={[styles.container, style]}
     >
       <DropDownItem
-        color={theme.colors.white}
+        color={colors.text}
         onPress={() => setIsModal(true)}
       >
         {accountName}
@@ -84,7 +86,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   title: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   }

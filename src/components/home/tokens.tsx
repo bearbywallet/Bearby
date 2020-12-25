@@ -13,9 +13,9 @@ import {
   Text,
   Dimensions
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 
 import { TokenCard } from 'app/components/token-card';
 import { AddToken } from 'app/components/add-token';
@@ -32,6 +32,8 @@ type Prop = {
 
 const { width, height } = Dimensions.get('window');
 export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewToken }) => {
+  const { colors } = useTheme();
+
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
@@ -70,9 +72,13 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewT
   }, [tokenForRemove, setTokenForRemove]);
 
   return (
-    <View style={styles.container}>
+    <View style={[styles.container, {
+      backgroundColor: colors['white']
+    }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('my_tokens')}
         </Text>
       </View>
@@ -117,7 +123,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
 
-    backgroundColor: theme.colors.background,
     minHeight: height / 1.7,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
@@ -138,7 +143,6 @@ const styles = StyleSheet.create({
     marginTop: 16
   },
   title: {
-    color: theme.colors.white,
     fontSize: 20
   }
 });

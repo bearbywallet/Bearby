@@ -37,6 +37,7 @@
     "react": "17.0.1",
     "react-native": "^0.63.4",
     "react-native-aes-crypto": "^1.3.10",
+    "react-native-appearance": "^0.3.4",
     "react-native-camera": "^3.40.0",
     "react-native-context-menu-view": "^1.2.1",
     "react-native-device-info": "^7.3.1",

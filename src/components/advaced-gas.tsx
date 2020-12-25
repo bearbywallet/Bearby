@@ -15,6 +15,7 @@ import {
   Button,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
 import { ArrowIconSVG } from 'app/components/svg';
@@ -43,6 +44,7 @@ export const AdvacedGas: React.FC<Prop> = ({
   onDSChanged,
   onChange
 }) => {
+  const { colors } = useTheme();
   const [isAdvanced, setIsAdvanced] = React.useState(false);
 
   return (
@@ -59,12 +61,12 @@ export const AdvacedGas: React.FC<Prop> = ({
       <View style={styles.advanced}>
         <Button
           title={i18n.t('advanced_title')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => setIsAdvanced(!isAdvanced)}
         />
         <SvgXml
           xml={ArrowIconSVG}
-          fill={theme.colors.primary}
+          fill={colors.primary}
           style={{ transform: [{ rotate: isAdvanced ? '-180deg' : '0deg' }]}}
         />
       </View>
@@ -74,17 +76,24 @@ export const AdvacedGas: React.FC<Prop> = ({
             enabled={ds}
             onChange={onDSChanged}
           >
-            <Text style={styles.dsLabel}>
+            <Text style={[styles.dsLabel, {
+              color: colors.text
+            }]}>
               {i18n.t('send_to_ds')}
             </Text>
           </Switcher>
           <View style={styles.inputWrapper}>
-            <Text style={styles.gasLimitLabel}>
+            <Text style={[styles.gasLimitLabel, {
+              color: colors.border
+            }]}>
               {i18n.t('gas_limit')}:
             </Text>
             <TextInput
-              style={styles.textInput}
-              placeholderTextColor="#8A8A8F"
+              style={[styles.textInput, {
+                borderBottomColor: colors.border,
+                color: colors.text
+              }]}
+              placeholderTextColor={colors.border}
               defaultValue={gas.gasLimit}
               onChangeText={(gasLimit) => onChange({ ...gas, gasLimit })}
             />
@@ -111,8 +120,7 @@ const styles = StyleSheet.create({
   },
   gasLimitLabel: {
     fontSize: 16,
-    lineHeight: 21,
-    color: '#8A8A8F'
+    lineHeight: 21
   },
   inputWrapper: {
     alignItems: 'center',
@@ -122,9 +130,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1,
-    color: theme.colors.white,
     width: '90%'
   },
 });

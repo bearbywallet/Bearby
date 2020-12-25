@@ -11,17 +11,27 @@ import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import { AppearanceProvider, useColorScheme } from 'react-native-appearance';
 
 import Navigator from './navigator';
-import { theme } from './styles';
+import { dark, light } from './styles';
+
+const theme = {
+  dark,
+  light
+};
 
 export default function Root() {
+  const scheme = useColorScheme();
+
   return (
-    <NavigationContainer theme={theme}>
-      <SafeAreaProvider>
-        <Navigator />
-      </SafeAreaProvider>
-      <StatusBar barStyle="light-content"/>
-    </NavigationContainer>
+    <AppearanceProvider>
+      <NavigationContainer theme={theme[scheme]}>
+        <SafeAreaProvider>
+          <Navigator />
+        </SafeAreaProvider>
+        <StatusBar barStyle="light-content"/>
+      </NavigationContainer>
+    </AppearanceProvider>
   );
 }

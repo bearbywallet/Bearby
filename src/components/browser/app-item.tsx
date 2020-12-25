@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
+import { useTheme } from '@react-navigation/native';
 import {
   View,
   Image,
@@ -16,7 +17,6 @@ import {
   Dimensions,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -34,9 +34,13 @@ export const BrowserAppItem: React.FC<Prop> = ({
   style,
   onPress
 }) => {
+  const { colors } = useTheme();
+
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
+      style={[styles.container, style, {
+        backgroundColor: colors.card
+      }]}
       onPress={onPress}
     >
       <Image
@@ -44,10 +48,14 @@ export const BrowserAppItem: React.FC<Prop> = ({
         source={{ uri: icon }}
       />
       <View>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {title}
         </Text>
-        <Text style={styles.domain}>
+        <Text style={[styles.domain, {
+          color: colors.notification
+        }]}>
           {domain}
         </Text>
       </View>
@@ -60,7 +68,6 @@ const styles = StyleSheet.create({
     padding: 10,
     minHeight: width / 6,
     borderRadius: 8,
-    backgroundColor: theme.colors.gray,
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
@@ -68,7 +75,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white,
     textAlign: 'right'
   },
   icon: {
@@ -78,7 +84,6 @@ const styles = StyleSheet.create({
   domain: {
     fontSize: 15,
     lineHeight: 17,
-    color: theme.colors.muted,
     textAlign: 'right'
   }
 });

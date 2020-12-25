@@ -14,11 +14,11 @@ import {
   Button,
   Dimensions
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { AccountMenu } from 'app/components/account-menu';
 import CreateBackground from 'app/assets/logo.svg';
 
-import { theme } from 'app/styles';
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
 import { fromZil, toConversion, toLocaleString } from 'app/filters';
@@ -47,6 +47,8 @@ export const HomeAccount: React.FC<Prop> = ({
   onSend,
   onRemove
 }) => {
+  const { colors } = useTheme();
+
   /**
    * ZIL(Default token) amount in float.
    */
@@ -76,25 +78,33 @@ export const HomeAccount: React.FC<Prop> = ({
           onRemove={onRemove}
         />
         <View style={styles.amountWrapper}>
-          <Text style={styles.amount}>
+          <Text style={[styles.amount, {
+            color: colors.text
+          }]}>
             {toLocaleString(amount)}
-            <Text style={styles.symbol}>
+            <Text style={[styles.symbol, {
+              color: colors.text
+            }]}>
               {token.symbol}
             </Text>
           </Text>
-          <Text style={styles.convertedAmount}>
+          <Text style={[styles.convertedAmount, {
+            color: colors.text
+          }]}>
             {toLocaleString(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
         <View style={styles.buttons}>
           <Button
-            color={theme.colors.primary}
+            color={colors.primary}
             title={I18n.t('send')}
             onPress={onSend}
           />
-          <View style={styles.seporate}/>
+          <View style={[styles.seporate, {
+            backgroundColor: colors.border
+          }]}/>
           <Button
-            color={theme.colors.primary}
+            color={colors.primary}
             title={I18n.t('receive')}
             onPress={onReceive}
           />
@@ -122,17 +132,14 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   amount: {
-    color: theme.colors.white,
     fontSize: 44,
     fontWeight: 'bold'
   },
   symbol: {
     fontSize: 17,
-    fontWeight: 'normal',
-    color: theme.colors.white
+    fontWeight: 'normal'
   },
   convertedAmount: {
-    color: '#8A8A8F',
     fontSize: 13
   },
   buttons: {
@@ -144,7 +151,6 @@ const styles = StyleSheet.create({
   },
   seporate: {
     width: 1,
-    height: 40,
-    backgroundColor: '#666666'
+    height: 40
   }
 });
