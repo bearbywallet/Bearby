@@ -14,7 +14,6 @@ import {
   FlatList,
   RefreshControl
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { HomeAccount, HomeTokens } from 'app/components/home';
@@ -25,6 +24,8 @@ import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
 import { ZILLIQA_KEYS } from 'app/config';
+import { viewAddress } from 'app/utils';
+import { Token } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -51,6 +52,17 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       screen: 'CreateAccount'
     });
   }, []);
+  const hanldeViewBlock = React.useCallback((token: Token) => {
+    const { selected } = networkState;
+    const url = viewAddress(token.address[selected], selected);
+
+    navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url
+      }
+    });
+  }, [networkState, navigation]);
   const handleSend = React.useCallback(() => {
     navigation.navigate('Common', {
       screen: 'Transfer',
@@ -116,7 +128,16 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onSend={handleSend}
                 onRemove={() => setIsConfirmModal(true)}
               />
-              <HomeTokens onSelectToken={hanldeSelectToken} />
+              <HomeTokens
+                onSelectToken={hanldeSelectToken}
+                onSendToken={(selectedToken) => navigation.navigate('Common', {
+                  screen: 'Transfer',
+                  params: {
+                    selectedToken
+                  }
+                })}
+                onViewToken={hanldeViewBlock}
+              />
             </View>
           )}
         />

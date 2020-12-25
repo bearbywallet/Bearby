@@ -44,7 +44,7 @@ type Prop = {
 };
 
 const { width } = Dimensions.get('window');
-export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
+export const TransferPage: React.FC<Prop> = ({ route }) => {
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
@@ -53,7 +53,9 @@ export const TransferPage: React.FC<Prop> = ({ navigation, route }) => {
 
   const [confirmModal, setConfirmModal] = React.useState(false);
   const [confirmError, setConfirmError] = React.useState<string>();
-  const [selectedToken, setSelectedToken] = React.useState(0);
+  const [selectedToken, setSelectedToken] = React.useState(
+    (route.params && route.params.selectedToken) || 0
+  );
   const [selectedAccount, setSelectedAccount] = React.useState(accountState.selectedAddress);
   const [amount, setAmount] = React.useState('0');
   const [tx, setTx] = React.useState<Transaction>();

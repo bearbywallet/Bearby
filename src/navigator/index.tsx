@@ -16,6 +16,7 @@ import { Unauthorized, UnauthorizedStackParamList } from './unauthorized';
 import { PreLoading, PreLoadingStackParamList } from './pre-loading';
 import { Settings, SettingsStackParamList } from './settings';
 import { Common, CommonStackParamList } from './common';
+import { BrwoserStackParamList } from './browser';
 
 export type RootParamList = {
   Loading: NavigatorScreenParams<PreLoadingStackParamList>;
@@ -23,6 +24,7 @@ export type RootParamList = {
   App: NavigatorScreenParams<TabStackParamList>;
   SettingsPages: NavigatorScreenParams<SettingsStackParamList>;
   Common: NavigatorScreenParams<CommonStackParamList>;
+  Browser: NavigatorScreenParams<BrwoserStackParamList>;
 };
 
 const Stack = createStackNavigator<RootParamList>();

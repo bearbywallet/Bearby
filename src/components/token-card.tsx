@@ -16,11 +16,13 @@ import {
 } from 'react-native';
 
 import { LoadSVG } from 'app/components/load-svg';
+import ContextMenu from 'react-native-context-menu-view';
 
 import { Token, Account } from 'types';
 import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
+import i18n from 'app/lib/i18n';
 
 export type Prop = {
   token: Token;
@@ -32,6 +34,8 @@ export type Prop = {
   style?: ViewStyle;
   onPress?: () => void;
   onRemove?: (token: Token) => void;
+  onSend?: (token: Token) => void;
+  onView?: (token: Token) => void;
 };
 
 export const TokenCard: React.FC<Prop> = ({
@@ -43,8 +47,34 @@ export const TokenCard: React.FC<Prop> = ({
   currency,
   style,
   onPress = () => null,
-  onRemove = () => null
+  onRemove = () => null,
+  onSend = () => null,
+  onView = () => null,
 }) => {
+  const actions = React.useMemo(() => [
+    {
+      title: i18n.t('send'),
+      press: onSend
+    },
+    {
+      title: i18n.t('show_on_viewblock'),
+      systemIcon: 'circlebadge',
+      press: onView
+    },
+    {
+      title: i18n.t('trade'),
+      systemIcon: 'circlebadge',
+      disabled: true,
+      press: onView
+    },
+    {
+      title: i18n.t('hide'),
+      systemIcon: 'trash',
+      destructive: true,
+      disabled: canRemove,
+      press: onRemove
+    }
+  ], [canRemove]);
   /**
    * ZIL(Default token) amount in float.
    */
@@ -61,51 +91,57 @@ export const TokenCard: React.FC<Prop> = ({
     return toConversion(balance, rate, token.decimals);
   }, [token, account, net, rate]);
 
-  const handlePress = React.useCallback(() => {
-    if (canRemove) {
-      return onRemove(token);
-    }
+  const hanldeSelect = React.useCallback(({ nativeEvent }) => {
+    const { index } = nativeEvent;
 
-    return onPress();
-  }, [canRemove, token, onRemove, onPress]);
+    actions[index].press(token);
+  }, [actions, token]);
 
   return (
-    <TouchableOpacity
-      style={[styles.container, style, {
-        borderColor: canRemove && !token.default ? theme.colors.danger : theme.colors.gray
-      }]}
-      onPress={handlePress}
+    <ContextMenu
+      style={[styles.container, style]}
+      previewBackgroundColor="transparent"
+      actions={actions}
+      onPress={hanldeSelect}
     >
-      <View style={styles.header}>
-        <Text style={styles.symbol}>
-          {token.symbol}
-        </Text>
-        <LoadSVG
-          height="30"
-          width="30"
-          url={`${TOKEN_ICONS}/${token.symbol}.svg`}
-        />
-      </View>
-      <View>
-        <Text style={styles.zilAmount}>
-          {toLocaleString(amount)}
-        </Text>
-        <Text style={styles.convertedAmount}>
-          {toLocaleString(conversion)} {currency.toUpperCase()}
-        </Text>
-      </View>
-    </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.wrapper}
+        onPress={onPress}
+      >
+        <View style={styles.header}>
+          <Text style={styles.symbol}>
+            {token.symbol}
+          </Text>
+          <LoadSVG
+            height="30"
+            width="30"
+            url={`${TOKEN_ICONS}/${token.symbol}.svg`}
+          />
+        </View>
+        <View>
+          <Text style={styles.zilAmount}>
+            {toLocaleString(amount)}
+          </Text>
+          <Text style={styles.convertedAmount}>
+            {toLocaleString(conversion)} {currency.toUpperCase()}
+          </Text>
+        </View>
+      </TouchableOpacity>
+    </ContextMenu>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
+    width: '47%'
+  },
+  wrapper: {
+    borderRadius: 8,
     minHeight: 90,
-    width: '47%',
+    maxHeight: 120,
     backgroundColor: theme.colors.gray,
-    padding: 10,
-    borderWidth: 1
+    padding: 10
   },
   header: {
     width: '100%',

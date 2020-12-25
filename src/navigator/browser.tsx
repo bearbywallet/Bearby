@@ -17,7 +17,9 @@ import {
 import { headerOptions } from 'app/config';
 
 export type BrwoserStackParamList = {
-  Browser: undefined;
+  Browser: {
+    url?: string;
+  };
   Category: {
     category: string;
   },

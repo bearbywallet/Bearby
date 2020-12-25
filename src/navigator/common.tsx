@@ -21,6 +21,7 @@ export type CommonStackParamList = {
   CreateAccount: undefined;
   Transfer: {
     recipient?: string;
+    selectedToken?: number;
   };
 };
 

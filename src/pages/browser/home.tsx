@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { RouteProp } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
 import { AccountMenu } from 'app/components/account-menu';
@@ -36,6 +37,7 @@ import { BrwoserStackParamList } from 'app/navigator/browser';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
+  route: RouteProp<BrwoserStackParamList, 'Browser'>;
 };
 
 enum Tabs {
@@ -45,7 +47,7 @@ enum Tabs {
 
 const { height, width } = Dimensions.get('window');
 const initialLayout = { width };
-export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
+export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
   const accountState = keystore.account.store.useValue();
   const connectState = keystore.connect.store.useValue();
 

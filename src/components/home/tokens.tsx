@@ -11,9 +11,7 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
-  Dimensions,
-  ScrollView
+  Dimensions
 } from 'react-native';
 
 import i18n from 'app/lib/i18n';
@@ -28,10 +26,12 @@ import { Token } from 'types';
 
 type Prop = {
   onSelectToken: (index: number) => void;
+  onSendToken: (index: number) => void;
+  onViewToken: (token: Token) => void;
 };
 
 const { width, height } = Dimensions.get('window');
-export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
+export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewToken }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
@@ -39,7 +39,6 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
   const tokens = keystore.token.store.useValue();
 
   const [tokenForRemove, setTokenForRemove] = React.useState<Token>();
-  const [isRemove, setIsRemove] = React.useState(false);
 
   const tokensList = React.useMemo(
     () => tokens.filter(
@@ -51,10 +50,6 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
-  );
-  const hasNonDefault = React.useMemo(
-    () => tokensList.filter((t) => !t.default).length > 0,
-    [tokensList]
   );
 
   const hanldeAddtoken = React.useCallback(async(token, cb) => {
@@ -80,27 +75,22 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken }) => {
         <Text style={styles.title}>
           {i18n.t('my_tokens')}
         </Text>
-        {hasNonDefault ? (
-          <Button
-            title={i18n.t('manage')}
-            color={theme.colors.primary}
-            onPress={() => setIsRemove(!isRemove)}
-          />
-        ) : null}
       </View>
         <View style={styles.list}>
           {tokensList.map((token, index) => (
             <TokenCard
               key={index}
+              style={styles.token}
               account={account}
-              canRemove={isRemove}
+              canRemove={Boolean(token.default)}
               token={token}
               currency={currencyState}
               net={netwrokState.selected}
               rate={settingsState.rate[currencyState]}
-              style={styles.token}
               onPress={() => onSelectToken(index + 1)}
               onRemove={setTokenForRemove}
+              onSend={() => onSendToken(index + 1)}
+              onView={onViewToken}
             />
           ))}
           <AddToken
