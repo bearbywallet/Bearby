@@ -14,14 +14,14 @@ import {
   Dimensions,
   TextInput,
   StyleSheet,
-  ActivityIndicator
+  ActivityIndicator,
+  LayoutAnimation
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
-import { AccountMenu } from 'app/components/account-menu';
 import { SearchIconSVG } from 'app/components/svg';
 import { TabView, SceneMap } from 'react-native-tab-view';
 import {
@@ -47,8 +47,7 @@ enum Tabs {
 
 const { height, width } = Dimensions.get('window');
 const initialLayout = { width };
-export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
-  const accountState = keystore.account.store.useValue();
+export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const connectState = keystore.connect.store.useValue();
 
   const [search, setSearch] = React.useState<string>('');
@@ -60,19 +59,16 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
     { key: Tabs.favorites, title: i18n.t('connections_title') }
   ]);
 
-  const account = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    [accountState]
-  );
-
   const hanldeSearch = React.useCallback(async() => {
     setIsLoading(true);
     const url = await keystore.searchEngine.onUrlSubmit(search);
+    setSearch('');
     setIsLoading(false);
     navigation.navigate('Web', {
       url
     });
-  }, [search, setIsLoading]);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+  }, [search]);
   const hanldeSelectCategory = React.useCallback((category) => {
     navigation.navigate('Category', {
       category
@@ -86,6 +82,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
     navigation.navigate('Web', {
       url
     });
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   }, []);
 
   const renderScene = SceneMap({
@@ -96,6 +93,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
       <BrowserFavorites
         connections={connectState}
         onGoConnection={handleConnect}
+        onRemove={(connect) => keystore.connect.rm(connect)}
       />
     )
   });
@@ -104,7 +102,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
     <React.Fragment>
       <SafeAreaView style={styles.container}>
         <View style={styles.header}>
-          <AccountMenu accountName={account.name} />
           <View style={styles.headerWraper}>
             <Text style={styles.headerTitle}>
               {i18n.t('browser_title')}
@@ -123,7 +120,11 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation, route }) => {
             )}
             <TextInput
               style={styles.textInput}
+              autoCorrect={false}
+              autoFocus={true}
+              autoCapitalize={'none'}
               textContentType={'URL'}
+              value={search}
               placeholder={i18n.t('browser_placeholder_input')}
               placeholderTextColor="#8A8A8F"
               onChangeText={setSearch}

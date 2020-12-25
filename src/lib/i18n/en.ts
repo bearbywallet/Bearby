@@ -22,7 +22,6 @@ export default {
   incognito_des: 'Private browsing, disable cache',
   connect_des: 'This site is requesting access to view your current account address. Always make sure you trust the sites you interact with.',
   connect_btn0: 'Connect',
-  connect_btn1: 'Reject',
   connect_title_question: 'Would you like to connect to this application?',
   remove_connect: 'Remove %{name} connect?',
   history: 'History',

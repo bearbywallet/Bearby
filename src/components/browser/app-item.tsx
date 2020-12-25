@@ -78,6 +78,7 @@ const styles = StyleSheet.create({
   domain: {
     fontSize: 15,
     lineHeight: 17,
-    color: theme.colors.muted
+    color: theme.colors.muted,
+    textAlign: 'right'
   }
 });

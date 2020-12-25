@@ -12,7 +12,8 @@ import {
   View,
   StyleSheet,
   FlatList,
-  RefreshControl
+  RefreshControl,
+  LayoutAnimation
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -81,6 +82,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     setIsConfirmModal(false);
   }, [account, setIsConfirmModal]);
   const hanldeSelectToken = React.useCallback((tokenIndex) => {
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
     navigation.navigate('App', {
       screen: 'History',
       params: {

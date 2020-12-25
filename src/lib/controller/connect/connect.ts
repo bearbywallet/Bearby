@@ -18,6 +18,17 @@ import { Connect } from 'types';
 import { STORAGE_FIELDS } from 'app/config';
 
 export class ConnectController {
+
+  public static uniqueCheck(connect: Connect) {
+    const connections = connectStore.get();
+
+    for (const iterator of connections) {
+      if (iterator.domain.toLowerCase() === connect.domain.toLowerCase()) {
+        throw new Error('Must be unique');
+      }
+    }
+  }
+
   public store = connectStore;
   private _storage: MobileStorage;
 
@@ -26,11 +37,15 @@ export class ConnectController {
   }
 
   public async add(connect: Connect) {
-    connectStoreAdd(connect);
-
-    await this._storage.set(
-      buildObject(STORAGE_FIELDS.CONNECTIONS, this.store.get())
-    );
+    try {
+      ConnectController.uniqueCheck(connect);
+      connectStoreAdd(connect);
+      await this._storage.set(
+        buildObject(STORAGE_FIELDS.CONNECTIONS, this.store.get())
+      );
+    } catch {
+      //
+    }
   }
 
   public async rm(connect: Connect) {

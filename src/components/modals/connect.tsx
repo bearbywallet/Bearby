@@ -76,19 +76,11 @@ export const ConnectModal: React.FC<Prop> = ({
           <Text style={styles.textInfo}>
             {i18n.t('connect_des')}
           </Text>
-          <View style={styles.btnsWrapper}>
-            <CustomButton
-              title={i18n.t('connect_btn0')}
-              style={styles.btn}
-              onPress={onConfirm}
-            />
-            <CustomButton
-              title={i18n.t('connect_btn1')}
-              color={theme.colors.danger}
-              style={{ ...styles.btn, ...styles.btnConfirm }}
-              onPress={onReject}
-            />
-          </View>
+          <CustomButton
+            title={i18n.t('connect_btn0')}
+            style={styles.btn}
+            onPress={onConfirm}
+          />
         </ScrollView>
       </ModalWrapper>
     </Modal>
@@ -97,7 +89,8 @@ export const ConnectModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   btn: {
-    minWidth: width / 3
+    minWidth: width / 4,
+    margin: 30
   },
   appWrapper: {
     alignItems: 'center',
@@ -121,19 +114,8 @@ const styles = StyleSheet.create({
     color: theme.colors.muted,
     marginVertical: 15
   },
-  btnsWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    marginBottom: 30
-  },
   icon: {
     width: 30,
     height: 30
-  },
-  btnConfirm: {
-    borderColor: theme.colors.danger,
-    borderWidth: 1,
-    backgroundColor: 'transparent',
-    color: theme.colors.danger
   }
 });

@@ -297,7 +297,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       });
       webViewRef.current.postMessage(m.serialize);
     }
-  }, [webViewRef, accountState, networkState]);
+  }, [webViewRef, accountState, networkState, isConnect]);
 
   if (!inpageJS) {
     return (

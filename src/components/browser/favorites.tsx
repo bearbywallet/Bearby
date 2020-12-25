@@ -9,12 +9,15 @@
 
 import React from 'react';
 import {
-  ScrollView,
   Text,
-  StyleSheet
+  StyleSheet,
+  FlatList,
+  View,
+  LayoutAnimation
 } from 'react-native';
 
 import { BrowserAppItem } from './app-item';
+import { SwipeRow } from 'app/components/swipe-row';
 
 import i18n from 'app/lib/i18n';
 import { theme } from 'app/styles';
@@ -23,36 +26,55 @@ import { Connect } from 'types';
 type Prop = {
   connections: Connect[];
   onGoConnection: (connct: Connect) => void;
+  onRemove: (connect: Connect) => void;
 };
 
-export const BrowserFavorites: React.FC<Prop> = ({ connections, onGoConnection }) => {
+export const BrowserFavorites: React.FC<Prop> = ({
+  connections,
+  onGoConnection,
+  onRemove
+}) => {
+  const hanldeRemove = React.useCallback((itemIndex: number) => {
+    onRemove(connections[itemIndex]);
+    // Animate list to close gap when item is deleted
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+  }, [connections]);
+
   return (
-    <ScrollView style={styles.container}>
+    <View style={styles.container}>
       {connections.length === 0 ? (
         <Text style={styles.havent}>
           {i18n.t('havent_connections')}
         </Text>
       ) : null}
-      {connections.map((c, index) => (
-        <BrowserAppItem
-          key={index}
-          style={{
-            marginTop: 15
-          }}
-          title={c.title}
-          icon={c.icon}
-          domain={c.domain}
-          onPress={() => onGoConnection(c)}
-        />
-      ))}
-    </ScrollView>
+      <FlatList
+        data={connections}
+        renderItem={({ item, index}) => (
+          <SwipeRow
+            index={index}
+            swipeThreshold={-150}
+            onSwipe={hanldeRemove}
+          >
+            <BrowserAppItem
+              style={{
+                marginTop: 10
+              }}
+              title={item.title}
+              icon={item.icon}
+              domain={item.domain}
+              onPress={() => onGoConnection(item)}
+            />
+          </SwipeRow>
+        )}
+        keyExtractor={(item) => item.domain}
+      />
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    paddingHorizontal: 15
+    flex: 1
   },
   havent: {
     fontSize: 17,
