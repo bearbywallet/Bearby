@@ -42,7 +42,7 @@ export const AccountName: React.FC<Prop> = ({
       <SvgXml xml={ProfileSVG} />
       <TextInput
         style={[styles.textInput, {
-          borderBottomColor: colors.card,
+          borderBottomColor: colors.text,
           color: colors.text
         }]}
         placeholder={i18n.t('pass_setup_input0')}
@@ -51,7 +51,9 @@ export const AccountName: React.FC<Prop> = ({
         onChangeText={setName}
       />
     </View>
-    <Text style={styles.label}>
+    <Text style={[styles.label, {
+      color: colors.border
+    }]}>
       {i18n.t('pass_setup_label0')}
     </Text>
   </View>
@@ -73,7 +75,6 @@ const styles = StyleSheet.create({
   },
   label: {
     marginVertical: 5,
-    color: '#8A8A8F',
     marginLeft: 38
   }
 });

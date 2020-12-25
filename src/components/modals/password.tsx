@@ -14,6 +14,7 @@ import {
   TextInput,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 
 import { CustomButton } from 'app/components/custom-button';
@@ -21,7 +22,6 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 
 type Prop = {
@@ -55,6 +55,7 @@ export const PasswordModal: React.FC<Prop> = ({
   onTriggered,
   onConfirmed
 }) => {
+  const { colors } = useTheme();
   const [passowrd, setPassowrd] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string>(' ');
 
@@ -82,20 +83,25 @@ export const PasswordModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <ModalWrapper style={{ ...style, ...styles.container }}>
+      <ModalWrapper style={style}>
         <ModalTitle onClose={onTriggered}>
           {title}
         </ModalTitle>
         <View>
           <TextInput
-            style={styles.textInput}
+            style={[styles.textInput, {
+              color: colors.text,
+              borderBottomColor: colors.border,
+            }]}
             secureTextEntry={true}
             placeholder={i18n.t('pass_setup_input1')}
-            placeholderTextColor="#8A8A8F"
+            placeholderTextColor={colors.border}
             onSubmitEditing={hanldeConfirm}
             onChangeText={hanldeChangePassword}
           />
-          <Text style={styles.error}>
+          <Text style={[styles.error, {
+            color: colors['danger']
+          }]}>
             {errorMessage}
           </Text>
         </View>
@@ -109,13 +115,7 @@ export const PasswordModal: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-  },
-  inputLable: {
-    color: '#8A8A8F'
-  },
   error: {
-    color: theme.colors.danger,
     marginTop: 4,
     lineHeight: 22
   },
@@ -123,9 +123,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1,
-    color: theme.colors.white,
     width: '90%'
   }
 });

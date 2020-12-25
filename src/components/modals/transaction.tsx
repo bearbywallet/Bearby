@@ -17,12 +17,12 @@ import {
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTheme } from '@react-navigation/native';
 
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { TransactionType } from 'types';
 import { trim, fromZil, toConversion } from 'app/filters';
@@ -44,6 +44,8 @@ export const TransactionModal: React.FC<Prop> = ({
   if (!transaction) {
     return null;
   }
+
+  const { colors } = useTheme();
 
   const tokenState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
@@ -103,10 +105,14 @@ export const TransactionModal: React.FC<Prop> = ({
             style={styles.txItem}
             onPress={hanldeViewBlock}
           >
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('block_height')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {transaction.blockHeight}
             </Text>
           </TouchableOpacity>
@@ -114,7 +120,9 @@ export const TransactionModal: React.FC<Prop> = ({
             style={styles.txItem}
             onPress={hanldeViewTx}
           >
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('tx_hash')}
             </Text>
             <Text style={styles.txValue}>
@@ -125,7 +133,9 @@ export const TransactionModal: React.FC<Prop> = ({
             style={styles.txItem}
             onPress={hanldeViewFrom}
           >
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('transfer_account')}
             </Text>
             <Text style={styles.txValue}>
@@ -136,7 +146,9 @@ export const TransactionModal: React.FC<Prop> = ({
             style={styles.txItem}
             onPress={hanldeViewTo}
           >
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('recipient_account')}
             </Text>
             <Text style={styles.txValue}>
@@ -144,18 +156,24 @@ export const TransactionModal: React.FC<Prop> = ({
             </Text>
           </TouchableOpacity>
           <View style={styles.txItem}>
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('transfer_amount')}
             </Text>
             <Text style={styles.txValue}>
               {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
             </Text>
-            <Text style={styles.txValeuLabel}>
+            <Text style={[styles.txValeuLabel, {
+              color: colors.notification
+            }]}>
               {conversion} {currencyState}
             </Text>
           </View>
           <View style={styles.txItem}>
-            <Text style={styles.txLable}>
+            <Text style={[styles.txLable, {
+              color: colors.border
+            }]}>
               {i18n.t('nonce')}
             </Text>
             <Text style={styles.txValue}>
@@ -174,17 +192,14 @@ const styles = StyleSheet.create({
     margin: 5
   },
   txLable: {
-    color: '#8A8A8F',
     fontSize: 16,
     lineHeight: 21
   },
   txValue: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   },
   txValeuLabel: {
-    color: theme.colors.muted,
     fontSize: 13,
     lineHeight: 17
   }

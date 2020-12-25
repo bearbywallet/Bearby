@@ -15,8 +15,8 @@ import {
   Text
 } from 'react-native';
 import URL from 'url-parse';
+import { useTheme } from '@react-navigation/native';
 
-import { theme } from 'app/styles';
 import { SvgXml } from 'react-native-svg';
 import { ArrowIconSVG, LockSVG } from 'app/components/svg';
 
@@ -34,15 +34,19 @@ export const BrowserViewBar: React.FC<Prop> = ({
   onBack,
   onGoForward
 }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.nav}>
+    <View style={[styles.nav, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.navBtns}>
         <TouchableOpacity onPress={onBack}>
           <SvgXml
             xml={ArrowIconSVG}
             height="30"
             width="30"
-            fill={theme.colors.primary}
+            fill={colors.primary}
             style={{
               transform: [{ rotate: '90deg' }]
             }}
@@ -56,7 +60,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
             xml={ArrowIconSVG}
             height="30"
             width="30"
-            fill={canGoForward ? theme.colors.primary : theme.colors.muted}
+            fill={canGoForward ? colors.primary : colors.notification}
             style={{
               transform: [{ rotate: '-90deg' }],
               marginLeft: 15
@@ -69,18 +73,26 @@ export const BrowserViewBar: React.FC<Prop> = ({
           xml={LockSVG}
           height="15"
           width="15"
-          fill={url.protocol.includes('https') ? theme.colors.white : theme.colors.danger}
+          fill={url.protocol.includes('https') ? colors.text : colors['danger']}
         />
-        <Text style={styles.host}>
+        <Text style={[styles.host, {
+          color: colors.text
+        }]}>
           {url.hostname}
         </Text>
       </View>
       <TouchableOpacity
         style={styles.dotsWrapper}
       >
-        <View style={styles.dot}/>
-        <View style={styles.dot}/>
-        <View style={styles.dot}/>
+        <View style={[styles.dot, {
+          backgroundColor: colors.primary
+        }]}/>
+        <View style={[styles.dot, {
+          backgroundColor: colors.primary
+        }]}/>
+        <View style={[styles.dot, {
+          backgroundColor: colors.primary
+        }]}/>
       </TouchableOpacity>
     </View>
   );
@@ -89,7 +101,6 @@ export const BrowserViewBar: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   nav: {
     height: 50,
-    backgroundColor: theme.colors.black,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around'
@@ -103,7 +114,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   host: {
-    color: theme.colors.white,
     fontWeight: 'bold',
     fontSize: 17,
     lineHeight: 22,
@@ -116,7 +126,6 @@ const styles = StyleSheet.create({
     width: 15
   },
   dot: {
-    backgroundColor: theme.colors.primary,
     borderRadius: 100,
     height: 5,
     width: 5,

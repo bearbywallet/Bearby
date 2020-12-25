@@ -9,24 +9,16 @@
 
 import React from 'react';
 import {
-  View,
-  Button,
-  TextInput,
-  Dimensions,
-  Text,
   StyleSheet
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
-import { LockSVG } from 'app/components/svg';
 import { CustomButton } from 'app/components/custom-button';
 import { AccountName } from 'app/components/account-name';
 import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { theme } from 'app/styles';
 
 type Prop = {
   biometricEnable: boolean;
@@ -34,7 +26,6 @@ type Prop = {
   onAdded: () => void;
 };
 
-const { width } = Dimensions.get('window');
 export const AddAccount: React.FC<Prop> = ({
   biometricEnable,
   newIndex,
@@ -93,34 +84,10 @@ export const AddAccount: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
-  errorMessage: {
-    color: theme.colors.danger,
-    marginTop: 4,
-    lineHeight: 22
-  },
   wrapper: {
     paddingHorizontal: 20
   },
   elementWrapper: {
     marginVertical: 35
-  },
-  label: {
-    marginVertical: 5,
-    color: '#8A8A8F',
-    marginLeft: 38
-  },
-  textInput: {
-    fontSize: 17,
-    lineHeight: 22,
-    padding: 10,
-    marginLeft: 15,
-    borderBottomColor: '#2B2E33',
-    borderBottomWidth: 1,
-    color: theme.colors.white,
-    width: width - 100
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center'
   }
 });

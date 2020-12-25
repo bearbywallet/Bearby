@@ -16,6 +16,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
 import { Selector } from 'app/components/selector';
@@ -24,7 +25,6 @@ import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { theme } from 'app/styles';
 
 type Prop = {
   biometricEnable: boolean;
@@ -40,6 +40,7 @@ export const ImportAccount: React.FC<Prop> = ({
   biometricEnable,
   onImported
 }) => {
+  const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
@@ -130,12 +131,17 @@ export const ImportAccount: React.FC<Prop> = ({
             <TextInput
               multiline={true}
               numberOfLines={10}
-              style={styles.text}
+              style={[styles.text, {
+                borderColor: colors.border,
+                color: colors.text
+              }]}
               placeholder={i18n.t('import_private_key_placeholder')}
-              placeholderTextColor="#8A8A8F"
+              placeholderTextColor={colors.border}
               onChangeText={hanldeChangePrivKey}
             />
-            <Text style={styles.errorMessage}>
+            <Text style={[styles.errorMessage, {
+              color: colors['danger']
+            }]}>
               {privKeyErr}
             </Text>
             {!biometricEnable ? (
@@ -152,7 +158,10 @@ export const ImportAccount: React.FC<Prop> = ({
           <TextInput
             value={String(ledgerIndex)}
             keyboardType={'numeric'}
-            style={styles.text}
+            style={[styles.text, {
+              borderColor: colors.border,
+              color: colors.text
+            }]}
             onChangeText={hanldeLedgerChange}
           />
         ) : null}
@@ -174,7 +183,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around'
   },
   errorMessage: {
-    color: theme.colors.danger,
     fontSize: 13,
     marginLeft: 5,
     lineHeight: 22
@@ -182,10 +190,8 @@ const styles = StyleSheet.create({
   text: {
     marginTop: 15,
     height: height / 10,
-    borderColor: '#8A8A8F',
     borderWidth: 1,
     borderRadius: 8,
-    color: theme.colors.white,
     padding: 20,
     fontSize: 23
   }

@@ -14,11 +14,11 @@ import {
   Text,
   StyleSheet
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
-import { BrowserCarditem, BrowserAppItem } from 'app/components/browser';
+import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 
 type Prop = {
   onSelect: (name: string) => void;
@@ -33,9 +33,13 @@ export const categories = [
 ];
 
 export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
+  const { colors } = useTheme();
+
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.namePlace}>
+      <Text style={[styles.namePlace, {
+        color: colors.notification
+      }]}>
         {i18n.t('categories')}
       </Text>
       <View style={styles.categoriesWrapper}>
@@ -69,7 +73,6 @@ const styles = StyleSheet.create({
     paddingTop: 15,
     fontWeight: 'bold',
     fontSize: 17,
-    lineHeight: 22,
-    color: theme.colors.muted
+    lineHeight: 22
   }
 });

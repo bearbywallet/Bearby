@@ -15,12 +15,11 @@ import {
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
-
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -42,6 +41,8 @@ export const SimpleConfirm: React.FC<Prop> = ({
   onTriggered,
   onConfirmed
 }) => {
+  const { colors } = useTheme();
+
   return (
     <Modal
       isVisible={visible}
@@ -57,7 +58,9 @@ export const SimpleConfirm: React.FC<Prop> = ({
           {title}
         </ModalTitle>
         <View>
-          <Text style={styles.description}>
+          <Text style={[styles.description, {
+            color: colors['warning'],
+          }]}>
             {description}
           </Text>
         </View>
@@ -69,8 +72,12 @@ export const SimpleConfirm: React.FC<Prop> = ({
           />
           <CustomButton
             title={btns[1]}
-            color={theme.colors.danger}
-            style={{ ...styles.btn, ...styles.btnConfirm }}
+            color={colors['danger']}
+            style={{
+              ...styles.btn,
+              ...styles.btnConfirm,
+              borderColor: colors['danger'],
+            }}
             onPress={onConfirmed}
           />
         </View>
@@ -81,7 +88,6 @@ export const SimpleConfirm: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   description: {
-    color: theme.colors.warning,
     marginTop: 4,
     fontSize: 17,
     lineHeight: 22,
@@ -92,10 +98,8 @@ const styles = StyleSheet.create({
     minWidth: width / 3
   },
   btnConfirm: {
-    borderColor: theme.colors.danger,
     borderWidth: 1,
-    backgroundColor: 'transparent',
-    color: theme.colors.danger
+    backgroundColor: 'transparent'
   },
   btnWraper: {
     paddingVertical: 15,

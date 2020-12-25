@@ -18,6 +18,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
@@ -25,7 +26,6 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { LoadSVG } from 'app/components/load-svg';
 
-import { theme } from 'app/styles';
 import { TOKEN_ICONS } from 'app/config';
 import { Token, Account } from 'types';
 import { fromZil } from 'app/filters';
@@ -54,6 +54,7 @@ export const TokensModal: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
+  const { colors } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelect(index);
     onTriggered();
@@ -78,7 +79,8 @@ export const TokensModal: React.FC<Prop> = ({
             <TouchableOpacity
               key={index}
               style={[styles.item, {
-                borderBottomWidth: index === tokens.length - 1 ? 0 : 1
+                borderBottomWidth: index === tokens.length - 1 ? 0 : 1,
+                borderBottomColor: colors.border
               }]}
               onPress={() => handleSelected(index)}
             >
@@ -90,17 +92,21 @@ export const TokensModal: React.FC<Prop> = ({
                 />
               ) : null}
               <View style={styles.wrapper}>
-                <Text style={styles.symbol}>
+                <Text style={[styles.symbol, {
+                  color: colors.text
+                }]}>
                   {token.name}
                 </Text>
                 {token.decimals ? (
-                  <Text style={styles.amount}>
+                  <Text style={[styles.amount, {
+                    color: colors.border
+                  }]}>
                     {fromZil(account.balance[network][token.symbol], token.decimals)} {token.symbol}
                   </Text>
                 ) : null}
               </View>
               {selected === index ? (
-                <SvgXml xml={OKIconSVG}/>
+                <SvgXml xml={OKIconSVG(colors.primary)}/>
               ) : (
                 <Unselected />
               )}
@@ -114,7 +120,6 @@ export const TokensModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   symbol: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   },
@@ -128,11 +133,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     justifyContent: 'space-between',
-    paddingVertical: 15,
-    borderBottomColor: theme.colors.black
+    paddingVertical: 15
   },
   amount: {
-    color: '#8A8A8F',
     fontSize: 13,
     lineHeight: 17
   },

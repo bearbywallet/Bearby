@@ -13,6 +13,7 @@ import {
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
@@ -20,7 +21,6 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import { QrCodeInput } from 'app/components/qr-code-input';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { Contact } from 'types';
 import { isBech32 } from 'app/utils';
 
@@ -39,6 +39,7 @@ export const AddContactModal: React.FC<Prop> = ({
   onTriggered,
   onAdd
 }) => {
+  const { colors } = useTheme();
   const [address, setAddress] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
 
@@ -75,7 +76,7 @@ export const AddContactModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <ModalWrapper style={{ ...style, ...styles.container }}>
+      <ModalWrapper style={style}>
         <ModalTitle onClose={onTriggered}>
           {title}
         </ModalTitle>
@@ -87,10 +88,13 @@ export const AddContactModal: React.FC<Prop> = ({
           onZNS={setName}
         />
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, {
+            color: colors.text,
+            borderBottomColor: colors.border
+          }]}
           value={name}
           placeholder={i18n.t('contacts_name')}
-          placeholderTextColor={'#8A8A8F'}
+          placeholderTextColor={colors.border}
           onChangeText={setName}
         />
         <CustomButton
@@ -104,18 +108,9 @@ export const AddContactModal: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
-  container: {
-  },
-  error: {
-    color: theme.colors.danger,
-    marginTop: 4,
-    lineHeight: 22
-  },
   textInput: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white,
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1,
     padding: 10,
     marginVertical: 20

@@ -16,7 +16,7 @@ import {
   View
 } from 'react-native';
 import { categories } from './apps';
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
 
 import Social from 'app/assets/social.svg';
 import Exchange from 'app/assets/exchange.svg';
@@ -61,15 +61,22 @@ const Imgaes = {
 };
 
 export const BrowserCarditem: React.FC<Prop> = ({ el, title, style, onPress }) => {
+  const { colors } = useTheme();
+
   return (
     <TouchableOpacity
-      style={[styles.container, style]}
+      style={[styles.container, {
+        backgroundColor: colors.card,
+        shadowColor: colors.primary
+      }, style]}
       onPress={onPress}
     >
       <View style={[StyleSheet.absoluteFill, styles.bgImage]}>
         {Imgaes[el]}
       </View>
-      <Text style={styles.title}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {title}
       </Text>
     </TouchableOpacity>
@@ -81,8 +88,13 @@ const styles = StyleSheet.create({
     minHeight: width / 5,
     minWidth: width / 2.5,
     borderRadius: 8,
-    backgroundColor: theme.colors.gray,
-    justifyContent: 'flex-end'
+    justifyContent: 'flex-end',
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2
   },
   bgImage: {
     width: '100%',
@@ -93,7 +105,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.white,
     padding: 10
   }
 });

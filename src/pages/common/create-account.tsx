@@ -13,6 +13,7 @@ import {
   Dimensions,
   StyleSheet
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TabView, SceneMap } from 'react-native-tab-view';
@@ -23,7 +24,6 @@ import {
   ImportAccount
 } from 'app/components/create-account';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
@@ -41,6 +41,7 @@ enum Tabs {
 }
 
 export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
 
   const [index, setIndex] = React.useState(0);
@@ -72,13 +73,19 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <SafeAreaView style={styles.container}>
-      <Text style={styles.title}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {i18n.t('create_account_title')}
       </Text>
       <TabView
-        style={styles.tabView}
-        renderTabBar={CreateAccountNavBar}
+        style={{
+          backgroundColor: colors.background
+        }}
+        renderTabBar={(props) => <CreateAccountNavBar {...props} />}
         navigationState={{ index, routes }}
         renderScene={renderScene}
         onIndexChange={setIndex}
@@ -93,18 +100,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   title: {
     textAlign: 'center',
     fontWeight: 'bold',
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     marginTop: 30
-  },
-  tabView: {
-    backgroundColor: theme.colors.black
   }
 });

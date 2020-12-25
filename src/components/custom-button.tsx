@@ -14,7 +14,7 @@ import {
   ActivityIndicator,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
 
 type Prop = {
   style?: ViewStyle;
@@ -33,21 +33,26 @@ export const CustomButton: React.FC<Prop> = ({
   isLoading = false,
   onPress = () => null
 }) => {
+  const { colors } = useTheme();
+
   return (
     <TouchableOpacity
-      style={[styles.container, style, {
-        opacity: (disabled || isLoading) ? 0.5 : 1
-      }]}
+      style={[styles.container, {
+        opacity: (disabled || isLoading) ? 0.5 : 1,
+        backgroundColor: colors.primary
+      }, style]}
       disabled={disabled || isLoading}
       onPress={onPress}
     >
       {isLoading ? (
         <ActivityIndicator
           animating={isLoading}
-          color={theme.colors.black}
+          color={colors.background}
         />
       ) : (
-        <Text style={[styles.text, { color }]}>
+        <Text style={[styles.text, {
+          color: color || colors.background
+        }]}>
           {title}
         </Text>
       )}
@@ -60,11 +65,9 @@ const styles = StyleSheet.create({
     padding: 8,
     paddingVertical: 11,
     borderRadius: 8,
-    backgroundColor: theme.colors.primary,
     alignItems: 'center'
   },
   text: {
-    color: theme.colors.black,
     fontSize: 17,
     lineHeight: 22
   }

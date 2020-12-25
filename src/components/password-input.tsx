@@ -15,10 +15,9 @@ import {
   Dimensions,
   View
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 import { LockSVG } from 'app/components/svg';
-
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -34,18 +33,25 @@ export const Passwordinput: React.FC<Prop> = ({
   passwordError,
   onChange
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={style}>
       <View style={styles.inputWrapper}>
         <SvgXml xml={LockSVG} />
         <TextInput
-          style={styles.textInput}
+          style={[styles.textInput, {
+            color: colors.text,
+            borderBottomColor: colors.card
+          }]}
           secureTextEntry={true}
           placeholder={placeholder}
-          placeholderTextColor="#2B2E33"
+          placeholderTextColor={colors.card}
           onChangeText={onChange}
         />
-        <Text style={styles.errorMessage}>
+        <Text style={[styles.errorMessage, {
+          color: colors['danger']
+        }]}>
           {passwordError}
         </Text>
       </View>
@@ -63,13 +69,10 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     padding: 10,
     marginLeft: 15,
-    borderBottomColor: '#2B2E33',
     borderBottomWidth: 1,
-    color: theme.colors.white,
     width: width - 100
   },
   errorMessage: {
-    color: theme.colors.danger,
     marginTop: 4,
     lineHeight: 22
   }

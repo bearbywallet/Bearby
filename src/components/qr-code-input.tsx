@@ -18,12 +18,12 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { QrcodeIconSVG } from 'app/components/svg';
 
 import { keystore } from 'app/keystore';
-import { theme } from 'app/styles';
 import { toBech32Address } from 'app/utils';
 
 type Prop = {
@@ -46,6 +46,7 @@ export const QrCodeInput: React.FC<Prop> = ({
   onChange = () => null,
   onZNS = () => null
 }) => {
+  const { colors } = useTheme();
   const [qrcodeModal, setQrcodeModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
 
@@ -84,21 +85,21 @@ export const QrCodeInput: React.FC<Prop> = ({
   return (
     <React.Fragment>
       <View style={[styles.container, style, {
-        borderBottomColor: error ? theme.colors.danger : '#8A8A8F'
+        borderBottomColor: error ? colors['danger'] : colors.border
       }]}>
         {isLoading ? (
           <ActivityIndicator
             animating={isLoading}
-            color={theme.colors.primary}
+            color={colors.primary}
           />
         ) : null}
         <TextInput
           style={[styles.textInput, {
-            color: error ? theme.colors.danger : theme.colors.white
+            color: error ? colors['danger'] : colors.text
           }]}
           placeholder={placeholder}
           value={value}
-          placeholderTextColor="#8A8A8F"
+          placeholderTextColor={colors.border}
           onSubmitEditing={() => null}
           onChangeText={hanldeChange}
         />
@@ -106,7 +107,9 @@ export const QrCodeInput: React.FC<Prop> = ({
           <SvgXml xml={QrcodeIconSVG}/>
         </TouchableOpacity>
       </View>
-      <Text style={styles.error}>
+      <Text style={[styles.error, {
+        color: colors['danger']
+      }]}>
         {error}
       </Text>
       <QRScaner
@@ -133,7 +136,6 @@ const styles = StyleSheet.create({
   },
   error: {
     fontSize: 13,
-    lineHeight: 17,
-    color: theme.colors.danger
+    lineHeight: 17
   }
 });

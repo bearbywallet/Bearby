@@ -20,6 +20,7 @@ import Clipboard from '@react-native-community/clipboard';
 import Modal from 'react-native-modal';
 import Share from 'react-native-share';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import QRCode from 'react-native-qrcode-svg';
 import { CustomButton } from 'app/components/custom-button';
@@ -32,7 +33,6 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { trim } from 'app/filters';
 import { viewAddress } from 'app/utils';
@@ -53,6 +53,7 @@ export const ReceiveModal: React.FC<Prop> = ({
   account,
   onTriggered
 }) => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const networkState = keystore.network.store.useValue();
 
@@ -131,37 +132,53 @@ export const ReceiveModal: React.FC<Prop> = ({
             getRef={setQrcodeRef}
           />
         </View>
-        <Text style={styles.accountName}>
+        <Text style={[styles.accountName, {
+          color: colors.text
+        }]}>
           {account.name}
         </Text>
-        <Text style={styles.accountAddress}>
+        <Text style={[styles.accountAddress, {
+          color: colors.border
+        }]}>
           {trim(account[settingsState.addressFormat])}
         </Text>
         <View style={styles.linkWrapper}>
           <TouchableOpacity
-            style={styles.linkItem}
+            style={[styles.linkItem, {
+              backgroundColor: colors.card
+            }]}
             onPress={handleShare}
           >
             <SvgXml xml={ShareIconSVG}/>
-            <Text style={styles.linkText}>
+            <Text style={[styles.linkText, {
+              color: colors.text
+            }]}>
               {i18n.t('share')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.linkItem}
+            style={[styles.linkItem, {
+              backgroundColor: colors.card
+            }]}
             onPress={hanldeCopy}
           >
             <SvgXml xml={ProfileSVG}/>
-            <Text style={styles.linkText}>
+            <Text style={[styles.linkText, {
+              color: colors.text
+            }]}>
               {i18n.t('copy_address')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.linkItem}
+            style={[styles.linkItem, {
+              backgroundColor: colors.card
+            }]}
             onPress={hanldeViewAddress}
           >
             <SvgXml xml={ViewBlockIconSVG}/>
-            <Text style={styles.linkText}>
+            <Text style={[styles.linkText, {
+              color: colors.text
+            }]}>
               {i18n.t('view_block')}
             </Text>
           </TouchableOpacity>
@@ -184,14 +201,12 @@ const styles = StyleSheet.create({
   },
   accountName: {
     textAlign: 'center',
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22,
     marginTop: 15
   },
   accountAddress: {
     textAlign: 'center',
-    color: '#8A8A8F',
     fontSize: 13,
     lineHeight: 17,
     marginBottom: 15
@@ -209,14 +224,12 @@ const styles = StyleSheet.create({
   linkItem: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    backgroundColor: '#2B2E33',
     padding: 15,
     borderRadius: 8,
     width: 80,
     height: 80
   },
   linkText: {
-    color: theme.colors.white,
     fontSize: 10,
     lineHeight: 13,
     textAlign: 'center',

@@ -52,7 +52,10 @@ export const dark = {
   ...DefaultTheme,
   dark: true,
   colors: {
+    success: colors.success,
+    warning: colors.warning,
     white: colors.white,
+    danger: colors.danger,
     primary: '#FF9500',
     background: '#09090C',
     card: '#2B2E33',
@@ -66,6 +69,7 @@ export const light = {
   dark: false,
   colors: {
     white: colors.white,
+    danger: colors.danger,
     primary: '#21A0B1',
     background: '#E1E7FF',
     card: '#F9F9F9',

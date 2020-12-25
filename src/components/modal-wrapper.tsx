@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -20,8 +21,12 @@ type Prop = {
 
 const { height } = Dimensions.get('window');
 export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, style, {
+      backgroundColor: colors.background
+    }]}>
       {children}
     </View>
   );
@@ -32,7 +37,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
     justifyContent: 'space-between',
     paddingVertical: 15,
     maxHeight: height

@@ -19,18 +19,17 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
 import { SearchIconSVG } from 'app/components/svg';
 import { TabView, SceneMap } from 'react-native-tab-view';
+import { CreateAccountNavBar } from 'app/components/create-account';
 import {
-  BrowserNavBar,
   BrowserApps,
   BrowserFavorites
 } from 'app/components/browser';
 
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
@@ -48,6 +47,7 @@ enum Tabs {
 const { height, width } = Dimensions.get('window');
 const initialLayout = { width };
 export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const connectState = keystore.connect.store.useValue();
 
   const [search, setSearch] = React.useState<string>('');
@@ -99,40 +99,49 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, {
+        backgroundColor: colors.background
+      }]}>
         <View style={styles.header}>
           <View style={styles.headerWraper}>
-            <Text style={styles.headerTitle}>
+            <Text style={[styles.headerTitle, {
+              color: colors.text
+            }]}>
               {i18n.t('browser_title')}
             </Text>
           </View>
         </View>
-        <View style={styles.main}>
+        <View style={[styles.main, {
+          backgroundColor: colors.background
+        }]}>
           <View style={styles.inputWrapper}>
             {isLoading ? (
               <ActivityIndicator
                 animating={isLoading}
-                color={theme.colors.primary}
+                color={colors.primary}
               />
             ) : (
               <SvgXml xml={SearchIconSVG} />
             )}
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {
+                color: colors.text,
+                borderBottomColor: colors.border
+              }]}
               autoCorrect={false}
               autoFocus={true}
               autoCapitalize={'none'}
               textContentType={'URL'}
               value={search}
               placeholder={i18n.t('browser_placeholder_input')}
-              placeholderTextColor="#8A8A8F"
+              placeholderTextColor={colors.border}
               onChangeText={setSearch}
               onSubmitEditing={hanldeSearch}
             />
           </View>
           <TabView
             style={styles.tabView}
-            renderTabBar={BrowserNavBar}
+            renderTabBar={(props) => <CreateAccountNavBar {...props}/>}
             navigationState={{ index, routes }}
             renderScene={renderScene}
             onIndexChange={setIndex}
@@ -146,8 +155,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   header: {
     alignItems: 'center',
@@ -158,14 +166,12 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold',
-    color: theme.colors.white,
     textAlign: 'left'
   },
   headerWraper: {
     width: '100%'
   },
   main: {
-    backgroundColor: theme.colors.background,
     height: height - 100,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
@@ -175,9 +181,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
-    borderBottomColor: '#8A8A8F',
     borderBottomWidth: 1,
-    color: theme.colors.white,
     width: width - 60
   },
   inputWrapper: {

@@ -345,7 +345,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         app={appConnect}
         visible={Boolean(appConnect)}
         onTriggered={() => handleConnect(false)}
-        onReject={() => handleConnect(false)}
         onConfirm={() => handleConnect(true)}
       />
       <SignMessageModal
@@ -356,7 +355,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         appTitle={signMessage?.title}
         payload={String(signMessage?.data)}
         onTriggered={() => setSignMessage(undefined)}
-        onReject={() => handleSignMessage(undefined)}
         onSign={handleSignMessage}
       />
       {transaction ? (

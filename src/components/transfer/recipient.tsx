@@ -15,6 +15,7 @@ import {
   ViewStyle
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import {
   ReceiveIconSVG,
@@ -29,7 +30,6 @@ import { QrCodeInput } from 'app/components/qr-code-input';
 
 import i18n from 'app/lib/i18n';
 import coomonStyles from './styles';
-import { theme } from 'app/styles';
 import { isBech32 } from 'app/utils/address';
 import { Account, Contact } from 'types';
 
@@ -50,6 +50,7 @@ export const TransferRecipient: React.FC<Prop> = ({
   onSelect,
   onError = () => null
 }) => {
+  const { colors } = useTheme();
   const [error, setError] = React.useState(false);
   const [accountModal, setAccountModal] = React.useState(false);
   const [contactModal, setContactModal] = React.useState(false);
@@ -78,20 +79,28 @@ export const TransferRecipient: React.FC<Prop> = ({
         </View>
         <View style={styles.itemsWrapper}>
           <TouchableOpacity
-            style={styles.item}
+            style={[styles.item, {
+              backgroundColor: colors.card
+            }]}
             onPress={() => setAccountModal(true)}
           >
             <SvgXml xml={ProfileSVG} />
-            <Text style={styles.textItem}>
+            <Text style={[styles.textItem, {
+              color: colors.text
+            }]}>
               {i18n.t('my_accounts')}
             </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.item}
+            style={[styles.item, {
+              backgroundColor: colors.card
+            }]}
             onPress={() => setContactModal(true)}
           >
             <SvgXml xml={BookIconSVG} />
-            <Text style={styles.textItem}>
+            <Text style={[styles.textItem, {
+              color: colors.text
+            }]}>
               {i18n.t('my_contacts')}
             </Text>
           </TouchableOpacity>
@@ -127,13 +136,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     borderRadius: 8,
-    backgroundColor: '#2B2E33',
     marginBottom: 5
   },
   textItem: {
     textAlign: 'center',
     fontSize: 10,
-    lineHeight: 13,
-    color: theme.colors.white
+    lineHeight: 13
   }
 });

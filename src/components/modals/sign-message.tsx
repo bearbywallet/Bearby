@@ -16,6 +16,7 @@ import {
   Text
 } from 'react-native';
 import Modal from 'react-native-modal';
+import { useTheme } from '@react-navigation/native';
 
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
@@ -23,7 +24,6 @@ import { Switcher } from 'app/components/switcher';
 import { CustomButton } from 'app/components/custom-button';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { Signature, Account } from 'types';
 import { sha256 } from 'app/lib/crypto/sha256';
 import { keystore } from 'app/keystore';
@@ -39,7 +39,6 @@ type Prop = {
   account: Account;
   onTriggered: () => void;
   onSign: (sig: Signature) => void;
-  onReject: () => void;
 };
 
 const { width } = Dimensions.get('window');
@@ -52,9 +51,9 @@ export const SignMessageModal: React.FC<Prop> = ({
   appTitle,
   account,
   onTriggered,
-  onSign,
-  onReject
+  onSign
 }) => {
+  const { colors } = useTheme();
   const [isHash, setIsHash] = React.useState(false);
   const [hash, setHash] = React.useState('');
 
@@ -104,7 +103,9 @@ export const SignMessageModal: React.FC<Prop> = ({
             style={styles.icon}
             source={{ uri: icon }}
           />
-          <Text style={styles.desc}>
+          <Text style={[styles.desc, {
+            color: colors.border
+          }]}>
             {i18n.t('sign_des')}
           </Text>
           <Switcher
@@ -112,28 +113,30 @@ export const SignMessageModal: React.FC<Prop> = ({
             enabled={isHash}
             onChange={setIsHash}
           >
-            <Text style={styles.wwitcherText}>
+            <Text style={[styles.wwitcherText, {
+              color: colors.notification
+            }]}>
               {isHash ? 'Hash' : 'Payload'}
             </Text>
           </Switcher>
-          <View style={styles.sigWrapper}>
-            <Text style={styles.sig}>
+          <View style={[styles.sigWrapper, {
+            backgroundColor: colors.background
+          }]}>
+            <Text style={[styles.sig, {
+              color: colors.text
+            }]}>
               {isHash ? hash : payload}
             </Text>
           </View>
-          <View style={styles.btnWrapper}>
-            <CustomButton
-              style={styles.cancelBtn}
-              title={i18n.t('cancel')}
-              onPress={onReject}
-            />
-            <CustomButton
-              style={styles.signBtn}
-              title={i18n.t('sign')}
-              color={theme.colors.warning}
-              onPress={handleSign}
-            />
-          </View>
+          <CustomButton
+            style={{
+              ...styles.signBtn,
+              borderColor: colors['warning']
+            }}
+            title={i18n.t('sign')}
+            color={colors['warning']}
+            onPress={handleSign}
+          />
         </View>
       </ModalWrapper>
     </Modal>
@@ -142,14 +145,14 @@ export const SignMessageModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   wwitcherText: {
-    color: theme.colors.muted
+    fontSize: 13,
+    lineHeight: 17
   },
   wrapper: {
     alignItems: 'center',
     marginVertical: 30
   },
   desc: {
-    color: theme.colors.muted,
     fontSize: 17,
     lineHeight: 22
   },
@@ -164,28 +167,18 @@ const styles = StyleSheet.create({
   },
   sigWrapper: {
     alignItems: 'flex-start',
-    backgroundColor: theme.colors.black,
     width: '100%',
     borderRadius: 8
   },
   sig: {
-    color: theme.colors.white,
     fontSize: 13,
     lineHeight: 17,
     padding: 10,
-    margin: 15
-  },
-  btnWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    width: '100%',
-    paddingVertical: 15
+    margin: 15,
+    minHeight: 100
   },
   signBtn: {
-    minWidth: width / 4,
-    backgroundColor: 'transparent',
-    borderColor: theme.colors.warning,
-    borderWidth: 1
+    minWidth: width / 2
   },
   cancelBtn: {
     minWidth: width / 4

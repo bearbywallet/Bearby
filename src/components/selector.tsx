@@ -14,6 +14,7 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
 import { OKIconSVG } from 'app/components/svg';
@@ -49,51 +50,57 @@ export const Selector: React.FC<Prop> = ({
   items,
   style,
   onSelect = () => null
-}) => (
-  <View style={[styles.container, style]}>
-    <Text style={styles.title}>
-      {title}
-    </Text>
-    {items.map((item, index) => (
-      <TouchableOpacity
-        key={index}
-        style={styles.item}
-        onPress={() => onSelect(item, index)}
-      >
-        {String(selected) === String(item) ? (
-          <SvgXml xml={OKIconSVG} />
-        ) : (
-          <Unselected />
-        )}
-        <Text style={styles.itemText}>
-          {item}
-        </Text>
-      </TouchableOpacity>
-    ))}
-  </View>
-);
+}) => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.container, style]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
+        {title}
+      </Text>
+      {items.map((item, index) => (
+        <TouchableOpacity
+          key={index}
+          style={[styles.item, {
+            borderBottomColor: colors.border
+          }]}
+          onPress={() => onSelect(item, index)}
+        >
+          {String(selected) === String(item) ? (
+            <SvgXml xml={OKIconSVG(colors.primary)} />
+          ) : (
+            <Unselected />
+          )}
+          <Text style={[styles.itemText, {
+            color: colors.text
+          }]}>
+            {item}
+          </Text>
+        </TouchableOpacity>
+      ))}
+    </View>
+  );
+};
 
 const styles = StyleSheet.create({
   container: {
     paddingTop: 16,
     paddingHorizontal: 16,
-    backgroundColor: theme.colors.gray,
     width: '100%'
   },
   title: {
     fontSize: 16,
-    lineHeight: 21,
-    color: '#8A8A8F'
+    lineHeight: 21
   },
   item: {
-    borderBottomColor: '#09090C',
     borderBottomWidth: 1,
     paddingVertical: 13,
     flexDirection: 'row',
     alignItems: 'center'
   },
   itemText: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22,
     marginLeft: 16

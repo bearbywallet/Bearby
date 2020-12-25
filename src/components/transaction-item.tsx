@@ -14,6 +14,7 @@ import {
   Text,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { theme } from 'app/styles';
 import { TX_DIRECTION } from 'app/config';
@@ -41,6 +42,8 @@ export const TransactionItem: React.FC<Prop> = ({
   style,
   onSelect
 }) => {
+  const { colors } = useTheme();
+
   const token = React.useMemo(() => {
     const toAddressbase16 = fromBech32Address(transaction.to).toLowerCase();
 
@@ -61,7 +64,7 @@ export const TransactionItem: React.FC<Prop> = ({
   }, [transaction]);
   const recipient = React.useMemo(() => {
     let t = '';
-    let color = theme.colors.danger;
+    let color = colors['danger'];
 
     if (transaction.direction === TX_DIRECTION.in) {
       t = '+';
@@ -70,7 +73,7 @@ export const TransactionItem: React.FC<Prop> = ({
     }
 
     if (Number(transaction.value) === 0 && !token) {
-      color = theme.colors.white;
+      color = colors.text;
       t = '';
     } else if (transaction.direction === TX_DIRECTION.in) {
       color = theme.colors.success;
@@ -80,7 +83,7 @@ export const TransactionItem: React.FC<Prop> = ({
       t,
       color
     };
-  }, [transaction, token]);
+  }, [colors, transaction, token]);
   const amount = React.useMemo(() => {
     const [zilliqa] = tokens;
 
@@ -132,7 +135,10 @@ export const TransactionItem: React.FC<Prop> = ({
       style={[
         styles.container,
         style,
-        { borderLeftColor: statusColor }
+        {
+          borderLeftColor: statusColor,
+          backgroundColor: colors.card
+        }
       ]}
       onPress={onSelect}
     >
@@ -140,15 +146,21 @@ export const TransactionItem: React.FC<Prop> = ({
         <Text style={styles.first}>
           {vname}
         </Text>
-        <Text style={[styles.first, { color: recipient.color }]}>
+        <Text style={[styles.first, {
+          color: recipient.color
+        }]}>
           {recipient.t}{amount.value} {amount.symbol}
         </Text>
       </View>
       <View style={styles.wrapper}>
-        <Text style={styles.second}>
+        <Text style={[styles.second, {
+          color: colors.border
+        }]}>
           {time}
         </Text>
-        <Text style={styles.second}>
+        <Text style={[styles.second, {
+          color: colors.border
+        }]}>
           {amount.converted} {currency.toUpperCase()}
         </Text>
       </View>
@@ -158,26 +170,22 @@ export const TransactionItem: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: '#2B2E33',
     padding: 7,
     margin: 5,
     borderRadius: 8,
-    borderLeftWidth: 5,
-    borderLeftColor: theme.colors.success
+    borderLeftWidth: 5
   },
   wrapper: {
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   first: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   },
   second: {
     fontSize: 13,
     lineHeight: 17,
-    color: '#8A8A8F',
     paddingTop: 3
   }
 });

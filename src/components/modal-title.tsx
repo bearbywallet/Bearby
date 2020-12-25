@@ -14,10 +14,10 @@ import {
   ViewStyle,
   TouchableOpacity
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { DeleteIconSVG } from 'app/components/svg';
 
-import { theme } from 'app/styles';
 import { SvgXml } from 'react-native-svg';
 
 type Prop = {
@@ -26,9 +26,13 @@ type Prop = {
 };
 
 export const ModalTitle: React.FC<Prop> = ({ children, style, onClose }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={[styles.container, style]}>
-      <Text style={styles.title}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {children}
       </Text>
       <TouchableOpacity onPress={onClose}>
@@ -45,7 +49,6 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   title: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   }

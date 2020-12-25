@@ -14,6 +14,7 @@ import {
   TouchableOpacity
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import {
   ProfileSVG,
@@ -39,6 +40,7 @@ export const TransferAccount: React.FC<Prop> = ({
   selected,
   onSelect
 }) => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
 
   const [isAccountModal, setIsAccountModal] = React.useState(false);
@@ -62,24 +64,33 @@ export const TransferAccount: React.FC<Prop> = ({
         onPress={() => setIsAccountModal(true)}
       >
         <SvgXml xml={ProfileSVG} />
-        <View style={styles.itemInfo}>
-          <Text style={styles.label}>
+        <View style={[styles.itemInfo, {
+          borderColor: colors.border,
+          borderBottomWidth: 1
+        }]}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {i18n.t('transfer_account')}
           </Text>
           <View style={styles.infoWrapper}>
-            <Text style={styles.nameAmountText}>
+            <Text style={[styles.nameAmountText, {
+              color: colors.text
+            }]}>
               {account.name}
             </Text>
           </View>
           <View style={[styles.infoWrapper, { marginBottom: 15 }]}>
-            <Text style={styles.addressAmount}>
+            <Text style={[styles.addressAmount, {
+              color: colors.border
+            }]}>
               {trim(account[settingsState.addressFormat])}
             </Text>
           </View>
         </View>
         <SvgXml
           xml={ArrowIconSVG}
-          fill="#666666"
+          fill={colors.notification}
           style={styles.arrowIcon}
         />
       </TouchableOpacity>

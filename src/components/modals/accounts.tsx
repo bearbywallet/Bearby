@@ -13,6 +13,7 @@ import {
   ViewStyle,
   View
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import Modal from 'react-native-modal';
 import { AccountItem } from 'app/components/account-item';
@@ -22,7 +23,6 @@ import { CustomButton } from 'app/components/custom-button';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { Account } from 'types';
 
 type Prop = {
@@ -48,6 +48,7 @@ export const AccountsModal: React.FC<Prop> = ({
   onSelected,
   onRemove
 }) => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
 
   return (
@@ -88,7 +89,9 @@ export const AccountsModal: React.FC<Prop> = ({
           {onRemove && selected !== 0 ? (
             <CustomButton
               title={i18n.t('account_menu_rm')}
-              style={styles.removeBtn}
+              style={{
+                backgroundColor: colors['danger']
+              }}
               onPress={onRemove}
             />
           ) : null}
@@ -102,8 +105,5 @@ const styles = StyleSheet.create({
   actionsWrapper: {
     justifyContent: 'space-between',
     marginBottom: 15
-  },
-  removeBtn: {
-    backgroundColor: theme.colors.danger
   }
 });

@@ -13,9 +13,8 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 
-import { theme } from 'app/styles';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 
 type Prop = {
@@ -24,16 +23,19 @@ type Prop = {
 };
 
 export const BrowserCategoryPage: React.FC<Prop> = () => {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   }
 });
 

@@ -9,14 +9,20 @@
 import React from 'react';
 import { StyleSheet } from 'react-native';
 import { TabBar, SceneRendererProps } from 'react-native-tab-view';
-
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
 
 export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props) => {
+  const { colors } = useTheme();
+
   return (
     <TabBar
       {...props}
-      indicatorStyle={styles.indicatorStyle}
+      indicatorStyle={{
+        backgroundColor: colors.primary
+      }}
+      labelStyle={{
+        color: colors.text
+      }}
       style={styles.bars}
     />
   );
@@ -25,8 +31,5 @@ export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props) => {
 const styles = StyleSheet.create({
   bars: {
     backgroundColor: 'transparent'
-  },
-  indicatorStyle: {
-    backgroundColor: theme.colors.primary
   }
 });

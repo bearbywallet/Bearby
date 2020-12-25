@@ -15,6 +15,7 @@ import {
   Dimensions
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import {
   ArrowIconSVG,
@@ -47,6 +48,7 @@ export const TransferToken: React.FC<Prop> = ({
   netwrok,
   onSelect
 }) => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -81,8 +83,12 @@ export const TransferToken: React.FC<Prop> = ({
         onPress={() => setTokenModal(true)}
       >
         <SvgXml xml={WalletIconSVG} />
-        <View style={styles.itemInfo}>
-          <Text style={styles.label}>
+        <View style={[styles.itemInfo, {
+          borderWidth: 0
+        }]}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {i18n.t('token')}
           </Text>
           <View style={{ flexDirection: 'row' }}>
@@ -93,10 +99,14 @@ export const TransferToken: React.FC<Prop> = ({
             />
             <View style={{ marginLeft: 5 }}>
               <View style={[styles.infoWrapper, { width: width - 120 }]}>
-                <Text style={styles.nameAmountText}>
+                <Text style={[styles.nameAmountText, {
+                  color: colors.text
+                }]}>
                   {token.symbol}
                 </Text>
-                <Text style={styles.nameAmountText}>
+                <Text style={[styles.nameAmountText, {
+                  color: colors.text
+                }]}>
                   {balance} {token.symbol}
                 </Text>
               </View>
@@ -104,10 +114,14 @@ export const TransferToken: React.FC<Prop> = ({
                 marginBottom: 15,
                 width: width - 120
               }]}>
-                <Text style={styles.addressAmount}>
+                <Text style={[styles.addressAmount, {
+                  color: colors.border
+                }]}>
                   {token.name}
                 </Text>
-                <Text style={styles.addressAmount}>
+                <Text style={[styles.addressAmount, {
+                  color: colors.border
+                }]}>
                   {converted}
                 </Text>
               </View>
@@ -116,7 +130,7 @@ export const TransferToken: React.FC<Prop> = ({
         </View>
         <SvgXml
           xml={ArrowIconSVG}
-          fill="#666666"
+          fill={colors.notification}
           style={styles.arrowIcon}
         />
       </TouchableOpacity>

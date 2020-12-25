@@ -14,6 +14,7 @@ import {
   Button,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { DropDownItem } from 'app/components/drop-down-item';
 import { HistoryStatus, TokensModal } from 'app/components/modals';
@@ -21,7 +22,6 @@ import { HistoryStatus, TokensModal } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { Token, Account } from 'types';
-import { theme } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -46,6 +46,7 @@ export const SortingWrapper: React.FC<Prop> = ({
   onSelectDate,
   onSelectToken
 }) => {
+  const { colors } = useTheme();
   const netwrokState = keystore.network.store.useValue();
 
   const [statusModal, setStatusModal] = React.useState(false);
@@ -61,26 +62,26 @@ export const SortingWrapper: React.FC<Prop> = ({
     <React.Fragment>
       <View style={[styles.container, style]}>
         <DropDownItem
-          color="#666666"
+          color={colors.notification}
           onPress={() => setStatusModal(true)}
         >
           {i18n.t('sorting_item0')}
         </DropDownItem>
         <DropDownItem
-          color="#666666"
+          color={colors.notification}
           onPress={() => setTokenModal(true)}
         >
           {i18n.t('sorting_item1')}
         </DropDownItem>
         <DropDownItem
-          color="#666666"
+          color={colors.notification}
           onPress={() => onSelectDate(!isDate)}
         >
           {i18n.t('sorting_item2')}
         </DropDownItem>
         <Button
           title={i18n.t('reset')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={handleReset}
         />
       </View>

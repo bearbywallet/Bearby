@@ -15,6 +15,7 @@ import {
   View
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import {
   ProfileSVG,
@@ -32,7 +33,6 @@ import { Account, GasState } from 'types';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
-import { theme } from 'app/styles';
 import { deppUnlink } from 'app/utils';
 import { Transaction } from 'app/lib/controller/transaction';
 
@@ -60,6 +60,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   onTriggered,
   onConfirm
 }) => {
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -107,12 +108,17 @@ export const ConfirmPopup: React.FC<Prop> = ({
         >
           <View style={styles.topWrapper}>
             {children}
-            <Text style={styles.toptext}>
+            <Text style={[styles.toptext, {
+              color: colors.text
+            }]}>
               {title}
             </Text>
           </View>
         </ModalTitle>
-        <Text style={styles.errorMessage}>
+        <Text style={[styles.errorMessage , {
+          color: colors['danger'],
+          textShadowColor: colors['danger']
+        }]}>
           {error}
         </Text>
         <ScrollView style={{ marginBottom: 15 }}>
@@ -185,11 +191,9 @@ const styles = StyleSheet.create({
     paddingBottom: 10
   },
   errorMessage: {
-    color: theme.colors.danger,
     fontSize: 17,
     lineHeight: 22,
     textAlign: 'center',
-    textShadowColor: theme.colors.danger,
     textShadowOffset: {
       width: -1,
       height: 1
@@ -207,7 +211,6 @@ const styles = StyleSheet.create({
     paddingLeft: 5,
     fontSize: 20,
     lineHeight: 26,
-    fontWeight: 'bold',
-    color: theme.colors.white
+    fontWeight: 'bold'
   }
 });

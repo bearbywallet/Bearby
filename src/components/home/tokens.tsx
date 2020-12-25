@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'center',
 
-    minHeight: height / 1.7,
+    minHeight: height / 1.5,
     borderTopLeftRadius: 16,
     borderTopRightRadius: 16,
     padding: 16

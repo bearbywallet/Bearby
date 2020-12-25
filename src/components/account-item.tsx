@@ -63,7 +63,7 @@ export const AccountItem: React.FC<Prop> = ({
         </Text>
       </View>
       {selected ? (
-        <SvgXml xml={OKIconSVG}/>
+        <SvgXml xml={OKIconSVG(colors.primary)}/>
       ) : (
         <Unselected />
       )}

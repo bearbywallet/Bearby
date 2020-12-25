@@ -18,6 +18,7 @@ import {
   Dimensions
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 import Big from 'big.js';
 
 import {
@@ -30,7 +31,6 @@ import { Amount } from 'app/utils';
 import { Token, Account, GasState } from 'types';
 
 import styles from './styles';
-import { theme } from 'app/styles';
 
 Big.PE = 99;
 
@@ -57,6 +57,7 @@ export const TransferAmount: React.FC<Prop> = ({
   onChange,
   onError = () => null
 }) => {
+  const { colors } = useTheme();
   const [error, setError] = React.useState(false);
 
   const balance = React.useMemo(
@@ -114,20 +115,22 @@ export const TransferAmount: React.FC<Prop> = ({
         }}>
           <SvgXml xml={AmountIconSVG} />
           <View style={[styles.inputWrapper, {
-            borderBottomColor: error ? theme.colors.danger : '#8A8A8F'
+            borderBottomColor: error ? colors['danger'] : colors.border
           }]}>
             <TextInput
               style={[commonStyles.input, {
-                color: error ? theme.colors.danger : theme.colors.white
+                color: error ? colors['danger'] : colors.text
               }]}
               keyboardType={'numeric'}
               placeholder={i18n.t('transfer_amount')}
-              placeholderTextColor="#8A8A8F"
+              placeholderTextColor={colors.border}
               value={value}
               onChangeText={handleChnage}
             />
             <Text style={{ minWidth: 50, textAlign: 'center' }}>
-              <Text style={[styles.nameAmountText, { color: '#8A8A8F' }]}>
+              <Text style={[styles.nameAmountText, {
+                color: colors.border
+              }]}>
                 {token.symbol}
               </Text>
             </Text>
@@ -139,7 +142,9 @@ export const TransferAmount: React.FC<Prop> = ({
               key={index}
               onPress={() => handlePercentSelect(a)}
             >
-              <Text style={styles.percent}>
+              <Text style={[styles.percent, {
+                color: colors.primary
+              }]}>
                 {a}%
               </Text>
             </TouchableOpacity>

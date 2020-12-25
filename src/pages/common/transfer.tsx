@@ -27,11 +27,10 @@ import {
 import { ConfirmPopup } from 'app/components/modals';
 import { LoadSVG } from 'app/components/load-svg';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
@@ -45,6 +44,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ route }) => {
+  const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
@@ -124,9 +124,13 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={styles.container}>
+      <SafeAreaView style={[styles.container, {
+        backgroundColor: colors.background
+      }]}>
         <KeyboardAwareScrollView>
-          <View style={styles.wrapper}>
+          <View style={{
+            backgroundColor: colors['white']
+          }}>
             <TransferAccount
               accounts={accountState.identities}
               selected={selectedAccount}
@@ -141,14 +145,19 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
             />
           </View>
           <TransferRecipient
-            style={{ ...styles.wrapper, marginTop: 30 }}
+            style={{
+              backgroundColor: colors['white'],
+              marginTop: 30
+            }}
             accounts={accountState.identities}
             recipient={recipient}
             contacts={contactsState}
             onSelect={setRecipient}
           />
           <TransferAmount
-            style={styles.wrapper}
+            style={{
+              backgroundColor: colors['white']
+            }}
             account={accountState.identities[selectedAccount]}
             token={token}
             gas={gasState}
@@ -194,10 +203,6 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
-  },
-  wrapper: {
-    backgroundColor: theme.colors.gray
+    flex: 1
   }
 });

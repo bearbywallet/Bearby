@@ -15,12 +15,12 @@ import {
   View,
   LayoutAnimation
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { BrowserAppItem } from './app-item';
 import { SwipeRow } from 'app/components/swipe-row';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { Connect } from 'types';
 
 type Prop = {
@@ -34,6 +34,8 @@ export const BrowserFavorites: React.FC<Prop> = ({
   onGoConnection,
   onRemove
 }) => {
+  const { colors } = useTheme();
+
   const hanldeRemove = React.useCallback((itemIndex: number) => {
     onRemove(connections[itemIndex]);
     // Animate list to close gap when item is deleted
@@ -43,7 +45,9 @@ export const BrowserFavorites: React.FC<Prop> = ({
   return (
     <View style={styles.container}>
       {connections.length === 0 ? (
-        <Text style={styles.havent}>
+        <Text style={[styles.havent, {
+          color: colors.notification
+        }]}>
           {i18n.t('havent_connections')}
         </Text>
       ) : null}
@@ -79,7 +83,6 @@ const styles = StyleSheet.create({
   havent: {
     fontSize: 17,
     lineHeight: 22,
-    color: theme.colors.muted,
     paddingTop: 15
   },
 });

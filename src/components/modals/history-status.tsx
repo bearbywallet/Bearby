@@ -15,6 +15,7 @@ import {
   TouchableOpacity,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 import { SvgXml } from 'react-native-svg';
 
@@ -23,7 +24,6 @@ import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { TxStatsues } from 'app/config';
 
 type Prop = {
@@ -44,6 +44,7 @@ export const HistoryStatus: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
+  const { colors } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelect(index);
     onTriggered();
@@ -59,7 +60,9 @@ export const HistoryStatus: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <View style={styles.modalContainer}>
+      <View style={[styles.modalContainer, {
+        backgroundColor: colors.background
+      }]}>
         <View style={[styles.modalContainer, style]}>
           <ModalTitle onClose={onTriggered}>
             {title}
@@ -69,17 +72,19 @@ export const HistoryStatus: React.FC<Prop> = ({
           {statuses.map((status, index) => (
             <TouchableOpacity
               key={index}
-              style={[
-                styles.statusItem,
-                { borderBottomWidth: (index !== statuses.length - 1) ? 1 : 0 }
-              ]}
+              style={[styles.statusItem, {
+                borderBottomWidth: (index !== statuses.length - 1) ? 1 : 0,
+                borderColor: colors.border
+              }]}
               onPress={() => handleSelected(index)}
             >
-              <Text style={styles.textItem}>
+              <Text style={[styles.textItem, {
+                color: colors.text
+              }]}>
                 {i18n.t(status)}
               </Text>
               {selected === index ? (
-                <SvgXml xml={OKIconSVG}/>
+                <SvgXml xml={OKIconSVG(colors.primary)}/>
               ) : (
                 <Unselected />
               )}
@@ -96,18 +101,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
-    backgroundColor: '#18191D',
     justifyContent: 'space-between',
     paddingVertical: 15
   },
   statusItem: {
     padding: 15,
-    borderColor: theme.colors.black,
     flexDirection: 'row',
     justifyContent: 'space-between'
   },
   textItem: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   }
