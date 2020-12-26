@@ -37,9 +37,7 @@ export const ContactItem: React.FC<Prop> = ({
 
   return (
     <TouchableOpacity
-      style={[styles.container, {
-        backgroundColor: colors.card
-      }, style]}
+      style={[styles.container, style]}
       onPress={onSelect}
     >
       <Text style={[styles.char, {
@@ -49,7 +47,7 @@ export const ContactItem: React.FC<Prop> = ({
       </Text>
       <View style={[styles.wrapper, {
         borderBottomWidth: last ? 0 : 1,
-        borderBottomColor: colors.background,
+        borderBottomColor: colors.card,
       }]}>
         <View>
           <Text style={[styles.name, {

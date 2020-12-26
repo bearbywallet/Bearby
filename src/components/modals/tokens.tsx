@@ -81,7 +81,7 @@ export const TokensModal: React.FC<Prop> = ({
               key={index}
               style={[styles.item, {
                 borderBottomWidth: index === tokens.length - 1 ? 0 : 1,
-                borderBottomColor: colors.notification
+                borderBottomColor: colors.border
               }]}
               onPress={() => handleSelected(index)}
             >

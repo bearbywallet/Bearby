@@ -41,6 +41,7 @@ type Prop = {
 
 Big.PE = 99;
 
+const selectedColor = '#0002';
 const { width } = Dimensions.get('window');
 export const GasSelector: React.FC<Prop> = ({
   style,
@@ -115,7 +116,7 @@ export const GasSelector: React.FC<Prop> = ({
       }]}>
         <TouchableOpacity
           style={[
-            firstSelected ? { backgroundColor: colors.background } : null,
+            firstSelected ? { backgroundColor: selectedColor } : null,
             styles.item
           ]}
           onPress={() => hanldeChangeGas(_1)}
@@ -142,7 +143,7 @@ export const GasSelector: React.FC<Prop> = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            secondSelected ? { backgroundColor: colors.background } : null,
+            secondSelected ? { backgroundColor: selectedColor } : null,
             styles.item
           ]}
           onPress={() => hanldeChangeGas(_2)}
@@ -167,7 +168,7 @@ export const GasSelector: React.FC<Prop> = ({
         </TouchableOpacity>
         <TouchableOpacity
           style={[
-            threeSelected ? { backgroundColor: colors.background } : null,
+            threeSelected ? { backgroundColor: selectedColor } : null,
             styles.item
           ]}
           onPress={() => hanldeChangeGas(_3)}

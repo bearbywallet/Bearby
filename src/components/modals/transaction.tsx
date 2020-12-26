@@ -126,7 +126,9 @@ export const TransactionModal: React.FC<Prop> = ({
             }]}>
               {i18n.t('tx_hash')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {transaction.hash}
             </Text>
           </TouchableOpacity>
@@ -139,7 +141,9 @@ export const TransactionModal: React.FC<Prop> = ({
             }]}>
               {i18n.t('transfer_account')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {trim(transaction.from)}
             </Text>
           </TouchableOpacity>
@@ -152,7 +156,9 @@ export const TransactionModal: React.FC<Prop> = ({
             }]}>
               {i18n.t('recipient_account')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {trim(transaction.to)}
             </Text>
           </TouchableOpacity>
@@ -162,7 +168,9 @@ export const TransactionModal: React.FC<Prop> = ({
             }]}>
               {i18n.t('transfer_amount')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
             </Text>
             <Text style={[styles.txValeuLabel, {
@@ -177,7 +185,9 @@ export const TransactionModal: React.FC<Prop> = ({
             }]}>
               {i18n.t('nonce')}
             </Text>
-            <Text style={styles.txValue}>
+            <Text style={[styles.txValue, {
+              color: colors.text
+            }]}>
               {transaction.nonce}
             </Text>
           </View>

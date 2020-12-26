@@ -80,7 +80,7 @@ export const TransferRecipient: React.FC<Prop> = ({
         <View style={styles.itemsWrapper}>
           <TouchableOpacity
             style={[styles.item, {
-              backgroundColor: colors.card
+              backgroundColor: colors.background
             }]}
             onPress={() => setAccountModal(true)}
           >
@@ -93,7 +93,7 @@ export const TransferRecipient: React.FC<Prop> = ({
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.item, {
-              backgroundColor: colors.card
+              backgroundColor: colors.background
             }]}
             onPress={() => setContactModal(true)}
           >
