@@ -149,7 +149,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
               }]}
               secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input1')}
-              placeholderTextColor={colors.card}
+              placeholderTextColor={colors.notification}
               onChangeText={setPassword}
             />
           </View>
@@ -161,7 +161,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
               }]}
               secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input2')}
-              placeholderTextColor={colors.card}
+              placeholderTextColor={colors.notification}
               onChangeText={setPasswordConfirm}
             />
           </View>

@@ -109,9 +109,9 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
               style={[styles.paginationDots,
                 (pageIndex === index ? null : {
                   ...styles.unDot,
-                  borderColor: colors.card
+                  borderColor: colors.background
                 }), {
-                backgroundColor: colors.card
+                backgroundColor: colors.primary
               }]}
             />
           ))}

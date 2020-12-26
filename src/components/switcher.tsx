@@ -13,7 +13,7 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
 
 type Prop = {
   enabled: boolean;
@@ -31,14 +31,16 @@ export const Switcher: React.FC<Prop> = ({
   style,
   onChange = () => null
 }) => {
+  const { colors } = useTheme();
+
   return (
     <View style={[styles.container, style]}>
       {children}
       <Switch
         style={{ marginLeft: 10 }}
-        trackColor={{ false: theme.colors.muted, true: theme.colors.primary }}
-        thumbColor={enabled ? theme.colors.white : theme.colors.muted}
-        ios_backgroundColor="#3e3e3e"
+        trackColor={{ false: colors.notification, true: colors.primary }}
+        thumbColor={enabled ? colors.card : colors.notification}
+        ios_backgroundColor={colors.background}
         onValueChange={onChange}
         value={enabled}
       />
@@ -51,10 +53,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center'
-  },
-  text: {
-    color: '#8A8A8F',
-    fontSize: 16,
-    lineHeight: 21
   }
 });
