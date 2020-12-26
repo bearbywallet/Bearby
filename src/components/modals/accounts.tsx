@@ -48,7 +48,7 @@ export const AccountsModal: React.FC<Prop> = ({
   onSelected,
   onRemove
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
 
   return (
@@ -59,6 +59,7 @@ export const AccountsModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

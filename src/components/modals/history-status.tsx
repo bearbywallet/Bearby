@@ -44,7 +44,7 @@ export const HistoryStatus: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelect(index);
     onTriggered();
@@ -58,6 +58,7 @@ export const HistoryStatus: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <View style={[styles.modalContainer, {

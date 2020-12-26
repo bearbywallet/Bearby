@@ -45,7 +45,7 @@ export const TransactionModal: React.FC<Prop> = ({
     return null;
   }
 
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
 
   const tokenState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
@@ -94,6 +94,7 @@ export const TransactionModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

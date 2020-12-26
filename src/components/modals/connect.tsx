@@ -41,7 +41,7 @@ export const ConnectModal: React.FC<Prop> = ({
   onConfirm,
   onTriggered
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
 
   return (
     <Modal
@@ -51,6 +51,7 @@ export const ConnectModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

@@ -12,6 +12,7 @@ import {
   ScrollView,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import Modal from 'react-native-modal';
 import { ContactItem } from 'app/components/contact-item';
@@ -37,6 +38,7 @@ export const ContactsModal: React.FC<Prop> = ({
   onTriggered,
   onSelected
 }) => {
+  const { colors, dark } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelected(index);
     onTriggered();
@@ -50,6 +52,7 @@ export const ContactsModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={{

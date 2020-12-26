@@ -60,7 +60,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   onTriggered,
   onConfirm
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -99,6 +99,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

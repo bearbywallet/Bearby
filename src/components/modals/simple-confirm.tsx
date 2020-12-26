@@ -41,7 +41,7 @@ export const SimpleConfirm: React.FC<Prop> = ({
   onTriggered,
   onConfirmed
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
 
   return (
     <Modal
@@ -51,6 +51,7 @@ export const SimpleConfirm: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

@@ -12,6 +12,7 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import Modal from 'react-native-modal';
 
 import { CustomButton } from 'app/components/custom-button';
@@ -45,6 +46,7 @@ export const AddTokenModal: React.FC<Prop> = ({
   onTriggered,
   onAddToken
 }) => {
+  const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -101,6 +103,7 @@ export const AddTokenModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={handleClose}
     >
       <ModalWrapper style={style}>

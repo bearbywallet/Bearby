@@ -11,6 +11,7 @@ import {
   Dimensions,
   View
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import Modal from 'react-native-modal';
 import QRCodeScanner from 'react-native-qrcode-scanner';
@@ -30,6 +31,7 @@ export const QRScaner: React.FC<Prop> = ({
   onTriggered,
   onScan
 }) => {
+  const { dark } = useTheme();
   const handleSuccess = React.useCallback((e) => {
     onScan(e.data);
     onTriggered();
@@ -43,6 +45,7 @@ export const QRScaner: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       {visible ? (

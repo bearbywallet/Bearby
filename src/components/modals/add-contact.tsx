@@ -39,7 +39,7 @@ export const AddContactModal: React.FC<Prop> = ({
   onTriggered,
   onAdd
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const [address, setAddress] = React.useState<string>('');
   const [name, setName] = React.useState<string>('');
 
@@ -74,6 +74,7 @@ export const AddContactModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

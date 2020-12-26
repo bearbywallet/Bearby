@@ -53,7 +53,7 @@ export const SignMessageModal: React.FC<Prop> = ({
   onTriggered,
   onSign
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const [isHash, setIsHash] = React.useState(false);
   const [hash, setHash] = React.useState('');
 
@@ -92,6 +92,7 @@ export const SignMessageModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

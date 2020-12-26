@@ -46,7 +46,7 @@ export const TabNavigator: React.FC = () => {
     },
     inactiveTintColor: colors.notification,
     style: {
-      borderTopColor: undefined,
+      borderTopColor: colors.background,
       backgroundColor: colors.background
     }
   }), [colors]);

@@ -53,7 +53,7 @@ export const ReceiveModal: React.FC<Prop> = ({
   account,
   onTriggered
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const networkState = keystore.network.store.useValue();
 
@@ -119,6 +119,7 @@ export const ReceiveModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

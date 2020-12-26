@@ -55,7 +55,7 @@ export const PasswordModal: React.FC<Prop> = ({
   onTriggered,
   onConfirmed
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const [passowrd, setPassowrd] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string>(' ');
 
@@ -81,6 +81,7 @@ export const PasswordModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
+      backdropColor={dark ? '#ffffff5' : '#00000060'}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>
