@@ -12,6 +12,7 @@ import {
   StatusBar
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
+import { useTheme } from '@react-navigation/native';
 
 import LottieView from 'lottie-react-native';
 
@@ -23,6 +24,8 @@ type Prop = {
 };
 
 export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
+  const { dark } = useTheme();
+
   React.useEffect(() => {
     keystore.sync().then(() => {
       const { isEnable, isReady } = keystore.guard.self;
@@ -42,11 +45,10 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
     <React.Fragment>
       <StatusBar barStyle="light-content" />
       <SafeAreaView style={{
-        flex: 1,
-        backgroundColor: '#09090c'
+        flex: 1
       }}>
         <LottieView
-          source={require('app/assets/loader')}
+          source={dark ? require('app/assets/dark') : require('app/assets/light')}
           autoPlay
           loop
         />

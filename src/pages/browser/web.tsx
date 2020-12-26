@@ -14,7 +14,6 @@ import {
   View,
   Image
 } from 'react-native';
-import LottieView from 'lottie-react-native';
 import URL from 'url-parse';
 import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
@@ -304,18 +303,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [webViewRef, accountState, networkState, isConnect]);
 
   if (!inpageJS) {
-    return (
-      <SafeAreaView style={{
-        flex: 1,
-        backgroundColor: '#09090c'
-      }}>
-        <LottieView
-          source={require('app/assets/loader')}
-          autoPlay
-          loop
-        />
-      </SafeAreaView>
-    );
+    return null;
   }
 
   return (
