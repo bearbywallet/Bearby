@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import { Selector } from 'app/components/selector';
 import { Switcher } from 'app/components/switcher';
@@ -23,7 +24,6 @@ import { PasswordModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { SecureTypes } from 'app/config';
 
@@ -46,6 +46,7 @@ const times = [
   },
 ];
 export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
   const accountState = keystore.account.store.useValue();
 
@@ -152,9 +153,13 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   }, [exportType]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('security_title')}
         </Text>
       </View>
@@ -167,36 +172,51 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
           onSelect={(_, index) => sethour(index)}
         />
         <Switcher
-          style={styles.biometric}
+          style={{
+            ...styles.biometric,
+            backgroundColor: colors.card
+          }}
           enabled={authState.biometricEnable}
           onChange={hanldeChangeBiometric}
         >
           <View style={styles.switcherWrapper}>
-            <Text style={styles.biometricText}>
+            <Text style={[styles.biometricText, {
+              color: colors.text
+            }]}>
               {i18n.t('use')} {authState.supportedBiometryType}
             </Text>
-            <Text style={styles.biometricLabel}>
+            <Text style={[styles.biometricLabel, {
+              color: colors.border
+            }]}>
               {i18n.t('biometric_description')}
             </Text>
           </View>
         </Switcher>
-        <View style={styles.btnWrapper}>
+        <View style={[styles.btnWrapper, {
+          backgroundColor: colors.card
+        }]}>
           <Button
             title={i18n.t('security_btn0')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={hanldeRevealPrivateKey}
           />
-          <Text style={styles.btnDesText}>
+          <Text style={[styles.btnDesText, {
+            color: colors.border
+          }]}>
             {i18n.t('security_des0', { account: selectedAccount.name })}
           </Text>
         </View>
-        <View style={styles.btnWrapper}>
+        <View style={[styles.btnWrapper, {
+          backgroundColor: colors.card
+        }]}>
           <Button
             title={i18n.t('security_btn1')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={hanldeRevealSecretPhrase}
           />
-          <Text style={styles.btnDesText}>
+          <Text style={[styles.btnDesText, {
+            color: colors.border
+          }]}>
             {i18n.t('security_des1')}
           </Text>
         </View>
@@ -214,8 +234,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   titleWrapper: {
     flexDirection: 'row',
@@ -225,37 +244,31 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
   },
   biometric: {
-    backgroundColor: theme.colors.gray,
     paddingVertical: 15,
     paddingHorizontal: 15
   },
   biometricText: {
     fontSize: 17,
-    lineHeight: 22,
-    color: theme.colors.white
+    lineHeight: 22
   },
   biometricLabel: {
     fontSize: 16,
-    lineHeight: 21,
-    color: '#8A8A8F'
+    lineHeight: 21
   },
   switcherWrapper: {
     maxWidth: '70%'
   },
   btnWrapper: {
     marginTop: 32,
-    backgroundColor: theme.colors.gray,
     alignItems: 'flex-start',
     padding: 15
   },
   btnDesText: {
-    color: '#8A8A8F',
     fontSize: 16,
     lineHeight: 21
   }

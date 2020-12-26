@@ -15,17 +15,18 @@ import {
   Button
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
+import { useTheme } from '@react-navigation/native';
 
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 // import { SSN_ADDRESS } from 'app/config';
 
 const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
+  const { colors } = useTheme();
   const networkState = keystore.network.store.useValue();
 
   const handleReset = React.useCallback(async() => {
@@ -48,14 +49,18 @@ export const NetworkPage = () => {
   // }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('netwrok_title')}
         </Text>
         <Button
           title={i18n.t('reset')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={handleReset}
         />
       </View>
@@ -79,8 +84,7 @@ export const NetworkPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   titleWrapper: {
     flexDirection: 'row',
@@ -90,7 +94,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'

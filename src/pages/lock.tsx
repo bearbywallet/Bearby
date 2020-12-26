@@ -18,12 +18,12 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 import { LockSVG, FingerPrintIconSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
 
@@ -33,13 +33,14 @@ type Prop = {
 
 const { width, height } = Dimensions.get('window');
 export const LockPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
   const [password, setPassword] = React.useState('');
   const [passwordError, setPasswordError] = React.useState(' ');
 
   const color = React.useMemo(
-    () => passwordError.length > 2 ? theme.colors.danger : '#666666',
-    [passwordError]
+    () => passwordError.length > 2 ? colors['danger'] : colors.notification,
+    [passwordError, colors]
   );
 
   const hanldeUnlock = React.useCallback(async() => {
@@ -73,7 +74,9 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
   }, [authState.biometricEnable]);
 
   return (
-    <KeyboardAwareScrollView style={styles.container}>
+    <KeyboardAwareScrollView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
           width={width + width / 6}
@@ -81,7 +84,9 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
         />
       </View>
       <View style={styles.pageContainer}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('lock_title')}
         </Text>
         <View>
@@ -91,7 +96,9 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               fill={color}
             />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {
+                color: colors.text
+              }]}
               secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input1')}
               placeholderTextColor={color}
@@ -105,21 +112,23 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               />
             ) : null}
           </View>
-          <Text style={styles.errorMessage}>
+          <Text style={[styles.errorMessage, {
+            color: colors['danger']
+          }]}>
             {passwordError}
           </Text>
         </View>
         <View style={styles.btnsWrapper}>
           <Button
             title={i18n.t('lock_btn1')}
-            color={theme.colors.muted}
+            color={colors.notification}
             onPress={() => navigation.navigate('Unauthorized', {
               screen: 'LetStart'
             })}
           />
           <Button
             title={i18n.t('lock_btn')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={hanldeUnlock}
           />
         </View>
@@ -130,8 +139,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   backgroundImage: {
     justifyContent: 'center',
@@ -142,11 +150,9 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
-    color: theme.colors.white,
     width: '84%'
   },
   errorMessage: {
-    color: theme.colors.danger,
     marginTop: 4,
     lineHeight: 22
   },
@@ -162,7 +168,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    color: theme.colors.white,
     lineHeight: 41,
     fontSize: 34
   },

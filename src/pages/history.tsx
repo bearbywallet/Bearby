@@ -19,7 +19,7 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { AccountMenu } from 'app/components/account-menu';
 import { TransactionItem } from 'app/components/transaction-item';
@@ -27,7 +27,6 @@ import { SortingWrapper } from 'app/components/history/sort-wrapper';
 import { TransactionModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { TabStackParamList } from 'app/navigator/tab-navigator';
 import { keystore } from 'app/keystore';
@@ -42,6 +41,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
+  const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
@@ -172,24 +172,30 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   }, [setSelectedToken, route.params]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.header}>
         <AccountMenu
           accountName={account.name}
           onCreate={handleCreateAccount}
         />
         <View style={styles.headerWraper}>
-          <Text style={styles.headerTitle}>
+          <Text style={[styles.headerTitle, {
+            color: colors.text
+          }]}>
             {i18n.t('history')}
           </Text>
           <Button
             title={i18n.t('history_btn0')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={() => keystore.transaction.reset()}
           />
         </View>
       </View>
-      <View style={styles.main}>
+      <View style={[styles.main, {
+        backgroundColor: colors.background
+      }]}>
         <SortingWrapper
           tokens={cusstomTokens}
           account={account}
@@ -205,7 +211,9 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
           renderItem={({ item }) => (
             <React.Fragment>
               {item.date ? (
-                 <Text style={styles.date}>
+                 <Text style={[styles.date, {
+                  color: colors.border
+                 }]}>
                   {item.date.toDateString()}
                 </Text>
               ) : null}
@@ -223,7 +231,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
           refreshControl={
             <RefreshControl
                 refreshing={refreshing}
-                tintColor={theme.colors.primary}
+                tintColor={colors.primary}
                 onRefresh={hanldeRefresh}
             />
           }
@@ -243,8 +251,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   header: {
     alignItems: 'center',
@@ -254,8 +261,7 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: 34,
     lineHeight: 41,
-    fontWeight: 'bold',
-    color: theme.colors.white
+    fontWeight: 'bold'
   },
   headerWraper: {
     flexDirection: 'row',
@@ -265,13 +271,11 @@ const styles = StyleSheet.create({
   main: {
     flex: 1,
     borderTopEndRadius: 16,
-    borderTopStartRadius: 16,
-    backgroundColor: '#18191D'
+    borderTopStartRadius: 16
   },
   date: {
     fontSize: 16,
-    lineHeight: 21,
-    color: '#8A8A8F'
+    lineHeight: 21
   },
   list: {
     paddingHorizontal: 15

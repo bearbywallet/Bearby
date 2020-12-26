@@ -13,12 +13,11 @@ import {
   Text,
   Button
 } from 'react-native';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Chip } from 'app/components/chip';
 
-import { theme } from 'app/styles';
 import { shuffle } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
@@ -29,6 +28,7 @@ type Prop = {
 };
 
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
+  const { colors } = useTheme();
   const [phrase] = React.useState(String(route.params.phrase));
   const [selectedWords, setSelectedWords] = React.useState<Set<string>>(new Set());
   const [shuffledWords, setShuffledWords] = React.useState(
@@ -63,8 +63,12 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   }, [navigation, phrase]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
+    <View style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {i18n.t('verify_title')}
       </Text>
       <View style={styles.verified}>
@@ -91,12 +95,14 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
         ))}
       </View>
       <View>
-        <Text style={styles.subTitle}>
+        <Text style={[styles.subTitle, {
+          color: colors.border
+        }]}>
           {i18n.t('verify_sub_title')}
         </Text>
         <Button
           title={i18n.t('verify_btn')}
-          color={theme.colors.primary}
+          color={colors.primary}
           disabled={!buttonDisabled}
           onPress={hanldeContinue}
         />
@@ -108,20 +114,17 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    height: '100%',
-    backgroundColor: theme.colors.black
+    height: '100%'
   },
   title: {
     textAlign: 'center',
     lineHeight: 41,
     fontSize: 31,
     fontWeight: 'bold',
-    color: theme.colors.white,
     marginTop: 30
   },
   subTitle: {
     textAlign: 'center',
-    color: '#8A8A8F',
     lineHeight: 21,
     fontSize: 16,
     marginVertical: 50

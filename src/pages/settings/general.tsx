@@ -14,15 +14,16 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { keystore } from 'app/keystore';
 
 export const GeneralPage = () => {
+  const { colors } = useTheme();
   const currencyState = keystore.currency.store.useValue();
   const themeState = keystore.theme.store.useValue();
 
@@ -32,14 +33,18 @@ export const GeneralPage = () => {
   }, []);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={styles.titleWrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('general_title')}
         </Text>
         <Button
           title={i18n.t('reset')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={hanldeReset}
         />
       </View>
@@ -65,8 +70,7 @@ export const GeneralPage = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   titleWrapper: {
     flexDirection: 'row',
@@ -76,7 +80,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'

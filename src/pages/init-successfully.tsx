@@ -17,8 +17,8 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
-import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -31,12 +31,15 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const hanldeOK = React.useCallback(() => {
     navigation.navigate('App', { screen: 'Home' });
   }, [navigation]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
           width={width + width / 4}
@@ -44,11 +47,13 @@ export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
         />
       </View>
       <View style={styles.wrapper}>
-        <Text style={styles.title}>
+        <Text style={[styles.title , {
+          color: colors.text
+        }]}>
           {i18n.t('successfully_title')}
         </Text>
         <Button
-          color={theme.colors.primary}
+          color={colors.primary}
           title={i18n.t('successfully_btn')}
           onPress={hanldeOK}
         />
@@ -59,8 +64,7 @@ export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   backgroundImage: {
     justifyContent: 'center',
@@ -74,7 +78,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    color: theme.colors.white,
     lineHeight: 41,
     fontSize: 34,
     textAlign: 'center',

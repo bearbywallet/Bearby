@@ -14,7 +14,8 @@ import {
   TextInput,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
+import { useTheme } from '@react-navigation/native';
+
 import i18n from 'app/lib/i18n';
 import { ZILLIQA } from 'app/config';
 
@@ -31,6 +32,7 @@ export const NetwrokConfig: React.FC<Prop> = ({
   selected,
   onChange = () => null
 }) => {
+  const { colors } = useTheme();
   const [lastNetwrok] = React.useState(Object.keys(config)[2]);
 
   const http = React.useMemo(
@@ -75,9 +77,13 @@ export const NetwrokConfig: React.FC<Prop> = ({
   }, [config, lastNetwrok]);
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, {
+      backgroundColor: colors.card
+    }, style]}>
     <View>
-      <Text style={styles.labelInput}>
+      <Text style={[styles.labelInput, {
+        color: colors.border
+      }]}>
         {i18n.t('netwrok_node')}
       </Text>
       <TextInput
@@ -88,22 +94,32 @@ export const NetwrokConfig: React.FC<Prop> = ({
       />
     </View>
     <View style={{ marginTop: 15 }}>
-      <Text style={styles.labelInput}>
+      <Text style={[styles.labelInput, {
+        color: colors.border
+      }]}>
         {i18n.t('netwrok_ws')}
       </Text>
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, {
+          borderBottomColor: colors.background,
+          color: colors.text
+        }]}
         editable={disabled}
         defaultValue={ws}
         onChangeText={hanldeChangeWS}
       />
     </View>
     <View style={{ marginTop: 15 }}>
-      <Text style={styles.labelInput}>
+      <Text style={[styles.labelInput, {
+        color: colors.border
+      }]}>
         {i18n.t('netwrok_msg')}
       </Text>
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, {
+          borderBottomColor: colors.background,
+          color: colors.text
+        }]}
         defaultValue={msg}
         editable={disabled}
         onChangeText={hanldeChangeMSG}
@@ -115,21 +131,17 @@ export const NetwrokConfig: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
-    backgroundColor: theme.colors.gray,
     padding: 15
   },
   labelInput: {
     fontSize: 17,
-    lineHeight: 22,
-    color: '#8A8A8F'
+    lineHeight: 22
   },
   textInput: {
     fontSize: 17,
     lineHeight: 22,
     paddingTop: 10,
     padding: 5,
-    borderBottomColor: theme.colors.black,
-    borderBottomWidth: 1,
-    color: theme.colors.white
+    borderBottomWidth: 1
   },
 });

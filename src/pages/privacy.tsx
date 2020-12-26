@@ -15,117 +15,147 @@ import {
   Button
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
-import { theme } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
-export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
+const SubTitle: React.FC = ({ children }) => {
+  const { colors } = useTheme();
+
   return (
-    <View style={styles.container}>
-      <Text style={styles.sub}>
+    <Text style={[styles.sub, {
+      color: colors.text
+    }]}>
+      {children}
+    </Text>
+  );
+};
+
+const Description: React.FC = ({ children }) => {
+  const { colors } = useTheme();
+
+  return (
+    <Text style={[styles.description, {
+      color: colors.text
+    }]}>
+      {children}
+    </Text>
+  );
+};
+
+export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
+
+  return (
+    <View style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <SubTitle>
         {i18n.t('privacy_sub')}
-      </Text>
+      </SubTitle>
       <ScrollView style={styles.content}>
-        <Text style={styles.description}>
+        <Description>
           {i18n.t('privacy_0')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_1')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_2')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_3')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_4')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_5')}
           {i18n.t('privacy_6')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_7')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_8')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_9')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_10')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_11')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_12')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_13')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_14')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_15')}
-        </Text>
-        <Text style={styles.description}>
+        </Description>
+        <Description>
           {i18n.t('privacy_16')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_17')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_18')}
           {i18n.t('privacy_19')}
           {i18n.t('privacy_20')}
           {i18n.t('privacy_21')}
           {i18n.t('privacy_22')}
           {i18n.t('privacy_23')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_24')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_25')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_26')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_27')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_28')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_29')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_30')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_31')}
-        </Text>
-        <Text style={styles.sub}>
+        </Description>
+        <SubTitle>
           {i18n.t('privacy_32')}
-        </Text>
-        <Text style={styles.description}>
+        </SubTitle>
+        <Description>
           {i18n.t('privacy_33')}
-        </Text>
+        </Description>
       </ScrollView>
-      <View style={styles.bottomView}>
+      <View style={[styles.bottomView, {
+        backgroundColor: colors.card
+      }]}>
         <Button
           title={i18n.t('accept')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => navigation.navigate('LetStart')}
         />
       </View>
@@ -136,11 +166,9 @@ export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: theme.colors.black,
     alignItems: 'center'
   },
   sub: {
-    color: theme.colors.white,
     fontWeight: 'bold',
     textAlign: 'center',
     fontSize: 16,
@@ -151,14 +179,12 @@ const styles = StyleSheet.create({
     width: '90%'
   },
   description: {
-    color: theme.colors.white,
     textAlign: 'left',
     marginVertical: 5
   },
   bottomView: {
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
-    backgroundColor: theme.colors.gray,
     width: '100%',
     height: 70
   }

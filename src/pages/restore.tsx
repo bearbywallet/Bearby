@@ -17,10 +17,10 @@ import {
   TextInput
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import { theme } from 'app/styles';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
@@ -31,6 +31,7 @@ type Prop = {
 
 const { height } = Dimensions.get('window');
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [disabled, setDisabled] = React.useState(true);
   const [phrase, setphrase] = React.useState<string>('');
 
@@ -52,16 +53,23 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   }, [phrase, navigation]);
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <KeyboardAwareScrollView>
         <View style={styles.pageContainer}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, {
+            color: colors.text
+          }]}>
             {i18n.t('restore_title')}
           </Text>
           <TextInput
             multiline={true}
             numberOfLines={10}
-            style={styles.text}
+            style={[styles.text, {
+              borderColor: colors.border,
+              color: colors.text
+            }]}
             placeholder={i18n.t('restore_placeholder')}
             placeholderTextColor="#2B2E33"
             onChangeText={hanldeChange}
@@ -69,7 +77,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
         </View>
         <Button
           title={i18n.t('restore_btn')}
-          color={theme.colors.primary}
+          color={colors.primary}
           disabled={disabled}
           onPress={hanldecreateWallet}
         />
@@ -80,8 +88,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   pageContainer: {
     marginTop: 54,
@@ -92,17 +99,14 @@ const styles = StyleSheet.create({
   title: {
     textAlign: 'center',
     fontWeight: 'bold',
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41
   },
   text: {
     marginTop: 60,
     height: height / 5,
-    borderColor: '#2B2E33',
     borderWidth: 1,
     borderRadius: 8,
-    color: theme.colors.white,
     padding: 20,
     fontSize: 23
   }

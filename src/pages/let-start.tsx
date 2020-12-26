@@ -16,9 +16,9 @@ import {
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
@@ -29,8 +29,12 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
+
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
           width={width + width / 6}
@@ -38,21 +42,25 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
         />
       </View>
       <View style={styles.pageContainer}>
-        <Text style={styles.title}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
           {i18n.t('get_started')}
         </Text>
-        <Text style={styles.subTitle}>
+        <Text style={[styles.subTitle, {
+          color: colors.text
+        }]}>
           {i18n.t('create_sub')}
         </Text>
         <View style={styles.buttons}>
           <Button
             title={i18n.t('create')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={() => navigation.navigate('Mnemonic')}
           />
           <Button
             title={i18n.t('restore')}
-            color={theme.colors.primary}
+            color={colors.primary}
             onPress={() => navigation.navigate('Restore')}
           />
         </View>
@@ -63,8 +71,7 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   backgroundImage: {
     justifyContent: 'center',
@@ -79,12 +86,10 @@ const styles = StyleSheet.create({
   },
   title: {
     fontWeight: 'bold',
-    color: theme.colors.white,
     lineHeight: 41,
     fontSize: 34
   },
   subTitle: {
-    color: theme.colors.white,
     lineHeight: 22,
     fontSize: 17
   },

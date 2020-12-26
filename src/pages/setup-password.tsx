@@ -20,12 +20,11 @@ import {
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 import { Switcher } from 'app/components/switcher';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
@@ -37,6 +36,7 @@ type Prop = {
 };
 
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
+  const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
 
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
@@ -99,8 +99,12 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   }, [disabledContinue]);
 
   return (
-    <ScrollView style={styles.container}>
-      <Text style={styles.title}>
+    <ScrollView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {i18n.t('password_title')}
       </Text>
       <View style={styles.wrapper}>
@@ -108,14 +112,19 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           <View style={styles.inputWrapper}>
             <SvgXml xml={ProfileSVG} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {
+                color: colors.text,
+                borderBottomColor: colors.border
+              }]}
               defaultValue={accountName}
               placeholder={i18n.t('pass_setup_input0')}
-              placeholderTextColor="#2B2E33"
+              placeholderTextColor={colors.card}
               onChangeText={setAccountName}
             />
           </View>
-          <Text style={styles.label}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {i18n.t('pass_setup_label0')}
           </Text>
         </View>
@@ -124,7 +133,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           enabled={isBiometric}
           onChange={setIsBiometric}
         >
-          <Text style={styles.label}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {biometric}
           </Text>
         </Switcher>
@@ -132,26 +143,36 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           <View style={styles.inputWrapper}>
             <SvgXml xml={LockSVG} />
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {
+                color: colors.text,
+                borderBottomColor: colors.border
+              }]}
               secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input1')}
-              placeholderTextColor="#2B2E33"
+              placeholderTextColor={colors.card}
               onChangeText={setPassword}
             />
           </View>
           <View style={{ marginLeft: 39 }}>
             <TextInput
-              style={styles.textInput}
+              style={[styles.textInput, {
+                color: colors.text,
+                borderBottomColor: colors.border
+              }]}
               secureTextEntry={true}
               placeholder={i18n.t('pass_setup_input2')}
-              placeholderTextColor="#2B2E33"
+              placeholderTextColor={colors.card}
               onChangeText={setPasswordConfirm}
             />
           </View>
-          <Text style={styles.label}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {i18n.t('pass_setup_label1')}
           </Text>
-          <Text style={styles.label}>
+          <Text style={[styles.label, {
+            color: colors.border
+          }]}>
             {i18n.t('pass_setup_label2')}
           </Text>
         </View>
@@ -159,12 +180,12 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       {loading ? (
         <ActivityIndicator
           animating={loading}
-          color={theme.colors.primary}
+          color={colors.primary}
         />
       ) : (
         <Button
           title={i18n.t('pass_setup_btn')}
-          color={theme.colors.primary}
+          color={colors.primary}
           disabled={disabledContinue}
           onPress={handleCreate}
         />
@@ -175,16 +196,13 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   textInput: {
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
-    borderBottomColor: '#2B2E33',
     borderBottomWidth: 1,
-    color: theme.colors.white,
     width: '90%'
   },
   biometric: {
@@ -201,13 +219,11 @@ const styles = StyleSheet.create({
   },
   label: {
     marginVertical: 5,
-    color: '#8A8A8F',
     marginLeft: 38
   },
   title: {
     textAlign: 'center',
     fontWeight: 'bold',
-    color: theme.colors.white,
     fontSize: 34,
     lineHeight: 41,
     marginTop: 30

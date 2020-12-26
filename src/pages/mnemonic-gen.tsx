@@ -15,8 +15,8 @@ import {
   Button
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { splitByChunk } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
@@ -29,6 +29,7 @@ type Prop = {
 const AMOUNT_OF_WORDS_IN_LINE = 3;
 const mnemonic = new Mnemonic();
 export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const [phrase, setPhrase] = React.useState('');
 
   const words = React.useMemo(() => {
@@ -50,11 +51,17 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
   }, [setPhrase]);
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>
+    <View style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <Text style={[styles.title, {
+        color: colors.text
+      }]}>
         {i18n.t('mnemonic_title')}
       </Text>
-      <Text style={styles.subTitle}>
+      <Text style={[styles.subTitle, {
+        color: colors.border
+      }]}>
         {i18n.t('mnemonic_sub_title')}
       </Text>
       <View style={styles.phraseContainer}>
@@ -71,7 +78,9 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
                 <Text style={styles.wordNumber}>
                   {wordIndex + 1}
                 </Text>
-                <Text style={styles.word}>
+                <Text style={[styles.word, {
+                  color: colors.text
+                }]}>
                   {word}
                 </Text>
               </View>
@@ -82,12 +91,12 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
       <View style={styles.btnsContainer}>
         <Button
           title={i18n.t('mnemonic_btn0')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={hanldeUpdate}
         />
         <Button
           title={i18n.t('mnemonic_btn1')}
-          color={theme.colors.primary}
+          color={colors.primary}
           onPress={() => navigation.navigate('MnemonicVerif', { phrase })}
         />
       </View>
@@ -98,20 +107,17 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    alignItems: 'center',
-    backgroundColor: theme.colors.black
+    alignItems: 'center'
   },
   title: {
     textAlign: 'center',
     lineHeight: 41,
     fontSize: 31,
     fontWeight: 'bold',
-    color: theme.colors.white,
     marginTop: 30
   },
   subTitle: {
     textAlign: 'center',
-    color: '#8A8A8F',
     lineHeight: 21,
     fontSize: 16,
   },
@@ -141,7 +147,6 @@ const styles = StyleSheet.create({
   word: {
     lineHeight: 21,
     fontSize: 16,
-    color: theme.colors.white,
     marginLeft: 4
   },
   btnsContainer: {

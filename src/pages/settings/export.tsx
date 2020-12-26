@@ -13,7 +13,7 @@ import {
   Text
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -30,6 +30,7 @@ type Prop = {
 };
 
 export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
+  const { colors } = useTheme();
   const dangerMessage = React.useMemo(() => {
     if (route.params.type === SecureTypes.privateKey) {
       return i18n.t('export_private_key_danger');
@@ -57,20 +58,33 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [navigation, route]);
 
   return (
-    <SafeAreaView style={styles.container}>
-      <View style={styles.wrapper}>
-        <View style={styles.dangerWrapper}>
-          <Text style={styles.dangerText}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <View style={[styles.wrapper, {
+        backgroundColor: colors.card
+      }]}>
+        <View style={[styles.dangerWrapper, {
+          borderColor: colors['danger']
+        }]}>
+          <Text style={[styles.dangerText, {
+            color: colors['danger']
+          }]}>
             {dangerMessage}
           </Text>
         </View>
-        <Text style={styles.contentText}>
+        <Text style={[styles.contentText, {
+          color: colors.text
+        }]}>
           {route.params.content}
         </Text>
         <CustomButton
           title={i18n.t('copy')}
-          style={styles.btn}
-          color={theme.colors.white}
+          style={{
+            ...styles.btn,
+            backgroundColor: colors['danger']
+          }}
+          color={colors.text}
           onPress={hanldeCopy}
         />
       </View>
@@ -80,34 +94,28 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   wrapper: {
     marginVertical: 20,
-    padding: 15,
-    backgroundColor: theme.colors.gray
+    padding: 15
   },
   dangerWrapper: {
     borderLeftWidth: 2,
-    borderColor: theme.colors.danger,
     padding: 5
   },
   dangerText: {
-    color: theme.colors.danger,
     fontSize: 16,
     lineHeight: 21
   },
   contentText: {
     marginTop: 30,
     textAlign: 'center',
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22
   },
   btn: {
-    marginTop: 20,
-    backgroundColor: theme.colors.danger
+    marginTop: 20
   }
 });
 
