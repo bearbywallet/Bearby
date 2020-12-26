@@ -16,12 +16,12 @@ import {
   LayoutAnimation
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import { HomeAccount, HomeTokens } from 'app/components/home';
 import { ReceiveModal, SimpleConfirm } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
 import { ZILLIQA_KEYS } from 'app/config';
@@ -33,6 +33,7 @@ type Prop = {
 };
 
 export const HomePage: React.FC<Prop> = ({ navigation }) => {
+  const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
@@ -113,7 +114,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
           refreshControl={
             <RefreshControl
                 refreshing={refreshing}
-                tintColor={theme.colors.primary}
+                tintColor={colors.primary}
                 onRefresh={hanldeRefresh}
             />
           }

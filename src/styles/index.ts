@@ -23,29 +23,12 @@ export const fontStyles = {
 };
 
 export const colors = {
-  primary: '#FF9500',
-  secondary: '#0C0D34',
-  gray: '#1D2024',
   success: '#00D99A',
   danger: '#FF0058',
   warning: '#FFC641',
-  info: '#50B9DE',
-  light: '#F6F6F6',
   black: '#000',
-  muted: '#C4C4C4',
-  white: '#fff'
-};
-
-export const theme = {
-  ...DefaultTheme,
-  colors: {
-    ...colors,
-    background: '#18191D',
-    card: '#50B9DE',
-    text: '#000',
-    border: '#0c0d3480',
-    notification: '#fff'
-  }
+  white: '#fff',
+  info: '#50B9DE'
 };
 
 export const dark = {
@@ -56,6 +39,7 @@ export const dark = {
     warning: colors.warning,
     white: colors.white,
     danger: colors.danger,
+    info: colors.info,
     primary: '#FF9500',
     background: '#09090C',
     card: '#2B2E33',
@@ -68,8 +52,11 @@ export const light = {
   ...DefaultTheme,
   dark: false,
   colors: {
+    success: colors.success,
+    warning: colors.warning,
     white: colors.white,
     danger: colors.danger,
+    info: colors.info,
     primary: '#21A0B1',
     background: '#E1E7FF',
     card: '#F9F9F9',

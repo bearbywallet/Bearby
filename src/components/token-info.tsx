@@ -13,10 +13,10 @@ import {
   Text,
   ViewStyle
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 
 import { LoadSVG } from 'app/components/load-svg';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
@@ -42,6 +42,7 @@ export const TokenInfo: React.FC<Prop> = ({
   balance = '0',
   totalSupply = '0'
 }) => {
+  const { colors } = useTheme();
   /**
    * ZIL(Default token) amount in float.
    */
@@ -61,10 +62,15 @@ export const TokenInfo: React.FC<Prop> = ({
   }, [rate, decimals, balance]);
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={[styles.container, {
+      backgroundColor: colors.card,
+      borderColor: colors.card
+    }, style]}>
       <View style={styles.header}>
         <View>
-          <Text style={styles.symbol}>
+          <Text style={[styles.symbol, {
+            color: colors.notification
+          }]}>
             {symbol}
           </Text>
           <Text style={styles.convertedAmount}>
@@ -78,17 +84,23 @@ export const TokenInfo: React.FC<Prop> = ({
         />
       </View>
       <View>
-        <Text style={styles.zilAmount}>
+        <Text style={[styles.zilAmount, {
+          color: colors.text
+        }]}>
           {toLocaleString(amount)}
         </Text>
         <View style={{
           justifyContent: 'space-between',
           flexDirection: 'row'
         }}>
-          <Text style={styles.convertedAmount}>
+          <Text style={[styles.convertedAmount, {
+            color: colors.notification
+          }]}>
             {toLocaleString(conversion)} {currency.toUpperCase()}
           </Text>
-          <Text style={styles.convertedAmount}>
+          <Text style={[styles.convertedAmount, {
+            color: colors.notification
+          }]}>
             {i18n.t('total_supply')}: {toLocaleString(tokensSupply)}
           </Text>
         </View>
@@ -101,10 +113,8 @@ const styles = StyleSheet.create({
   container: {
     borderRadius: 8,
     minHeight: 90,
-    backgroundColor: theme.colors.gray,
     padding: 10,
     borderWidth: 0.9,
-    borderColor: theme.colors.gray,
     height: 110
   },
   header: {
@@ -115,17 +125,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   symbol: {
-    color: theme.colors.muted,
     fontSize: 17
   },
   zilAmount: {
-    color: theme.colors.white,
     fontSize: 17,
     lineHeight: 22,
     fontWeight: 'bold'
   },
   convertedAmount: {
-    color: theme.colors.muted,
     fontSize: 13
   }
 });

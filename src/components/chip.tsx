@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import {
   View,
@@ -13,7 +14,6 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
 
 type Prop = {
   count?: number | string;
@@ -22,17 +22,25 @@ type Prop = {
 };
 
 export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
+  const { colors } = useTheme();
+
   return (
     <View
-      style={[styles.container, style]}
+      style={[styles.container, {
+        backgroundColor: colors.card
+      }, style]}
       onTouchEnd={onPress}
     >
       {count && !isNaN(Number(count)) ? (
-        <Text style={styles.count}>
+        <Text style={[styles.count, {
+          color: colors.notification
+        }]}>
           {count}
         </Text>
       ) : null}
-      <Text style={styles.text}>
+      <Text style={[styles.text, {
+        color: colors.text
+      }]}>
         {children}
       </Text>
     </View>
@@ -42,18 +50,15 @@ export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
 const styles = StyleSheet.create({
   container: {
     padding: 8,
-    backgroundColor: theme.colors.gray,
     borderRadius: 10,
     flexDirection: 'row',
     minWidth: 100
   },
   count: {
-    color: '#666666',
     fontSize: 16,
     lineHeight: 18
   },
   text: {
-    color: theme.colors.white,
     fontSize: 16,
     lineHeight: 18,
     marginLeft: 4

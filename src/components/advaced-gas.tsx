@@ -22,7 +22,6 @@ import { ArrowIconSVG } from 'app/components/svg';
 import { GasSelector } from 'app/components/gas-selector';
 import { Switcher } from 'app/components/switcher';
 
-import { theme } from 'app/styles';
 import { GasState } from 'types';
 import i18n from 'app/lib/i18n';
 import { deppUnlink } from 'app/utils';
@@ -115,8 +114,7 @@ const styles = StyleSheet.create({
   },
   dsLabel: {
     fontSize: 17,
-    lineHeight: 22,
-    color: theme.colors.white
+    lineHeight: 22
   },
   gasLimitLabel: {
     fontSize: 16,

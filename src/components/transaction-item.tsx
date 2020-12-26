@@ -16,7 +16,6 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { theme } from 'app/styles';
 import { TX_DIRECTION } from 'app/config';
 import { Token, TransactionType } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
@@ -53,15 +52,15 @@ export const TransactionItem: React.FC<Prop> = ({
   }, [transaction, tokens, netwrok]);
   const statusColor = React.useMemo(() => {
     if (transaction.receiptSuccess) {
-      return theme.colors.success;
+      return colors['success'];
     } else if (transaction.receiptSuccess === undefined) {
-      return theme.colors.info;
+      return colors['info'];
     } else if (!transaction.receiptSuccess) {
-      return theme.colors.danger;
+      return colors['danger'];
     }
 
-    return theme.colors.warning;
-  }, [transaction]);
+    return colors['warning'];
+  }, [transaction, colors]);
   const recipient = React.useMemo(() => {
     let t = '';
     let color = colors['danger'];
@@ -76,7 +75,7 @@ export const TransactionItem: React.FC<Prop> = ({
       color = colors.text;
       t = '';
     } else if (transaction.direction === TX_DIRECTION.in) {
-      color = theme.colors.success;
+      color = colors['success'];
     }
 
     return {

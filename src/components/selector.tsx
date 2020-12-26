@@ -20,8 +20,6 @@ import { SvgXml } from 'react-native-svg';
 import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
 
-import { theme } from 'app/styles';
-
 type Prop = {
   items: string[];
   title?: string;

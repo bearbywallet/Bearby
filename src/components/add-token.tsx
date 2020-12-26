@@ -17,7 +17,6 @@ import { useTheme } from '@react-navigation/native';
 
 import { AddTokenModal } from 'app/components/modals';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
 

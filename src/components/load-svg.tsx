@@ -8,16 +8,13 @@
  */
 import React from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
   ActivityIndicator
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { SvgCss } from 'react-native-svg';
 
 import { HelpIconSVG } from 'app/components/svg';
-
-import { theme } from 'app/styles';
 
 type Prop = {
   url: string;
@@ -27,6 +24,7 @@ type Prop = {
 };
 
 export const LoadSVG: React.FC<Prop> = ({ url, height, width }) => {
+  const { colors } = useTheme();
   const [isLoading, setIsLoading] = React.useState(true);
   const [svg, setSvg] = React.useState<string>();
 
@@ -50,7 +48,7 @@ export const LoadSVG: React.FC<Prop> = ({ url, height, width }) => {
     return (
       <ActivityIndicator
         animating={isLoading}
-        color={theme.colors.primary}
+        color={colors.primary}
       />
     );
   }

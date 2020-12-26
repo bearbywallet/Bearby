@@ -12,7 +12,6 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { theme } from 'app/styles';
 import { useTheme } from '@react-navigation/native';
 
 type Prop = {

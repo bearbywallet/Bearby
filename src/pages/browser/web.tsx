@@ -27,8 +27,7 @@ import {
   ConfirmPopup
 } from 'app/components/modals';
 
-import { theme } from 'app/styles';
-import { RouteProp } from '@react-navigation/native';
+import { RouteProp, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { keystore } from 'app/keystore';
@@ -46,6 +45,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
+  const { colors } = useTheme();
   const inpageJS = keystore.inpage.store.useValue();
   const searchEngineState = keystore.searchEngine.store.useValue();
   const connectState = keystore.connect.store.useValue();
@@ -319,7 +319,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
       <BrowserViewBar
         url={url}
         canGoForward={canGoForward}
@@ -327,7 +329,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         onGoForward={handleGoForward}
       />
       {loadingProgress !== 1 ? (
-        <View style={[styles.loading, { width: width * loadingProgress }]}/>
+        <View style={[styles.loading, {
+          width: width * loadingProgress,
+          backgroundColor: colors.primary
+        }]}/>
       ) : null}
       <WebView
         ref={webViewRef}
@@ -382,12 +387,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 };
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    backgroundColor: theme.colors.black
+    flex: 1
   },
   loading: {
-    height: 3,
-    backgroundColor: theme.colors.primary
+    height: 3
   }
 });
 

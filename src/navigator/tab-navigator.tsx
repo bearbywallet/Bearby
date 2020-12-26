@@ -9,6 +9,7 @@
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SvgXml } from 'react-native-svg';
+import { useTheme } from '@react-navigation/native';
 
 import {
   HomeIconSVG,
@@ -23,7 +24,6 @@ import { SettingsPage } from 'app/pages/settings';
 import { HistoryPage } from 'app/pages/history';
 
 import I18n from 'app/lib/i18n';
-import { theme } from 'app/styles';
 
 export type TabStackParamList = {
   Home: undefined;
@@ -35,19 +35,21 @@ export type TabStackParamList = {
 };
 
 const TabStack = createBottomTabNavigator<TabStackParamList>();
-const tabBarOptions = {
-  activeTintColor: theme.colors.primary,
-  activeColor: theme.colors.white,
-  labelStyle: {
-    fontSize: 12
-  },
-  inactiveTintColor: theme.colors.muted,
-  style: {
-    backgroundColor: theme.colors.gray
-  }
-};
 
 export const TabNavigator: React.FC = () => {
+  const { colors } = useTheme();
+  const tabBarOptions = React.useMemo(() => ({
+    activeTintColor: colors.primary,
+    activeColor: colors.text,
+    labelStyle: {
+      fontSize: 12
+    },
+    inactiveTintColor: colors.notification,
+    style: {
+      backgroundColor: colors.card
+    }
+  }), [colors]);
+
   return (
     <TabStack.Navigator
       tabBarOptions={tabBarOptions}

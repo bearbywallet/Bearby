@@ -19,7 +19,6 @@ import { StackNavigationProp } from '@react-navigation/stack';
 
 import { CustomButton } from 'app/components/custom-button';
 
-import { theme } from 'app/styles';
 import i18n from 'app/lib/i18n';
 import { SecureTypes } from 'app/config';
 import { SettingsStackParamList } from 'app/navigator/settings';
