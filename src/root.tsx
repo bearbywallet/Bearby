@@ -30,7 +30,7 @@ export default function Root() {
         <SafeAreaProvider>
           <Navigator />
         </SafeAreaProvider>
-        <StatusBar barStyle="light-content"/>
+        <StatusBar barStyle="default"/>
       </NavigationContainer>
     </AppearanceProvider>
   );
