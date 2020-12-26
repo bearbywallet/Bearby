@@ -34,7 +34,7 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
-import { TOKEN_ICONS } from 'app/config';
+import { TOKEN_ICONS, DEFAULT_GAS } from 'app/config';
 import { fromBech32Address } from 'app/utils';
 
 type Prop = {
@@ -99,22 +99,56 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
   ]);
 
   React.useEffect(() => {
+    const [zil] = tokensState;
+    let data = '';
+    let qa = '0';
+    let gas = gasState;
+    let toAddr = null;
+
     try {
-      const toAddr = fromBech32Address(recipient);
-      const qa = toQA(amount, token.decimals);
+      if (zil.symbol === token.symbol) {
+        toAddr = fromBech32Address(recipient);
+        qa = toQA(amount, token.decimals);
+      } else {
+        // If user selected ZRC token.
+        data = JSON.stringify({
+          _tag: 'Transfer',
+          params: [
+            {
+              vname: 'to',
+              type: 'ByStr20',
+              value: fromBech32Address(recipient).toLowerCase()
+            },
+            {
+              vname: 'amount',
+              type: 'Uint128',
+              value: toQA(amount, token.decimals)
+            }
+          ]
+        });
+        gas = {
+          gasPrice: String(DEFAULT_GAS.gasPrice),
+          gasLimit: String(9000)
+        };
+        toAddr = token.address[networkState.selected];
+      }
 
       setTx(new Transaction(
         qa,
-        gasState,
+        gas,
         account,
-        toAddr
+        toAddr,
+        '',
+        data
       ));
     } catch (err) {
       //
     }
   }, [
     setTx,
+    networkState,
     token,
+    tokensState,
     account,
     amount,
     selectedAccount,
