@@ -42,8 +42,8 @@ export const dark = {
     info: colors.info,
     primary: '#FF9500',
     background: '#09090C',
-    card: '#2B2E33',
-    text: '#F9F9F9',
+    card: '#18191D',
+    text: '#FFFFFF',
     border: '#8A8A8F',
     notification: '#666666'
   }

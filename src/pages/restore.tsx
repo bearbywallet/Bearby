@@ -66,6 +66,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
           <TextInput
             multiline={true}
             numberOfLines={10}
+            autoCorrect={false}
             style={[styles.text, {
               borderColor: colors.border,
               color: colors.text

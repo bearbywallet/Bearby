@@ -129,7 +129,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
       }]}>
         <KeyboardAwareScrollView>
           <View style={{
-            backgroundColor: colors['white']
+            backgroundColor: colors.card
           }}>
             <TransferAccount
               accounts={accountState.identities}
@@ -146,7 +146,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
           </View>
           <TransferRecipient
             style={{
-              backgroundColor: colors['white'],
+              backgroundColor: colors.card,
               marginTop: 30
             }}
             accounts={accountState.identities}
@@ -156,7 +156,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
           />
           <TransferAmount
             style={{
-              backgroundColor: colors['white']
+              backgroundColor: colors.card
             }}
             account={accountState.identities[selectedAccount]}
             token={token}

@@ -135,6 +135,7 @@ export const ImportAccount: React.FC<Prop> = ({
                 borderColor: colors.border,
                 color: colors.text
               }]}
+              autoCorrect={false}
               placeholder={i18n.t('import_private_key_placeholder')}
               placeholderTextColor={colors.border}
               onChangeText={hanldeChangePrivKey}
@@ -158,6 +159,7 @@ export const ImportAccount: React.FC<Prop> = ({
           <TextInput
             value={String(ledgerIndex)}
             keyboardType={'numeric'}
+            autoCorrect={false}
             style={[styles.text, {
               borderColor: colors.border,
               color: colors.text

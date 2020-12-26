@@ -92,6 +92,7 @@ export const AddContactModal: React.FC<Prop> = ({
             color: colors.text,
             borderBottomColor: colors.border
           }]}
+          autoCorrect={false}
           value={name}
           placeholder={i18n.t('contacts_name')}
           placeholderTextColor={colors.border}

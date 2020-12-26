@@ -46,7 +46,7 @@ export const AccountItem: React.FC<Prop> = ({
     <TouchableOpacity
       style={[styles.accountItemWrapper, style, {
         borderBottomWidth: last ? 0 : 1,
-        borderBottomColor: colors.background
+        borderBottomColor: colors.card
       }]}
       onPress={() => onPress(account)}
     >

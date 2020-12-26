@@ -51,7 +51,7 @@ export const TokenCard: React.FC<Prop> = ({
   onSend = () => null,
   onView = () => null,
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const actions = React.useMemo(() => [
     {
       title: i18n.t('send'),
@@ -107,8 +107,8 @@ export const TokenCard: React.FC<Prop> = ({
     >
       <TouchableOpacity
         style={[styles.wrapper, {
-          backgroundColor: colors['white'],
-          shadowColor: colors.primary
+          backgroundColor: colors.card,
+          shadowColor: dark ? colors.background : colors.primary
         }]}
         onPress={onPress}
       >

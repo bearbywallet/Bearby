@@ -97,6 +97,7 @@ export const QrCodeInput: React.FC<Prop> = ({
           style={[styles.textInput, {
             color: error ? colors['danger'] : colors.text
           }]}
+          autoCorrect={false}
           placeholder={placeholder}
           value={value}
           placeholderTextColor={colors.border}

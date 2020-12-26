@@ -15,6 +15,7 @@ import { AppearanceProvider, useColorScheme } from 'react-native-appearance';
 
 import Navigator from './navigator';
 import { dark, light } from './styles';
+import { keystore } from 'app/keystore';
 
 const theme = {
   dark,
@@ -30,7 +31,7 @@ export default function Root() {
         <SafeAreaProvider>
           <Navigator />
         </SafeAreaProvider>
-        <StatusBar barStyle="default"/>
+        <StatusBar barStyle={theme[scheme].dark ? 'light-content' : 'dark-content'}/>
       </NavigationContainer>
     </AppearanceProvider>
   );

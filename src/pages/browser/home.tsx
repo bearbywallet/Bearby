@@ -112,7 +112,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           </View>
         </View>
         <View style={[styles.main, {
-          backgroundColor: colors.background
+          backgroundColor: colors.card
         }]}>
           <View style={styles.inputWrapper}>
             {isLoading ? (
@@ -129,7 +129,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
                 borderBottomColor: colors.border
               }]}
               autoCorrect={false}
-              autoFocus={true}
               autoCapitalize={'none'}
               textContentType={'URL'}
               value={search}

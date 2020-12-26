@@ -67,7 +67,8 @@ export const ConnectionsPage = () => {
         {connectState.map((item, index) => (
           <BrowserAppItem
             style={{
-              borderRadius: 0
+              borderRadius: 0,
+              backgroundColor: colors.card
             }}
             key={index}
             title={item.title}

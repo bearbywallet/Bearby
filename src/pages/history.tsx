@@ -194,7 +194,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
         </View>
       </View>
       <View style={[styles.main, {
-        backgroundColor: colors.background
+        backgroundColor: colors.card
       }]}>
         <SortingWrapper
           tokens={cusstomTokens}

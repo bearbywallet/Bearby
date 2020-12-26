@@ -61,13 +61,13 @@ const Imgaes = {
 };
 
 export const BrowserCarditem: React.FC<Prop> = ({ el, title, style, onPress }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
 
   return (
     <TouchableOpacity
       style={[styles.container, {
         backgroundColor: colors.card,
-        shadowColor: colors.primary
+        shadowColor: dark ? colors.background : colors.primary
       }, style]}
       onPress={onPress}
     >

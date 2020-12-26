@@ -52,14 +52,18 @@ export const ContactsModal: React.FC<Prop> = ({
       }}
       onBackdropPress={onTriggered}
     >
-      <ModalWrapper style={style}>
+      <ModalWrapper style={{
+        ...style,
+        paddingHorizontal: 0,
+        paddingBottom: 0
+      }}>
         <ModalTitle
           style={{ padding: 15 }}
           onClose={onTriggered}
         >
           {title}
         </ModalTitle>
-        <ScrollView style={{ marginVertical: 20 }}>
+        <ScrollView>
           {contacts.map((contact, index) => (
             <ContactItem
               key={index}

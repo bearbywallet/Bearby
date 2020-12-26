@@ -73,7 +73,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewT
 
   return (
     <View style={[styles.container, {
-      backgroundColor: colors['white']
+      backgroundColor: colors.card
     }]}>
       <View style={styles.header}>
         <Text style={[styles.title, {

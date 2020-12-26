@@ -88,6 +88,7 @@ export const NetwrokConfig: React.FC<Prop> = ({
       </Text>
       <TextInput
         style={styles.textInput}
+        autoCorrect={false}
         defaultValue={http}
         editable={disabled}
         onChangeText={hanldeChangeNode}
@@ -104,6 +105,7 @@ export const NetwrokConfig: React.FC<Prop> = ({
           borderBottomColor: colors.background,
           color: colors.text
         }]}
+        autoCorrect={false}
         editable={disabled}
         defaultValue={ws}
         onChangeText={hanldeChangeWS}
@@ -120,6 +122,7 @@ export const NetwrokConfig: React.FC<Prop> = ({
           borderBottomColor: colors.background,
           color: colors.text
         }]}
+        autoCorrect={false}
         defaultValue={msg}
         editable={disabled}
         onChangeText={hanldeChangeMSG}

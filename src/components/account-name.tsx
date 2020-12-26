@@ -45,6 +45,7 @@ export const AccountName: React.FC<Prop> = ({
           borderBottomColor: colors.text,
           color: colors.text
         }]}
+        autoCorrect={false}
         placeholder={i18n.t('pass_setup_input0')}
         defaultValue={name}
         placeholderTextColor={colors.card}

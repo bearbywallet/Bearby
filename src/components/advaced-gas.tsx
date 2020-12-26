@@ -92,6 +92,7 @@ export const AdvacedGas: React.FC<Prop> = ({
                 borderBottomColor: colors.border,
                 color: colors.text
               }]}
+              autoCorrect={false}
               placeholderTextColor={colors.border}
               defaultValue={gas.gasLimit}
               onChangeText={(gasLimit) => onChange({ ...gas, gasLimit })}

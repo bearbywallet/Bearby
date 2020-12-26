@@ -27,15 +27,15 @@ export type Prop = {
 };
 
 export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <React.Fragment>
       <TouchableOpacity
         style={[styles.container, style, {
-          backgroundColor: colors.background,
-          borderColor: colors.background
+          backgroundColor: colors.card,
+          shadowColor: dark ? colors.background : colors.primary
         }]}
         onPress={() => setModalVisible(true)}
       >
@@ -63,7 +63,13 @@ const styles = StyleSheet.create({
     minHeight: 90,
     width: '47%',
     padding: 10,
-    borderWidth: 0.9,
+
+    shadowOffset: {
+      width: 0,
+      height: 2
+    },
+    shadowOpacity: 0.5,
+    shadowRadius: 2,
 
     justifyContent: 'center',
     alignItems: 'center'

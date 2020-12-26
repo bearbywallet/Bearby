@@ -136,13 +136,15 @@ export const TransactionItem: React.FC<Prop> = ({
         style,
         {
           borderLeftColor: statusColor,
-          backgroundColor: colors.card
+          backgroundColor: colors.background
         }
       ]}
       onPress={onSelect}
     >
       <View style={styles.wrapper}>
-        <Text style={styles.first}>
+        <Text style={[styles.first, {
+          color: colors.text
+        }]}>
           {vname}
         </Text>
         <Text style={[styles.first, {
