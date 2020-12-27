@@ -24,6 +24,7 @@ type Prop = {
   placeholder?: string;
   passwordError?: string;
   onChange: (password: string) => void;
+  onSubmitEditing?: () => void
 };
 
 const { width } = Dimensions.get('window');
@@ -31,13 +32,16 @@ export const Passwordinput: React.FC<Prop> = ({
   style,
   placeholder,
   passwordError,
-  onChange
+  onChange,
+  onSubmitEditing = () => null
 }) => {
   const { colors } = useTheme();
 
   return (
     <View style={style}>
-      <View style={styles.inputWrapper}>
+      <View style={[styles.inputWrapper, {
+        borderBottomColor: colors.border
+      }]}>
         <SvgXml xml={LockSVG} />
         <TextInput
           style={[styles.textInput, {
@@ -46,15 +50,16 @@ export const Passwordinput: React.FC<Prop> = ({
           }]}
           secureTextEntry={true}
           placeholder={placeholder}
-          placeholderTextColor={colors.card}
+          placeholderTextColor={colors.border}
           onChangeText={onChange}
+          onSubmitEditing={onSubmitEditing}
         />
-        <Text style={[styles.errorMessage, {
-          color: colors['danger']
-        }]}>
-          {passwordError}
-        </Text>
       </View>
+      <Text style={[styles.errorMessage, {
+        color: colors['danger']
+      }]}>
+        {passwordError}
+      </Text>
     </View>
   );
 };
@@ -62,7 +67,8 @@ export const Passwordinput: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   inputWrapper: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    borderBottomWidth: 1
   },
   textInput: {
     fontSize: 17,

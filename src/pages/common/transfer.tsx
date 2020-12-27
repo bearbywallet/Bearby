@@ -50,6 +50,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
   const tokensState = keystore.token.store.useValue();
   const networkState = keystore.network.store.useValue();
   const gasState = keystore.gas.store.useValue();
+  const authState = keystore.guard.auth.store.useValue();
 
   const [confirmModal, setConfirmModal] = React.useState(false);
   const [confirmError, setConfirmError] = React.useState<string>();
@@ -72,12 +73,12 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
     [accountState, selectedAccount]
   );
 
-  const handleSiging = React.useCallback(async(transaction: Transaction, cb) => {
+  const handleSiging = React.useCallback(async(transaction: Transaction, cb, password) => {
     setConfirmError(undefined);
     try {
       await keystore.account.updateNonce(selectedAccount);
       const chainID = await keystore.zilliqa.getNetworkId();
-      const keyPair = await keystore.getkeyPairs(account);
+      const keyPair = await keystore.getkeyPairs(account, password);
 
       transaction.setVersion(chainID);
       transaction.nonce = account.nonce + 1;
@@ -221,6 +222,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
           account={account}
           title={i18n.t('confirm')}
           visible={confirmModal}
+          needPassword={!authState.biometricEnable}
           onTriggered={() => setConfirmModal(false)}
           onConfirm={handleSiging}
         >

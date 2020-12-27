@@ -51,6 +51,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const accountState = keystore.account.store.useValue();
   const networkState = keystore.network.store.useValue();
   const tokenState = keystore.token.store.useValue();
+  const authState = keystore.guard.auth.store.useValue();
 
   const webViewRef = React.useRef<null | WebView>(null);
 
@@ -227,7 +228,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     webViewRef.current.postMessage(m.serialize);
     setSignMessage(undefined);
   }, [webViewRef, signMessage, setSignMessage]);
-  const handleConfirmTransaction = React.useCallback(async(tx: Transaction, cb) => {
+  const handleConfirmTransaction = React.useCallback(async(tx: Transaction, cb, password) => {
     setConfirmError(undefined);
 
     if (!webViewRef.current || !transaction) {
@@ -237,7 +238,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     try {
       await keystore.account.updateNonce(accountState.selectedAddress);
       const chainID = await keystore.zilliqa.getNetworkId();
-      const keyPair = await keystore.getkeyPairs(account);
+      const keyPair = await keystore.getkeyPairs(account, password);
 
       tx.setVersion(chainID);
       tx.nonce = account.nonce + 1;
@@ -367,6 +368,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           account={account}
           error={confirmError}
           title={i18n.t('confirm')}
+          needPassword={!authState.biometricEnable}
           visible={Boolean(transaction)}
           onTriggered={hanldeRejectTransaction}
           onConfirm={handleConfirmTransaction}

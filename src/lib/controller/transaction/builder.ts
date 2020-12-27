@@ -22,12 +22,14 @@ import {
 import { toLi, fromLI, gasToFee } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
+import { DEFAULT_GAS } from 'app/config';
 
 export class Transaction {
 
   public static fromPayload(payload: TxParams, account: Account) {
+    const gasPrice = toLi(payload.gasPrice);
     const gas = {
-      gasPrice: toLi(payload.gasPrice),
+      gasPrice: Number(gasPrice) < Number(DEFAULT_GAS.gasPrice) ? DEFAULT_GAS.gasPrice : gasPrice,
       gasLimit: payload.gasLimit
     };
 

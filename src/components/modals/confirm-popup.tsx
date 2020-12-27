@@ -28,6 +28,7 @@ import Modal from 'react-native-modal';
 import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { Passwordinput } from 'app/components/password-input';
 
 import { Account, GasState } from 'types';
 import i18n from 'app/lib/i18n';
@@ -44,8 +45,9 @@ type Prop = {
   visible: boolean;
   title: string;
   error?: string;
+  needPassword?: boolean;
   onTriggered: () => void;
-  onConfirm: (transaction: Transaction, cb: () => void) => void;
+  onConfirm: (transaction: Transaction, cb: () => void, password?: string) => void;
 };
 
 export const ConfirmPopup: React.FC<Prop> = ({
@@ -56,6 +58,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   decimals,
   visible,
   children,
+  needPassword,
   error,
   onTriggered,
   onConfirm
@@ -63,6 +66,8 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
+
+  const [passowrd, setPassowrd] = React.useState<string>('');
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(transaction.priority);
@@ -80,9 +85,11 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
-    onConfirm(transaction, () => setIsLoading(false));
+    onConfirm(transaction, () => setIsLoading(false), passowrd);
   }, [
     transaction,
+    needPassword,
+    passowrd,
     setIsLoading,
     onConfirm
   ]);
@@ -168,6 +175,15 @@ export const ConfirmPopup: React.FC<Prop> = ({
               </View>
             </View>
           </View>
+          {needPassword ? (
+            <Passwordinput
+              style={{
+                marginVertical: 15
+              }}
+              placeholder={i18n.t('pass_setup_input1')}
+              onChange={setPassowrd}
+            />
+          ) : null}
           <AdvacedGas
             gas={gas}
             ds={DS}
@@ -178,6 +194,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <CustomButton
             title={i18n.t('send')}
             style={styles.sendBtn}
+            disabled={needPassword && !passowrd}
             isLoading={isLoading}
             onPress={handleSend}
           />

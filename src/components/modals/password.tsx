@@ -8,10 +8,7 @@
  */
 import React from 'react';
 import {
-  View,
-  Text,
   StyleSheet,
-  TextInput,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -20,6 +17,7 @@ import Modal from 'react-native-modal';
 import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -55,7 +53,7 @@ export const PasswordModal: React.FC<Prop> = ({
   onTriggered,
   onConfirmed
 }) => {
-  const { colors, dark } = useTheme();
+  const { dark } = useTheme();
   const [passowrd, setPassowrd] = React.useState<string>('');
   const [errorMessage, setErrorMessage] = React.useState<string>(' ');
 
@@ -88,24 +86,15 @@ export const PasswordModal: React.FC<Prop> = ({
         <ModalTitle onClose={onTriggered}>
           {title}
         </ModalTitle>
-        <View>
-          <TextInput
-            style={[styles.textInput, {
-              color: colors.text,
-              borderBottomColor: colors.border,
-            }]}
-            secureTextEntry={true}
-            placeholder={i18n.t('pass_setup_input1')}
-            placeholderTextColor={colors.border}
-            onSubmitEditing={hanldeConfirm}
-            onChangeText={hanldeChangePassword}
-          />
-          <Text style={[styles.error, {
-            color: colors['danger']
-          }]}>
-            {errorMessage}
-          </Text>
-        </View>
+        <Passwordinput
+          style={{
+            marginVertical: 15
+          }}
+          placeholder={i18n.t('pass_setup_input1')}
+          passwordError={errorMessage}
+          onSubmitEditing={hanldeConfirm}
+          onChange={hanldeChangePassword}
+        />
         <CustomButton
           title={btnTitle}
           onPress={hanldeConfirm}
@@ -116,15 +105,5 @@ export const PasswordModal: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
-  error: {
-    marginTop: 4,
-    lineHeight: 22
-  },
-  textInput: {
-    fontSize: 17,
-    lineHeight: 22,
-    padding: 10,
-    borderBottomWidth: 1,
-    width: '90%'
-  }
+  //
 });
