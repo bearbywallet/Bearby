@@ -21,7 +21,11 @@ import ContextMenu from 'react-native-context-menu-view';
 
 import { Token, Account } from 'types';
 import { TOKEN_ICONS } from 'app/config';
-import { toLocaleString, toConversion, fromZil } from 'app/filters';
+import {
+  toConversion,
+  fromZil,
+  nFormatter
+} from 'app/filters';
 import i18n from 'app/lib/i18n';
 
 export type Prop = {
@@ -128,12 +132,12 @@ export const TokenCard: React.FC<Prop> = ({
           <Text style={[styles.zilAmount, {
             color: colors.text
           }]}>
-            {toLocaleString(amount)}
+            {nFormatter(amount)}
           </Text>
           <Text style={[styles.convertedAmount, {
             color: colors.notification
           }]}>
-            {toLocaleString(conversion)} {currency.toUpperCase()}
+            {nFormatter(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
       </TouchableOpacity>

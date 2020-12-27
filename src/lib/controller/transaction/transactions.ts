@@ -107,6 +107,7 @@ export class TransactionsContoller {
       to: toBech32Address(tx.toAddr),
       value: tx.amount,
       fee: tx.feeValue,
+      receiptSuccess: undefined,
       timestamp: tx.timestamp,
       direction: tx.direction,
       nonce: tx.nonce,

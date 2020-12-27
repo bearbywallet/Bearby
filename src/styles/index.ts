@@ -12,16 +12,6 @@
  */
 import { DefaultTheme } from '@react-navigation/native';
 
-/**
- * Map of reusable fonts
- */
-export const fontStyles = {
-  // [Fonts.Bold]: require('assets/fonts/SF-Pro-Display-Bold.otf'),
-  // [Fonts.Light]: require('assets/fonts/SF-Pro-Display-Light.otf'),
-  // [Fonts.Medium]: require('assets/fonts/SF-Pro-Display-Medium.otf'),
-  // [Fonts.Regilar]: require('assets/fonts/SF-Pro-Display-Regular.otf')
-};
-
 export const colors = {
   success: '#00D99A',
   danger: '#FF0058',
@@ -36,7 +26,7 @@ export const dark = {
   dark: true,
   colors: {
     ...colors,
-    primary: '#FF9500',
+    primary: '#29CCC4',
     background: '#09090C',
     card: '#18191D',
     text: '#FFFFFF',

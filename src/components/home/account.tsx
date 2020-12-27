@@ -21,7 +21,7 @@ import CreateBackground from 'app/assets/logo.svg';
 
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
-import { fromZil, toConversion, toLocaleString } from 'app/filters';
+import { fromZil, toConversion, nFormatter } from 'app/filters';
 
 type Prop = {
   account: Account;
@@ -81,7 +81,7 @@ export const HomeAccount: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {toLocaleString(amount)}
+            {nFormatter(amount)}
             <Text style={[styles.symbol, {
               color: colors.text
             }]}>
@@ -91,7 +91,7 @@ export const HomeAccount: React.FC<Prop> = ({
           <Text style={[styles.convertedAmount, {
             color: colors.text
           }]}>
-            {toLocaleString(conversion)} {currency.toUpperCase()}
+            {nFormatter(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
         <View style={styles.buttons}>
@@ -133,14 +133,17 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 44,
+    fontFamily: 'Avenir',
     fontWeight: 'bold'
   },
   symbol: {
     fontSize: 17,
+    fontFamily: 'Avenir',
     fontWeight: 'normal'
   },
   convertedAmount: {
-    fontSize: 13
+    fontSize: 13,
+    fontFamily: 'Avenir'
   },
   buttons: {
     flexDirection: 'row',

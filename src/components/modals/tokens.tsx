@@ -28,7 +28,7 @@ import { LoadSVG } from 'app/components/load-svg';
 
 import { TOKEN_ICONS } from 'app/config';
 import { Token, Account } from 'types';
-import { fromZil } from 'app/filters';
+import { fromZil, toLocaleString } from 'app/filters';
 
 type Prop = {
   style?: ViewStyle;
@@ -59,6 +59,11 @@ export const TokensModal: React.FC<Prop> = ({
     onSelect(index);
     onTriggered();
   }, [onSelect, onTriggered]);
+
+
+  const getAmount = (balance: string, token: Token) => toLocaleString(
+    fromZil(balance, token.decimals)
+  );
 
   return (
     <Modal
@@ -102,7 +107,7 @@ export const TokensModal: React.FC<Prop> = ({
                   <Text style={[styles.amount, {
                     color: colors.border
                   }]}>
-                    {fromZil(account.balance[network][token.symbol], token.decimals)} {token.symbol}
+                    {getAmount(account.balance[network][token.symbol], token)} {token.symbol}
                   </Text>
                 ) : null}
               </View>

@@ -12,3 +12,4 @@ export * from './from-zil';
 export * from './gas-to-fee';
 export * from './trim';
 export * from './to-qa';
+export * from './n-format';
