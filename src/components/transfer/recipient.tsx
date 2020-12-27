@@ -95,6 +95,7 @@ export const TransferRecipient: React.FC<Prop> = ({
             style={[styles.item, {
               backgroundColor: colors.background
             }]}
+            disabled={contacts.length === 0}
             onPress={() => setContactModal(true)}
           >
             <SvgXml xml={BookIconSVG} />

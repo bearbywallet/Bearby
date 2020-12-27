@@ -11,35 +11,44 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
-  Linking,
   ScrollView,
   ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
+import Share from 'react-native-share';
 import { useTheme } from '@react-navigation/native';
+import Clipboard from '@react-native-community/clipboard';
 
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { ViewButton } from 'app/components/view-button';
+import {
+  ProfileSVG,
+  ViewBlockIconSVG,
+  ShareIconSVG
+} from 'app/components/svg';
+import { LabelValue } from 'app/components/label-value';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { TransactionType } from 'types';
 import { trim, fromZil, toConversion } from 'app/filters';
-import { viewAddress, viewBlockNumber, viewTransaction } from 'app/utils';
+import { viewTransaction } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
   transaction?: TransactionType;
   onTriggered: () => void;
+  onViewBlock: (url: string) => void;
 };
 
 export const TransactionModal: React.FC<Prop> = ({
   style,
   transaction,
   visible,
-  onTriggered
+  onTriggered,
+  onViewBlock
 }) => {
   if (!transaction) {
     return null;
@@ -61,30 +70,35 @@ export const TransactionModal: React.FC<Prop> = ({
 
     return toConversion(amount, rate, zilliqaToken.decimals);
   }, [zilliqaToken, transaction, settingsState, currencyState]);
+  const data = React.useMemo(() => {
+    if (!transaction.data) {
+      return null;
+    }
 
-  const hanldeViewFrom = React.useCallback(() => {
-    const url = viewAddress(transaction.from, keystore.network.selected);
-
-    Linking.openURL(url);
+    try {
+      return JSON.parse(transaction.data);
+    } catch {
+      return null;
+    }
   }, [transaction]);
-
-  const hanldeViewTo = React.useCallback(() => {
-    const url = viewAddress(transaction.to, keystore.network.selected);
-
-    Linking.openURL(url);
+  const handleShare = React.useCallback(() => {
+    const url = viewTransaction(transaction.hash, keystore.network.selected);
+    const shareOptions = {
+      url,
+      title: `Transaction`
+    };
+    Share.open(shareOptions)
+      .then(() => null)
+      .catch(() => null);
   }, [transaction]);
-
-  const hanldeViewBlock = React.useCallback(() => {
-    const url = viewBlockNumber(transaction.blockHeight, keystore.network.selected);
-
-    Linking.openURL(url);
+  const hanldeCopy = React.useCallback(() => {
+    Clipboard.setString(transaction.hash);
   }, [transaction]);
-
-  const hanldeViewTx = React.useCallback(() => {
+  const handleViewTx = React.useCallback(() => {
     const url = viewTransaction(transaction.hash, keystore.network.selected);
 
-    Linking.openURL(url);
-  }, [transaction]);
+    onViewBlock(url);
+  }, [onViewBlock]);
 
   return (
     <Modal
@@ -102,116 +116,64 @@ export const TransactionModal: React.FC<Prop> = ({
           {i18n.t('history_tx_details')}
         </ModalTitle>
         <ScrollView>
-          <TouchableOpacity
-            style={styles.txItem}
-            onPress={hanldeViewBlock}
-          >
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('block_height')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {transaction.blockHeight}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.txItem}
-            onPress={hanldeViewTx}
-          >
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('tx_hash')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {transaction.hash}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.txItem}
-            onPress={hanldeViewFrom}
-          >
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('transfer_account')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {trim(transaction.from)}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.txItem}
-            onPress={hanldeViewTo}
-          >
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('recipient_account')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {trim(transaction.to)}
-            </Text>
-          </TouchableOpacity>
-          <View style={styles.txItem}>
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('transfer_amount')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
-            </Text>
-            <Text style={[styles.txValeuLabel, {
-              color: colors.notification
-            }]}>
-              {conversion} {currencyState}
-            </Text>
-          </View>
-          <View style={styles.txItem}>
-            <Text style={[styles.txLable, {
-              color: colors.border
-            }]}>
-              {i18n.t('nonce')}
-            </Text>
-            <Text style={[styles.txValue, {
-              color: colors.text
-            }]}>
-              {transaction.nonce}
-            </Text>
-          </View>
+          <LabelValue title={i18n.t('block_height')}>
+            {transaction.blockHeight}
+          </LabelValue>
+          <LabelValue title={i18n.t('tx_hash')}>
+            {transaction.hash}
+          </LabelValue>
+          <LabelValue title={i18n.t('transfer_account')}>
+            {trim(transaction.from)}
+          </LabelValue>
+          <LabelValue title={i18n.t('recipient_account')}>
+            {trim(transaction.to)}
+          </LabelValue>
+          <LabelValue title={i18n.t('transfer_amount')}>
+            {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
+          </LabelValue>
+          <LabelValue title={i18n.t('nonce')}>
+            {transaction.nonce}
+          </LabelValue>
+          {data ? (
+            <LabelValue title={i18n.t('transition')}>
+              {data._tag}
+            </LabelValue>
+          ) : null}
         </ScrollView>
+        <View style={styles.linkWrapper}>
+          <ViewButton
+            icon={ShareIconSVG}
+            onPress={handleShare}
+          >
+            {i18n.t('share')}
+          </ViewButton>
+          <ViewButton
+            icon={ProfileSVG}
+            onPress={hanldeCopy}
+          >
+            {i18n.t('copy_hash')}
+          </ViewButton>
+          <ViewButton
+            icon={ViewBlockIconSVG}
+            onPress={handleViewTx}
+          >
+            {i18n.t('view_block')}
+          </ViewButton>
+        </View>
       </ModalWrapper>
     </Modal>
   );
 };
 
 const styles = StyleSheet.create({
-  txItem: {
-    padding: 10,
-    margin: 5
-  },
-  txLable: {
-    fontSize: 16,
-    lineHeight: 21
-  },
-  txValue: {
-    fontSize: 17,
-    lineHeight: 22
-  },
   txValeuLabel: {
     fontSize: 13,
     lineHeight: 17
+  },
+  linkWrapper: {
+    paddingVertical: 20,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-evenly'
   }
 });

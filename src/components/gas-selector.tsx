@@ -41,7 +41,6 @@ type Prop = {
 
 Big.PE = 99;
 
-const selectedColor = '#0002';
 const { width } = Dimensions.get('window');
 export const GasSelector: React.FC<Prop> = ({
   style,
@@ -50,7 +49,7 @@ export const GasSelector: React.FC<Prop> = ({
   defaultGas,
   onChange = () => null
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const tokensState = keystore.token.store.useValue();
 
   const _1 = Big(1);
@@ -64,6 +63,14 @@ export const GasSelector: React.FC<Prop> = ({
 
     return `${toLocaleString(String(fee))} ${zilliqa.symbol}`;
   };
+
+  const selectedColor = React.useMemo(() => {
+    if (dark) {
+      return '#fff3';
+    }
+
+    return '#0003';
+  }, [dark, colors]);
 
   const firstSelected = React.useMemo(
     () => Big(defaultGas.gasPrice).mul(_1).eq(gasPrice),
@@ -162,7 +169,9 @@ export const GasSelector: React.FC<Prop> = ({
               fill={colors.notification}
             />
           </View>
-          <Text style={styles.amount}>
+          <Text style={[styles.amount, {
+            color: colors.text
+          }]}>
             {amountGas(2)}
           </Text>
         </TouchableOpacity>
@@ -187,7 +196,9 @@ export const GasSelector: React.FC<Prop> = ({
               fill={colors.text}
             />
           </View>
-          <Text style={styles.amount}>
+          <Text style={[styles.amount, {
+            color: colors.text
+          }]}>
             {amountGas(3)}
           </Text>
         </TouchableOpacity>

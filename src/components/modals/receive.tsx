@@ -12,14 +12,12 @@ import {
   Text,
   StyleSheet,
   Linking,
-  TouchableOpacity,
   Dimensions,
   ViewStyle
 } from 'react-native';
 import Clipboard from '@react-native-community/clipboard';
 import Modal from 'react-native-modal';
 import Share from 'react-native-share';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
 import QRCode from 'react-native-qrcode-svg';
@@ -31,6 +29,7 @@ import {
 } from 'app/components/svg';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { ViewButton } from 'app/components/view-button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -144,45 +143,24 @@ export const ReceiveModal: React.FC<Prop> = ({
           {trim(account[settingsState.addressFormat])}
         </Text>
         <View style={styles.linkWrapper}>
-          <TouchableOpacity
-            style={[styles.linkItem, {
-              backgroundColor: colors.card
-            }]}
+          <ViewButton
+            icon={ShareIconSVG}
             onPress={handleShare}
           >
-            <SvgXml xml={ShareIconSVG}/>
-            <Text style={[styles.linkText, {
-              color: colors.text
-            }]}>
-              {i18n.t('share')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.linkItem, {
-              backgroundColor: colors.card
-            }]}
+            {i18n.t('share')}
+          </ViewButton>
+          <ViewButton
+            icon={ProfileSVG}
             onPress={hanldeCopy}
           >
-            <SvgXml xml={ProfileSVG}/>
-            <Text style={[styles.linkText, {
-              color: colors.text
-            }]}>
-              {i18n.t('copy_address')}
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.linkItem, {
-              backgroundColor: colors.card
-            }]}
+            {i18n.t('copy_address')}
+          </ViewButton>
+          <ViewButton
+            icon={ViewBlockIconSVG}
             onPress={hanldeViewAddress}
           >
-            <SvgXml xml={ViewBlockIconSVG}/>
-            <Text style={[styles.linkText, {
-              color: colors.text
-            }]}>
-              {i18n.t('view_block')}
-            </Text>
-          </TouchableOpacity>
+            {i18n.t('view_block')}
+          </ViewButton>
         </View>
         <View style={styles.btnWrapper}>
           <CustomButton
@@ -221,19 +199,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly'
-  },
-  linkItem: {
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    padding: 15,
-    borderRadius: 8,
-    width: 80,
-    height: 80
-  },
-  linkText: {
-    fontSize: 10,
-    lineHeight: 13,
-    textAlign: 'center',
-    marginTop: 5
   }
 });

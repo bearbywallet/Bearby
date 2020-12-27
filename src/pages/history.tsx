@@ -163,6 +163,15 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
     await keystore.transaction.forceUpdate();
     setRefreshing(false);
   }, [setRefreshing]);
+  const hanldeViewBlock = React.useCallback((url: string) => {
+    navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url
+      }
+    });
+    setTransactionModal(false);
+  }, [navigation]);
 
   React.useEffect(() => {
     keystore.transaction.sync();
@@ -249,6 +258,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
         <TransactionModal
           visible={transactionModal}
           transaction={transaction}
+          onViewBlock={hanldeViewBlock}
           onTriggered={() => setTransactionModal(false)}
         />
       ) : null}
