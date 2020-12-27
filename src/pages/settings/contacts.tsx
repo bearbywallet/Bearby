@@ -12,7 +12,9 @@ import {
   Text,
   Button,
   ScrollView,
-  StyleSheet
+  StyleSheet,
+  FlatList,
+  LayoutAnimation
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -20,11 +22,13 @@ import { useTheme } from '@react-navigation/native';
 
 import { ContactItem } from 'app/components/contact-item';
 import { AddContactModal } from 'app/components/modals';
+import { SwipeRow } from 'app/components/swipe-row';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { Contact } from 'types';
 import { keystore } from 'app/keystore';
+import { BrowserAppItem } from 'app/components/browser';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -70,6 +74,10 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
       }
     });
   }, []);
+  const hanldeRemove = React.useCallback(async(contact: Contact) => {
+    await keystore.contacts.rm(contact);
+    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -87,20 +95,26 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
           onPress={() => setContactModal(true)}
         />
       </View>
-      <ScrollView style={[styles.list, {
-        backgroundColor: colors.background
-      }]}>
-        {alphabetSorted.map((item, index) => (
-          <ContactItem
-            key={index}
-            name={item.name}
-            isChar={!checkChar(alphabetSorted, index)}
-            last={index === alphabetSorted.length - 1}
-            bech32={item.address}
-            onSelect={() => handleSelectContect(item.address)}
-          />
-        ))}
-      </ScrollView>
+      <FlatList
+        data={alphabetSorted}
+        renderItem={({ item, index}) => (
+          <SwipeRow
+            index={index}
+            swipeThreshold={-150}
+            onSwipe={() => hanldeRemove(item)}
+          >
+            <ContactItem
+              key={index}
+              name={item.name}
+              isChar={!checkChar(alphabetSorted, index)}
+              last={index === alphabetSorted.length - 1}
+              bech32={item.address}
+              onSelect={() => handleSelectContect(item.address)}
+            />
+          </SwipeRow>
+        )}
+        keyExtractor={(item) => item.address}
+      />
       <AddContactModal
         title={i18n.t('contacts_btn')}
         visible={contactModal}
@@ -126,9 +140,6 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 41,
     fontWeight: 'bold'
-  },
-  list: {
-    marginTop: 16
   }
 });
 

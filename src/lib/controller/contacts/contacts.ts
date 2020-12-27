@@ -49,7 +49,7 @@ export class ContactsControler {
     const contacts = this
       .store
       .get()
-      .filter((acc) => acc.address === contact.address);
+      .filter((acc) => acc.address !== contact.address);
 
     contactsStoreUpdate(contacts);
 

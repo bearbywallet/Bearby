@@ -53,6 +53,7 @@ export const AdvancedPage: React.FC = () => {
       <ScrollView>
         <GasSelector
           style={{ marginVertical: 16 }}
+          selectedColor={colors.background}
           gasLimit={gasState.gasLimit}
           gasPrice={gasState.gasPrice}
           defaultGas={DEFAULT_GAS}

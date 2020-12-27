@@ -35,8 +35,9 @@ type Prop = {
   gasLimit: string;
   gasPrice: string;
   defaultGas: GasState;
-  onChange?: (gas: GasState) => void;
   style?: ViewStyle;
+  selectedColor: string;
+  onChange?: (gas: GasState) => void;
 };
 
 Big.PE = 99;
@@ -47,6 +48,7 @@ export const GasSelector: React.FC<Prop> = ({
   gasLimit,
   gasPrice,
   defaultGas,
+  selectedColor,
   onChange = () => null
 }) => {
   const { colors, dark } = useTheme();
@@ -63,14 +65,6 @@ export const GasSelector: React.FC<Prop> = ({
 
     return `${toLocaleString(String(fee))} ${zilliqa.symbol}`;
   };
-
-  const selectedColor = React.useMemo(() => {
-    if (dark) {
-      return '#fff3';
-    }
-
-    return '#0003';
-  }, [dark, colors]);
 
   const firstSelected = React.useMemo(
     () => Big(defaultGas.gasPrice).mul(_1).eq(gasPrice),
@@ -158,11 +152,11 @@ export const GasSelector: React.FC<Prop> = ({
           <View style={{ flexDirection: 'row' }}>
             <SvgXml
               xml={BigArrowIconSVG}
-              fill={colors.text}
+              fill={colors.primary}
             />
             <SvgXml
               xml={BigArrowIconSVG}
-              fill={colors.text}
+              fill={colors.primary}
             />
             <SvgXml
               xml={BigArrowIconSVG}
@@ -185,15 +179,15 @@ export const GasSelector: React.FC<Prop> = ({
           <View style={{ flexDirection: 'row' }}>
           <SvgXml
               xml={BigArrowIconSVG}
-              fill={colors.text}
+              fill={colors.primary}
             />
             <SvgXml
               xml={BigArrowIconSVG}
-              fill={colors.text}
+              fill={colors.primary}
             />
             <SvgXml
               xml={BigArrowIconSVG}
-              fill={colors.text}
+              fill={colors.primary}
             />
           </View>
           <Text style={[styles.amount, {

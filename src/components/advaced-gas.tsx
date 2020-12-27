@@ -52,6 +52,7 @@ export const AdvacedGas: React.FC<Prop> = ({
     >
       <GasSelector
         style={{ backgroundColor: 'transparent' }}
+        selectedColor={colors.card}
         gasLimit={gas.gasLimit}
         gasPrice={gas.gasPrice}
         defaultGas={deppUnlink(defaultGas)}
