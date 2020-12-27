@@ -34,6 +34,8 @@ import { TxStatsues, ZILLIQA_KEYS, TokenTypes } from 'app/config';
 import { toBech32Address } from 'app/utils';
 import { TransactionType } from 'types';
 
+import ZIlliqaLogo from 'app/assets/zilliqa.svg';
+
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
   route: RouteProp<TabStackParamList, 'History'>;
@@ -176,6 +178,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
       backgroundColor: colors.background
     }]}>
       <View style={styles.header}>
+        <ZIlliqaLogo
+          style={[StyleSheet.absoluteFill, styles.logo]}
+          width={width}
+          height={width}
+        />
         <AccountMenu
           accountName={account.name}
           onCreate={handleCreateAccount}
@@ -279,5 +286,9 @@ const styles = StyleSheet.create({
   },
   list: {
     paddingHorizontal: 15
+  },
+  logo: {
+    top: -150,
+    right: -30
   }
 });

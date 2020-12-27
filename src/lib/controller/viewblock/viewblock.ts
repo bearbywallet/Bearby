@@ -9,6 +9,7 @@
 import { API_KEY, VIEW_BLOCK_API_V1 } from 'app/config';
 import { NetworkControll } from 'app/lib/controller/network';
 import { ViewBlockMethods } from './methods';
+import { TransactionType } from 'types';
 
 export class ViewBlockControler {
   private _network: NetworkControll;
@@ -37,7 +38,7 @@ export class ViewBlockControler {
     return response.json();
   }
 
-  public async getTransactions(address: string, page: number = 1) {
+  public async getTransactions(address: string, page: number = 1): Promise<TransactionType[]> {
     const params = `?page=${page}&${this._netwrokParam}`;
     const method = ViewBlockMethods.Addresses;
     const txns = ViewBlockMethods.Txns;

@@ -17,9 +17,9 @@ import {
   transactionStoreUpdate,
   transactionStoreAdd
 } from './store';
-import { ZILLIQA_KEYS } from 'app/config';
+import { TX_DIRECTION, ZILLIQA_KEYS } from 'app/config';
 import { Transaction } from './builder';
-import { toBech32Address } from 'app/utils';
+import { toBech32Address, tohexString } from 'app/utils';
 
 export class TransactionsContoller {
   public store = transactionStore;
@@ -66,13 +66,17 @@ export class TransactionsContoller {
       return this._update();
     }
 
-    const parsed = JSON.parse(txns);
+    try {
+      const parsed = JSON.parse(txns);
 
-    if (Array.isArray(parsed) && parsed.length === 0) {
+      if (Array.isArray(parsed) && parsed.length === 0) {
+        return this._update();
+      }
+
+      transactionStoreUpdate(parsed);
+    } catch {
       return this._update();
     }
-
-    transactionStoreUpdate(parsed);
   }
 
   public async forceUpdate() {
@@ -96,15 +100,16 @@ export class TransactionsContoller {
       throw new Error('incorect transaction hash.');
     }
     const { field } = this._field;
+    const to = toBech32Address(tx.toAddr);
 
-    tx.direction = 'out';
+    tx.direction = to === tx.from ? TX_DIRECTION.self : TX_DIRECTION.out;
     tx.timestamp = new Date().getTime();
 
     transactionStoreAdd({
+      to,
       hash: tx.hash,
       blockHeight: 0,
       from: tx.from,
-      to: toBech32Address(tx.toAddr),
       value: tx.amount,
       fee: tx.feeValue,
       receiptSuccess: undefined,
@@ -121,13 +126,17 @@ export class TransactionsContoller {
   }
 
   private async _update() {
-    const state = this.store.get().filter((t) => t.blockHeight === 0);
     const { account, field } = this._field;
     const gotTxns = await this
       ._viewblock
       .getTransactions(account.bech32);
+    const panding = this
+      .store
+      .get()
+      .filter((t) => t.blockHeight === 0)
+      .filter((t) => !gotTxns.some((tx) => tohexString(tx.hash) === tohexString(t.hash)));
 
-    transactionStoreUpdate([...state, ...gotTxns]);
+    transactionStoreUpdate([...panding, ...gotTxns]);
 
     await this._storage.set(
       buildObject(field, gotTxns)

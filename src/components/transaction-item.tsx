@@ -69,6 +69,9 @@ export const TransactionItem: React.FC<Prop> = ({
       t = '+';
     } else if (transaction.direction === TX_DIRECTION.out) {
       t = '-';
+    } else if (transaction.direction === TX_DIRECTION.self) {
+      t = '';
+      color = colors['info'];
     }
 
     if (Number(transaction.value) === 0 && !token) {
