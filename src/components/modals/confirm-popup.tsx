@@ -29,6 +29,7 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { Passwordinput } from 'app/components/password-input';
+import { ErrorMessage } from 'app/components/error-message';
 
 import { Account, GasState } from 'types';
 import i18n from 'app/lib/i18n';
@@ -123,12 +124,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
             </Text>
           </View>
         </ModalTitle>
-        <Text style={[styles.errorMessage , {
-          color: colors['danger'],
-          textShadowColor: colors['danger']
-        }]}>
+        <ErrorMessage>
           {error}
-        </Text>
+        </ErrorMessage>
         <ScrollView style={{ marginBottom: 15 }}>
           <View style={commonStyles.item}>
             <SvgXml xml={ProfileSVG} />
@@ -207,16 +205,6 @@ export const ConfirmPopup: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   item: {
     paddingBottom: 10
-  },
-  errorMessage: {
-    fontSize: 17,
-    lineHeight: 22,
-    textAlign: 'center',
-    textShadowOffset: {
-      width: -1,
-      height: 1
-    },
-    textShadowRadius: 3
   },
   sendBtn: {
     marginVertical: 15

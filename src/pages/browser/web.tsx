@@ -356,6 +356,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         visible={Boolean(signMessage)}
         icon={signMessage?.icon}
         account={account}
+        needPassword={!authState.biometricEnable}
         appTitle={signMessage?.title}
         payload={String(signMessage?.data)}
         onTriggered={() => setSignMessage(undefined)}

@@ -22,6 +22,8 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { Switcher } from 'app/components/switcher';
 import { CustomButton } from 'app/components/custom-button';
+import { Passwordinput } from 'app/components/password-input';
+import { ErrorMessage } from 'app/components/error-message';
 
 import i18n from 'app/lib/i18n';
 import { Signature, Account } from 'types';
@@ -37,6 +39,7 @@ type Prop = {
   payload?: string;
   appTitle?: string;
   account: Account;
+  needPassword?: boolean;
   onTriggered: () => void;
   onSign: (sig: Signature) => void;
 };
@@ -50,35 +53,43 @@ export const SignMessageModal: React.FC<Prop> = ({
   payload,
   appTitle,
   account,
+  needPassword,
   onTriggered,
   onSign
 }) => {
   const { colors, dark } = useTheme();
   const [isHash, setIsHash] = React.useState(false);
   const [hash, setHash] = React.useState('');
+  const [passowrd, setPassowrd] = React.useState<string>('');
+  const [error, setError] = React.useState<string>();
+
+  const handleSign = React.useCallback(async() => {
+    setError(undefined);
+    if (!payload || !hash) {
+      return null;
+    }
+
+    try {
+      const bytes = Buffer.from(hash, 'hex');
+      const keyPair = await keystore.getkeyPairs(account, passowrd);
+      const schnorrControl = new SchnorrControl(keyPair.privateKey);
+      const signature = schnorrControl.getSignature(bytes);
+
+      onSign({
+        signature,
+        message: payload,
+        publicKey: keyPair.publicKey
+      });
+    } catch (err) {
+      setError(err.message);
+    }
+  }, [hash, account, payload, passowrd]);
 
   React.useEffect(() => {
     if (payload) {
       sha256(payload).then(setHash);
     }
   }, [payload]);
-
-  const handleSign = React.useCallback(async() => {
-    if (!payload || !hash) {
-      return null;
-    }
-
-    const bytes = Buffer.from(hash, 'hex');
-    const keyPair = await keystore.getkeyPairs(account);
-    const schnorrControl = new SchnorrControl(keyPair.privateKey);
-    const signature = schnorrControl.getSignature(bytes);
-
-    onSign({
-      signature,
-      message: payload,
-      publicKey: keyPair.publicKey
-    });
-  }, [onSign, hash, account, payload]);
 
   if (!icon || !payload || !appTitle) {
     return null;
@@ -104,6 +115,9 @@ export const SignMessageModal: React.FC<Prop> = ({
             style={styles.icon}
             source={{ uri: icon }}
           />
+          <ErrorMessage>
+            {error}
+          </ErrorMessage>
           <Text style={[styles.desc, {
             color: colors.border
           }]}>
@@ -129,13 +143,19 @@ export const SignMessageModal: React.FC<Prop> = ({
               {isHash ? hash : payload}
             </Text>
           </View>
+          {needPassword ? (
+            <Passwordinput
+              style={{
+                marginVertical: 15
+              }}
+              placeholder={i18n.t('pass_setup_input1')}
+              onChange={setPassowrd}
+            />
+          ) : null}
           <CustomButton
-            style={{
-              ...styles.signBtn,
-              borderColor: colors['warning']
-            }}
+            style={styles.signBtn}
             title={i18n.t('sign')}
-            color={colors['warning']}
+            disabled={needPassword && !passowrd}
             onPress={handleSign}
           />
         </View>
