@@ -131,11 +131,15 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <View style={commonStyles.item}>
             <SvgXml xml={ProfileSVG} />
             <View style={[commonStyles.itemInfo, styles.item]}>
-              <Text style={commonStyles.label}>
+              <Text style={[commonStyles.label, {
+                color: colors.text
+              }]}>
                 {i18n.t('transfer_account')}
               </Text>
               <View style={commonStyles.infoWrapper}>
-                <Text style={commonStyles.nameAmountText}>
+                <Text style={[commonStyles.nameAmountText, {
+                  color: colors.border
+                }]}>
                   {account.name}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
@@ -147,11 +151,15 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <View style={commonStyles.item}>
             <SvgXml xml={AmountIconSVG} />
             <View style={[commonStyles.itemInfo, styles.item]}>
-              <Text style={commonStyles.label}>
+              <Text style={[commonStyles.label, {
+                color: colors.text
+              }]}>
                 {i18n.t('transfer_amount')}
               </Text>
               <View style={commonStyles.infoWrapper}>
-                <Text style={commonStyles.nameAmountText}>
+                <Text style={[commonStyles.nameAmountText, {
+                  color: colors.border
+                }]}>
                   {toLocaleString(fromZil(transaction.amount, decimals))}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
@@ -163,11 +171,15 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <View style={commonStyles.item}>
             <SvgXml xml={ReceiveIconSVG} />
             <View style={[commonStyles.itemInfo, styles.item]}>
-              <Text style={commonStyles.label}>
+              <Text style={[commonStyles.label, {
+                color: colors.text
+              }]}>
                 {i18n.t('recipient_account')}
               </Text>
               <View style={commonStyles.infoWrapper}>
-                <Text style={commonStyles.nameAmountText}>
+                <Text style={[commonStyles.nameAmountText, {
+                  color: colors.border
+                }]}>
                   {trim(transaction.recipient)}
                 </Text>
               </View>
