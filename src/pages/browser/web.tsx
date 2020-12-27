@@ -88,13 +88,21 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     if (webViewRef && webViewRef.current) {
       webViewRef.current.goForward();
     }
-  }, [canGoBack]);
+  }, [webViewRef, canGoBack]);
+  const handleGoHome = React.useCallback(() => {
+    navigation.navigate('Browser', {});
+  }, [navigation]);
 
   const handleLoaded = React.useCallback(({ nativeEvent }: WebViewProgressEvent) => {
     setLoadingProgress(nativeEvent.progress);
     setCanGoBack(nativeEvent.canGoBack);
     setCanGoForward(nativeEvent.canGoForward);
   }, [setLoadingProgress, setCanGoBack, setCanGoForward]);
+  const hanldeRefresh = React.useCallback(() => {
+    if (webViewRef.current) {
+      webViewRef.current.reload();
+    }
+  }, [webViewRef]);
 
   const handleMessage = React.useCallback(async({ nativeEvent }) => {
     if (!webViewRef.current) {
@@ -314,7 +322,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         url={url}
         canGoForward={canGoForward}
         onBack={handleBack}
+        onHome={handleGoHome}
         onGoForward={handleGoForward}
+        onRefresh={hanldeRefresh}
       />
       {loadingProgress !== 1 ? (
         <View style={[styles.loading, {

@@ -18,12 +18,15 @@ import URL from 'url-parse';
 import { useTheme } from '@react-navigation/native';
 
 import { SvgXml } from 'react-native-svg';
-import { ArrowIconSVG, LockSVG } from 'app/components/svg';
+import { ArrowIconSVG, LockSVG, HomeIconSVG } from 'app/components/svg';
+import RepeatSVG from 'app/assets/repeat.svg';
 
 type Prop = {
   url: URL;
   canGoForward: boolean;
   onBack: () => void;
+  onHome: () => void;
+  onRefresh: () => void;
   onGoForward: () => void;
 };
 
@@ -32,6 +35,8 @@ export const BrowserViewBar: React.FC<Prop> = ({
   url,
   canGoForward,
   onBack,
+  onRefresh,
+  onHome,
   onGoForward
 }) => {
   const { colors } = useTheme();
@@ -52,6 +57,14 @@ export const BrowserViewBar: React.FC<Prop> = ({
             }}
           />
         </TouchableOpacity>
+        <TouchableOpacity onPress={onHome}>
+          <SvgXml
+            xml={HomeIconSVG}
+            height="30"
+            width="30"
+            fill={colors.primary}
+          />
+        </TouchableOpacity>
         <TouchableOpacity
           disabled={!canGoForward}
           onPress={onGoForward}
@@ -62,8 +75,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
             width="30"
             fill={canGoForward ? colors.primary : colors.notification}
             style={{
-              transform: [{ rotate: '-90deg' }],
-              marginLeft: 15
+              transform: [{ rotate: '-90deg' }]
             }}
           />
         </TouchableOpacity>
@@ -81,18 +93,12 @@ export const BrowserViewBar: React.FC<Prop> = ({
           {url.hostname}
         </Text>
       </View>
-      <TouchableOpacity
-        style={styles.dotsWrapper}
-      >
-        <View style={[styles.dot, {
-          backgroundColor: colors.primary
-        }]}/>
-        <View style={[styles.dot, {
-          backgroundColor: colors.primary
-        }]}/>
-        <View style={[styles.dot, {
-          backgroundColor: colors.primary
-        }]}/>
+      <TouchableOpacity onPress={onRefresh}>
+        <RepeatSVG
+          fill={colors.primary}
+          width={30}
+          height={30}
+        />
       </TouchableOpacity>
     </View>
   );
@@ -107,7 +113,8 @@ const styles = StyleSheet.create({
   },
   navBtns: {
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    width: 100
   },
   hostWrapper: {
     flexDirection: 'row',
@@ -118,17 +125,5 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     minWidth: width / 3
-  },
-  dotsWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    height: '100%',
-    width: 15
-  },
-  dot: {
-    borderRadius: 100,
-    height: 5,
-    width: 5,
-    marginLeft: 3
   }
 });
