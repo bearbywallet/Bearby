@@ -7,13 +7,9 @@
  * Copyright (c) 2020 ZilPay
  */
 import RNFS from 'react-native-fs';
-import WebView from 'react-native-webview';
 
 import { inpageStore, inpageStoreUpdate } from './store';
 import { Device } from 'app/utils';
-import { MessageType } from 'types';
-import { Messages } from 'app/config';
-import { Message } from './message';
 import { NetworkControll } from 'app/lib/controller/network';
 import { AccountControler } from 'app/lib/controller/account';
 
