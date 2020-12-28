@@ -12,8 +12,7 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  Dimensions,
-  Button
+  Dimensions
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -21,6 +20,7 @@ import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
+import { Button } from 'app/components/button';
 
 import GetStartedFirst from 'app/assets/get_started_1.svg';
 import GetStartedSecond from 'app/assets/get_started_2.svg';

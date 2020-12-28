@@ -11,7 +11,6 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
   Keyboard,
   Dimensions,
   TextInput
@@ -20,6 +19,8 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
+
+import { Button } from 'app/components/button';
 
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';

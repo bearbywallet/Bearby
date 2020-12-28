@@ -11,14 +11,14 @@ import {
   View,
   StyleSheet,
   Text,
-  ScrollView,
-  Button
+  ScrollView
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
+import { Button } from 'app/components/button';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;

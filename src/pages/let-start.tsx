@@ -8,7 +8,6 @@
  */
 import React from 'react';
 import {
-  Button,
   StyleSheet,
   Dimensions,
   Text,
@@ -20,6 +19,7 @@ import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
+import { Button } from 'app/components/button';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 
