@@ -10,18 +10,48 @@ import { NativeModules } from 'react-native';
 import { MNEMONIC_PACH } from 'app/config';
 import { KeyPair } from 'types';
 
-const { Crypto } = NativeModules;
+const { Crypto, CryptoModule } = NativeModules;
+
+interface NativeKeyPair {
+  private_key: string;
+  public_key: string;
+}
+
+export class CryptoNativeModule {
+  public createHDKeyPair: (mnemonic: string, passphrase: string, path: string, index: number) => Promise<NativeKeyPair>;
+  public createHDKeyPairs: () => Promise<NativeKeyPair[]>;
+  public generateMnemonic: (length: number) => Promise<string>;
+  public mnemonicIsValid: (mnemonic: string) => Promise<string>;
+
+  constructor() {
+    if (Crypto) {
+      this.createHDKeyPair = Crypto.createHDKeyPair;
+      this.createHDKeyPairs = Crypto.createHDKeyPairs;
+      this.generateMnemonic = Crypto.generateMnemonic;
+      this.mnemonicIsValid = Crypto.mnemonicIsValid;
+    } else if (CryptoModule) {
+      this.createHDKeyPair = CryptoModule.createHDKeyPair;
+      this.createHDKeyPairs = CryptoModule.createHDKeyPairs;
+      this.generateMnemonic = CryptoModule.generateMnemonic;
+      this.mnemonicIsValid = CryptoModule.mnemonicIsValid;
+    } else {
+      throw new Error('Incorect native modules');
+    }
+  }
+}
 
 /**
  * Mnemonic seed phrase contoller.
  */
 export class Mnemonic {
+  private _crypto = new CryptoNativeModule();
+
   /**
    * Check and validate the mnemonic seed phrase.
    * @param mnemonic - Mnemonic seed phrase.
    */
   public async validateMnemonic(mnemonic: string): Promise<boolean> {
-    const checked = await Crypto.mnemonicIsValid(mnemonic);
+    const checked = await this._crypto.mnemonicIsValid(mnemonic);
 
     return Number(checked) !== 0;
   }
@@ -37,7 +67,7 @@ export class Mnemonic {
    * const pairs = mnemonicController.getKeyPair(mnemonicPhrase, 0);
    */
   public async getKeyPair(mnemonic: string, index: number = 0, passphrase = ''): Promise<KeyPair> {
-    const { private_key, public_key } = await Crypto.createHDKeyPair(
+    const { private_key, public_key } = await this._crypto.createHDKeyPair(
       mnemonic,
       passphrase,
       MNEMONIC_PACH,
@@ -59,6 +89,6 @@ export class Mnemonic {
    * new Mnemonic().generateMnemonic(256) => 24 words
    */
   public generateMnemonic(len: number = 128): Promise<string> {
-    return Crypto.generateMnemonic(len);
+    return this._crypto.generateMnemonic(len);
   }
 }
