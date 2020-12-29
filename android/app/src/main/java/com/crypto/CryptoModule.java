@@ -7,9 +7,9 @@ import com.facebook.react.bridge.ReactContextBaseJavaModule;
 import com.facebook.react.bridge.ReactMethod;
 import com.facebook.react.bridge.WritableArray;
 import com.facebook.react.bridge.WritableMap;
-import com.reactlibrary.libs.ECPoint;
-import com.reactlibrary.libs.KeyDerivation;
-import com.reactlibrary.libs.Mnemonic;
+import com.crypto.libs.ECPoint;
+import com.crypto.libs.KeyDerivation;
+import com.crypto.libs.Mnemonic;
 
 import java.security.SecureRandom;
 
@@ -82,7 +82,6 @@ public class CryptoModule extends ReactContextBaseJavaModule {
     public void createHDKeyPairs(String mnemonic, String passphrase, String path, int from, int to, Promise p) {
         byte[] seed2 = new Mnemonic(mnemonic).GetSeed(passphrase);
         String Seed_Str = Mnemonic.bytesToHex(seed2);
-        // log("ahihi" + seed2, Seed_Str);
         System.out.println("ahihi" + seed2 + Seed_Str);
         KeyDerivation key = KeyDerivation.createFromSeed(seed2);
         String pathFormated = path.replace("/index", "");
