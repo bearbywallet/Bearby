@@ -12,14 +12,14 @@ import {
   View,
   StyleSheet,
   Dimensions,
-  Text,
-  Button
+  Text
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
 import { RootParamList } from 'app/navigator';
+import { Button } from 'app/components/button';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 

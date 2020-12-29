@@ -11,12 +11,13 @@ import {
   View,
   StyleSheet,
   Text,
-  Button
+  Dimensions
 } from 'react-native';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Chip } from 'app/components/chip';
+import { Button } from 'app/components/button';
 
 import { shuffle } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
@@ -27,6 +28,7 @@ type Prop = {
   route: RouteProp<UnauthorizedStackParamList, 'MnemonicVerif'>;
 };
 
+const { height } = Dimensions.get('window');
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const [phrase] = React.useState(String(route.params.phrase));
@@ -121,7 +123,7 @@ const styles = StyleSheet.create({
     lineHeight: 41,
     fontSize: 31,
     fontWeight: 'bold',
-    marginTop: 30
+    marginTop: height / 30
   },
   subTitle: {
     textAlign: 'center',
@@ -133,8 +135,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: '3%',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    marginVertical: '10%'
+    justifyContent: 'space-between'
   },
   randoms: {
     flexDirection: 'row',

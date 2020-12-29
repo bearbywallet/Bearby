@@ -11,11 +11,13 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Text,
-  Button
+  Dimensions,
+  Text
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
+
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { splitByChunk } from 'app/utils';
@@ -28,6 +30,7 @@ type Prop = {
 
 const AMOUNT_OF_WORDS_IN_LINE = 3;
 const mnemonic = new Mnemonic();
+const { width, height } = Dimensions.get('window');
 export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const [phrase, setPhrase] = React.useState('');
@@ -75,7 +78,9 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
                 key={wordIndex + AMOUNT_OF_WORDS_IN_LINE}
                 style={styles.wordContainer}
               >
-                <Text style={styles.wordNumber}>
+                <Text style={[styles.wordNumber, {
+                  color: colors.border
+                }]}>
                   {wordIndex + 1}
                 </Text>
                 <Text style={[styles.word, {
@@ -126,23 +131,23 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    maxWidth: 300,
+    maxWidth: width - 60,
     textAlign: 'center'
   },
   lineContainer: {
     flexDirection: 'row',
-    width: '100%',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    maxHeight: 70
   },
   wordContainer: {
     flexDirection: 'row',
-    marginTop: 60,
-    minWidth: 120
+    marginTop: height / 20,
+    minHeight: 60,
+    minWidth: width / 3
   },
   wordNumber: {
     lineHeight: 21,
-    fontSize: 16,
-    color: '#8A8A8F'
+    fontSize: 16
   },
   word: {
     lineHeight: 21,

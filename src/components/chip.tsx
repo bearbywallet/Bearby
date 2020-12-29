@@ -9,9 +9,10 @@
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import {
-  View,
+  TouchableOpacity,
   Text,
   StyleSheet,
+  Dimensions,
   ViewStyle
 } from 'react-native';
 
@@ -21,15 +22,16 @@ type Prop = {
   onPress?: () => void;
 };
 
+const { width } = Dimensions.get('window');
 export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
   const { colors } = useTheme();
 
   return (
-    <View
+    <TouchableOpacity
       style={[styles.container, {
         backgroundColor: colors.card
       }, style]}
-      onTouchEnd={onPress}
+      onPress={onPress}
     >
       {count && !isNaN(Number(count)) ? (
         <Text style={[styles.count, {
@@ -43,23 +45,23 @@ export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
       }]}>
         {children}
       </Text>
-    </View>
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    padding: 8,
+    padding: (width / 100) * 1,
     borderRadius: 10,
     flexDirection: 'row',
-    minWidth: 100
+    minWidth: (width / 100) * 17
   },
   count: {
-    fontSize: 16,
+    fontSize: (width / 100) * 4,
     lineHeight: 18
   },
   text: {
-    fontSize: 16,
+    fontSize: (width / 100) * 3,
     lineHeight: 18,
     marginLeft: 4
   }

@@ -17,7 +17,7 @@ import {
 type Prop = {
   color: string;
   title: string;
-  disabled: boolean;
+  disabled?: boolean;
   style?: ViewStyle | ViewStyle[];
   onPress?: () => void;
 };

@@ -12,7 +12,6 @@ import {
   Text,
   StyleSheet,
   TextInput,
-  Button,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -21,6 +20,7 @@ import { SvgXml } from 'react-native-svg';
 import { ArrowIconSVG } from 'app/components/svg';
 import { GasSelector } from 'app/components/gas-selector';
 import { Switcher } from 'app/components/switcher';
+import { Button } from 'app/components/button';
 
 import { GasState } from 'types';
 import i18n from 'app/lib/i18n';

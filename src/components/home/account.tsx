@@ -11,13 +11,13 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
   Dimensions
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { AccountMenu } from 'app/components/account-menu';
 import CreateBackground from 'app/assets/logo.svg';
+import { Button } from 'app/components/button';
 
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';

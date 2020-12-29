@@ -10,7 +10,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
   ScrollView,
   StyleSheet
 } from 'react-native';
@@ -18,6 +17,7 @@ import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';

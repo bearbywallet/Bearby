@@ -11,14 +11,14 @@ import {
   View,
   StyleSheet,
   Text,
-  ScrollView,
-  Button
+  ScrollView
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';

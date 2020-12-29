@@ -10,7 +10,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
   ScrollView,
   StyleSheet
 } from 'react-native';
@@ -19,6 +18,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { BrowserAppItem } from 'app/components/browser';
 import { SimpleConfirm } from 'app/components/modals';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';

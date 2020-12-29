@@ -10,8 +10,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
-  ScrollView,
   StyleSheet,
   FlatList,
   LayoutAnimation
@@ -23,6 +21,7 @@ import { useTheme } from '@react-navigation/native';
 import { ContactItem } from 'app/components/contact-item';
 import { AddContactModal } from 'app/components/modals';
 import { SwipeRow } from 'app/components/swipe-row';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';

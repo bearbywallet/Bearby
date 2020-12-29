@@ -12,13 +12,13 @@ import {
   StyleSheet,
   Text,
   Linking,
-  Button,
   Dimensions
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 

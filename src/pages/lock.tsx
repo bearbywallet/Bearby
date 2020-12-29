@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text,
   TextInput,
-  Button,
   Dimensions
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,6 +21,7 @@ import { useTheme } from '@react-navigation/native';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 import { LockSVG, FingerPrintIconSVG } from 'app/components/svg';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';

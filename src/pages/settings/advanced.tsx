@@ -11,7 +11,6 @@ import {
   View,
   StyleSheet,
   Text,
-  Button,
   ScrollView
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
@@ -19,6 +18,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { GasSelector } from 'app/components/gas-selector';
 import { Selector } from 'app/components/selector';
+import { Button } from 'app/components/button';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';

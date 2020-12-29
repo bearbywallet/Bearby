@@ -11,7 +11,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
   FlatList,
   Dimensions,
   RefreshControl,
@@ -25,6 +24,7 @@ import { AccountMenu } from 'app/components/account-menu';
 import { TransactionItem } from 'app/components/transaction-item';
 import { SortingWrapper } from 'app/components/history/sort-wrapper';
 import { TransactionModal } from 'app/components/modals';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';

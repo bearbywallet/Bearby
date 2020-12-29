@@ -11,13 +11,13 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Button,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import { DropDownItem } from 'app/components/drop-down-item';
 import { HistoryStatus, TokensModal } from 'app/components/modals';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';

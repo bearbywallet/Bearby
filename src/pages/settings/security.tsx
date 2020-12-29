@@ -10,7 +10,6 @@ import React from 'react';
 import {
   View,
   Text,
-  Button,
   ScrollView,
   StyleSheet
 } from 'react-native';
@@ -21,6 +20,7 @@ import { useTheme } from '@react-navigation/native';
 import { Selector } from 'app/components/selector';
 import { Switcher } from 'app/components/switcher';
 import { PasswordModal } from 'app/components/modals';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
