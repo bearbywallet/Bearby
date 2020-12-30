@@ -76,6 +76,7 @@ export default {
   share: 'Share',
   faucet: 'Test faucet',
   buy: 'Buy ZIL',
+  no_contacts: 'You have no contacts yet.',
   recipient_account: 'Recipient account',
   block_height: 'Block Height',
   copy_address: 'Copy address',

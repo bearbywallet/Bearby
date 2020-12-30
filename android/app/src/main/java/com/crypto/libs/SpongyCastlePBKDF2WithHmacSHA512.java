@@ -1,12 +1,9 @@
 package com.crypto.libs;
+
 import org.spongycastle.crypto.PBEParametersGenerator;
 import org.spongycastle.crypto.digests.SHA512Digest;
 import org.spongycastle.crypto.generators.PKCS5S2ParametersGenerator;
 import org.spongycastle.crypto.params.KeyParameter;
-
-/**
- * Created by skylab on 7/23/18.
- */
 
 public enum SpongyCastlePBKDF2WithHmacSHA512 implements IPBKDF2WithHmacSHA512Algorithm {
     INSTANCE;

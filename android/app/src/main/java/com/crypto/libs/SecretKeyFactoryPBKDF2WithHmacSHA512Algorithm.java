@@ -5,10 +5,6 @@ import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-/**
- * Created by skylab on 7/23/18.
- */
-
 public enum SecretKeyFactoryPBKDF2WithHmacSHA512Algorithm implements IPBKDF2WithHmacSHA512Algorithm {
     INSTANCE;
 

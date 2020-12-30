@@ -94,6 +94,13 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
           onPress={() => setContactModal(true)}
         />
       </View>
+      {alphabetSorted.length === 0 ? (
+        <Text style={[styles.noContacts, {
+          color: colors.border
+        }]}>
+          {i18n.t('no_contacts')}
+        </Text>
+      ) : null}
       <FlatList
         data={alphabetSorted}
         renderItem={({ item, index}) => (
@@ -133,6 +140,11 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     marginTop: '10%',
+    paddingHorizontal: 15
+  },
+  noContacts: {
+    fontSize: 17,
+    lineHeight: 22,
     paddingHorizontal: 15
   },
   title: {

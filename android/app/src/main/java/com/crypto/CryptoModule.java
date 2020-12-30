@@ -58,31 +58,29 @@ public class CryptoModule extends ReactContextBaseJavaModule {
         }
     }
 
-    @ReactMethod
-    public void createHDKeyPair(String mnemonic, String passphrase, String path, int index, Promise p) {
-        byte[] seed2 = new Mnemonic(mnemonic).GetSeed(passphrase);
-        KeyDerivation key = KeyDerivation.createFromSeed(seed2);
-        String pathFormated = path.replace("/index", "");
-        KeyDerivation child = key.derive(pathFormated);
-        if (child == null) {
-            p.reject("PATH_NOT_SUPPORTED", "Path is not supported");
-        } else {
-            ECPoint ecPoint = child.derive(index).getKey();
-            String priKey = ecPoint.getPrivateKeyHex();
-            String pubKey = ecPoint.getPublicKeyHex();
-            WritableMap mapResult = Arguments.createMap();
-            mapResult.putString("private_key", priKey);
-            mapResult.putString("public_key", pubKey);
-            p.resolve(mapResult);
-        }
-
-    }
+	@ReactMethod
+	public void createHDKeyPair(String mnemonic, String passphrase, String path, int index, Promise p) {
+		byte[] seed2 = new Mnemonic(mnemonic).GetSeed(passphrase);
+		KeyDerivation key = KeyDerivation.createFromSeed(seed2);
+		String pathFormated = path.replace("/index", "");
+		KeyDerivation child = key.derive(pathFormated);
+		if (child == null) {
+			p.reject("PATH_NOT_SUPPORTED", "Path is not supported");
+		} else {
+			ECPoint ecPoint = child.derive(index).getKey();
+			String priKey = ecPoint.getPrivateKeyHex();
+			String pubKey = ecPoint.getPublicKeyHex();
+			WritableMap mapResult = Arguments.createMap();
+			mapResult.putString("private_key", priKey);
+			mapResult.putString("public_key", pubKey);
+			p.resolve(mapResult);
+		}
+	}
 
     @ReactMethod
     public void createHDKeyPairs(String mnemonic, String passphrase, String path, int from, int to, Promise p) {
         byte[] seed2 = new Mnemonic(mnemonic).GetSeed(passphrase);
         String Seed_Str = Mnemonic.bytesToHex(seed2);
-        System.out.println("ahihi" + seed2 + Seed_Str);
         KeyDerivation key = KeyDerivation.createFromSeed(seed2);
         String pathFormated = path.replace("/index", "");
         KeyDerivation child = key.derive(pathFormated);
