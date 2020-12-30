@@ -100,6 +100,7 @@ export const TransactionItem: React.FC<Prop> = ({
         symbol: token.symbol
       };
     }
+
     const value = fromZil(transaction.value, zilliqa.decimals);
     const rate = token ? settings.rate[token.symbol] : 0;
     const converted = toConversion(transaction.value, rate, zilliqa.decimals);
