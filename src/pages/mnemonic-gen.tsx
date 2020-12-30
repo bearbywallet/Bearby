@@ -124,15 +124,16 @@ const styles = StyleSheet.create({
   subTitle: {
     textAlign: 'center',
     lineHeight: 21,
-    fontSize: 16,
+    fontSize: 16
   },
   phraseContainer: {
     flex: 1,
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    maxWidth: width - 60,
-    textAlign: 'center'
+    alignItems: 'center',
+    textAlign: 'center',
+    paddingHorizontal: 15
   },
   lineContainer: {
     flexDirection: 'row',
@@ -147,11 +148,11 @@ const styles = StyleSheet.create({
   },
   wordNumber: {
     lineHeight: 21,
-    fontSize: (height / 100) * 3
+    fontSize: (height / 100) * 2
   },
   word: {
     lineHeight: 21,
-    fontSize: (height / 100) * 3,
+    fontSize: (height / 100) * 2,
     marginLeft: 4
   },
   btnsContainer: {

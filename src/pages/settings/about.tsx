@@ -40,7 +40,7 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
       params: {
         url
       }
-    })
+    });
   }, [navigation]);
 
   return (

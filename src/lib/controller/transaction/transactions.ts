@@ -117,9 +117,8 @@ export class TransactionsContoller {
 
     if (needUpdate) {
       transactionStoreUpdate(state);
+      await this._update();
     }
-
-    await this._update();
   }
 
   public async add(tx: Transaction) {

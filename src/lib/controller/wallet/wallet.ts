@@ -134,6 +134,6 @@ export class WalletControler extends Mnemonic {
     await this.connect.sync();
     await this.inpage.sync();
     await this.ssn.sync();
-    this.worker.step();
+    this.worker.start();
   }
 }

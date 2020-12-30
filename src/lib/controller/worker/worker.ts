@@ -22,7 +22,11 @@ export class WorkerController {
   }
 
   public async step() {
-    await this._transactions.checkProcessedTx();
+    try {
+      await this._transactions.checkProcessedTx();
+    } catch {
+      //
+    }
   }
 
   public async start() {
