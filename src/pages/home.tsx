@@ -65,6 +65,14 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       }
     });
   }, [networkState, navigation]);
+  const hanldeViewBlockURL = React.useCallback((url: string) => {
+    navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url
+      }
+    });
+  }, [networkState, navigation]);
   const handleSend = React.useCallback(() => {
     navigation.navigate('Common', {
       screen: 'Transfer',
@@ -149,6 +157,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
         account={account}
         visible={isReceiveModal}
         onTriggered={() => setIsReceiveModal(false)}
+        onViewblock={hanldeViewBlockURL}
       />
       <SimpleConfirm
         title={i18n.t('remove_acc_title', {

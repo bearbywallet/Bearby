@@ -19,34 +19,34 @@ import { useTheme } from '@react-navigation/native';
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';
 import { Button } from 'app/components/button';
+import { SSnList } from 'app/components/ssn-list';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-// import { SSN_ADDRESS } from 'app/config';
+import { ZILLIQA_KEYS } from 'app/config';
+import { SSN } from 'types';
 
+const [mainnet, testnet, custom] = ZILLIQA_KEYS;
 const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
   const { colors } = useTheme();
   const networkState = keystore.network.store.useValue();
+  const ssnState = keystore.ssn.store.useValue();
 
   const handleReset = React.useCallback(async() => {
     await keystore.network.reset();
     await keystore.transaction.sync();
     await keystore.account.balanceUpdate();
+    await keystore.ssn.reset();
   }, []);
   const handleNetwrokChange = React.useCallback(async(net) => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
+    await keystore.ssn.sync();
   }, []);
-
-  // React.useEffect(() => {
-  //   const field = 'ssnlist';
-
-  //   keystore.zilliqa.getSmartContractSubState(
-  //     SSN_ADDRESS,
-  //     field
-  //   );
-  // }, []);
+  const hanldeChangeSSN = React.useCallback(async(ssn: SSN) => {
+    await keystore.ssn.changeSSn(ssn.name);
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -72,11 +72,23 @@ export const NetworkPage = () => {
           selected={networkState.selected}
           onSelect={handleNetwrokChange}
         />
-        <NetwrokConfig
-          config={networkState.config}
-          selected={networkState.selected}
-          onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
-        />
+        {networkState.selected === custom ? (
+          <NetwrokConfig
+            config={networkState.config}
+            selected={networkState.selected}
+            onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
+          />
+        ) : (
+          <SSnList
+            style={{
+              marginTop: 15
+            }}
+            ssnList={ssnState.list}
+            selected={ssnState.selected}
+            onSelect={hanldeChangeSSN}
+            onUpdate={() => null}
+          />
+        )}
       </ScrollView>
     </SafeAreaView>
   );

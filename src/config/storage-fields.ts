@@ -26,5 +26,6 @@ export const STORAGE_FIELDS = {
   ADDRESS_FORMAT: `${prefix}address_format`,
 
   ACCESS_CONTROL: `${prefix}access_control`,
-  SEARCH_ENGINE: `${prefix}search_engine`
+  SEARCH_ENGINE: `${prefix}search_engine`,
+  SSN_LIST: `${prefix}ssn_list`
 };

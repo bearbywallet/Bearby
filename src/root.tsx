@@ -18,32 +18,20 @@ import { dark, light } from './styles';
 import { keystore } from 'app/keystore';
 
 const theme = {
-  dark,
-  light
+  Dark: dark,
+  Light: light
 };
 
 export default function Root() {
   const selected = keystore.theme.store.useValue();
-  const iosScheme = useColorScheme();
-
-  const scheme = React.useMemo(() => {
-    if (!iosScheme) {
-      return selected;
-    } else if (!selected) {
-      return 'dark';
-    }
-
-    return iosScheme;
-  }, [iosScheme, selected]);
-
 
   return (
     <AppearanceProvider>
-      <NavigationContainer theme={theme.dark}>
+      <NavigationContainer theme={theme[selected]}>
         <SafeAreaProvider>
           <Navigator />
         </SafeAreaProvider>
-        <StatusBar barStyle={theme.dark.dark ? 'light-content' : 'dark-content'}/>
+        <StatusBar barStyle={theme[selected].dark ? 'light-content' : 'dark-content'}/>
       </NavigationContainer>
     </AppearanceProvider>
   );

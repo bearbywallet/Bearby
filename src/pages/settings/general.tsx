@@ -25,6 +25,7 @@ import { keystore } from 'app/keystore';
 export const GeneralPage = () => {
   const { colors } = useTheme();
   const currencyState = keystore.currency.store.useValue();
+  const themeState = keystore.theme.store.useValue();
 
   const hanldeReset = React.useCallback(() => {
     keystore.currency.reset();
@@ -54,6 +55,13 @@ export const GeneralPage = () => {
           selected={currencyState}
           title={i18n.t('currency')}
           onSelect={(item) => keystore.currency.set(item)}
+        />
+        <Selector
+          style={styles.selector}
+          items={keystore.theme.themes}
+          selected={themeState}
+          title={i18n.t('theme')}
+          onSelect={(item) => keystore.theme.set(item)}
         />
       </ScrollView>
     </SafeAreaView>

@@ -76,6 +76,8 @@ export default {
   share: 'Share',
   faucet: 'Test faucet',
   buy: 'Buy ZIL',
+  update: 'Update',
+  ssn: 'blockchain nodes',
   no_contacts: 'You have no contacts yet.',
   recipient_account: 'Recipient account',
   block_height: 'Block Height',

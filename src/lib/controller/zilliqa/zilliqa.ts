@@ -10,9 +10,15 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { tokensStore } from 'app/lib/controller/tokens/state';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-import { Token, TxParams } from 'types';
+import { Token, TxParams, SSN } from 'types';
 import { tohexString } from 'app/utils/address';
 import { Transaction } from '../transaction';
+import {
+  SSN_ADDRESS,
+  ZILLIQA,
+  ZILLIQA_KEYS,
+  DEFAULT_SSN
+} from 'app/config';
 
 type Params = TxParams[] | string[] | number[] | (string | string[] | number[])[];
 type Balance = {
@@ -161,6 +167,41 @@ export class ZilliqaControl {
     }
 
     throw new Error('Netwrok fail');
+  }
+
+  public async getSSnList(): Promise<SSN[]> {
+    const custom = ZILLIQA_KEYS[ZILLIQA_KEYS.length - 1];
+    if (this._network.selected === custom) {
+      throw new Error('SSn list allow on mainnet and testnet only');
+    }
+    const field = 'ssnlist';
+    const contract = tohexString(SSN_ADDRESS[this._network.selected]);
+    const http = ZILLIQA[this._network.selected].PROVIDER;
+
+    const request = this._json(
+      Methods.GetSmartContractSubState,
+      [contract, field, []]
+    );
+    const responce = await fetch(http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    const ssnlist = data.result[field];
+    const list = Object.keys(ssnlist).map((addr) => ({
+      address: addr,
+      name: ssnlist[addr].arguments[3],
+      api: ssnlist[addr].arguments[5]
+    }));
+    const defaultSSn: SSN = {
+      address: '',
+      name: DEFAULT_SSN,
+      api: http
+    };
+
+    return [defaultSSn, ...list];
   }
 
   private _json(method: string, params: Params) {

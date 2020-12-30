@@ -87,7 +87,9 @@ export const NetwrokConfig: React.FC<Prop> = ({
         {i18n.t('netwrok_node')}
       </Text>
       <TextInput
-        style={styles.textInput}
+        style={[styles.textInput, {
+          color: colors.text
+        }]}
         autoCorrect={false}
         defaultValue={http}
         editable={disabled}

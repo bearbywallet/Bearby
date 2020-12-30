@@ -8,6 +8,7 @@
  */
 export * from './store';
 export * from './inpage';
+export * from './ssn';
 
 export interface ZilliqaNetwork {
   [key: string]: {

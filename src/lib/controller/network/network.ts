@@ -90,18 +90,13 @@ export class NetworkControll {
       throw new Error('missed properties');
     }
 
-    const newConfig = {
-      ...ZILLIQA,
-      [privateNet]: config[privateNet]
-    };
-
-    setConfigNetworkStore(newConfig);
+    setConfigNetworkStore(config);
 
     await this._storage.set(
-      buildObject(STORAGE_FIELDS.CONFIG, newConfig)
+      buildObject(STORAGE_FIELDS.CONFIG, config)
     );
 
-    return newConfig;
+    return config;
   }
 
   public async sync() {

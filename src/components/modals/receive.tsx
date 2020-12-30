@@ -11,7 +11,6 @@ import {
   View,
   Text,
   StyleSheet,
-  Linking,
   Dimensions,
   ViewStyle
 } from 'react-native';
@@ -43,6 +42,7 @@ type Prop = {
   visible: boolean;
   account: Account;
   onTriggered: () => void;
+  onViewblock: (url: string) => void;
 };
 
 const { width } = Dimensions.get('window');
@@ -50,7 +50,8 @@ export const ReceiveModal: React.FC<Prop> = ({
   style,
   visible,
   account,
-  onTriggered
+  onTriggered,
+  onViewblock
 }) => {
   const { colors, dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
@@ -77,7 +78,7 @@ export const ReceiveModal: React.FC<Prop> = ({
   const hanldeViewAddress = React.useCallback(() => {
     const url = viewAddress(account.bech32, networkState.selected);
 
-    Linking.openURL(url);
+    onViewblock(url);
   }, [account, networkState]);
   /**
    * Open share qrcode image.
@@ -102,12 +103,12 @@ export const ReceiveModal: React.FC<Prop> = ({
     const [mainnet] = Object.keys(networkState.config);
 
     if (networkState.selected === mainnet) {
-      Linking.openURL(ORDERS.TRANSAK_URL);
+      onViewblock(ORDERS.TRANSAK_URL);
 
       return null;
     }
 
-    Linking.openURL(ORDERS.FAUCET);
+    onViewblock(ORDERS.FAUCET);
   }, [networkState]);
 
   return (

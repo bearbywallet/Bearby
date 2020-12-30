@@ -24,6 +24,7 @@ import { SearchController } from 'app/lib/controller/search-engine';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { InjectScript } from 'app/lib/controller';
 import { ConnectController } from 'app/lib/controller/connect';
+import { SSnController } from 'app/lib/controller/ssn';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -43,6 +44,7 @@ export class WalletControler extends Mnemonic {
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly searchEngine = new SearchController(_storage, this.ud);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
+  public readonly ssn = new SSnController(_storage, this.zilliqa, this.network);
   public readonly account = new AccountControler(
     _storage,
     this.token,
@@ -124,5 +126,6 @@ export class WalletControler extends Mnemonic {
     await this.searchEngine.sync();
     await this.connect.sync();
     await this.inpage.sync();
+    await this.ssn.sync();
   }
 }

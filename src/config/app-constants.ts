@@ -41,6 +41,7 @@ export const ZILLIQA: ZilliqaNetwork = {
 };
 export const ZILLIQA_KEYS = Object.keys(ZILLIQA);
 const [mainnet, testnet] = ZILLIQA_KEYS;
+export const DEFAULT_SSN = 'Main';
 export const SSN_ADDRESS = {
   [mainnet]: '0xB780e8095b8BA85A7145965ed632b3B774ac51cE',
   [testnet]: '0x05c2ddec2e4449160436130cb4f9b84de9f7ee5b'
