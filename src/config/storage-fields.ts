@@ -20,12 +20,11 @@ export const STORAGE_FIELDS = {
   ACCOUNTS: `${prefix}accounts`,
   TRANSACTIONS: `${prefix}transactions`,
   CURRENCY: `${prefix}currency`,
-  RATE: `${prefix}rate`,
   CONNECTIONS: `${prefix}/connections`,
   GAS: `${prefix}gas_config`,
-  ADDRESS_FORMAT: `${prefix}address_format`,
 
   ACCESS_CONTROL: `${prefix}access_control`,
   SEARCH_ENGINE: `${prefix}search_engine`,
-  SSN_LIST: `${prefix}ssn_list`
+  SSN_LIST: `${prefix}ssn_list`,
+  SETTINGS: `${prefix}settings`
 };

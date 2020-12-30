@@ -9,7 +9,6 @@
 import React from 'react';
 import {
   View,
-  Text,
   StyleSheet,
   ScrollView,
   ViewStyle
@@ -54,22 +53,14 @@ export const TransactionModal: React.FC<Prop> = ({
     return null;
   }
 
-  const { colors, dark } = useTheme();
+  const { dark } = useTheme();
 
   const tokenState = keystore.token.store.useValue();
-  const settingsState = keystore.settings.store.useValue();
-  const currencyState = keystore.currency.store.useValue();
 
   const zilliqaToken = React.useMemo(
     () => tokenState[0],
     [tokenState]
   );
-  const conversion = React.useMemo(() => {
-    const amount = transaction.value;
-    const rate = settingsState.rate[currencyState];
-
-    return toConversion(amount, rate, zilliqaToken.decimals);
-  }, [zilliqaToken, transaction, settingsState, currencyState]);
   const data = React.useMemo(() => {
     if (!transaction.data) {
       return null;

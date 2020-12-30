@@ -37,7 +37,6 @@ export class WalletControler extends Mnemonic {
   public readonly network = new NetworkControll(_storage);
   public readonly currency = new CurrencyControler(_storage);
   public readonly theme = new ThemeControler(_storage);
-  public readonly settings = new SettingsControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
   public readonly gas = new GasControler(_storage);
   public readonly viewblock = new ViewBlockControler(this.network);
@@ -45,6 +44,12 @@ export class WalletControler extends Mnemonic {
   public readonly searchEngine = new SearchController(_storage, this.ud);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
   public readonly ssn = new SSnController(_storage, this.zilliqa, this.network);
+  public readonly settings = new SettingsControler(
+    _storage,
+    this.zilliqa,
+    this.token,
+    this.network
+  );
   public readonly account = new AccountControler(
     _storage,
     this.token,

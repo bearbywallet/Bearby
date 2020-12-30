@@ -13,7 +13,7 @@ Big.PE = 99;
 
 const si = [
   { value: Big(1), symbol: '' },
-  { value: Big(1E3), symbol: 'k' },
+  { value: Big(1E3), symbol: '' },
   { value: Big(1E6), symbol: 'M' },
   { value: Big(1E9), symbol: 'G' },
   { value: Big(1E12), symbol: 'T' },

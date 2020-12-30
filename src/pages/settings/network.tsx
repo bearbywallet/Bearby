@@ -83,8 +83,7 @@ export const NetworkPage = () => {
             style={{
               marginTop: 15
             }}
-            ssnList={ssnState.list}
-            selected={ssnState.selected}
+            ssnState={ssnState}
             onSelect={hanldeChangeSSN}
             onUpdate={() => null}
           />

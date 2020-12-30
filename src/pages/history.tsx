@@ -237,7 +237,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
                 transaction={item.tx}
                 netwrok={networkState.selected}
                 currency={currencyState}
-                rate={settingsState.rate[currencyState]}
+                settings={settingsState}
                 tokens={tokensState}
                 status={TxStatsues.success}
                 onSelect={() => showTxDetails(item.tx)}

@@ -17,7 +17,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 
 import { TX_DIRECTION } from 'app/config';
-import { Token, TransactionType } from 'types';
+import { Token, TransactionType, Settings } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
 import { fromBech32Address } from 'app/utils';
 
@@ -25,7 +25,7 @@ type Prop = {
   style?: ViewStyle;
   status: number;
   tokens: Token[];
-  rate: number;
+  settings: Settings;
   netwrok: string;
   currency: string;
   transaction: TransactionType;
@@ -35,7 +35,7 @@ type Prop = {
 export const TransactionItem: React.FC<Prop> = ({
   transaction,
   tokens,
-  rate,
+  settings,
   currency,
   netwrok,
   style,
@@ -101,6 +101,7 @@ export const TransactionItem: React.FC<Prop> = ({
       };
     }
     const value = fromZil(transaction.value, zilliqa.decimals);
+    const rate = token ? settings.rate[token.symbol] : 0;
     const converted = toConversion(transaction.value, rate, zilliqa.decimals);
 
     return {
@@ -108,7 +109,7 @@ export const TransactionItem: React.FC<Prop> = ({
       value: toLocaleString(value),
       symbol: zilliqa.symbol
     };
-  }, [transaction, tokens, rate, token]);
+  }, [transaction, tokens, settings, token]);
   const vname = React.useMemo(() => {
     if (transaction.data && typeof transaction.data === 'string') {
       try {

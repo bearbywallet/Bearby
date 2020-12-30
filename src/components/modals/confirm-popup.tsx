@@ -50,7 +50,7 @@ type Prop = {
   onTriggered: () => void;
   onConfirm: (transaction: Transaction, cb: () => void, password?: string) => void;
 };
-
+// TODO
 export const ConfirmPopup: React.FC<Prop> = ({
   title,
   style,

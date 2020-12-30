@@ -104,16 +104,6 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     keystore.account.balanceUpdate();
   }, []);
 
-  React.useEffect(() => {
-    const [mainnet] = ZILLIQA_KEYS;
-
-    if (networkState.selected === mainnet) {
-      keystore.settings.rateUpdate();
-    } else {
-      keystore.settings.reset();
-    }
-  }, []);
-
   return (
     <React.Fragment>
       <View>
@@ -130,7 +120,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
             <View>
               <HomeAccount
                 token={tokensState[0]}
-                rate={settingsState.rate[currencyState]}
+                rate={settingsState.rate[tokensState[0].symbol]}
                 currency={currencyState}
                 netwrok={networkState.selected}
                 account={account}

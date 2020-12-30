@@ -6,16 +6,16 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { ADDRESS_FORMATS, DEFAULT_CURRENCIES } from 'app/config';
+import { ADDRESS_FORMATS } from 'app/config';
 import { newRidgeState } from 'react-ridge-state';
 import { Settings } from 'types';
+import { tokensStore } from 'app/lib/controller/tokens/state';
 
+const [zil] = tokensStore.get();
 const initalState: Settings = {
   addressFormat: ADDRESS_FORMATS[0],
   rate: {
-    [DEFAULT_CURRENCIES[0].toLowerCase()]: 0,
-    [DEFAULT_CURRENCIES[1].toLowerCase()]: 0,
-    [DEFAULT_CURRENCIES[2].toLowerCase()]: 0,
+    [zil.symbol]: 0
   }
 };
 export const settingsStore = newRidgeState<Settings>(initalState);
@@ -27,12 +27,6 @@ export function settingsStoreSetAddressFormat(addressFormat: string) {
   settingsStore.set((prevState) => ({
     ...prevState,
     addressFormat
-  }));
-}
-export function settingsStoreSetRate(rate: { [key: string]: number; }) {
-  settingsStore.set((prevState) => ({
-    ...prevState,
-    rate
   }));
 }
 export function settingsStoreReset() {

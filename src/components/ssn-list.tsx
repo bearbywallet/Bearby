@@ -18,40 +18,38 @@ import {
 import { Button } from 'app/components/button';
 import { Selector } from 'app/components/selector';
 
-import { SSN } from 'types';
+import { SSN, SSNState } from 'types';
 import i18n from 'app/lib/i18n';
 
 type Prop = {
   style?: ViewStyle;
-  ssnList: SSN[];
-  selected: string;
+  ssnState: SSNState;
   onUpdate: () => void;
   onSelect: (ssn: SSN) => void;
 };
 
 export const SSnList: React.FC<Prop> = ({
   style,
-  ssnList,
-  selected,
+  ssnState,
   onSelect,
   onUpdate
 }) => {
   const { colors } = useTheme();
 
   const items = React.useMemo(
-    () => ssnList.map((ssn) => ssn.name),
-    []
+    () => ssnState.list.map((ssn) => ssn.name),
+    [ssnState]
   );
 
   const hanldeSelect = React.useCallback((name) => {
-    const found = ssnList.find((ssn) => ssn.name === name);
+    const found = ssnState.list.find((ssn) => ssn.name === name);
 
     if (!found) {
       return null;
     }
 
     onSelect(found);
-  }, [ssnList]);
+  }, [ssnState]);
 
   return (
     <View style={[styles.container, style]}>
@@ -69,7 +67,7 @@ export const SSnList: React.FC<Prop> = ({
       </View>
       <Selector
         items={items}
-        selected={selected}
+        selected={ssnState.selected}
         onSelect={hanldeSelect}
       />
     </View>

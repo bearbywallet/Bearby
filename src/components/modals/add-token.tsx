@@ -46,7 +46,7 @@ export const AddTokenModal: React.FC<Prop> = ({
   onTriggered,
   onAddToken
 }) => {
-  const { colors, dark } = useTheme();
+  const { dark } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -127,7 +127,7 @@ export const AddTokenModal: React.FC<Prop> = ({
                 symbol={token.symbol}
                 balance={token.balance}
                 totalSupply={token.totalSupply}
-                rate={settingsState.rate[currencyState]}
+                rate={settingsState.rate[token.symbol]}
                 currency={currencyState}
               />
               <CustomButton
