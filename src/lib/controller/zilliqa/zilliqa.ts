@@ -169,6 +169,20 @@ export class ZilliqaControl {
     throw new Error('Netwrok fail');
   }
 
+  public async getPendingTxn(hash: string) {
+    hash = tohexString(hash);
+
+    const request = this._json(Methods.GetPendingTxn, [hash]);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+    
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
   public async getSSnList(): Promise<SSN[]> {
     const custom = ZILLIQA_KEYS[ZILLIQA_KEYS.length - 1];
     if (this._network.selected === custom) {

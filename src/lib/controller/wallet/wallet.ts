@@ -25,6 +25,7 @@ import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { InjectScript } from 'app/lib/controller';
 import { ConnectController } from 'app/lib/controller/connect';
 import { SSnController } from 'app/lib/controller/ssn';
+import { WorkerController } from 'app/lib/controller/worker';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -66,6 +67,7 @@ export class WalletControler extends Mnemonic {
   );
   public readonly inpage = new InjectScript(this.account, this.network);
   public readonly connect = new ConnectController(_storage);
+  public readonly worker = new WorkerController(this.transaction, this.zilliqa);
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();
@@ -132,5 +134,6 @@ export class WalletControler extends Mnemonic {
     await this.connect.sync();
     await this.inpage.sync();
     await this.ssn.sync();
+    this.worker.step();
   }
 }

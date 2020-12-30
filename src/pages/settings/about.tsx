@@ -11,23 +11,37 @@ import {
   View,
   StyleSheet,
   Text,
-  Linking,
   Dimensions
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
+import { StackNavigationProp } from '@react-navigation/stack';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
 import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
+import { RootParamList } from 'app/navigator';
+
+type Prop = {
+  navigation: StackNavigationProp<RootParamList>;
+};
 
 const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
 const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
 const TERMS_URL = 'https://zilpay.xyz/Terms/';
 const { width } = Dimensions.get('window');
-export const AboutPage = () => {
+export const AboutPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
+
+  const handleOpen = React.useCallback((url) => {
+    navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url
+      }
+    })
+  }, [navigation]);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -46,17 +60,17 @@ export const AboutPage = () => {
         <Button
           title={i18n.t('about_link_0')}
           color={colors.primary}
-          onPress={() => Linking.openURL(GIHTUB_URL)}
+          onPress={() => handleOpen(GIHTUB_URL)}
         />
         <Button
           title={i18n.t('about_link_1')}
           color={colors.primary}
-          onPress={() => Linking.openURL(PRIVACY_URL)}
+          onPress={() => handleOpen(PRIVACY_URL)}
         />
         <Button
           title={i18n.t('about_link_2')}
           color={colors.primary}
-          onPress={() => Linking.openURL(TERMS_URL)}
+          onPress={() => handleOpen(TERMS_URL)}
         />
       </View>
     </ SafeAreaView>

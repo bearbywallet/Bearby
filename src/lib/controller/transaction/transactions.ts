@@ -95,6 +95,33 @@ export class TransactionsContoller {
     transactionStoreReset();
   }
 
+  public async checkProcessedTx() {
+    await this.sync();
+    const panding = this.store.get().filter(
+      (t) => Number(t.blockHeight) === 0
+    );
+    let state = this.store.get();
+    let needUpdate = false;
+
+    for (const iterator of panding) {
+      const data = await this._zilliqa.getPendingTxn(iterator.hash);
+
+      if (data.confirmed) {
+        state = state.map((t) => ({
+          ...t,
+          blockHeight: t.hash === iterator.hash ? 1 : t.blockHeight
+        }));
+        needUpdate = true;
+      }
+    }
+
+    if (needUpdate) {
+      transactionStoreUpdate(state);
+    }
+
+    await this._update();
+  }
+
   public async add(tx: Transaction) {
     if (!tx.hash) {
       throw new Error('incorect transaction hash.');
