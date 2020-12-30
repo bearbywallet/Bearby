@@ -218,7 +218,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
         <ConfirmPopup
           transaction={tx}
           error={confirmError}
-          decimals={token.decimals}
+          token={token}
           account={account}
           title={i18n.t('confirm')}
           visible={confirmModal}

@@ -31,7 +31,7 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import { Passwordinput } from 'app/components/password-input';
 import { ErrorMessage } from 'app/components/error-message';
 
-import { Account, GasState } from 'types';
+import { Account, GasState, Token } from 'types';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
@@ -42,7 +42,7 @@ type Prop = {
   style?: ViewStyle;
   account: Account;
   transaction: Transaction;
-  decimals: number;
+  token: Token;
   visible: boolean;
   title: string;
   error?: string;
@@ -50,13 +50,13 @@ type Prop = {
   onTriggered: () => void;
   onConfirm: (transaction: Transaction, cb: () => void, password?: string) => void;
 };
-// TODO
+
 export const ConfirmPopup: React.FC<Prop> = ({
   title,
   style,
   account,
   transaction,
-  decimals,
+  token,
   visible,
   children,
   needPassword,
@@ -78,11 +78,11 @@ export const ConfirmPopup: React.FC<Prop> = ({
   });
 
   const conversion = React.useMemo(() => {
-    const rate = settingsState.rate[currencyState];
-    const value = toConversion(transaction.amount, rate, decimals);
+    const rate = settingsState.rate[token.symbol];
+    const value = toConversion(transaction.amount, rate, token.decimals);
 
     return toLocaleString(value);
-  }, [transaction, settingsState, currencyState, decimals]);
+  }, [transaction, settingsState, token]);
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
@@ -160,7 +160,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 <Text style={[commonStyles.nameAmountText, {
                   color: colors.border
                 }]}>
-                  {toLocaleString(fromZil(transaction.amount, decimals))}
+                  {toLocaleString(fromZil(transaction.amount, token.decimals))}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}

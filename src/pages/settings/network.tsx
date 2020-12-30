@@ -38,11 +38,13 @@ export const NetworkPage = () => {
     await keystore.transaction.sync();
     await keystore.account.balanceUpdate();
     await keystore.ssn.reset();
+    await keystore.settings.sync();
   }, []);
   const handleNetwrokChange = React.useCallback(async(net) => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
     await keystore.ssn.sync();
+    await keystore.settings.sync();
   }, []);
   const hanldeChangeSSN = React.useCallback(async(ssn: SSN) => {
     await keystore.ssn.changeSSn(ssn.name);

@@ -365,7 +365,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       {transaction ? (
         <ConfirmPopup
           transaction={transaction.params}
-          decimals={tokenState[0].decimals}
+          token={tokenState[0]}
           account={account}
           error={confirmError}
           title={i18n.t('confirm')}
