@@ -8,6 +8,7 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.SecureRandom;
+import java.security.Security;
 import java.util.Arrays;
 import java.nio.charset.StandardCharsets;
 
@@ -134,8 +135,8 @@ public class KeyDerivation {
 				extended[pub.length + 3] = (byte) (index & 0xff);
 			}
 
-			Mac mac = Mac.getInstance ("HmacSHA512", "BC");
-			SecretKey key = new SecretKeySpec (this.chainCode, "HmacSHA512");
+			Mac mac = Mac.getInstance (HMAC_SHA512);
+			SecretKey key = new SecretKeySpec (this.chainCode, HMAC_SHA512);
 			mac.init (key);
 
 			byte[] lr = mac.doFinal (extended);
@@ -157,12 +158,7 @@ public class KeyDerivation {
 		catch ( NoSuchAlgorithmException e )
 		{
 			throw new RuntimeException (e);
-		}
-		catch ( NoSuchProviderException e )
-		{
-			throw new RuntimeException (e);
-		}
-		catch ( InvalidKeyException e )
+		} catch ( InvalidKeyException e )
 		{
 			throw new RuntimeException (e);
 		}

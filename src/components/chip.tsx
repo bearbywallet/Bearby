@@ -22,7 +22,7 @@ type Prop = {
   onPress?: () => void;
 };
 
-const { width } = Dimensions.get('window');
+const { height } = Dimensions.get('window');
 export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
   const { colors } = useTheme();
 
@@ -51,17 +51,17 @@ export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
 
 const styles = StyleSheet.create({
   container: {
-    padding: (width / 100) * 1,
+    padding: (height / 100) * 1,
     borderRadius: 10,
     flexDirection: 'row',
-    minWidth: (width / 100) * 17
+    minWidth: (height / 100) * 15
   },
   count: {
-    fontSize: (width / 100) * 4,
+    fontSize: (height / 100) * 2,
     lineHeight: 18
   },
   text: {
-    fontSize: (width / 100) * 3,
+    fontSize: (height / 100) * 2,
     lineHeight: 18,
     marginLeft: 4
   }

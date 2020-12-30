@@ -81,7 +81,7 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
                 <Text style={[styles.wordNumber, {
                   color: colors.border
                 }]}>
-                  {wordIndex + 1}
+                  {index * AMOUNT_OF_WORDS_IN_LINE + wordIndex + 1}
                 </Text>
                 <Text style={[styles.word, {
                   color: colors.text
@@ -147,11 +147,11 @@ const styles = StyleSheet.create({
   },
   wordNumber: {
     lineHeight: 21,
-    fontSize: 16
+    fontSize: (height / 100) * 3
   },
   word: {
     lineHeight: 21,
-    fontSize: 16,
+    fontSize: (height / 100) * 3,
     marginLeft: 4
   },
   btnsContainer: {

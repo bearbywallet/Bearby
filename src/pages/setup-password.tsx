@@ -14,6 +14,7 @@ import {
   TextInput,
   Keyboard,
   ScrollView,
+  Dimensions,
   ActivityIndicator,
   StyleSheet
 } from 'react-native';
@@ -35,6 +36,7 @@ type Prop = {
   route: RouteProp<UnauthorizedStackParamList, 'SetupPassword'>;
 };
 
+const { width } = Dimensions.get('window');
 export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
@@ -143,7 +145,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         ) : null}
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
-            <SvgXml xml={LockSVG} />
+            <SvgXml xml={LockSVG} width={30}/>
             <TextInput
               style={[styles.textInput, {
                 color: colors.text,
@@ -155,7 +157,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
               onChangeText={setPassword}
             />
           </View>
-          <View style={{ marginLeft: 39 }}>
+          <View style={{ marginLeft: 30 }}>
             <TextInput
               style={[styles.textInput, {
                 color: colors.text,
@@ -186,6 +188,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         />
       ) : (
         <Button
+          style={{
+            marginBottom: 30
+          }}
           title={i18n.t('pass_setup_btn')}
           color={colors.primary}
           disabled={disabledContinue}
@@ -205,7 +210,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     padding: 10,
     borderBottomWidth: 1,
-    width: '90%'
+    width
   },
   biometric: {
     flexDirection: 'row',

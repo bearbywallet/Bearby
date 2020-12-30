@@ -11,7 +11,9 @@ import {
   View,
   StyleSheet,
   Text,
-  Dimensions
+  Dimensions,
+  ScrollView,
+  SafeAreaView
 } from 'react-native';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -65,51 +67,53 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   }, [navigation, phrase]);
 
   return (
-    <View style={[styles.container, {
+    <SafeAreaView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
-      <Text style={[styles.title, {
-        color: colors.text
-      }]}>
-        {i18n.t('verify_title')}
-      </Text>
-      <View style={styles.verified}>
-        {Array.from(selectedWords).map((word, index) => (
-          <Chip
-            key={index}
-            style={styles.defaultChip}
-            count={index + 1}
-            onPress={() => handleRemove(word)}
-          >
-            {word}
-          </Chip>
-        ))}
-      </View>
-      <View style={styles.randoms}>
-        {Array.from(shuffledWords).map((word, index) => (
-          <Chip
-            key={index}
-            style={styles.defaultChip}
-            onPress={() => handleSelect(word)}
-          >
-            {word}
-          </Chip>
-        ))}
-      </View>
-      <View>
-        <Text style={[styles.subTitle, {
-          color: colors.border
+      <ScrollView>
+        <Text style={[styles.title, {
+          color: colors.text
         }]}>
-          {i18n.t('verify_sub_title')}
+          {i18n.t('verify_title')}
         </Text>
-        <Button
-          title={i18n.t('verify_btn')}
-          color={colors.primary}
-          disabled={!buttonDisabled}
-          onPress={hanldeContinue}
-        />
-      </View>
-    </View>
+        <View style={styles.verified}>
+          {Array.from(selectedWords).map((word, index) => (
+            <Chip
+              key={index}
+              style={styles.defaultChip}
+              count={index + 1}
+              onPress={() => handleRemove(word)}
+            >
+              {word}
+            </Chip>
+          ))}
+        </View>
+        <View style={styles.randoms}>
+          {Array.from(shuffledWords).map((word, index) => (
+            <Chip
+              key={index}
+              style={styles.defaultChip}
+              onPress={() => handleSelect(word)}
+            >
+              {word}
+            </Chip>
+          ))}
+        </View>
+        <View>
+          <Text style={[styles.subTitle, {
+            color: colors.border
+          }]}>
+            {i18n.t('verify_sub_title')}
+          </Text>
+          <Button
+            title={i18n.t('verify_btn')}
+            color={colors.primary}
+            disabled={!buttonDisabled}
+            onPress={hanldeContinue}
+          />
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
