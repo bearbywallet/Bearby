@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  TouchableOpacity,
   Text,
   TextInput,
   Dimensions
@@ -49,23 +50,22 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
 
       navigation.navigate('App', { screen: 'Home' });
     } catch (err) {
-      // console.log(err);
       setPasswordError(i18n.t('lock_error'));
     }
-  }, [password, setPasswordError]);
+  }, [navigation, password]);
   const hanldeInputPassword = React.useCallback((value) => {
     setPassword(value);
     setPasswordError(' ');
   }, [setPassword]);
   const hanldeBiometricUnlock = React.useCallback(async() => {
     try {
-      await  keystore.guard.unlock();
+      await keystore.guard.unlock();
 
       return navigation.navigate('App', { screen: 'Home' });
     } catch (err) {
       setPasswordError(i18n.t('biometric_error'));
     }
-  }, []);
+  }, [navigation]);
 
   React.useEffect(() => {
     if (authState.biometricEnable) {
@@ -106,10 +106,9 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
               onSubmitEditing={hanldeUnlock}
             />
             {authState.biometricEnable ? (
-              <SvgXml
-                xml={FingerPrintIconSVG}
-                onTouchEnd={hanldeBiometricUnlock}
-              />
+              <TouchableOpacity onPress={hanldeBiometricUnlock}>
+                <SvgXml xml={FingerPrintIconSVG}/>
+              </TouchableOpacity>
             ) : null}
           </View>
           <Text style={[styles.errorMessage, {
