@@ -46,3 +46,4 @@ local.properties
 android/.project
 android/app/.project
 android/app/bin/
+*.keystore
