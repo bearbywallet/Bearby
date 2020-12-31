@@ -14,6 +14,7 @@ import {
   FlatList,
   Dimensions,
   RefreshControl,
+  Alert,
   StyleSheet
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
@@ -160,8 +161,19 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
 
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
-    await keystore.transaction.forceUpdate();
-    setRefreshing(false);
+    try {
+      await keystore.transaction.forceUpdate();
+      setRefreshing(false);
+    } catch (err) {
+      setRefreshing(false);
+      Alert.alert(
+        i18n.t('update'),
+        err.message,
+        [
+          { text: "OK" }
+        ]
+      );
+    }
   }, [setRefreshing]);
   const hanldeViewBlock = React.useCallback((url: string) => {
     navigation.navigate('Browser', {

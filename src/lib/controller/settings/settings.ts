@@ -157,7 +157,11 @@ export class SettingsControler {
       await this.reset();
     }
 
-    await this.rateUpdate();
-    await this.getDexRate();
+    try {
+      await this.rateUpdate();
+      await this.getDexRate();
+    } catch {
+      //
+    }
   }
 }

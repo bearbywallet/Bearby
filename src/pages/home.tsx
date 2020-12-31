@@ -12,6 +12,7 @@ import {
   View,
   StyleSheet,
   FlatList,
+  Alert,
   RefreshControl,
   LayoutAnimation
 } from 'react-native';
@@ -83,8 +84,19 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, []);
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
-    await keystore.account.balanceUpdate();
-    setRefreshing(false);
+    try {
+      await keystore.account.balanceUpdate();
+      setRefreshing(false);
+    } catch (err) {
+      setRefreshing(false);
+      Alert.alert(
+        i18n.t('update'),
+        err.message,
+        [
+          { text: "OK" }
+        ]
+      );
+    }
   }, [setRefreshing]);
   const handleRemoveAccount = React.useCallback(async() => {
     await keystore.account.removeAccount(account);
