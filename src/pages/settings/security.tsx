@@ -171,27 +171,29 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
           selected={times[hour].name}
           onSelect={(_, index) => sethour(index)}
         />
-        <Switcher
-          style={{
-            ...styles.biometric,
-            backgroundColor: colors.card
-          }}
-          enabled={authState.biometricEnable}
-          onChange={hanldeChangeBiometric}
-        >
-          <View style={styles.switcherWrapper}>
-            <Text style={[styles.biometricText, {
-              color: colors.text
-            }]}>
-              {i18n.t('use')} {authState.supportedBiometryType}
-            </Text>
-            <Text style={[styles.biometricLabel, {
-              color: colors.border
-            }]}>
-              {i18n.t('biometric_description')}
-            </Text>
-          </View>
-        </Switcher>
+        {authState.supportedBiometryType ? (
+          <Switcher
+            style={{
+              ...styles.biometric,
+              backgroundColor: colors.card
+            }}
+            enabled={authState.biometricEnable}
+            onChange={hanldeChangeBiometric}
+          >
+            <View style={styles.switcherWrapper}>
+              <Text style={[styles.biometricText, {
+                color: colors.text
+              }]}>
+                {i18n.t('use')} {authState.supportedBiometryType}
+              </Text>
+              <Text style={[styles.biometricLabel, {
+                color: colors.border
+              }]}>
+                {i18n.t('biometric_description')}
+              </Text>
+            </View>
+          </Switcher>
+        ) : null}
         <View style={[styles.btnWrapper, {
           backgroundColor: colors.card
         }]}>
