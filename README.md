@@ -1,6 +1,28 @@
 # ZilPay mobile wallet.
 
-### run:
+ZilPay wallet the decentralized browser and wallet in one. Via ZilPay you any developers can create decentralized applications on ZIlliqa blockchain.
+
+<p align="center">
+  <a href="https://zilpay.xyz"><img src="https://github.com/zilpay/zilpay-mobile/blob/master/imgs/preview.png"></a>
+</p>
+
+For developers:
++ [ZilPay full documentation](https://zilpay.xyz/Documentation/)
++ [ZilPay try build your dApp](https://medium.com/coinmonks/test-and-develop-dapps-on-zilliqa-with-zilpay-52b165f118bf?source=friends_link&sk=2a60070ddac60677ec36b1234c60222a)
++ [Zilliqa dApps example](https://github.com/lich666dead/zilliqa-dApps)
+
+## Authors
+
+* **Rinat Khasanshin** - *Initial work* - [hicaru](https://github.com/hicaru)
+
+## Built With
+
+* [react-native](https://reactnative.dev/)
+* [babel](https://github.com/babel/babel)
+* [TypeScript](https://www.typescriptlang.org/)
+
+## Getting Started
+Build deploy the local version, from source code.
 
 Clone:
 ```bash
@@ -24,94 +46,18 @@ $ yarn ios --device
 $ yarn android --device
 ```
 
-## Roadmap check list:
+building release.
+```bash
+$ yarn ios --variant=release
+$ yarn android --variant=release
+```
 
-### Cross platforms:
-- [x] IOS.
-- [x] android.
+Thanks for yours donate.
+------
 
-### Authentication:
-- [x] Password authentication.
-- [x] Biometric authentication.
-- [x] Encryptor session.
-
-### Web3
-- [x] WebView.
-- [x] Create JS injector.
-- [x] meesage beetween app and inject script.
-
-### Netwrok
-- [x] ssnList node APIs.
-- [x] components for node list.
-- [x] selector node list.
-- [x] using node list.
-
-### DWeb
-- [x] unstoppabledomains controller.
-	- [x] Contract parser.
-	- [x] get Contract State.
-- [x] patterns nad parsing URL.
-
-### Tokens
-- [x] Send tokens.
-- [x] Image token parser.
-- [x] Add token card.
-- [x] add token form.
-- [x] add token modal.
-- [x] Token ZRC parser.
-	- [ ] parser ZRC-1.
-	- [x] parser ZRC-2.
-	- [ ] parser ZRC-3.
-
-### Controller Core librarys:
-- [x] i18n.
-- [x] storage.
-- [x] crypto.
-- [x] account.
-- [x] auth.
-- [x] contacts.
-- [x] currency.
-- [x] gas.
-- [x] guard.
-- [x] mnemonic.
-- [x] network.
-- [x] settings.
-- [x] theme.
-- [x] tokens.
-- [x] wallet.
-- [x] zilliqa.
-- [x] nonce counter.
-
-### Pages:
-- [x] Settings.
-	- [x] about.
-	- [x] advanced.
-	- [x] connections.
-	- [x] contacts.
-	- [x] export.
-	- [x] general.
-	- [x] security.
-	- [x] network.
-- [x] unauthorized
-	- [x] LetStartPage.
-	- [x] GetStartedPage.
-	- [x] LockPage.
-	- [x] RestorePage.
-	- [x] PrivacyPage.
-	- [x] MnemonicGenPage.
-	- [x] MnemonicVerifyPage.
-	- [x] SetupPasswordPage.
-	- [x] InitSuccessfullyPage.
-- [x] Tabs.
-	- [x] HomePage.
-	- [x] BrowserPage.
-	- [x] SettingsPage.
-	- [x] HistoryPage.
-- [x] Common.
-	- [x] CreateAccountPage.
-	- [x] TransferPage.
-	- [x] ConnectDApp.
-	- [x] SignMessage.
-	- [x] confirmTransaction.
-	- [x] AuthLoading.
-
+- ZIL: zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace
+- ETH: 0x246C5881E3F109B2aF170F5C773EF969d3da581B
+- BTC: 12MRR8LyLVLHVqXcjz46c9o3KBS76fAY9r
+- ZEC: t1dZMw8FVWnGKC9cyXKaiKWmmAFmQoeNc5Y
+- LTC: LM3JwjTbboMkHdFEYnn4ycJB61r3fqvXPr
+- DASH: Xv2tpCMHPAztd4B5UMnaqwkqnSfiUs1P8B
