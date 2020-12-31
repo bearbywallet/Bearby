@@ -22,6 +22,7 @@ import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -83,9 +84,8 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: fonts.Bold,
     marginTop: '5%'
   }
 });

@@ -23,6 +23,7 @@ import { Button } from 'app/components/button';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { Connect } from 'types';
+import { fonts } from 'app/styles';
 
 export const ConnectionsPage = () => {
   const { colors } = useTheme();
@@ -104,16 +105,15 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   },
   list: {
     marginTop: 16
   },
   noConnect: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Regular,
     paddingLeft: 15
   }
 });

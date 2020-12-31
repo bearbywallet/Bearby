@@ -157,10 +157,6 @@ export const TransactionModal: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
-  txValeuLabel: {
-    fontSize: 13,
-    lineHeight: 17
-  },
   linkWrapper: {
     paddingVertical: 20,
     flexDirection: 'row',

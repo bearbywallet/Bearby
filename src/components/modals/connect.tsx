@@ -25,6 +25,7 @@ import { CustomButton } from 'app/components/custom-button';
 
 import i18n from 'app/lib/i18n';
 import { MessagePayload } from 'types';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -109,19 +110,19 @@ const styles = StyleSheet.create({
   },
   appTitle: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     marginBottom: 10
   },
   appDes: {
     textAlign: 'center',
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular,
   },
   textInfo: {
     textAlign: 'center',
     marginVertical: 15,
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular
   },
   icon: {
     width: 30,

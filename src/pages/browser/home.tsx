@@ -33,6 +33,7 @@ import {
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -162,9 +163,8 @@ const styles = StyleSheet.create({
     paddingBottom: 30
   },
   headerTitle: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: fonts.Bold,
     textAlign: 'left'
   },
   headerWraper: {
@@ -180,6 +180,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
+    fontFamily: fonts.Demi,
     borderBottomWidth: 1,
     width: width - 60
   },

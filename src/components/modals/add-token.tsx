@@ -146,8 +146,5 @@ export const AddTokenModal: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     paddingBottom: 30
-  },
-  inputLable: {
-    color: '#8A8A8F'
   }
 });

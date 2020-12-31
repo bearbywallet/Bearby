@@ -19,6 +19,7 @@ import { useTheme } from '@react-navigation/native';
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Button } from 'app/components/button';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -169,7 +170,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   sub: {
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     textAlign: 'center',
     fontSize: 16,
     paddingHorizontal: 30,
@@ -180,6 +181,7 @@ const styles = StyleSheet.create({
   },
   description: {
     textAlign: 'left',
+    fontFamily: fonts.Regular,
     marginVertical: 5
   },
   bottomView: {

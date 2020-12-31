@@ -15,6 +15,7 @@ import {
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -68,7 +69,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   text: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi,
+    fontSize: 17
   }
 });

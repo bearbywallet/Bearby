@@ -25,6 +25,7 @@ import { QrcodeIconSVG } from 'app/components/svg';
 
 import { keystore } from 'app/keystore';
 import { toBech32Address } from 'app/utils';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -132,11 +133,11 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     width: width - 100
   },
   error: {
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Demi
   }
 });

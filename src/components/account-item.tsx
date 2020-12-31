@@ -22,6 +22,7 @@ import { Unselected } from 'app/components/unselected';
 
 import { trim } from 'app/filters';
 import { Account } from 'types';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -74,11 +75,11 @@ export const AccountItem: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   accountName: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   },
   accountAddress: {
-    fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular,
+    fontSize: 13
   },
   accountItemWrapper: {
     flexDirection: 'row',

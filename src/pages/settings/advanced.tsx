@@ -23,6 +23,7 @@ import { Button } from 'app/components/button';
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { DEFAULT_GAS } from 'app/config';
+import { fonts } from 'app/styles';
 
 export const AdvancedPage: React.FC = () => {
   const { colors } = useTheme();
@@ -83,9 +84,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   }
 });
 

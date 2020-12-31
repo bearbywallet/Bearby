@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { fonts } from 'app/styles';
 import React from 'react';
 import {
   Text,
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
+    fontFamily: fonts.Demi,
     fontSize: 17,
     lineHeight: 22
   }

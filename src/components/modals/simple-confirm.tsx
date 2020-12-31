@@ -20,6 +20,7 @@ import { useTheme } from '@react-navigation/native';
 import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -60,7 +61,7 @@ export const SimpleConfirm: React.FC<Prop> = ({
         </ModalTitle>
         <View>
           <Text style={[styles.description, {
-            color: colors['warning'],
+            color: colors.text
           }]}>
             {description}
           </Text>
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
   description: {
     marginTop: 4,
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Regular,
     paddingVertical: 15,
     textAlign: 'center'
   },

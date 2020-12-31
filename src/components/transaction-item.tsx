@@ -20,6 +20,7 @@ import { TX_DIRECTION } from 'app/config';
 import { Token, TransactionType, Settings } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
 import { fromBech32Address } from 'app/utils';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -186,12 +187,12 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   first: {
-    fontSize: 17,
-    lineHeight: 22
+    fontSize: 14,
+    fontFamily: fonts.Demi
   },
   second: {
     fontSize: 13,
-    lineHeight: 17,
+    fontFamily: fonts.Regular,
     paddingTop: 3
   }
 });

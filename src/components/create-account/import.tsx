@@ -25,6 +25,7 @@ import { Passwordinput } from 'app/components/password-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
+import { fonts } from 'app/styles';
 
 type Prop = {
   biometricEnable: boolean;
@@ -187,7 +188,7 @@ const styles = StyleSheet.create({
   errorMessage: {
     fontSize: 13,
     marginLeft: 5,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   },
   text: {
     marginTop: 15,
@@ -195,6 +196,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderRadius: 8,
     padding: 20,
+    fontFamily: fonts.Regular,
     fontSize: 23
   }
 });

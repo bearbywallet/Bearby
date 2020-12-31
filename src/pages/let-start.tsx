@@ -22,6 +22,7 @@ import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Button } from 'app/components/button';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -85,12 +86,13 @@ const styles = StyleSheet.create({
     paddingBottom: 100
   },
   title: {
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     lineHeight: 41,
     fontSize: 34
   },
   subTitle: {
     lineHeight: 22,
+    fontFamily: fonts.Demi,
     fontSize: 17
   },
   buttons: {

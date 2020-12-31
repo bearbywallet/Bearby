@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 import React from 'react';
 import {
   Text,
@@ -34,7 +35,7 @@ export const ErrorMessage: React.FC<Prop> = ({ children, style }) => {
 const styles = StyleSheet.create({
   errorMessage: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     textAlign: 'center',
     textShadowOffset: {
       width: -1,

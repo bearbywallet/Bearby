@@ -18,6 +18,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 import { LockSVG } from 'app/components/svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -79,7 +80,8 @@ const styles = StyleSheet.create({
     width: width - 100
   },
   errorMessage: {
+    fontSize: 13,
     marginTop: 4,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   }
 });

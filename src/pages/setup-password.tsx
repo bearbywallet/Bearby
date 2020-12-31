@@ -30,6 +30,7 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { PASSWORD_DIFFICULTY, MAX_NAME_DIFFICULTY } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -112,7 +113,10 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       <View style={styles.wrapper}>
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
-            <SvgXml xml={ProfileSVG} />
+            <SvgXml
+              xml={ProfileSVG}
+              width={30}
+            />
             <TextInput
               style={[styles.textInput, {
                 color: colors.text,
@@ -145,7 +149,10 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         ) : null}
         <View style={styles.elementWrapper}>
           <View style={styles.inputWrapper}>
-            <SvgXml xml={LockSVG} width={30}/>
+            <SvgXml
+              xml={LockSVG}
+              width={30}
+            />
             <TextInput
               style={[styles.textInput, {
                 color: colors.text,
@@ -209,6 +216,7 @@ const styles = StyleSheet.create({
     fontSize: 17,
     lineHeight: 22,
     padding: 10,
+    fontFamily: fonts.Demi,
     borderBottomWidth: 1,
     width
   },
@@ -222,15 +230,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   elementWrapper: {
-    marginVertical: 35
+    width,
+    marginVertical: 15
   },
   label: {
     marginVertical: 5,
+    fontFamily: fonts.Regular,
     marginLeft: 38
   },
   title: {
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     fontSize: 34,
     lineHeight: 41,
     marginTop: 30

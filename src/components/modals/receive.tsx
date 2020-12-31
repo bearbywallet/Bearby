@@ -36,6 +36,7 @@ import { trim } from 'app/filters';
 import { viewAddress } from 'app/utils';
 import { QrcodeType, Account } from 'types';
 import { ORDERS } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -184,13 +185,13 @@ const styles = StyleSheet.create({
   accountName: {
     textAlign: 'center',
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     marginTop: 15
   },
   accountAddress: {
     textAlign: 'center',
     fontSize: 13,
-    lineHeight: 17,
+    fontFamily: fonts.Regular,
     marginBottom: 15
   },
   btnWrapper: {

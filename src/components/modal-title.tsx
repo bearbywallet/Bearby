@@ -19,6 +19,7 @@ import { useTheme } from '@react-navigation/native';
 import { DeleteIconSVG } from 'app/components/svg';
 
 import { SvgXml } from 'react-native-svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -50,6 +51,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   }
 });

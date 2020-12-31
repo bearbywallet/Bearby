@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { fonts } from 'app/styles';
 import React from 'react';
 import {
   TouchableOpacity,
@@ -52,7 +53,7 @@ const styles = StyleSheet.create({
     padding: 15
   },
   title: {
-    fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Demi,
+    fontSize: 13
   }
 });

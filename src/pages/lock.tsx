@@ -27,6 +27,7 @@ import { Button } from 'app/components/button';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -148,10 +149,12 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 17,
     lineHeight: 22,
+    fontFamily: fonts.Demi,
     padding: 10,
     width: '84%'
   },
   errorMessage: {
+    fontFamily: fonts.Demi,
     marginTop: 4,
     lineHeight: 22
   },
@@ -166,9 +169,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end'
   },
   title: {
-    fontWeight: 'bold',
-    lineHeight: 41,
-    fontSize: 34
+    fontFamily: fonts.Bold,
+    fontSize: 30
   },
   btnsWrapper: {
     flexDirection: 'row',

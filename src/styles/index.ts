@@ -12,6 +12,12 @@
  */
 import { DefaultTheme } from '@react-navigation/native';
 
+export enum fonts {
+  Regular = 'AvenirNextLTPro-Regular',
+  Demi = 'AvenirNextLTPro-Demi',
+  Bold = 'AvenirNextLTPro-Bold'
+}
+
 export const colors = {
   success: '#00D99A',
   danger: '#FF0058',

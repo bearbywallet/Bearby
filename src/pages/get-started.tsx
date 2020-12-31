@@ -26,6 +26,8 @@ import GetStartedFirst from 'app/assets/get_started_1.svg';
 import GetStartedSecond from 'app/assets/get_started_2.svg';
 import GetStartedThird from 'app/assets/get_started_3.svg';
 
+import { fonts } from 'app/styles';
+
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
@@ -147,14 +149,14 @@ const styles = StyleSheet.create({
   },
   header: {
     fontSize: 34,
-    lineHeight: 31,
-    fontWeight: 'bold',
     marginBottom: 20,
+    fontFamily: fonts.Bold,
     textAlign: 'center'
   },
   paragraph: {
     fontSize: 17,
     lineHeight: 22,
+    fontFamily: fonts.Regular,
     textAlign: 'center'
   },
   paginationWrapper: {

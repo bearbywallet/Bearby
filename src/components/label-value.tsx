@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 import React from 'react';
 import {
   View,
@@ -46,10 +47,10 @@ const styles = StyleSheet.create({
   },
   txLable: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Demi
   },
   txValue: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular,
+    fontSize: 17
   }
 });

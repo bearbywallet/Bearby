@@ -25,6 +25,7 @@ import { Unselected } from 'app/components/unselected';
 
 import i18n from 'app/lib/i18n';
 import { TxStatsues } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -112,6 +113,6 @@ const styles = StyleSheet.create({
   },
   textItem: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   }
 });

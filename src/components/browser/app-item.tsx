@@ -17,6 +17,7 @@ import {
   Dimensions,
   ViewStyle
 } from 'react-native';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -74,7 +75,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     textAlign: 'right'
   },
   icon: {
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
   },
   domain: {
     fontSize: 15,
-    lineHeight: 17,
+    fontFamily: fonts.Regular,
     textAlign: 'right'
   }
 });

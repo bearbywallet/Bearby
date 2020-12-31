@@ -36,6 +36,7 @@ import { toBech32Address } from 'app/utils';
 import { TransactionType } from 'types';
 
 import ZIlliqaLogo from 'app/assets/zilliqa.svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -284,13 +285,11 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    padding: 15,
-    paddingBottom: 30
+    padding: 15
   },
   headerTitle: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   },
   headerWraper: {
     flexDirection: 'row',
@@ -304,6 +303,7 @@ const styles = StyleSheet.create({
   },
   date: {
     fontSize: 16,
+    fontFamily: fonts.Regular,
     lineHeight: 21
   },
   list: {

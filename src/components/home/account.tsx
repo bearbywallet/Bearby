@@ -22,6 +22,7 @@ import { Button } from 'app/components/button';
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
 import { fromZil, toConversion, nFormatter } from 'app/filters';
+import { fonts } from 'app/styles';
 
 type Prop = {
   account: Account;
@@ -132,13 +133,12 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   amount: {
-    fontSize: 44,
-    fontFamily: 'Avenir',
-    fontWeight: 'bold'
+    fontSize: 40,
+    fontFamily: fonts.Bold
   },
   symbol: {
     fontSize: 17,
-    fontFamily: 'Avenir',
+    fontFamily: fonts.Demi,
     fontWeight: 'normal'
   },
   convertedAmount: {

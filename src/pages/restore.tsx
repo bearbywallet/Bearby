@@ -25,6 +25,7 @@ import { Button } from 'app/components/button';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -73,7 +74,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
               color: colors.text
             }]}
             placeholder={i18n.t('restore_placeholder')}
-            placeholderTextColor="#2B2E33"
+            placeholderTextColor={colors.border}
             onChangeText={hanldeChange}
           />
         </View>
@@ -100,13 +101,14 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     fontSize: 34,
     lineHeight: 41
   },
   text: {
     marginTop: 60,
     height: height / 5,
+    fontFamily: fonts.Regular,
     borderWidth: 1,
     borderRadius: 8,
     padding: 20,

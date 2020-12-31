@@ -26,6 +26,7 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
 import { SecureTypes } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -246,9 +247,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   },
   biometric: {
     paddingVertical: 15,
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
   },
   biometricText: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   },
   biometricLabel: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Regular
   },
   switcherWrapper: {
     maxWidth: '70%'
@@ -271,8 +271,8 @@ const styles = StyleSheet.create({
     padding: 15
   },
   btnDesText: {
-    fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Regular,
+    fontSize: 16
   }
 });
 

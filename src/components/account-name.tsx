@@ -21,6 +21,7 @@ import { SvgXml } from 'react-native-svg';
 import { ProfileSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -64,7 +65,7 @@ export const AccountName: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     padding: 10,
     marginLeft: 15,
     borderBottomWidth: 1,

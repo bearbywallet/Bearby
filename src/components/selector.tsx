@@ -19,6 +19,7 @@ import { SvgXml } from 'react-native-svg';
 
 import { OKIconSVG } from 'app/components/svg';
 import { Unselected } from 'app/components/unselected';
+import { fonts } from 'app/styles';
 
 type Prop = {
   items: string[];
@@ -91,7 +92,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Demi
   },
   item: {
     paddingVertical: 13,
@@ -100,7 +101,7 @@ const styles = StyleSheet.create({
   },
   itemText: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Regular,
     marginLeft: 16
   }
 });

@@ -22,6 +22,7 @@ import { Chip } from 'app/components/chip';
 import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -95,11 +96,12 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 41,
     fontSize: 31,
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     marginTop: 30
   },
   subTitle: {
     textAlign: 'center',
+    fontFamily: fonts.Regular,
     lineHeight: 21,
     fontSize: 16
   },

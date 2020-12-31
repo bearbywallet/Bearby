@@ -23,6 +23,7 @@ import { SimpleConfirm } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
 import { Token } from 'types';
+import { fonts } from 'app/styles';
 
 type Prop = {
   onSelectToken: (index: number) => void;
@@ -143,6 +144,7 @@ const styles = StyleSheet.create({
     marginTop: 16
   },
   title: {
-    fontSize: 20
+    fontFamily: fonts.Demi,
+    fontSize: 17
   }
 });

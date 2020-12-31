@@ -18,6 +18,7 @@ import { useTheme } from '@react-navigation/native';
 
 import i18n from 'app/lib/i18n';
 import { ZILLIQA } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -140,11 +141,11 @@ const styles = StyleSheet.create({
   },
   labelInput: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular
   },
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     paddingTop: 10,
     padding: 5,
     borderBottomWidth: 1

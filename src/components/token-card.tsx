@@ -27,6 +27,7 @@ import {
   nFormatter
 } from 'app/filters';
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 export type Prop = {
   token: Token;
@@ -170,14 +171,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   symbol: {
+    fontFamily: fonts.Demi,
     fontSize: 17
   },
   zilAmount: {
     fontSize: 17,
-    lineHeight: 22,
-    fontWeight: 'bold'
+    fontFamily: fonts.Bold
   },
   convertedAmount: {
+    fontFamily: fonts.Regular,
     fontSize: 13
   }
 });

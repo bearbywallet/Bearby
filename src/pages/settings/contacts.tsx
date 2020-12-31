@@ -27,7 +27,7 @@ import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { Contact } from 'types';
 import { keystore } from 'app/keystore';
-import { BrowserAppItem } from 'app/components/browser';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -143,14 +143,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   noContacts: {
+    fontFamily: fonts.Regular,
     fontSize: 17,
-    lineHeight: 22,
     paddingHorizontal: 15
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   }
 });
 

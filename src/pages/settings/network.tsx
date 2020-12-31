@@ -25,6 +25,7 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { ZILLIQA_KEYS } from 'app/config';
 import { SSN } from 'types';
+import { fonts } from 'app/styles';
 
 const [mainnet, testnet, custom] = ZILLIQA_KEYS;
 const netwroks = Object.keys(keystore.network.config);
@@ -43,8 +44,11 @@ export const NetworkPage = () => {
   const handleNetwrokChange = React.useCallback(async(net) => {
     await keystore.network.changeNetwork(net);
     await keystore.transaction.sync();
-    await keystore.ssn.sync();
-    await keystore.settings.sync();
+
+    if (net !== custom) {
+      await keystore.ssn.sync();
+      await keystore.settings.sync();
+    }
   }, []);
   const hanldeChangeSSN = React.useCallback(async(ssn: SSN) => {
     await keystore.ssn.changeSSn(ssn.name);
@@ -107,9 +111,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold'
+    fontSize: 30,
+    fontFamily: fonts.Bold
   },
 });
 

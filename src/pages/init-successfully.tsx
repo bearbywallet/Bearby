@@ -24,6 +24,7 @@ import { Button } from 'app/components/button';
 import CreateBackground from 'app/assets/get_started_1.svg';
 
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -77,7 +78,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end'
   },
   title: {
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     lineHeight: 41,
     fontSize: 34,
     textAlign: 'center',

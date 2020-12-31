@@ -30,6 +30,7 @@ import { GasState } from 'types';
 import { gasToFee, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { DEFAULT_GAS } from 'app/config';
+import { fonts } from 'app/styles';
 
 type Prop = {
   gasLimit: string;
@@ -214,7 +215,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Demi
   },
   wrapper: {
     borderWidth: 1,
@@ -237,6 +238,6 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular
   }
 });

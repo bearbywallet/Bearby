@@ -33,6 +33,7 @@ import {
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -220,9 +221,8 @@ const styles = StyleSheet.create({
     flexDirection: 'column'
   },
   title: {
-    fontSize: 34,
-    lineHeight: 41,
-    fontWeight: 'bold',
+    fontSize: 30,
+    fontFamily: fonts.Bold,
     padding: 15,
     marginTop: '10%'
   },
@@ -241,8 +241,8 @@ const styles = StyleSheet.create({
     paddingVertical: 15
   },
   listTextItem: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular,
+    fontSize: 17
   },
   arrow: {
     transform: [{ rotate: '-90deg'}],

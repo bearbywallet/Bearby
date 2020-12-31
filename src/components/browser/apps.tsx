@@ -19,6 +19,7 @@ import { useTheme } from '@react-navigation/native';
 import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   onSelect: (name: string) => void;
@@ -71,8 +72,7 @@ const styles = StyleSheet.create({
   },
   namePlace: {
     paddingTop: 15,
-    fontWeight: 'bold',
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular,
+    fontSize: 17
   }
 });

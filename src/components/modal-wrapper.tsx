@@ -39,6 +39,6 @@ const styles = StyleSheet.create({
     borderTopStartRadius: 16,
     justifyContent: 'space-between',
     paddingVertical: 15,
-    maxHeight: height - 20
+    maxHeight: height - 50
   }
 });

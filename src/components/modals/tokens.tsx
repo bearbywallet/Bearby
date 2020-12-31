@@ -29,6 +29,7 @@ import { LoadSVG } from 'app/components/load-svg';
 import { TOKEN_ICONS } from 'app/config';
 import { Token, Account } from 'types';
 import { fromZil, toLocaleString } from 'app/filters';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -127,7 +128,7 @@ export const TokensModal: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   symbol: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   },
   wrapper: {
     width: width - 100,
@@ -143,7 +144,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular
   },
   main: {
     marginTop: 15

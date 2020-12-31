@@ -24,13 +24,14 @@ import { Button } from 'app/components/button';
 import { shuffle } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
   route: RouteProp<UnauthorizedStackParamList, 'MnemonicVerif'>;
 };
 
-const { height } = Dimensions.get('window');
+const { height, width } = Dimensions.get('window');
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const [phrase] = React.useState(String(route.params.phrase));
@@ -129,18 +130,19 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 41,
     fontSize: 31,
-    fontWeight: 'bold',
+    fontFamily: fonts.Bold,
     marginTop: height / 30
   },
   subTitle: {
     textAlign: 'center',
     lineHeight: 21,
     fontSize: 16,
+    fontFamily: fonts.Regular,
     marginVertical: 50
   },
   verified: {
     flexDirection: 'row',
-    paddingHorizontal: '3%',
+    paddingHorizontal: width / 10,
     flexWrap: 'wrap',
     justifyContent: 'space-between'
   },

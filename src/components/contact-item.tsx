@@ -15,6 +15,7 @@ import {
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -82,15 +83,15 @@ const styles = StyleSheet.create({
     paddingLeft: 15
   },
   name: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi,
+    fontSize: 17
   },
   address: {
-    fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular,
+    fontSize: 13
   },
   char: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi,
+    fontSize: 17
   }
 });

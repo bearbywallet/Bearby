@@ -27,6 +27,7 @@ import {
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -104,9 +105,8 @@ const styles = StyleSheet.create({
   },
   title: {
     textAlign: 'center',
-    fontWeight: 'bold',
-    fontSize: 34,
-    lineHeight: 41,
+    fontFamily: fonts.Bold,
+    fontSize: 30,
     marginTop: 30
   }
 });

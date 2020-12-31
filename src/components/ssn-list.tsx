@@ -20,6 +20,7 @@ import { Selector } from 'app/components/selector';
 
 import { SSN, SSNState } from 'types';
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -84,13 +85,9 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    fontWeight: 'bold',
-    lineHeight: 22
+    fontFamily: fonts.Bold
   },
   item: {
     flexDirection: 'row'
-  },
-  itemName: {
-
   }
 });

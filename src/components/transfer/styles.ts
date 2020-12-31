@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { fonts } from 'app/styles';
 import { StyleSheet, Dimensions } from 'react-native';
 
 const { width } = Dimensions.get('window');
@@ -34,7 +35,7 @@ export default StyleSheet.create({
   },
   percent: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Demi
   },
   itemInfo: {
     alignItems: 'flex-start',
@@ -42,9 +43,8 @@ export default StyleSheet.create({
   },
   receivinglabel: {
     fontSize: 16,
-    lineHeight: 21,
-    width: width - 100,
-    color: '#8A8A8F'
+    fontFamily: fonts.Regular,
+    width: width - 100
   },
   receiving: {
     padding: 15,
@@ -54,12 +54,11 @@ export default StyleSheet.create({
   },
   addressAmount: {
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Regular
   },
   label: {
+    fontFamily: fonts.Demi,
     fontSize: 16,
-    lineHeight: 21,
-    color: '#8A8A8F',
     marginBottom: 7
   },
   arrowIcon: {

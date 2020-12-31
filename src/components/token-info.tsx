@@ -20,6 +20,7 @@ import { LoadSVG } from 'app/components/load-svg';
 import i18n from 'app/lib/i18n';
 import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
+import { fonts } from 'app/styles';
 
 export type Prop = {
   decimals: number;
@@ -125,14 +126,15 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between'
   },
   symbol: {
-    fontSize: 17
+    fontSize: 17,
+    fontFamily: fonts.Demi
   },
   zilAmount: {
     fontSize: 17,
-    lineHeight: 22,
-    fontWeight: 'bold'
+    fontFamily: fonts.Bold
   },
   convertedAmount: {
-    fontSize: 13
+    fontSize: 13,
+    fontFamily: fonts.Regular
   }
 });

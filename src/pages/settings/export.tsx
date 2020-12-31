@@ -22,6 +22,7 @@ import { CustomButton } from 'app/components/custom-button';
 import i18n from 'app/lib/i18n';
 import { SecureTypes } from 'app/config';
 import { SettingsStackParamList } from 'app/navigator/settings';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<SettingsStackParamList>;
@@ -105,13 +106,13 @@ const styles = StyleSheet.create({
   },
   dangerText: {
     fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Demi
   },
   contentText: {
     marginTop: 30,
     textAlign: 'center',
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular,
+    fontSize: 17
   },
   btn: {
     marginTop: 20

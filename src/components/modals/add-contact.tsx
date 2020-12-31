@@ -23,6 +23,7 @@ import { QrCodeInput } from 'app/components/qr-code-input';
 import i18n from 'app/lib/i18n';
 import { Contact } from 'types';
 import { isBech32 } from 'app/utils';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -112,7 +113,7 @@ export const AddContactModal: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     borderBottomWidth: 1,
     padding: 10,
     marginVertical: 20

@@ -30,6 +30,7 @@ import { Signature, Account } from 'types';
 import { sha256 } from 'app/lib/crypto/sha256';
 import { keystore } from 'app/keystore';
 import { SchnorrControl } from 'app/lib/controller';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -167,7 +168,7 @@ export const SignMessageModal: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   wwitcherText: {
     fontSize: 13,
-    lineHeight: 17
+    fontFamily: fonts.Demi
   },
   wrapper: {
     alignItems: 'center',
@@ -175,7 +176,7 @@ const styles = StyleSheet.create({
   },
   desc: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Regular
   },
   switcher: {
     alignSelf: 'flex-end',
@@ -193,7 +194,7 @@ const styles = StyleSheet.create({
   },
   sig: {
     fontSize: 13,
-    lineHeight: 17,
+    fontFamily: fonts.Regular,
     padding: 10,
     margin: 15,
     minHeight: 100

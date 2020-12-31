@@ -20,6 +20,7 @@ import { useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 import { ArrowIconSVG, LockSVG, HomeIconSVG } from 'app/components/svg';
 import RepeatSVG from 'app/assets/repeat.svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   url: URL;
@@ -121,9 +122,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   host: {
-    fontWeight: 'bold',
+    fontFamily: fonts.Demi,
     fontSize: 17,
-    lineHeight: 22,
     minWidth: width / 3
   }
 });

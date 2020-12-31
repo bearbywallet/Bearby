@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 import React from 'react';
 import {
   TouchableOpacity,
@@ -66,10 +67,12 @@ const styles = StyleSheet.create({
   },
   count: {
     fontSize: (height / 100) * 2,
-    lineHeight: 18
+    lineHeight: 18,
+    fontFamily: fonts.Demi
   },
   text: {
     fontSize: (height / 100) * 2,
+    fontFamily: fonts.Regular,
     lineHeight: 18,
     marginLeft: 4
   }

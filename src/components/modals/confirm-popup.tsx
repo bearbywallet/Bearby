@@ -37,6 +37,7 @@ import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils';
 import { Transaction } from 'app/lib/controller/transaction';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -228,7 +229,6 @@ const styles = StyleSheet.create({
   toptext: {
     paddingLeft: 5,
     fontSize: 20,
-    lineHeight: 26,
-    fontWeight: 'bold'
+    fontFamily: fonts.Demi
   }
 });

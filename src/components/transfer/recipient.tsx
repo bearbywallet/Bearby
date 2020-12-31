@@ -32,6 +32,7 @@ import i18n from 'app/lib/i18n';
 import coomonStyles from './styles';
 import { isBech32 } from 'app/utils/address';
 import { Account, Contact } from 'types';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -141,7 +142,7 @@ const styles = StyleSheet.create({
   },
   textItem: {
     textAlign: 'center',
-    fontSize: 10,
-    lineHeight: 13
+    fontFamily: fonts.Regular,
+    fontSize: 10
   }
 });

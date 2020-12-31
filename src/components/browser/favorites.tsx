@@ -22,6 +22,7 @@ import { SwipeRow } from 'app/components/swipe-row';
 
 import i18n from 'app/lib/i18n';
 import { Connect } from 'types';
+import { fonts } from 'app/styles';
 
 type Prop = {
   connections: Connect[];
@@ -82,7 +83,7 @@ const styles = StyleSheet.create({
   },
   havent: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Regular,
     paddingTop: 15
   },
 });

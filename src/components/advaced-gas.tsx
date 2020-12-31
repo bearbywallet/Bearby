@@ -25,6 +25,7 @@ import { Button } from 'app/components/button';
 import { GasState } from 'types';
 import i18n from 'app/lib/i18n';
 import { deppUnlink } from 'app/utils';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -116,11 +117,11 @@ const styles = StyleSheet.create({
   },
   dsLabel: {
     fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi
   },
   gasLimitLabel: {
-    fontSize: 16,
-    lineHeight: 21
+    fontFamily: fonts.Regular,
+    fontSize: 16
   },
   inputWrapper: {
     alignItems: 'center',
@@ -128,7 +129,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     padding: 10,
     borderBottomWidth: 1,
     width: '90%'

@@ -24,6 +24,7 @@ import Finance from 'app/assets/finance.svg';
 import Gambling from 'app/assets/gambling.svg';
 import Games from 'app/assets/games.svg';
 import HighRisk from 'app/assets/high-risk.svg';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -105,7 +106,7 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 17,
-    lineHeight: 22,
+    fontFamily: fonts.Demi,
     padding: 10
   }
 });

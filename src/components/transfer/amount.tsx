@@ -31,6 +31,7 @@ import { Amount } from 'app/utils';
 import { Token, Account, GasState } from 'types';
 
 import styles from './styles';
+import { fonts } from 'app/styles';
 
 Big.PE = 99;
 
@@ -158,6 +159,7 @@ export const TransferAmount: React.FC<Prop> = ({
 const commonStyles = StyleSheet.create({
   input: {
     width: width - 100,
+    fontFamily: fonts.Demi,
     fontSize: 17,
     padding: 10
   }

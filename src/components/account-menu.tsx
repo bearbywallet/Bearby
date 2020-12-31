@@ -19,6 +19,7 @@ import { AccountsModal } from 'app/components/modals';
 
 import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   style?: ViewStyle;
@@ -86,7 +87,7 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   title: {
-    fontSize: 17,
-    lineHeight: 22
+    fontFamily: fonts.Demi,
+    fontSize: 17
   }
 });
