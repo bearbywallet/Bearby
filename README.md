@@ -28,7 +28,7 @@ $ yarn android --device
 
 ### Cross platforms:
 - [x] IOS.
-- [ ] android.
+- [x] android.
 
 ### Authentication:
 - [x] Password authentication.
@@ -39,6 +39,12 @@ $ yarn android --device
 - [x] WebView.
 - [x] Create JS injector.
 - [x] meesage beetween app and inject script.
+
+### Netwrok
+- [x] ssnList node APIs.
+- [x] components for node list.
+- [x] selector node list.
+- [x] using node list.
 
 ### DWeb
 - [x] unstoppabledomains controller.
