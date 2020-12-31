@@ -130,7 +130,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             {i18n.t('pass_setup_label0')}
           </Text>
         </View>
-        {authState.biometricEnable ? (
+        {authState.supportedBiometryType ? (
           <Switcher
             style={styles.biometric}
             enabled={isBiometric}

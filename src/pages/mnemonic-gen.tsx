@@ -11,16 +11,15 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  Dimensions,
   Text
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
 import { Button } from 'app/components/button';
+import { Chip } from 'app/components/chip';
 
 import i18n from 'app/lib/i18n';
-import { splitByChunk } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
 
@@ -28,18 +27,10 @@ type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
-const AMOUNT_OF_WORDS_IN_LINE = 3;
 const mnemonic = new Mnemonic();
-const { width, height } = Dimensions.get('window');
 export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const [phrase, setPhrase] = React.useState('');
-
-  const words = React.useMemo(() => {
-    const splited = phrase.split(' ');
-
-    return splitByChunk<string>(splited, AMOUNT_OF_WORDS_IN_LINE);
-  }, [phrase]);
 
   const hanldeUpdate = React.useCallback(async () => {
     const seedPhrase = await mnemonic.generateMnemonic();
@@ -68,29 +59,15 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
         {i18n.t('mnemonic_sub_title')}
       </Text>
       <View style={styles.phraseContainer}>
-        {words.map((chunk, index) => (
-          <View
+        {phrase.split(' ').map((word, index) => (
+          <Chip
             key={index}
-            style={styles.lineContainer}
+            style={styles.defaultChip}
+            count={index + 1}
+            disabled
           >
-            {chunk.map((word, wordIndex) => (
-              <View
-                key={wordIndex + AMOUNT_OF_WORDS_IN_LINE}
-                style={styles.wordContainer}
-              >
-                <Text style={[styles.wordNumber, {
-                  color: colors.border
-                }]}>
-                  {index * AMOUNT_OF_WORDS_IN_LINE + wordIndex + 1}
-                </Text>
-                <Text style={[styles.word, {
-                  color: colors.text
-                }]}>
-                  {word}
-                </Text>
-              </View>
-            ))}
-          </View>
+            {word}
+          </Chip>
         ))}
       </View>
       <View style={styles.btnsContainer}>
@@ -129,31 +106,12 @@ const styles = StyleSheet.create({
   phraseContainer: {
     flex: 1,
     flexDirection: 'row',
+    paddingHorizontal: '3%',
     flexWrap: 'wrap',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    textAlign: 'center',
-    paddingHorizontal: 15
+    justifyContent: 'space-between'
   },
-  lineContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    maxHeight: 70
-  },
-  wordContainer: {
-    flexDirection: 'row',
-    marginTop: height / 20,
-    minHeight: 60,
-    minWidth: width / 3
-  },
-  wordNumber: {
-    lineHeight: 21,
-    fontSize: (height / 100) * 2
-  },
-  word: {
-    lineHeight: 21,
-    fontSize: (height / 100) * 2,
-    marginLeft: 4
+  defaultChip: {
+    margin: 8
   },
   btnsContainer: {
     flexDirection: 'row',

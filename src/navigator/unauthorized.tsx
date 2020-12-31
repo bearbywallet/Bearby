@@ -7,7 +7,8 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { createStackNavigator } from '@react-navigation/stack';
+import { createStackNavigator, StackNavigationOptions } from '@react-navigation/stack';
+import { useTheme } from '@react-navigation/native';
 
 import LetStartPage from 'app/pages/let-start';
 import GetStartedPage from 'app/pages/get-started';
@@ -18,8 +19,6 @@ import MnemonicGenPage from 'app/pages/mnemonic-gen';
 import MnemonicVerifyPage from 'app/pages/mnemonic-verify';
 import SetupPasswordPage from 'app/pages/setup-password';
 import InitSuccessfullyPage from 'app/pages/init-successfully';
-
-import { headerOptions } from 'app/config';
 
 export type UnauthorizedStackParamList = {
   GetStarted: undefined;
@@ -38,73 +37,87 @@ export type UnauthorizedStackParamList = {
 };
 
 const UnauthorizedStack = createStackNavigator<UnauthorizedStackParamList>();
-export const Unauthorized: React.FC = () => (
-  <UnauthorizedStack.Navigator>
-    <UnauthorizedStack.Screen
-      name="GetStarted"
-      component={GetStartedPage}
-      options={{
-        header: () => null,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="Lock"
-      component={LockPage}
-      options={{
-        header: () => null,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="SetupPassword"
-      component={SetupPasswordPage}
-      options={{
-        header: () => null,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="InitSuccessfully"
-      component={InitSuccessfullyPage}
-      options={{
-        header: () => null,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="Privacy"
-      component={PrivacyPage}
-      options={headerOptions}
-    />
-    <UnauthorizedStack.Screen
-      name="LetStart"
-      component={LetStartPage}
-      options={{
-        ...headerOptions,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="Restore"
-      component={RestorePage}
-      options={headerOptions}
-    />
-    <UnauthorizedStack.Screen
-      name="Mnemonic"
-      component={MnemonicGenPage}
-      options={{
-        ...headerOptions,
-        title: ''
-      }}
-    />
-    <UnauthorizedStack.Screen
-      name="MnemonicVerif"
-      component={MnemonicVerifyPage}
-      options={{
-        ...headerOptions,
-        title: ''
-      }}
-    />
-  </UnauthorizedStack.Navigator>
-);
+export const Unauthorized: React.FC = () => {
+  const { colors } = useTheme();
+
+  const headerOptions: StackNavigationOptions = React.useMemo(() => ({
+    headerTintColor: colors.text,
+    headerStyle: {
+      backgroundColor: colors.background
+    },
+    headerTitleStyle: {
+      fontWeight: 'bold'
+    }
+  }), [colors]);
+
+  return (
+    <UnauthorizedStack.Navigator>
+      <UnauthorizedStack.Screen
+        name="GetStarted"
+        component={GetStartedPage}
+        options={{
+          header: () => null,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="Lock"
+        component={LockPage}
+        options={{
+          header: () => null,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="SetupPassword"
+        component={SetupPasswordPage}
+        options={{
+          header: () => null,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="InitSuccessfully"
+        component={InitSuccessfullyPage}
+        options={{
+          header: () => null,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="Privacy"
+        component={PrivacyPage}
+        options={headerOptions}
+      />
+      <UnauthorizedStack.Screen
+        name="LetStart"
+        component={LetStartPage}
+        options={{
+          ...headerOptions,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="Restore"
+        component={RestorePage}
+        options={headerOptions}
+      />
+      <UnauthorizedStack.Screen
+        name="Mnemonic"
+        component={MnemonicGenPage}
+        options={{
+          ...headerOptions,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="MnemonicVerif"
+        component={MnemonicVerifyPage}
+        options={{
+          ...headerOptions,
+          title: ''
+        }}
+      />
+    </UnauthorizedStack.Navigator>
+  );
+};

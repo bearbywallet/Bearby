@@ -45,10 +45,10 @@ export class SettingsControler {
   }
 
   public get rate() {
-    const currency = currenciesStore.get();
     const state = this.store.get();
+    const [zil] = this._tokens.store.get();
 
-    return state.rate[currency];
+    return state.rate[zil.symbol];
   }
 
   public getRate(symbol: string) {
@@ -114,8 +114,13 @@ export class SettingsControler {
       const exchangeRate = (_zilReserve / _tokenReserve).toFixed(10);
 
       state.rate[token.symbol] = this.rate * Number(exchangeRate);
+
+      if (!state.rate[token.symbol] || isNaN(state.rate[token.symbol])) {
+        state.rate[token.symbol] = 0;
+      }
     }
 
+    settingsStoreUpdate(state);
     return this._storage.set(
       buildObject(STORAGE_FIELDS.SETTINGS, state)
     );
@@ -152,13 +157,7 @@ export class SettingsControler {
       await this.reset();
     }
 
-    if (this._netwrok.selected === ZILLIQA_KEYS[0]) {
-      await this.rateUpdate();
-    }
-
     await this.rateUpdate();
-
-
     await this.getDexRate();
   }
 }

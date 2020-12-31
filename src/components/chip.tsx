@@ -19,11 +19,18 @@ import {
 type Prop = {
   count?: number | string;
   style?: ViewStyle;
+  disabled?: boolean;
   onPress?: () => void;
 };
 
 const { height } = Dimensions.get('window');
-export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
+export const Chip: React.FC<Prop> = ({
+  disabled,
+  children,
+  count,
+  style,
+  onPress
+}) => {
   const { colors } = useTheme();
 
   return (
@@ -31,6 +38,7 @@ export const Chip: React.FC<Prop> = ({ children, count, style, onPress }) => {
       style={[styles.container, {
         backgroundColor: colors.card
       }, style]}
+      disabled={disabled}
       onPress={onPress}
     >
       {count && !isNaN(Number(count)) ? (

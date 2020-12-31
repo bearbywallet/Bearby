@@ -88,6 +88,9 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
             </Chip>
           ))}
         </View>
+        <View style={[styles.seporate, {
+          backgroundColor: colors.card
+        }]}/>
         <View style={styles.randoms}>
           {Array.from(shuffledWords).map((word, index) => (
             <Chip
@@ -150,6 +153,10 @@ const styles = StyleSheet.create({
   },
   defaultChip: {
     margin: 8
+  },
+  seporate: {
+    width: '100%',
+    height: 2
   }
 });
 
