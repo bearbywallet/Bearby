@@ -235,6 +235,7 @@ const styles = StyleSheet.create({
   },
   label: {
     marginVertical: 5,
+    maxWidth: width - 70,
     fontFamily: fonts.Regular,
     marginLeft: 38
   },

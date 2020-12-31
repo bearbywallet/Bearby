@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
+import Big from 'big.js';
 import {
   STORAGE_FIELDS,
   AccountTypes,
@@ -30,6 +31,8 @@ import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { ViewBlockControler } from 'app/lib/controller/viewblock';
+
+Big.PE = 99;
 
 export class AccountControler {
   public store = accountStore;
@@ -229,6 +232,21 @@ export class AccountControler {
     account.balance = await this._tokenBalance(account.base16);
 
     await this.update(deppUnlink(accounts));
+  }
+
+  public async zilBalaceUpdate() {
+    const net = this._netwrok.selected;
+    const [zil] = this._token.store.get();
+    const accounts = this.store.get();
+    const account = accounts.identities[accounts.selectedAddress];
+    const { balance } = await this._zilliqa.getBalance(account.base16);
+    const _gotBalance = Big(balance);
+    const currentBalance = Big(account.balance[net][zil.symbol]);
+    const needUpdate = _gotBalance.eq(currentBalance);
+
+    account.balance[net][zil.symbol] = balance;
+
+    return !needUpdate;
   }
 
   private async _checkAccount(account: Account) {

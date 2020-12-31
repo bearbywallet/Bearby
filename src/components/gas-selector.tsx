@@ -238,6 +238,7 @@ const styles = StyleSheet.create({
   },
   amount: {
     fontSize: 13,
+    lineHeight: 22,
     fontFamily: fonts.Regular
   }
 });

@@ -10,7 +10,9 @@ import React from 'react';
 import {
   View,
   StyleSheet,
-  ViewStyle
+  ViewStyle,
+  Alert,
+  ActivityIndicator
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
@@ -39,16 +41,30 @@ export const AccountMenu: React.FC<Prop> = ({
   const accountState = keystore.account.store.useValue();
 
   const [isModal, setIsModal] = React.useState(false);
+  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleCreateAccount = React.useCallback(() => {
     setIsModal(false);
     onCreate();
   }, [setIsModal]);
   const handleChangeAccount = React.useCallback(async(index) => {
-    await keystore.account.selectAccount(index);
-    keystore.transaction.sync();
-
+    setIsLoading(true);
     setIsModal(false);
+    try {
+      await keystore.account.selectAccount(index);
+      await keystore.account.zilBalaceUpdate();
+      await keystore.transaction.sync();
+      setIsLoading(false);
+    } catch (err) {
+      setIsLoading(false);
+      Alert.alert(
+        i18n.t('update'),
+        err.message,
+        [
+          { text: "OK" }
+        ]
+      );
+    }
   }, [setIsModal]);
   const hanldeRemove = React.useCallback(() => {
     setIsModal(false);
@@ -59,12 +75,19 @@ export const AccountMenu: React.FC<Prop> = ({
     <View
       style={[styles.container, style]}
     >
-      <DropDownItem
-        color={colors.primary}
-        onPress={() => setIsModal(true)}
-      >
-        {accountName}
-      </DropDownItem>
+      {isLoading ? (
+        <ActivityIndicator
+          animating={isLoading}
+          color={colors.primary}
+        />
+      ) : (
+        <DropDownItem
+          color={colors.primary}
+          onPress={() => setIsModal(true)}
+        >
+          {accountName}
+        </DropDownItem>
+      )}
       <AccountsModal
         accounts={accountState.identities}
         selected={accountState.selectedAddress}
