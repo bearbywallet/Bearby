@@ -51,7 +51,7 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
         flex: 1
       }}>
         <LottieView
-          source={dark ? require('app/assets/dark') : require('app/assets/light')}
+          source={require('app/assets/dark')}
           autoPlay
           loop
         />
