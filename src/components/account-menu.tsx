@@ -59,7 +59,7 @@ export const AccountMenu: React.FC<Prop> = ({
       style={[styles.container, style]}
     >
       <DropDownItem
-        color={colors.text}
+        color={colors.primary}
         onPress={() => setIsModal(true)}
       >
         {accountName}
