@@ -130,6 +130,8 @@ export const ReceiveModal: React.FC<Prop> = ({
           <QRCode
             value={`zilliqa://${account.bech32}`}
             size={width / 2}
+            backgroundColor={colors['black']}
+            color={colors['white']}
             getRef={setQrcodeRef}
           />
         </View>

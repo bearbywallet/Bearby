@@ -31,7 +31,7 @@ import { LabelValue } from 'app/components/label-value';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { TransactionType } from 'types';
-import { trim, fromZil, toConversion } from 'app/filters';
+import { trim, fromZil } from 'app/filters';
 import { viewTransaction } from 'app/utils';
 
 type Prop = {
