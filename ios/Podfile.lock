@@ -342,7 +342,7 @@ PODS:
     - React-Core
   - RNScreens (2.16.1):
     - React-Core
-  - RNShare (4.1.0):
+  - RNShare (4.1.2):
     - React-Core
   - RNSVG (12.1.0):
     - React
@@ -594,7 +594,7 @@ SPEC CHECKSUMS:
   RNPermissions: 99dd8d4a30ff13509b949ca63cd1f69edc461775
   RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
   RNScreens: 45c457af3d2ee9e08fc01e70da87e653d46b1198
-  RNShare: 106a76243ac90f43ddb9028dcb78ade406b8adff
+  RNShare: d22507fa5e80c72f236b5622556cf831de5b1e93
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e
   TrezorCrypto: bfeea47a052dca2c77d4a39e1e183865e52de14d
   Yoga: 4bd86afe9883422a7c4028c00e34790f560923d6
