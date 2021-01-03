@@ -40,11 +40,11 @@ export class ViewBlockControler {
 
   public async getTransactions(address: string, page: number = 1): Promise<TransactionType[]> {
     const params = `?page=${page}&${this._netwrokParam}`;
-    const method = ViewBlockMethods.Addresses;
-    const txns = ViewBlockMethods.Txns;
-    const url = `${VIEW_BLOCK_API_V1}/${method}/${address}/${txns}${params}`;
+    const method = ViewBlockMethods.Txns;
+    const url = `${VIEW_BLOCK_API_V1}/${method}/${address}/${method}${params}`;
     const response = await fetch(url, this._options);
+    const { docs } = await response.json();
 
-    return response.json();
+    return docs;
   }
 }
