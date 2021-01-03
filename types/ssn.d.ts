@@ -11,6 +11,9 @@ export interface SSN {
   name: string;
   api: string;
   address: string;
+  id: number;
+  time: number;
+  ok: boolean;
 }
 
 export interface SSNState {

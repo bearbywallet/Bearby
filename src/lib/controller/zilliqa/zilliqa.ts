@@ -212,10 +212,47 @@ export class ZilliqaControl {
     const defaultSSn: SSN = {
       address: '',
       name: DEFAULT_SSN,
-      api: http
+      api: http,
+      ok: true,
+      id: 1,
+      time: 0
     };
+    const ssnList = [defaultSSn, ...list].map(async(ssn) => {
+      const t0 = performance.now();
+      try {
+        const r = this._json(
+          Methods.GetNetworkId,
+          []
+        );
+        const res = await fetch(ssn.api, r);
+        const { error, result } = await res.json();
 
-    return [defaultSSn, ...list];
+        if (error) {
+          throw new Error(error.message);
+        }
+
+        const id = Number(result);
+        const t1 = performance.now();
+
+        return {
+          ...ssn,
+          id,
+          time: t1 - t0,
+          ok: res.ok
+        };
+      } catch {
+        const t1 = performance.now();
+        return {
+          ...ssn,
+          id: 0,
+          time: t1 - t0,
+          ok: false
+        };
+      }
+    });
+    const gotSSN = await Promise.all(ssnList);
+
+    return gotSSN.filter((ssn) => ssn.ok);
   }
 
   private _json(method: string, params: Params) {
