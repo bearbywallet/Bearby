@@ -26,7 +26,6 @@ import { OKIconSVG } from 'app/components/svg';
 import { SSN, SSNState } from 'types';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
-import { millisToMinutesAndSeconds } from 'app/filters';
 
 type Prop = {
   style?: ViewStyle;
@@ -85,7 +84,7 @@ export const SSnList: React.FC<Prop> = ({
                 <Text style={[styles.itemText, {
                   color: item.time <= timing ? colors.text : colors['warning']
                 }]}>
-                  {millisToMinutesAndSeconds(item.time)}
+                  {Math.floor(item.time)} ms
                 </Text>
               </View>
             </TouchableOpacity>
