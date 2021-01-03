@@ -12,7 +12,6 @@ import {
   StatusBar
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
-import { useTheme } from '@react-navigation/native';
 
 import LottieView from 'lottie-react-native';
 
@@ -24,8 +23,6 @@ type Prop = {
 };
 
 export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
-  const { dark } = useTheme();
-
   React.useEffect(() => {
     keystore.sync().then(() => {
       const { isEnable, isReady } = keystore.guard.self;

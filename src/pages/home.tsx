@@ -113,7 +113,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   React.useEffect(() => {
-    keystore.account.balanceUpdate();
+    keystore
+      .account
+      .balanceUpdate()
+      .then(() => keystore.settings.rateUpdate())
+      .then(() => keystore.settings.getDexRate());
   }, []);
 
   return (

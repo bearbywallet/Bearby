@@ -32,7 +32,7 @@ export const dark = {
   dark: true,
   colors: {
     ...colors,
-    primary: '#29CCC4',
+    primary: '#06B4B1',
     background: '#09090C',
     card: '#18191D',
     text: '#FFFFFF',
@@ -45,7 +45,7 @@ export const light = {
   dark: false,
   colors: {
     ...colors,
-    primary: '#21A0B1',
+    primary: '#06B4B1',
     background: '#E1E7FF',
     card: '#F9F9F9',
     text: '#32335A',

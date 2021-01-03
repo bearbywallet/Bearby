@@ -34,26 +34,55 @@ export const NetworkPage = () => {
   const networkState = keystore.network.store.useValue();
   const ssnState = keystore.ssn.store.useValue();
 
+  const [isLoading, setIsLoading] = React.useState(false);
+
   const handleReset = React.useCallback(async() => {
-    await keystore.network.reset();
-    await keystore.transaction.sync();
-    await keystore.account.balanceUpdate();
-    await keystore.ssn.reset();
-    await keystore.settings.sync();
+    setIsLoading(true);
+    try {
+      await keystore.network.reset();
+      await keystore.transaction.sync();
+      await keystore.account.balanceUpdate();
+      await keystore.ssn.reset();
+      await keystore.settings.sync();
+    } catch {
+      //
+    }
+    setIsLoading(false);
   }, []);
   const handleNetwrokChange = React.useCallback(async(net) => {
-    await keystore.network.changeNetwork(net);
+    setIsLoading(true);
+    try {
+      await keystore.network.changeNetwork(net);
 
-    if (net !== custom) {
-      await keystore.transaction.sync();
-      await keystore.ssn.sync();
-      await keystore.settings.sync();
+      if (net !== custom) {
+        await keystore.transaction.sync();
+        await keystore.ssn.sync();
+        await keystore.settings.sync();
+      }
+
+      await keystore.account.zilBalaceUpdate();
+    } catch (err) {
+      // console.log(err);
     }
-
-    await keystore.account.zilBalaceUpdate();
+    setIsLoading(false);
   }, []);
   const hanldeChangeSSN = React.useCallback(async(ssn: SSN) => {
-    await keystore.ssn.changeSSn(ssn.name);
+    setIsLoading(true);
+    try {
+      await keystore.ssn.changeSSn(ssn.name);
+    } catch {
+      //
+    }
+    setIsLoading(false);
+  }, []);
+  const hanldeSSNUpdate = React.useCallback(async() => {
+    setIsLoading(true);
+    try {
+      await keystore.ssn.reset();
+    } catch {
+      //
+    }
+    setIsLoading(false);
   }, []);
 
   return (
@@ -91,9 +120,10 @@ export const NetworkPage = () => {
             style={{
               marginTop: 15
             }}
+            isLoading={isLoading}
             ssnState={ssnState}
             onSelect={hanldeChangeSSN}
-            onUpdate={() => null}
+            onUpdate={hanldeSSNUpdate}
           />
         )}
       </ScrollView>
