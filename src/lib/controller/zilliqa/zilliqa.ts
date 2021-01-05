@@ -169,6 +169,20 @@ export class ZilliqaControl {
     throw new Error('Netwrok fail');
   }
 
+  public async getTransaction(hash: string) {
+    hash = tohexString(hash);
+
+    const request = this._json(Methods.GetTransaction, [hash]);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
   public async getPendingTxn(hash: string) {
     hash = tohexString(hash);
 

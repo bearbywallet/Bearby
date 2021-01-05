@@ -25,7 +25,7 @@ type Prop = {
   onScan: (address: string) => void;
 };
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export const QRScaner: React.FC<Prop> = ({
   visible,
   onTriggered,
@@ -51,6 +51,9 @@ export const QRScaner: React.FC<Prop> = ({
       {visible ? (
         <QRCodeScanner
           onRead={handleSuccess}
+          cameraStyle={{
+            height: height / 2
+          }}
           bottomContent={
             <CustomButton
               style={{

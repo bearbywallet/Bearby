@@ -163,7 +163,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
     try {
-      await keystore.transaction.forceUpdate();
+      await keystore.transaction.updateTxns();
       setRefreshing(false);
     } catch (err) {
       setRefreshing(false);

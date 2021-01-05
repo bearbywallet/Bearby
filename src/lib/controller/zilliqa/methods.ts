@@ -13,5 +13,6 @@ export enum Methods {
   GetSmartContractSubState = 'GetSmartContractSubState',
   GetNetworkId = 'GetNetworkId',
   GetPendingTxn = 'GetPendingTxn',
+  GetTransaction = 'GetTransaction',
   CreateTransaction = 'CreateTransaction'
 }

@@ -79,12 +79,12 @@ export class TransactionsContoller {
     }
   }
 
-  public async forceUpdate() {
+  public async updateTxns() {
     if (this._netwrok.selected === ZILLIQA_KEYS[2]) {
       return null;
     }
 
-    return this._update();
+    await this._update();
   }
 
   public async reset() {
@@ -101,25 +101,19 @@ export class TransactionsContoller {
       (t) => Number(t.blockHeight) === 0
     );
     let state = this.store.get();
-    let needUpdate = false;
 
     for (const iterator of panding) {
-      const data = await this._zilliqa.getPendingTxn(iterator.hash);
-
-      if (data.confirmed) {
+      try {
+        const data = await this._zilliqa.getTransaction(iterator.hash);
         state = state.map((t) => ({
           ...t,
-          blockHeight: t.hash === iterator.hash ? 1 : t.blockHeight
+          ...data
         }));
-        needUpdate = true;
+        transactionStoreUpdate(state);
+      } catch {
+        continue;
       }
     }
-
-    if (needUpdate) {
-      transactionStoreUpdate(state);
-    }
-
-    await this._update();
   }
 
   public async add(tx: Transaction) {
