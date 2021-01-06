@@ -52,6 +52,11 @@ $ yarn ios --variant=release
 $ yarn android --variant=release
 ```
 
+build bungle
+```bash
+node node_modules/react-native/local-cli/cli.js bundle --entry-file='./index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
+```
+
 Thanks for yours donate.
 ------
 
