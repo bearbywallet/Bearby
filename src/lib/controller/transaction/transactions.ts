@@ -100,7 +100,7 @@ export class TransactionsContoller {
     const panding = this.store.get().filter(
       (t) => Number(t.blockHeight) === 0
     );
-    let state = deppUnlink(this.store.get()) as TransactionType[];
+    const state = deppUnlink(this.store.get()) as TransactionType[];
     const { field } = this._field;
 
     for (const iterator of panding) {

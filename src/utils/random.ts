@@ -11,6 +11,19 @@ import { base64ToByteArray } from './base64';
 
 const { Crypto, CryptoModule } = NativeModules;
 
+export async function getRandomBytes(length: number) {
+  if (Crypto) {
+    return Crypto.randomBytes(length);
+  }
+
+  if (CryptoModule) {
+    return CryptoModule.randomBytes(length);
+  }
+
+  return Array
+    .from({ length }, () => Math.floor(Math.random() * 10));
+}
+
 /**
  * randomBytes
  *
@@ -21,7 +34,7 @@ const { Crypto, CryptoModule } = NativeModules;
  * @returns {string}
  */
 export const randomBytes = async (bytes: number) => {
-  const base64Random = await Crypto.randomBytes(bytes);
+  const base64Random = await getRandomBytes(bytes);
   const nativeBytes = new Uint8Array(base64ToByteArray(base64Random));
   let randBz: number[] | Uint8Array;
 

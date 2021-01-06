@@ -12,6 +12,7 @@ import com.crypto.libs.KeyDerivation;
 import com.crypto.libs.Mnemonic;
 
 import java.security.SecureRandom;
+import android.util.Base64;
 
 import io.github.novacrypto.bip39.MnemonicValidator;
 import io.github.novacrypto.bip39.Validation.InvalidChecksumException;
@@ -77,6 +78,11 @@ public class CryptoModule extends ReactContextBaseJavaModule {
 		}
 	}
 
+	@ReactMethod
+	public void randomBytes(int size, Promise p) {
+		p.resolve(getRandomBytes(size));
+	}
+
     @ReactMethod
     public void createHDKeyPairs(String mnemonic, String passphrase, String path, int from, int to, Promise p) {
         byte[] seed2 = new Mnemonic(mnemonic).GetSeed(passphrase);
@@ -101,4 +107,11 @@ public class CryptoModule extends ReactContextBaseJavaModule {
             p.resolve(results);
         }
     }
+
+	private String getRandomBytes(int size) {
+		SecureRandom sr = new SecureRandom();
+		byte[] output = new byte[size];
+		sr.nextBytes(output);
+		return Base64.encodeToString(output, Base64.NO_WRAP);
+	}
 }
