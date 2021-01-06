@@ -19,7 +19,8 @@ import {
 } from './store';
 import { TX_DIRECTION, ZILLIQA_KEYS } from 'app/config';
 import { Transaction } from './builder';
-import { toBech32Address, tohexString } from 'app/utils';
+import { toBech32Address, tohexString, deppUnlink } from 'app/utils';
+import { TransactionType } from 'types';
 
 export class TransactionsContoller {
   public store = transactionStore;
@@ -96,24 +97,33 @@ export class TransactionsContoller {
   }
 
   public async checkProcessedTx() {
-    await this.sync();
     const panding = this.store.get().filter(
       (t) => Number(t.blockHeight) === 0
     );
-    let state = this.store.get();
+    let state = deppUnlink(this.store.get()) as TransactionType[];
+    const { field } = this._field;
 
     for (const iterator of panding) {
       try {
         const data = await this._zilliqa.getTransaction(iterator.hash);
-        state = state.map((t) => ({
-          ...t,
-          ...data
-        }));
-        transactionStoreUpdate(state);
+        const foundIndex = state.findIndex((tx) => tx.hash === data.ID);
+
+        state[foundIndex] = {
+          ...state[foundIndex],
+          blockHeight: data.receipt.epoch_num,
+          receiptSuccess: data.receipt.success,
+          events: data.receipt.event_logs
+        };
       } catch {
         continue;
       }
     }
+
+    transactionStoreUpdate(state);
+
+    await this._storage.set(
+      buildObject(field, state)
+    );
   }
 
   public async add(tx: Transaction) {
@@ -156,7 +166,6 @@ export class TransactionsContoller {
       .get()
       .filter((t) => t.blockHeight === 0)
       .filter((t) => !gotTxns.some((tx) => tohexString(tx.hash) === tohexString(t.hash)));
-
     transactionStoreUpdate([...panding, ...gotTxns]);
 
     await this._storage.set(

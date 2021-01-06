@@ -4,6 +4,7 @@
 //
 //  Created by Rinat on 21.10.2020.
 //
+#include <stdlib.h>
 
 #import <React/RCTLog.h>
 #import "Crypto.h"
@@ -20,7 +21,21 @@
   return dispatch_queue_create("wallet.zilpay.keystore_queue", DISPATCH_QUEUE_CONCURRENT);
 }
 
+- (NSString *) randomBytes:(NSUInteger)length
+{
+    NSMutableData* bytes = [NSMutableData dataWithLength:length];
+    SecRandomCopyBytes(kSecRandomDefault, length, [bytes mutableBytes]);
+    return [bytes base64EncodedStringWithOptions:0];
+}
+
 RCT_EXPORT_MODULE()
+
+RCT_EXPORT_METHOD(randomBytes:(NSUInteger)length
+                  resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
+{
+  resolve([self randomBytes:length]);
+}
 
 RCT_EXPORT_METHOD(generateMnemonic:(NSInteger)length
                   resolver:(RCTPromiseResolveBlock)resolve
@@ -59,6 +74,8 @@ RCT_EXPORT_METHOD(getCompressedPublicKeyFrom:(nonnull NSData *)privateKey
     resolve(publicKey);
   });
 }
+
+
 
 RCT_EXPORT_METHOD(createHDKeyPair:(NSString *)mnemonic
                   passphrase:(NSString *)passphrase

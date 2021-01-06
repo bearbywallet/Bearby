@@ -138,11 +138,11 @@ export class Transaction {
     return this.version;
   }
 
-  public sign(privKey: string) {
+  public async sign(privKey: string) {
     const bytes = this._encodeTransactionProto();
     const schnorrControl = new SchnorrControl(privKey);
 
-    this.signature = schnorrControl.getSignature(bytes);
+    this.signature = await schnorrControl.getSignature(bytes);
   }
 
   private _encodeTransactionProto() {

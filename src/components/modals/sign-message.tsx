@@ -74,7 +74,7 @@ export const SignMessageModal: React.FC<Prop> = ({
       const bytes = Buffer.from(hash, 'hex');
       const keyPair = await keystore.getkeyPairs(account, passowrd);
       const schnorrControl = new SchnorrControl(keyPair.privateKey);
-      const signature = schnorrControl.getSignature(bytes);
+      const signature = await schnorrControl.getSignature(bytes);
 
       onSign({
         signature,

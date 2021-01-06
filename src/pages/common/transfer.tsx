@@ -82,7 +82,7 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
 
       transaction.setVersion(chainID);
       transaction.nonce = account.nonce + 1;
-      transaction.sign(keyPair.privateKey);
+      await transaction.sign(keyPair.privateKey);
       transaction.hash = await keystore.zilliqa.send(transaction);
 
       await keystore.account.increaseNonce(selectedAccount);

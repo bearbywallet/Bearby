@@ -6,6 +6,11 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { NativeModules } from 'react-native';
+import { base64ToByteArray } from './base64';
+
+const { Crypto, CryptoModule } = NativeModules;
+
 /**
  * randomBytes
  *
@@ -15,12 +20,14 @@
  * @param {number} bytes
  * @returns {string}
  */
-export const randomBytes = (bytes: number) => {
+export const randomBytes = async (bytes: number) => {
+  const base64Random = await Crypto.randomBytes(bytes);
+  const nativeBytes = new Uint8Array(base64ToByteArray(base64Random));
   let randBz: number[] | Uint8Array;
 
   const b = Buffer
     .allocUnsafe(bytes)
-    .map((n) => (Math.random() * 0x100000000) | n);
+    .map((_, index) => nativeBytes[index]);
   randBz = new Uint8Array(
     b.buffer,
     b.byteOffset,

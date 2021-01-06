@@ -24,6 +24,12 @@ export class WorkerController {
 
   public async step() {
     try {
+      await this._transactions.checkProcessedTx();
+    } catch {
+      //
+    }
+
+    try {
       const needUpdate = await this._account.zilBalaceUpdate();
 
       if (needUpdate) {
@@ -32,8 +38,6 @@ export class WorkerController {
     } catch {
       //
     }
-
-    await this._transactions.checkProcessedTx();
   }
 
   public async start() {

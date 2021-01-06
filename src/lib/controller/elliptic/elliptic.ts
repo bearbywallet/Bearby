@@ -33,11 +33,11 @@ const ENT_LEN = 32;
  *
  * @returns {DRBG}
  */
-const getDRBG = (msg: Buffer) => {
-  const entropy = randomBytes(ENT_LEN);
+const getDRBG = async (msg: Buffer) => {
+  const entropy = await randomBytes(ENT_LEN);
   const pers = Buffer.allocUnsafe(ALG_LEN + ENT_LEN);
 
-  Buffer.from(randomBytes(ENT_LEN)).copy(pers, 0);
+  Buffer.from(await randomBytes(ENT_LEN)).copy(pers, 0);
   ALG.copy(pers, ENT_LEN);
 
   return new DRBG({
@@ -59,8 +59,8 @@ export class SchnorrControl {
     this._publicKey = getPubKeyFromPrivateKey(this._privateKey);
   }
 
-  public getSignature(msg: Buffer) {
-    const sig = this._sign(
+  public async getSignature(msg: Buffer) {
+    const sig = await this._sign(
       msg,
       Buffer.from(this._privateKey, 'hex'),
       Buffer.from(this._publicKey, 'hex')
@@ -94,9 +94,9 @@ export class SchnorrControl {
     return new BN(sha256.update(B).digest('hex'), 16);
   }
 
-  private _sign(msg: Buffer, privKey: Buffer, pubKey: Buffer): Signature {
+  private async _sign(msg: Buffer, privKey: Buffer, pubKey: Buffer): Promise<Signature> {
     const prv = new BN(privKey);
-    const drbg = getDRBG(msg);
+    const drbg = await getDRBG(msg);
     const len = this._curve.n.byteLength();
 
     let sig;
