@@ -34,10 +34,10 @@ import { Account } from 'types';
 const _storage = new MobileStorage();
 
 export class WalletControler extends Mnemonic {
-  public readonly notificationManager = new NotificationManager(_storage);
   public readonly ud = new UnstoppableDomains(_storage);
   public readonly guard = new GuardControler(_storage);
   public readonly network = new NetworkControll(_storage);
+  public readonly notificationManager = new NotificationManager(_storage, this.network);
   public readonly currency = new CurrencyControler(_storage);
   public readonly theme = new ThemeControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
@@ -65,7 +65,8 @@ export class WalletControler extends Mnemonic {
     this.zilliqa,
     _storage,
     this.account,
-    this.network
+    this.network,
+    this.notificationManager
   );
   public readonly inpage = new InjectScript(this.account, this.network);
   public readonly connect = new ConnectController(_storage);

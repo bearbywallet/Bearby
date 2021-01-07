@@ -11,6 +11,7 @@ import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { AccountControler } from 'app/lib/controller/account';
 import { NetworkControll } from 'app/lib/controller/network';
+import { NotificationManager } from 'app/lib/controller/notification';
 import {
   transactionStore,
   transactionStoreReset,
@@ -20,6 +21,8 @@ import {
 import { TX_DIRECTION, ZILLIQA_KEYS } from 'app/config';
 import { Transaction } from './builder';
 import { toBech32Address, tohexString, deppUnlink } from 'app/utils';
+import { trim } from 'app/filters';
+import i18n from 'app/lib/i18n';
 import { TransactionType } from 'types';
 
 export class TransactionsContoller {
@@ -30,19 +33,22 @@ export class TransactionsContoller {
   private _storage: MobileStorage;
   private _account: AccountControler;
   private _netwrok: NetworkControll;
+  private _notification: NotificationManager;
 
   constructor(
     viewblock: ViewBlockControler,
     zilliqa: ZilliqaControl,
     storage: MobileStorage,
     account: AccountControler,
-    netwrok: NetworkControll
+    netwrok: NetworkControll,
+    notification: NotificationManager
   ) {
     this._viewblock = viewblock;
     this._zilliqa = zilliqa;
     this._storage = storage;
     this._account = account;
     this._netwrok = netwrok;
+    this._notification = notification;
   }
 
   private get _field() {
@@ -93,6 +99,8 @@ export class TransactionsContoller {
 
     await this._storage.rm(field);
 
+    this._notification.setBadgeNumber(0);
+
     transactionStoreReset();
   }
 
@@ -102,18 +110,31 @@ export class TransactionsContoller {
     );
     const state = deppUnlink(this.store.get()) as TransactionType[];
     const { field } = this._field;
+    const countBadge = await this._notification.getBadgeNumber();
 
     for (const iterator of panding) {
       try {
         const data = await this._zilliqa.getTransaction(iterator.hash);
         const foundIndex = state.findIndex((tx) => tx.hash === data.ID);
+        const title = data.receipt.errors ? i18n.t('tx_fail') : i18n.t('sent');
+
+        this._notification.localNotification({
+          title,
+          message: i18n.t('transaction', {
+            hash: `0x${trim(data.ID)}`
+          }),
+          userInfo: {
+            hash: data.ID
+          }
+        });
 
         state[foundIndex] = {
           ...state[foundIndex],
-          blockHeight: data.receipt.epoch_num,
+          blockHeight: Number(data.receipt.epoch_num),
           receiptSuccess: data.receipt.success,
           events: data.receipt.event_logs
         };
+        this._notification.setBadgeNumber(countBadge - 1);
       } catch {
         continue;
       }
@@ -154,10 +175,14 @@ export class TransactionsContoller {
     await this._storage.set(
       buildObject(field, this.store.get())
     );
+    const countBadge = await this._notification.getBadgeNumber();
+
+    this._notification.setBadgeNumber(countBadge + 1);
   }
 
   private async _update() {
     const { account, field } = this._field;
+    const countBadge = await this._notification.getBadgeNumber();
     const gotTxns = await this
       ._viewblock
       .getTransactions(account.bech32);
@@ -165,7 +190,15 @@ export class TransactionsContoller {
       .store
       .get()
       .filter((t) => t.blockHeight === 0)
-      .filter((t) => !gotTxns.some((tx) => tohexString(tx.hash) === tohexString(t.hash)));
+      .filter((t) => {
+        const test = gotTxns.some((tx) => tohexString(tx.hash) === tohexString(t.hash));
+
+        if (test) {
+          this._notification.setBadgeNumber(countBadge - 1);
+        }
+
+        return !test;
+      });
     transactionStoreUpdate([...panding, ...gotTxns]);
 
     await this._storage.set(

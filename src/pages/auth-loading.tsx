@@ -24,6 +24,7 @@ type Prop = {
 
 export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
   React.useEffect(() => {
+    keystore.notificationManager.setNavigation(navigation);
     keystore.sync().then(() => {
       const { isEnable, isReady } = keystore.guard.self;
 

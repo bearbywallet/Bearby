@@ -188,6 +188,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
 
   React.useEffect(() => {
     keystore.transaction.sync();
+    keystore.notificationManager.setBadgeNumber(0);
   }, []);
   React.useEffect(() => {
     if (route.params && route.params.tokenIndex) {

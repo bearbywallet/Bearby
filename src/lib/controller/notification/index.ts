@@ -6,6 +6,5 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './actions';
 export * from './notification';
 export * from './store';

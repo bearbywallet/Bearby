@@ -8,7 +8,6 @@
  */
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
 import RNPushNotification, { PushNotification } from 'react-native-push-notification';
-import { NotificationActions } from './actions';
 import {
   notificationStoreReset,
   notificationStore,
@@ -17,16 +16,16 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from 'app/navigator';
-import { MobileStorage, buildObject } from 'app/lib';
+import { MobileStorage, buildObject, NetworkControll } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
 import { NotificationState } from 'types';
+import { viewTransaction } from 'app/utils';
 
 export type MessageNotification = {
   title: string;
   message: string;
-  id: number;
   userInfo: {
-    action: NotificationActions
+    hash: string;
   }
 };
 export type NotificationPermissions = {
@@ -39,9 +38,15 @@ export class NotificationManager {
   public store = notificationStore;
   private _navigation: StackNavigationProp<RootParamList> | undefined;
   private _storage: MobileStorage;
+  private _netwrok: NetworkControll;
 
-  constructor(storage: MobileStorage) {
+  constructor(storage: MobileStorage, netwrok: NetworkControll) {
     this._storage = storage;
+    this._netwrok = netwrok;
+  }
+
+  public setNavigation(navigation: StackNavigationProp<RootParamList>) {
+    this._navigation = navigation;
   }
 
   public async reset() {
@@ -74,7 +79,20 @@ export class NotificationManager {
   }
 
   public onNotification(notification: PushNotification) {
-    // console.log(notification);
+    if (!notification || !notification.data || !this._navigation) {
+      return null;
+    }
+    const net = this._netwrok.selected;
+    const hash = notification.data['hash'];
+
+    const url = viewTransaction(hash, net);
+
+    this._navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url
+      }
+    });
   }
 
   public async toggleNotification() {
@@ -91,10 +109,14 @@ export class NotificationManager {
   }
 
   public setBadgeNumber(count: number) {
+    if (count < 0) {
+      count = 0;
+    }
+
     PushNotificationIOS.setApplicationIconBadgeNumber(count);
   }
 
-  public getBadgeNumber() {
+  public getBadgeNumber(): Promise<number> {
     return new Promise((resolve) => {
       PushNotificationIOS.getApplicationIconBadgeNumber(resolve);
     });
