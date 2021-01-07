@@ -18,3 +18,4 @@ export * from './auth';
 export * from './transaction';
 export * from './search-engine';
 export * from './domain';
+export * from './notification';

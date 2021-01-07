@@ -127,6 +127,8 @@ export default {
   biometric_error: 'Incorect biometric!',
   biometric_description: 'LogIn and confirm transactions',
   theme: 'Theme',
+  notification: 'Notification',
+  notification_des: 'Show transactions notification.',
   about_title: 'About',
   about_link_0: 'Github',
   about_link_1: 'Privacy policy',

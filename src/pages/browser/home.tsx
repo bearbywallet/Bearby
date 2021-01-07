@@ -23,7 +23,7 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
 
 import { SearchIconSVG } from 'app/components/svg';
-import { TabView, SceneMap } from 'react-native-tab-view';
+import { TabView, SceneMap, SceneRendererProps } from 'react-native-tab-view';
 import { CreateAccountNavBar } from 'app/components/create-account';
 import {
   BrowserApps,
@@ -141,7 +141,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           </View>
           <TabView
             style={styles.tabView}
-            renderTabBar={(props) => <CreateAccountNavBar {...props}/>}
+            renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
             navigationState={{ index, routes }}
             renderScene={renderScene}
             onIndexChange={setIndex}

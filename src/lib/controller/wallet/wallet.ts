@@ -26,6 +26,7 @@ import { InjectScript } from 'app/lib/controller';
 import { ConnectController } from 'app/lib/controller/connect';
 import { SSnController } from 'app/lib/controller/ssn';
 import { WorkerController } from 'app/lib/controller/worker';
+import { NotificationManager } from 'app/lib/controller/notification';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -33,6 +34,7 @@ import { Account } from 'types';
 const _storage = new MobileStorage();
 
 export class WalletControler extends Mnemonic {
+  public readonly notificationManager = new NotificationManager(_storage);
   public readonly ud = new UnstoppableDomains(_storage);
   public readonly guard = new GuardControler(_storage);
   public readonly network = new NetworkControll(_storage);
@@ -134,6 +136,7 @@ export class WalletControler extends Mnemonic {
     await this.connect.sync();
     await this.inpage.sync();
     await this.ssn.sync();
+    await this.notificationManager.sync();
     this.worker.start();
   }
 }

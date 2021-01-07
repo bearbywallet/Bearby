@@ -18,6 +18,7 @@ import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
 import { Button } from 'app/components/button';
+import { Switcher } from 'app/components/switcher';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -27,11 +28,16 @@ export const GeneralPage = () => {
   const { colors } = useTheme();
   const currencyState = keystore.currency.store.useValue();
   const themeState = keystore.theme.store.useValue();
+  const notificationState = keystore.notificationManager.store.useValue();
 
   const hanldeReset = React.useCallback(() => {
     keystore.currency.reset();
     keystore.theme.reset();
+    keystore.notificationManager.reset();
   }, []);
+  const hanldeToggleNotification = React.useCallback(() => {
+    keystore.notificationManager.toggleNotification();
+  }, [notificationState]);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -64,6 +70,27 @@ export const GeneralPage = () => {
           title={i18n.t('theme')}
           onSelect={(item) => keystore.theme.set(item)}
         />
+        <Switcher
+          style={{
+            backgroundColor: colors.card,
+            padding: 15
+          }}
+          enabled={notificationState.enabled}
+          onChange={hanldeToggleNotification}
+        >
+          <View style={styles.switcherWrapper}>
+            <Text style={[styles.someText, {
+              color: colors.text
+            }]}>
+              {i18n.t('notification')}
+            </Text>
+            <Text style={[styles.someLable, {
+              color: colors.border
+            }]}>
+              {i18n.t('notification_des')}
+            </Text>
+          </View>
+        </Switcher>
       </ScrollView>
     </SafeAreaView>
   );
@@ -86,6 +113,17 @@ const styles = StyleSheet.create({
   },
   selector: {
     marginVertical: 16
+  },
+  someLable: {
+    fontSize: 16,
+    fontFamily: fonts.Regular
+  },
+  someText: {
+    fontSize: 17,
+    fontFamily: fonts.Demi
+  },
+  switcherWrapper: {
+    maxWidth: '70%'
   }
 });
 

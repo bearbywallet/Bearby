@@ -77,6 +77,7 @@
     "@types/react-native": "^0.63.40",
     "@types/react-native-background-timer": "^2.0.0",
     "@types/react-native-i18n": "^2.0.0",
+    "@types/react-native-push-notification": "^5.0.5",
     "@types/react-native-share": "^3.3.0",
     "@types/react-test-renderer": "^17.0.0",
     "@types/url-parse": "^1.4.3",

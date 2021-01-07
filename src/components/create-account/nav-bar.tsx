@@ -11,12 +11,13 @@ import { StyleSheet } from 'react-native';
 import { TabBar, SceneRendererProps } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
 
-export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props) => {
+export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props: SceneRendererProps) => {
   const { colors } = useTheme();
 
   return (
     <TabBar
       {...props}
+      navigationState={props['navigationState']}
       indicatorStyle={{
         backgroundColor: colors.primary
       }}
