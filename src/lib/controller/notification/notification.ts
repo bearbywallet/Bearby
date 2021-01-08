@@ -19,7 +19,7 @@ import { RootParamList } from 'app/navigator';
 import { MobileStorage, buildObject, NetworkControll } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
 import { NotificationState } from 'types';
-import { viewTransaction } from 'app/utils';
+import { viewTransaction, Device } from 'app/utils';
 
 export type MessageNotification = {
   title: string;
@@ -72,7 +72,8 @@ export class NotificationManager {
 
     if (this.store.get().enabled) {
       RNPushNotification.configure({
-        requestPermissions: true,
+        requestPermissions: Device.isIos(),
+        popInitialNotification: true,
         onNotification: (n) => this.onNotification(n)
       });
     }
@@ -105,7 +106,9 @@ export class NotificationManager {
   }
 
   public abandonPermissions() {
-    PushNotificationIOS.abandonPermissions();
+    if (Device.isIos()) {
+      PushNotificationIOS.abandonPermissions();
+    }
   }
 
   public setBadgeNumber(count: number) {
@@ -113,29 +116,48 @@ export class NotificationManager {
       count = 0;
     }
 
-    PushNotificationIOS.setApplicationIconBadgeNumber(count);
+    if (Device.isIos()) {
+      PushNotificationIOS.setApplicationIconBadgeNumber(count);
+    }
   }
 
   public getBadgeNumber(): Promise<number> {
     return new Promise((resolve) => {
-      PushNotificationIOS.getApplicationIconBadgeNumber(resolve);
+      if (Device.isIos()) {
+        return PushNotificationIOS.getApplicationIconBadgeNumber(resolve);
+      }
+
+      return resolve(0);
     });
   }
 
   public getPermissions() {
     return new Promise((resolve) => {
-      PushNotificationIOS.checkPermissions(resolve);
+      if (Device.isIos()) {
+        PushNotificationIOS.checkPermissions(resolve);
+      }
+
+      resolve({
+        alert: true,
+        badge: true,
+        sound: true
+      });
     });
   }
 
-  public async localNotification(message: MessageNotification) {
+  public localNotification(message: MessageNotification) {
     if (this.store.get().enabled) {
-      RNPushNotification.localNotification(message);
+      RNPushNotification.localNotification({
+        ...message,
+        channelId: 'default-channel-id'
+      });
     }
   }
 
   public requestPermissions(permissions: NotificationPermissions) {
-    return PushNotificationIOS.requestPermissions(permissions);
+      if (Device.isIos()) {
+        return PushNotificationIOS.requestPermissions(permissions);
+      }
   }
 
   private async _update(state: NotificationState) {
