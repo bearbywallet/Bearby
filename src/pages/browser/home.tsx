@@ -158,9 +158,9 @@ const styles = StyleSheet.create({
     flex: 1
   },
   header: {
+    paddingVertical: 30,
     alignItems: 'center',
-    padding: 15,
-    paddingBottom: 30
+    padding: 15
   },
   headerTitle: {
     fontSize: 30,

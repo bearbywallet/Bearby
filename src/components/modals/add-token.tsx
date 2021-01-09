@@ -46,7 +46,7 @@ export const AddTokenModal: React.FC<Prop> = ({
   onTriggered,
   onAddToken
 }) => {
-  const { dark } = useTheme();
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -103,7 +103,7 @@ export const AddTokenModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
-      backdropColor={dark ? '#ffffff5' : '#00000060'}
+      backdropColor={colors['modal']}
       onBackdropPress={handleClose}
     >
       <ModalWrapper style={style}>

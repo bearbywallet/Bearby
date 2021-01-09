@@ -59,7 +59,7 @@ export const HistoryStatus: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
-      backdropColor={dark ? '#ffffff5' : '#00000060'}
+      backdropColor={colors['modal']}
       onBackdropPress={onTriggered}
     >
       <View style={[styles.modalContainer, {

@@ -55,7 +55,7 @@ export const TokensModal: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelect(index);
     onTriggered();
@@ -74,7 +74,7 @@ export const TokensModal: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
-      backdropColor={dark ? '#ffffff5' : '#00000060'}
+      backdropColor={colors['modal']}
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>

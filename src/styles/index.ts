@@ -38,7 +38,8 @@ export const dark = {
     card1: '#2B2E33',
     text: '#FFFFFF',
     border: '#8A8A8F',
-    notification: '#666666'
+    notification: '#666666',
+    modal: '#000'
   }
 };
 export const light = {
@@ -52,7 +53,8 @@ export const light = {
     card1: '#E7EBFE',
     text: '#32335A',
     border: '#B9B9D7',
-    notification: '#8E8EAE'
+    notification: '#8E8EAE',
+    modal: '#000'
   }
 };
 

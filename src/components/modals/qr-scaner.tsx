@@ -31,7 +31,7 @@ export const QRScaner: React.FC<Prop> = ({
   onTriggered,
   onScan
 }) => {
-  const { dark } = useTheme();
+  const { colors } = useTheme();
   const handleSuccess = React.useCallback((e) => {
     onScan(e.data);
     onTriggered();
@@ -45,7 +45,7 @@ export const QRScaner: React.FC<Prop> = ({
         margin: 0,
         marginBottom: 1
       }}
-      backdropColor={dark ? '#ffffff5' : '#00000060'}
+      backdropColor={colors['modal']}
       onBackdropPress={onTriggered}
     >
       {visible ? (
