@@ -53,3 +53,8 @@ export const light = {
     notification: '#8E8EAE'
   }
 };
+
+export const theme = {
+  Dark: dark,
+  Light: light
+};

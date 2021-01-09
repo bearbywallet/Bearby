@@ -11,16 +11,11 @@ import { StatusBar } from 'react-native';
 
 import { NavigationContainer } from '@react-navigation/native';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { AppearanceProvider, useColorScheme } from 'react-native-appearance';
+import { AppearanceProvider } from 'react-native-appearance';
 
 import Navigator from './navigator';
-import { dark, light } from './styles';
+import { theme } from './styles';
 import { keystore } from 'app/keystore';
-
-const theme = {
-  Dark: dark,
-  Light: light
-};
 
 export default function Root() {
   const selected = keystore.theme.store.useValue();
