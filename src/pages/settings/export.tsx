@@ -23,6 +23,7 @@ import i18n from 'app/lib/i18n';
 import { SecureTypes } from 'app/config';
 import { SettingsStackParamList } from 'app/navigator/settings';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<SettingsStackParamList>;
@@ -56,6 +57,12 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
       navigation.goBack();
     }
   }, [navigation, route]);
+
+  React.useEffect(() => {
+    keystore.guard.screenForbid();
+
+    return () => keystore.guard.screenAllow();
+  }, [route]);
 
   return (
     <SafeAreaView style={[styles.container, {

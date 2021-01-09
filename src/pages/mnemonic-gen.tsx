@@ -24,6 +24,7 @@ import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -46,6 +47,12 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
       .generateMnemonic()
       .then((seedPhrase) => setPhrase(seedPhrase));
   }, [setPhrase]);
+
+  React.useEffect(() => {
+    keystore.guard.screenForbid();
+
+    return () => keystore.guard.screenAllow();
+  }, [navigation]);
 
   return (
     <View style={[styles.container, {

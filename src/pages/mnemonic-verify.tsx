@@ -25,6 +25,7 @@ import { shuffle } from 'app/utils';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -60,6 +61,12 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
       phrase
     });
   }, [navigation, phrase]);
+
+  React.useEffect(() => {
+    keystore.guard.screenForbid();
+
+    return () => keystore.guard.screenAllow();
+  }, [navigation]);
 
   return (
     <SafeAreaView style={[styles.container, {

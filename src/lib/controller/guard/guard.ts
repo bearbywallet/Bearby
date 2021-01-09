@@ -6,9 +6,13 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { NativeModules } from 'react-native';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { KeychainControler } from 'app/lib/controller/auth';
 import { STORAGE_FIELDS } from 'app/config';
+import { Device } from 'app/utils';
+
+const { ScreenshotLock } = NativeModules;
 
 // this property is responsible for control session.
 let _isEnable = false;
@@ -37,6 +41,18 @@ export class GuardControler {
 
   public get isReady() {
     return _isReady;
+  }
+
+  public screenForbid() {
+    if (Device.isAndroid()) {
+      ScreenshotLock.forbid();
+    }
+  }
+
+  public screenAllow() {
+    if (Device.isAndroid()) {
+      ScreenshotLock.allow();
+    }
   }
 
   public async setupWallet(password: string, mnemonic: string) {

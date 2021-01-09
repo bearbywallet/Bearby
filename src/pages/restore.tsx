@@ -26,6 +26,7 @@ import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { Mnemonic } from 'app/lib/controller/mnemonic';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -54,6 +55,12 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
       phrase
     });
   }, [phrase, navigation]);
+
+  React.useEffect(() => {
+    keystore.guard.screenForbid();
+
+    return () => keystore.guard.screenAllow();
+  }, [navigation]);
 
   return (
     <SafeAreaView style={[styles.container, {
