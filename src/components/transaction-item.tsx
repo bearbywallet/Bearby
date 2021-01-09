@@ -142,7 +142,7 @@ export const TransactionItem: React.FC<Prop> = ({
         style,
         {
           borderLeftColor: statusColor,
-          backgroundColor: colors.background
+          backgroundColor: colors['card1']
         }
       ]}
       onPress={onSelect}

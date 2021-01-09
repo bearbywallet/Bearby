@@ -40,7 +40,7 @@ export const BrowserAppItem: React.FC<Prop> = ({
   return (
     <TouchableOpacity
       style={[styles.container, {
-        backgroundColor: colors.background
+        backgroundColor: colors['card1']
       }, style]}
       onPress={onPress}
     >

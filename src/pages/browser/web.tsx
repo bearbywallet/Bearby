@@ -295,6 +295,19 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   React.useEffect(() => {
     if (webViewRef.current) {
+      const { hostname } = new URL(route.params.url);
+
+      keystore.account.updateWebView(
+        webViewRef.current,
+        hostname
+      );
+    }
+
+    return () => keystore.account.updateWebView(undefined);
+  }, [route, webViewRef]);
+
+  React.useEffect(() => {
+    if (webViewRef.current) {
       const { base16, bech32 } = keystore.account.getCurrentAccount();
       const m = new Message(Messages.resConnect, {
         data: {

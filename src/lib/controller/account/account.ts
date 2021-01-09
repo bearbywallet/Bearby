@@ -7,11 +7,13 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
+import WebView from 'react-native-webview';
 import Big from 'big.js';
 import {
   STORAGE_FIELDS,
   AccountTypes,
   ZILLIQA_KEYS,
+  Messages,
   NONCE_DIFFICULTY
 } from 'app/config';
 import {
@@ -31,6 +33,8 @@ import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { ViewBlockControler } from 'app/lib/controller/viewblock';
+import { Message } from 'app/lib/controller/inject/message';
+import { connectStore } from 'app/lib/controller/connect';
 
 Big.PE = 99;
 
@@ -41,6 +45,8 @@ export class AccountControler {
   private _zilliqa: ZilliqaControl;
   private _netwrok: NetworkControll;
   private _viewblock: ViewBlockControler;
+  private _webView: WebView | undefined;
+  private _origin: string | undefined;
 
   constructor(
     storage: MobileStorage,
@@ -81,6 +87,11 @@ export class AccountControler {
       .identities
       .filter((acc) => acc.type === AccountTypes.Ledger)
       .length;
+  }
+
+  public updateWebView(webView: WebView | undefined, origin = '') {
+    this._webView = webView;
+    this._origin = origin;
   }
 
   public async sync(): Promise<AccountState> {
@@ -145,6 +156,27 @@ export class AccountControler {
 
   public update(accountState: AccountState): Promise<void> {
     accountStoreUpdate(accountState);
+
+    if (this._webView && this._origin) {
+      const connections = connectStore.get();
+      const isConnect = connections.some(
+        (c) => c.domain.toLowerCase() === String(this._origin).toLowerCase()
+      );
+      const { base16, bech32 } = this.getCurrentAccount();
+      const m = new Message(Messages.wallet, {
+        origin: this._origin,
+        data: {
+          isConnect,
+          account: isConnect ? {
+            base16,
+            bech32
+          } : null,
+          isEnable: true,
+          netwrok: true
+        }
+      });
+      this._webView.postMessage(m.serialize);
+    }
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.ACCOUNTS, accountState)

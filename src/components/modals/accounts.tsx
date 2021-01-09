@@ -48,7 +48,7 @@ export const AccountsModal: React.FC<Prop> = ({
   onSelected,
   onRemove
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
 
   return (
@@ -57,6 +57,7 @@ export const AccountsModal: React.FC<Prop> = ({
       style={{
         justifyContent: 'flex-end',
         margin: 0,
+        elevation: 0,
         marginBottom: 1
       }}
       backdropColor={colors['modal']}
