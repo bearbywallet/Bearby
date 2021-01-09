@@ -34,10 +34,15 @@ export const GeneralPage = () => {
     keystore.currency.reset();
     keystore.theme.reset();
     keystore.notificationManager.reset();
+    keystore.settings.rateUpdate();
   }, []);
   const hanldeToggleNotification = React.useCallback(() => {
     keystore.notificationManager.toggleNotification();
   }, [notificationState]);
+
+  const hanldeSelectedCurrency = React.useCallback(async(item) => {
+    keystore.currency.set(item);
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -61,7 +66,7 @@ export const GeneralPage = () => {
           items={keystore.currency.currencies}
           selected={currencyState}
           title={i18n.t('currency')}
-          onSelect={(item) => keystore.currency.set(item)}
+          onSelect={hanldeSelectedCurrency}
         />
         <Selector
           style={styles.selector}

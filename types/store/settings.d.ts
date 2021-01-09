@@ -13,4 +13,7 @@ export interface Settings {
   rate: {
     [key: string]: number;
   };
+  sideRate: {
+    [key: string]: number;
+  }
 }

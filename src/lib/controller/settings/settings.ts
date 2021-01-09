@@ -73,6 +73,9 @@ export class SettingsControler {
     const [zil] = this._tokens.store.get();
 
     state.rate[zil.symbol] = rate[currency];
+    state.sideRate = rate;
+
+    settingsStoreUpdate(state);
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.SETTINGS, state)
