@@ -68,7 +68,8 @@ const styles = StyleSheet.create({
   categoriesWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around'
+    justifyContent: 'space-around',
+    paddingVertical: 10
   },
   namePlace: {
     paddingTop: 15,

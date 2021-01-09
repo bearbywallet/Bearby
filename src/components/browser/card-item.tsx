@@ -67,8 +67,7 @@ export const BrowserCarditem: React.FC<Prop> = ({ el, title, style, onPress }) =
   return (
     <TouchableOpacity
       style={[styles.container, {
-        backgroundColor: colors.card,
-        shadowColor: dark ? colors.background : colors.primary
+        backgroundColor: colors['card1']
       }, style]}
       onPress={onPress}
     >
@@ -89,14 +88,7 @@ const styles = StyleSheet.create({
     minHeight: width / 5,
     minWidth: width / 2.5,
     borderRadius: 8,
-    justifyContent: 'flex-end',
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2
+    justifyContent: 'flex-end'
   },
   bgImage: {
     width: '100%',

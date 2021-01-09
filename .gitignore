@@ -12,6 +12,7 @@ web-build/
 .env
 # macOS
 .DS_Store
+.vscode
 
 # CocoaPods
 /ios/Pods/

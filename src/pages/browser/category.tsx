@@ -9,26 +9,37 @@
 
 import React from 'react';
 import {
-  StyleSheet
+  StyleSheet,
+  View,
+  Text
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { BrwoserStackParamList } from 'app/navigator/browser';
+import i18n from 'app/lib/i18n';
+import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
   route: RouteProp<BrwoserStackParamList, 'Category'>;
 };
 
-export const BrowserCategoryPage: React.FC<Prop> = () => {
+export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
 
   return (
     <SafeAreaView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
+      <View style={styles.titleWrapper}>
+        <Text style={[styles.title, {
+          color: colors.text
+        }]}>
+          {i18n.t(route.params.category)}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 };
@@ -36,6 +47,17 @@ export const BrowserCategoryPage: React.FC<Prop> = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  titleWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: '10%',
+    paddingHorizontal: 15
+  },
+  title: {
+    fontSize: 30,
+    fontFamily: fonts.Bold
   }
 });
 
