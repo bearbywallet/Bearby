@@ -18,8 +18,7 @@ import {
   ADDRESS_FORMATS,
   API_COINGECKO,
   DEFAULT_CURRENCIES,
-  ZIL_SWAP_CONTRACTS,
-  ZILLIQA_KEYS
+  ZIL_SWAP_CONTRACTS
 } from 'app/config';
 import { ZilliqaControl, TokenControll, NetworkControll } from 'app/lib/controller';
 import { currenciesStore } from 'app/lib/controller/currency/store';
