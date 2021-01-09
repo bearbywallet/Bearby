@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { changeBarColors } from 'react-native-immersive-bars';
 import {
   themesStore,
   themesStoreReset,
@@ -16,6 +17,7 @@ import {
   DEFAULT_THEMES,
   STORAGE_FIELDS
 } from 'app/config';
+import { theme } from 'app/styles';
 
 export class ThemeControler {
   public readonly store = themesStore;
@@ -26,16 +28,23 @@ export class ThemeControler {
     this._storage = storage;
   }
 
-  public set(currency: string) {
-    themesStoreUpdate(currency);
+  public set(type: string) {
+    themesStoreUpdate(type);
+    const { dark, colors } = theme[type];
+
+    changeBarColors(dark, colors.background, colors.background);
 
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.THEME, currency)
+      buildObject(STORAGE_FIELDS.THEME, type)
     );
   }
 
   public reset() {
     themesStoreReset();
+    const type = this.store.get();
+    const { dark, colors } = theme[type];
+
+    changeBarColors(dark, colors.text, colors.background);
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.THEME, this.store.get())
@@ -43,12 +52,16 @@ export class ThemeControler {
   }
 
   public async sync() {
-    const currency = await this._storage.get<string>(
+    const type = await this._storage.get<string>(
       STORAGE_FIELDS.THEME
     );
 
-    if (typeof currency === 'string') {
-      themesStoreUpdate(currency);
+    if (typeof type === 'string') {
+      const { dark, colors } = theme[type];
+
+      changeBarColors(dark, colors.text, colors.background);
+
+      themesStoreUpdate(type);
     }
   }
 }

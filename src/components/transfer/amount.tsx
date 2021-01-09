@@ -114,7 +114,11 @@ export const TransferAmount: React.FC<Prop> = ({
           flexDirection: 'row',
           alignItems: 'center'
         }}>
-          <SvgXml xml={AmountIconSVG} />
+          <SvgXml
+            xml={AmountIconSVG}
+            height={20}
+            width={30}
+          />
           <View style={[styles.inputWrapper, {
             borderBottomColor: error ? colors['danger'] : colors.border
           }]}>

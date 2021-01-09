@@ -10,8 +10,13 @@ import { DEFAULT_THEMES } from 'app/config';
 import { newRidgeState } from 'react-ridge-state';
 import { Appearance } from 'react-native-appearance';
 
-const currentTheme = String(Appearance.getColorScheme()).replace(/^\w/, (c) => c.toUpperCase());
-const initalState = currentTheme || DEFAULT_THEMES[0];
+let currentTheme = String(Appearance.getColorScheme()).replace(/^\w/, (c) => c.toUpperCase());
+
+if (!DEFAULT_THEMES.includes(currentTheme)) {
+  currentTheme = DEFAULT_THEMES[0];
+}
+
+const initalState = currentTheme;
 export const themesStore = newRidgeState<string>(initalState);
 
 export function themesStoreUpdate(selected: string) {

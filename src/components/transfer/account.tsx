@@ -63,7 +63,11 @@ export const TransferAccount: React.FC<Prop> = ({
         style={styles.item}
         onPress={() => setIsAccountModal(true)}
       >
-        <SvgXml xml={ProfileSVG} />
+        <SvgXml
+          xml={ProfileSVG}
+          height={20}
+          width={20}
+        />
         <View style={[styles.itemInfo, {
           borderColor: colors.border,
           borderBottomWidth: 1

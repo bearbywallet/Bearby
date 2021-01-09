@@ -156,7 +156,8 @@ export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
       }]}>
         <Button
           style={{
-            padding: 10
+            padding: 10,
+            marginBottom: 10
           }}
           title={i18n.t('accept')}
           color={colors.primary}
@@ -191,7 +192,7 @@ const styles = StyleSheet.create({
     borderTopLeftRadius: 5,
     borderTopRightRadius: 5,
     width: '100%',
-    height: 70
+    height: 90
   }
 });
 
