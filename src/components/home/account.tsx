@@ -102,7 +102,7 @@ export const HomeAccount: React.FC<Prop> = ({
             onPress={onSend}
           />
           <View style={[styles.seporate, {
-            backgroundColor: colors.border
+            backgroundColor: colors.notification
           }]}/>
           <Button
             color={colors.primary}

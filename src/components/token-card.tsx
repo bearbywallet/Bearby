@@ -112,8 +112,7 @@ export const TokenCard: React.FC<Prop> = ({
     >
       <TouchableOpacity
         style={[styles.wrapper, {
-          backgroundColor: colors.card,
-          shadowColor: dark ? colors.background : colors.primary
+          backgroundColor: colors.background
         }]}
         onPress={onPress}
       >
@@ -155,14 +154,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     minHeight: 90,
     maxHeight: 120,
-    padding: 10,
-    shadowOffset: {
-      width: 0,
-      height: 2
-    },
-    shadowOpacity: 0.5,
-    shadowRadius: 2,
-    elevation: 2
+    padding: 10
   },
   header: {
     width: '100%',

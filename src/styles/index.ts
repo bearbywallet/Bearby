@@ -45,11 +45,11 @@ export const light = {
   dark: false,
   colors: {
     ...colors,
-    primary: '#06B4B1',
-    background: '#E1E7FF',
-    card: '#F9F9F9',
+    primary: '#009AAE',
+    background: '#E7EBFE',
+    card: '#FFFFFF',
     text: '#32335A',
-    border: '#8A8A8F',
+    border: '#B9B9D7',
     notification: '#8E8EAE'
   }
 };

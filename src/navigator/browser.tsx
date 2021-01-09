@@ -34,7 +34,9 @@ export const browserNav: React.FC = () => {
   const headerOptions: StackNavigationOptions = React.useMemo(() => ({
     headerTintColor: colors.text,
     headerStyle: {
-      backgroundColor: colors.background
+      backgroundColor: colors.background,
+      elevation: 0,
+      shadowOpacity: 0
     },
     headerTitleStyle: {
       fontWeight: 'bold'
