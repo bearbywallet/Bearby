@@ -140,11 +140,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     width: '100%',
     justifyContent: 'space-between',
-    paddingVertical: 15
+    paddingVertical: 10
   },
   amount: {
     fontSize: 13,
-    fontFamily: fonts.Regular
+    fontFamily: fonts.Regular,
+    marginTop: 2
   },
   main: {
     marginTop: 15

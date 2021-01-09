@@ -112,7 +112,7 @@ export const TokenCard: React.FC<Prop> = ({
     >
       <TouchableOpacity
         style={[styles.wrapper, {
-          backgroundColor: colors.background
+          backgroundColor: colors['card1']
         }]}
         onPress={onPress}
       >

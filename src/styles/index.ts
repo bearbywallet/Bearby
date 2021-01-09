@@ -32,9 +32,10 @@ export const dark = {
   dark: true,
   colors: {
     ...colors,
-    primary: '#06B4B1',
+    primary: '#00B9B6',
     background: '#09090C',
     card: '#18191D',
+    card1: '#2B2E33',
     text: '#FFFFFF',
     border: '#8A8A8F',
     notification: '#666666'
@@ -48,6 +49,7 @@ export const light = {
     primary: '#009AAE',
     background: '#E7EBFE',
     card: '#FFFFFF',
+    card1: '#E7EBFE',
     text: '#32335A',
     border: '#B9B9D7',
     notification: '#8E8EAE'

@@ -27,14 +27,14 @@ export type Prop = {
 };
 
 export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <React.Fragment>
       <TouchableOpacity
         style={[styles.container, style, {
-          backgroundColor: colors.background
+          backgroundColor: colors['card1']
         }]}
         onPress={() => setModalVisible(true)}
       >

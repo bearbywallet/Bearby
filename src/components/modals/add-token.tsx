@@ -145,6 +145,6 @@ export const AddTokenModal: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   container: {
-    paddingBottom: 30
+    paddingVertical: 30
   }
 });

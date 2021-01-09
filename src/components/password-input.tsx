@@ -73,8 +73,7 @@ const styles = StyleSheet.create({
   },
   textInput: {
     fontSize: 17,
-    lineHeight: 22,
-    padding: 10,
+    padding: 5,
     marginLeft: 15,
     borderBottomWidth: 1,
     width: width - 100

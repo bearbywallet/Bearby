@@ -295,6 +295,7 @@ const styles = StyleSheet.create({
   headerWraper: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'flex-end',
     width: width - 30
   },
   main: {

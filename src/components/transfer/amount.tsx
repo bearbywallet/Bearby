@@ -161,6 +161,6 @@ const commonStyles = StyleSheet.create({
     width: width - 100,
     fontFamily: fonts.Demi,
     fontSize: 17,
-    padding: 10
+    padding: 5
   }
 });

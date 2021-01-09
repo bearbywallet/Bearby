@@ -51,7 +51,9 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
       }]}>
         {i18n.t('settings_title')}
       </Text>
-      <ScrollView>
+      <ScrollView style={{
+        backgroundColor: colors.card
+      }}>
         <TouchableOpacity
           style={styles.listItemWrapper}
           onPress={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}

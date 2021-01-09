@@ -215,7 +215,7 @@ const styles = StyleSheet.create({
   textInput: {
     fontSize: 17,
     lineHeight: 22,
-    padding: 10,
+    padding: 5,
     fontFamily: fonts.Demi,
     borderBottomWidth: 1,
     width
