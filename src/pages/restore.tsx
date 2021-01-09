@@ -38,6 +38,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const [phrase, setphrase] = React.useState<string>('');
 
   const hanldeChange = React.useCallback(async(value) => {
+    value = String(value).toLowerCase();
     const mnemonic = new Mnemonic();
     const isValid = await mnemonic.validateMnemonic(value);
 

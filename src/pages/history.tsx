@@ -43,7 +43,7 @@ type Prop = {
   route: RouteProp<TabStackParamList, 'History'>;
 };
 
-const { width } = Dimensions.get('window');
+const { width, height } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
@@ -299,6 +299,7 @@ const styles = StyleSheet.create({
     width: width - 30
   },
   main: {
+    flex: 1,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16
   },

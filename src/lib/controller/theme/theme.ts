@@ -18,6 +18,7 @@ import {
   STORAGE_FIELDS
 } from 'app/config';
 import { theme } from 'app/styles';
+import { Device } from 'app/utils';
 
 export class ThemeControler {
   public readonly store = themesStore;
@@ -30,9 +31,7 @@ export class ThemeControler {
 
   public set(type: string) {
     themesStoreUpdate(type);
-    const { dark, colors } = theme[type];
-
-    changeBarColors(dark, colors.background, colors.background);
+    this._updateColors();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.THEME, type)
@@ -41,10 +40,7 @@ export class ThemeControler {
 
   public reset() {
     themesStoreReset();
-    const type = this.store.get();
-    const { dark, colors } = theme[type];
-
-    changeBarColors(dark, colors.text, colors.background);
+    this._updateColors();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.THEME, this.store.get())
@@ -57,11 +53,18 @@ export class ThemeControler {
     );
 
     if (typeof type === 'string') {
+      themesStoreUpdate(type);
+    }
+
+    this._updateColors();
+  }
+
+  private _updateColors() {
+    if (Device.isAndroid()) {
+      const type = this.store.get();
       const { dark, colors } = theme[type];
 
       changeBarColors(dark, colors.text, colors.background);
-
-      themesStoreUpdate(type);
     }
   }
 }

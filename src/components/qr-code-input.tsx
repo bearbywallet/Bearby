@@ -67,6 +67,8 @@ export const QrCodeInput: React.FC<Prop> = ({
       setIsLoading(true);
 
       try {
+        onChange(text);
+
         const res = await keystore.ud.getAddressByDomain(text);
         const bech32 = toBech32Address(res.address || res.owner);
 
