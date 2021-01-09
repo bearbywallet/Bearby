@@ -28,7 +28,7 @@ export type UnauthorizedStackParamList = {
   Restore: undefined;
   Mnemonic: undefined;
   MnemonicVerif: {
-    phrase: string
+    phrase: string;
   };
   SetupPassword: {
     phrase: string

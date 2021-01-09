@@ -155,6 +155,9 @@ export const PrivacyPage: React.FC<Prop> = ({ navigation }) => {
         backgroundColor: colors.card
       }]}>
         <Button
+          style={{
+            padding: 10
+          }}
           title={i18n.t('accept')}
           color={colors.primary}
           onPress={() => navigation.navigate('LetStart')}

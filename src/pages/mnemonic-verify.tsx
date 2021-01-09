@@ -34,33 +34,27 @@ type Prop = {
 const { height, width } = Dimensions.get('window');
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
-  const [phrase] = React.useState(String(route.params.phrase));
-  const [selectedWords, setSelectedWords] = React.useState<Set<string>>(new Set());
+  const [phrase] = React.useState(route.params.phrase);
+  const [selectedWords, setSelectedWords] = React.useState<string[]>([]);
   const [shuffledWords, setShuffledWords] = React.useState(
-    new Set(shuffle(phrase.split(' ')))
+    shuffle(phrase.split(' '))
   );
 
   const buttonDisabled = React.useMemo(() => {
-    const words = Array.from(selectedWords).join(' ');
+    const words = selectedWords.join(' ');
     const trueWords = phrase;
 
     return words === trueWords;
   }, [selectedWords, phrase]);
 
-  const handleRemove = React.useCallback((word) => {
-    selectedWords.delete(word);
-    shuffledWords.add(word);
-
-    setSelectedWords(new Set(selectedWords));
-    setShuffledWords(new Set(shuffledWords));
-  }, [setShuffledWords, setSelectedWords]);
-  const handleSelect = React.useCallback((word) => {
-    selectedWords.add(word);
-    shuffledWords.delete(word);
-
-    setShuffledWords(new Set(shuffledWords));
-    setSelectedWords(new Set(selectedWords));
-  }, [setShuffledWords, setSelectedWords]);
+  const handleRemove = React.useCallback((word, index) => {
+    setSelectedWords(selectedWords.filter((_, i) => index !== i));
+    setShuffledWords([...shuffledWords, word]);
+  }, [shuffledWords, selectedWords]);
+  const handleSelect = React.useCallback((word, index) => {
+    setShuffledWords(shuffledWords.filter((_, i) => index !== i));
+    setSelectedWords([...selectedWords, word]);
+  }, [selectedWords, selectedWords]);
   const hanldeContinue = React.useCallback(() => {
     navigation.navigate('SetupPassword', {
       phrase
@@ -78,12 +72,12 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
           {i18n.t('verify_title')}
         </Text>
         <View style={styles.verified}>
-          {Array.from(selectedWords).map((word, index) => (
+          {selectedWords.map((word, index) => (
             <Chip
-              key={index}
+              key={`${index}s`}
               style={styles.defaultChip}
               count={index + 1}
-              onPress={() => handleRemove(word)}
+              onPress={() => handleRemove(word, index)}
             >
               {word}
             </Chip>
@@ -93,11 +87,11 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
           backgroundColor: colors.card
         }]}/>
         <View style={styles.randoms}>
-          {Array.from(shuffledWords).map((word, index) => (
+          {shuffledWords.map((word, index) => (
             <Chip
-              key={index}
+              key={`${index}r`}
               style={styles.defaultChip}
-              onPress={() => handleSelect(word)}
+              onPress={() => handleSelect(word, index)}
             >
               {word}
             </Chip>

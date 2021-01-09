@@ -11,6 +11,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  Dimensions,
   Text
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -28,6 +29,7 @@ type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
+const { width } = Dimensions.get('window');
 const mnemonic = new Mnemonic();
 export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -80,7 +82,9 @@ export const MnemonicGenPage: React.FC<Prop> = ({ navigation }) => {
         <Button
           title={i18n.t('mnemonic_btn1')}
           color={colors.primary}
-          onPress={() => navigation.navigate('MnemonicVerif', { phrase })}
+          onPress={() => navigation.navigate('MnemonicVerif', {
+            phrase
+          })}
         />
       </View>
     </View>
@@ -110,7 +114,8 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     paddingHorizontal: '3%',
     flexWrap: 'wrap',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    maxWidth: width / 1.2
   },
   defaultChip: {
     margin: 8
