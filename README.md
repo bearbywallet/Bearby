@@ -1,6 +1,6 @@
 # ZilPay mobile wallet.
 
-ZilPay wallet the decentralized browser and wallet in one. Via ZilPay you any developers can create decentralized applications on ZIlliqa blockchain.
+ZilPay wallet the decentralized browser and wallet in one. Via ZilPay you and developers can create decentralized applications on ZIlliqa blockchain.
 
 <p align="center">
   <a href="https://zilpay.xyz"><img src="https://github.com/zilpay/zilpay-mobile/blob/master/imgs/preview.png"></a>
@@ -57,7 +57,7 @@ build bungle
 node node_modules/react-native/local-cli/cli.js bundle --entry-file='./index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
 ```
 
-Thanks for yours donate.
+Thanks for yours donations.
 ------
 
 - ZIL: zil1wl38cwww2u3g8wzgutxlxtxwwc0rf7jf27zace
