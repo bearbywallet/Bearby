@@ -57,6 +57,11 @@ build bungle
 node node_modules/react-native/local-cli/cli.js bundle --entry-file='./index.js' --bundle-output='./ios/main.jsbundle' --dev=false --platform='ios' --assets-dest='./ios'
 ```
 
+Android build singed package
+```bash
+ $ ./gradlew bundleRelease
+```
+
 Thanks for yours donations.
 ------
 
