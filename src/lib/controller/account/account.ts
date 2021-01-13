@@ -172,7 +172,7 @@ export class AccountControler {
             bech32
           } : null,
           isEnable: true,
-          netwrok: true
+          netwrok: this._netwrok.selected
         }
       });
       this._webView.postMessage(m.serialize);
