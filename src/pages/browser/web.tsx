@@ -133,7 +133,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.appConnect:
           if (isConnect) {
-            handleConnect(isConnect);
+            handleConnect(isConnect, message.payload);
             break;
           }
           setAppConnect(message.payload);
@@ -166,7 +166,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
       }
     } catch (err) {
-      console.error(err);
+      // console.error(err);
     }
   }, [
     webViewRef,
@@ -174,20 +174,26 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     isConnect
   ]);
 
-  const handleConnect = React.useCallback((value) => {
-    if (value && appConnect && appConnect.title && appConnect.icon && appConnect.origin) {
+  const handleConnect = React.useCallback((value, app?: MessagePayload) => {
+    let connector = app;
+
+    if (appConnect) {
+      connector = appConnect;
+    }
+
+    if (value && connector && connector.title && connector.icon && connector.origin) {
       keystore.connect.add({
-        title: appConnect.title,
-        domain: new URL(appConnect.origin).hostname,
-        icon: appConnect.icon
+        title: connector.title,
+        domain: new URL(connector.origin).hostname,
+        icon: connector.icon
       });
     }
 
-    if (webViewRef.current && appConnect) {
+    if (webViewRef.current && connector) {
       const { base16, bech32 } = keystore.account.getCurrentAccount();
       const m = new Message(Messages.resConnect, {
-        origin: appConnect.origin,
-        uuid: appConnect.uuid,
+        origin: connector.origin,
+        uuid: connector.uuid,
         data: {
           confirm: value,
           account: value ? {

@@ -136,6 +136,7 @@ export default {
   about_link_0: 'Github',
   about_link_1: 'Privacy policy',
   about_link_2: 'Terms and use',
+  about_link_3: 'Issues',
   connections_title: 'Connections',
   connections_remove_all: 'Remove All',
   netwrok_title: 'Network',

@@ -31,6 +31,7 @@ type Prop = {
 const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
 const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
 const TERMS_URL = 'https://zilpay.xyz/Terms/';
+const ISSUES = 'https://github.com/zilpay/zilpay-mobile/issues';
 const { width } = Dimensions.get('window');
 export const AboutPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
@@ -72,6 +73,11 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
           title={i18n.t('about_link_2')}
           color={colors.primary}
           onPress={() => handleOpen(TERMS_URL)}
+        />
+        <Button
+          title={i18n.t('about_link_3')}
+          color={colors.primary}
+          onPress={() => handleOpen(ISSUES)}
         />
       </View>
     </ SafeAreaView>
