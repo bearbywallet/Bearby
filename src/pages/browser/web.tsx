@@ -378,6 +378,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         source={{
           uri: route.params.url
         }}
+        style={{
+          backgroundColor: colors.background
+        }}
         applicationNameForUserAgent={`ZilPay/${version}`}
         incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
