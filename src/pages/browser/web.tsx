@@ -234,6 +234,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     webViewRef.current.postMessage(m.serialize);
     setSignMessage(undefined);
   }, [webViewRef, signMessage, setSignMessage]);
+  /**
+   * Confirm and send transaction from popup.
+   */
   const handleConfirmTransaction = React.useCallback(async(tx: Transaction, cb, password) => {
     setConfirmError(undefined);
 
@@ -277,6 +280,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     transaction,
     webViewRef
   ]);
+  /**
+   * Reject the transaction, from popup.
+   */
   const hanldeRejectTransaction = React.useCallback(() => {
     if (!webViewRef.current || !transaction) {
       return null;
@@ -293,12 +299,20 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     setTransaction(undefined);
   }, [transaction]);
 
+  /**
+   * Sync if inject page script didn't load.
+   */
   React.useEffect(() => {
     if (!inpageJS) {
       keystore.inpage.sync();
     }
   }, []);
 
+  /**
+   * Listing webViewRef when it created, and update
+   * network and accounts webView instance for autoupdate
+   * selected netwrok and selecte daccount.
+   */
   React.useEffect(() => {
     if (webViewRef.current) {
       const { hostname } = new URL(route.params.url);
@@ -316,6 +330,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     return () => keystore.account.updateWebView(undefined);
   }, [route, webViewRef]);
 
+  /**
+   * Listing event when page loaded, send connection information.
+   */
   React.useEffect(() => {
     if (webViewRef.current) {
       const { base16, bech32 } = keystore.account.getCurrentAccount();
