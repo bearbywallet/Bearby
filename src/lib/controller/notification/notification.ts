@@ -34,6 +34,8 @@ export type NotificationPermissions = {
   sound: boolean;
 };
 
+const CHANNEL_ID = 'zilpay-notification-channel';
+
 export class NotificationManager {
   public store = notificationStore;
   private _navigation: StackNavigationProp<RootParamList> | undefined;
@@ -76,6 +78,14 @@ export class NotificationManager {
         popInitialNotification: true,
         onNotification: (n) => this.onNotification(n)
       });
+
+      RNPushNotification.createChannel(
+        {
+          channelId: CHANNEL_ID,
+          channelName: 'Default channel'
+        },
+        () => null
+      );
     }
   }
 
