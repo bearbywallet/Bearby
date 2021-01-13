@@ -13,7 +13,7 @@ web-build/
 # macOS
 .DS_Store
 .vscode
-
+*.hprof
 # CocoaPods
 /ios/Pods/
 

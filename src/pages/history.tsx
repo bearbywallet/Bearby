@@ -17,7 +17,6 @@ import {
   Alert,
   StyleSheet
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
@@ -32,7 +31,7 @@ import { RootParamList } from 'app/navigator';
 import { TabStackParamList } from 'app/navigator/tab-navigator';
 import { keystore } from 'app/keystore';
 import { TxStatsues, ZILLIQA_KEYS, TokenTypes } from 'app/config';
-import { toBech32Address } from 'app/utils';
+import { toBech32Address, Device } from 'app/utils';
 import { TransactionType } from 'types';
 
 import ZIlliqaLogo from 'app/assets/zilliqa.svg';
@@ -43,7 +42,7 @@ type Prop = {
   route: RouteProp<TabStackParamList, 'History'>;
 };
 
-const { width, height } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
@@ -197,7 +196,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
   }, [setSelectedToken, route.params]);
 
   return (
-    <SafeAreaView style={[styles.container, {
+    <View style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <View style={styles.header}>
@@ -276,7 +275,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation, route }) => {
           onTriggered={() => setTransactionModal(false)}
         />
       ) : null}
-    </SafeAreaView>
+    </View>
   );
 };
 
@@ -286,6 +285,7 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
+    marginTop: '5%',
     padding: 15
   },
   headerTitle: {
