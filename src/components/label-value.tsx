@@ -43,14 +43,14 @@ export const LabelValue: React.FC<Prop> = ({ children, title, style }) => {
 const styles = StyleSheet.create({
   txItem: {
     padding: 10,
-    margin: 5
+    margin: 3
   },
   txLable: {
-    fontSize: 16,
+    fontSize: 13,
     fontFamily: fonts.Demi
   },
   txValue: {
     fontFamily: fonts.Regular,
-    fontSize: 17
+    fontSize: 10
   }
 });
