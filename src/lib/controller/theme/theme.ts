@@ -64,7 +64,7 @@ export class ThemeControler {
       const type = this.store.get();
       const { dark, colors } = theme[type];
 
-      changeBarColors(dark, colors.text, colors.background);
+      changeBarColors(dark, colors.background, colors.background);
     }
   }
 }

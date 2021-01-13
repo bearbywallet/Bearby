@@ -58,7 +58,7 @@ export const AccountItem: React.FC<Prop> = ({
           {account.name}
         </Text>
         <Text style={[styles.accountAddress, {
-          color: colors.text
+          color: colors.notification
         }]}>
           {trim(account[format])}
         </Text>

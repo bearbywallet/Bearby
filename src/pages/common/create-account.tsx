@@ -97,16 +97,12 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
 };
 
 const styles = StyleSheet.create({
-  scene: {
-    flex: 1,
-  },
   container: {
     flex: 1
   },
   title: {
     textAlign: 'center',
     fontFamily: fonts.Bold,
-    fontSize: 30,
-    marginTop: 30
+    fontSize: 30
   }
 });

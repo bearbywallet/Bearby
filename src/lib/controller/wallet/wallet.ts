@@ -90,7 +90,9 @@ export class WalletControler extends Mnemonic {
 
   public async addNextAccount(name: string, password?: string) {
     const { identities } = this.account.store.get();
-    const nextIndex = identities.length + 1;
+    const nextIndex = identities.filter(
+      (acc) => acc.type === AccountTypes.Seed
+    ).length;
     const mnemonic = await this.guard.getMnemonic(password);
     const keyPairs = await this.getKeyPair(mnemonic, nextIndex);
 
@@ -106,21 +108,44 @@ export class WalletControler extends Mnemonic {
   }
 
   public async addPrivateKeyAccount(privatekey: string, name: string, password?: string) {
+    const { identities } = this.account.store.get();
+    const nextIndex = identities.filter(
+      (acc) => acc.type === AccountTypes.privateKey
+    ).length;
     const account = await this.account.fromPrivateKey(privatekey, name);
     const encryptedPrivateKey = await this.guard.auth.encryptVault(
       privatekey, password
     );
 
+    account.index = nextIndex;
     account.privKey = JSON.stringify(encryptedPrivateKey);
 
     await this.account.add(account);
   }
 
   public async getkeyPairs(account: Account, password?: string) {
-    const mnemonic = await this.guard.getMnemonic(password);
-    const keyPairs = await this.getKeyPair(mnemonic, account.index);
+    // Getting account by seed phrase.
+    if (account.type === AccountTypes.Seed) {
+      const mnemonic = await this.guard.getMnemonic(password);
+      const keyPairs = await this.getKeyPair(mnemonic, account.index);
 
-    return keyPairs;
+      return keyPairs;
+    }
+
+    // Getting account from chiper privateKey
+    if (account.privKey && account.type === AccountTypes.privateKey) {
+      const { index, pubKey } = account;
+      const encrypted = JSON.parse(account.privKey);
+      const privateKey = await this.guard.auth.decryptVault(encrypted);
+
+      return {
+        index,
+        privateKey,
+        publicKey: pubKey
+      };
+    }
+
+    throw new Error('Incorect account type');
   }
 
   public async sync() {
