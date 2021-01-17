@@ -1,6 +1,7 @@
 apply plugin: "com.android.application"
 
 import com.android.build.OutputFile
+import groovy.json.JsonSlurper
 
 /**
  * The react.gradle file registers a task for each build variant (e.g. bundleDebugJsAndAssets
@@ -83,6 +84,17 @@ project.ext.react = [
 
 apply from: "../../node_modules/react-native/react.gradle"
 
+def getNpmVersion() {
+	def inputFile = new File("../package.json")
+	def packageJson = new JsonSlurper().parseText(inputFile.text)
+	return packageJson["version"]
+}
+/* calculated from git commits to give sequential integers */
+def getGitVersion() {
+	def process = "git rev-list master --first-parent --count".execute()
+	return process.text.toInteger()
+}
+
 /**
  * Set this to true to create two separate APKs instead of one:
  *   - An APK that only works on ARM devices
@@ -120,6 +132,9 @@ def jscFlavor = 'org.webkit:android-jsc:+'
  */
 def enableHermes = project.ext.react.get("enableHermes", false);
 
+def userVer = getNpmVersion();
+def googleVer = getGitVersion();
+
 android {
     compileSdkVersion rootProject.ext.compileSdkVersion
 
@@ -132,8 +147,8 @@ android {
         applicationId "com.zilpaymobile"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 1
-        versionName "1.0"
+		versionCode googleVer
+		versionName userVer
 		missingDimensionStrategy 'react-native-camera', 'general'
 		multiDexEnabled true
 	}
