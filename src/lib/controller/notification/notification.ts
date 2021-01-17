@@ -7,7 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import PushNotificationIOS from '@react-native-community/push-notification-ios';
-import RNPushNotification, { PushNotification } from 'react-native-push-notification';
+import RNPushNotification, { ReceivedNotification } from 'react-native-push-notification';
 import {
   notificationStoreReset,
   notificationStore,
@@ -34,7 +34,7 @@ export type NotificationPermissions = {
   sound: boolean;
 };
 
-const CHANNEL_ID = 'zilpay-notification-channel';
+const CHANNEL_ID = 'default-channel-id';
 
 export class NotificationManager {
   public store = notificationStore;
@@ -89,7 +89,7 @@ export class NotificationManager {
     }
   }
 
-  public onNotification(notification: PushNotification) {
+  public onNotification(notification: Omit<ReceivedNotification, 'userInfo'>) {
     if (!notification || !notification.data || !this._navigation) {
       return null;
     }
