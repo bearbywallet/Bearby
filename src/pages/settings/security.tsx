@@ -17,7 +17,6 @@ import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
-import { Selector } from 'app/components/selector';
 import { Switcher } from 'app/components/switcher';
 import { PasswordModal } from 'app/components/modals';
 import { Button } from 'app/components/button';
@@ -32,20 +31,6 @@ type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
-const times = [
-  {
-    time: 1,
-    name: `1 ${i18n.t('hour')}`
-  },
-  {
-    time: 3,
-    name: `3 ${i18n.t('hours')}`
-  },
-  {
-    time: 5,
-    name: `5 ${i18n.t('hours')}`
-  },
-];
 export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const authState = keystore.guard.auth.store.useValue();
@@ -164,14 +149,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
           {i18n.t('security_title')}
         </Text>
       </View>
-      <ScrollView>
-        <Selector
-          style={{ marginVertical: 16 }}
-          title={i18n.t('security_lock')}
-          items={times.map((item) => item.name)}
-          selected={times[hour].name}
-          onSelect={(_, index) => sethour(index)}
-        />
+      <ScrollView style={styles.wrapper}>
         {authState.supportedBiometryType ? (
           <Switcher
             style={{
@@ -238,6 +216,9 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  wrapper: {
+    paddingVertical: 15
   },
   titleWrapper: {
     flexDirection: 'row',

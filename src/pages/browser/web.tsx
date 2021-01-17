@@ -15,7 +15,6 @@ import {
   Image
 } from 'react-native';
 import URL from 'url-parse';
-import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
@@ -356,7 +355,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }
 
   return (
-    <SafeAreaView style={[styles.container, {
+    <View style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <BrowserViewBar
@@ -426,13 +425,13 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           />
         </ConfirmPopup>
       ) : null}
-    </SafeAreaView>
+    </View>
   );
 };
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    marginTop: 30
+    marginTop: 25
   },
   loading: {
     height: 3

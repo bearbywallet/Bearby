@@ -40,24 +40,35 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
           {i18n.t(route.params.category)}
         </Text>
       </View>
+      <View>
+        <Text style={[styles.placeholder, {
+          color: colors.notification
+        }]}>
+          {i18n.t('havent_apps')}
+        </Text>
+      </View>
     </SafeAreaView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+    paddingHorizontal: 15
   },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '10%',
-    paddingHorizontal: 15
+    marginTop: '10%'
   },
   title: {
     fontSize: 30,
     fontFamily: fonts.Bold
+  },
+  placeholder: {
+    fontSize: 16,
+    fontFamily: fonts.Regular
   }
 });
 
