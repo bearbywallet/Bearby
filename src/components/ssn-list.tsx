@@ -45,6 +45,11 @@ export const SSnList: React.FC<Prop> = ({
 }) => {
   const { colors } = useTheme();
 
+  const SSNList = React.useMemo(
+    () => ssnState.list.sort((a, b) => a.time - b.time),
+    [ssnState]
+  );
+
   return (
     <View style={[styles.container, style]}>
       <View style={styles.titleWrapper}>
@@ -61,7 +66,7 @@ export const SSnList: React.FC<Prop> = ({
       </View>
       {!isLoading ? (
         <View style={[styles.container, style]}>
-          {ssnState.list.map((item, index) => (
+          {SSNList.map((item, index) => (
             <TouchableOpacity
               key={index}
               style={[styles.item, {
