@@ -164,7 +164,7 @@ const styles = StyleSheet.create({
   },
   symbol: {
     fontFamily: fonts.Demi,
-    fontSize: 17
+    fontSize: 14
   },
   zilAmount: {
     fontSize: 17,

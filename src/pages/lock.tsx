@@ -108,7 +108,11 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
             />
             {authState.biometricEnable ? (
               <TouchableOpacity onPress={hanldeBiometricUnlock}>
-                <SvgXml xml={FingerPrintIconSVG}/>
+                <SvgXml
+                  xml={FingerPrintIconSVG}
+                  width={40}
+                  height={40}
+                />
               </TouchableOpacity>
             ) : null}
           </View>
@@ -151,7 +155,7 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     fontFamily: fonts.Demi,
     padding: 10,
-    width: '84%'
+    width: '80%'
   },
   errorMessage: {
     fontFamily: fonts.Demi,

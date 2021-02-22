@@ -45,7 +45,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [mnemonicPhrase] = React.useState(String(route.params.phrase));
   const [loading, setLoading] = React.useState(false);
 
-  const [accountName, setAccountName] = React.useState('Account 0');
+  const [accountName, setAccountName] = React.useState(`${i18n.t('settings_item_account')} 0`);
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [isBiometric, setIsBiometric] = React.useState(true);

@@ -14,7 +14,8 @@ import {
   AccountTypes,
   ZILLIQA_KEYS,
   Messages,
-  NONCE_DIFFICULTY
+  NONCE_DIFFICULTY,
+  MAX_NAME_DIFFICULTY
 } from 'app/config';
 import {
   getAddressFromPublicKey,
@@ -180,6 +181,28 @@ export class AccountControler {
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.ACCOUNTS, accountState)
+    );
+  }
+
+  public updateAccountName(account: Account) {
+    const accounts = this.store.get();
+
+    if (account.name.length > MAX_NAME_DIFFICULTY) {
+      return null;
+    }
+
+    accounts.identities = accounts.identities.map((acc) => {
+      if (acc.base16 === account.base16) {
+        return account;
+      }
+
+      return acc;
+    });
+
+    accountStoreUpdate(accounts);
+
+    return this._storage.set(
+      buildObject(STORAGE_FIELDS.ACCOUNTS, accounts)
     );
   }
 
