@@ -23,6 +23,7 @@ import {
   ArrowIconSVG,
   GearIconSVG,
   AdvancedIconSVG,
+  ProfileSVG,
   NetworkIconSVG,
   BookIconSVG,
   AboutIconSVG,
@@ -54,6 +55,26 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
       <ScrollView style={{
         backgroundColor: colors.card
       }}>
+        <TouchableOpacity
+          style={styles.listItemWrapper}
+          onPress={() => navigation.navigate('SettingsPages', { screen: 'AccountSettings' })}
+        >
+          <SvgXml xml={ProfileSVG} />
+          <View style={[styles.listItem, {
+            borderBottomColor: colors.notification
+          }]}>
+            <Text style={[styles.listTextItem, {
+              color: colors.text
+            }]}>
+              {i18n.t('settings_item_account')}
+            </Text>
+            <SvgXml
+              xml={ArrowIconSVG}
+              fill={colors.notification}
+              style={styles.arrow}
+            />
+          </View>
+        </TouchableOpacity>
         <TouchableOpacity
           style={styles.listItemWrapper}
           onPress={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}
