@@ -153,8 +153,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
+          const newTX = Transaction.fromPayload(message.payload.data, account);
+          newTX.setNonce(account.nonce + 1);
           setTransaction({
-            params: Transaction.fromPayload(message.payload.data, account),
+            params: newTX,
             uuid: message.payload.uuid,
             origin: message.payload.origin,
             icon: message.payload.icon
@@ -249,7 +251,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       const keyPair = await keystore.getkeyPairs(account, password);
 
       tx.setVersion(chainID);
-      tx.nonce = account.nonce + 1;
       await tx.sign(keyPair.privateKey);
       tx.hash = await keystore.zilliqa.send(tx);
 

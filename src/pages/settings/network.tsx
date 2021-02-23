@@ -60,7 +60,9 @@ export const NetworkPage = () => {
         await keystore.settings.sync();
       }
 
+      const { selectedAddress } = keystore.account.store.get();
       await keystore.account.zilBalaceUpdate();
+      await keystore.account.updateNonce(selectedAddress);
     } catch (err) {
       // console.log(err);
     }

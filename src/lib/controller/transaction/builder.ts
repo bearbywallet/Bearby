@@ -129,6 +129,10 @@ export class Transaction {
     this.priority = priority;
   }
 
+  public setNonce(nonce: number) {
+    this.nonce = nonce;
+  }
+
   public setVersion(chainId: number) {
     const { config, selected } = networkStore.get();
     const msg = config[selected].MSG_VERSION;

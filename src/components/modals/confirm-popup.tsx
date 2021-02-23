@@ -65,7 +65,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   onTriggered,
   onConfirm
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -112,10 +112,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
       onBackdropPress={onTriggered}
     >
       <ModalWrapper style={style}>
-        <ModalTitle
-          style={{ padding: 15 }}
-          onClose={onTriggered}
-        >
+        <ModalTitle onClose={onTriggered}>
           <View style={styles.topWrapper}>
             {children}
             <Text style={[styles.toptext, {
@@ -198,9 +195,12 @@ export const ConfirmPopup: React.FC<Prop> = ({
           <AdvacedGas
             gas={gas}
             ds={DS}
+            isDS={!transaction.data}
+            nonce={transaction.nonce}
             defaultGas={deppUnlink(transaction.fee)}
             onDSChanged={setDS}
             onChange={setGas}
+            onChangeNonce={(nonce) => transaction.setNonce(nonce)}
           />
           <CustomButton
             title={i18n.t('send')}

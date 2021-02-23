@@ -58,7 +58,7 @@ export default StyleSheet.create({
   },
   label: {
     fontFamily: fonts.Demi,
-    fontSize: 16,
+    fontSize: 14,
     marginBottom: 7
   },
   arrowIcon: {
@@ -66,7 +66,7 @@ export default StyleSheet.create({
     alignSelf: 'center'
   },
   nameAmountText: {
-    fontSize: 17,
+    fontSize: 14,
     lineHeight: 22
   }
 });

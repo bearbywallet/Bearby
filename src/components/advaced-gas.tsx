@@ -31,18 +31,24 @@ type Prop = {
   style?: ViewStyle;
   gas: GasState;
   ds: boolean;
+  isDS: boolean;
+  nonce: number;
   defaultGas: GasState;
   onDSChanged: (value: boolean) => void;
   onChange: (gas: GasState) => void;
+  onChangeNonce: (nonce: number) => void;
 };
 
 export const AdvacedGas: React.FC<Prop> = ({
   style,
   gas,
   ds,
+  isDS,
+  nonce,
   defaultGas,
   onDSChanged,
-  onChange
+  onChange,
+  onChangeNonce
 }) => {
   const { colors } = useTheme();
   const [isAdvanced, setIsAdvanced] = React.useState(false);
@@ -73,25 +79,11 @@ export const AdvacedGas: React.FC<Prop> = ({
       </View>
       {isAdvanced ? (
         <React.Fragment>
-          <Switcher
-            enabled={ds}
-            onChange={onDSChanged}
-          >
-            <Text style={[styles.dsLabel, {
-              color: colors.text
-            }]}>
-              {i18n.t('send_to_ds')}
-            </Text>
-          </Switcher>
-          <View style={styles.inputWrapper}>
-            <Text style={[styles.gasLimitLabel, {
-              color: colors.border
-            }]}>
-              {i18n.t('gas_limit')}:
-            </Text>
+          <View style={[styles.inputWrapper, {
+            borderBottomColor: colors.border
+          }]}>
             <TextInput
               style={[styles.textInput, {
-                borderBottomColor: colors.border,
                 color: colors.text
               }]}
               autoCorrect={false}
@@ -99,7 +91,42 @@ export const AdvacedGas: React.FC<Prop> = ({
               defaultValue={gas.gasLimit}
               onChangeText={(gasLimit) => onChange({ ...gas, gasLimit })}
             />
+            <Text style={[styles.gasLimitLabel, {
+              color: colors.border
+            }]}>
+              {i18n.t('gas_limit')}
+            </Text>
           </View>
+                    <View style={[styles.inputWrapper, {
+            borderBottomColor: colors.border
+          }]}>
+            <TextInput
+              style={[styles.textInput, {
+                color: colors.text
+              }]}
+              autoCorrect={false}
+              placeholderTextColor={colors.border}
+              defaultValue={String(nonce)}
+              onChangeText={(nonce) => onChangeNonce(Number(nonce))}
+            />
+            <Text style={[styles.gasLimitLabel, {
+              color: colors.border
+            }]}>
+              {i18n.t('nonce')}
+            </Text>
+          </View>
+          {isDS ? (
+            <Switcher
+              enabled={ds}
+              onChange={onDSChanged}
+            >
+              <Text style={[styles.dsLabel, {
+                color: colors.text
+              }]}>
+                {i18n.t('send_to_ds')}
+              </Text>
+            </Switcher>
+          ) : null}
         </React.Fragment>
       ) : null}
     </View>
@@ -121,17 +148,19 @@ const styles = StyleSheet.create({
   },
   gasLimitLabel: {
     fontFamily: fonts.Regular,
-    fontSize: 16
+    fontSize: 13
   },
   inputWrapper: {
+    flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 15
+    justifyContent: 'space-between',
+    marginVertical: 10,
+    borderBottomWidth: 1
   },
   textInput: {
-    fontSize: 17,
+    fontSize: 14,
     fontFamily: fonts.Demi,
-    padding: 10,
-    borderBottomWidth: 1,
-    width: '90%'
+    padding: 5,
+    width: '50%'
   },
 });

@@ -43,7 +43,7 @@ type Prop = {
 };
 
 const { width } = Dimensions.get('window');
-export const TransferPage: React.FC<Prop> = ({ route }) => {
+export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
@@ -81,7 +81,6 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
       const keyPair = await keystore.getkeyPairs(account, password);
 
       transaction.setVersion(chainID);
-      transaction.nonce = account.nonce + 1;
       await transaction.sign(keyPair.privateKey);
       transaction.hash = await keystore.zilliqa.send(transaction);
 
@@ -90,6 +89,11 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
 
       cb();
       setConfirmModal(false);
+
+      navigation.navigate('App', {
+        screen: 'History',
+        params: {}
+      });
     } catch (err) {
       cb();
       setConfirmError(err.message);
@@ -133,15 +137,17 @@ export const TransferPage: React.FC<Prop> = ({ route }) => {
         };
         toAddr = token.address[networkState.selected];
       }
-
-      setTx(new Transaction(
+      const newTX = new Transaction(
         qa,
         gas,
         account,
         toAddr,
         '',
         data
-      ));
+      );
+      newTX.setNonce(account.nonce + 1);
+
+      setTx(newTX);
     } catch (err) {
       //
     }
