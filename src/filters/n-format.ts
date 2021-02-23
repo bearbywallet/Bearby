@@ -7,7 +7,6 @@
  * Copyright (c) 2020 ZilPay
  */
 import Big from 'big.js';
-import { toLocaleString } from './to-locale-string';
 
 Big.PE = 99;
 

@@ -21,8 +21,9 @@ import { useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
 import { Selector } from 'app/components/selector';
-import { AccountName } from 'app/components/account-name';
+import { CustomTextInput } from 'app/components/custom-text-input';
 import { Passwordinput } from 'app/components/password-input';
+import { ProfileSVG } from 'app/components/svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -122,12 +123,14 @@ export const ImportAccount: React.FC<Prop> = ({
         selected={selected}
         onSelect={handleChangeType}
       />
+      <CustomTextInput
+        icon={ProfileSVG}
+        defaultValue={accName}
+        onChangeText={setAccName}
+        placeholder={i18n.t('pass_setup_input0')}
+        labelText={i18n.t('pass_setup_label0')}
+      />
       <View style={styles.wrapper}>
-        <AccountName
-          style={{ paddingVertical: 15}}
-          name={accName}
-          setName={setAccName}
-        />
         {variants[0] === selected ? (
           <KeyboardAwareScrollView>
             <TextInput

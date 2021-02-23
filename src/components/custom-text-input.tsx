@@ -23,9 +23,10 @@ import { SvgXml } from 'react-native-svg';
 type Prop = {
   style?: ViewStyle;
   defaultValue?: string;
-  icon: string;
+  icon?: string;
   placeholder?: string;
   labelText?: string;
+  secureTextEntry?: boolean;
   onChangeText?: ((text: string) => void);
 };
 
@@ -36,17 +37,22 @@ export const CustomTextInput: React.FC<Prop> = ({
   placeholder,
   defaultValue,
   labelText = '',
+  secureTextEntry = false,
   onChangeText
 }) => {
   const { colors } = useTheme();
 
   return (
     <View style={[styles.inputWrapper, style]}>
-      <SvgXml
-        style={styles.icon}
-        xml={icon}
-        width={30}
-      />
+      {icon ? (
+        <SvgXml
+          style={styles.icon}
+          xml={icon}
+          width={30}
+        />
+      ) : (
+        <View style={styles.icon} />
+      )}
       <View style={styles.wrapper}>
         <TextInput
           style={[styles.textInput, {
@@ -54,8 +60,9 @@ export const CustomTextInput: React.FC<Prop> = ({
             borderBottomColor: colors.border
           }]}
           defaultValue={defaultValue}
+          secureTextEntry={secureTextEntry}
           placeholder={placeholder}
-          placeholderTextColor={colors.card}
+          placeholderTextColor={colors.notification}
           onChangeText={onChangeText}
         />
         <Text style={[styles.label, {

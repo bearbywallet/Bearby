@@ -9,16 +9,17 @@
 
 import React from 'react';
 import {
-  StyleSheet
+  StyleSheet, View
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { CustomButton } from 'app/components/custom-button';
-import { AccountName } from 'app/components/account-name';
 import { Passwordinput } from 'app/components/password-input';
+import { CustomTextInput } from 'app/components/custom-text-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
+import { ProfileSVG } from 'app/components/svg';
 
 type Prop = {
   biometricEnable: boolean;
@@ -60,34 +61,37 @@ export const AddAccount: React.FC<Prop> = ({
   }, [password, name, biometricEnable, onAdded]);
 
   return (
-    <KeyboardAwareScrollView style={styles.wrapper}>
-      <AccountName
-        style={styles.elementWrapper}
-        name={name}
-        setName={setName}
+    <KeyboardAwareScrollView style={styles.container}>
+      <CustomTextInput
+        icon={ProfileSVG}
+        onChangeText={setName}
+        defaultValue={name}
+        placeholder={i18n.t('pass_setup_input0')}
+        labelText={i18n.t('pass_setup_label0')}
       />
-      {!biometricEnable ? (
-        <Passwordinput
-          style={styles.elementWrapper}
-          passwordError={passwordError}
-          placeholder={i18n.t('pass_setup_input1')}
-          onChange={setPassword}
+      <View style={styles.wrapper}>
+        {!biometricEnable ? (
+          <Passwordinput
+            passwordError={passwordError}
+            placeholder={i18n.t('pass_setup_input1')}
+            onChange={setPassword}
+          />
+        ) : null}
+        <CustomButton
+          isLoading={loading}
+          title={i18n.t('create_account_btn')}
+          onPress={handleCreate}
         />
-      ) : null}
-      <CustomButton
-        isLoading={loading}
-        title={i18n.t('create_account_btn')}
-        onPress={handleCreate}
-      />
+      </View>
     </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  wrapper: {
-    paddingHorizontal: 20
+  container: {
+    paddingVertical: 16
   },
-  elementWrapper: {
-    marginVertical: 35
+  wrapper: {
+    padding: 16
   }
 });

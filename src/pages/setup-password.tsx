@@ -18,13 +18,13 @@ import {
   ActivityIndicator,
   StyleSheet
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { ProfileSVG, LockSVG } from 'app/components/svg';
 import { Switcher } from 'app/components/switcher';
 import { Button } from 'app/components/button';
+import { CustomTextInput } from 'app/components/custom-text-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -111,29 +111,13 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         {i18n.t('password_title')}
       </Text>
       <View style={styles.wrapper}>
-        <View style={styles.elementWrapper}>
-          <View style={styles.inputWrapper}>
-            <SvgXml
-              xml={ProfileSVG}
-              width={30}
-            />
-            <TextInput
-              style={[styles.textInput, {
-                color: colors.text,
-                borderBottomColor: colors.border
-              }]}
-              defaultValue={accountName}
-              placeholder={i18n.t('pass_setup_input0')}
-              placeholderTextColor={colors.card}
-              onChangeText={setAccountName}
-            />
-          </View>
-          <Text style={[styles.label, {
-            color: colors.border
-          }]}>
-            {i18n.t('pass_setup_label0')}
-          </Text>
-        </View>
+        <CustomTextInput
+          icon={ProfileSVG}
+          defaultValue={accountName}
+          placeholder={i18n.t('pass_setup_input0')}
+          onChangeText={setAccountName}
+          labelText={i18n.t('pass_setup_label0')}
+        />
         {authState.supportedBiometryType ? (
           <Switcher
             style={styles.biometric}
@@ -148,44 +132,18 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           </Switcher>
         ) : null}
         <View style={styles.elementWrapper}>
-          <View style={styles.inputWrapper}>
-            <SvgXml
-              xml={LockSVG}
-              width={30}
-            />
-            <TextInput
-              style={[styles.textInput, {
-                color: colors.text,
-                borderBottomColor: colors.border
-              }]}
-              secureTextEntry={true}
-              placeholder={i18n.t('pass_setup_input1')}
-              placeholderTextColor={colors.notification}
-              onChangeText={setPassword}
-            />
-          </View>
-          <View style={{ marginLeft: 30 }}>
-            <TextInput
-              style={[styles.textInput, {
-                color: colors.text,
-                borderBottomColor: colors.border
-              }]}
-              secureTextEntry={true}
-              placeholder={i18n.t('pass_setup_input2')}
-              placeholderTextColor={colors.notification}
-              onChangeText={setPasswordConfirm}
-            />
-          </View>
-          <Text style={[styles.label, {
-            color: colors.border
-          }]}>
-            {i18n.t('pass_setup_label1')}
-          </Text>
-          <Text style={[styles.label, {
-            color: colors.border
-          }]}>
-            {i18n.t('pass_setup_label2')}
-          </Text>
+          <CustomTextInput
+            icon={LockSVG}
+            placeholder={i18n.t('pass_setup_input1')}
+            onChangeText={setPassword}
+            secureTextEntry
+          />
+          <CustomTextInput
+            placeholder={i18n.t('pass_setup_input2')}
+            onChangeText={setPasswordConfirm}
+            labelText={i18n.t('pass_setup_label1') + ' ' + i18n.t('pass_setup_label2')}
+            secureTextEntry
+          />
         </View>
       </View>
       {loading ? (
@@ -221,23 +179,14 @@ const styles = StyleSheet.create({
     width
   },
   biometric: {
+    paddingLeft: 50,
+    paddingHorizontal: 10,
     flexDirection: 'row',
     alignItems: 'center'
-  },
-  inputWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between'
   },
   elementWrapper: {
     width,
     marginVertical: 15
-  },
-  label: {
-    marginVertical: 5,
-    maxWidth: width - 70,
-    fontFamily: fonts.Regular,
-    marginLeft: 38
   },
   title: {
     textAlign: 'center',
@@ -247,7 +196,6 @@ const styles = StyleSheet.create({
     marginTop: 30
   },
   wrapper: {
-    paddingHorizontal: 20,
     marginTop: 40,
     marginBottom: 60
   }
