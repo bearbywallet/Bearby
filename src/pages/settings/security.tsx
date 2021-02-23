@@ -36,7 +36,6 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   const authState = keystore.guard.auth.store.useValue();
   const accountState = keystore.account.store.useValue();
 
-  const [hour, sethour] = React.useState(0);
   const [modaltitle, setModalTitle] = React.useState('');
   const [modalBtntitle, setModalBtntitle] = React.useState('');
   const [exportType, setExportType] = React.useState<SecureTypes | null>(null);

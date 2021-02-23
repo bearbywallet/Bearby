@@ -48,7 +48,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [accountName, setAccountName] = React.useState(`${i18n.t('settings_item_account')} 0`);
   const [password, setPassword] = React.useState('');
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
-  const [isBiometric, setIsBiometric] = React.useState(true);
+  const [isBiometric, setIsBiometric] = React.useState(Boolean(authState.supportedBiometryType));
   const [biometric, setBiometric] = React.useState<string>();
 
   const disabledContinue = React.useMemo(() => {
@@ -124,9 +124,9 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             enabled={isBiometric}
             onChange={setIsBiometric}
           >
-            <Text style={[styles.label, {
+            <Text style={{
               color: colors.border
-            }]}>
+            }}>
               {biometric}
             </Text>
           </Switcher>

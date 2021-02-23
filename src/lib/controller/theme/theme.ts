@@ -62,9 +62,9 @@ export class ThemeControler {
   private _updateColors() {
     if (Device.isAndroid()) {
       const type = this.store.get();
-      const { dark } = theme[type];
+      const { dark, colors } = theme[type];
 
-      changeBarColors(dark, 'transparent', 'transparent');
+      changeBarColors(dark, colors.text, 'transparent');
     }
   }
 }
