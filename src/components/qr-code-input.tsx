@@ -61,6 +61,8 @@ export const QrCodeInput: React.FC<Prop> = ({
       return onChange(text);
     }
 
+    text = String(text).toLowerCase();
+
     const regExpDomain = /.*\w.zil/gm;
 
     if (regExpDomain.test(text)) {
@@ -104,7 +106,7 @@ export const QrCodeInput: React.FC<Prop> = ({
           placeholder={placeholder}
           value={value}
           placeholderTextColor={colors.border}
-          onSubmitEditing={() => null}
+          autoCapitalize="none"
           onChangeText={hanldeChange}
         />
         <TouchableOpacity onPress={() => setQrcodeModal(true)}>

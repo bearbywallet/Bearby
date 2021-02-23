@@ -44,6 +44,9 @@ export const AccountSettingsPage = () => {
       name
     });
   }, [account, accountState]);
+  const hanldeResetNonce = React.useCallback(() => {
+    keystore.account.updateNonce(accountState.selectedAddress);
+  }, [accountState]);
   const handleChangeName = React.useCallback((name: string) => {
     keystore.account.updateAccountName({
       ...account,
@@ -80,6 +83,38 @@ export const AccountSettingsPage = () => {
             onChangeText={handleChangeName}
           />
         </View>
+        <View style={[styles.itemWrapper, {
+          backgroundColor: colors.card
+        }]}>
+          <Button
+            title={i18n.t('reset')}
+            color={colors.primary}
+            style={styles.resetBtn}
+            onPress={hanldeResetNonce}
+          />
+          <View style={{
+            flexDirection: 'row',
+            paddingHorizontal: 16
+          }}>
+            <Text style={[styles.title, {
+              color: colors.notification
+            }]}>
+              #
+            </Text>
+            <View style={styles.infoWrapper}>
+              <Text style={[styles.text, {
+                color: colors.notification
+              }]}>
+                Nonce
+              </Text>
+              <Text style={[styles.text, {
+                color: colors.text
+              }]}>
+                {account.nonce}
+              </Text>
+            </View>
+          </View>
+        </View>
       </KeyboardAwareScrollView>
     </SafeAreaView>
   );
@@ -107,6 +142,13 @@ const styles = StyleSheet.create({
   itemWrapper: {
     marginTop: 30,
     paddingVertical: 10
+  },
+  infoWrapper: {
+    paddingHorizontal: 16
+  },
+  text: {
+    fontSize: 15,
+    fontFamily: fonts.Demi
   }
 });
 

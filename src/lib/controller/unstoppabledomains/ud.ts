@@ -11,6 +11,7 @@ import { PINTA, NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
 import { DomainResolver } from 'types';
+import { fromBech32Address } from 'app/utils';
 
 /**
  * Unstoppabledomains service domain resolver.
@@ -49,6 +50,12 @@ export class UnstoppableDomains {
 
       if (result && result[this._field][zilRecords]) {
         address = result[this._field][zilRecords];
+      }
+
+      try {
+        address = fromBech32Address(address);
+      } catch {
+        ///
       }
     }
 

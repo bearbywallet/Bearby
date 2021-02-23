@@ -7,7 +7,6 @@
  * Copyright (c) 2020 ZilPay
  */
 import { useTheme } from '@react-navigation/native';
-import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 import React from 'react';
 import {

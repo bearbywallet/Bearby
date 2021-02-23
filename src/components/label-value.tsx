@@ -25,7 +25,7 @@ export const LabelValue: React.FC<Prop> = ({ children, title, style }) => {
   const { colors } = useTheme();
 
   return (
-    <View style={styles.txItem}>
+    <View style={[styles.txItem, style]}>
       <Text style={[styles.txLable, {
         color: colors.border
       }]}>
