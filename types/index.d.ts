@@ -64,6 +64,22 @@ export interface PubNubPublishResponse {
   timetoken: string;
 }
 
+export interface ExtensionAccount {
+  address: string;
+  balance: string;
+  index: number;
+  name?: string;
+}
+
+export interface PubNubDataResult {
+  seed: string;
+  importedAccounts: string;
+  wallet: {
+    identities: ExtensionAccount[];
+    selectedAddress: number;
+  }
+}
+
 export interface PubNubEventListener {
   message?: (m: PubNubMesage) => void;
   presence?: (m: object) => void;

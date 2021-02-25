@@ -10,5 +10,6 @@ export enum WalletConnectTypes {
   Start = 'start-sync',
   EndSync = 'end-sync',
   SyncingData = 'syncing-data',
-  SyncError = 'error-sync'
+  SyncError = 'error-sync',
+  SyncDone = 'sync-done'
 }

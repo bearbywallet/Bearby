@@ -131,6 +131,7 @@ export default {
   theme: 'Theme',
   connect: 'Connect',
   connect_title: 'Steps to sync with ZIlPay extension.',
+  connect_title_decrypt: 'ZIlPay password',
   connect_step0: 'Open ZIlPay extension on Desktop.',
   connect_step1: 'Go to Settings > security.',
   connect_step2: 'Click to `Mobile connect`.',

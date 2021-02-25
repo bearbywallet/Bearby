@@ -10,12 +10,13 @@ import PubNub from 'pubnub';
 
 import {
 	PubHubInstance,
-	PubNubEventListener,
 	PubNubMesage,
 	PubNubPublishStatus,
-	PubNubPublishResponse
+	PubNubPublishResponse,
+	PubNubDataResult
 } from 'types';
 import { WalletConnectTypes } from 'app/config';
+import EventEmitter from 'events';
 
 type MessageResponse = {
 	status: PubNubPublishStatus;
@@ -29,6 +30,7 @@ const EXPIRED_CODE_TIMEOUT = 30000;
 export class PubNubWrapper {
 	public static FIELD = 'zilpay-sync';
 
+	private _event = new EventEmitter();
 	private _pubnub: PubHubInstance;
 	private _cipherKey: string;
 	private _channelName: string;
@@ -54,7 +56,7 @@ export class PubNubWrapper {
 		});
 	}
 
-	public async startSync() {
+	public async startSync(): Promise<PubNubDataResult> {
 		const payload = {
 			message: {
 				event: WalletConnectTypes.Start
@@ -64,6 +66,17 @@ export class PubNubWrapper {
 			storeInHistory: false
 		};
 		await this._sendMessage(payload);
+
+		return new Promise((resolve, reject) => {
+			this._event.once(WalletConnectTypes.SyncDone, (data) => {
+				try {
+					resolve(JSON.parse(data))
+				} catch (err) {
+					reject(err);
+				}
+			});
+			this._event.once(WalletConnectTypes.SyncError, (err) => reject(err));
+		});
 	}
 
 	public async endSync() {
@@ -84,6 +97,7 @@ export class PubNubWrapper {
 		this._pubnub.removeAllListeners();
 		this._pubnub.stop();
 		this._pubnub.unsubscribeAll();
+		this._event.removeAllListeners();
 	}
 
 	private _sendMessage(payload: PubNubMesage): Promise<MessageResponse> {
@@ -105,7 +119,6 @@ export class PubNubWrapper {
 				}
 			},
 			message: ({ channel, message }) => {
-				console.log(channel, message);
 				if (channel !== this._channelName || !message) {
 					this.disconnectWebsockets();
 
@@ -114,12 +127,15 @@ export class PubNubWrapper {
 
 				switch (message.event) {
 					case WalletConnectTypes.SyncError:
+						this._event.emit(WalletConnectTypes.SyncError, message.data);
+						this.endSync();
 						break;
 					case WalletConnectTypes.SyncingData:
+						this._event.emit(WalletConnectTypes.SyncDone, message.data);
 						this.endSync();
 						break;
 					case WalletConnectTypes.EndSync:
-						this.disconnectWebsockets();
+						this.endSync();
 						break;
 					default:
 						break;
