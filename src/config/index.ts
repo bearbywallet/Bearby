@@ -20,3 +20,4 @@ export * from './explorer';
 export * from './tx-statuses';
 export * from './token-type';
 export * from './messages';
+export * from './wallet-connect';

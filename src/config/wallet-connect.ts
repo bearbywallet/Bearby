@@ -6,6 +6,9 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './connect';
-export * from './store';
-export * from './wallet-connect';
+export enum WalletConnectTypes {
+  Start = 'start-sync',
+  EndSync = 'end-sync',
+  SyncingData = 'syncing-data',
+  SyncError = 'error-sync'
+}

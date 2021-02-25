@@ -137,6 +137,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         };
         toAddr = token.address[networkState.selected];
       }
+
       const newTX = new Transaction(
         qa,
         gas,

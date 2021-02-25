@@ -31,7 +31,7 @@ import { LabelValue } from 'app/components/label-value';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { TransactionType } from 'types';
-import { trim, fromZil } from 'app/filters';
+import { fromZil } from 'app/filters';
 import { viewTransaction } from 'app/utils';
 
 type Prop = {
@@ -114,10 +114,10 @@ export const TransactionModal: React.FC<Prop> = ({
             {transaction.hash}
           </LabelValue>
           <LabelValue title={i18n.t('transfer_account')}>
-            {trim(transaction.from)}
+            {transaction.from}
           </LabelValue>
           <LabelValue title={i18n.t('recipient_account')}>
-            {trim(transaction.to)}
+            {transaction.to}
           </LabelValue>
           <LabelValue title={i18n.t('transfer_amount')}>
             {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}

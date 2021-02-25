@@ -6,6 +6,5 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './connect';
-export * from './store';
-export * from './wallet-connect';
+
+declare module 'pubnub';

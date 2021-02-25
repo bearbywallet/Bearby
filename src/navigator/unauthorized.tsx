@@ -19,6 +19,7 @@ import MnemonicGenPage from 'app/pages/mnemonic-gen';
 import MnemonicVerifyPage from 'app/pages/mnemonic-verify';
 import SetupPasswordPage from 'app/pages/setup-password';
 import InitSuccessfullyPage from 'app/pages/init-successfully';
+import { WalletConnectPage } from 'app/pages/wallet-connect';
 
 export type UnauthorizedStackParamList = {
   GetStarted: undefined;
@@ -34,6 +35,7 @@ export type UnauthorizedStackParamList = {
     phrase: string
   };
   InitSuccessfully: undefined;
+  WalletConnect: undefined;
 };
 
 const UnauthorizedStack = createStackNavigator<UnauthorizedStackParamList>();
@@ -115,6 +117,14 @@ export const Unauthorized: React.FC = () => {
       <UnauthorizedStack.Screen
         name="MnemonicVerif"
         component={MnemonicVerifyPage}
+        options={{
+          ...headerOptions,
+          title: ''
+        }}
+      />
+      <UnauthorizedStack.Screen
+        name="WalletConnect"
+        component={WalletConnectPage}
         options={{
           ...headerOptions,
           title: ''

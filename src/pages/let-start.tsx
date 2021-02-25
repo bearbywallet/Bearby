@@ -64,6 +64,11 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
             color={colors.primary}
             onPress={() => navigation.navigate('Restore')}
           />
+          <Button
+            title={i18n.t('connect')}
+            color={colors.primary}
+            onPress={() => navigation.navigate('WalletConnect')}
+          />
         </View>
       </View>
     </SafeAreaView>
@@ -98,6 +103,7 @@ const styles = StyleSheet.create({
   buttons: {
     flexDirection: 'row',
     justifyContent: 'space-evenly',
+    flexWrap: 'wrap',
     marginTop: 72,
     minWidth: '100%'
   }
