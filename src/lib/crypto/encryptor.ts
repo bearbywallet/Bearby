@@ -7,6 +7,7 @@
  * Copyright (c) 2020 ZilPay
  */
 import { NativeModules } from 'react-native';
+import { sha256 } from './sha256';
 
 const Aes = NativeModules.Aes;
 

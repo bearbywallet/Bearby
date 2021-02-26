@@ -13,6 +13,7 @@ import {
   View,
   Alert
 } from 'react-native';
+import { NativeModules } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -26,13 +27,14 @@ import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 import { PubNubWrapper } from 'app/lib/controller/connect';
-import { Encryptor } from 'app/lib/crypto';
+import { sha256 } from 'app/lib/crypto';
 import { PubNubDataResult } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
+const Aes = NativeModules.Aes;
 const STEPS = [
   i18n.t('connect_step0'),
   i18n.t('connect_step1'),
@@ -52,13 +54,16 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
     if (value && value.search('zilpay-sync:') !== -1) {
       const field = PubNubWrapper.FIELD;
-      const [channelName, cipherKey] = value.replace(`${field}:`, '').split('|@|');
+      const [channelName, cipherKey, iv] = value.replace(`${field}:`, '').split('|@|');
       const pubnubWrapper = new PubNubWrapper(channelName, cipherKey);
 
       try {
         const data = await pubnubWrapper.startSync();
 
-        setData(data);
+        setData({
+          ...data,
+          iv
+        });
       } catch (err) {
         Alert.alert(
           i18n.t('connect_invalid_qr_code_title'),
@@ -74,13 +79,27 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
     setIsLoading(false);
   }, []);
-  const handleDecrypt = React.useCallback(() => {
+  const handleDecrypt = React.useCallback(async() => {
     setIsLoading(true);
-    const encryptor = new Encryptor('');
 
-    console.log(JSON.stringify(data, null, 4));
+    if (!data || !password) {
+      Alert.alert(
+        i18n.t('connect_invalid_qr_code_title'),
+        i18n.t('connect_invalid_qr_code_des')
+      );
 
-    // encryptor.decrypt(password);
+      return null;
+    }
+
+    try {
+      const pwd = await sha256(password);
+      const content = await Aes.decrypt(data.cipher, pwd, data.iv)
+      const decrypted = JSON.parse(JSON.parse(content))
+
+      console.log(JSON.stringify(decrypted, null, 4));
+    } catch (err) {
+      console.error(err);
+    }
 
     setIsLoading(false);
   }, [password, data]);
@@ -127,6 +146,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
             <Passwordinput
               placeholder={i18n.t('pass_setup_input1')}
               onChange={setPassword}
+              onSubmitEditing={handleDecrypt}
             />
             <CustomButton
               disabled={!password}

@@ -72,8 +72,8 @@ export interface ExtensionAccount {
 }
 
 export interface PubNubDataResult {
-  seed: string;
-  importedAccounts: string;
+  cipher: string;
+  iv: string;
   wallet: {
     identities: ExtensionAccount[];
     selectedAddress: number;
