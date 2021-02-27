@@ -272,6 +272,8 @@ export class AccountControler {
     }
 
     await this.update(state);
+
+    return nonce;
   }
 
   public async increaseNonce(selected: number) {

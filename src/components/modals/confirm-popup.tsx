@@ -112,7 +112,13 @@ export const ConfirmPopup: React.FC<Prop> = ({
       keystore
         .account
         .updateNonce(foundIndex)
-        .then(() => setIsLoading(false))
+        .then((nonce) => {
+          if (nonce) {
+            transaction.setNonce(nonce);
+          }
+
+          setIsLoading(false)
+        })
         .catch(() => setIsLoading(false));
     }
   }, [account]);
