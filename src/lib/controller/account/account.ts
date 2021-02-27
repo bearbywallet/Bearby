@@ -119,6 +119,7 @@ export class AccountControler {
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
+    const { nonce } = await this._zilliqa.getBalance(base16);
 
     return {
       base16,
@@ -127,8 +128,8 @@ export class AccountControler {
       type,
       pubKey,
       balance,
-      index: Number(acc.index),
-      nonce: 0 // TODO: check and update nonce.
+      nonce,
+      index: Number(acc.index)
     };
   }
 

@@ -77,8 +77,8 @@ export class WalletControler extends Mnemonic {
     await this.guard.setupWallet(password, mnemonic);
   }
 
-  public async addAccount(mnemonic: string, name: string) {
-    const keyPairs = await this.getKeyPair(mnemonic);
+  public async addAccount(mnemonic: string, name: string, index?: number) {
+    const keyPairs = await this.getKeyPair(mnemonic, index);
     const account = await this.account.fromKeyPairs(
       keyPairs,
       AccountTypes.Seed,

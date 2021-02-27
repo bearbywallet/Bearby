@@ -22,13 +22,15 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { CustomButton } from 'app/components/custom-button';
 import { Passwordinput } from 'app/components/password-input';
+import { Switcher } from 'app/components/switcher';
 
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 import { PubNubWrapper } from 'app/lib/controller/connect';
 import { sha256 } from 'app/lib/crypto';
-import { PubNubDataResult } from 'types';
+import { PubNubDataResult, EncryptedWallet } from 'types';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
@@ -44,10 +46,15 @@ const STEPS = [
 
 export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
+  const authState = keystore.guard.auth.store.useValue();
+
   const [qrcodeModal, setQrcodeModal] = React.useState(false);
   const [isLoading, setIsLoading] = React.useState(false);
   const [password, setPassword] = React.useState<string>();
+  const [passwordError, setPasswordError] = React.useState(' ');
   const [data, setData] = React.useState<PubNubDataResult>();
+  const [isBiometric, setIsBiometric] = React.useState(Boolean(authState.supportedBiometryType));
+  const [biometric, setBiometric] = React.useState<string>();
 
   const handleScan = React.useCallback(async(value) => {
     setIsLoading(true);
@@ -79,6 +86,10 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
     setIsLoading(false);
   }, []);
+  const hanldeChangePassword = React.useCallback((value) => {
+    setPasswordError(' ');
+    setPassword(value);
+  }, []);
   const handleDecrypt = React.useCallback(async() => {
     setIsLoading(true);
 
@@ -88,21 +99,74 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
         i18n.t('connect_invalid_qr_code_des')
       );
 
+      setIsLoading(false);
+
       return null;
     }
 
     try {
       const pwd = await sha256(password);
-      const content = await Aes.decrypt(data.cipher, pwd, data.iv)
-      const decrypted = JSON.parse(JSON.parse(content))
+      const content = await Aes.decrypt(data.cipher, pwd, data.iv);
+      const decrypted: EncryptedWallet = JSON.parse(JSON.parse(content));
 
-      console.log(JSON.stringify(decrypted, null, 4));
+      await keystore.initWallet(password, decrypted.decryptSeed);
+      await keystore.account.reset();
+
+      for (const iterator of data.wallet.identities) {
+        if (iterator.hwType) {
+          continue;
+        } else if (iterator.isImport) {
+          const found = decrypted.decryptImported.find(
+            (el) => el.index === iterator.index
+          );
+
+          if (!found) {
+            continue;
+          }
+
+          if (!iterator.name) {
+            iterator.name = `Imported ${iterator.index}`;
+          }
+
+          await keystore.addPrivateKeyAccount(
+            found.privateKey,
+            iterator.name,
+            password
+          );
+        } else {
+          if (!iterator.name) {
+            iterator.name = `Account ${iterator.index}`;
+          }
+
+          await keystore.addAccount(
+            decrypted.decryptSeed,
+            iterator.name,
+            iterator.index
+          );
+        }
+      }
+
+      if (isBiometric) {
+        await keystore.guard.auth.initKeychain(password);
+      }
+
+      navigation.navigate('InitSuccessfully');
     } catch (err) {
-      console.error(err);
+      setPasswordError(i18n.t('lock_error'));
     }
 
     setIsLoading(false);
-  }, [password, data]);
+  }, [password, data, isBiometric]);
+
+  React.useEffect(() => {
+    const { accessControl } = authState;
+
+    if (!accessControl) {
+      setBiometric(i18n.t('biometric_pin'));
+    } else {
+      setBiometric(i18n.t('biometric_touch_id'));
+    }
+  }, []);
 
   return (
     <React.Fragment>
@@ -145,9 +209,23 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
             </Text>
             <Passwordinput
               placeholder={i18n.t('pass_setup_input1')}
-              onChange={setPassword}
+              onChange={hanldeChangePassword}
+              passwordError={passwordError}
               onSubmitEditing={handleDecrypt}
             />
+            {authState.supportedBiometryType ? (
+              <Switcher
+                style={styles.biometric}
+                enabled={isBiometric}
+                onChange={setIsBiometric}
+              >
+                <Text style={{
+                  color: colors.border
+                }}>
+                  {biometric}
+                </Text>
+              </Switcher>
+            ) : null}
             <CustomButton
               disabled={!password}
               title={i18n.t('confirm')}
@@ -177,6 +255,11 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Regular,
     fontSize: 14,
     lineHeight: 30
+  },
+  biometric: {
+    paddingBottom: 15,
+    flexDirection: 'row',
+    alignItems: 'center'
   },
   scanBtn: {
     width: '70%',
