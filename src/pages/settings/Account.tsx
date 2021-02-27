@@ -23,6 +23,7 @@ import { ProfileSVG } from 'app/components/svg';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { fonts } from 'app/styles';
+import { AccountTypes } from 'app/config';
 
 export const AccountSettingsPage = () => {
   const { colors } = useTheme();
@@ -37,7 +38,15 @@ export const AccountSettingsPage = () => {
     const index = accountState.identities.findIndex(
       (acc) => acc.base16 === account.base16
     );
-    const name = `${i18n.t('settings_item_account')} ${index}`;
+    let name = '';
+
+    if (account.type === AccountTypes.Seed) {
+      name = `Account ${index}`;
+    } else if (account.type === AccountTypes.privateKey) {
+      name = `Imported ${index}`;
+    } else if (account.type === AccountTypes.Ledger) {
+      name = `Ledger ${index}`;
+    }
 
     keystore.account.updateAccountName({
       ...account,
