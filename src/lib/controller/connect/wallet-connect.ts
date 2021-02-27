@@ -36,12 +36,7 @@ export class PubNubWrapper {
 	private _channelName: string;
 
 	constructor(channelName: string, cipherKey?: string) {
-		if (!cipherKey) {
-			this._cipherKey = PubNub.generateUUID();
-		} else {
-			this._cipherKey = cipherKey;
-		}
-
+		this._cipherKey = cipherKey ? cipherKey : PubNub.generateUUID();
 		this._pubnub = new PubNub({
 			cipherKey: this._cipherKey,
 			publishKey: PUB_KEY,
@@ -70,7 +65,7 @@ export class PubNubWrapper {
 		return new Promise((resolve, reject) => {
 			this._event.once(WalletConnectTypes.SyncDone, (data) => {
 				try {
-					resolve(JSON.parse(data))
+					resolve(JSON.parse(data));
 				} catch (err) {
 					reject(err);
 				}
@@ -107,7 +102,7 @@ export class PubNubWrapper {
 					status,
 					response
 				});
-			})
+			});
 		});
 	}
 

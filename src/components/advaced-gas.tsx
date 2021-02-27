@@ -107,7 +107,7 @@ export const AdvacedGas: React.FC<Prop> = ({
               autoCorrect={false}
               placeholderTextColor={colors.border}
               defaultValue={String(nonce)}
-              onChangeText={(nonce) => onChangeNonce(Number(nonce))}
+              onChangeText={(n) => onChangeNonce(Number(n))}
             />
             <Text style={[styles.gasLimitLabel, {
               color: colors.border

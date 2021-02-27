@@ -11,9 +11,9 @@ import {
   StyleSheet,
   Text,
   View,
-  Alert
+  Alert,
+  NativeModules
 } from 'react-native';
-import { NativeModules } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -65,10 +65,10 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
       const pubnubWrapper = new PubNubWrapper(channelName, cipherKey);
 
       try {
-        const data = await pubnubWrapper.startSync();
+        const content = await pubnubWrapper.startSync();
 
         setData({
-          ...data,
+          ...content,
           iv
         });
       } catch (err) {
