@@ -174,13 +174,17 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
         <SafeAreaView style={[styles.container, {
           backgroundColor: colors.background
         }]}>
-          <Text style={styles.title}>
+          <Text style={[styles.title, {
+            color: colors.text
+          }]}>
             {i18n.t('connect_title')}
           </Text>
           <View>
             {STEPS.map((step, index) => (
               <Text
-                style={styles.stepText}
+                style={[styles.stepText, {
+                  color: colors.text
+                }]}
                 key={index}
               >
                 {index + 1}. {step}
@@ -204,7 +208,9 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
           backgroundColor: colors.background
         }]}>
           <KeyboardAwareScrollView>
-            <Text style={styles.title}>
+            <Text style={[styles.title, {
+              color: colors.text
+            }]}>
               {i18n.t('connect_title_decrypt')}
             </Text>
             <Passwordinput

@@ -84,7 +84,7 @@ export default {
   recipient_account: 'Recipient account',
   block_height: 'Block Height',
   copy_address: 'Copy address',
-  copy_hash: 'Copy hash',
+  copy_hash: 'Copy hash', 
   copy: 'Copy',
   transition: 'Transitions',
   view_block: 'View on ViewBlock',
