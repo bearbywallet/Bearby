@@ -36,11 +36,6 @@ const styles = StyleSheet.create({
   errorMessage: {
     fontSize: 17,
     fontFamily: fonts.Demi,
-    textAlign: 'center',
-    textShadowOffset: {
-      width: -1,
-      height: 1
-    },
-    textShadowRadius: 1
+    textAlign: 'center'
   }
 });
