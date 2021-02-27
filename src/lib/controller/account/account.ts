@@ -264,7 +264,7 @@ export class AccountControler {
     }
 
     if (nonce === account.nonce) {
-      return null;
+      return account.nonce;
     }
 
     if (nonce > account.nonce) {
@@ -273,7 +273,7 @@ export class AccountControler {
 
     await this.update(state);
 
-    return nonce;
+    return account.nonce;
   }
 
   public async increaseNonce(selected: number) {

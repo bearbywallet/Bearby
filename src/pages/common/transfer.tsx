@@ -146,7 +146,6 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         '',
         data
       );
-      newTX.setNonce(account.nonce + 1);
 
       setTx(newTX);
     } catch (err) {

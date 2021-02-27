@@ -28,6 +28,8 @@ export const BrowserSettingsPage = () => {
   const { colors } = useTheme();
   const searchEngineState = keystore.searchEngine.store.useValue();
 
+  const [incognito, setIncognito] = React.useState(searchEngineState.incognito);
+
   const engineList = React.useMemo(
     () => searchEngineState.identities.map((e) => e.name),
     [searchEngineState]
@@ -48,6 +50,10 @@ export const BrowserSettingsPage = () => {
       //
     }
   }, [searchEngineState]);
+  const hanldeChangeIncognito = React.useCallback(() => {
+    keystore.searchEngine.toggleIncognito(!incognito);
+    setIncognito(!incognito);
+  }, [incognito]);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -98,8 +104,8 @@ export const BrowserSettingsPage = () => {
             ...styles.switcherContainer,
             backgroundColor: colors.card
           }}
-          enabled={searchEngineState.incognito}
-          onChange={() => keystore.searchEngine.toggleIncognito(!searchEngineState.incognito)}
+          enabled={incognito}
+          onChange={hanldeChangeIncognito}
         >
           <View style={styles.switcherWrapper}>
             <Text style={[styles.someText, {

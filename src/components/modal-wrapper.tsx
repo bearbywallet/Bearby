@@ -9,24 +9,50 @@
 import { useTheme } from '@react-navigation/native';
 import React from 'react';
 import {
-  View,
   StyleSheet,
   Dimensions,
-  ViewStyle
+  ViewStyle,
+  Keyboard,
+  View
 } from 'react-native';
+
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 type Prop = {
   style?: ViewStyle;
 };
 
+enum Events {
+  KeyboardDidShow = 'keyboardDidShow',
+  KeyboardDidHide = 'keyboardDidHide'
+}
+
 const { height } = Dimensions.get('window');
 export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
   const { colors } = useTheme();
+  const [minHeight, setMinHeight] = React.useState(height / 5);
+
+  React.useEffect(() => {
+    Keyboard.addListener(Events.KeyboardDidShow, () => {
+      setMinHeight(height / 1.5);
+    });
+    Keyboard.addListener(Events.KeyboardDidHide, () => {
+      setMinHeight(height / 5);
+    });
+
+    return () => {
+      Keyboard.removeAllListeners(Events.KeyboardDidShow);
+      Keyboard.removeAllListeners(Events.KeyboardDidHide);
+    };
+  });
 
   return (
-    <View style={[styles.container, style, {
-      backgroundColor: colors.background
-    }]}>
+    <View
+      style={[styles.container, style, {
+        backgroundColor: colors.background,
+        minHeight: minHeight
+      }]}
+    >
       {children}
     </View>
   );
@@ -37,7 +63,6 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
-    justifyContent: 'space-between',
     paddingVertical: 15,
     maxHeight: height - 50
   }

@@ -113,15 +113,13 @@ export const ConfirmPopup: React.FC<Prop> = ({
         .account
         .updateNonce(foundIndex)
         .then((nonce) => {
-          if (nonce) {
-            transaction.setNonce(nonce);
-          }
+          transaction.setNonce(nonce + 1);
 
           setIsLoading(false)
         })
         .catch(() => setIsLoading(false));
     }
-  }, [account]);
+  }, [account, transaction]);
 
   return (
     <Modal

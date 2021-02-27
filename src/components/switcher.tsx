@@ -39,7 +39,7 @@ export const Switcher: React.FC<Prop> = ({
       <Switch
         style={{ marginLeft: 10 }}
         trackColor={{ false: colors.notification, true: colors.primary }}
-        thumbColor={enabled ? colors.card : colors.notification}
+        thumbColor={enabled ? colors.card : colors.background}
         ios_backgroundColor={colors.background}
         onValueChange={onChange}
         value={enabled}
