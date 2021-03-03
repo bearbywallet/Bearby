@@ -88,7 +88,7 @@ export const NetworkPage = () => {
   const hanldeSSNUpdate = React.useCallback(async() => {
     setIsLoading(true);
     try {
-      await keystore.ssn.reset();
+      await keystore.ssn.updateList();
     } catch {
       //
     }

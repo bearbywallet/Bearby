@@ -66,8 +66,22 @@ export class SSnController {
     await this._network.changeConfig(config);
   }
 
-  public async reset() {
+  public async updateList() {
+    const { selected } = this.store.get();
     const list = await this._zilliqa.getSSnList();
+
+    await this._update({
+      selected,
+      list
+    });
+  }
+
+  public async reset() {
+    let { list } = this.store.get();
+
+    if (!list || list.length === 0) {
+      list = await this._zilliqa.getSSnList();
+    }
 
     await this._update({
       selected: DEFAULT_SSN,
