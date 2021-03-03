@@ -19,12 +19,11 @@ import { useTheme } from '@react-navigation/native';
 import { Selector } from 'app/components/selector';
 import { NetwrokConfig } from 'app/components/netwrok-config';
 import { Button } from 'app/components/button';
-import { SSnList } from 'app/components/ssn-list';
+import { DropMenu } from 'app/components/drop-menu';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { ZILLIQA_KEYS } from 'app/config';
-import { SSN } from 'types';
 import { fonts } from 'app/styles';
 
 const [mainnet, testnet, custom] = ZILLIQA_KEYS;
@@ -35,6 +34,14 @@ export const NetworkPage = () => {
   const ssnState = keystore.ssn.store.useValue();
 
   const [isLoading, setIsLoading] = React.useState(false);
+
+  const nodeList = React.useMemo(
+    () => ssnState.list.sort((a, b) => a.time - b.time).map((el) => ({
+      name: el.name,
+      value: `${Math.floor(el.time)}ms`
+    })),
+    [ssnState]
+  );
 
   const handleReset = React.useCallback(async() => {
     setIsLoading(true);
@@ -68,10 +75,11 @@ export const NetworkPage = () => {
     }
     setIsLoading(false);
   }, []);
-  const hanldeChangeSSN = React.useCallback(async(ssn: SSN) => {
+  const hanldeChangeSSN = React.useCallback(async({ name }) => {
     setIsLoading(true);
+
     try {
-      await keystore.ssn.changeSSn(ssn.name);
+      await keystore.ssn.changeSSn(name);
     } catch {
       //
     }
@@ -118,14 +126,15 @@ export const NetworkPage = () => {
             onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
           />
         ) : (
-          <SSnList
-            style={{
-              marginTop: 15
+          <DropMenu
+            selected={{
+              name: ssnState.selected
             }}
+            title={i18n.t('ssn')}
+            list={nodeList}
             isLoading={isLoading}
-            ssnState={ssnState}
-            onSelect={hanldeChangeSSN}
             onUpdate={hanldeSSNUpdate}
+            onSelect={hanldeChangeSSN}
           />
         )}
       </ScrollView>

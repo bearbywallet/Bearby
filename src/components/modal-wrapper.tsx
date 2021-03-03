@@ -15,8 +15,7 @@ import {
   Keyboard,
   View
 } from 'react-native';
-
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { Device } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
@@ -33,12 +32,14 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
   const [minHeight, setMinHeight] = React.useState(height / 5);
 
   React.useEffect(() => {
-    Keyboard.addListener(Events.KeyboardDidShow, () => {
-      setMinHeight(height / 1.5);
-    });
-    Keyboard.addListener(Events.KeyboardDidHide, () => {
-      setMinHeight(height / 5);
-    });
+    if (Device.isIos()) {
+      Keyboard.addListener(Events.KeyboardDidShow, () => {
+        setMinHeight(height / 1.5);
+      });
+      Keyboard.addListener(Events.KeyboardDidHide, () => {
+        setMinHeight(height / 5);
+      });
+    }
 
     return () => {
       Keyboard.removeAllListeners(Events.KeyboardDidShow);
@@ -50,7 +51,7 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
     <View
       style={[styles.container, style, {
         backgroundColor: colors.background,
-        minHeight: minHeight
+        minHeight
       }]}
     >
       {children}

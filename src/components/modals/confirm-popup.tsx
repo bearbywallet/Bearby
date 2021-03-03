@@ -115,7 +115,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
         .then((nonce) => {
           transaction.setNonce(nonce + 1);
 
-          setIsLoading(false)
+          setIsLoading(false);
         })
         .catch(() => setIsLoading(false));
     }
