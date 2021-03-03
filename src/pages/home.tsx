@@ -167,7 +167,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       />
       <SimpleConfirm
         title={i18n.t('remove_acc_title', {
-          name: account.name || ''
+          name: account?.name || ''
         })}
         description={i18n.t('remove_seed_acc_des')}
         btns={[i18n.t('reject'), i18n.t('confirm')]}

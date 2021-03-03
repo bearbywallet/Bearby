@@ -115,11 +115,19 @@ export class AccountControler {
   }
 
   public async fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Promise<Account> {
+    let nonce = 0;
     const pubKey = acc.publicKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
-    const { nonce } = await this._zilliqa.getBalance(base16);
+
+    try {
+      const res = await this._zilliqa.getBalance(base16);
+
+      nonce = res.nonce;
+    } catch {
+      //
+    }
 
     return {
       base16,
@@ -222,13 +230,21 @@ export class AccountControler {
   }
 
   public async fromPrivateKey(privatekey: string, name: string): Promise<Account> {
+    let nonce = 0;
     const pubKey = getPubKeyFromPrivateKey(privatekey);
     const type = AccountTypes.privateKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
     const index = this.lastIndexPrivKey;
-    const { nonce } = await this._zilliqa.getBalance(base16);
+
+    try {
+      const res = await this._zilliqa.getBalance(base16);
+
+      nonce = res.nonce;
+    } catch {
+      //
+    }
 
     return {
       base16,
@@ -333,7 +349,11 @@ export class AccountControler {
     const balances = Object.fromEntries(entries);
 
     for (const t of this._token.store.get()) {
-      balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+      try {
+        balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+      } catch {
+        balances[net][t.symbol] = '0';
+      }
     }
 
     return balances;
