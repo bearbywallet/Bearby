@@ -16,7 +16,7 @@ web-build/
 *.hprof
 # CocoaPods
 /ios/Pods/
-
+*.hprof
 # xcode
 build/
 *.pbxuser
