@@ -342,35 +342,8 @@ PODS:
     - React
   - RNPermissions (3.0.1):
     - React-Core
-  - RNReanimated (2.0.0):
-    - DoubleConversion
-    - FBLazyVector
-    - FBReactNativeSpec
-    - Folly
-    - glog
-    - RCTRequired
-    - RCTTypeSafety
-    - React
-    - React-callinvoker
+  - RNReanimated (1.13.2):
     - React-Core
-    - React-Core/DevSupport
-    - React-Core/RCTWebSocket
-    - React-CoreModules
-    - React-cxxreact
-    - React-jsi
-    - React-jsiexecutor
-    - React-jsinspector
-    - React-RCTActionSheet
-    - React-RCTAnimation
-    - React-RCTBlob
-    - React-RCTImage
-    - React-RCTLinking
-    - React-RCTNetwork
-    - React-RCTSettings
-    - React-RCTText
-    - React-RCTVibration
-    - ReactCommon/turbomodule/core
-    - Yoga
   - RNScreens (2.18.1):
     - React-Core
   - RNShare (5.1.4):
@@ -629,7 +602,7 @@ SPEC CHECKSUMS:
   RNI18n: e2f7e76389fcc6e84f2c8733ea89b92502351fd8
   RNKeychain: b8e0711b959a19c5b057d1e970d3c83d159b6da5
   RNPermissions: 4c8a37b4dde50f1f152bf8cd08c4a43d2355829e
-  RNReanimated: 5231286440b796e09df3bfa5c1b12b02bfe07664
+  RNReanimated: e03f7425cb7a38dcf1b644d680d1bfc91c3337ad
   RNScreens: f7ad633b2e0190b77b6a7aab7f914fad6f198d8d
   RNShare: 8af5349f05fc042d230674dd650d19789187ff9c
   RNSVG: ce9d996113475209013317e48b05c21ee988d42e

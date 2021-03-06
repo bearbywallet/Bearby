@@ -62,6 +62,7 @@ export const NetworkPage = () => {
       await keystore.network.changeNetwork(net);
 
       if (net !== custom) {
+        await keystore.network.sync();
         await keystore.transaction.sync();
         await keystore.ssn.sync();
         await keystore.settings.sync();
