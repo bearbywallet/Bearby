@@ -17,9 +17,7 @@ import {
 } from 'app/pages/browser';
 
 export type BrwoserStackParamList = {
-  Browser: {
-    url?: string;
-  };
+  Browser: undefined;
   Category: {
     category: string;
   },

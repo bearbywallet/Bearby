@@ -91,9 +91,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [webViewRef, canGoBack]);
   const handleGoHome = React.useCallback(() => {
+    // navigation.navigate('Browser');
     navigation.navigate('Browser', {
-      screen: 'Browser',
-      params: {}
+      screen: 'Browser'
     });
   }, [navigation]);
 
@@ -108,12 +108,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [webViewRef]);
   const hanldeSearch = React.useCallback(async(search) => {
-    navigation.navigate('Browser', {
-      screen: 'Web',
-      params: {
-        url: await keystore.searchEngine.onUrlSubmit(search)
-      }
-    });
+    const _url = await keystore.searchEngine.onUrlSubmit(search);
+    setUrl(new URL(_url));
   }, []);
 
   const handleMessage = React.useCallback(async({ nativeEvent }) => {
@@ -326,16 +322,19 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
    * selected netwrok and selecte daccount.
    */
   React.useEffect(() => {
+    const uri = new URL(route.params.url);
+
+    setUrl(uri);
+
     if (webViewRef.current) {
-      const { hostname } = new URL(route.params.url);
 
       keystore.account.updateWebView(
         webViewRef.current,
-        hostname
+        uri.hostname
       );
       keystore.network.updateWebView(
         webViewRef.current,
-        hostname
+        uri.hostname
       );
     }
 
@@ -393,7 +392,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       <WebView
         ref={webViewRef}
         source={{
-          uri: route.params.url
+          uri: url.toString()
         }}
         style={{
           backgroundColor: colors.background
