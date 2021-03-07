@@ -8,9 +8,10 @@
  */
 import { newRidgeState } from 'react-ridge-state';
 import { SSN, SSNState } from 'types';
+import { DEFAULT_SSN } from 'app/config';
 
 const initalState: SSNState = {
-  selected: '',
+  selected: DEFAULT_SSN,
   list: []
 };
 export const ssnStore = newRidgeState<SSNState>(initalState);

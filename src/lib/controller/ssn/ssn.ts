@@ -9,8 +9,13 @@
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { STORAGE_FIELDS, DEFAULT_SSN } from 'app/config';
-import { SSN, SSNState } from 'types';
-import { ssnStore, StoreUpdate, selectSsnStoreUpdate } from './store';
+import { SSNState } from 'types';
+import {
+  ssnStore,
+  StoreUpdate,
+  selectSsnStoreUpdate,
+  ssnStoreUpdate
+} from './store';
 
 export class SSnController {
   public store = ssnStore;
@@ -38,13 +43,17 @@ export class SSnController {
 
     try {
       if (!ssnList || typeof ssnList !== 'string') {
-        throw new Error('incorect data');
+        await this.updateList();
+        await this.reset();
       }
 
       const parsed = JSON.parse(ssnList as string);
 
-      StoreUpdate(parsed);
+      if (parsed) {
+        StoreUpdate(parsed);
+      }
     } catch {
+      await this.updateList();
       await this.reset();
     }
   }
@@ -62,18 +71,20 @@ export class SSnController {
 
     selectSsnStoreUpdate(selected);
 
-    await this._update(this.store.get());
+    await this._storage.set(
+      buildObject(this.field, this.store.get())
+    );
     await this._network.changeConfig(config);
   }
 
   public async updateList() {
-    const { selected } = this.store.get();
     const list = await this._zilliqa.getSSnList();
 
-    await this._update({
-      selected,
-      list
-    });
+    ssnStoreUpdate(list);
+
+    await this._storage.set(
+      buildObject(this.field, this.store.get())
+    );
   }
 
   public async reset() {
@@ -83,17 +94,12 @@ export class SSnController {
       list = await this._zilliqa.getSSnList();
     }
 
-    await this._update({
+    StoreUpdate({
       selected: DEFAULT_SSN,
       list
     });
-  }
-
-  private async _update(state: SSNState) {
-    StoreUpdate(state);
-
     await this._storage.set(
-      buildObject(this.field, state)
+      buildObject(this.field, this.store.get())
     );
   }
 }

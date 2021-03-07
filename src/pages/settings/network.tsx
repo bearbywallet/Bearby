@@ -35,13 +35,16 @@ export const NetworkPage = () => {
 
   const [isLoading, setIsLoading] = React.useState(false);
 
-  const nodeList = React.useMemo(
-    () => ssnState.list.sort((a, b) => a.time - b.time).map((el) => ({
-      name: el.name,
-      value: `${Math.floor(el.time)}ms`
-    })),
-    [ssnState]
-  );
+  const nodeList = React.useMemo(() => {
+    try {
+      return ssnState.list.sort((a, b) => a.time - b.time).map((el) => ({
+        name: el.name,
+        value: `${Math.floor(el.time)}ms`
+      }));
+    } catch {
+      return [];
+    }
+  }, [ssnState]);
 
   const handleReset = React.useCallback(async() => {
     setIsLoading(true);

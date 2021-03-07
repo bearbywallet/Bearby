@@ -181,7 +181,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 <Text style={[commonStyles.nameAmountText, {
                   color: colors.border
                 }]}>
-                  {toLocaleString(fromZil(transaction.tokenAmount, token.decimals))} {token.symbol}
+                  {toLocaleString(fromZil(transaction.tokenAmount, token.decimals))}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}
