@@ -39,7 +39,8 @@ export const dark = {
     text: '#FFFFFF',
     border: '#8A8A8F',
     notification: '#666666',
-    modal: '#000'
+    modal: '#000',
+    bg1: '#171719'
   }
 };
 export const light = {
@@ -54,7 +55,8 @@ export const light = {
     text: '#32335A',
     border: '#B9B9D7',
     notification: '#8E8EAE',
-    modal: '#000'
+    modal: '#000',
+    bg1: '#FFFFFF'
   }
 };
 

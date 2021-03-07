@@ -12,6 +12,7 @@ import {
   StyleSheet,
   Dimensions,
   View,
+  ActivityIndicator,
   Image
 } from 'react-native';
 import URL from 'url-parse';
@@ -54,7 +55,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const webViewRef = React.useRef<null | WebView>(null);
 
-  const [url] = React.useState(new URL(route.params.url));
+  const [url, setUrl] = React.useState(new URL(route.params.url));
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
@@ -103,6 +104,11 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       webViewRef.current.reload();
     }
   }, [webViewRef]);
+  const hanldeSearch = React.useCallback(async(search) => {
+    navigation.navigate('Web', {
+      url: await keystore.searchEngine.onUrlSubmit(search)
+    });
+  }, []);
 
   const handleMessage = React.useCallback(async({ nativeEvent }) => {
     if (!webViewRef.current) {
@@ -366,6 +372,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         onHome={handleGoHome}
         onGoForward={handleGoForward}
         onRefresh={hanldeRefresh}
+        onSubmit={hanldeSearch}
       />
       {loadingProgress !== 1 ? (
         <View style={[styles.loading, {
@@ -385,6 +392,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
         cacheEnabled={false}
+        onNavigationStateChange={(event) => setUrl(new URL(event.url))}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />
