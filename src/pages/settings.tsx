@@ -126,6 +126,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
             key={index}
             text={el.value}
             icon={el.icon}
+            last={list.length === index + 1}
             onPress={el.onLink}
           />
         ))}

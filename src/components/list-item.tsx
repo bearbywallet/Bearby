@@ -24,6 +24,7 @@ type Prop = {
   style?: ViewStyle;
   icon: string;
   text: string;
+  last: boolean;
   onPress?: () => void;
 };
 
@@ -31,6 +32,7 @@ export const ListItem: React.FC<Prop> = ({
   style,
   icon,
   text,
+  last,
   onPress
 }) => {
   const { colors } = useTheme();
@@ -42,7 +44,7 @@ export const ListItem: React.FC<Prop> = ({
     >
       <SvgXml xml={icon} />
       <View style={[styles.listItem, {
-        borderBottomColor: colors.notification
+        borderBottomColor: last ? 'transparent' : colors.notification
       }]}>
         <Text style={[styles.listTextItem, {
           color: colors.text
