@@ -142,7 +142,7 @@ export const BrowserSettingsPage = () => {
             <Text style={[styles.someLable, {
               color: colors.border
             }]}>
-              {i18n.t('incognito_des')}
+              {i18n.t('cache_des')}
             </Text>
           </View>
         </Switcher>

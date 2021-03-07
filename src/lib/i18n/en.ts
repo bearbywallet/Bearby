@@ -28,6 +28,7 @@ export default {
   forward: 'Forward',
   incognito: 'Incognito mode',
   incognito_des: 'Private browsing, disable cache',
+  cache_des: 'Cache to save traffic.',
   connect_des: 'This site is requesting access to view your current account address. Always make sure you trust the sites you interact with.',
   connect_btn0: 'Connect',
   connect_title_question: 'Would you like to connect to this application?',
