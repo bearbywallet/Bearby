@@ -53,6 +53,8 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
         {i18n.t('settings_title')}
       </Text>
       <ScrollView style={{
+        borderTopLeftRadius: 16,
+        borderTopRightRadius: 16,
         backgroundColor: colors.card
       }}>
         <TouchableOpacity
@@ -241,7 +243,9 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column'
+    flexDirection: 'column',
+    borderTopEndRadius: 16,
+    borderTopStartRadius: 16
   },
   title: {
     fontSize: 30,
