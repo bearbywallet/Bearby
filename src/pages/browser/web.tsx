@@ -12,7 +12,8 @@ import {
   StyleSheet,
   Dimensions,
   View,
-  Image
+  Image,
+  ActivityIndicator
 } from 'react-native';
 import URL from 'url-parse';
 import { WebView } from 'react-native-webview';
@@ -56,6 +57,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const webViewRef = React.useRef<null | WebView>(null);
 
   const [url, setUrl] = React.useState(new URL(route.params.url));
+  const [urlPach, setUrlPach] = React.useState(url);
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
   const [canGoForward, setCanGoForward] = React.useState(false);
@@ -67,12 +69,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   const [transaction, setTransaction] = React.useState<TxMessage>();
 
   const isConnect = React.useMemo(() => {
-    const { hostname } = new URL(route.params.url);
+    const { hostname } = url;
 
     return connectState.some(
       (app) => app.domain.toLowerCase() === hostname.toLowerCase()
     );
-  }, [connectState, route.params.url]);
+  }, [connectState, url]);
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
@@ -108,9 +110,17 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [webViewRef]);
   const hanldeSearch = React.useCallback(async(search) => {
+    if (!webViewRef || !webViewRef.current) {
+      return null;
+    }
+
     const _url = await keystore.searchEngine.onUrlSubmit(search);
-    setUrl(new URL(_url));
-  }, []);
+
+    setUrlPach(new URL(_url));
+  }, [webViewRef]);
+  const hanldeoNavigationStateChange = React.useCallback((event) => {
+    setUrl(new URL(event.url));
+  }, [url]);
 
   const handleMessage = React.useCallback(async({ nativeEvent }) => {
     if (!webViewRef.current) {
@@ -316,30 +326,29 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, []);
 
+  React.useEffect(() => {
+    setUrlPach(new URL(route.params.url));
+  }, [route]);
+
   /**
    * Listing webViewRef when it created, and update
    * network and accounts webView instance for autoupdate
    * selected netwrok and selecte daccount.
    */
   React.useEffect(() => {
-    const uri = new URL(route.params.url);
-
-    setUrl(uri);
-
     if (webViewRef.current) {
-
       keystore.account.updateWebView(
         webViewRef.current,
-        uri.hostname
+        url.hostname
       );
       keystore.network.updateWebView(
         webViewRef.current,
-        uri.hostname
+        url.hostname
       );
     }
 
     return () => keystore.account.updateWebView(undefined);
-  }, [route, webViewRef]);
+  }, [url, route, webViewRef]);
 
   /**
    * Listing event when page loaded, send connection information.
@@ -360,7 +369,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       });
       webViewRef.current.postMessage(m.serialize);
     }
-  }, [webViewRef, accountState, networkState, isConnect]);
+  }, [
+    webViewRef,
+    accountState,
+    networkState,
+    isConnect
+  ]);
 
   if (!inpageJS) {
     return null;
@@ -392,7 +406,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       <WebView
         ref={webViewRef}
         source={{
-          uri: url.toString()
+          uri: urlPach.toString()
         }}
         style={{
           backgroundColor: colors.background
@@ -401,7 +415,16 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
         cacheEnabled={searchEngineState.cache}
-        onNavigationStateChange={(event) => setUrl(new URL(event.url))}
+        renderLoading={() => (
+          <ActivityIndicator
+            color={colors.primary}
+            size='large'
+            style={{
+              flex: 1
+            }}
+          />
+        )}
+        onNavigationStateChange={hanldeoNavigationStateChange}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />
