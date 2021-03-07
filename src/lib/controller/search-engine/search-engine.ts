@@ -77,6 +77,14 @@ export class SearchController {
     return this._update(state);
   }
 
+  public toggleCache(value: boolean) {
+    const state = this.store.get();
+
+    state.cache = value;
+
+    return this._update(state);
+  }
+
   public getURLSearchEngine(query: string) {
     const state = this.store.get();
     const searchEngine = state.identities[state.selected];

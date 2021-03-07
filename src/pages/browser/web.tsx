@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Dimensions,
   View,
-  ActivityIndicator,
   Image
 } from 'react-native';
 import URL from 'url-parse';
@@ -36,9 +35,10 @@ import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
 import { MessagePayload, TxMessage } from 'types';
 import i18n from 'app/lib/i18n';
+import { RootParamList } from 'app/navigator';
 
 type Prop = {
-  navigation: StackNavigationProp<BrwoserStackParamList>;
+  navigation: StackNavigationProp<RootParamList>;
   route: RouteProp<BrwoserStackParamList, 'Web'>;
 };
 
@@ -91,7 +91,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [webViewRef, canGoBack]);
   const handleGoHome = React.useCallback(() => {
-    navigation.navigate('Browser', {});
+    navigation.navigate('Browser', {
+      screen: 'Browser',
+      params: {}
+    });
   }, [navigation]);
 
   const handleLoaded = React.useCallback(({ nativeEvent }: WebViewProgressEvent) => {
@@ -105,8 +108,11 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [webViewRef]);
   const hanldeSearch = React.useCallback(async(search) => {
-    navigation.navigate('Web', {
-      url: await keystore.searchEngine.onUrlSubmit(search)
+    navigation.navigate('Browser', {
+      screen: 'Web',
+      params: {
+        url: await keystore.searchEngine.onUrlSubmit(search)
+      }
     });
   }, []);
 
@@ -367,12 +373,16 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }]}>
       <BrowserViewBar
         url={url}
+        connected={isConnect}
         canGoForward={canGoForward}
         onBack={handleBack}
         onHome={handleGoHome}
         onGoForward={handleGoForward}
         onRefresh={hanldeRefresh}
         onSubmit={hanldeSearch}
+        onSettings={() => navigation.navigate('SettingsPages', {
+          screen: 'BrowserSettings'
+        })}
       />
       {loadingProgress !== 1 ? (
         <View style={[styles.loading, {
@@ -391,7 +401,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         applicationNameForUserAgent={`ZilPay/${version}`}
         incognito={searchEngineState.incognito}
         injectedJavaScriptBeforeContentLoaded={inpageJS}
-        cacheEnabled={false}
+        cacheEnabled={searchEngineState.cache}
         onNavigationStateChange={(event) => setUrl(new URL(event.url))}
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}

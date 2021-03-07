@@ -11,7 +11,6 @@ import {
   StyleSheet,
   TouchableOpacity,
   View,
-  Dimensions,
   ScrollView,
   TextInput,
   Text
@@ -20,29 +19,41 @@ import URL from 'url-parse';
 import { useTheme } from '@react-navigation/native';
 
 import { SvgXml } from 'react-native-svg';
-import { ArrowIconSVG, LockSVG, HomeIconSVG } from 'app/components/svg';
+import {
+  ArrowIconSVG,
+  LockSVG,
+  HomeIconSVG,
+  OKIconSVG,
+  SettingsIconSVG
+} from 'app/components/svg';
+import { Unselected } from 'app/components/unselected';
 import RepeatSVG from 'app/assets/repeat.svg';
 
 import { fonts } from 'app/styles';
+import i18n from 'app/lib/i18n';
 
 type Prop = {
   url: URL;
   canGoForward: boolean;
+  connected: boolean;
   onBack: () => void;
   onHome: () => void;
   onRefresh: () => void;
   onGoForward: () => void;
+  onSettings: () => void;
   onSubmit: (text: string) => void;
 };
 
-const { width } = Dimensions.get('window');
+const ICON_SIZE = 25;
 export const BrowserViewBar: React.FC<Prop> = ({
   url,
   canGoForward,
   onBack,
   onRefresh,
+  connected,
   onHome,
   onGoForward,
+  onSettings,
   onSubmit
 }) => {
   const { colors } = useTheme();
@@ -120,6 +131,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
         }]}>
           <View style={styles.navActionWrapper}>
             <TouchableOpacity
+              style={styles.navAction}
               disabled={!canGoForward}
               onPress={onGoForward}
             >
@@ -132,31 +144,85 @@ export const BrowserViewBar: React.FC<Prop> = ({
                   transform: [{ rotate: '-90deg' }]
                 }}
               />
+              <Text style={[styles.navActionText, {
+                color: colors.text
+              }]}>
+                {i18n.t('forward')}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onHome}>
+            <TouchableOpacity
+              style={styles.navAction}
+              onPress={onHome}
+            >
               <SvgXml
                 xml={HomeIconSVG}
-                height={25}
-                width={25}
+                height={ICON_SIZE}
+                width={ICON_SIZE}
                 fill={colors.primary}
               />
+              <Text style={[styles.navActionText, {
+                color: colors.text
+              }]}>
+                {i18n.t('home')}
+              </Text>
             </TouchableOpacity>
-            <TouchableOpacity onPress={onRefresh}>
+            <View style={styles.navAction}>
+              {connected ? (
+                <SvgXml
+                  xml={OKIconSVG(colors.primary)}
+                  width={ICON_SIZE}
+                  height={ICON_SIZE}
+                />
+              ) : (
+                <Unselected style={{
+                  width: ICON_SIZE,
+                  height: ICON_SIZE
+                }}/>
+              )}
+              <Text style={[styles.navActionText, {
+                color: colors.text
+              }]}>
+                {i18n.t('connect_btn0')}
+              </Text>
+            </View>
+            <TouchableOpacity
+              style={styles.navAction}
+              onPress={onSettings}
+            >
+              <SvgXml
+                xml={SettingsIconSVG}
+                width={ICON_SIZE}
+                height={ICON_SIZE}
+              />
+              <Text style={[styles.navActionText, {
+                color: colors.text
+              }]}>
+                {i18n.t('settings')}
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.navAction}
+              onPress={onRefresh}
+            >
               <RepeatSVG
                 fill={colors.primary}
-                width={30}
-                height={30}
+                width={ICON_SIZE}
+                height={ICON_SIZE}
               />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={onRefresh}>
-              <RepeatSVG
-                fill={colors.primary}
-                width={30}
-                height={30}
-              />
+              <Text style={[styles.navActionText, {
+                color: colors.text
+              }]}>
+                {i18n.t('reload')}
+              </Text>
             </TouchableOpacity>
           </View>
         </ScrollView>
+      ) : null}
+      {menu ? (
+        <View
+          style={styles.navMenuBlock}
+          onTouchEnd={() => setMenu(false)}
+        />
       ) : null}
     </React.Fragment>
   );
@@ -169,12 +235,29 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-around'
   },
+  navMenuBlock: {
+    position: 'absolute',
+    height: '100%',
+    width: '100%',
+    zIndex: 98
+  },
+  navActionText: {
+    textAlign: 'right',
+    fontSize: 13,
+    fontFamily: fonts.Regular,
+    marginLeft: 10
+  },
+  navAction: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    margin: 5
+  },
   navMenu: {
     position: 'absolute',
-    height: 100,
-    top: 40,
-    right: 20,
-    left: width / 3,
+    top: 5,
+    right: 10,
+    padding: 10,
     alignContent: 'flex-end',
     zIndex: 99,
     borderRadius: 5,
@@ -187,9 +270,8 @@ const styles = StyleSheet.create({
     shadowRadius: 2
   },
   navActionWrapper: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    padding: 5
+    // justifyContent: 'space-around',
+    // padding: 5
   },
   navBtns: {
     flexDirection: 'row',

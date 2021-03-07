@@ -29,6 +29,7 @@ export const BrowserSettingsPage = () => {
   const searchEngineState = keystore.searchEngine.store.useValue();
 
   const [incognito, setIncognito] = React.useState(searchEngineState.incognito);
+  const [cache, setCache] = React.useState(searchEngineState.cache);
 
   const engineList = React.useMemo(
     () => searchEngineState.identities.map((e) => e.name),
@@ -54,6 +55,10 @@ export const BrowserSettingsPage = () => {
     keystore.searchEngine.toggleIncognito(!incognito);
     setIncognito(!incognito);
   }, [incognito]);
+  const hanldeChangeCache = React.useCallback(() => {
+    keystore.searchEngine.toggleCache(!cache);
+    setCache(!cache);
+  }, [cache]);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -120,6 +125,27 @@ export const BrowserSettingsPage = () => {
             </Text>
           </View>
         </Switcher>
+        <Switcher
+          style={{
+            ...styles.switcherContainer,
+            backgroundColor: colors.card
+          }}
+          enabled={cache}
+          onChange={hanldeChangeCache}
+        >
+          <View style={styles.switcherWrapper}>
+            <Text style={[styles.someText, {
+              color: colors.text
+            }]}>
+              {i18n.t('cache')}
+            </Text>
+            <Text style={[styles.someLable, {
+              color: colors.border
+            }]}>
+              {i18n.t('incognito_des')}
+            </Text>
+          </View>
+        </Switcher>
       </ScrollView>
     </SafeAreaView>
   );
@@ -155,7 +181,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Regular
   },
   switcherContainer: {
-    marginTop: 30,
+    marginTop: 15,
     paddingVertical: 15,
     paddingHorizontal: 15
   }
