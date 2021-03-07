@@ -59,28 +59,32 @@ export class TokenControll {
     }
   }
 
-  public async getToken(address: string, acc: Account): Promise<Token> {
+  public async getToken(address: string, acc?: Account): Promise<Token> {
+    let balance = '0';
     const type = TokenTypes.ZRC2;
     const init = await this._zilliqa.getSmartContractInit(address);
     const zrc = toZRC1(init);
-    const userAddress = acc.base16.toLowerCase();
     const field = 'balances';
     const totalSupplyField = 'total_supply';
     let totalSupply = await this._zilliqa.getSmartContractSubState(
       address,
       totalSupplyField
     );
-    let balance = await this._zilliqa.getSmartContractSubState(
-      address,
-      field,
-      [userAddress]
-    );
 
-    try {
-      balance = balance[field][userAddress];
-      totalSupply = totalSupply[totalSupplyField];
-    } catch {
-      balance = '0';
+    if (acc) {
+      const userAddress = acc.base16.toLowerCase();
+      balance = await this._zilliqa.getSmartContractSubState(
+        address,
+        field,
+        [userAddress]
+      );
+
+      try {
+        balance = balance[field][userAddress];
+        totalSupply = totalSupply[totalSupplyField];
+      } catch {
+        balance = '0';
+      }
     }
 
     return {

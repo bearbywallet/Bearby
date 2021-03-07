@@ -91,9 +91,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   }, [
     transaction,
     needPassword,
-    passowrd,
-    setIsLoading,
-    onConfirm
+    passowrd
   ]);
 
   React.useEffect(() => {
@@ -179,7 +177,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 <Text style={[commonStyles.nameAmountText, {
                   color: colors.border
                 }]}>
-                  {toLocaleString(fromZil(transaction.amount, token.decimals))}
+                  {toLocaleString(fromZil(transaction.amount, token.decimals))} {token.symbol}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}
@@ -238,7 +236,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
 const styles = StyleSheet.create({
   item: {
-    paddingBottom: 10
+    // paddingBottom: 10
   },
   sendBtn: {
     marginVertical: 15

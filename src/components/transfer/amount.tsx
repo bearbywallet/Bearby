@@ -107,7 +107,7 @@ export const TransferAmount: React.FC<Prop> = ({
   return (
     <React.Fragment>
       <View style={[style, {
-        marginTop: 30,
+        marginTop: 15,
         padding: 15
       }]}>
         <View style={{

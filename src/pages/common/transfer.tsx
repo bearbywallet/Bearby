@@ -103,6 +103,15 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
     account
   ]);
 
+  const hanldeSelectToken = React.useCallback((tokenIndex) => {
+    setSelectedToken(tokenIndex);
+    setAmount('0');
+  }, []);
+  const hanldeSelectAccount = React.useCallback((accountIndex) => {
+    setSelectedAccount(accountIndex);
+    setAmount('0');
+  }, []);
+
   React.useEffect(() => {
     const [zil] = tokensState;
     let data = '';
@@ -152,7 +161,6 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
       //
     }
   }, [
-    setTx,
     networkState,
     token,
     tokensState,
@@ -175,20 +183,20 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
             <TransferAccount
               accounts={accountState.identities}
               selected={selectedAccount}
-              onSelect={setSelectedAccount}
+              onSelect={hanldeSelectAccount}
             />
             <TransferToken
               account={accountState.identities[selectedAccount]}
               tokens={tokensState}
               selected={selectedToken}
               netwrok={networkState.selected}
-              onSelect={setSelectedToken}
+              onSelect={hanldeSelectToken}
             />
           </View>
           <TransferRecipient
             style={{
               backgroundColor: colors.card,
-              marginTop: 30
+              marginTop: 15
             }}
             accounts={accountState.identities}
             recipient={recipient}
@@ -209,7 +217,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           <View style={{
             width: '100%',
             alignItems: 'center',
-            marginTop: '10%'
+            marginTop: 15
           }}>
             <CustomButton
               disabled={!tx}
