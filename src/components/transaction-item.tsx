@@ -21,6 +21,7 @@ import { Token, TransactionType, Settings } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
 import { fromBech32Address } from 'app/utils';
 import { fonts } from 'app/styles';
+import { TransactionMethods } from 'app/lib/controller/transaction/builder';
 
 type Prop = {
   style?: ViewStyle;
@@ -118,16 +119,16 @@ export const TransactionItem: React.FC<Prop> = ({
         const data = JSON.parse(transaction.data);
 
         if (!data._tag && Array.isArray(data)) {
-          return 'Deployed';
+          return TransactionMethods.Deploy;
         }
 
         return data._tag;
       } catch (err) {
-        return 'Unexpected';
+        return TransactionMethods.Unexpected;
       }
     }
 
-    return 'Payment';
+    return TransactionMethods.Payment;
   }, [transaction]);
   const time = React.useMemo(() => {
     const date = new Date(transaction.timestamp);

@@ -24,6 +24,19 @@ import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
 import { DEFAULT_GAS } from 'app/config';
 
+export enum TransactionMethods {
+  Payment = 'Payment',
+  Deploy = 'Deployed',
+  Unexpected = 'Unexpected',
+  Transfer = 'Transfer'
+}
+
+export interface ContractItemType {
+  vname: string;
+  type: string;
+  value: string;
+}
+
 export class Transaction {
 
   public static fromPayload(payload: TxParams, account: Account) {
@@ -85,6 +98,40 @@ export class Transaction {
     this.toAddr = toChecksumAddress(toAddr);
     this.version = version;
     this.signature = signature;
+  }
+
+  public get tag() {
+    if (this.data && this.code) {
+      return TransactionMethods.Deploy;
+    }
+
+    if (this.data) {
+      const parsed = JSON.parse(this.data);
+
+      return parsed._tag;
+    }
+
+    return TransactionMethods.Payment;
+  }
+
+  public get tokenAmount() {
+    try {
+      const parsed = JSON.parse(this.data);
+
+      if (parsed._tag === TransactionMethods.Transfer) {
+        const param = parsed.params.find(
+          (el: ContractItemType) => el.vname === 'amount'
+        );
+
+        if (param.value) {
+          return param.value;
+        }
+      }
+
+      return this.amount;
+    } catch {
+      return this.amount;
+    }
   }
 
   public get recipient() {

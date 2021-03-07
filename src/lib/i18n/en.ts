@@ -15,6 +15,7 @@ export default {
   transaction: 'Transaction %{hash}',
   all: 'All',
   close: 'Close',
+  method: 'Method',
   havent_apps: 'have no applictations yet',
   hide: 'Hide',
   tx_fail: 'Transaction fail',

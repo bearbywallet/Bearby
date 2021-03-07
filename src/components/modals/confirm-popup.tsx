@@ -30,6 +30,7 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { Passwordinput } from 'app/components/password-input';
 import { ErrorMessage } from 'app/components/error-message';
+import { LabelValue } from 'app/components/label-value';
 
 import { Account, GasState, Token } from 'types';
 import i18n from 'app/lib/i18n';
@@ -145,6 +146,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
           {error}
         </ErrorMessage>
         <ScrollView style={{ marginBottom: 15 }}>
+          <LabelValue title={i18n.t('method')}>
+            {transaction.tag}
+          </LabelValue>
           <View style={commonStyles.item}>
             <SvgXml xml={ProfileSVG} />
             <View style={[commonStyles.itemInfo, styles.item]}>
@@ -177,7 +181,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 <Text style={[commonStyles.nameAmountText, {
                   color: colors.border
                 }]}>
-                  {toLocaleString(fromZil(transaction.amount, token.decimals))} {token.symbol}
+                  {toLocaleString(fromZil(transaction.tokenAmount, token.decimals))} {token.symbol}
                 </Text>
                 <Text style={commonStyles.addressAmount}>
                   {conversion} {currencyState}
