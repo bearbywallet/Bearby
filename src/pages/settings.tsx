@@ -12,15 +12,13 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  TouchableOpacity,
   View
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
+import { ListItem } from 'app/components/list-item';
 import {
-  ArrowIconSVG,
   GearIconSVG,
   AdvancedIconSVG,
   ProfileSVG,
@@ -43,6 +41,72 @@ type Prop = {
 export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
 
+  const list = [
+    {
+      value: i18n.t('settings_item_account'),
+      icon: ProfileSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'AccountSettings'
+      })
+    },
+    {
+      value: i18n.t('settings_item0'),
+      icon: BookIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'Contacts'
+      })
+    },
+    {
+      value: i18n.t('settings_item1'),
+      icon: GearIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'General'
+      })
+    },
+    {
+      value: i18n.t('settings_item2'),
+      icon: AdvancedIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'Advanced'
+      })
+    },
+    {
+      value: i18n.t('settings_item3'),
+      icon: NetworkIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'Network'
+      })
+    },
+    {
+      value: i18n.t('settings_item7'),
+      icon: SearchIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'BrowserSettings'
+      })
+    },
+    {
+      value: i18n.t('settings_item4'),
+      icon: ConnectIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'Connections'
+      })
+    },
+    {
+      value: i18n.t('settings_item5'),
+      icon: SecureIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'Security'
+      })
+    },
+    {
+      value: i18n.t('settings_item6'),
+      icon: AboutIconSVG,
+      onLink: () => navigation.navigate('SettingsPages', {
+        screen: 'About'
+      })
+    }
+  ];
+
   return (
     <View style={[styles.container, {
       backgroundColor: colors.background
@@ -57,184 +121,14 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
         borderTopRightRadius: 16,
         backgroundColor: colors.card
       }}>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'AccountSettings' })}
-        >
-          <SvgXml xml={ProfileSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item_account')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'Contacts' })}
-        >
-          <SvgXml xml={BookIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item0')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'General' })}
-        >
-          <SvgXml xml={GearIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item1')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'Advanced' })}
-        >
-          <SvgXml xml={AdvancedIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item2')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'Network' })}
-        >
-          <SvgXml xml={NetworkIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item3')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'BrowserSettings' })}
-        >
-          <SvgXml xml={SearchIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item7')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'Connections' })}
-        >
-          <SvgXml xml={ConnectIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item4')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'Security' })}
-        >
-          <SvgXml xml={SecureIconSVG} />
-          <View style={[styles.listItem, {
-            borderBottomColor: colors.notification
-          }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item5')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.listItemWrapper}
-          onPress={() => navigation.navigate('SettingsPages', { screen: 'About' })}
-        >
-          <SvgXml xml={AboutIconSVG} />
-          <View style={[styles.listItem, { borderBottomWidth: 0 }]}>
-            <Text style={[styles.listTextItem, {
-              color: colors.text
-            }]}>
-              {i18n.t('settings_item6')}
-            </Text>
-            <SvgXml
-              xml={ArrowIconSVG}
-              fill={colors.notification}
-              style={styles.arrow}
-            />
-          </View>
-        </TouchableOpacity>
+        {list.map((el, index) => (
+          <ListItem
+            key={index}
+            text={el.value}
+            icon={el.icon}
+            onPress={el.onLink}
+          />
+        ))}
       </ScrollView>
     </View>
   );
@@ -252,27 +146,5 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Bold,
     padding: 15,
     marginTop: '10%'
-  },
-  listItemWrapper: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingLeft: 20
-  },
-  listItem: {
-    width: '90%',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    paddingVertical: 15
-  },
-  listTextItem: {
-    fontFamily: fonts.Regular,
-    fontSize: 17
-  },
-  arrow: {
-    transform: [{ rotate: '-90deg'}],
-    marginRight: 15
   }
 });
