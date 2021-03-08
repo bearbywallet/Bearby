@@ -650,7 +650,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = E0D57866D317D35A5BC48D13 /* Pods-zilpayMobile-zilpayMobileTests.debug.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				GCC_PREPROCESSOR_DEFINITIONS = (
 					"DEBUG=1",
@@ -674,7 +673,6 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 168DB95C4DE4D4ED4D62ED12 /* Pods-zilpayMobile-zilpayMobileTests.release.xcconfig */;
 			buildSettings = {
-				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				BUNDLE_LOADER = "$(TEST_HOST)";
 				COPY_PHASE_STRIP = NO;
 				INFOPLIST_FILE = zilpayMobileTests/Info.plist;
