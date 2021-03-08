@@ -28,6 +28,7 @@ import { AccountTypes } from 'app/config';
 export const AccountSettingsPage = () => {
   const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
+  const networkState = keystore.network.store.useValue();
 
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
@@ -119,7 +120,7 @@ export const AccountSettingsPage = () => {
               <Text style={[styles.text, {
                 color: colors.text
               }]}>
-                {account.nonce}
+                {account.nonce[networkState.selected]}
               </Text>
             </View>
           </View>
