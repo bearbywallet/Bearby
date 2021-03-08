@@ -13,7 +13,9 @@ export interface Account {
   name: string;
   index: number;
   type: AccountTypes;
-  nonce: number;
+  nonce: {
+    [key: string]: number;
+  };
   base16: string;
   bech32: string;
   privKey?: string;

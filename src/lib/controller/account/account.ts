@@ -115,7 +115,12 @@ export class AccountControler {
   }
 
   public async fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Promise<Account> {
-    let nonce = 0;
+    const [mainnet, testnet, custom] = NetworkControll.defualtNetwroks;
+    const nonce = {
+      [mainnet]: 0,
+      [testnet]: 0,
+      [custom]: 0
+    };
     const pubKey = acc.publicKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
@@ -124,7 +129,7 @@ export class AccountControler {
     try {
       const res = await this._zilliqa.getBalance(base16);
 
-      nonce = res.nonce;
+      nonce[this._netwrok.selected] = res.nonce;
     } catch {
       //
     }
@@ -230,7 +235,12 @@ export class AccountControler {
   }
 
   public async fromPrivateKey(privatekey: string, name: string): Promise<Account> {
-    let nonce = 0;
+    const [mainnet, testnet, custom] = NetworkControll.defualtNetwroks;
+    const nonce = {
+      [mainnet]: 0,
+      [testnet]: 0,
+      [custom]: 0
+    };
     const pubKey = getPubKeyFromPrivateKey(privatekey);
     const type = AccountTypes.privateKey;
     const base16 = getAddressFromPublicKey(pubKey);
@@ -241,7 +251,7 @@ export class AccountControler {
     try {
       const res = await this._zilliqa.getBalance(base16);
 
-      nonce = res.nonce;
+      nonce[this._netwrok.selected] = res.nonce;
     } catch {
       //
     }
@@ -272,30 +282,35 @@ export class AccountControler {
 
   public async updateNonce(selected: number) {
     const state = this.store.get();
+    const net = this._netwrok.selected;
     const account = state.identities[selected];
+    const currentNonce = account.nonce[net] || 0;
     const { nonce } = await this._zilliqa.getBalance(account.base16);
 
-    if (nonce < account.nonce && NONCE_DIFFICULTY < nonce - account.nonce) {
+    if (nonce < currentNonce && NONCE_DIFFICULTY < nonce - currentNonce) {
       throw new Error('nonce too hight');
     }
 
-    if (nonce === account.nonce) {
-      return account.nonce;
+    if (nonce === currentNonce) {
+      return currentNonce;
     }
 
-    if (nonce > account.nonce) {
-      state.identities[selected].nonce = nonce;
+    if (nonce > currentNonce) {
+      state.identities[selected].nonce = {
+        [net]: nonce
+      };
     }
 
     await this.update(state);
 
-    return account.nonce;
+    return account.nonce[net];
   }
 
   public async increaseNonce(selected: number) {
+    const net = this._netwrok.selected;
     const state = this.store.get();
 
-    state.identities[selected].nonce++;
+    state.identities[selected].nonce[net]++;
 
     await this.update(state);
   }

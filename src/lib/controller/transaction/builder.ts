@@ -39,7 +39,7 @@ export interface ContractItemType {
 
 export class Transaction {
 
-  public static fromPayload(payload: TxParams, account: Account) {
+  public static fromPayload(payload: TxParams, account: Account, net: string) {
     const gasPrice = toLi(payload.gasPrice);
     const gas = {
       gasPrice: Number(gasPrice) < Number(DEFAULT_GAS.gasPrice) ? DEFAULT_GAS.gasPrice : gasPrice,
@@ -51,6 +51,7 @@ export class Transaction {
       gas,
       account,
       payload.toAddr,
+      net,
       payload.code,
       payload.data,
       payload.priority
@@ -67,6 +68,7 @@ export class Transaction {
   public pubKey: string;
   public toAddr: string;
   public from: string;
+  public net: string;
   public version?: number;
   public signature?: string;
   public hash?: string;
@@ -78,6 +80,7 @@ export class Transaction {
     gas: GasState,
     account: Account,
     toAddr: string,
+    net: string,
     code = '',
     data = '',
     priority = false,
@@ -92,12 +95,13 @@ export class Transaction {
     this.data = data;
     this.gasLimit = Long.fromNumber(Number(gas.gasLimit));
     this.gasPrice = gas.gasPrice;
-    this.nonce = account.nonce;
     this.priority = priority;
     this.pubKey = account.pubKey;
     this.toAddr = toChecksumAddress(toAddr);
     this.version = version;
     this.signature = signature;
+    this.net = net;
+    this.nonce = account.nonce[net];
   }
 
   public get tag() {

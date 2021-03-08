@@ -127,6 +127,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       return null;
     }
 
+    const net = networkState.selected;
+
     try {
       const message = JSON.parse(nativeEvent.data);
 
@@ -142,7 +144,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
                 bech32
               } : null,
               isEnable: keystore.guard.isEnable,
-              netwrok: keystore.network.selected
+              netwrok: net
             }
           });
           webViewRef.current.postMessage(m.serialize);
@@ -171,8 +173,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
-          const newTX = Transaction.fromPayload(message.payload.data, account);
-          newTX.setNonce(account.nonce + 1);
+          const newTX = Transaction.fromPayload(
+            message.payload.data,
+            account,
+            net
+          );
+          newTX.setNonce(account.nonce[net] + 1);
           setTransaction({
             params: newTX,
             uuid: message.payload.uuid,
@@ -189,6 +195,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [
     webViewRef,
+    networkState,
     account,
     isConnect
   ]);

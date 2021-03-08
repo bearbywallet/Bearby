@@ -24,6 +24,7 @@ const defualtNetwroks = Object.keys(ZILLIQA);
 const [mainnet, testnet, privateNet] = defualtNetwroks;
 
 export class NetworkControll {
+  public static defualtNetwroks = defualtNetwroks;
   public static isValidSelected(selected: string) {
     if (!defualtNetwroks.includes(selected)) {
       throw new Error('unavailable network');

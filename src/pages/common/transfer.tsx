@@ -114,6 +114,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
 
   React.useEffect(() => {
     const [zil] = tokensState;
+    const net = networkState.selected;
     let data = '';
     let qa = '0';
     let gas = gasState;
@@ -144,7 +145,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           gasPrice: String(DEFAULT_GAS.gasPrice),
           gasLimit: String(9000)
         };
-        toAddr = token.address[networkState.selected];
+        toAddr = token.address[net];
       }
 
       const newTX = new Transaction(
@@ -152,6 +153,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         gas,
         account,
         toAddr,
+        net,
         '',
         data
       );
