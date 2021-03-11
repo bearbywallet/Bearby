@@ -74,7 +74,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     return connectState.some(
       (app) => app.domain.toLowerCase() === hostname.toLowerCase()
     );
-  }, [connectState, url]);
+  }, [connectState, url, urlPach]);
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]

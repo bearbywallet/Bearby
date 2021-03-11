@@ -209,7 +209,8 @@ export const ConfirmPopup: React.FC<Prop> = ({
           {needPassword ? (
             <Passwordinput
               style={{
-                marginVertical: 15
+                marginVertical: 15,
+                paddingHorizontal: 15
               }}
               placeholder={i18n.t('pass_setup_input1')}
               onChange={setPassowrd}

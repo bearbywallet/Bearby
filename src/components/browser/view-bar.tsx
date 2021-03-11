@@ -104,6 +104,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
             autoCapitalize={'none'}
             textContentType={'URL'}
             defaultValue={urlValue}
+            selectionColor={colors.notification}
             onFocus={() => isTyping(true)}
             onBlur={() => isTyping(false)}
             onSubmitEditing={(e) => onSubmit(e.nativeEvent.text)}

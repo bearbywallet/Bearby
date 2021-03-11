@@ -35,9 +35,11 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
     if (Device.isIos()) {
       Keyboard.addListener(Events.KeyboardDidShow, () => {
         setMinHeight(height / 1.5);
+        Keyboard.removeAllListeners(Events.KeyboardDidShow);
       });
       Keyboard.addListener(Events.KeyboardDidHide, () => {
         setMinHeight(height / 5);
+        Keyboard.removeAllListeners(Events.KeyboardDidHide);
       });
     }
 

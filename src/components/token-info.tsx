@@ -74,7 +74,9 @@ export const TokenInfo: React.FC<Prop> = ({
           }]}>
             {symbol}
           </Text>
-          <Text style={styles.convertedAmount}>
+          <Text style={[styles.convertedAmount, {
+            color: colors.text
+          }]}>
             {name}
           </Text>
         </View>

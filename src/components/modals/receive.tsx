@@ -96,8 +96,8 @@ export const ReceiveModal: React.FC<Prop> = ({
         title: account.bech32
       };
       Share.open(shareOptions)
-        .then(res => null)
-        .catch(err => null);
+        .then(res => onTriggered())
+        .catch(err => onTriggered());
     });
   }, [qrcodeRef, account]);
   const handleGetZil = React.useCallback(() => {
