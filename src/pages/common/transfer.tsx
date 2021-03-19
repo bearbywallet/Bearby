@@ -85,22 +85,23 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
       transaction.hash = await keystore.zilliqa.send(transaction);
 
       await keystore.account.increaseNonce(selectedAccount);
-      await keystore.transaction.add(transaction);
+      await keystore.transaction.add(transaction, token);
 
       cb();
       setConfirmModal(false);
 
       navigation.navigate('App', {
-        screen: 'History',
-        params: {}
+        screen: 'History'
       });
     } catch (err) {
       cb();
       setConfirmError(err.message);
     }
   }, [
+    navigation,
     selectedAccount,
-    account
+    account,
+    token
   ]);
 
   const hanldeSelectToken = React.useCallback((tokenIndex) => {

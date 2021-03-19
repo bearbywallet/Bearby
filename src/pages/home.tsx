@@ -13,8 +13,7 @@ import {
   StyleSheet,
   FlatList,
   Alert,
-  RefreshControl,
-  LayoutAnimation
+  RefreshControl
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
@@ -102,15 +101,6 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     await keystore.account.removeAccount(account);
     setIsConfirmModal(false);
   }, [account, setIsConfirmModal]);
-  const hanldeSelectToken = React.useCallback((tokenIndex) => {
-    LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
-    navigation.navigate('App', {
-      screen: 'History',
-      params: {
-        tokenIndex
-      }
-    });
-  }, [navigation]);
 
   React.useEffect(() => {
     keystore
@@ -146,7 +136,6 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onRemove={() => setIsConfirmModal(true)}
               />
               <HomeTokens
-                onSelectToken={hanldeSelectToken}
                 onSendToken={(selectedToken) => navigation.navigate('Common', {
                   screen: 'Transfer',
                   params: {

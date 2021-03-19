@@ -7,15 +7,16 @@
  * Copyright (c) 2020 ZilPay
  */
 import BackgroundTimer from 'react-native-background-timer';
-import { TransactionsContoller, AccountControler } from 'app/lib/controller';
+import { TransactionsQueue } from 'app/lib/controller/transaction';
+import { AccountControler } from 'app/lib/controller/account';
 import { BLOCK_INTERVAL } from 'app/config';
 
 export class WorkerController {
-  private _transactions: TransactionsContoller;
+  private _transactions: TransactionsQueue;
   private _account: AccountControler;
 
   constructor(
-    transactions: TransactionsContoller,
+    transactions: TransactionsQueue,
     account: AccountControler
   ) {
     this._account = account;
@@ -28,19 +29,10 @@ export class WorkerController {
     } catch {
       //
     }
-
-    try {
-      const needUpdate = await this._account.zilBalaceUpdate();
-
-      if (needUpdate) {
-        this._transactions.updateTxns();
-      }
-    } catch {
-      //
-    }
   }
 
   public async start() {
+    await this.step();
     BackgroundTimer.runBackgroundTimer(() => {
       this.step();
     }, BLOCK_INTERVAL);

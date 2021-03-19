@@ -6,70 +6,36 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export interface TransactionType {
-  hash: string;
-  blockHeight: number;
-  from: string;
-  to: string;
-  value: string;
-  fee: string;
-  timestamp: number;
-  direction: string;
-  nonce: number;
-  receiptSuccess?: boolean;
-  data: string | null;
-  code: string | null;
-  events?: object[];
-}
+import { StatusCodes } from 'app/lib/controller/transaction';
 
-export interface ZilliqaArgType {
-  type: string;
-  value: string;
-  vname: string;
-}
-
-export interface ZilliqaEventType {
-  _eventname: string;
-  address: string;
-  params: ZilliqaArgType[];
-}
-
-export interface ZIlliqaMSGType {
-  _amount: string;
-  _recipient: string;
-  _tag: string;
-  params: ZilliqaArgType[];
-}
-
-export interface ZIlliqaTransitionType {
-  accepted: boolean;
-  addr: string;
-  depth: number;
-  msg: ZIlliqaMSGType;
-}
-
-export interface ZilliqaException {
-  line: number;
-  message: string;
-}
-
-export interface ZilliqaTransactionType {
-  ID: string;
+export interface TxParams {
   amount: string;
+  code: string;
+  data: string;
   gasLimit: string;
   gasPrice: string;
-  nonce: string;
-  receipt: {
-    cumulative_gas: string;
-    epoch_num: string;
-    success: boolean;
-    errors?: number[];
-    event_logs?: ZilliqaEventType[];
-    transitions?: ZIlliqaTransitionType[];
-    exceptions?: ZilliqaException[];
-  };
-  senderPubKey: string;
-  signature: string;
+  nonce: number;
+  priority: boolean;
+  pubKey: string;
+  signature?: string;
   toAddr: string;
-  version: string;
+  version?: number;
+  hash?: string;
+}
+export interface StoredTx {
+  status: StatusCodes;
+  confirmed?: boolean;
+  token: {
+    decimals: number;
+    symbol: string;
+  },
+  info?: string;
+  teg: string;
+  amount: string;
+  type: number;
+  fee: string;
+  nonce: number;
+  toAddr: string;
+  hash: string;
+  timestamp: number;
 }

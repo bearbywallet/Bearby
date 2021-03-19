@@ -30,14 +30,14 @@ import { LabelValue } from 'app/components/label-value';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { TransactionType } from 'types';
+import { StoredTx } from 'types';
 import { fromZil } from 'app/filters';
 import { viewTransaction } from 'app/utils';
 
 type Prop = {
   style?: ViewStyle;
   visible: boolean;
-  transaction?: TransactionType;
+  transaction?: StoredTx;
   onTriggered: () => void;
   onViewBlock: (url: string) => void;
 };
@@ -61,17 +61,17 @@ export const TransactionModal: React.FC<Prop> = ({
     () => tokenState[0],
     [tokenState]
   );
-  const data = React.useMemo(() => {
-    if (!transaction.data) {
-      return null;
-    }
+  // const data = React.useMemo(() => {
+  //   if (!transaction.data) {
+  //     return null;
+  //   }
 
-    try {
-      return JSON.parse(transaction.data);
-    } catch {
-      return null;
-    }
-  }, [transaction]);
+  //   try {
+  //     return JSON.parse(transaction.data);
+  //   } catch {
+  //     return null;
+  //   }
+  // }, [transaction]);
   const handleShare = React.useCallback(() => {
     const url = viewTransaction(transaction.hash, keystore.network.selected);
     const shareOptions = {
@@ -106,7 +106,7 @@ export const TransactionModal: React.FC<Prop> = ({
         <ModalTitle onClose={onTriggered}>
           {i18n.t('history_tx_details')}
         </ModalTitle>
-        <ScrollView>
+        {/* <ScrollView>
           <LabelValue title={i18n.t('block_height')}>
             {transaction.blockHeight}
           </LabelValue>
@@ -130,7 +130,7 @@ export const TransactionModal: React.FC<Prop> = ({
               {data._tag}
             </LabelValue>
           ) : null}
-        </ScrollView>
+        </ScrollView> */}
         <View style={styles.linkWrapper}>
           <ViewButton
             icon={ShareIconSVG}

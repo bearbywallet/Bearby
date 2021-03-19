@@ -31,6 +31,12 @@ export enum TransactionMethods {
   Transfer = 'Transfer'
 }
 
+export enum TransactionTypes {
+  Payment,
+  triggered,
+  Deploy
+}
+
 export interface ContractItemType {
   vname: string;
   type: string;
@@ -102,6 +108,18 @@ export class Transaction {
     this.signature = signature;
     this.net = net;
     this.nonce = account.nonce[net];
+  }
+
+  public get transactionType() {
+    if (this.code) {
+      return TransactionTypes.Deploy;
+    }
+
+    if (this.data) {
+      return TransactionTypes.triggered;
+    }
+
+    return TransactionTypes.Payment;
   }
 
   public get tag() {

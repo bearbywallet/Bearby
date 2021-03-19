@@ -14,5 +14,6 @@ export enum Methods {
   GetNetworkId = 'GetNetworkId',
   GetPendingTxn = 'GetPendingTxn',
   GetTransaction = 'GetTransaction',
-  CreateTransaction = 'CreateTransaction'
+  CreateTransaction = 'CreateTransaction',
+  GetTransactionStatus = 'GetTransactionStatus'
 }

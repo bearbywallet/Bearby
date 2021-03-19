@@ -21,7 +21,8 @@ export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-t
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;
 export const NONCE_DIFFICULTY = 10;
-export const BLOCK_INTERVAL = 20000;
+export const BLOCK_INTERVAL = 15000;
+export const MAX_TX_QUEUE = 20;
 
 export const ZILLIQA: ZilliqaNetwork = {
   mainnet: {

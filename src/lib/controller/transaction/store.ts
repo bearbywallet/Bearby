@@ -7,16 +7,29 @@
  * Copyright (c) 2020 ZilPay
  */
 import { newRidgeState } from 'react-ridge-state';
-import { TransactionType } from 'types';
+import { StoredTx } from 'types';
+import { MAX_TX_QUEUE } from 'app/config';
 
-const initalState: TransactionType[] = [];
-export const transactionStore = newRidgeState<TransactionType[]>(initalState);
+const initalState: StoredTx[] = [];
+export const transactionStore = newRidgeState<StoredTx[]>(initalState);
 
-export function transactionStoreUpdate(txns: TransactionType[]) {
-  transactionStore.set(() => txns);
+export function transactionStoreUpdate(txns: StoredTx[]) {
+  transactionStore.set(() => txns.filter(Boolean));
 }
-export function transactionStoreAdd(txn: TransactionType) {
-  transactionStore.set((state) => [txn, ...state]);
+export function transactionStoreAdd(txn: StoredTx) {
+
+  if (!txn) {
+    throw new Error('Tx cannobe null');
+  }
+
+  transactionStore.set((state) => {
+    const newList = [txn, ...state];
+
+    // Circumcision Array.
+    newList.length = MAX_TX_QUEUE;
+
+    return newList.filter(Boolean);
+  });
 }
 export function transactionStoreReset() {
   transactionStore.reset();

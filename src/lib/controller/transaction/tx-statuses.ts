@@ -6,8 +6,8 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-
-export enum ViewBlockMethods {
-  Addresses = 'addresses',
-  Txns = 'txs'
+export enum StatusCodes {
+  Pending = 1,
+  PendingAwait = 2,
+  Confirmed = 3
 }

@@ -8,13 +8,6 @@
  */
 
 export const VIEW_BLOCK_URL = 'https://viewblock.io/zilliqa';
-export const VIEW_BLOCK_API_V1 = 'https://viewblock.zillet.io';
-export const API_KEY = '';
-export const TX_DIRECTION = {
-  in: 'in',
-  out: 'out',
-  self: 'self'
-};
 export const VIEW_BLOCK_METHODS = {
   tx: 'tx',
   address: 'address',

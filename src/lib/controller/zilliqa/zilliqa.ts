@@ -10,7 +10,7 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { tokensStore } from 'app/lib/controller/tokens/state';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-import { Token, TxParams, SSN, ZilliqaTransactionType } from 'types';
+import { Token, TxParams, SSN } from 'types';
 import { tohexString } from 'app/utils/address';
 import { Transaction } from '../transaction';
 import {
@@ -169,7 +169,22 @@ export class ZilliqaControl {
     throw new Error('Netwrok fail');
   }
 
-  public async getTransaction(hash: string): Promise<ZilliqaTransactionType> {
+  public async getTransactionStatus(hash: string) {
+    hash = tohexString(hash);
+
+    const request = this._json(Methods.GetTransactionStatus, [hash]);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
+  // TODO add return interface.
+  public async getTransaction(hash: string) {
     hash = tohexString(hash);
 
     const request = this._json(Methods.GetTransaction, [hash]);

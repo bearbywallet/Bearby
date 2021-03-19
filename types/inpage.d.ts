@@ -21,21 +21,6 @@ export interface MessageType {
   payload: MessagePayload;
 }
 
-export interface TxParams {
-  amount: string
-  code: string;
-  data: string;
-  gasLimit: string;
-  gasPrice: string;
-  nonce: number;
-  priority: boolean;
-  pubKey: string;
-  signature?: string;
-  toAddr: string;
-  version?: number;
-  hash?: string;
-}
-
 export interface Signature {
   message: string;
   publicKey: string;

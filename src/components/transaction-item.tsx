@@ -16,12 +16,11 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { TX_DIRECTION } from 'app/config';
-import { Token, TransactionType, Settings } from 'types';
+import { Token, StoredTx, Settings } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
 import { fromBech32Address } from 'app/utils';
 import { fonts } from 'app/styles';
-import { TransactionMethods } from 'app/lib/controller/transaction/builder';
+import { StatusCodes } from 'app/lib/controller/transaction';
 
 type Prop = {
   style?: ViewStyle;
@@ -30,7 +29,7 @@ type Prop = {
   settings: Settings;
   netwrok: string;
   currency: string;
-  transaction: TransactionType;
+  transaction: StoredTx;
   onSelect: () => void;
 };
 
@@ -46,41 +45,32 @@ export const TransactionItem: React.FC<Prop> = ({
   const { colors } = useTheme();
 
   const token = React.useMemo(() => {
-    const toAddressbase16 = fromBech32Address(transaction.to).toLowerCase();
+    const toAddressbase16 = transaction.toAddr.toLowerCase();
 
     return tokens.find(
       (t) => t.address[netwrok] === toAddressbase16
     );
   }, [transaction, tokens, netwrok]);
-  const statusColor = React.useMemo(() => {
-    if (transaction.receiptSuccess) {
-      return colors['success'];
-    } else if (transaction.receiptSuccess === undefined) {
-      return colors['info'];
-    } else if (!transaction.receiptSuccess) {
-      return colors['danger'];
-    }
 
-    return colors['warning'];
+  const statusColor = React.useMemo(() => {
+    switch (transaction.status) {
+      case StatusCodes.Confirmed:
+        return colors['success'];
+      case StatusCodes.PendingAwait:
+        return colors['warning'];
+      case StatusCodes.Pending:
+        return colors['warning'];
+      default:
+        return colors['danger'];
+    }
   }, [transaction, colors]);
   const recipient = React.useMemo(() => {
-    let t = '';
-    let color = colors['danger'];
+    let t = '-';
+    let color = colors['info'];
 
-    if (transaction.direction === TX_DIRECTION.in) {
-      t = '+';
-    } else if (transaction.direction === TX_DIRECTION.out) {
-      t = '-';
-    } else if (transaction.direction === TX_DIRECTION.self) {
-      t = '';
-      color = colors['info'];
-    }
-
-    if (Number(transaction.value) === 0 && !token) {
+    if (Number(transaction.amount) === 0 && !token) {
       color = colors.text;
       t = '';
-    } else if (transaction.direction === TX_DIRECTION.in) {
-      color = colors['success'];
     }
 
     return {
@@ -89,47 +79,16 @@ export const TransactionItem: React.FC<Prop> = ({
     };
   }, [colors, transaction, token]);
   const amount = React.useMemo(() => {
-    const [zilliqa] = tokens;
-
-    if (token && transaction.data) {
-      const data = JSON.parse(transaction.data);
-      const [_, amt] = data.params;
-      const v = fromZil(amt.value, token.decimals);
-
-      return {
-        converted: 0,
-        value: toLocaleString(v),
-        symbol: token.symbol
-      };
-    }
-
-    const value = fromZil(transaction.value, zilliqa.decimals);
+    const value = fromZil(transaction.amount, transaction.token.decimals);
     const rate = token ? settings.rate[token.symbol] : 0;
-    const converted = toConversion(transaction.value, rate, zilliqa.decimals);
+    const converted = toConversion(transaction.amount, rate, transaction.token.decimals);
 
     return {
       converted,
       value: toLocaleString(value),
-      symbol: zilliqa.symbol
+      symbol: transaction.token.symbol
     };
   }, [transaction, tokens, settings, token]);
-  const vname = React.useMemo(() => {
-    if (transaction.data && typeof transaction.data === 'string') {
-      try {
-        const data = JSON.parse(transaction.data);
-
-        if (!data._tag && Array.isArray(data)) {
-          return TransactionMethods.Deploy;
-        }
-
-        return data._tag;
-      } catch (err) {
-        return TransactionMethods.Unexpected;
-      }
-    }
-
-    return TransactionMethods.Payment;
-  }, [transaction]);
   const time = React.useMemo(() => {
     const date = new Date(transaction.timestamp);
 
@@ -152,7 +111,7 @@ export const TransactionItem: React.FC<Prop> = ({
         <Text style={[styles.first, {
           color: colors.text
         }]}>
-          {vname}
+          {transaction.teg}
         </Text>
         <Text style={[styles.first, {
           color: recipient.color

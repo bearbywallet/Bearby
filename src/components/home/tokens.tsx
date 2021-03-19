@@ -26,13 +26,12 @@ import { Token } from 'types';
 import { fonts } from 'app/styles';
 
 type Prop = {
-  onSelectToken: (index: number) => void;
   onSendToken: (index: number) => void;
   onViewToken: (token: Token) => void;
 };
 
 const { width, height } = Dimensions.get('window');
-export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewToken }) => {
+export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
   const { colors } = useTheme();
 
   const settingsState = keystore.settings.store.useValue();
@@ -94,7 +93,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSelectToken, onSendToken, onViewT
               currency={currencyState}
               net={netwrokState.selected}
               rate={settingsState.rate[token.symbol]}
-              onPress={() => onSelectToken(index + 1)}
+              onPress={() => onSendToken(index + 1)}
               onRemove={setTokenForRemove}
               onSend={() => onSendToken(index + 1)}
               onView={onViewToken}

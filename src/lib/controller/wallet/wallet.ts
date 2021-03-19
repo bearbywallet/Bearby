@@ -18,8 +18,7 @@ import { ThemeControler } from 'app/lib/controller/theme';
 import { ContactsControler } from 'app/lib/controller/contacts';
 import { SettingsControler } from 'app/lib/controller/settings';
 import { GasControler } from 'app/lib/controller/gas';
-import { ViewBlockControler } from 'app/lib/controller/viewblock';
-import { TransactionsContoller } from 'app/lib/controller/transaction';
+import { TransactionsQueue } from 'app/lib/controller/transaction';
 import { SearchController } from 'app/lib/controller/search-engine';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { InjectScript } from 'app/lib/controller';
@@ -42,7 +41,6 @@ export class WalletControler extends Mnemonic {
   public readonly theme = new ThemeControler(_storage);
   public readonly contacts = new ContactsControler(_storage);
   public readonly gas = new GasControler(_storage);
-  public readonly viewblock = new ViewBlockControler(this.network);
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly searchEngine = new SearchController(_storage, this.ud);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
@@ -57,11 +55,9 @@ export class WalletControler extends Mnemonic {
     _storage,
     this.token,
     this.zilliqa,
-    this.network,
-    this.viewblock
+    this.network
   );
-  public readonly transaction = new TransactionsContoller(
-    this.viewblock,
+  public readonly transaction = new TransactionsQueue(
     this.zilliqa,
     _storage,
     this.account,
@@ -163,6 +159,7 @@ export class WalletControler extends Mnemonic {
     await this.inpage.sync();
     await this.ssn.sync();
     await this.notificationManager.sync();
+    await this.transaction.sync();
     this.worker.start();
   }
 }

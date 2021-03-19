@@ -20,6 +20,5 @@ export * from './settings';
 export * from './theme';
 export * from './transaction';
 export * from './unstoppabledomains';
-export * from './viewblock';
 export * from './contacts';
 export * from './inject';

@@ -27,9 +27,7 @@ import I18n from 'app/lib/i18n';
 
 export type TabStackParamList = {
   Home: undefined;
-  History: {
-    tokenIndex?: number;
-  };
+  History: undefined;
   Browser: BrwoserStackParamList;
   Settings: undefined;
 };

@@ -33,7 +33,6 @@ import { AccountState, Account, KeyPair } from 'types';
 import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
-import { ViewBlockControler } from 'app/lib/controller/viewblock';
 import { Message } from 'app/lib/controller/inject/message';
 import { connectStore } from 'app/lib/controller/connect';
 
@@ -45,7 +44,6 @@ export class AccountControler {
   private _token: TokenControll;
   private _zilliqa: ZilliqaControl;
   private _netwrok: NetworkControll;
-  private _viewblock: ViewBlockControler;
   private _webView: WebView | undefined;
   private _origin: string | undefined;
 
@@ -53,14 +51,12 @@ export class AccountControler {
     storage: MobileStorage,
     token: TokenControll,
     zilliqa: ZilliqaControl,
-    netwrok: NetworkControll,
-    viewblock: ViewBlockControler
+    netwrok: NetworkControll
   ) {
     this._storage = storage;
     this._token = token;
     this._zilliqa = zilliqa;
     this._netwrok = netwrok;
-    this._viewblock = viewblock;
   }
 
   public get lastIndexPrivKey() {

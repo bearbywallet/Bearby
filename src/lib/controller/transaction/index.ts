@@ -6,5 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './transactions';
+export * from './queue';
 export * from './builder';
+export * from './tx-statuses';
