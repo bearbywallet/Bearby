@@ -11,7 +11,8 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  ViewStyle
+  ViewStyle,
+  Text
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Share from 'react-native-share';
@@ -61,17 +62,6 @@ export const TransactionModal: React.FC<Prop> = ({
     () => tokenState[0],
     [tokenState]
   );
-  // const data = React.useMemo(() => {
-  //   if (!transaction.data) {
-  //     return null;
-  //   }
-
-  //   try {
-  //     return JSON.parse(transaction.data);
-  //   } catch {
-  //     return null;
-  //   }
-  // }, [transaction]);
   const handleShare = React.useCallback(() => {
     const url = viewTransaction(transaction.hash, keystore.network.selected);
     const shareOptions = {
@@ -106,31 +96,50 @@ export const TransactionModal: React.FC<Prop> = ({
         <ModalTitle onClose={onTriggered}>
           {i18n.t('history_tx_details')}
         </ModalTitle>
-        {/* <ScrollView>
-          <LabelValue title={i18n.t('block_height')}>
-            {transaction.blockHeight}
-          </LabelValue>
-          <LabelValue title={i18n.t('tx_hash')}>
-            {transaction.hash}
-          </LabelValue>
-          <LabelValue title={i18n.t('transfer_account')}>
-            {transaction.from}
-          </LabelValue>
-          <LabelValue title={i18n.t('recipient_account')}>
-            {transaction.to}
-          </LabelValue>
-          <LabelValue title={i18n.t('transfer_amount')}>
-            {fromZil(transaction.value, zilliqaToken.decimals)} {zilliqaToken.symbol}
-          </LabelValue>
-          <LabelValue title={i18n.t('nonce')}>
-            {transaction.nonce}
-          </LabelValue>
-          {data ? (
-            <LabelValue title={i18n.t('transition')}>
-              {data._tag}
-            </LabelValue>
-          ) : null}
-        </ScrollView> */}
+        <ScrollView>
+          <View style={[styles.item, {
+            borderColor: colors.primary
+          }]}>
+            <Text style={{
+              color: colors.text
+            }}>
+              Nonce
+            </Text>
+            <Text style={{
+              color: colors.text
+            }}>
+              #{transaction.nonce}
+            </Text>
+          </View>
+          <View style={[styles.item, {
+            borderColor: colors.primary
+          }]}>
+            <Text style={{
+              color: colors.text
+            }}>
+              Amount
+            </Text>
+            <Text style={{
+              color: colors.text
+            }}>
+              -{fromZil(transaction.amount, transaction.token.decimals)} {transaction.token.symbol}
+            </Text>
+          </View>
+          <View style={[styles.item, {
+            borderColor: colors.primary
+          }]}>
+            <Text style={{
+              color: colors.text
+            }}>
+              Status
+            </Text>
+            <Text style={{
+              color: colors.text
+            }}>
+              {transaction.info}
+            </Text>
+          </View>
+        </ScrollView>
         <View style={styles.linkWrapper}>
           <ViewButton
             icon={ShareIconSVG}
@@ -162,5 +171,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly'
+  },
+  item: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    borderBottomWidth: 1,
+    padding: 3
   }
 });

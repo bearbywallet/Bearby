@@ -47,16 +47,14 @@ const styles = StyleSheet.create({
   linkItem: {
     alignItems: 'center',
     justifyContent: 'space-between',
-    padding: 15,
+    padding: 10,
     borderRadius: 8,
-    width: 80,
-    height: 80
+    width: 70,
+    height: 70
   },
   linkText: {
     fontSize: 10,
     fontFamily: fonts.Regular,
-    lineHeight: 13,
-    textAlign: 'center',
-    marginTop: 5
+    textAlign: 'center'
   }
 });

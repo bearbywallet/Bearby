@@ -59,18 +59,40 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+  const dateTransactions = React.useMemo(() => {
+    let lasDate: Date | null = null;
+
+    return transactionState.map((tx) => {
+      let date: Date | null = new Date(tx.timestamp);
+
+      if (!lasDate) {
+        lasDate = date;
+      } else if (lasDate.getDay() >= date.getDay()) {
+        date = null;
+      } else if (lasDate.getDay() < date.getDay()) {
+        lasDate = date;
+      }
+
+      return {
+        tx,
+        date
+      };
+    });
+  }, [
+    transactionState,
+    networkState,
+    tokensState
+  ]);
 
   const handleCreateAccount = React.useCallback(() => {
     navigation.navigate('Common', {
       screen: 'CreateAccount'
     });
-  }, []);
-
+  }, [navigation]);
   const showTxDetails = React.useCallback((tx) => {
     setTransaction(tx);
     setTransactionModal(true);
   }, [setTransaction, setTransactionModal]);
-
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
     try {
@@ -128,22 +150,24 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
         backgroundColor: colors.card
       }]}>
         <FlatList
-          data={transactionState}
-          renderItem={(data) => (
+          data={dateTransactions}
+          renderItem={({ item }) => (
             <React.Fragment>
-              <Text style={[styles.date, {
-                color: colors.border
-              }]}>
-                {new Date(data.item.timestamp).toDateString()}
-              </Text>
+              {item.date ? (
+                 <Text style={[styles.date, {
+                  color: colors.border
+                 }]}>
+                  {new Date(item.tx.timestamp).toDateString()}
+                </Text>
+              ) : null}
               <TransactionItem
-                transaction={data.item}
+                transaction={item.tx}
                 netwrok={networkState.selected}
                 currency={currencyState}
                 settings={settingsState}
                 tokens={tokensState}
                 status={TxStatsues.success}
-                onSelect={() => showTxDetails(data.item)}
+                onSelect={() => showTxDetails(item.tx)}
               />
             </React.Fragment>
           )}

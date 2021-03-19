@@ -66,7 +66,7 @@ export const TransactionItem: React.FC<Prop> = ({
   }, [transaction, colors]);
   const recipient = React.useMemo(() => {
     let t = '-';
-    let color = colors['info'];
+    let color = colors.text;
 
     if (Number(transaction.amount) === 0 && !token) {
       color = colors.text;
