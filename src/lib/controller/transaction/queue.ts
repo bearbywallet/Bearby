@@ -134,7 +134,7 @@ export class TransactionsQueue {
         continue;
       }
 
-      if (element.status === StatusCodes.Confirmed) {
+      if (element.confirmed) {
         continue;
       }
 
