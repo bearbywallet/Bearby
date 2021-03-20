@@ -164,7 +164,7 @@ export class TransactionsQueue {
             break;
           default:
             element.status = result.status;
-            element.confirmed = result.success;
+            element.confirmed = true;
             element.nonce = result.nonce;
             element.info = i18n.t(`node_status_${result.status}`);
             rejectAll = {
