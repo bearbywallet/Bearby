@@ -334,7 +334,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, []);
 
   React.useEffect(() => {
-    setUrlPach(new URL(route.params.url));
+    hanldeSearch(route.params.url);
   }, [route]);
 
   /**

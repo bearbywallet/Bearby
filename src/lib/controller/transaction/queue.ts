@@ -17,12 +17,9 @@ import {
   transactionStoreUpdate,
   transactionStoreAdd
 } from './store';
-import { ZILLIQA_KEYS, MAX_TX_QUEUE } from 'app/config';
 import { Transaction } from './builder';
-import { toBech32Address, deppUnlink } from 'app/utils';
-import { trim } from 'app/filters';
 import i18n from 'app/lib/i18n';
-import { TxParams, StoredTx, Token } from 'types';
+import { Token } from 'types';
 import { StatusCodes } from './tx-statuses';
 import { tokensStore } from 'app/lib/controller/tokens';
 
@@ -102,6 +99,8 @@ export class TransactionsQueue {
 
         if (Array.isArray(list)) {
           transactionStoreUpdate(list);
+        } else {
+          transactionStoreReset();
         }
       }
     } catch {

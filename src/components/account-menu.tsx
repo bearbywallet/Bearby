@@ -54,6 +54,7 @@ export const AccountMenu: React.FC<Prop> = ({
       await keystore.account.selectAccount(index);
       await keystore.account.zilBalaceUpdate();
       await keystore.transaction.sync();
+      await keystore.transaction.checkProcessedTx();
       setIsLoading(false);
     } catch (err) {
       setIsLoading(false);

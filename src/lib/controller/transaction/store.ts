@@ -9,12 +9,13 @@
 import { newRidgeState } from 'react-ridge-state';
 import { StoredTx } from 'types';
 import { MAX_TX_QUEUE } from 'app/config';
+import { deppUnlink } from 'app/utils';
 
 const initalState: StoredTx[] = [];
 export const transactionStore = newRidgeState<StoredTx[]>(initalState);
 
 export function transactionStoreUpdate(txns: StoredTx[]) {
-  transactionStore.set(() => txns.filter(Boolean));
+  transactionStore.set(() => deppUnlink(txns.filter(Boolean)));
 }
 export function transactionStoreAdd(txn: StoredTx) {
 
@@ -28,7 +29,7 @@ export function transactionStoreAdd(txn: StoredTx) {
     // Circumcision Array.
     newList.length = MAX_TX_QUEUE;
 
-    return newList.filter(Boolean);
+    return deppUnlink(newList.filter(Boolean));
   });
 }
 export function transactionStoreReset() {
