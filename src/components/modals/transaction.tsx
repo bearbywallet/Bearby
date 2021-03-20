@@ -11,8 +11,7 @@ import {
   View,
   StyleSheet,
   ScrollView,
-  ViewStyle,
-  Text
+  ViewStyle
 } from 'react-native';
 import Modal from 'react-native-modal';
 import Share from 'react-native-share';
@@ -27,13 +26,14 @@ import {
   ViewBlockIconSVG,
   ShareIconSVG
 } from 'app/components/svg';
-import { LabelValue } from 'app/components/label-value';
+import { KeyValue } from 'app/components/key-value';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { StoredTx } from 'types';
-import { fromZil } from 'app/filters';
-import { viewTransaction } from 'app/utils';
+import { fromZil, trim } from 'app/filters';
+import { toBech32Address, toChecksumAddress, viewTransaction } from 'app/utils';
+import { ADDRESS_FORMATS } from 'app/config';
 
 type Prop = {
   style?: ViewStyle;
@@ -55,13 +55,21 @@ export const TransactionModal: React.FC<Prop> = ({
   }
 
   const { colors } = useTheme();
+  const settingsState = keystore.settings.store.useValue();
 
-  const tokenState = keystore.token.store.useValue();
+  const toAddr = React.useMemo(() => {
+    let address = transaction.toAddr;
+    const [bech32, base16] = ADDRESS_FORMATS;
 
-  const zilliqaToken = React.useMemo(
-    () => tokenState[0],
-    [tokenState]
-  );
+    if (settingsState.addressFormat === bech32) {
+      address = toBech32Address(address);
+    } else if (settingsState.addressFormat === base16) {
+      address = toChecksumAddress(address);
+    }
+
+    return trim(address);
+  }, [settingsState, transaction]);
+
   const handleShare = React.useCallback(() => {
     const url = viewTransaction(transaction.hash, keystore.network.selected);
     const shareOptions = {
@@ -97,48 +105,24 @@ export const TransactionModal: React.FC<Prop> = ({
           {i18n.t('history_tx_details')}
         </ModalTitle>
         <ScrollView>
-          <View style={[styles.item, {
-            borderColor: colors.primary
-          }]}>
-            <Text style={{
-              color: colors.text
-            }}>
-              Nonce
-            </Text>
-            <Text style={{
-              color: colors.text
-            }}>
-              #{transaction.nonce}
-            </Text>
-          </View>
-          <View style={[styles.item, {
-            borderColor: colors.primary
-          }]}>
-            <Text style={{
-              color: colors.text
-            }}>
-              Amount
-            </Text>
-            <Text style={{
-              color: colors.text
-            }}>
-              -{fromZil(transaction.amount, transaction.token.decimals)} {transaction.token.symbol}
-            </Text>
-          </View>
-          <View style={[styles.item, {
-            borderColor: colors.primary
-          }]}>
-            <Text style={{
-              color: colors.text
-            }}>
-              Status
-            </Text>
-            <Text style={{
-              color: colors.text
-            }}>
-              {transaction.info}
-            </Text>
-          </View>
+          <KeyValue title={i18n.t('method')}>
+            {transaction.teg}
+          </KeyValue>
+          <KeyValue title={i18n.t('sorting_item0')}>
+            {transaction.info}
+          </KeyValue>
+          <KeyValue title={i18n.t('transfer_amount')}>
+            -{fromZil(transaction.amount, transaction.token.decimals)} {transaction.token.symbol}
+          </KeyValue>
+          <KeyValue title={i18n.t('nonce')}>
+            #{transaction.nonce}
+          </KeyValue>
+          <KeyValue title={i18n.t('timestamp')}>
+            {new Date(transaction.timestamp).toDateString()}
+          </KeyValue>
+          <KeyValue title={i18n.t('to_address')}>
+            {toAddr}
+          </KeyValue>
         </ScrollView>
         <View style={styles.linkWrapper}>
           <ViewButton
@@ -171,11 +155,5 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-evenly'
-  },
-  item: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    borderBottomWidth: 1,
-    padding: 3
   }
 });

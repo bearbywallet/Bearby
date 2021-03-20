@@ -6,10 +6,10 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { ZILLIQA, AddressFormats } from 'src/config/app-constants';
+import { ZILLIQA } from 'src/config/app-constants';
 
 export interface Settings {
-  addressFormat: AddressFormats;
+  addressFormat: string;
   rate: {
     [key: string]: number;
   };
