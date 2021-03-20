@@ -64,12 +64,13 @@ export const NetworkPage = () => {
     try {
       await keystore.network.changeNetwork(net);
 
-      if (net !== custom) {
-        await keystore.network.sync();
-        await keystore.transaction.sync();
+      if (net === mainnet) {
         await keystore.ssn.sync();
-        await keystore.settings.sync();
       }
+
+      await keystore.network.sync();
+      await keystore.transaction.sync();
+      await keystore.settings.sync();
 
       const { selectedAddress } = keystore.account.store.get();
       await keystore.account.zilBalaceUpdate();
@@ -123,13 +124,7 @@ export const NetworkPage = () => {
           selected={networkState.selected}
           onSelect={handleNetwrokChange}
         />
-        {networkState.selected === custom ? (
-          <NetwrokConfig
-            config={networkState.config}
-            selected={networkState.selected}
-            onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
-          />
-        ) : (
+        {networkState.selected === mainnet ? (
           <DropMenu
             selected={{
               name: ssnState.selected
@@ -139,6 +134,12 @@ export const NetworkPage = () => {
             isLoading={isLoading}
             onUpdate={hanldeSSNUpdate}
             onSelect={hanldeChangeSSN}
+          />
+        ) : (
+          <NetwrokConfig
+            config={networkState.config}
+            selected={networkState.selected}
+            onChange={(netConfig) => keystore.network.changeConfig(netConfig)}
           />
         )}
       </ScrollView>

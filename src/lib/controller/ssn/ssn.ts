@@ -9,7 +9,6 @@
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { STORAGE_FIELDS, DEFAULT_SSN } from 'app/config';
-import { SSNState } from 'types';
 import {
   ssnStore,
   StoreUpdate,
