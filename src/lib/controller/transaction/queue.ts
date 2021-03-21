@@ -136,22 +136,18 @@ export class TransactionsQueue {
   public async calcNextNonce() {
     await this.sync();
 
-    let nonce = 0;
     const account = this._account.getCurrentAccount();
     const list = this.store.get().filter((t) => !t.confirmed);
+    let { nonce } = await this._zilliqa.getBalance(account.base16);
 
     if (list.length > NONCE_DIFFICULTY) {
       throw new Error('nonce too hight');
     }
 
-    if (list.length === 0) {
-      const result = await this._zilliqa.getBalance(account.base16);
-
-      nonce = result.nonce;
-    } else if (list && list[0]) {
+    if (list && list[0]) {
       const [tx] = list;
 
-      nonce = tx.nonce;
+      nonce = Number(nonce) < Number(tx.nonce) ? Number(tx.nonce) : Number(nonce);
     }
 
     return nonce + 1;
@@ -168,6 +164,7 @@ export class TransactionsQueue {
         element.info = rejectAll.info;
         element.status = rejectAll.status;
         element.confirmed = true;
+        element.nonce = 0;
 
         continue;
       }
@@ -185,24 +182,24 @@ export class TransactionsQueue {
             element.status = result.status;
             element.confirmed = result.success;
             element.nonce = result.nonce;
-            element.info = i18n.t(`node_status_${result.status}`);
+            element.info = `node_status_${result.status}`;
             this._makeNotify(title, element.hash, element.info);
             break;
           case StatusCodes.Pending:
             element.status = result.status;
             element.confirmed = result.success;
-            element.info = i18n.t(`node_status_${result.status}`);
+            element.info = `node_status_${result.status}`;
             break;
           case StatusCodes.PendingAwait:
             element.status = result.status;
             element.confirmed = result.success;
-            element.info = i18n.t(`node_status_${result.status}`);
+            element.info = `node_status_${result.status}`;
             break;
           default:
             element.status = result.status;
             element.confirmed = true;
             element.nonce = 0;
-            element.info = i18n.t(`node_status_${result.status}`);
+            element.info = `node_status_${result.status}`;
             rejectAll = {
               info: element.info,
               status: result.status
@@ -223,7 +220,7 @@ export class TransactionsQueue {
   private _makeNotify(title: string, hash: string, message: string) {
     this._notification.localNotification({
       title,
-      message,
+      message: i18n.t(message),
       userInfo: {
         hash
       }

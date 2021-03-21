@@ -108,9 +108,11 @@ export const TransactionModal: React.FC<Prop> = ({
           <KeyValue title={i18n.t('method')}>
             {transaction.teg}
           </KeyValue>
-          <KeyValue title={i18n.t('sorting_item0')}>
-            {transaction.info}
-          </KeyValue>
+          {transaction.info ? (
+            <KeyValue title={i18n.t('sorting_item0')}>
+              {i18n.t(transaction.info)}
+            </KeyValue>
+          ) : null}
           <KeyValue title={i18n.t('transfer_amount')}>
             -{fromZil(transaction.amount, transaction.token.decimals)} {transaction.token.symbol}
           </KeyValue>

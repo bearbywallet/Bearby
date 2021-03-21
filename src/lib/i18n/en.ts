@@ -255,7 +255,7 @@ export default {
   d_web_description: 'Support for decentralized domain protocols.',
   node_status_0: 'Transaction not found',
   node_status_1: 'Pending - Dispatched',
-  node_status_2: 'Pending - Soft-confirmed (awaiting Tx block generation)',
+  node_status_2: 'Pending - Soft-confirmed',
   node_status_3: 'Confirmed',
   node_status_4: 'Pending - Nonce is higher than expected',
   node_status_5: 'Pending - Microblock gas limit exceeded',
