@@ -183,7 +183,6 @@ export class ZilliqaControl {
     return data.result;
   }
 
-  // TODO add return interface.
   public async getTransaction(hash: string) {
     hash = tohexString(hash);
 

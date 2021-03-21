@@ -8,6 +8,7 @@
  */
 import { newRidgeState } from 'react-ridge-state';
 import { AccountState } from 'types';
+import { deppUnlink } from 'app/utils';
 
 const initalState: AccountState = {
   identities: [],
@@ -16,10 +17,10 @@ const initalState: AccountState = {
 export const accountStore = newRidgeState<AccountState>(initalState);
 
 export function accountStoreUpdate(payload: AccountState) {
-  accountStore.set(() => payload);
+  accountStore.set(() => deppUnlink(payload));
 }
 export function accountStoreSelect(selectedAddress: number) {
-  accountStore.set((prevState) => ({
+  accountStore.set((prevState) => deppUnlink({
     ...prevState,
     selectedAddress
   }));

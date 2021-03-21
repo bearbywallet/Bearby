@@ -99,27 +99,6 @@ export const ConfirmPopup: React.FC<Prop> = ({
     transaction.setPriority(DS);
   }, [DS, setDS]);
 
-  React.useEffect(() => {
-    setIsLoading(true);
-
-    const accountState = keystore.account.store.get();
-    const foundIndex = accountState.identities.findIndex(
-      (acc) => acc.base16 === account.base16
-    );
-
-    if (foundIndex !== -1) {
-      keystore
-        .account
-        .updateNonce(foundIndex)
-        .then((nonce) => {
-          transaction.setNonce(nonce + 1);
-
-          setIsLoading(false);
-        })
-        .catch(() => setIsLoading(false));
-    }
-  }, [account, transaction]);
-
   return (
     <Modal
       isVisible={visible}

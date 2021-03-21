@@ -58,6 +58,7 @@ export class Transaction {
       account,
       payload.toAddr,
       net,
+      payload.nonce,
       payload.code,
       payload.data,
       payload.priority
@@ -87,6 +88,7 @@ export class Transaction {
     account: Account,
     toAddr: string,
     net: string,
+    nonce: number,
     code = '',
     data = '',
     priority = false,
@@ -107,7 +109,7 @@ export class Transaction {
     this.version = version;
     this.signature = signature;
     this.net = net;
-    this.nonce = account.nonce[net];
+    this.nonce = nonce;
   }
 
   public get transactionType() {

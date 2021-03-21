@@ -16,6 +16,7 @@ import {
   ActivityIndicator
 } from 'react-native';
 import URL from 'url-parse';
+import SafeAreaView from 'react-native-safe-area-view';
 import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 
@@ -173,12 +174,13 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
+          const nonce = await keystore.transaction.calcNextNonce();
           const newTX = Transaction.fromPayload(
             message.payload.data,
             account,
             net
           );
-          newTX.setNonce(account.nonce[net] + 1);
+          newTX.setNonce(nonce);
           setTransaction({
             params: newTX,
             uuid: message.payload.uuid,
@@ -271,7 +273,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     }
 
     try {
-      await keystore.account.updateNonce(accountState.selectedAddress);
       const chainID = await keystore.zilliqa.getNetworkId();
       const keyPair = await keystore.getkeyPairs(account, password);
 
@@ -279,7 +280,6 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       await tx.sign(keyPair.privateKey);
       tx.hash = await keystore.zilliqa.send(tx);
 
-      await keystore.account.increaseNonce(accountState.selectedAddress);
       await keystore.transaction.add(tx);
 
       const m = new Message(Messages.signResult, {
@@ -388,7 +388,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }
 
   return (
-    <View style={[styles.container, {
+    <SafeAreaView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <BrowserViewBar
@@ -473,7 +473,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           />
         </ConfirmPopup>
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 const styles = StyleSheet.create({

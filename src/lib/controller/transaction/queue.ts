@@ -22,6 +22,7 @@ import i18n from 'app/lib/i18n';
 import { Token } from 'types';
 import { StatusCodes } from './tx-statuses';
 import { tokensStore } from 'app/lib/controller/tokens';
+import { NONCE_DIFFICULTY } from 'app/config';
 
 export class TransactionsQueue {
   public store = transactionStore;
@@ -118,6 +119,44 @@ export class TransactionsQueue {
     transactionStoreReset();
   }
 
+  public async resetNonce() {
+    await this.sync();
+
+    const account = this._account.getCurrentAccount();
+    const list = this.store.get();
+    const result = await this._zilliqa.getBalance(account.base16);
+
+    if (list.length !== 0) {
+      list[0].nonce = result.nonce;
+    }
+
+    return result.nonce;
+  }
+
+  public async calcNextNonce() {
+    await this.sync();
+
+    let nonce = 0;
+    const account = this._account.getCurrentAccount();
+    const list = this.store.get().filter((t) => !t.confirmed);
+
+    if (list.length > NONCE_DIFFICULTY) {
+      throw new Error('nonce too hight');
+    }
+
+    if (list.length === 0) {
+      const result = await this._zilliqa.getBalance(account.base16);
+
+      nonce = result.nonce;
+    } else if (list && list[0]) {
+      const [tx] = list;
+
+      nonce = tx.nonce;
+    }
+
+    return nonce + 1;
+  }
+
   public async checkProcessedTx() {
     const list = this.store.get();
     let rejectAll = null;
@@ -152,19 +191,17 @@ export class TransactionsQueue {
           case StatusCodes.Pending:
             element.status = result.status;
             element.confirmed = result.success;
-            element.nonce = result.nonce;
             element.info = i18n.t(`node_status_${result.status}`);
             break;
           case StatusCodes.PendingAwait:
             element.status = result.status;
             element.confirmed = result.success;
-            element.nonce = result.nonce;
             element.info = i18n.t(`node_status_${result.status}`);
             break;
           default:
             element.status = result.status;
             element.confirmed = true;
-            element.nonce = result.nonce;
+            element.nonce = 0;
             element.info = i18n.t(`node_status_${result.status}`);
             rejectAll = {
               info: element.info,

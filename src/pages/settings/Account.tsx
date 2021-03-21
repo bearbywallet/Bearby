@@ -10,7 +10,8 @@ import React from 'react';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  ActivityIndicator
 } from 'react-native';
 import SafeAreaView from 'react-native-safe-area-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -25,10 +26,11 @@ import { keystore } from 'app/keystore';
 import { fonts } from 'app/styles';
 import { AccountTypes } from 'app/config';
 
-export const AccountSettingsPage = () => {
+export const AccountSettingsPage: React.FC = () => {
   const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
-  const networkState = keystore.network.store.useValue();
+  const [loading, setLoading] = React.useState(false);
+  const [nonce, setNonce] = React.useState(0);
 
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
@@ -54,8 +56,10 @@ export const AccountSettingsPage = () => {
       name
     });
   }, [account, accountState]);
-  const hanldeResetNonce = React.useCallback(() => {
-    keystore.account.updateNonce(accountState.selectedAddress);
+  const hanldeResetNonce = React.useCallback(async() => {
+    setLoading(true);
+    setNonce(await keystore.transaction.resetNonce());
+    setLoading(false);
   }, [accountState]);
   const handleChangeName = React.useCallback((name: string) => {
     keystore.account.updateAccountName({
@@ -63,6 +67,20 @@ export const AccountSettingsPage = () => {
       name
     });
   }, [account, accountState]);
+
+  React.useEffect(() => {
+    setLoading(true);
+
+    keystore
+      .transaction
+      .calcNextNonce()
+      .then((n) => {
+        setNonce(n - 1);
+        setLoading(false);
+      })
+      .catch((err) => null)
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <SafeAreaView style={[styles.container, {
@@ -117,11 +135,18 @@ export const AccountSettingsPage = () => {
               }]}>
                 Nonce
               </Text>
-              <Text style={[styles.text, {
-                color: colors.text
-              }]}>
-                {account.nonce[networkState.selected]}
-              </Text>
+              {loading ? (
+                <ActivityIndicator
+                animating={loading}
+                color={colors.primary}
+              />
+              ) : (
+                <Text style={[styles.text, {
+                  color: colors.text
+                }]}>
+                  {nonce}
+                </Text>
+              )}
             </View>
           </View>
         </View>

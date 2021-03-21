@@ -11,7 +11,8 @@ import React from 'react';
 import {
   View,
   Dimensions,
-  StyleSheet
+  StyleSheet,
+  Alert
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import SafeAreaView from 'react-native-safe-area-view';
@@ -52,6 +53,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
   const gasState = keystore.gas.store.useValue();
   const authState = keystore.guard.auth.store.useValue();
 
+  const [isLoading, setIsLoading] = React.useState(false);
   const [confirmModal, setConfirmModal] = React.useState(false);
   const [confirmError, setConfirmError] = React.useState<string>();
   const [selectedToken, setSelectedToken] = React.useState(
@@ -76,23 +78,25 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
   const handleSiging = React.useCallback(async(transaction: Transaction, cb, password) => {
     setConfirmError(undefined);
     try {
-      await keystore.account.updateNonce(selectedAccount);
       const chainID = await keystore.zilliqa.getNetworkId();
       const keyPair = await keystore.getkeyPairs(account, password);
 
       transaction.setVersion(chainID);
+
       await transaction.sign(keyPair.privateKey);
+
       transaction.hash = await keystore.zilliqa.send(transaction);
 
-      await keystore.account.increaseNonce(selectedAccount);
       await keystore.transaction.add(transaction, token);
 
       cb();
       setConfirmModal(false);
 
-      navigation.navigate('App', {
-        screen: 'History'
-      });
+      setTimeout(() => {
+        navigation.navigate('App', {
+          screen: 'History'
+        });
+      }, 500);
     } catch (err) {
       cb();
       setConfirmError(err.message);
@@ -103,17 +107,17 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
     account,
     token
   ]);
-
-  const hanldeSelectToken = React.useCallback((tokenIndex) => {
+  const handleSelectToken = React.useCallback((tokenIndex) => {
     setSelectedToken(tokenIndex);
     setAmount('0');
   }, []);
-  const hanldeSelectAccount = React.useCallback((accountIndex) => {
+  const handleSelectAccount = React.useCallback((accountIndex) => {
     setSelectedAccount(accountIndex);
     setAmount('0');
   }, []);
+  const handleSend = React.useCallback(async() => {
+    setIsLoading(true);
 
-  React.useEffect(() => {
     const [zil] = tokensState;
     const net = networkState.selected;
     let data = '';
@@ -149,20 +153,31 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         toAddr = token.address[net];
       }
 
+      const nonce = await keystore.transaction.calcNextNonce();
       const newTX = new Transaction(
         qa,
         gas,
         account,
         toAddr,
         net,
+        nonce,
         '',
         data
       );
 
       setTx(newTX);
+      setConfirmModal(true);
     } catch (err) {
-      //
+      setConfirmModal(false);
+      Alert.alert(
+        i18n.t('transfer_title'),
+        err.message,
+        [
+          { text: "OK" }
+        ]
+      );
     }
+    setIsLoading(false);
   }, [
     networkState,
     token,
@@ -186,14 +201,14 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
             <TransferAccount
               accounts={accountState.identities}
               selected={selectedAccount}
-              onSelect={hanldeSelectAccount}
+              onSelect={handleSelectAccount}
             />
             <TransferToken
               account={accountState.identities[selectedAccount]}
               tokens={tokensState}
               selected={selectedToken}
               netwrok={networkState.selected}
-              onSelect={hanldeSelectToken}
+              onSelect={handleSelectToken}
             />
           </View>
           <TransferRecipient
@@ -223,10 +238,11 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
             marginTop: 15
           }}>
             <CustomButton
-              disabled={!tx}
+              disabled={!recipient}
               style={{ width: width / 1.5 }}
               title={i18n.t('restore_btn')}
-              onPress={() => setConfirmModal(true)}
+              isLoading={isLoading}
+              onPress={handleSend}
             />
           </View>
         </KeyboardAwareScrollView>

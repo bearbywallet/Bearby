@@ -14,7 +14,6 @@ import {
   AccountTypes,
   ZILLIQA_KEYS,
   Messages,
-  NONCE_DIFFICULTY,
   MAX_NAME_DIFFICULTY
 } from 'app/config';
 import {
@@ -111,24 +110,10 @@ export class AccountControler {
   }
 
   public async fromKeyPairs(acc: KeyPair, type: AccountTypes, name = ''): Promise<Account> {
-    const [mainnet, testnet, custom] = NetworkControll.defualtNetwroks;
-    const nonce = {
-      [mainnet]: 0,
-      [testnet]: 0,
-      [custom]: 0
-    };
     const pubKey = acc.publicKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
-
-    try {
-      const res = await this._zilliqa.getBalance(base16);
-
-      nonce[this._netwrok.selected] = res.nonce;
-    } catch {
-      //
-    }
 
     return {
       base16,
@@ -137,7 +122,6 @@ export class AccountControler {
       type,
       pubKey,
       balance,
-      nonce,
       index: Number(acc.index)
     };
   }
@@ -231,26 +215,12 @@ export class AccountControler {
   }
 
   public async fromPrivateKey(privatekey: string, name: string): Promise<Account> {
-    const [mainnet, testnet, custom] = NetworkControll.defualtNetwroks;
-    const nonce = {
-      [mainnet]: 0,
-      [testnet]: 0,
-      [custom]: 0
-    };
     const pubKey = getPubKeyFromPrivateKey(privatekey);
     const type = AccountTypes.privateKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
     const balance = await this._tokenBalance(base16);
     const index = this.lastIndexPrivKey;
-
-    try {
-      const res = await this._zilliqa.getBalance(base16);
-
-      nonce[this._netwrok.selected] = res.nonce;
-    } catch {
-      //
-    }
 
     return {
       base16,
@@ -259,8 +229,7 @@ export class AccountControler {
       pubKey,
       type,
       balance,
-      index,
-      nonce
+      index
     };
   }
 
@@ -274,41 +243,6 @@ export class AccountControler {
     accountStoreSelect(index);
 
     await this.update(this.store.get());
-  }
-
-  public async updateNonce(selected: number) {
-    const state = this.store.get();
-    const net = this._netwrok.selected;
-    const account = state.identities[selected];
-    const currentNonce = account.nonce[net] || 0;
-    const { nonce } = await this._zilliqa.getBalance(account.base16);
-
-    if (nonce < currentNonce && NONCE_DIFFICULTY < nonce - currentNonce) {
-      throw new Error('nonce too hight');
-    }
-
-    if (nonce === currentNonce) {
-      return currentNonce;
-    }
-
-    if (nonce > currentNonce) {
-      state.identities[selected].nonce = {
-        [net]: nonce
-      };
-    }
-
-    await this.update(state);
-
-    return account.nonce[net];
-  }
-
-  public async increaseNonce(selected: number) {
-    const net = this._netwrok.selected;
-    const state = this.store.get();
-
-    state.identities[selected].nonce[net]++;
-
-    await this.update(state);
   }
 
   public async balanceUpdate() {

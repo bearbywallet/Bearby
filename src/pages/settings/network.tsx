@@ -26,7 +26,7 @@ import { keystore } from 'app/keystore';
 import { ZILLIQA_KEYS } from 'app/config';
 import { fonts } from 'app/styles';
 
-const [mainnet, testnet, custom] = ZILLIQA_KEYS;
+const [mainnet] = ZILLIQA_KEYS;
 const netwroks = Object.keys(keystore.network.config);
 export const NetworkPage = () => {
   const { colors } = useTheme();
@@ -72,9 +72,7 @@ export const NetworkPage = () => {
       await keystore.transaction.sync();
       await keystore.settings.sync();
 
-      const { selectedAddress } = keystore.account.store.get();
       await keystore.account.zilBalaceUpdate();
-      await keystore.account.updateNonce(selectedAddress);
     } catch (err) {
       // console.log(err);
     }

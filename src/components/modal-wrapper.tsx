@@ -47,7 +47,7 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
       Keyboard.removeAllListeners(Events.KeyboardDidShow);
       Keyboard.removeAllListeners(Events.KeyboardDidHide);
     };
-  });
+  }, []);
 
   return (
     <View
