@@ -125,6 +125,9 @@ export const TransactionModal: React.FC<Prop> = ({
           <KeyValue title={i18n.t('to_address')}>
             {toAddr}
           </KeyValue>
+          <KeyValue title={i18n.t('from')}>
+            {trim(transaction.from)}
+          </KeyValue>
         </ScrollView>
         <View style={styles.linkWrapper}>
           <ViewButton

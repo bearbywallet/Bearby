@@ -174,7 +174,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
-          const nonce = await keystore.transaction.calcNextNonce();
+          const nonce = await keystore.transaction.calcNextNonce(account);
           const newTX = Transaction.fromPayload(
             message.payload.data,
             account,

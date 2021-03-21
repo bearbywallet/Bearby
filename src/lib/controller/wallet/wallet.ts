@@ -61,7 +61,6 @@ export class WalletControler extends Mnemonic {
     this.zilliqa,
     _storage,
     this.account,
-    this.network,
     this.notificationManager
   );
   public readonly inpage = new InjectScript(this.account, this.network);

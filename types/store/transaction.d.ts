@@ -36,6 +36,7 @@ export interface StoredTx {
   fee: string;
   nonce: number;
   toAddr: string;
+  from: string;
   hash: string;
   timestamp: number;
 }

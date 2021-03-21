@@ -12,6 +12,7 @@ export default {
   my_contacts: 'My contacts',
   token: 'Token',
   all: 'All',
+  from: 'From',
   close: 'Close',
   method: 'Method',
   reload: 'Reload',

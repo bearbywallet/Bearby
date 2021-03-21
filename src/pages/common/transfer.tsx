@@ -153,7 +153,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         toAddr = token.address[net];
       }
 
-      const nonce = await keystore.transaction.calcNextNonce();
+      const nonce = await keystore.transaction.calcNextNonce(account);
       const newTX = new Transaction(
         qa,
         gas,
@@ -184,7 +184,6 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
     tokensState,
     account,
     amount,
-    selectedAccount,
     recipient,
     gasState
   ]);

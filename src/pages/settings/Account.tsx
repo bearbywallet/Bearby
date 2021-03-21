@@ -58,9 +58,9 @@ export const AccountSettingsPage: React.FC = () => {
   }, [account, accountState]);
   const hanldeResetNonce = React.useCallback(async() => {
     setLoading(true);
-    setNonce(await keystore.transaction.resetNonce());
+    setNonce(await keystore.transaction.resetNonce(account));
     setLoading(false);
-  }, [accountState]);
+  }, [account]);
   const handleChangeName = React.useCallback((name: string) => {
     keystore.account.updateAccountName({
       ...account,
@@ -73,7 +73,7 @@ export const AccountSettingsPage: React.FC = () => {
 
     keystore
       .transaction
-      .calcNextNonce()
+      .calcNextNonce(account)
       .then((n) => {
         setNonce(n - 1);
         setLoading(false);

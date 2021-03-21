@@ -9,7 +9,6 @@
 import { MobileStorage, buildObject } from 'app/lib';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { AccountControler } from 'app/lib/controller/account';
-import { NetworkControll } from 'app/lib/controller/network';
 import { NotificationManager } from 'app/lib/controller/notification';
 import {
   transactionStore,
@@ -19,10 +18,10 @@ import {
 } from './store';
 import { Transaction } from './builder';
 import i18n from 'app/lib/i18n';
-import { Token } from 'types';
+import { Token, Account } from 'types';
 import { StatusCodes } from './tx-statuses';
 import { tokensStore } from 'app/lib/controller/tokens';
-import { NONCE_DIFFICULTY } from 'app/config';
+import { NONCE_DIFFICULTY, STORAGE_FIELDS } from 'app/config';
 
 export class TransactionsQueue {
   public store = transactionStore;
@@ -30,34 +29,22 @@ export class TransactionsQueue {
   private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
   private _account: AccountControler;
-  private _netwrok: NetworkControll;
   private _notification: NotificationManager;
 
   constructor(
     zilliqa: ZilliqaControl,
     storage: MobileStorage,
     account: AccountControler,
-    netwrok: NetworkControll,
     notification: NotificationManager
   ) {
     this._zilliqa = zilliqa;
     this._storage = storage;
     this._account = account;
-    this._netwrok = netwrok;
     this._notification = notification;
   }
 
-  /**
-   * Create a key for storage, via `account` and `netwrok`.
-   */
   private get _field() {
-    const account = this._account.getCurrentAccount();
-    const netwrok = this._netwrok.selected;
-
-    return {
-      account,
-      field: `${account.base16}/${netwrok}`
-    };
+    return STORAGE_FIELDS.TRANSACTIONS;
   }
 
   public async add(tx: Transaction, token?: Token) {
@@ -77,6 +64,7 @@ export class TransactionsQueue {
         decimals: token.decimals,
         symbol: token.symbol
       },
+      from: tx.from,
       status: StatusCodes.Pending,
       amount: tx.tokenAmount,
       type: tx.transactionType,
@@ -91,8 +79,7 @@ export class TransactionsQueue {
   }
 
   public async sync() {
-    const { field } = this._field;
-    const data = await this._storage.get(field);
+    const data = await this._storage.get(this._field);
 
     try {
       if (Boolean(data) && typeof data === 'string') {
@@ -110,19 +97,16 @@ export class TransactionsQueue {
   }
 
   public async reset() {
-    const { field } = this._field;
-
-    await this._storage.rm(field);
+    await this._storage.rm(this._field);
 
     this._notification.setBadgeNumber(0);
 
     transactionStoreReset();
   }
 
-  public async resetNonce() {
+  public async resetNonce(account: Account) {
     await this.sync();
 
-    const account = this._account.getCurrentAccount();
     const list = this.store.get();
     const result = await this._zilliqa.getBalance(account.base16);
 
@@ -133,10 +117,9 @@ export class TransactionsQueue {
     return result.nonce;
   }
 
-  public async calcNextNonce() {
+  public async calcNextNonce(account: Account) {
     await this.sync();
 
-    const account = this._account.getCurrentAccount();
     const list = this.store.get().filter((t) => !t.confirmed);
     let { nonce } = await this._zilliqa.getBalance(account.base16);
 
@@ -228,11 +211,10 @@ export class TransactionsQueue {
   }
 
   private async _update() {
-    const { field } = this._field;
     const state = this.store.get();
 
     await this._storage.set(
-      buildObject(field, state)
+      buildObject(this._field, state)
     );
   }
 }
