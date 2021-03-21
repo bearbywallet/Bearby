@@ -38,7 +38,7 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
       navigation.navigate('App', { screen: 'Home' });
     })
     .catch(() => {
-      return navigation.navigate('Unauthorized', { screen: 'Lock' });
+      return navigation.navigate('Unauthorized', { screen: 'GetStarted' });
     });
   }, []);
 
