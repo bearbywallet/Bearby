@@ -104,7 +104,7 @@ export const TransactionModal: React.FC<Prop> = ({
         <ModalTitle onClose={onTriggered}>
           {i18n.t('history_tx_details')}
         </ModalTitle>
-        <ScrollView>
+        <ScrollView style={styles.wrapper}>
           <KeyValue title={i18n.t('method')}>
             {transaction.teg}
           </KeyValue>
@@ -127,6 +127,12 @@ export const TransactionModal: React.FC<Prop> = ({
           </KeyValue>
           <KeyValue title={i18n.t('from')}>
             {trim(transaction.from)}
+          </KeyValue>
+          <KeyValue
+            title={i18n.t('tx_hash')}
+            border={false}
+          >
+            0x{trim(transaction.hash)}
           </KeyValue>
         </ScrollView>
         <View style={styles.linkWrapper}>
@@ -155,6 +161,9 @@ export const TransactionModal: React.FC<Prop> = ({
 };
 
 const styles = StyleSheet.create({
+  wrapper: {
+    paddingTop: 20
+  },
   linkWrapper: {
     paddingVertical: 20,
     flexDirection: 'row',

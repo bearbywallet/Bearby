@@ -13,10 +13,12 @@ import { Methods } from './methods';
 import { Token, TxParams, SSN } from 'types';
 import { tohexString } from 'app/utils/address';
 import { Transaction } from '../transaction';
+import { toChecksumAddress } from 'app/utils';
 import {
   SSN_ADDRESS,
   ZILLIQA,
   ZILLIQA_KEYS,
+  SCAM_TOKEN,
   DEFAULT_SSN
 } from 'app/config';
 
@@ -151,7 +153,35 @@ export class ZilliqaControl {
     return responce.json();
   }
 
+  public async detectSacmAddress(address: string) {
+    const field = 'balances';
+    let isScam = false;
+
+    address = toChecksumAddress(address).toLowerCase();
+
+    try {
+      const result = await this.getSmartContractSubState(
+        SCAM_TOKEN,
+        field,
+        [address]
+      );
+
+      if (result && result[field] && result[field][address]) {
+        isScam = Number(result[field][address]) > 0;
+      }
+
+    } catch {
+      //
+    }
+
+    if (isScam) {
+      throw new Error('Scam detected');
+    }
+  }
+
   public async send(tx: Transaction): Promise<string> {
+    await this.detectSacmAddress(tx.toAddr);
+
     const request = this._json(Methods.CreateTransaction, [
       tx.self
     ]);

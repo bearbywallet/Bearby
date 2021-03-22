@@ -17,17 +17,19 @@ import {
 
 type Prop = {
   title: string;
+  border?: boolean;
 };
 
 export const KeyValue: React.FC<Prop> = ({
   title,
-  children
+  children,
+  border = true
 }) => {
   const { colors } = useTheme();
 
   return (
     <View style={[styles.item, {
-      borderColor: colors.primary
+      borderColor: border ? colors.notification : 'transparent'
     }]}>
       <Text style={[styles.text, {
         color: colors.text
