@@ -54,7 +54,9 @@ export const TransactionItem: React.FC<Prop> = ({
 
   const statusColor = React.useMemo(() => {
     switch (transaction.status) {
-      case StatusCodes.Confirmed && StatusCodes.PendingAwait:
+      case StatusCodes.Confirmed:
+        return colors['success'];
+      case StatusCodes.PendingAwait:
         return colors['success'];
       case StatusCodes.Pending:
         return colors['warning'];
