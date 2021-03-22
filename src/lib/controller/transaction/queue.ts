@@ -175,8 +175,9 @@ export class TransactionsQueue {
             break;
           case StatusCodes.PendingAwait:
             element.status = result.status;
-            element.confirmed = result.success;
+            element.confirmed = true;
             element.info = `node_status_${result.status}`;
+            this._makeNotify(title, element.hash, element.info);
             break;
           default:
             element.status = result.status;

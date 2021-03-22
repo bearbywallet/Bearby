@@ -71,8 +71,6 @@ export const NetworkPage = () => {
       await keystore.network.sync();
       await keystore.transaction.sync();
       await keystore.settings.sync();
-
-      await keystore.account.zilBalaceUpdate();
     } catch (err) {
       // console.log(err);
     }

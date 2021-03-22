@@ -40,7 +40,7 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
     .catch(() => {
       return navigation.navigate('Unauthorized', { screen: 'GetStarted' });
     });
-  }, []);
+  }, [navigation]);
 
   return (
     <React.Fragment>

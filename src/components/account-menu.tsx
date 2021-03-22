@@ -41,23 +41,16 @@ export const AccountMenu: React.FC<Prop> = ({
   const accountState = keystore.account.store.useValue();
 
   const [isModal, setIsModal] = React.useState(false);
-  const [isLoading, setIsLoading] = React.useState(false);
 
   const handleCreateAccount = React.useCallback(() => {
     setIsModal(false);
     onCreate();
   }, [setIsModal]);
   const handleChangeAccount = React.useCallback(async(index) => {
-    setIsLoading(true);
     setIsModal(false);
     try {
       await keystore.account.selectAccount(index);
-      await keystore.account.zilBalaceUpdate();
-      await keystore.transaction.sync();
-      await keystore.transaction.checkProcessedTx();
-      setIsLoading(false);
     } catch (err) {
-      setIsLoading(false);
       Alert.alert(
         i18n.t('update'),
         err.message,
@@ -76,19 +69,12 @@ export const AccountMenu: React.FC<Prop> = ({
     <View
       style={[styles.container, style]}
     >
-      {isLoading ? (
-        <ActivityIndicator
-          animating={isLoading}
-          color={colors.primary}
-        />
-      ) : (
-        <DropDownItem
-          color={colors.primary}
-          onPress={() => setIsModal(true)}
-        >
-          {accountName}
-        </DropDownItem>
-      )}
+      <DropDownItem
+        color={colors.primary}
+        onPress={() => setIsModal(true)}
+      >
+        {accountName}
+      </DropDownItem>
       <AccountsModal
         accounts={accountState.identities}
         selected={accountState.selectedAddress}

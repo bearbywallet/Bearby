@@ -254,21 +254,6 @@ export class AccountControler {
     await this.update(deppUnlink(accounts));
   }
 
-  public async zilBalaceUpdate() {
-    const net = this._netwrok.selected;
-    const [zil] = this._token.store.get();
-    const accounts = this.store.get();
-    const account = accounts.identities[accounts.selectedAddress];
-    const { balance } = await this._zilliqa.getBalance(account.base16);
-    const _gotBalance = Big(balance);
-    const currentBalance = Big(account.balance[net][zil.symbol]);
-    const needUpdate = _gotBalance.eq(currentBalance);
-
-    account.balance[net][zil.symbol] = balance;
-
-    return !needUpdate;
-  }
-
   private async _checkAccount(account: Account) {
     const accounts = await this.sync();
     const isUnique = accounts.identities.some(

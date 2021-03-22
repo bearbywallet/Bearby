@@ -18,19 +18,16 @@ import {
   StyleSheet
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RouteProp, useTheme } from '@react-navigation/native';
+import { useTheme } from '@react-navigation/native';
 
-import { AccountMenu } from 'app/components/account-menu';
 import { TransactionItem } from 'app/components/transaction-item';
 import { TransactionModal } from 'app/components/modals';
 import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
-import { TabStackParamList } from 'app/navigator/tab-navigator';
 import { keystore } from 'app/keystore';
-import { TxStatsues, ZILLIQA_KEYS, TokenTypes } from 'app/config';
-import { toBech32Address } from 'app/utils';
+import { TxStatsues } from 'app/config';
 import { StoredTx } from 'types';
 
 import ZIlliqaLogo from 'app/assets/zilliqa.svg';
@@ -55,10 +52,6 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
 
   const [refreshing, setRefreshing] = React.useState(false);
 
-  const account = React.useMemo(
-    () => accountState.identities[accountState.selectedAddress],
-    [accountState]
-  );
   const dateTransactions = React.useMemo(() => {
     let lasDate: Date | null = null;
 
@@ -83,12 +76,6 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     networkState,
     tokensState
   ]);
-
-  const handleCreateAccount = React.useCallback(() => {
-    navigation.navigate('Common', {
-      screen: 'CreateAccount'
-    });
-  }, [navigation]);
   const showTxDetails = React.useCallback((tx) => {
     setTransaction(tx);
     setTransactionModal(true);
@@ -128,10 +115,6 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           style={[StyleSheet.absoluteFill, styles.logo]}
           width={width}
           height={width}
-        />
-        <AccountMenu
-          accountName={account.name}
-          onCreate={handleCreateAccount}
         />
         <View style={styles.headerWraper}>
           <Text style={[styles.headerTitle, {
@@ -178,6 +161,15 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
                 onRefresh={hanldeRefresh}
             />
           }
+          ListEmptyComponent={() => (
+            <Text
+              style={[styles.noTxns, {
+                color: colors.border
+              }]}
+            >
+              {i18n.t('havent_txns')}
+            </Text>
+          )}
           keyExtractor={(_, index) => String(index)}
         />
       </View>
@@ -228,7 +220,12 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15
   },
   logo: {
-    top: -150,
+    top: -120,
     right: -30
+  },
+  noTxns: {
+    fontFamily: fonts.Demi,
+    fontSize: 16,
+    padding: 16
   }
 });
