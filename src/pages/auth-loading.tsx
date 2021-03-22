@@ -25,6 +25,11 @@ type Prop = {
 export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
   React.useEffect(() => {
     keystore.notificationManager.setNavigation(navigation);
+
+    if (keystore.guard.self.isReady) {
+      navigation.navigate('Unauthorized', { screen: 'Lock' });
+    }
+
     keystore.sync().then(() => {
       const { isEnable, isReady } = keystore.guard.self;
 

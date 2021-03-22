@@ -117,6 +117,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
   }, []);
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
+    setConfirmError(undefined);
 
     const [zil] = tokensState;
     const net = networkState.selected;

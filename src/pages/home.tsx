@@ -24,7 +24,6 @@ import { ReceiveModal, SimpleConfirm } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
-import { ZILLIQA_KEYS } from 'app/config';
 import { viewAddress } from 'app/utils';
 import { Token } from 'types';
 

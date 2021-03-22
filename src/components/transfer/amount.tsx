@@ -77,7 +77,6 @@ export const TransferAmount: React.FC<Prop> = ({
       const _amount = toQA(amount, token.decimals);
       const isInsufficientFunds = new Amount(gas, balance)
         .insufficientFunds(_amount, token);
-
       setError(isInsufficientFunds);
       onError(isInsufficientFunds);
 
