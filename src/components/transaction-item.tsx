@@ -18,7 +18,6 @@ import { useTheme } from '@react-navigation/native';
 
 import { Token, StoredTx, Settings } from 'types';
 import { fromZil, toLocaleString, toConversion } from 'app/filters';
-import { fromBech32Address } from 'app/utils';
 import { fonts } from 'app/styles';
 import { StatusCodes } from 'app/lib/controller/transaction';
 
