@@ -167,18 +167,18 @@ export class TransactionsQueue {
             element.nonce = result.nonce;
             element.info = `node_status_${result.status}`;
             this._makeNotify(title, element.hash, element.info);
-            break;
+            continue;
           case StatusCodes.Pending:
             element.status = result.status;
             element.confirmed = result.success;
             element.info = `node_status_${result.status}`;
-            break;
+            continue;
           case StatusCodes.PendingAwait:
             element.status = result.status;
             element.confirmed = true;
             element.info = `node_status_${result.status}`;
             this._makeNotify(title, element.hash, element.info);
-            break;
+            continue;
           default:
             element.status = result.status;
             element.confirmed = true;
@@ -189,7 +189,7 @@ export class TransactionsQueue {
               status: result.status
             };
             this._makeNotify(title, element.hash, element.info);
-            break;
+            continue;
         }
       } catch (err) {
         continue;

@@ -35,17 +35,18 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
     if (Device.isIos()) {
       Keyboard.addListener(Events.KeyboardDidShow, () => {
         setMinHeight(height / 1.5);
-        Keyboard.removeAllListeners(Events.KeyboardDidShow);
       });
       Keyboard.addListener(Events.KeyboardDidHide, () => {
         setMinHeight(height / 5);
-        Keyboard.removeAllListeners(Events.KeyboardDidHide);
       });
     }
 
     return () => {
-      Keyboard.removeAllListeners(Events.KeyboardDidShow);
-      Keyboard.removeAllListeners(Events.KeyboardDidHide);
+      // Waiting an animation.
+      setTimeout(() => {
+        Keyboard.removeAllListeners(Events.KeyboardDidShow);
+        Keyboard.removeAllListeners(Events.KeyboardDidHide);
+      }, 500);
     };
   }, []);
 
