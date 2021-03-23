@@ -9,6 +9,7 @@
 import Big from 'big.js';
 import { GasState, Token } from 'types';
 import { keystore } from 'app/keystore';
+import { gasToFee } from 'app/filters';
 
 Big.PE = 99;
 
@@ -25,7 +26,7 @@ export class Amount {
 
     this._gasPrice = Big(gas.gasPrice).round();
     this._gasLimit = Big(gas.gasLimit).round();
-    this._fee = this._gasLimit.mul(this._gasPrice);
+    this._fee = gasToFee(gas.gasLimit, gas.gasPrice)._fee;
   }
 
   public get fee() {
