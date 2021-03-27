@@ -19,6 +19,7 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { TransactionItem } from 'app/components/transaction-item';
 import { TransactionModal } from 'app/components/modals';
@@ -107,7 +108,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <View style={[styles.container, {
+    <SafeAreaView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <View style={styles.header}>
@@ -181,7 +182,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           onTriggered={() => setTransactionModal(false)}
         />
       ) : null}
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -191,7 +192,6 @@ const styles = StyleSheet.create({
   },
   header: {
     alignItems: 'center',
-    marginTop: '5%',
     padding: 15
   },
   headerTitle: {

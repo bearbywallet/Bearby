@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
+import SafeAreaView from 'react-native-safe-area-view';
 
 import { ListItem } from 'app/components/list-item';
 import {
@@ -108,7 +109,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
   ];
 
   return (
-    <View style={[styles.container, {
+    <SafeAreaView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <Text style={[styles.title, {
@@ -131,7 +132,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
           />
         ))}
       </ScrollView>
-    </View>
+    </SafeAreaView>
   );
 };
 
@@ -145,7 +146,6 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontFamily: fonts.Bold,
-    padding: 15,
-    marginTop: '10%'
+    padding: 15
   }
 });

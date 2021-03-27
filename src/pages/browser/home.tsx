@@ -99,57 +99,55 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <React.Fragment>
-      <SafeAreaView style={[styles.container, {
-        backgroundColor: colors.background
-      }]}>
-        <View style={styles.header}>
-          <View style={styles.headerWraper}>
-            <Text style={[styles.headerTitle, {
-              color: colors.text
-            }]}>
-              {i18n.t('browser_title')}
-            </Text>
-          </View>
+    <SafeAreaView style={[styles.container, {
+      backgroundColor: colors.background
+    }]}>
+      <View style={styles.header}>
+        <View style={styles.headerWraper}>
+          <Text style={[styles.headerTitle, {
+            color: colors.text
+          }]}>
+            {i18n.t('browser_title')}
+          </Text>
         </View>
-        <View style={[styles.main, {
-          backgroundColor: colors.card
-        }]}>
-          <View style={styles.inputWrapper}>
-            {isLoading ? (
-              <ActivityIndicator
-                animating={isLoading}
-                color={colors.primary}
-              />
-            ) : (
-              <SvgXml xml={SearchIconSVG} />
-            )}
-            <TextInput
-              style={[styles.textInput, {
-                color: colors.text,
-                borderBottomColor: colors.border
-              }]}
-              autoCorrect={false}
-              autoCapitalize={'none'}
-              textContentType={'URL'}
-              value={search}
-              placeholder={i18n.t('browser_placeholder_input')}
-              placeholderTextColor={colors.border}
-              onChangeText={setSearch}
-              onSubmitEditing={hanldeSearch}
+      </View>
+      <View style={[styles.main, {
+        backgroundColor: colors.card
+      }]}>
+        <View style={styles.inputWrapper}>
+          {isLoading ? (
+            <ActivityIndicator
+              animating={isLoading}
+              color={colors.primary}
             />
-          </View>
-          <TabView
-            style={styles.tabView}
-            renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
-            navigationState={{ index, routes }}
-            renderScene={renderScene}
-            onIndexChange={setIndex}
-            initialLayout={initialLayout}
+          ) : (
+            <SvgXml xml={SearchIconSVG} />
+          )}
+          <TextInput
+            style={[styles.textInput, {
+              color: colors.text,
+              borderBottomColor: colors.border
+            }]}
+            autoCorrect={false}
+            autoCapitalize={'none'}
+            textContentType={'URL'}
+            value={search}
+            placeholder={i18n.t('browser_placeholder_input')}
+            placeholderTextColor={colors.border}
+            onChangeText={setSearch}
+            onSubmitEditing={hanldeSearch}
           />
         </View>
-      </SafeAreaView>
-    </React.Fragment>
+        <TabView
+          style={styles.tabView}
+          renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          onIndexChange={setIndex}
+          initialLayout={initialLayout}
+        />
+      </View>
+    </SafeAreaView>
   );
 };
 
@@ -158,7 +156,6 @@ const styles = StyleSheet.create({
     flex: 1
   },
   header: {
-    paddingVertical: 30,
     alignItems: 'center',
     padding: 15
   },
