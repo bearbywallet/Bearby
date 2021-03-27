@@ -18,6 +18,7 @@ import {
 import URL from 'url-parse';
 import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
+import FastImage from 'react-native-fast-image';
 
 import { BrowserViewBar } from 'app/components/browser';
 import {
@@ -463,7 +464,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           onTriggered={hanldeRejectTransaction}
           onConfirm={handleConfirmTransaction}
         >
-          <Image
+          <FastImage
             style={{
               height: 30,
               width: 30

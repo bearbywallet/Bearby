@@ -6947,6 +6947,11 @@ react-native-device-info@^8.0.2:
   resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-8.0.2.tgz#edefb8538412bf33e12a7ba1b80fbd804f69580b"
   integrity sha512-5X5sMO2N9WpnqA4BXHlby0ml0WKlHconLhgf8fCiXDELf7DIjOMX8z6iYZ7WDgmn0E/6Psubq9yb5D2Qdc30Wg==
 
+react-native-fast-image@^8.3.4:
+  version "8.3.4"
+  resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.3.4.tgz#79edca177e30311b19d59ff335625bcbe22650d7"
+  integrity sha512-LpzAdjUphihUpVEBn5fEv5AILe55rHav0YiZroPZ1rumKDhAl4u2cG01ku2Pb7l8sayjTsNu7FuURAlXUUDsow==
+
 react-native-fs@^2.16.6:
   version "2.16.6"
   resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.16.6.tgz#2901789a43210a35a0ef0a098019bbef3af395fd"

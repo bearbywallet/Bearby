@@ -12,12 +12,12 @@ import {
   ScrollView,
   ViewStyle,
   Text,
-  Image,
   Dimensions,
   View
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { useTheme } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
@@ -58,7 +58,7 @@ export const ConnectModal: React.FC<Prop> = ({
       <ModalWrapper style={style}>
         <ModalTitle onClose={onTriggered}>
           {i18n.t('connect_btn0')} {app && app.icon ? (
-            <Image
+            <FastImage
               style={styles.icon}
               source={{ uri: app.icon }}
             />

@@ -10,7 +10,6 @@ import React from 'react';
 import { useTheme } from '@react-navigation/native';
 import {
   View,
-  Image,
   Text,
   TouchableOpacity,
   StyleSheet,
@@ -18,6 +17,7 @@ import {
   ViewStyle
 } from 'react-native';
 import { fonts } from 'app/styles';
+import FastImage from 'react-native-fast-image';
 
 type Prop = {
   style?: ViewStyle;
@@ -44,7 +44,7 @@ export const BrowserAppItem: React.FC<Prop> = ({
       }, style]}
       onPress={onPress}
     >
-      <Image
+      <FastImage
         style={styles.icon}
         source={{ uri: icon }}
       />

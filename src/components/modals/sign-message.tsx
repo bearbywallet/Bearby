@@ -11,12 +11,12 @@ import {
   StyleSheet,
   ViewStyle,
   View,
-  Image,
   Dimensions,
   Text
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { useTheme } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
@@ -112,7 +112,7 @@ export const SignMessageModal: React.FC<Prop> = ({
           {appTitle} {title}
         </ModalTitle>
         <View style={styles.wrapper}>
-          <Image
+          <FastImage
             style={styles.icon}
             source={{ uri: icon }}
           />
