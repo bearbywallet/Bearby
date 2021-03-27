@@ -72,7 +72,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
     if (authState.biometricEnable) {
       hanldeBiometricUnlock();
     }
-  }, [authState.biometricEnable]);
+  }, []);
 
   return (
     <KeyboardAwareScrollView style={[styles.container, {

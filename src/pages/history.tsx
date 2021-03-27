@@ -40,9 +40,9 @@ type Prop = {
 const { width } = Dimensions.get('window');
 export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
-  const accountState = keystore.account.store.useValue();
   const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
+  const ssnState = keystore.ssn.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const transactionState = keystore.transaction.store.useValue();
   const networkState = keystore.network.store.useValue();
@@ -89,13 +89,13 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       setRefreshing(false);
       Alert.alert(
         i18n.t('update'),
-        err.message,
+        `${ssnState.selected}: ${err.message}`,
         [
           { text: "OK" }
         ]
       );
     }
-  }, [setRefreshing]);
+  }, [ssnState]);
   const hanldeViewBlock = React.useCallback((url: string) => {
     navigation.navigate('Browser', {
       screen: 'Web',

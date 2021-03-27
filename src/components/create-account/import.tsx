@@ -13,7 +13,6 @@ import {
   Text,
   TextInput,
   Dimensions,
-  ScrollView,
   StyleSheet
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -116,7 +115,7 @@ export const ImportAccount: React.FC<Prop> = ({
   }, [selected, accountState, setlastindex]);
 
   return (
-    <ScrollView>
+    <KeyboardAwareScrollView>
       <Selector
         style={{ backgroundColor: 'transparent' }}
         items={variants}
@@ -132,7 +131,7 @@ export const ImportAccount: React.FC<Prop> = ({
       />
       <View style={styles.wrapper}>
         {variants[0] === selected ? (
-          <KeyboardAwareScrollView>
+          <View>
             <TextInput
               multiline={true}
               numberOfLines={10}
@@ -158,7 +157,7 @@ export const ImportAccount: React.FC<Prop> = ({
                 onChange={setPassword}
               />
             ) : null}
-          </KeyboardAwareScrollView>
+          </View>
         ) : null}
         {variants[1] === selected ? (
           <TextInput
@@ -180,7 +179,7 @@ export const ImportAccount: React.FC<Prop> = ({
           onPress={handleimport}
         />
       </View>
-    </ScrollView>
+    </KeyboardAwareScrollView>
   );
 };
 

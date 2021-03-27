@@ -156,43 +156,39 @@ export class TransactionsQueue {
         continue;
       }
 
-      try {
-        const title = i18n.t('transaction');
-        const result = await this._zilliqa.getTransactionStatus(element.hash);
+      const title = i18n.t('transaction');
+      const result = await this._zilliqa.getTransactionStatus(element.hash);
 
-        switch (result.status) {
-          case StatusCodes.Confirmed:
-            element.status = result.status;
-            element.confirmed = result.success;
-            element.nonce = result.nonce;
-            element.info = `node_status_${result.status}`;
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-          case StatusCodes.Pending:
-            element.status = result.status;
-            element.confirmed = result.success;
-            element.info = `node_status_${result.status}`;
-            continue;
-          case StatusCodes.PendingAwait:
-            element.status = result.status;
-            element.confirmed = true;
-            element.info = `node_status_${result.status}`;
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-          default:
-            element.status = result.status;
-            element.confirmed = true;
-            element.nonce = 0;
-            element.info = `node_status_${result.status}`;
-            rejectAll = {
-              info: element.info,
-              status: result.status
-            };
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-        }
-      } catch (err) {
-        continue;
+      switch (result.status) {
+        case StatusCodes.Confirmed:
+          element.status = result.status;
+          element.confirmed = result.success;
+          element.nonce = result.nonce;
+          element.info = `node_status_${result.status}`;
+          this._makeNotify(title, element.hash, element.info);
+          continue;
+        case StatusCodes.Pending:
+          element.status = result.status;
+          element.confirmed = result.success;
+          element.info = `node_status_${result.status}`;
+          continue;
+        case StatusCodes.PendingAwait:
+          element.status = result.status;
+          element.confirmed = true;
+          element.info = `node_status_${result.status}`;
+          this._makeNotify(title, element.hash, element.info);
+          continue;
+        default:
+          element.status = result.status;
+          element.confirmed = true;
+          element.nonce = 0;
+          element.info = `node_status_${result.status}`;
+          rejectAll = {
+            info: element.info,
+            status: result.status
+          };
+          this._makeNotify(title, element.hash, element.info);
+          continue;
       }
     }
 

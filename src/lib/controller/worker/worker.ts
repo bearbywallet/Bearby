@@ -29,6 +29,12 @@ export class WorkerController {
     } catch {
       //
     }
+
+    try {
+      await this._account.balanceUpdate();
+    } catch {
+      //
+    }
   }
 
   public async start() {

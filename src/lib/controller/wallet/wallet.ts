@@ -29,6 +29,7 @@ import { NotificationManager } from 'app/lib/controller/notification';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
+import { isPrivateKey } from 'app/utils';
 
 const _storage = new MobileStorage();
 
@@ -103,6 +104,7 @@ export class WalletControler extends Mnemonic {
   }
 
   public async addPrivateKeyAccount(privatekey: string, name: string, password?: string) {
+    isPrivateKey(privatekey);
     const { identities } = this.account.store.get();
     const nextIndex = identities.filter(
       (acc) => acc.type === AccountTypes.privateKey

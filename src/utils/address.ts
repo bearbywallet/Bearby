@@ -80,3 +80,9 @@ export const getPubKeyFromPrivateKey = (privateKey: string) => {
 
   return keyPair.getPublic(true, 'hex');
 };
+
+export const isPrivateKey = (privateKey: string) => {
+  if (!isByteString(privateKey, 64)) {
+    throw new Error('Incorect priaveKey');
+  }
+};
