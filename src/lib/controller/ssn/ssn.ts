@@ -8,7 +8,7 @@
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
-import { STORAGE_FIELDS, DEFAULT_SSN } from 'app/config';
+import { STORAGE_FIELDS, DEFAULT_SSN, ZILLIQA_KEYS } from 'app/config';
 import {
   ssnStore,
   StoreUpdate,
@@ -89,7 +89,7 @@ export class SSnController {
   public async reset() {
     let { list } = this.store.get();
 
-    if (!list || list.length === 0) {
+    if ((!list || list.length === 0) && this._network.selected === ZILLIQA_KEYS[0]) {
       list = await this._zilliqa.getSSnList();
     }
 
