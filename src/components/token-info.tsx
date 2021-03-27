@@ -18,14 +18,15 @@ import { useTheme } from '@react-navigation/native';
 import { LoadSVG } from 'app/components/load-svg';
 
 import i18n from 'app/lib/i18n';
-import { TOKEN_ICONS } from 'app/config';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
 import { fonts } from 'app/styles';
+import { getIcon } from 'app/utils';
 
 export type Prop = {
   decimals: number;
   balance?: string;
   symbol: string;
+  address: string;
   name: string;
   rate: number;
   totalSupply?: string;
@@ -37,13 +38,14 @@ export const TokenInfo: React.FC<Prop> = ({
   rate,
   symbol,
   decimals,
+  address,
   name,
   currency,
   style,
   balance = '0',
   totalSupply = '0'
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   /**
    * ZIL(Default token) amount in float.
    */
@@ -83,7 +85,7 @@ export const TokenInfo: React.FC<Prop> = ({
         <LoadSVG
           height="30"
           width="30"
-          url={`${TOKEN_ICONS}/${symbol}.svg`}
+          url={getIcon(address, dark)}
         />
       </View>
       <View>

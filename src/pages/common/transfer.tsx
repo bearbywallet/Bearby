@@ -35,8 +35,8 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
-import { TOKEN_ICONS, DEFAULT_GAS } from 'app/config';
-import { fromBech32Address } from 'app/utils';
+import { DEFAULT_GAS } from 'app/config';
+import { fromBech32Address, getIcon } from 'app/utils';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -45,7 +45,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
@@ -260,7 +260,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           onConfirm={handleSiging}
         >
           <LoadSVG
-            url={`${TOKEN_ICONS}/${token.symbol}.svg`}
+            url={getIcon(token.address[networkState.selected], dark)}
             height="30"
             width="30"
           />

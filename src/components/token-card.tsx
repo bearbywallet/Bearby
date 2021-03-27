@@ -20,7 +20,6 @@ import { LoadSVG } from 'app/components/load-svg';
 import ContextMenu from 'react-native-context-menu-view';
 
 import { Token, Account } from 'types';
-import { TOKEN_ICONS } from 'app/config';
 import {
   toConversion,
   fromZil,
@@ -28,6 +27,7 @@ import {
 } from 'app/filters';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
+import { getIcon } from 'app/utils';
 
 export type Prop = {
   token: Token;
@@ -125,7 +125,7 @@ export const TokenCard: React.FC<Prop> = ({
           <LoadSVG
             height="30"
             width="30"
-            url={`${TOKEN_ICONS}/${token.symbol}.svg`}
+            url={getIcon(token.address[net], dark)}
           />
         </View>
         <View>

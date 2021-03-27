@@ -49,6 +49,7 @@ export const AddTokenModal: React.FC<Prop> = ({
   const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
+  const netwrokState = keystore.network.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
 
@@ -124,6 +125,7 @@ export const AddTokenModal: React.FC<Prop> = ({
                 style={{ marginVertical: 30 }}
                 decimals={token.decimals}
                 name={token.name}
+                address={token.address[netwrokState.selected]}
                 symbol={token.symbol}
                 balance={token.balance}
                 totalSupply={token.totalSupply}

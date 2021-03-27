@@ -18,7 +18,6 @@ export const PINTA = 'https://gateway.pinata.cloud/ipfs';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const UD_CONTRACT_ADDRESS = '0x9611c53be6d1b32058b2747bdececed7e1216793';
 export const SCAM_TOKEN = '0xe66593414Ba537e965b5e0eB723a58b4d1fACc89';
-export const TOKEN_ICONS = 'https://raw.githubusercontent.com/Switcheo/zilswap-token-list/master/logos';
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;
 export const NONCE_DIFFICULTY = 10;

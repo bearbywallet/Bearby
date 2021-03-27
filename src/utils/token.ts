@@ -6,6 +6,8 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { toBech32Address } from 'app/utils';
+
 interface InitItem {
   type: string;
   value: string;
@@ -18,6 +20,10 @@ enum Fields {
   Symbol = 'symbol',
   Decimals = 'decimals',
   Address = '_this_address'
+}
+
+export function getIcon(address: string, dark: boolean) {
+  return `https://meta.viewblock.io/zilliqa.${toBech32Address(address)}/logo${dark ? '?t=dark' : ''}`;
 }
 
 export function toZRC1(init: InitItem[]) {

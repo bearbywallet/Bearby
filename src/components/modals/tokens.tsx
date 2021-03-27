@@ -26,9 +26,9 @@ import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { LoadSVG } from 'app/components/load-svg';
 
-import { TOKEN_ICONS } from 'app/config';
 import { Token, Account } from 'types';
 import { fromZil, toLocaleString } from 'app/filters';
+import { getIcon } from 'app/utils';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -55,7 +55,7 @@ export const TokensModal: React.FC<Prop> = ({
   onTriggered,
   onSelect
 }) => {
-  const { colors } = useTheme();
+  const { colors, dark } = useTheme();
   const handleSelected = React.useCallback((index) => {
     onSelect(index);
     onTriggered();
@@ -95,7 +95,7 @@ export const TokensModal: React.FC<Prop> = ({
                 <LoadSVG
                   height="30"
                   width="30"
-                  url={`${TOKEN_ICONS}/${token.symbol}.svg`}
+                  url={getIcon(token.address[network], dark)}
                 />
               ) : null}
               <View style={styles.wrapper}>
