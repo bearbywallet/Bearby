@@ -38,7 +38,6 @@ export const TokenInfo: React.FC<Prop> = ({
   rate,
   symbol,
   decimals,
-  address,
   name,
   currency,
   style,
@@ -85,7 +84,7 @@ export const TokenInfo: React.FC<Prop> = ({
         <LoadSVG
           height="30"
           width="30"
-          url={getIcon(address, dark)}
+          url={getIcon(symbol)}
         />
       </View>
       <View>

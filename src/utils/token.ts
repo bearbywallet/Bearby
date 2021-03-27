@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { toBech32Address } from 'app/utils';
+import { TOKEN_ICONS } from 'app/config';
 
 interface InitItem {
   type: string;
@@ -22,8 +22,8 @@ enum Fields {
   Address = '_this_address'
 }
 
-export function getIcon(address: string, dark: boolean) {
-  return `https://meta.viewblock.io/zilliqa.${toBech32Address(address)}/logo${dark ? '?t=dark' : ''}`;
+export function getIcon(symbol: string) {
+  return `${TOKEN_ICONS}/${symbol}.svg`;
 }
 
 export function toZRC1(init: InitItem[]) {

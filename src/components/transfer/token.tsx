@@ -94,7 +94,7 @@ export const TransferToken: React.FC<Prop> = ({
             <LoadSVG
               height="30"
               width="30"
-              url={getIcon(token.address[netwrok], dark)}
+              url={getIcon(token.symbol)}
             />
             <View style={{ marginLeft: 5 }}>
               <View style={[styles.infoWrapper, { width: width - 120 }]}>

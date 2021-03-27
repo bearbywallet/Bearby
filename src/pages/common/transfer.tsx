@@ -260,7 +260,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           onConfirm={handleSiging}
         >
           <LoadSVG
-            url={getIcon(token.address[networkState.selected], dark)}
+            url={getIcon(token.symbol)}
             height="30"
             width="30"
           />

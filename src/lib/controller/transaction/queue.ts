@@ -162,7 +162,7 @@ export class TransactionsQueue {
       switch (result.status) {
         case StatusCodes.Confirmed:
           element.status = result.status;
-          element.confirmed = result.success;
+          element.confirmed = true;
           element.nonce = result.nonce;
           element.info = `node_status_${result.status}`;
           this._makeNotify(title, element.hash, element.info);

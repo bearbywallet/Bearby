@@ -56,7 +56,7 @@ export const TokenCard: React.FC<Prop> = ({
   onSend = () => null,
   onView = () => null,
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const actions = React.useMemo(() => [
     {
       title: i18n.t('send'),
@@ -125,7 +125,7 @@ export const TokenCard: React.FC<Prop> = ({
           <LoadSVG
             height="30"
             width="30"
-            url={getIcon(token.address[net], dark)}
+            url={getIcon(token.symbol)}
           />
         </View>
         <View>

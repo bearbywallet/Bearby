@@ -95,7 +95,7 @@ export const TokensModal: React.FC<Prop> = ({
                 <LoadSVG
                   height="30"
                   width="30"
-                  url={getIcon(token.address[network], dark)}
+                  url={getIcon(token.symbol)}
                 />
               ) : null}
               <View style={styles.wrapper}>
