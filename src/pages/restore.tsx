@@ -31,26 +31,41 @@ import { keystore } from 'app/keystore';
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
-
+const placeholder = 'shock silent awful guard long thing early test thought defy treat pink';
 const { height } = Dimensions.get('window');
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
-  const [disabled, setDisabled] = React.useState(true);
   const [phrase, setphrase] = React.useState<string>('');
+  const [errorMessage, setErrorMessage] = React.useState<string>('');
 
-  const hanldeChange = React.useCallback(async(value) => {
+  const hanldeChange = React.useCallback(async(value: string) => {
+    setErrorMessage('');
     value = String(value).toLowerCase();
     const mnemonic = new Mnemonic();
     const isValid = await mnemonic.validateMnemonic(value);
 
-    setDisabled(!isValid);
     setphrase(value);
 
     if (isValid) {
       Keyboard.dismiss();
     }
-  }, [setDisabled, setphrase]);
-  const hanldecreateWallet = React.useCallback(() => {
+  }, []);
+  const hanldecreateWallet = React.useCallback(async() => {
+    if (phrase.split(' ').length < 12) {
+      setErrorMessage(i18n.t('mnemonic_error0'));
+
+      return null;
+    }
+
+    const mnemonic = new Mnemonic();
+    const isValid = await mnemonic.validateMnemonic(phrase);
+
+    if (!isValid) {
+      setErrorMessage(i18n.t('mnemonic_error1'));
+
+      return null;
+    }
+
     navigation.navigate('SetupPassword', {
       phrase
     });
@@ -73,23 +88,34 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
           }]}>
             {i18n.t('restore_title')}
           </Text>
-          <TextInput
-            multiline={true}
-            numberOfLines={10}
-            autoCorrect={false}
-            style={[styles.text, {
-              borderColor: colors.border,
-              color: colors.text
-            }]}
-            placeholder={i18n.t('restore_placeholder')}
-            placeholderTextColor={colors.border}
-            onChangeText={hanldeChange}
-          />
+          <View style={styles.imputContainer}>
+            <Text style={[styles.helps, {
+              color: colors.border
+            }]}>
+              {i18n.t('mnemonic_des')}
+            </Text>
+            <TextInput
+              multiline={true}
+              numberOfLines={10}
+              autoCorrect={false}
+              style={[styles.text, {
+                borderColor: errorMessage ? colors['danger'] : colors.border,
+                color: colors.text
+              }]}
+              placeholder={placeholder}
+              placeholderTextColor={colors.border}
+              onChangeText={hanldeChange}
+            />
+            <Text style={[styles.helps, {
+              color: colors['danger']
+            }]}>
+              {errorMessage}
+            </Text>
+          </View>
         </View>
         <Button
           title={i18n.t('restore_btn')}
           color={colors.primary}
-          disabled={disabled}
           onPress={hanldecreateWallet}
         />
       </KeyboardAwareScrollView>
@@ -113,8 +139,16 @@ const styles = StyleSheet.create({
     fontSize: 34,
     lineHeight: 41
   },
+  imputContainer: {
+    marginTop: 30
+  },
+  helps: {
+    marginLeft: 8,
+    marginVertical: 5,
+    fontSize: 15,
+    fontFamily: fonts.Regular
+  },
   text: {
-    marginTop: 60,
     height: height / 5,
     fontFamily: fonts.Regular,
     borderWidth: 1,
