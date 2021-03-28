@@ -14,14 +14,12 @@ import {
   View,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ReceiveIconSVG,
-  ProfileSVG,
-  BookIconSVG
-} from 'app/components/svg';
+import ReceiveIconSVG from 'app/assets/icons/receive.svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import BookIconSVG from 'app/assets/icons/book.svg';
+
 import {
   AccountsModal,
   ContactsModal
@@ -70,7 +68,7 @@ export const TransferRecipient: React.FC<Prop> = ({
     <React.Fragment>
       <View style={style}>
         <View style={coomonStyles.receiving}>
-          <SvgXml xml={ReceiveIconSVG} />
+          <ReceiveIconSVG />
           <QrCodeInput
             zns
             placeholder={i18n.t('transfer_view0')}
@@ -85,7 +83,7 @@ export const TransferRecipient: React.FC<Prop> = ({
             }]}
             onPress={() => setAccountModal(true)}
           >
-            <SvgXml xml={ProfileSVG} />
+            <ProfileSVG />
             <Text style={[styles.textItem, {
               color: colors.text
             }]}>
@@ -99,7 +97,7 @@ export const TransferRecipient: React.FC<Prop> = ({
             disabled={contacts.length === 0}
             onPress={() => setContactModal(true)}
           >
-            <SvgXml xml={BookIconSVG} />
+            <BookIconSVG />
             <Text style={[styles.textItem, {
               color: colors.text
             }]}>

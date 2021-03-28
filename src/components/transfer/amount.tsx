@@ -17,13 +17,10 @@ import {
   ViewStyle,
   Dimensions
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 import Big from 'big.js';
 
-import {
-  AmountIconSVG
-} from 'app/components/svg';
+import AmountIconSVG from 'app/assets/icons/amount.svg';
 
 import i18n from 'app/lib/i18n';
 import { fromZil, toQA } from 'app/filters';
@@ -113,8 +110,7 @@ export const TransferAmount: React.FC<Prop> = ({
           flexDirection: 'row',
           alignItems: 'center'
         }}>
-          <SvgXml
-            xml={AmountIconSVG}
+          <AmountIconSVG
             height={20}
             width={30}
           />

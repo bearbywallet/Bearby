@@ -14,13 +14,11 @@ import {
   TouchableOpacity,
   Dimensions
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ArrowIconSVG,
-  WalletIconSVG
-} from 'app/components/svg';
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
+import WalletIconSVG from 'app/assets/icons/wallet.svg';
+
 import { TokensModal } from 'app/components/modals';
 import { LoadSVG } from 'app/components/load-svg';
 
@@ -81,7 +79,7 @@ export const TransferToken: React.FC<Prop> = ({
         style={styles.item}
         onPress={() => setTokenModal(true)}
       >
-        <SvgXml xml={WalletIconSVG} />
+        <WalletIconSVG />
         <View style={[styles.itemInfo, {
           borderWidth: 0
         }]}>
@@ -127,8 +125,7 @@ export const TransferToken: React.FC<Prop> = ({
             </View>
           </View>
         </View>
-        <SvgXml
-          xml={ArrowIconSVG}
+        <ArrowIconSVG
           fill={colors.notification}
           style={styles.arrowIcon}
         />

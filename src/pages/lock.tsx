@@ -17,11 +17,12 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
 import CreateBackground from 'app/assets/get_started_1.svg';
-import { LockSVG, FingerPrintIconSVG } from 'app/components/svg';
+import LockSVG from 'app/assets/icons/lock.svg';
+import FingerPrintIconSVG from 'app/assets/icons/fingerprint.svg';
+
 import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
@@ -92,10 +93,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
         </Text>
         <View>
           <View style={[styles.inputWrapper, { borderBottomColor: color }]}>
-            <SvgXml
-              xml={LockSVG}
-              fill={color}
-            />
+            <LockSVG fill={color} />
             <TextInput
               style={[styles.textInput, {
                 color: colors.text
@@ -108,8 +106,7 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
             />
             {authState.biometricEnable ? (
               <TouchableOpacity onPress={hanldeBiometricUnlock}>
-                <SvgXml
-                  xml={FingerPrintIconSVG}
+                <FingerPrintIconSVG
                   width={40}
                   height={40}
                 />

@@ -16,14 +16,11 @@ import {
   Dimensions,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import Big from 'big.js';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  BigArrowIconSVG,
-  HelpIconSVG
-} from 'app/components/svg';
+import HelpIconSVG from 'app/assets/icons/help.svg';
+import BigArrowIconSVG from 'app/assets/icons/big-arrow.svg';
 
 import i18n from 'app/lib/i18n';
 import { GasState } from 'types';
@@ -107,10 +104,7 @@ export const GasSelector: React.FC<Prop> = ({
           {i18n.t('fee')}
         </Text>
         <TouchableOpacity onPress={createTwoButtonAlert}>
-          <SvgXml
-            xml={HelpIconSVG}
-            fill={colors.border}
-          />
+          <HelpIconSVG fill={colors.border} />
         </TouchableOpacity>
       </View>
       <View style={styles.wrapper}>
@@ -122,18 +116,9 @@ export const GasSelector: React.FC<Prop> = ({
           onPress={() => hanldeChangeGas(_1)}
         >
           <View style={{ flexDirection: 'row' }}>
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.notification}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.notification}
-            />
+            <BigArrowIconSVG fill={colors.primary} />
+            <BigArrowIconSVG fill={colors.notification} />
+            <BigArrowIconSVG fill={colors.notification} />
           </View>
           <Text style={[styles.amount, {
             color: colors.text
@@ -149,18 +134,9 @@ export const GasSelector: React.FC<Prop> = ({
           onPress={() => hanldeChangeGas(_2)}
         >
           <View style={{ flexDirection: 'row' }}>
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.notification}
-            />
+            <BigArrowIconSVG fill={colors.primary} />
+            <BigArrowIconSVG fill={colors.primary} />
+            <BigArrowIconSVG fill={colors.notification} />
           </View>
           <Text style={[styles.amount, {
             color: colors.text
@@ -176,18 +152,9 @@ export const GasSelector: React.FC<Prop> = ({
           onPress={() => hanldeChangeGas(_3)}
         >
           <View style={{ flexDirection: 'row' }}>
-          <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
-            <SvgXml
-              xml={BigArrowIconSVG}
-              fill={colors.primary}
-            />
+          <BigArrowIconSVG fill={colors.primary} />
+            <BigArrowIconSVG fill={colors.primary} />
+            <BigArrowIconSVG fill={colors.primary} />
           </View>
           <Text style={[styles.amount, {
             color: colors.text

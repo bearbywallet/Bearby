@@ -8,15 +8,12 @@
  */
 import React from 'react';
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  HomeIconSVG,
-  TimerIconSVG,
-  BrowserIconSVG,
-  SettingsIconSVG
-} from 'app/components/svg';
+import HomeIconSVG from 'app/assets/icons/home.svg';
+import TimerIconSVG from 'app/assets/icons/timer.svg';
+import BrowserIconSVG from 'app/assets/icons/browser.svg';
+import SettingsIconSVG from 'app/assets/icons/settings.svg';
 
 import HomePage from 'app/pages/home';
 import { browserNav, BrwoserStackParamList } from 'app/navigator/browser';
@@ -61,10 +58,7 @@ export const TabNavigator: React.FC = () => {
         options={{
           tabBarLabel: I18n.t('home'),
           tabBarIcon: ({ color }) => (
-            <SvgXml
-              xml={HomeIconSVG}
-              fill={color}
-            />
+            <HomeIconSVG fill={color} />
           )
         }}
       />
@@ -74,10 +68,7 @@ export const TabNavigator: React.FC = () => {
         options={{
           tabBarLabel: I18n.t('history'),
           tabBarIcon: ({ color }) => (
-            <SvgXml
-              xml={TimerIconSVG}
-              fill={color}
-            />
+            <TimerIconSVG fill={color} />
           )
         }}
       />
@@ -87,10 +78,7 @@ export const TabNavigator: React.FC = () => {
         options={{
           tabBarLabel: I18n.t('browser'),
           tabBarIcon: ({ color }) => (
-            <SvgXml
-              xml={BrowserIconSVG}
-              fill={color}
-            />
+            <BrowserIconSVG fill={color}/>
           )
         }}
       />
@@ -100,10 +88,7 @@ export const TabNavigator: React.FC = () => {
         options={{
           tabBarLabel: I18n.t('settings'),
           tabBarIcon: ({ color }) => (
-            <SvgXml
-              xml={SettingsIconSVG}
-              fill={color}
-            />
+            <SettingsIconSVG fill={color} />
           )
         }}
       />

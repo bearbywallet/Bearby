@@ -14,10 +14,8 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
-import { ArrowIconSVG } from './svg';
-
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
 
 type Prop = {
   style?: ViewStyle;
@@ -38,8 +36,7 @@ export const DropDownItem: React.FC<Prop> = ({
     <Text style={[styles.title, { color }]}>
       {children}
     </Text>
-    <SvgXml
-      xml={ArrowIconSVG}
+    <ArrowIconSVG
       fill={color}
       style={{ marginLeft: 5 }}
     />

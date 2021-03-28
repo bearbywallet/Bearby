@@ -22,7 +22,7 @@ import { CustomButton } from 'app/components/custom-button';
 import { Selector } from 'app/components/selector';
 import { CustomTextInput } from 'app/components/custom-text-input';
 import { Passwordinput } from 'app/components/password-input';
-import { ProfileSVG } from 'app/components/svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -123,7 +123,7 @@ export const ImportAccount: React.FC<Prop> = ({
         onSelect={handleChangeType}
       />
       <CustomTextInput
-        icon={ProfileSVG}
+        Icon={ProfileSVG}
         defaultValue={accName}
         onChangeText={setAccName}
         placeholder={i18n.t('pass_setup_input0')}

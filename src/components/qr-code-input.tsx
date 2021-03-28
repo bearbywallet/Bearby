@@ -17,11 +17,10 @@ import {
   Dimensions,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
 import { QRScaner } from 'app/components/modals/qr-scaner';
-import { QrcodeIconSVG } from 'app/components/svg';
+import QrcodeIconSVG from 'app/assets/icons/qrcode.svg';
 
 import { keystore } from 'app/keystore';
 import { toBech32Address } from 'app/utils';
@@ -110,7 +109,7 @@ export const QrCodeInput: React.FC<Prop> = ({
           onChangeText={hanldeChange}
         />
         <TouchableOpacity onPress={() => setQrcodeModal(true)}>
-          <SvgXml xml={QrcodeIconSVG}/>
+          <QrcodeIconSVG />
         </TouchableOpacity>
       </View>
       <Text style={[styles.error, {

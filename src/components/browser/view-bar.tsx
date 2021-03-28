@@ -19,13 +19,12 @@ import URL from 'url-parse';
 import { useTheme } from '@react-navigation/native';
 
 import { SvgXml } from 'react-native-svg';
-import {
-  ArrowIconSVG,
-  LockSVG,
-  HomeIconSVG,
-  OKIconSVG,
-  SettingsIconSVG
-} from 'app/components/svg';
+import { OKIconSVG } from 'app/components/svg';
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
+import LockSVG from 'app/assets/icons/lock.svg';
+import HomeIconSVG from 'app/assets/icons/home.svg';
+import SettingsIconSVG from 'app/assets/icons/settings.svg';
+
 import { Unselected } from 'app/components/unselected';
 import RepeatSVG from 'app/assets/repeat.svg';
 
@@ -75,8 +74,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
       }]}>
         <View style={styles.navBtns}>
           <TouchableOpacity onPress={onBack}>
-            <SvgXml
-              xml={ArrowIconSVG}
+            <ArrowIconSVG
               height="30"
               width="30"
               fill={colors.primary}
@@ -89,8 +87,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
         <View style={[styles.hostWrapper, {
           backgroundColor: colors['bg1']
         }]}>
-          <SvgXml
-            xml={LockSVG}
+          <LockSVG
             height="15"
             width="15"
             fill={url.protocol.includes('https') ? colors.text : colors['danger']}
@@ -155,8 +152,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
               style={styles.navAction}
               onPress={onHome}
             >
-              <SvgXml
-                xml={HomeIconSVG}
+              <HomeIconSVG
                 height={ICON_SIZE}
                 width={ICON_SIZE}
                 fill={colors.primary}
@@ -190,8 +186,7 @@ export const BrowserViewBar: React.FC<Prop> = ({
               style={styles.navAction}
               onPress={onSettings}
             >
-              <SvgXml
-                xml={SettingsIconSVG}
+              <SettingsIconSVG
                 width={ICON_SIZE}
                 height={ICON_SIZE}
               />

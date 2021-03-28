@@ -16,8 +16,8 @@ import {
   View
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { SvgXml } from 'react-native-svg';
-import { LockSVG } from 'app/components/svg';
+import LockSVG from 'app/assets/icons/lock.svg';
+
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -43,7 +43,7 @@ export const Passwordinput: React.FC<Prop> = ({
       <View style={[styles.inputWrapper, {
         borderBottomColor: colors.border
       }]}>
-        <SvgXml xml={LockSVG} />
+        <LockSVG />
         <TextInput
           style={[styles.textInput, {
             color: colors.text,

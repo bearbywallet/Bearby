@@ -18,17 +18,16 @@ import { useTheme } from '@react-navigation/native';
 
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { ListItem } from 'app/components/list-item';
-import {
-  GearIconSVG,
-  AdvancedIconSVG,
-  ProfileSVG,
-  NetworkIconSVG,
-  BookIconSVG,
-  AboutIconSVG,
-  SecureIconSVG,
-  SearchIconSVG,
-  ConnectIconSVG
-} from 'app/components/svg';
+
+import AboutIconSVG from 'app/assets/icons/about-icon.svg';
+import GearIconSVG from 'app/assets/icons/gear.svg';
+import AdvancedIconSVG from 'app/assets/icons/advanced.svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import NetworkIconSVG from 'app/assets/icons/network.svg';
+import BookIconSVG from 'app/assets/icons/book.svg';
+import SecureIconSVG from 'app/assets/icons/secure.svg';
+import SearchIconSVG from 'app/assets/icons/search.svg';
+import ConnectIconSVG from 'app/assets/icons/connect.svg';
 
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
@@ -44,63 +43,63 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
   const list = [
     {
       value: i18n.t('settings_item_account'),
-      icon: ProfileSVG,
+      Icon: ProfileSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'AccountSettings'
       })
     },
     {
       value: i18n.t('settings_item0'),
-      icon: BookIconSVG,
+      Icon: BookIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'Contacts'
       })
     },
     {
       value: i18n.t('settings_item1'),
-      icon: GearIconSVG,
+      Icon: GearIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'General'
       })
     },
     {
       value: i18n.t('settings_item2'),
-      icon: AdvancedIconSVG,
+      Icon: AdvancedIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'Advanced'
       })
     },
     {
       value: i18n.t('settings_item3'),
-      icon: NetworkIconSVG,
+      Icon: NetworkIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'Network'
       })
     },
     {
       value: i18n.t('settings_item7'),
-      icon: SearchIconSVG,
+      Icon: SearchIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'BrowserSettings'
       })
     },
     {
       value: i18n.t('settings_item4'),
-      icon: ConnectIconSVG,
+      Icon: ConnectIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'Connections'
       })
     },
     {
       value: i18n.t('settings_item5'),
-      icon: SecureIconSVG,
+      Icon: SecureIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'Security'
       })
     },
     {
       value: i18n.t('settings_item6'),
-      icon: AboutIconSVG,
+      Icon: AboutIconSVG,
       onLink: () => navigation.navigate('SettingsPages', {
         screen: 'About'
       })
@@ -125,10 +124,11 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
           <ListItem
             key={index}
             text={el.value}
-            icon={el.icon}
             last={list.length === index + 1}
             onPress={el.onLink}
-          />
+          >
+            <el.Icon />
+          </ListItem>
         ))}
       </ScrollView>
     </SafeWrapper>

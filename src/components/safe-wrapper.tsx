@@ -15,7 +15,6 @@ import {
   ViewProps,
   SafeAreaView as SafeAreaViewIOS
 } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { Device } from 'app/utils';
 
 export const SafeWrapper: React.FC<ViewProps> = ({

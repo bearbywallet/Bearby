@@ -11,18 +11,19 @@ import { fonts } from 'app/styles';
 import React from 'react';
 import {
   TextInput,
+  ImagePropsBase,
+  ViewProps,
   Text,
   StyleSheet,
   ViewStyle,
   View,
   Dimensions
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 type Prop = {
   style?: ViewStyle;
   defaultValue?: string;
-  icon?: string;
+  Icon?: React.FunctionComponent<ImagePropsBase | ViewProps>;
   placeholder?: string;
   labelText?: string;
   secureTextEntry?: boolean;
@@ -31,7 +32,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const CustomTextInput: React.FC<Prop> = ({
-  icon,
+  Icon,
   style,
   placeholder,
   defaultValue,
@@ -43,10 +44,9 @@ export const CustomTextInput: React.FC<Prop> = ({
 
   return (
     <View style={[styles.inputWrapper, style]}>
-      {icon ? (
-        <SvgXml
+      {Icon ? (
+        <Icon
           style={styles.icon}
-          xml={icon}
           width={30}
         />
       ) : (

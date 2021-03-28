@@ -21,11 +21,11 @@ import { useTheme } from '@react-navigation/native';
 
 import QRCode from 'react-native-qrcode-svg';
 import { CustomButton } from 'app/components/custom-button';
-import {
-  ProfileSVG,
-  ViewBlockIconSVG,
-  ShareIconSVG
-} from 'app/components/svg';
+
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import ViewBlockIconSVG from 'app/assets/icons/view-block.svg';
+import ShareIconSVG from 'app/assets/icons/share.svg';
+
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { ViewButton } from 'app/components/view-button';

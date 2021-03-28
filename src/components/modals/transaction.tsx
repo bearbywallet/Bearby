@@ -21,11 +21,11 @@ import Clipboard from '@react-native-community/clipboard';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { ViewButton } from 'app/components/view-button';
-import {
-  ProfileSVG,
-  ViewBlockIconSVG,
-  ShareIconSVG
-} from 'app/components/svg';
+
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import ViewBlockIconSVG from 'app/assets/icons/view-block.svg';
+import ShareIconSVG from 'app/assets/icons/share.svg';
+
 import { KeyValue } from 'app/components/key-value';
 
 import i18n from 'app/lib/i18n';

@@ -15,11 +15,10 @@ import {
   StyleSheet,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
 type Prop = {
   style?: ViewStyle;
-  icon: string;
+  icon: React.FunctionComponent;
   onPress?: () => void;
 };
 
@@ -31,7 +30,7 @@ export const ViewButton: React.FC<Prop> = ({ icon, children, style, onPress }) =
       style={[styles.linkItem, style]}
       onPress={onPress}
     >
-      <SvgXml xml={icon}/>
+      {icon({})}
       <Text style={[styles.linkText, {
         color: colors.text
       }]}>

@@ -9,13 +9,12 @@
 import React from 'react';
 import {
   StyleSheet,
-  ActivityIndicator,
-  View
+  ActivityIndicator
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { SvgCss } from 'react-native-svg';
 
-import { HelpIconSVG } from 'app/components/svg';
+import HelpIconSVG from 'app/assets/icons/help.svg';
 
 type Prop = {
   url: string;
@@ -65,8 +64,7 @@ export const LoadSVG: React.FC<Prop> = ({ url, height, width }) => {
   }
 
   return (
-    <SvgCss
-      xml={HelpIconSVG}
+    <HelpIconSVG
       width={width}
       height={height}
     />

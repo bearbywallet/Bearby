@@ -18,7 +18,7 @@ import { useTheme } from '@react-navigation/native';
 
 import { Button } from 'app/components/button';
 import { CustomTextInput } from 'app/components/custom-text-input';
-import { ProfileSVG } from 'app/components/svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
@@ -102,7 +102,7 @@ export const AccountSettingsPage: React.FC = () => {
           />
           <CustomTextInput
             defaultValue={account.name}
-            icon={ProfileSVG}
+            Icon={ProfileSVG}
             labelText={i18n.t('pass_setup_label0')}
             placeholder={i18n.t('pass_setup_input0')}
             onChangeText={handleChangeName}

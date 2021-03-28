@@ -19,7 +19,8 @@ import { CustomTextInput } from 'app/components/custom-text-input';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { ProfileSVG } from 'app/components/svg';
+
+import ProfileSVG from 'app/assets/icons/profile.svg';
 
 type Prop = {
   biometricEnable: boolean;
@@ -64,7 +65,7 @@ export const AddAccount: React.FC<Prop> = ({
   return (
     <KeyboardAwareScrollView style={styles.container}>
       <CustomTextInput
-        icon={ProfileSVG}
+        Icon={ProfileSVG}
         onChangeText={setName}
         defaultValue={name}
         placeholder={i18n.t('pass_setup_input0')}

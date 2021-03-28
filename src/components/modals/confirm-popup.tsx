@@ -14,14 +14,12 @@ import {
   ViewStyle,
   View
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ProfileSVG,
-  ReceiveIconSVG,
-  AmountIconSVG
-} from 'app/components/svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import ReceiveIconSVG from 'app/assets/icons/receive.svg';
+import AmountIconSVG from 'app/assets/icons/amount.svg';
+
 import commonStyles from 'app/components/transfer/styles';
 import { AdvacedGas } from 'app/components/advaced-gas';
 import Modal from 'react-native-modal';
@@ -129,7 +127,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
             {transaction.tag}
           </LabelValue>
           <View style={commonStyles.item}>
-            <SvgXml xml={ProfileSVG} />
+            <ProfileSVG />
             <View style={[commonStyles.itemInfo, styles.item]}>
               <Text style={[commonStyles.label, {
                 color: colors.text
@@ -149,7 +147,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
             </View>
           </View>
           <View style={commonStyles.item}>
-            <SvgXml xml={AmountIconSVG} />
+            <AmountIconSVG />
             <View style={[commonStyles.itemInfo, styles.item]}>
               <Text style={[commonStyles.label, {
                 color: colors.text
@@ -169,7 +167,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
             </View>
           </View>
           <View style={commonStyles.item}>
-            <SvgXml xml={ReceiveIconSVG} />
+            <ReceiveIconSVG />
             <View style={[commonStyles.itemInfo, styles.item]}>
               <Text style={[commonStyles.label, {
                 color: colors.text

@@ -16,9 +16,8 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { DeleteIconSVG } from 'app/components/svg';
+import DeleteIconSVG from 'app/assets/icons/delete.svg';
 
-import { SvgXml } from 'react-native-svg';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -37,7 +36,7 @@ export const ModalTitle: React.FC<Prop> = ({ children, style, onClose }) => {
         {children}
       </Text>
       <TouchableOpacity onPress={onClose}>
-        <SvgXml xml={DeleteIconSVG}/>
+        <DeleteIconSVG />
       </TouchableOpacity>
     </View>
   );

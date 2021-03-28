@@ -21,12 +21,14 @@ import {
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
 
-import { ArrowIconSVG, OKIconSVG } from 'app/components/svg';
+import { OKIconSVG } from 'app/components/svg';
 import Modal from 'react-native-modal';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { ModalTitle } from 'app/components/modal-title';
 import { CustomButton } from 'app/components/custom-button';
 import { Unselected } from 'app/components/unselected';
+
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
 
 import i18n from 'app/lib/i18n';
 
@@ -89,10 +91,7 @@ export const DropMenu: React.FC<Prop> = ({
             {list.length === 0 ? '' : selected.name}
           </Text>
         )}
-        <SvgXml
-          xml={ArrowIconSVG}
-          fill={colors.primary}
-        />
+        <ArrowIconSVG fill={colors.primary} />
       </TouchableOpacity>
       <Modal
         isVisible={visible}

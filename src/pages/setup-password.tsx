@@ -20,7 +20,9 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
-import { ProfileSVG, LockSVG } from 'app/components/svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import LockSVG from 'app/assets/icons/lock.svg';
+
 import { Switcher } from 'app/components/switcher';
 import { Button } from 'app/components/button';
 import { CustomTextInput } from 'app/components/custom-text-input';
@@ -111,7 +113,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       </Text>
       <View style={styles.wrapper}>
         <CustomTextInput
-          icon={ProfileSVG}
+          Icon={ProfileSVG}
           defaultValue={accountName}
           placeholder={i18n.t('pass_setup_input0')}
           onChangeText={setAccountName}
@@ -132,7 +134,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
         ) : null}
         <View style={styles.elementWrapper}>
           <CustomTextInput
-            icon={LockSVG}
+            Icon={LockSVG}
             placeholder={i18n.t('pass_setup_input1')}
             onChangeText={setPassword}
             secureTextEntry

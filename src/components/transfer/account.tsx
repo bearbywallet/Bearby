@@ -13,13 +13,11 @@ import {
   Text,
   TouchableOpacity
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 import { useTheme } from '@react-navigation/native';
 
-import {
-  ProfileSVG,
-  ArrowIconSVG
-} from 'app/components/svg';
+import ProfileSVG from 'app/assets/icons/profile.svg';
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
+
 import { AccountsModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
@@ -63,8 +61,7 @@ export const TransferAccount: React.FC<Prop> = ({
         style={styles.item}
         onPress={() => setIsAccountModal(true)}
       >
-        <SvgXml
-          xml={ProfileSVG}
+        <ProfileSVG
           height={20}
           width={20}
         />
@@ -92,8 +89,7 @@ export const TransferAccount: React.FC<Prop> = ({
             </Text>
           </View>
         </View>
-        <SvgXml
-          xml={ArrowIconSVG}
+        <ArrowIconSVG
           fill={colors.notification}
           style={styles.arrowIcon}
         />

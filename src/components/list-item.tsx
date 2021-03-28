@@ -16,13 +16,11 @@ import {
   View,
   ViewStyle
 } from 'react-native';
-import { SvgXml } from 'react-native-svg';
 
-import { ArrowIconSVG } from 'app/components/svg';
+import ArrowIconSVG from 'app/assets/icons/arrow.svg';
 
 type Prop = {
   style?: ViewStyle;
-  icon: string;
   text: string;
   last: boolean;
   onPress?: () => void;
@@ -30,7 +28,7 @@ type Prop = {
 
 export const ListItem: React.FC<Prop> = ({
   style,
-  icon,
+  children,
   text,
   last,
   onPress
@@ -42,7 +40,7 @@ export const ListItem: React.FC<Prop> = ({
       style={[styles.listItemWrapper, style]}
       onPress={onPress}
     >
-      <SvgXml xml={icon} />
+      {children}
       <View style={[styles.listItem, {
         borderBottomColor: last ? 'transparent' : colors.notification
       }]}>
@@ -51,11 +49,7 @@ export const ListItem: React.FC<Prop> = ({
         }]}>
           {text}
         </Text>
-        <SvgXml
-          xml={ArrowIconSVG}
-          fill={colors.notification}
-          style={styles.arrow}
-        />
+        <ArrowIconSVG fill={colors.notification} style={styles.arrow} />
       </View>
     </TouchableOpacity>
   );

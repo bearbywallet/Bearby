@@ -20,9 +20,9 @@ import {
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
-import { SvgXml } from 'react-native-svg';
 
-import { SearchIconSVG } from 'app/components/svg';
+import SearchIconSVG from 'app/assets/icons/search.svg';
+
 import { TabView, SceneMap, SceneRendererProps } from 'react-native-tab-view';
 import { CreateAccountNavBar } from 'app/components/create-account';
 import {
@@ -119,7 +119,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
               color={colors.primary}
             />
           ) : (
-            <SvgXml xml={SearchIconSVG} />
+            <SearchIconSVG />
           )}
           <TextInput
             style={[styles.textInput, {
