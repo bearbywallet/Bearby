@@ -98,7 +98,7 @@ export const GasSelector: React.FC<Prop> = ({
 
   return (
     <View style={[styles.container, {
-      backgroundColor: colors.card,
+      backgroundColor: colors.card
     }, style]}>
       <View style={styles.header}>
         <Text style={[styles.title, {
@@ -113,9 +113,7 @@ export const GasSelector: React.FC<Prop> = ({
           />
         </TouchableOpacity>
       </View>
-      <View style={[styles.wrapper, {
-        borderColor: colors.background
-      }]}>
+      <View style={styles.wrapper}>
         <TouchableOpacity
           style={[
             firstSelected ? { backgroundColor: selectedColor } : null,
@@ -218,7 +216,6 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Demi
   },
   wrapper: {
-    borderWidth: 1,
     borderRadius: 8,
     padding: 5,
     marginTop: 10,

@@ -43,17 +43,15 @@ export const ModalWrapper: React.FC<Prop> = ({ children, style }) => {
 
     return () => {
       // Waiting an animation.
-      setTimeout(() => {
-        Keyboard.removeAllListeners(Events.KeyboardDidShow);
-        Keyboard.removeAllListeners(Events.KeyboardDidHide);
-      }, 500);
+      Keyboard.removeAllListeners(Events.KeyboardDidShow);
+      Keyboard.removeAllListeners(Events.KeyboardDidHide);
     };
   }, []);
 
   return (
     <View
       style={[styles.container, style, {
-        backgroundColor: colors.background,
+        backgroundColor: colors.card,
         minHeight
       }]}
     >
@@ -68,6 +66,7 @@ const styles = StyleSheet.create({
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
     paddingVertical: 15,
-    maxHeight: height - 50
+    maxHeight: height - 50,
+    borderTopWidth: 1
   }
 });

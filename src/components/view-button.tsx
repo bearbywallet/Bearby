@@ -28,9 +28,7 @@ export const ViewButton: React.FC<Prop> = ({ icon, children, style, onPress }) =
 
   return (
     <TouchableOpacity
-      style={[styles.linkItem, {
-        backgroundColor: colors.card
-      }, style]}
+      style={[styles.linkItem, style]}
       onPress={onPress}
     >
       <SvgXml xml={icon}/>
@@ -48,7 +46,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between',
     padding: 10,
-    borderRadius: 8,
     width: 70,
     height: 70
   },

@@ -41,15 +41,16 @@ export const AddAccount: React.FC<Prop> = ({
 
   const handleCreate = React.useCallback(async() => {
     setLoading(true);
-    if (biometricEnable) {
-      await keystore.addNextAccount(name);
-      await keystore.transaction.sync();
-
-      setLoading(false);
-      return onAdded();
-    }
 
     try {
+      if (biometricEnable) {
+        await keystore.addNextAccount(name);
+        await keystore.transaction.sync();
+
+        setLoading(false);
+        return onAdded();
+      }
+
       await keystore.addNextAccount(name, password);
       await keystore.transaction.sync();
 
