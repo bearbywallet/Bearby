@@ -16,6 +16,9 @@ import {
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
+import { BrowserCategoryLoading } from 'app/components/browser/category-loading';
+import { BrowserCategoryItem } from 'app/components/browser/category-item';
+
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
@@ -27,9 +30,16 @@ type Prop = {
 
 export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    setTimeout(() => {
+      setLoading(false);
+    }, 3000);
+  }, []);
 
   return (
-    <View style={styles.container}>
+    <View>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -37,12 +47,23 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
           {i18n.t(route.params.category)}
         </Text>
       </View>
-      <View>
-        <Text style={[styles.placeholder, {
+      <View style={[styles.container, {
+        backgroundColor: colors.card
+      }]}>
+        {loading ? (
+          <BrowserCategoryLoading />
+        ) : null}
+        <BrowserCategoryItem
+          title={'Game of dragons'}
+          domain={'dragonzil.xyz'}
+          url={'https://res.cloudinary.com/dragonseth/image/upload/1_398.png'}
+          onPress={() => null}
+        />
+        {/* <Text style={[styles.placeholder, {
           color: colors.notification
         }]}>
           {i18n.t('havent_apps')}
-        </Text>
+        </Text> */}
       </View>
     </View>
   );
@@ -50,9 +71,15 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 15
+    paddingHorizontal: 15,
+    borderTopRightRadius: 16,
+    borderTopLeftRadius: 16,
+    height: '100%',
+    marginTop: 8,
+    padding: 16
   },
   titleWrapper: {
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between'
