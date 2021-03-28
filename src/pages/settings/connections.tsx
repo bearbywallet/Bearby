@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import { BrowserAppItem } from 'app/components/browser';
@@ -40,9 +39,7 @@ export const ConnectionsPage = () => {
   }, [rmConnect, setRmConnect]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <React.Fragment>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -55,9 +52,7 @@ export const ConnectionsPage = () => {
           onPress={() => keystore.connect.reset()}
         />
       </View>
-      <ScrollView style={[styles.list, {
-        backgroundColor: colors.background
-      }]}>
+      <ScrollView style={styles.list}>
         {connectState.length === 0 ? (
           <Text style={[styles.noConnect, {
             color: colors.notification
@@ -89,19 +84,16 @@ export const ConnectionsPage = () => {
         onConfirmed={handleRemove}
         onTriggered={() => setRmConnect(undefined)}
       />
-    </SafeAreaView>
+    </React.Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '10%',
+    marginTop: 16,
     paddingHorizontal: 15
   },
   title: {
@@ -109,7 +101,8 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Bold
   },
   list: {
-    marginTop: 16
+    marginTop: 16,
+    marginBottom: 100
   },
   noConnect: {
     fontSize: 17,

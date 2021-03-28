@@ -11,11 +11,9 @@ import React from 'react';
 import {
   View,
   Dimensions,
-  StyleSheet,
   Alert
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
-import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { CustomButton } from 'app/components/custom-button';
@@ -191,9 +189,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
 
   return (
     <React.Fragment>
-      <SafeAreaView style={[styles.container, {
-        backgroundColor: colors.background
-      }]}>
+      <View>
         <KeyboardAwareScrollView>
           <View style={{
             backgroundColor: colors.card
@@ -246,7 +242,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
             />
           </View>
         </KeyboardAwareScrollView>
-      </SafeAreaView>
+      </View>
       {tx ? (
         <ConfirmPopup
           transaction={tx}
@@ -269,9 +265,3 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
     </React.Fragment>
   );
 };
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  }
-});

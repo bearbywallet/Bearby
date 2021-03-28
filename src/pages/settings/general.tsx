@@ -14,7 +14,6 @@ import {
   StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
 
 import { Selector } from 'app/components/selector';
 import { Button } from 'app/components/button';
@@ -45,9 +44,7 @@ export const GeneralPage = () => {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <React.Fragment>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -60,7 +57,7 @@ export const GeneralPage = () => {
           onPress={hanldeReset}
         />
       </View>
-      <ScrollView>
+      <ScrollView style={styles.list}>
         <Selector
           style={styles.selector}
           items={keystore.currency.currencies}
@@ -97,13 +94,13 @@ export const GeneralPage = () => {
           </View>
         </Switcher>
       </ScrollView>
-    </SafeAreaView>
+    </React.Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
+  list: {
+    paddingBottom: 100
   },
   titleWrapper: {
     flexDirection: 'row',

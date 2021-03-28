@@ -15,7 +15,7 @@ import {
   NativeModules
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
@@ -171,9 +171,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <React.Fragment>
       {!data ? (
-        <SafeAreaView style={[styles.container, {
-          backgroundColor: colors.background
-        }]}>
+        <SafeWrapper style={styles.container}>
           <Text style={[styles.title, {
             color: colors.text
           }]}>
@@ -202,11 +200,9 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
             onTriggered={() => setQrcodeModal(false)}
             onScan={handleScan}
           />
-        </SafeAreaView>
+        </SafeWrapper>
       ) : (
-        <SafeAreaView style={[styles.container, {
-          backgroundColor: colors.background
-        }]}>
+        <SafeWrapper style={styles.container}>
           <KeyboardAwareScrollView>
             <Text style={[styles.title, {
               color: colors.text
@@ -239,7 +235,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
               onPress={handleDecrypt}
             />
           </KeyboardAwareScrollView>
-        </SafeAreaView>
+        </SafeWrapper>
       )}
     </React.Fragment>
   );
@@ -247,7 +243,6 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     alignItems: 'center'
   },
   title: {

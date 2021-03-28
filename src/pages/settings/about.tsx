@@ -13,7 +13,6 @@ import {
   Text,
   Dimensions
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
@@ -46,9 +45,7 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View>
       <Text style={[styles.title, {
         color: colors.text
       }]}>
@@ -80,14 +77,11 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
           onPress={() => handleOpen(ISSUES)}
         />
       </View>
-    </ SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   title: {
     textAlign: 'center',
     fontSize: 30,

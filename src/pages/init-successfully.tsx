@@ -14,7 +14,7 @@ import {
   Dimensions,
   Text
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
@@ -38,9 +38,7 @@ export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
         <CreateBackground
           width={width + width / 4}
@@ -59,14 +57,11 @@ export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
           onPress={hanldeOK}
         />
       </View>
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   backgroundImage: {
     justifyContent: 'center',
     alignItems: 'center',

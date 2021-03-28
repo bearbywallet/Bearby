@@ -13,7 +13,6 @@ import {
   Text,
   ScrollView
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import { Selector } from 'app/components/selector';
@@ -97,9 +96,7 @@ export const NetworkPage = () => {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <React.Fragment>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -139,14 +136,11 @@ export const NetworkPage = () => {
           />
         )}
       </ScrollView>
-    </SafeAreaView>
+    </React.Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',

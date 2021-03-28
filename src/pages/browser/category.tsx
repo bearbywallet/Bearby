@@ -13,7 +13,6 @@ import {
   View,
   Text
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
@@ -30,9 +29,7 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View style={styles.container}>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -47,20 +44,18 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
           {i18n.t('havent_apps')}
         </Text>
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     paddingHorizontal: 15
   },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: '10%'
+    justifyContent: 'space-between'
   },
   title: {
     fontSize: 30,

@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import Clipboard from '@react-native-community/clipboard';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -65,9 +64,7 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [route]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View>
       <View style={[styles.wrapper, {
         backgroundColor: colors.card
       }]}>
@@ -95,16 +92,12 @@ export const ExportPage: React.FC<Prop> = ({ route, navigation }) => {
           onPress={hanldeCopy}
         />
       </View>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   wrapper: {
-    marginVertical: 20,
     padding: 15
   },
   dangerWrapper: {

@@ -13,7 +13,6 @@ import {
   Text,
   ScrollView
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import { GasSelector } from 'app/components/gas-selector';
@@ -36,9 +35,7 @@ export const AdvancedPage: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -68,19 +65,16 @@ export const AdvancedPage: React.FC = () => {
           onSelect={(format) => keystore.settings.setFormat(format)}
         />
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '10%',
+    marginTop: 16,
     paddingHorizontal: 15
   },
   title: {

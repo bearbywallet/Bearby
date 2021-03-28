@@ -11,7 +11,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import {
   StatusBar
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 
 import LottieView from 'lottie-react-native';
 
@@ -50,15 +50,13 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <React.Fragment>
       <StatusBar barStyle="light-content" />
-      <SafeAreaView style={{
-        flex: 1
-      }}>
+      <SafeWrapper>
         <LottieView
           source={require('app/assets/dark')}
           autoPlay
           loop
         />
-      </SafeAreaView>
+      </SafeWrapper>
     </React.Fragment>
   );
 };

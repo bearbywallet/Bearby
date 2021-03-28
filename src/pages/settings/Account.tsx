@@ -13,7 +13,6 @@ import {
   StyleSheet,
   ActivityIndicator
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@react-navigation/native';
 
@@ -83,9 +82,7 @@ export const AccountSettingsPage: React.FC = () => {
   }, []);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -151,19 +148,16 @@ export const AccountSettingsPage: React.FC = () => {
           </View>
         </View>
       </KeyboardAwareScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '10%',
+    marginTop: 16,
     paddingHorizontal: 15
   },
   title: {

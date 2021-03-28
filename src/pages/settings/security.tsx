@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
@@ -138,9 +137,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
   }, [exportType]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <React.Fragment>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -208,16 +205,14 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
           onConfirmed={hanldeConfirmPassword}
         />
       </ScrollView>
-    </SafeAreaView>
+    </React.Fragment>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   wrapper: {
-    paddingVertical: 15
+    paddingVertical: 15,
+    paddingBottom: 100
   },
   titleWrapper: {
     flexDirection: 'row',

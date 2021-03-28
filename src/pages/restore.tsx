@@ -17,7 +17,7 @@ import {
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 
 import { Button } from 'app/components/button';
@@ -78,9 +78,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <KeyboardAwareScrollView>
         <View style={styles.pageContainer}>
           <Text style={[styles.title, {
@@ -119,14 +117,11 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
           onPress={hanldecreateWallet}
         />
       </KeyboardAwareScrollView>
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   pageContainer: {
     marginTop: 54,
     justifyContent: 'flex-start',

@@ -11,13 +11,12 @@ import React from 'react';
 import {
   StyleSheet,
   Text,
-  ScrollView,
-  View
+  ScrollView
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
 
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { ListItem } from 'app/components/list-item';
 import {
   GearIconSVG,
@@ -109,7 +108,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
   ];
 
   return (
-    <SafeAreaView style={[styles.container, {
+    <SafeWrapper style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <Text style={[styles.title, {
@@ -132,7 +131,7 @@ export const SettingsPage: React.FC<Prop> = ({ navigation }) => {
           />
         ))}
       </ScrollView>
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 

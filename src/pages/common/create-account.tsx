@@ -14,7 +14,7 @@ import {
   StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { TabView, SceneMap } from 'react-native-tab-view';
 
@@ -74,9 +74,7 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <Text style={[styles.title, {
         color: colors.text
       }]}>
@@ -92,14 +90,11 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
         onIndexChange={setIndex}
         initialLayout={initialLayout}
       />
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   title: {
     textAlign: 'center',
     fontFamily: fonts.Bold,

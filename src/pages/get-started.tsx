@@ -14,7 +14,7 @@ import {
   ScrollView,
   Dimensions
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
 
@@ -71,9 +71,7 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
   const { currentPage: pageIndex } = sliderState;
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <View style={styles.scrollView}>
         <ScrollView
           style={styles.scrollView}
@@ -124,17 +122,11 @@ export const GetStartedPage: React.FC<Prop> = ({ navigation }) => {
           onPress={() => navigation.navigate('Privacy')}
         />
       </View>
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
-  safeArea: {
-    flex: 2
-  },
   scrollView: {
     flex: 1,
     maxHeight: height - 50

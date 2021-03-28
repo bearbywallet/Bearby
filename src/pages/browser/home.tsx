@@ -17,7 +17,7 @@ import {
   ActivityIndicator,
   LayoutAnimation
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import { SvgXml } from 'react-native-svg';
@@ -99,9 +99,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <View style={styles.header}>
         <View style={styles.headerWraper}>
           <Text style={[styles.headerTitle, {
@@ -147,14 +145,11 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           initialLayout={initialLayout}
         />
       </View>
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   header: {
     alignItems: 'center',
     padding: 15

@@ -13,7 +13,6 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import SafeAreaView from 'react-native-safe-area-view';
 import { useTheme } from '@react-navigation/native';
 
 import { Selector } from 'app/components/selector';
@@ -61,9 +60,7 @@ export const BrowserSettingsPage = () => {
   }, [cache]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <ScrollView>
       <View style={styles.titleWrapper}>
         <Text style={[styles.title, {
           color: colors.text
@@ -76,7 +73,7 @@ export const BrowserSettingsPage = () => {
           onPress={() =>  keystore.searchEngine.reset()}
         />
       </View>
-      <ScrollView style={styles.list}>
+      <View style={styles.list}>
         <Selector
           title={i18n.t('browser_settings_selector_title')}
           items={engineList}
@@ -146,20 +143,17 @@ export const BrowserSettingsPage = () => {
             </Text>
           </View>
         </Switcher>
-      </ScrollView>
-    </SafeAreaView>
+      </View>
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   titleWrapper: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginTop: '10%',
+    marginTop: 16,
     paddingHorizontal: 15
   },
   title: {
@@ -170,7 +164,7 @@ const styles = StyleSheet.create({
     maxWidth: '70%'
   },
   list: {
-    marginTop: 16
+    marginBottom: 100
   },
   someText: {
     fontSize: 17,

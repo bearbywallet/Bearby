@@ -19,9 +19,9 @@ import {
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
-import SafeAreaView from 'react-native-safe-area-view';
 
 import { TransactionItem } from 'app/components/transaction-item';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 import { TransactionModal } from 'app/components/modals';
 import { Button } from 'app/components/button';
 
@@ -108,9 +108,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <View style={styles.header}>
         <ZIlliqaLogo
           style={[StyleSheet.absoluteFill, styles.logo]}
@@ -182,14 +180,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           onTriggered={() => setTransactionModal(false)}
         />
       ) : null}
-    </SafeAreaView>
+    </SafeWrapper>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1
-  },
   header: {
     alignItems: 'center',
     padding: 15
