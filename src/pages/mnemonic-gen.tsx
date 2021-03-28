@@ -108,7 +108,7 @@ const styles = StyleSheet.create({
     lineHeight: 41,
     fontSize: 31,
     fontFamily: fonts.Bold,
-    marginTop: 30
+    marginTop: 16
   },
   subTitle: {
     textAlign: 'center',
@@ -131,7 +131,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     width: '60%',
-    marginBottom: 50
+    marginBottom: 70
   }
 });
 

@@ -12,8 +12,7 @@ import {
   StyleSheet,
   Text,
   Dimensions,
-  ScrollView,
-  SafeAreaView
+  ScrollView
 } from 'react-native';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -32,7 +31,7 @@ type Prop = {
   route: RouteProp<UnauthorizedStackParamList, 'MnemonicVerif'>;
 };
 
-const { height, width } = Dimensions.get('window');
+const { width } = Dimensions.get('window');
 export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   const { colors } = useTheme();
   const [phrase] = React.useState(route.params.phrase);
@@ -69,9 +68,7 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
   }, [navigation]);
 
   return (
-    <SafeAreaView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <View>
       <ScrollView>
         <Text style={[styles.title, {
           color: colors.text
@@ -118,21 +115,16 @@ export const MnemonicVerifypage: React.FC<Prop> = ({ navigation, route }) => {
           />
         </View>
       </ScrollView>
-    </SafeAreaView>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    height: '100%'
-  },
   title: {
     textAlign: 'center',
     lineHeight: 41,
     fontSize: 31,
-    fontFamily: fonts.Bold,
-    marginTop: height / 30
+    fontFamily: fonts.Bold
   },
   subTitle: {
     textAlign: 'center',

@@ -12,13 +12,13 @@ import {
   StyleSheet,
   Dimensions,
   View,
-  Image,
   ActivityIndicator
 } from 'react-native';
 import URL from 'url-parse';
 import { WebView } from 'react-native-webview';
 import { WebViewProgressEvent } from 'react-native-webview/lib/WebViewTypes';
 import FastImage from 'react-native-fast-image';
+import { SafeWrapper } from 'app/components/safe-wrapper';
 
 import { BrowserViewBar } from 'app/components/browser';
 import {
@@ -388,9 +388,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }
 
   return (
-    <View style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <SafeWrapper>
       <BrowserViewBar
         url={url}
         connected={isConnect}
@@ -473,14 +471,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           />
         </ConfirmPopup>
       ) : null}
-    </View>
+    </SafeWrapper>
   );
 };
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    marginTop: 25
-  },
   loading: {
     height: 3
   }

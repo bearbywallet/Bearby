@@ -68,14 +68,13 @@ const styles = StyleSheet.create({
     marginBottom: '40%'
   },
   wrapper: {
-    height: '90%',
+    height: '80%',
     alignItems: 'center',
     justifyContent: 'flex-end'
   },
   title: {
     fontFamily: fonts.Bold,
-    lineHeight: 41,
-    fontSize: 34,
+    fontSize: 24,
     textAlign: 'center',
     marginBottom: 100
   }

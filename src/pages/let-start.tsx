@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
   backgroundImage: {
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 200
+    marginBottom: 300
   },
   pageContainer: {
     justifyContent: 'flex-end',

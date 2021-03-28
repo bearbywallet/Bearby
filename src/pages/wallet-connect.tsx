@@ -171,7 +171,9 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <React.Fragment>
       {!data ? (
-        <SafeWrapper style={styles.container}>
+        <View style={[styles.container, {
+          alignItems: 'center'
+        }]}>
           <Text style={[styles.title, {
             color: colors.text
           }]}>
@@ -200,42 +202,40 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
             onTriggered={() => setQrcodeModal(false)}
             onScan={handleScan}
           />
-        </SafeWrapper>
+        </View>
       ) : (
-        <SafeWrapper style={styles.container}>
-          <KeyboardAwareScrollView>
-            <Text style={[styles.title, {
-              color: colors.text
-            }]}>
-              {i18n.t('connect_title_decrypt')}
-            </Text>
-            <Passwordinput
-              placeholder={i18n.t('pass_setup_input1')}
-              onChange={hanldeChangePassword}
-              passwordError={passwordError}
-              onSubmitEditing={handleDecrypt}
-            />
-            {authState.supportedBiometryType ? (
-              <Switcher
-                style={styles.biometric}
-                enabled={isBiometric}
-                onChange={setIsBiometric}
-              >
-                <Text style={{
-                  color: colors.border
-                }}>
-                  {biometric}
-                </Text>
-              </Switcher>
-            ) : null}
-            <CustomButton
-              disabled={!password}
-              title={i18n.t('confirm')}
-              isLoading={isLoading}
-              onPress={handleDecrypt}
-            />
-          </KeyboardAwareScrollView>
-        </SafeWrapper>
+        <View style={styles.container}>
+          <Text style={[styles.title, {
+            color: colors.text
+          }]}>
+            {i18n.t('connect_title_decrypt')}
+          </Text>
+          <Passwordinput
+            placeholder={i18n.t('pass_setup_input1')}
+            onChange={hanldeChangePassword}
+            passwordError={passwordError}
+            onSubmitEditing={handleDecrypt}
+          />
+          {authState.supportedBiometryType ? (
+            <Switcher
+              style={styles.biometric}
+              enabled={isBiometric}
+              onChange={setIsBiometric}
+            >
+              <Text style={{
+                color: colors.border
+              }}>
+                {biometric}
+              </Text>
+            </Switcher>
+          ) : null}
+          <CustomButton
+            disabled={!password}
+            title={i18n.t('confirm')}
+            isLoading={isLoading}
+            onPress={handleDecrypt}
+          />
+        </View>
       )}
     </React.Fragment>
   );
@@ -243,14 +243,14 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
 const styles = StyleSheet.create({
   container: {
-    alignItems: 'center'
+    paddingHorizontal: 16
   },
   title: {
     fontFamily: fonts.Bold,
     textAlign: 'center',
-    fontSize: 17,
+    fontSize: 16,
     lineHeight: 40,
-    marginVertical: 30
+    marginTop: 16
   },
   stepText: {
     fontFamily: fonts.Regular,
