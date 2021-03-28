@@ -81,6 +81,8 @@ export class ContactsControler {
       } catch {
         await this.reset();
       }
+    } else {
+      await this.reset();
     }
   }
 }
