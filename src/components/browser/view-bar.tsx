@@ -13,6 +13,7 @@ import {
   View,
   ScrollView,
   TextInput,
+  StatusBar,
   Text
 } from 'react-native';
 import URL from 'url-parse';
@@ -124,17 +125,16 @@ export const BrowserViewBar: React.FC<Prop> = ({
       </View>
       {menu ? (
         <ScrollView style={[styles.navMenu, {
-          backgroundColor: colors['bg1'],
-          shadowColor: colors.border
+          backgroundColor: colors.card,
+          shadowColor: colors.background
         }]}>
-          <View style={styles.navActionWrapper}>
+          <View>
             <TouchableOpacity
               style={styles.navAction}
               disabled={!canGoForward}
               onPress={onGoForward}
             >
-              <SvgXml
-                xml={ArrowIconSVG}
+              <ArrowIconSVG
                 height={30}
                 width={30}
                 fill={canGoForward ? colors.primary : colors.notification}
@@ -251,23 +251,19 @@ const styles = StyleSheet.create({
   },
   navMenu: {
     position: 'absolute',
-    top: 5,
+    top: '9%',
     right: 10,
     padding: 10,
     alignContent: 'flex-end',
     zIndex: 99,
     borderRadius: 5,
     textShadowOffset: {
-      width: 2,
-      height: 2
+      width: 3,
+      height: 3
     },
     elevation: 5,
     shadowOpacity: 0.5,
-    shadowRadius: 2
-  },
-  navActionWrapper: {
-    // justifyContent: 'space-around',
-    // padding: 5
+    shadowRadius: 10
   },
   navBtns: {
     flexDirection: 'row',
