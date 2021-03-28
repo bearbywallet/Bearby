@@ -67,12 +67,20 @@ export class ContactsControler {
   }
 
   public async sync() {
-    const contacts = await this._storage.get<Contact[]>(
+    const contacts = await this._storage.get(
       STORAGE_FIELDS.CONTACTS
     );
 
-    if (Array.isArray(contacts)) {
-      contactsStoreUpdate(contacts);
+    if (contacts && typeof contacts === 'string') {
+      try {
+        const list = JSON.parse(contacts);
+
+        if (Array.isArray(list)) {
+          contactsStoreUpdate(list);
+        }
+      } catch {
+        await this.reset();
+      }
     }
   }
 }
