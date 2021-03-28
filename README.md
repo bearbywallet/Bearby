@@ -3,7 +3,7 @@
 ZilPay wallet the decentralized browser and wallet in one. Via ZilPay you and developers can create decentralized applications on ZIlliqa blockchain.
 
 <p align="center">
-  <a href="https://zilpay.xyz"><img src="https://github.com/zilpay/zilpay-mobile/blob/master/imgs/preview.png"></a>
+  <a href="https://zilpay.io"><img src="https://github.com/zilpay/zilpay-mobile/blob/master/imgs/preview.png"></a>
 </p>
 
 For developers:
