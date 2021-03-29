@@ -13,6 +13,7 @@ import {
   View,
   Alert,
   Text,
+  ScrollView,
   RefreshControl
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -24,7 +25,6 @@ import { BrowserCategoryItem } from 'app/components/browser/category-item';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
-import { ScrollView } from 'react-native-gesture-handler';
 import { keystore } from 'app/keystore';
 import { DApp } from 'types';
 
