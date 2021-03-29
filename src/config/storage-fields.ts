@@ -22,6 +22,7 @@ export const STORAGE_FIELDS = {
   CURRENCY: `${prefix}currency`,
   CONNECTIONS: `${prefix}/connections`,
   GAS: `${prefix}gas_config`,
+  APPS: `${prefix}apps_list`,
 
   ACCESS_CONTROL: `${prefix}access_control`,
   SEARCH_ENGINE: `${prefix}search_engine`,

@@ -11,7 +11,9 @@ import React from 'react';
 import {
   StyleSheet,
   View,
-  Text
+  Alert,
+  Text,
+  RefreshControl
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
@@ -22,6 +24,9 @@ import { BrowserCategoryItem } from 'app/components/browser/category-item';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
+import { ScrollView } from 'react-native-gesture-handler';
+import { keystore } from 'app/keystore';
+import { DApp } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -31,11 +36,33 @@ type Prop = {
 export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
   const [loading, setLoading] = React.useState(true);
+  const [list, setList] = React.useState<DApp[]>([]);
+
+  const hanldeRefresh = React.useCallback(async(force) => {
+    setLoading(true);
+
+    try {
+      const result = await keystore.app.getAppsByCategory(
+        route.params.category,
+        force
+      );
+
+      setList(result);
+    } catch (err) {
+      Alert.alert(
+        i18n.t('update'),
+        err.message,
+        [
+          { text: "OK" }
+        ]
+      );
+    }
+
+    setLoading(false);
+  }, [route]);
 
   React.useEffect(() => {
-    setTimeout(() => {
-      setLoading(false);
-    }, 3000);
+    hanldeRefresh(false);
   }, []);
 
   return (
@@ -44,27 +71,41 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
         <Text style={[styles.title, {
           color: colors.text
         }]}>
-          {i18n.t(route.params.category)}
+          {i18n.t(`category_${route.params.category}`)}
         </Text>
       </View>
-      <View style={[styles.container, {
-        backgroundColor: colors.card
-      }]}>
+      <ScrollView
+        style={[styles.container, {
+          backgroundColor: colors.card
+        }]}
+        refreshControl={
+          <RefreshControl
+            refreshing={loading}
+            onRefresh={() => hanldeRefresh(true)}
+          />
+        }
+      >
         {loading ? (
           <BrowserCategoryLoading />
         ) : null}
-        <BrowserCategoryItem
-          title={'Game of dragons'}
-          domain={'dragonzil.xyz'}
-          url={'https://res.cloudinary.com/dragonseth/image/upload/1_398.png'}
-          onPress={() => null}
-        />
-        {/* <Text style={[styles.placeholder, {
-          color: colors.notification
-        }]}>
-          {i18n.t('havent_apps')}
-        </Text> */}
-      </View>
+        {list.map((app, index) => (
+          <BrowserCategoryItem
+            key={index}
+            app={app}
+            style={{
+              marginTop: index === 0 ? 0 : 8
+            }}
+            onPress={() => null}
+          />
+        ))}
+        {!loading && list.length === 0 ? (
+          <Text style={[styles.placeholder, {
+            color: colors.notification
+          }]}>
+            {i18n.t('havent_apps')}
+          </Text>
+        ) : null}
+      </ScrollView>
     </View>
   );
 };

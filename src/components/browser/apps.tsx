@@ -22,15 +22,15 @@ import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 
 type Prop = {
-  onSelect: (name: string) => void;
+  onSelect: (name: number) => void;
 };
 export const categories = [
-  'games',
-  'finance',
-  'social',
-  'high_risk',
-  'exchanges',
-  'gambling'
+  0,
+  1,
+  2,
+  3,
+  4,
+  5
 ];
 
 export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
@@ -44,13 +44,13 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
         {i18n.t('categories')}
       </Text>
       <View style={styles.categoriesWrapper}>
-        {categories.map((c, index) => (
+        {categories.map((_, index) => (
           <BrowserCarditem
             style={{ marginTop: 15 }}
             key={index}
-            el={c}
-            title={i18n.t(c)}
-            onPress={() => onSelect(c)}
+            el={index}
+            title={i18n.t(`category_${index}`)}
+            onPress={() => onSelect(index)}
           />
         ))}
       </View>

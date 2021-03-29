@@ -8,6 +8,7 @@
  */
 import React from 'react';
 import { useTheme } from '@react-navigation/native';
+import URL from 'url-parse';
 import {
   View,
   TouchableOpacity,
@@ -18,20 +19,17 @@ import {
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
 import { fonts } from 'app/styles';
+import { DApp } from 'types';
 
 type Prop = {
-  url: string;
-  title: string;
-  domain: string;
+  app: DApp;
   style?: ViewStyle;
   onPress: () => void;
 };
 
 const { width } = Dimensions.get('window');
 export const BrowserCategoryItem: React.FC<Prop> = ({
-  url,
-  title,
-  domain,
+  app,
   style,
   onPress
 }) => {
@@ -45,7 +43,7 @@ export const BrowserCategoryItem: React.FC<Prop> = ({
       onPress={onPress}
     >
       <FastImage
-        source={{ uri: url }}
+        source={{ uri: app.icon }}
         style={[styles.icon, {
           backgroundColor: colors.card
         }]}
@@ -56,14 +54,14 @@ export const BrowserCategoryItem: React.FC<Prop> = ({
           color: colors.text,
           fontSize: 17
         }}>
-          {title}
+          {app.title}
         </Text>
         <Text style={{
           fontFamily: fonts.Regular,
           color: colors.border,
           fontSize: 13
         }}>
-          {domain}
+          {new URL(app.url).host}
         </Text>
       </View>
     </TouchableOpacity>

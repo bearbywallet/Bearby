@@ -29,40 +29,39 @@ import { fonts } from 'app/styles';
 type Prop = {
   style?: ViewStyle;
   title: string;
-  el: string;
+  el: number;
   onPress?: () => void;
 };
 const { width } = Dimensions.get('window');
-
-const Imgaes = {
-  [categories[0]]: <Games
+const Imgaes = [
+  <Games
     width={width / 3}
     height={width / 7}
   />,
-  [categories[1]]: <Finance
+  <Finance
     width={width / 3}
     height={width / 7}
   />,
-  [categories[2]]: <Social
+  <Social
     width={width / 3}
     height={width / 5}
   />,
-  [categories[3]]: <HighRisk
+  <HighRisk
     width={width / 3}
     height={width / 7}
   />,
-  [categories[4]]: <Exchange
+  <Exchange
     width={width / 3}
     height={width / 5}
   />,
-  [categories[5]]: <Gambling
+  <Gambling
     width={width / 3}
     height={width / 5}
   />,
-};
+];
 
 export const BrowserCarditem: React.FC<Prop> = ({ el, title, style, onPress }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
 
   return (
     <TouchableOpacity

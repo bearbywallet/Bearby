@@ -19,7 +19,7 @@ import {
 export type BrwoserStackParamList = {
   Browser: undefined;
   Category: {
-    category: string;
+    category: number;
   },
   Web: {
     url: string;
