@@ -12,27 +12,44 @@ import {
   StyleSheet,
   View,
   ScrollView,
-  Alert,
-  Text,
-  RefreshControl
+  Dimensions,
+  ActivityIndicator,
+  Text
 } from 'react-native';
+import URL from 'url-parse';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 
+import { CustomButton } from 'app/components/custom-button';
+
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
-import { keystore } from 'app/keystore';
-import { DApp } from 'types';
+import { PINTA } from 'app/config';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
   route: RouteProp<BrwoserStackParamList, 'BrowserApp'>;
 };
 
-export const BrowserAppPage: React.FC<Prop> = ({ route }) => {
+const { height, width } = Dimensions.get('window');
+export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const [description, setDescription] = React.useState<string>();
+
+  const handleLaunch = React.useCallback(() => {
+    navigation.navigate('Web', {
+      url: route.params.app.url
+    });
+  }, [navigation, route]);
+
+  React.useEffect(() => {
+    fetch(`${PINTA}/${route.params.app.description}`)
+      .then((res) => res.text())
+      .then((text) => setDescription(text))
+      .catch(() => setDescription(''));
+  }, []);
 
   return (
     <View>
@@ -41,15 +58,54 @@ export const BrowserAppPage: React.FC<Prop> = ({ route }) => {
       }]}>
         <View style={styles.titleContainer}>
           <FastImage
-            source={{ uri: route.params.app.icon }}
+            source={{ uri: `${PINTA}/${route.params.app.icon}` }}
             style={styles.icon}
           />
-          <Text style={[styles.title, {
+          <View>
+            <Text style={[styles.title, {
+              color: colors.text
+            }]}>
+              {route.params.app.title}
+            </Text>
+            <Text style={[styles.host, {
+              color: colors.border
+            }]}>
+              {new URL(route.params.app.url).host}
+            </Text>
+          </View>
+        </View>
+        <ScrollView
+          style={styles.scrollView}
+          horizontal={true}
+          scrollEventThrottle={16}
+          pagingEnabled={true}
+          showsHorizontalScrollIndicator={false}
+        >
+          {route.params.app.images.map((img, index) => (
+            <FastImage
+              key={index}
+              source={{ uri: `${PINTA}/${img}` }}
+              style={styles.previewImages}
+            />
+          ))}
+        </ScrollView>
+        {!description ? (
+          <ActivityIndicator
+            animating={!description}
+            color={colors.background}
+          />
+        ) : (
+          <Text style={[styles.description, {
             color: colors.text
           }]}>
-            {route.params.app.title}
+            {description}
           </Text>
-        </View>
+        )}
+        <CustomButton
+          title={i18n.t('launch_app')}
+          style={styles.launch}
+          onPress={handleLaunch}
+        />
       </ScrollView>
     </View>
   );
@@ -57,25 +113,50 @@ export const BrowserAppPage: React.FC<Prop> = ({ route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    paddingHorizontal: 15,
     borderTopRightRadius: 16,
     borderTopLeftRadius: 16,
     height: '100%',
-    marginTop: 8,
-    padding: 16
+    marginTop: 8
   },
   icon: {
     height: 50,
     width: 50,
-    borderRadius: 100,
+    borderRadius: 100
   },
   titleContainer: {
     flexDirection: 'row',
-    alignItems: 'center'
+    alignItems: 'center',
+    paddingVertical: 16
   },
   title: {
     fontFamily: fonts.Bold,
     fontSize: 32
+  },
+  host: {
+    fontFamily: fonts.Regular,
+    fontSize: 16,
+    marginTop: 5
+  },
+  scrollView: {
+    flex: 1,
+    maxHeight: height - 50
+  },
+  previewImages: {
+    height: height / 3,
+    width: width - 30,
+    borderRadius: 8,
+    margin: 5
+  },
+  description: {
+    fontFamily: fonts.Regular,
+    fontSize: 17,
+    padding: 16,
+    textAlign: 'center'
+  },
+  launch: {
+    maxWidth: 300,
+    minWidth: 200,
+    alignSelf: 'center'
   }
 });
 

@@ -255,6 +255,7 @@ export default {
   category_3: 'High-risk',
   category_4: 'Exchanges',
   category_5: 'Gambling',
+  launch_app: 'Launch',
   d_web: 'DWeb',
   d_web_description: 'Support for decentralized domain protocols.',
   node_status_0: 'Transaction not found',

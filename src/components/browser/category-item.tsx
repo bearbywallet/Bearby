@@ -20,6 +20,7 @@ import {
 import FastImage from 'react-native-fast-image';
 import { fonts } from 'app/styles';
 import { DApp } from 'types';
+import { PINTA } from 'app/config';
 
 type Prop = {
   app: DApp;
@@ -43,7 +44,7 @@ export const BrowserCategoryItem: React.FC<Prop> = ({
       onPress={onPress}
     >
       <FastImage
-        source={{ uri: app.icon }}
+        source={{ uri: `${PINTA}/${app.icon}` }}
         style={[styles.icon, {
           backgroundColor: colors.card
         }]}
