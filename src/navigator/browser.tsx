@@ -13,8 +13,11 @@ import { useTheme } from '@react-navigation/native';
 import {
   BrowserHomePage,
   WebViewPage,
-  BrowserCategoryPage
+  BrowserCategoryPage,
+  BrowserAppPage
 } from 'app/pages/browser';
+
+import { DApp } from 'types';
 
 export type BrwoserStackParamList = {
   Browser: undefined;
@@ -24,6 +27,9 @@ export type BrwoserStackParamList = {
   Web: {
     url: string;
   };
+  BrowserApp: {
+    app: DApp;
+  }
 };
 
 const BrowserStack = createStackNavigator<BrwoserStackParamList>();
@@ -62,6 +68,14 @@ export const browserNav: React.FC = () => {
       <BrowserStack.Screen
         name="Category"
         component={BrowserCategoryPage}
+        options={{
+          ...headerOptions,
+          title: ''
+        }}
+      />
+      <BrowserStack.Screen
+        name="BrowserApp"
+        component={BrowserAppPage}
         options={{
           ...headerOptions,
           title: ''

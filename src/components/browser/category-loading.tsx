@@ -61,7 +61,7 @@ export const BrowserCategoryLoading: React.FC<ViewStyle> = (props) => {
       <View
         {...props}
         style={[styles.container, {
-          backgroundColor: colors.background
+          backgroundColor: colors['card1']
         }]}
       >
         <View style={[styles.fadeIcon, {

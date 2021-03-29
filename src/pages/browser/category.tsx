@@ -33,7 +33,7 @@ type Prop = {
   route: RouteProp<BrwoserStackParamList, 'Category'>;
 };
 
-export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
+export const BrowserCategoryPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
   const [loading, setLoading] = React.useState(true);
   const [refreshing, setRefreshing] = React.useState(false);
@@ -58,6 +58,11 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
     }
   };
 
+  const hanldeSelectApp = React.useCallback((app: DApp) => {
+    navigation.navigate('BrowserApp', {
+      app
+    });
+  }, [navigation]);
   const hanldeRefresh = React.useCallback(async(force) => {
     setRefreshing(true);
 
@@ -105,7 +110,7 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
             style={{
               marginTop: index === 0 ? 0 : 8
             }}
-            onPress={() => null}
+            onPress={() => hanldeSelectApp(app)}
           />
         ))}
         {!loading && list.length === 0 ? (
