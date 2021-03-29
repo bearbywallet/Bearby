@@ -36,18 +36,17 @@ type Prop = {
 export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
   const [loading, setLoading] = React.useState(true);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [list, setList] = React.useState<DApp[]>([]);
 
-  const hanldeRefresh = React.useCallback(async(force) => {
-    setLoading(true);
-
+  const update = async(force = false) => {
     try {
       const result = await keystore.app.getAppsByCategory(
         route.params.category,
         force
       );
 
-      setList(result);
+      return result;
     } catch (err) {
       Alert.alert(
         i18n.t('update'),
@@ -57,12 +56,23 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
         ]
       );
     }
+  };
 
-    setLoading(false);
+  const hanldeRefresh = React.useCallback(async(force) => {
+    setRefreshing(true);
+
+    const result = await update(force);
+
+    setList(result);
+
+    setRefreshing(false);
   }, [route]);
 
   React.useEffect(() => {
-    hanldeRefresh(false);
+    update().then((result) => {
+      setList(result);
+      setLoading(false);
+    });
   }, []);
 
   return (
@@ -80,7 +90,7 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route }) => {
         }]}
         refreshControl={
           <RefreshControl
-            refreshing={loading}
+            refreshing={refreshing}
             onRefresh={() => hanldeRefresh(true)}
           />
         }
