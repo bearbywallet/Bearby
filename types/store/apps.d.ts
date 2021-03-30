@@ -17,3 +17,9 @@ export interface DApp {
   icon: string;
   category: string;
 }
+
+export interface Poster {
+  block: string;
+  url: string;
+  banner: string;
+}

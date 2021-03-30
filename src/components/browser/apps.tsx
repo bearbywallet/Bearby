@@ -11,18 +11,21 @@ import React from 'react';
 import {
   View,
   ScrollView,
-  Text,
+  TouchableOpacity,
   StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
-import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
+import { PINTA } from 'app/config';
 
 type Prop = {
   onSelect: (name: number) => void;
+  onBanner: (url: string) => void;
 };
 export const categories = [
   0,
@@ -33,16 +36,33 @@ export const categories = [
   5
 ];
 
-export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
+export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
   const { colors } = useTheme();
+  const browserState = keystore.app.store.useValue();
+  const [loading, setLoading] = React.useState(true);
+
+  // getBanners
+
+  React.useEffect(() => {
+    setLoading(true);
+    keystore
+      .app
+      .getBanners()
+      .finally(() => setLoading(false));
+  }, []);
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={[styles.namePlace, {
-        color: colors.notification
-      }]}>
-        {i18n.t('categories')}
-      </Text>
+      {!loading && browserState ? (
+        <TouchableOpacity onPress={() => onBanner(browserState.url)}>
+          <FastImage
+            source={{
+              uri: `${PINTA}/${browserState.banner}`
+            }}
+            style={styles.banner}
+          />
+        </TouchableOpacity>
+      ) : null}
       <View style={styles.categoriesWrapper}>
         {categories.map((_, index) => (
           <BrowserCarditem
@@ -54,9 +74,6 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
           />
         ))}
       </View>
-      {/* <Text style={styles.namePlace}>
-        {i18n.t('top_aaps')}
-      </Text> */}
     </ScrollView>
   );
 };
@@ -65,15 +82,16 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
+  banner: {
+    marginTop: 16,
+    borderRadius: 8,
+    height: 100,
+    width: '100%'
+  },
   categoriesWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-around',
     paddingVertical: 10
-  },
-  namePlace: {
-    paddingTop: 15,
-    fontFamily: fonts.Regular,
-    fontSize: 17
   }
 });

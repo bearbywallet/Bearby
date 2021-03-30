@@ -6,13 +6,17 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { adStore, adStoreReset, adStoreUpdate } from './store';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { MobileStorage, buildObject } from 'app/lib';
 import { STORAGE_FIELDS, APP_EXPLORER } from 'app/config';
-import { DApp } from 'types';
+import { DApp, Poster } from 'types';
+import { shuffle } from 'app/utils';
 
 export class AppsController {
+  public store = adStore;
+
   private _app = 'app_list';
   private _ad = 'ad_list';
 
@@ -24,6 +28,47 @@ export class AppsController {
     this._netwrok = new NetworkControll(storage);
     this._zilliqa = new ZilliqaControl(this._netwrok);
     this._storage = storage;
+  }
+
+  public async getBanners(force = false) {
+    const list = await this._storage.get(STORAGE_FIELDS.POSTERS);
+
+    try {
+      if (!list || typeof list !== 'string' || force) {
+        throw new Error();
+      }
+
+      const parsed = JSON.parse(String(list));
+      const [random] = shuffle<Poster>(parsed);
+
+      if (random) {
+        adStoreUpdate(random);
+      }
+
+      return parsed;
+    } catch {
+      adStoreReset();
+    }
+
+    const result = await this._zilliqa.getSmartContractSubState(
+      APP_EXPLORER,
+      this._ad
+    );
+
+    if (result && result[this._ad]) {
+      const key = 'arguments';
+      const posters = Object.values<object>(result[this._ad]).map((p) => ({
+        block: p[key][0],
+        url: p[key][1],
+        banner: p[key][2]
+      }));
+
+      await this._cahce(posters, STORAGE_FIELDS.POSTERS);
+
+      return posters;
+    }
+
+    return [];
   }
 
   public async getAppsByCategory(category: number | string, force = false) {
@@ -71,7 +116,7 @@ export class AppsController {
     return `${STORAGE_FIELDS.APPS}/${category}`;
   }
 
-  private async _cahce(list: DApp[], field: string) {
+  private async _cahce(list: DApp[] | Poster[], field: string) {
     await this._storage.set(
       buildObject(field, list)
     );

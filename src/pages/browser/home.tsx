@@ -60,6 +60,14 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     { key: Tabs.favorites, title: i18n.t('connections_title') }
   ]);
 
+  const hanldeBanner = React.useCallback(async(bannerURL: string) => {
+    setIsLoading(true);
+    const url = await keystore.searchEngine.onUrlSubmit(bannerURL);
+    setIsLoading(false);
+    navigation.navigate('Web', {
+      url
+    });
+  }, [navigation]);
   const hanldeSearch = React.useCallback(async() => {
     setIsLoading(true);
     const url = await keystore.searchEngine.onUrlSubmit(search);
@@ -87,7 +95,10 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
   const renderScene = SceneMap({
     [Tabs.apps]: () => (
-      <BrowserApps onSelect={hanldeSelectCategory} />
+      <BrowserApps
+        onSelect={hanldeSelectCategory}
+        onBanner={hanldeBanner}
+      />
     ),
     [Tabs.favorites]: () => (
       <BrowserFavorites

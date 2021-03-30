@@ -43,8 +43,6 @@ export default {
   sign_des: 'Your signature is being requested',
   sign: 'Sign',
   cancel: 'Cancel',
-  categories: 'Categories',
-  top_aaps: 'Top DApps',
   havent_connections: 'You have no connections yet.',
   acc_name_key: 'Imported %{index}',
   acc_name_ledger: 'Ledger %{index}',
