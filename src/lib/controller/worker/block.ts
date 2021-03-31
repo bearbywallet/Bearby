@@ -64,8 +64,10 @@ export class BlockControl {
         const m = new Message(Messages.block, {
           origin: this._origin,
           data: {
-            TxBlock: result,
-            TxHashes: [TxnHashes]
+            block: {
+              TxBlock: result,
+              TxHashes: [TxnHashes]
+            }
           }
         });
         this._webView.postMessage(m.serialize);
