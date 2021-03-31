@@ -15,6 +15,7 @@ import {
   StyleSheet
 } from 'react-native';
 import FastImage from 'react-native-fast-image';
+import { useTheme } from '@react-navigation/native';
 
 import { BrowserCarditem } from 'app/components/browser';
 
@@ -36,20 +37,27 @@ export const categories = [
 ];
 
 export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
+  const { colors } = useTheme();
   const browserState = keystore.app.store.useValue();
+
+  const handleBanner = React.useCallback(() => {
+    if (browserState?.url) {
+      onBanner(browserState?.url);
+    }
+  }, [browserState]);
 
   return (
     <ScrollView style={styles.container}>
-      {browserState ? (
-        <TouchableOpacity onPress={() => onBanner(browserState.url)}>
-          <FastImage
-            source={{
-              uri: `${PINTA}/${browserState.banner}`
-            }}
-            style={styles.banner}
-          />
-        </TouchableOpacity>
-      ) : null}
+      <TouchableOpacity onPress={handleBanner}>
+        <FastImage
+          source={{
+            uri: `${PINTA}/${String(browserState?.banner)}`
+          }}
+          style={[styles.banner, {
+            backgroundColor: colors['card1']
+          }]}
+        />
+      </TouchableOpacity>
       <View style={styles.categoriesWrapper}>
         {categories.map((_, index) => (
           <BrowserCarditem

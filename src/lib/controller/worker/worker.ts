@@ -9,6 +9,7 @@
 import { TransactionsQueue } from 'app/lib/controller/transaction';
 import { AccountControler } from 'app/lib/controller/account';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
+import { AppsController } from 'app/lib/controller/apps';
 import { MobileStorage } from 'app/lib/storage';
 import { BlockControl } from './block';
 import { blockStore } from './store';
@@ -19,19 +20,23 @@ export class WorkerController {
 
   private _transactions: TransactionsQueue;
   private _account: AccountControler;
+  private _apps: AppsController;
 
   constructor(
     transactions: TransactionsQueue,
     account: AccountControler,
     zilliqa: ZilliqaControl,
-    storage: MobileStorage
+    storage: MobileStorage,
+    apps: AppsController
   ) {
     this._account = account;
+    this._apps = apps;
     this._transactions = transactions;
     this.block = new BlockControl(storage, zilliqa);
   }
 
   public async step() {
+    await this.block.sync();
     try {
       await this._transactions.checkProcessedTx();
     } catch {
@@ -46,8 +51,15 @@ export class WorkerController {
   }
 
   public async start() {
-    this.block.subscriber((block) => {
-      this.step();
+    await this.block.sync();
+
+    const blocknumber = this.store.get();
+
+    await this._apps.getBanners(blocknumber);
+
+    this.block.subscriber(async(block) => {
+      await this.step();
+      await this._apps.getBanners(block);
     });
   }
 }

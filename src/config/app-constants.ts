@@ -25,6 +25,7 @@ export const MAX_NAME_DIFFICULTY = 10;
 export const NONCE_DIFFICULTY = 10;
 export const BLOCK_INTERVAL = 20000;
 export const MAX_TX_QUEUE = 20;
+export const MIN_POSTERS_CAHCE = 10;
 
 export const ZILLIQA: ZilliqaNetwork = {
   mainnet: {

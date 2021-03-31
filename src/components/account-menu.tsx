@@ -11,8 +11,7 @@ import {
   View,
   StyleSheet,
   ViewStyle,
-  Alert,
-  ActivityIndicator
+  Alert
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 

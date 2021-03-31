@@ -10,7 +10,11 @@ import { adStore, adStoreReset, adStoreUpdate } from './store';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { MobileStorage, buildObject } from 'app/lib';
-import { STORAGE_FIELDS, APP_EXPLORER } from 'app/config';
+import {
+  STORAGE_FIELDS,
+  APP_EXPLORER,
+  MIN_POSTERS_CAHCE
+} from 'app/config';
 import { DApp, Poster } from 'types';
 import { shuffle } from 'app/utils';
 
@@ -30,7 +34,7 @@ export class AppsController {
     this._storage = storage;
   }
 
-  public async getBanners(force = false) {
+  public async getBanners(blockNumber: number, force = false) {
     const list = await this._storage.get(STORAGE_FIELDS.POSTERS);
 
     try {
@@ -38,7 +42,16 @@ export class AppsController {
         throw new Error();
       }
 
-      const parsed = JSON.parse(String(list));
+      const parsed = JSON.parse(String(list)).filter(
+        (p: Poster) => Number(p.block) >= blockNumber
+      );
+
+      await this._cahce(parsed, STORAGE_FIELDS.POSTERS);
+
+      if (parsed.length <= MIN_POSTERS_CAHCE) {
+        throw new Error();
+      }
+
       const [random] = shuffle<Poster>(parsed);
 
       if (random) {
@@ -61,7 +74,10 @@ export class AppsController {
         block: p[key][0],
         url: p[key][1],
         banner: p[key][2]
-      }));
+      })).filter((p: Poster) => Number(p.block) >= blockNumber);
+      const [random] = shuffle<Poster>(posters);
+
+      adStoreUpdate(random);
 
       await this._cahce(posters, STORAGE_FIELDS.POSTERS);
 
