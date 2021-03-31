@@ -14,7 +14,6 @@ import {
   TouchableOpacity,
   StyleSheet
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
 
 import { BrowserCarditem } from 'app/components/browser';
@@ -37,24 +36,11 @@ export const categories = [
 ];
 
 export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
-  const { colors } = useTheme();
   const browserState = keystore.app.store.useValue();
-  const [loading, setLoading] = React.useState(true);
-
-  // getBanners
-
-  React.useEffect(() => {
-    setLoading(true);
-    keystore
-      .app
-      .getBanners()
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
-  }, []);
 
   return (
     <ScrollView style={styles.container}>
-      {!loading && browserState ? (
+      {browserState ? (
         <TouchableOpacity onPress={() => onBanner(browserState.url)}>
           <FastImage
             source={{

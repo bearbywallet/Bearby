@@ -13,7 +13,6 @@ import {
   View,
   ScrollView,
   Dimensions,
-  ActivityIndicator,
   Text
 } from 'react-native';
 import URL from 'url-parse';
@@ -85,22 +84,19 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
             <FastImage
               key={index}
               source={{ uri: `${PINTA}/${img}` }}
-              style={styles.previewImages}
+              style={[styles.previewImages, {
+                backgroundColor: colors['card1']
+              }]}
             />
           ))}
         </ScrollView>
-        {!description ? (
-          <ActivityIndicator
-            animating={!description}
-            color={colors.background}
-          />
-        ) : (
+        {description ? (
           <Text style={[styles.description, {
             color: colors.text
           }]}>
             {description}
           </Text>
-        )}
+        ) : null}
         <CustomButton
           title={i18n.t('launch_app')}
           style={styles.launch}
