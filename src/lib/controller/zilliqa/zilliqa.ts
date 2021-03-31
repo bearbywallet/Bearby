@@ -134,6 +134,30 @@ export class ZilliqaControl {
     return data.result;
   }
 
+  public async getLatestTxBlock() {
+    const request = this._json(Methods.GetLatestTxBlock, []);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
+  public async getRecentTransactions() {
+    const request = this._json(Methods.GetRecentTransactions, []);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
   public async getNetworkId() {
     const request = this._json(Methods.GetNetworkId, []);
     const responce = await fetch(this._network.http, request);

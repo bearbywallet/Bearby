@@ -8,8 +8,6 @@
  */
 import { MobileStorage, buildObject } from 'app/lib';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
-import { AccountControler } from 'app/lib/controller/account';
-import { NetworkControll } from 'app/lib/controller/network';
 import { NotificationManager } from 'app/lib/controller/notification';
 import {
   transactionStore,
@@ -29,21 +27,15 @@ export class TransactionsQueue {
 
   private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
-  private _netwrok: NetworkControll;
-  private _account: AccountControler;
   private _notification: NotificationManager;
 
   constructor(
     zilliqa: ZilliqaControl,
     storage: MobileStorage,
-    account: AccountControler,
-    netwrok: NetworkControll,
     notification: NotificationManager
   ) {
     this._zilliqa = zilliqa;
     this._storage = storage;
-    this._account = account;
-    this._netwrok = netwrok;
     this._notification = notification;
   }
 

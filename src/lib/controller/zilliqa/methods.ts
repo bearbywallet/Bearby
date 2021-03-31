@@ -15,5 +15,7 @@ export enum Methods {
   GetPendingTxn = 'GetPendingTxn',
   GetTransaction = 'GetTransaction',
   CreateTransaction = 'CreateTransaction',
-  GetTransactionStatus = 'GetTransactionStatus'
+  GetTransactionStatus = 'GetTransactionStatus',
+  GetLatestTxBlock = 'GetLatestTxBlock',
+  GetRecentTransactions = 'GetRecentTransactions'
 }

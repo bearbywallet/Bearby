@@ -352,6 +352,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         webViewRef.current,
         url.hostname
       );
+      keystore.worker.block.updateWebView(
+        webViewRef.current,
+        url.hostname
+      );
     }
 
     return () => keystore.account.updateWebView(undefined);

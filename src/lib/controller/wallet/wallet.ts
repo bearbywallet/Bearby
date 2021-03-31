@@ -63,13 +63,16 @@ export class WalletControler extends Mnemonic {
   public readonly transaction = new TransactionsQueue(
     this.zilliqa,
     _storage,
-    this.account,
-    this.network,
     this.notificationManager
   );
   public readonly inpage = new InjectScript(this.account, this.network);
   public readonly connect = new ConnectController(_storage);
-  public readonly worker = new WorkerController(this.transaction, this.account);
+  public readonly worker = new WorkerController(
+    this.transaction,
+    this.account,
+    this.zilliqa,
+    _storage
+  );
 
   public async initWallet(password: string, mnemonic: string) {
     await this.network.sync();

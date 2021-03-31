@@ -24,6 +24,7 @@ export const STORAGE_FIELDS = {
   GAS: `${prefix}gas_config`,
   APPS: `${prefix}apps_list`,
   POSTERS: `${prefix}poster_list`,
+  BLOCK_NUMBER: `${prefix}blocknumber`,
 
   ACCESS_CONTROL: `${prefix}access_control`,
   SEARCH_ENGINE: `${prefix}search_engine`,

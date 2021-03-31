@@ -23,7 +23,7 @@ export const APP_EXPLORER = '0x7793f1d8313ba8c81839bbf3b343aa6307bd5a17';
 export const PASSWORD_DIFFICULTY = 6;
 export const MAX_NAME_DIFFICULTY = 10;
 export const NONCE_DIFFICULTY = 10;
-export const BLOCK_INTERVAL = 15000;
+export const BLOCK_INTERVAL = 20000;
 export const MAX_TX_QUEUE = 20;
 
 export const ZILLIQA: ZilliqaNetwork = {
