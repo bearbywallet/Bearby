@@ -11,13 +11,13 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
+		155C2E4126146E6E0083FC20 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 155C2E4026146E6E0083FC20 /* inpage.js */; };
 		158A2BE02544529800D32C44 /* Data+HexString.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BDF2544529800D32C44 /* Data+HexString.m */; };
 		158A2BE82544530400D32C44 /* HDKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BE72544530400D32C44 /* HDKeyPair.m */; };
 		158A2BF32544536C00D32C44 /* KeyDerivation.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF22544536C00D32C44 /* KeyDerivation.m */; };
 		158A2BFA254453C100D32C44 /* KeyIndexPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF9254453C100D32C44 /* KeyIndexPath.m */; };
 		158A2C012544540800D32C44 /* Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2C002544540800D32C44 /* Mnemonic.m */; };
 		1593FFB425404282003A377C /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 1593FFB325404282003A377C /* Crypto.m */; };
-		15E5FFB0259DB9CC00DB3C14 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 15E5FFAF259DB9CC00DB3C14 /* inpage.js */; };
 		15FE7B48259E2682007BDB4B /* AvenirNextLTPro-Demi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B44259E2682007BDB4B /* AvenirNextLTPro-Demi.otf */; };
 		15FE7B49259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B45259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf */; };
 		15FE7B4A259E2682007BDB4B /* AvenirNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B46259E2682007BDB4B /* AvenirNextLTPro-Regular.otf */; };
@@ -59,6 +59,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = zilpayMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = zilpayMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = zilpayMobile/main.m; sourceTree = "<group>"; };
+		155C2E4026146E6E0083FC20 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-inpage/dist/inpage.js"; sourceTree = "<group>"; };
 		158A2BDF2544529800D32C44 /* Data+HexString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Data+HexString.m"; sourceTree = "<group>"; };
 		158A2BE5254452B500D32C44 /* Data+HexString.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Data+HexString.h"; sourceTree = "<group>"; };
 		158A2BE6254452DF00D32C44 /* HDKeyPair.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = HDKeyPair.h; sourceTree = "<group>"; };
@@ -71,7 +72,6 @@
 		158A2C002544540800D32C44 /* Mnemonic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Mnemonic.m; sourceTree = "<group>"; };
 		1593FFB225404277003A377C /* Crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
 		1593FFB325404282003A377C /* Crypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
-		15E5FFAF259DB9CC00DB3C14 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-inpage/dist/inpage.js"; sourceTree = "<group>"; };
 		15FE7B44259E2682007BDB4B /* AvenirNextLTPro-Demi.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-Demi.otf"; sourceTree = "<group>"; };
 		15FE7B45259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-MediumCn.otf"; sourceTree = "<group>"; };
 		15FE7B46259E2682007BDB4B /* AvenirNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-Regular.otf"; sourceTree = "<group>"; };
@@ -143,7 +143,7 @@
 		13B07FAE1A68108700A75B9A /* zilpayMobile */ = {
 			isa = PBXGroup;
 			children = (
-				15E5FFAF259DB9CC00DB3C14 /* inpage.js */,
+				155C2E4026146E6E0083FC20 /* inpage.js */,
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
@@ -381,8 +381,8 @@
 				15FE7B4B259E2682007BDB4B /* AvenirNextLTPro-Bold.otf in Resources */,
 				15FE7B48259E2682007BDB4B /* AvenirNextLTPro-Demi.otf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
-				15E5FFB0259DB9CC00DB3C14 /* inpage.js in Resources */,
 				15FE7B4A259E2682007BDB4B /* AvenirNextLTPro-Regular.otf in Resources */,
+				155C2E4126146E6E0083FC20 /* inpage.js in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

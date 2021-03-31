@@ -48,7 +48,8 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
     keystore
       .app
       .getBanners()
-      .finally(() => setLoading(false));
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
   }, []);
 
   return (
