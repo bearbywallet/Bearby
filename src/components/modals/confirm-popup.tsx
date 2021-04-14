@@ -140,7 +140,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 }]}>
                   {account.name}
                 </Text>
-                <Text style={commonStyles.addressAmount}>
+                <Text style={[commonStyles.addressAmount, {
+                  color: colors.border
+                }]}>
                   {trim(account[settingsState.addressFormat])}
                 </Text>
               </View>
@@ -160,7 +162,9 @@ export const ConfirmPopup: React.FC<Prop> = ({
                 }]}>
                   {toLocaleString(fromZil(transaction.tokenAmount, token.decimals))}
                 </Text>
-                <Text style={commonStyles.addressAmount}>
+                <Text style={[commonStyles.addressAmount, {
+                  color: colors.border
+                }]}>
                   {conversion} {currencyState}
                 </Text>
               </View>
