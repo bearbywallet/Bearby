@@ -18,7 +18,7 @@ export default {
   reload: 'Reload',
   timestamp: 'Timestamp',
   transaction: 'Transaction',
-  havent_apps: 'Have no applictations yet',
+  havent_apps: 'Have no applications yet',
   havent_txns: 'Have no transactions yet',
   hide: 'Hide',
   show_on_viewblock: 'Viewblock',
