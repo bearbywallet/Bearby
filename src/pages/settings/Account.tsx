@@ -11,9 +11,9 @@ import {
   View,
   Text,
   StyleSheet,
+  ScrollView,
   ActivityIndicator
 } from 'react-native';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@react-navigation/native';
 
 import { Button } from 'app/components/button';
@@ -90,7 +90,7 @@ export const AccountSettingsPage: React.FC = () => {
           {i18n.t('account_settings_title')}
         </Text>
       </View>
-      <KeyboardAwareScrollView>
+      <ScrollView>
         <View style={[styles.itemWrapper, {
           backgroundColor: colors.card
         }]}>
@@ -147,7 +147,7 @@ export const AccountSettingsPage: React.FC = () => {
             </View>
           </View>
         </View>
-      </KeyboardAwareScrollView>
+      </ScrollView>
     </View>
   );
 };

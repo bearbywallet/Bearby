@@ -123,6 +123,8 @@ export class AppsController {
       await this._cahce(apps, field);
 
       return apps;
+    } else {
+      await this._cahce([], field);
     }
 
     return [];

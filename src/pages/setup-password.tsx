@@ -51,6 +51,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
   const [passwordConfirm, setPasswordConfirm] = React.useState('');
   const [isBiometric, setIsBiometric] = React.useState(Boolean(authState.supportedBiometryType));
   const [biometric, setBiometric] = React.useState<string>();
+  const [error, setError] = React.useState<string>();
 
   const disabledContinue = React.useMemo(() => {
     if (!passwordConfirm || !password) {
@@ -68,6 +69,24 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
    * Create Keystore and account by KeyPairs.
    */
   const handleCreate = React.useCallback(async() => {
+    const isConfirmed = passwordConfirm === password;
+    const isDifficulty = String(password).length < PASSWORD_DIFFICULTY;
+    const isNameLength = String(accountName).length > MAX_NAME_DIFFICULTY;
+
+    if (!isConfirmed) {
+      setError(i18n.t('pass_setup_error0'));
+
+      return null;
+    } else if (isDifficulty) {
+      setError(i18n.t('pass_setup_error1'));
+
+      return null;
+    } else if (isNameLength) {
+      setError(i18n.t('pass_setup_error2'));
+
+      return null;
+    }
+
     setLoading(true);
 
     try {
@@ -81,7 +100,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {
-      console.error(err);
+      setError(err.message);
     }
 
     setLoading(false);
@@ -101,6 +120,10 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       Keyboard.dismiss();
     }
   }, [disabledContinue]);
+
+  React.useEffect(() => {
+    setError(undefined);
+  }, [accountName, passwordConfirm]);
 
   return (
     <ScrollView style={[styles.container, {
@@ -146,6 +169,11 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
             secureTextEntry
           />
         </View>
+        <Text style={[styles.error, {
+          color: colors['danger']
+        }]}>
+          {error}
+        </Text>
       </View>
       {loading ? (
         <ActivityIndicator
@@ -159,7 +187,6 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
           }}
           title={i18n.t('pass_setup_btn')}
           color={colors.primary}
-          disabled={disabledContinue}
           onPress={handleCreate}
         />
       )}
@@ -170,6 +197,11 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  error: {
+    fontSize: 13,
+    textAlign: 'center',
+    fontFamily: fonts.Demi
   },
   textInput: {
     fontSize: 17,
