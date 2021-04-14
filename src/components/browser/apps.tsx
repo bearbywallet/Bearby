@@ -38,17 +38,17 @@ export const categories = [
 
 export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
   const { colors } = useTheme();
-  const browserState = keystore.app.store.useValue();
+  // const browserState = keystore.app.store.useValue();
 
-  const handleBanner = React.useCallback(() => {
-    if (browserState?.url) {
-      onBanner(browserState?.url);
-    }
-  }, [browserState]);
+  // const handleBanner = React.useCallback(() => {
+  //   if (browserState?.url) {
+  //     onBanner(browserState?.url);
+  //   }
+  // }, [browserState]);
 
   return (
     <ScrollView style={styles.container}>
-      <TouchableOpacity onPress={handleBanner}>
+      {/* <TouchableOpacity onPress={handleBanner}>
         <FastImage
           source={{
             uri: `${PINTA}/${String(browserState?.banner)}`
@@ -57,7 +57,7 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
             backgroundColor: colors['card1']
           }]}
         />
-      </TouchableOpacity>
+      </TouchableOpacity> */}
       <View style={styles.categoriesWrapper}>
         {categories.map((_, index) => (
           <BrowserCarditem
