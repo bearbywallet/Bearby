@@ -140,7 +140,7 @@ export class WalletControler extends Mnemonic {
     if (account.privKey && account.type === AccountTypes.privateKey) {
       const { index, pubKey } = account;
       const encrypted = JSON.parse(account.privKey);
-      const privateKey = await this.guard.auth.decryptVault(encrypted);
+      const privateKey = await this.guard.auth.decryptVault(encrypted, password);
 
       return {
         index,

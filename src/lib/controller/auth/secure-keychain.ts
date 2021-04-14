@@ -115,7 +115,7 @@ export class SecureKeychain {
     const credentials = await Keychain.getGenericPassword(options);
 
     if (!credentials || !credentials.password) {
-      this.reset();
+      await this.reset();
 
       // Rejcet isEnable
 

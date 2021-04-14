@@ -7,6 +7,6 @@
  * Copyright (c) 2020 ZilPay
  */
 export const DEFAULT_GAS = {
-  gasPrice: '2000',
+  gasPrice: '1000',
   gasLimit: '1'
 };

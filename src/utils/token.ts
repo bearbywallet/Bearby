@@ -28,7 +28,7 @@ export function getIcon(symbol: string) {
 
 export function toZRC1(init: InitItem[]) {
   const contractOwner = init.find((el) => el.vname === Fields.ContractOwner)?.value;
-  const name = init.find((el) => el.vname === Fields.Name)?.value;
+  const name = init.find((el) => el.vname === Fields.Name)?.value || '';
   const symbol = init.find((el) => el.vname === Fields.Symbol)?.value;
   const address = init.find((el) => el.vname === Fields.Address)?.value;
   const decimals = init.find((el) => el.vname === Fields.Decimals)?.value;
