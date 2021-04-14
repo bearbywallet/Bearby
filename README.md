@@ -7,7 +7,7 @@ ZilPay wallet the decentralized browser and wallet in one. Via ZilPay you and de
 </p>
 
 For developers:
-+ [ZilPay full documentation](https://zilpay.xyz/Documentation/)
++ [ZilPay full documentation](https://zilpay.github.io/zilpay-docs/)
 + [ZilPay try build your dApp](https://medium.com/coinmonks/test-and-develop-dapps-on-zilliqa-with-zilpay-52b165f118bf?source=friends_link&sk=2a60070ddac60677ec36b1234c60222a)
 + [Zilliqa dApps example](https://github.com/lich666dead/zilliqa-dApps)
 
