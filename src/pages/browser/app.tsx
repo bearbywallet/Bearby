@@ -75,6 +75,10 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
         </View>
         <ScrollView
           style={styles.scrollView}
+          contentContainerStyle={{
+            justifyContent: 'center',
+            alignItems: 'center'
+          }}
           horizontal={true}
           scrollEventThrottle={16}
           pagingEnabled={true}
@@ -139,9 +143,9 @@ const styles = StyleSheet.create({
   },
   previewImages: {
     height: height / 3,
-    width: width - 30,
+    width: width - 20,
     borderRadius: 8,
-    margin: 5
+    marginHorizontal: 5
   },
   description: {
     fontFamily: fonts.Regular,
