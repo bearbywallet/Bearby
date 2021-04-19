@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>ZilPay.ipa</key>
+	<array>
+		<dict>
+			<key>architectures</key>
+			<array>
+				<string>arm64</string>
+			</array>
+			<key>certificate</key>
+			<dict>
+				<key>SHA1</key>
+				<string>FBCB4EB329FDA1DC9BB1CFF4F4ADA62FED7867BD</string>
+				<key>dateExpires</key>
+				<string>05.03.2022</string>
+				<key>type</key>
+				<string>Apple Development</string>
+			</dict>
+			<key>embeddedBinaries</key>
+			<array>
+				<dict>
+					<key>architectures</key>
+					<array>
+						<string>arm64</string>
+					</array>
+					<key>certificate</key>
+					<dict>
+						<key>SHA1</key>
+						<string>FBCB4EB329FDA1DC9BB1CFF4F4ADA62FED7867BD</string>
+						<key>dateExpires</key>
+						<string>05.03.2022</string>
+						<key>type</key>
+						<string>Apple Development</string>
+					</dict>
+					<key>name</key>
+					<string>OpenSSL.framework</string>
+					<key>team</key>
+					<dict>
+						<key>id</key>
+						<string>DNQ8PB6F6V</string>
+						<key>name</key>
+						<string>Khasanshin Rinat Ildarovich, IP</string>
+					</dict>
+				</dict>
+			</array>
+			<key>entitlements</key>
+			<dict>
+				<key>application-identifier</key>
+				<string>DNQ8PB6F6V.org.reactjs.native.zilpayMobile</string>
+				<key>com.apple.developer.team-identifier</key>
+				<string>DNQ8PB6F6V</string>
+				<key>get-task-allow</key>
+				<true/>
+				<key>keychain-access-groups</key>
+				<array>
+					<string>DNQ8PB6F6V.org.reactjs.native.zilpayMobile</string>
+				</array>
+			</dict>
+			<key>name</key>
+			<string>zilpayMobile.app</string>
+			<key>profile</key>
+			<dict>
+				<key>UUID</key>
+				<string>8debfcb2-f2e8-4b1e-9a4c-73bfc94f301a</string>
+				<key>name</key>
+				<string>iOS Team Provisioning Profile: org.reactjs.native.zilpayMobile</string>
+			</dict>
+			<key>team</key>
+			<dict>
+				<key>id</key>
+				<string>DNQ8PB6F6V</string>
+				<key>name</key>
+				<string>Khasanshin Rinat Ildarovich, IP</string>
+			</dict>
+		</dict>
+	</array>
+</dict>
+</plist>
