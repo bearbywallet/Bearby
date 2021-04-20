@@ -8,5 +8,5 @@
  */
 export const DEFAULT_GAS = {
   gasPrice: '1000',
-  gasLimit: '1'
+  gasLimit: '50'
 };

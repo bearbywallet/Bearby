@@ -35,6 +35,10 @@ export class GasControler {
     try {
       const state = JSON.parse(String(gasConfig));
 
+      if (Number(state.gasLimit) < Number(DEFAULT_GAS.gasLimit)) {
+        state.gasLimit = DEFAULT_GAS.gasLimit;
+      }
+
       gasStoreUpdate(state);
     } catch (err) {
       return null;
