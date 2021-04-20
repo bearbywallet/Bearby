@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/bin/node /usr/local/bin/yarn add -D @types/react-native-remote-svg
+  /usr/local/bin/node /usr/local/bin/yarn add -D @types/ledgerhq__react-native-hw-transport-ble
 
 PATH: 
   /usr/local/opt/ruby/bin:/usr/local/opt/python@3.9/libexec/bin:/usr/local/sbin:/Users/rinat/go/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Library/Apple/usr/bin
@@ -14,7 +14,7 @@ Platform:
   darwin x64
 
 Trace: 
-  Error: https://registry.yarnpkg.com/@types%2freact-native-remote-svg: Not found
+  Error: https://registry.yarnpkg.com/@types%2fledgerhq__react-native-hw-transport-ble: Not found
       at Request.params.callback [as _callback] (/usr/local/lib/node_modules/yarn/lib/cli.js:66988:18)
       at Request.self.callback (/usr/local/lib/node_modules/yarn/lib/cli.js:140662:22)
       at Request.emit (events.js:315:20)
@@ -29,7 +29,7 @@ Trace:
 npm manifest: 
   {
     "name": "zilpay-mobile",
-    "version": "0.0.7",
+    "version": "0.1.0",
     "private": false,
     "license": "MIT",
     "scripts": {
@@ -43,6 +43,7 @@ npm manifest:
       "lint:ts:fix": "npm run lint:ts -- --fix"
     },
     "dependencies": {
+      "@ledgerhq/react-native-hw-transport-ble": "^5.49.0",
       "@react-native-community/async-storage": "^1.12.1",
       "@react-native-community/clipboard": "^1.5.1",
       "@react-native-community/masked-view": "^0.1.10",
@@ -73,6 +74,7 @@ npm manifest:
       "react-native-camera": "^3.43.0",
       "react-native-context-menu-view": "^1.2.1",
       "react-native-device-info": "^8.0.2",
+      "react-native-fast-image": "^8.3.4",
       "react-native-fs": "^2.16.6",
       "react-native-gesture-handler": "^1.10.3",
       "react-native-i18n": "^2.0.15",
@@ -85,9 +87,7 @@ npm manifest:
       "react-native-qrcode-scanner": "^1.5.3",
       "react-native-qrcode-svg": "^6.1.1",
       "react-native-reanimated": "^1.13.1",
-      "react-native-remote-svg": "^2.0.6",
       "react-native-safe-area-context": "^3.1.9",
-      "react-native-safe-area-view": "^1.1.1",
       "react-native-screens": "^2.18.1",
       "react-native-share": "^5.1.4",
       "react-native-svg": "^12.1.0",
@@ -1197,6 +1197,48 @@ Lockfile:
       "@types/node" "*"
       "@types/yargs" "^15.0.0"
       chalk "^4.0.0"
+  
+  "@ledgerhq/devices@^5.49.0":
+    version "5.49.0"
+    resolved "https://registry.yarnpkg.com/@ledgerhq/devices/-/devices-5.49.0.tgz#86733944ea724acb974b136e46487a90ee0bfa6e"
+    integrity sha512-14VSO+NeR/O8VSXXnlBsA0DAluzanJVEjHLDJubU5NZjEttXVF9gdQh1j10+MKW0f8H23IkdqwswVQIB9ZPomQ==
+    dependencies:
+      "@ledgerhq/errors" "^5.49.0"
+      "@ledgerhq/logs" "^5.49.0"
+      rxjs "^6.6.7"
+      semver "^7.3.5"
+  
+  "@ledgerhq/errors@^5.49.0":
+    version "5.49.0"
+    resolved "https://registry.yarnpkg.com/@ledgerhq/errors/-/errors-5.49.0.tgz#8ecb43bb702504d9fc94ee12022d81d6e36cb5ce"
+    integrity sha512-+uhoSsAnzZiZ2CUk/dv4Uo8lrl0jn2izYJATSbC5aZFd0Yl7PWZ1SMHMkvPVEgQvWZcu4iQZ67rlKOtj5tUFWA==
+  
+  "@ledgerhq/hw-transport@^5.49.0":
+    version "5.49.0"
+    resolved "https://registry.yarnpkg.com/@ledgerhq/hw-transport/-/hw-transport-5.49.0.tgz#f0c7c22c19e38d9338ec1056713f80e0a669cc31"
+    integrity sha512-mfQNSxZ3cTXo+l6SEM+D92YaW46GkP1IiWo9OkHPnsq8y8IxSD6QJOEiAAZtvpGvV1eRqqrVyanoFRTuHcZjZA==
+    dependencies:
+      "@ledgerhq/devices" "^5.49.0"
+      "@ledgerhq/errors" "^5.49.0"
+      events "^3.3.0"
+  
+  "@ledgerhq/logs@^5.49.0":
+    version "5.49.0"
+    resolved "https://registry.yarnpkg.com/@ledgerhq/logs/-/logs-5.49.0.tgz#e14e34df1605c17d6b90eb32c591c7b3de3fbae8"
+    integrity sha512-Ynl2JzRwh8l9PoXrDNihXEicpVo6Ra2lYZoqSYfVH/v/2/TSa/JB9Qll8P85XFYkS3ouDTTbp1S5KViaTkqD5g==
+  
+  "@ledgerhq/react-native-hw-transport-ble@^5.49.0":
+    version "5.49.0"
+    resolved "https://registry.yarnpkg.com/@ledgerhq/react-native-hw-transport-ble/-/react-native-hw-transport-ble-5.49.0.tgz#9c19e56f378505e9f6addf475e76131b8972735e"
+    integrity sha512-GNIE9jzvTadxmNh9NR1s5cMy00ZYRZmsdLk0KLu01Hn3ysNdr1eXpq9U2dIAUM+f4jFfqndDvOtgSC0k7uDyYg==
+    dependencies:
+      "@ledgerhq/devices" "^5.49.0"
+      "@ledgerhq/errors" "^5.49.0"
+      "@ledgerhq/hw-transport" "^5.49.0"
+      "@ledgerhq/logs" "^5.49.0"
+      invariant "^2.2.4"
+      rxjs "^6.6.7"
+      uuid "^3.4.0"
   
   "@nodelib/fs.scandir@2.1.4":
     version "2.1.4"
@@ -7096,6 +7138,11 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/react-native-device-info/-/react-native-device-info-8.0.2.tgz#edefb8538412bf33e12a7ba1b80fbd804f69580b"
     integrity sha512-5X5sMO2N9WpnqA4BXHlby0ml0WKlHconLhgf8fCiXDELf7DIjOMX8z6iYZ7WDgmn0E/6Psubq9yb5D2Qdc30Wg==
   
+  react-native-fast-image@^8.3.4:
+    version "8.3.4"
+    resolved "https://registry.yarnpkg.com/react-native-fast-image/-/react-native-fast-image-8.3.4.tgz#79edca177e30311b19d59ff335625bcbe22650d7"
+    integrity sha512-LpzAdjUphihUpVEBn5fEv5AILe55rHav0YiZroPZ1rumKDhAl4u2cG01ku2Pb7l8sayjTsNu7FuURAlXUUDsow==
+  
   react-native-fs@^2.16.6:
     version "2.16.6"
     resolved "https://registry.yarnpkg.com/react-native-fs/-/react-native-fs-2.16.6.tgz#2901789a43210a35a0ef0a098019bbef3af395fd"
@@ -7192,11 +7239,6 @@ Lockfile:
     dependencies:
       fbjs "^1.0.0"
   
-  react-native-remote-svg@^2.0.6:
-    version "2.0.6"
-    resolved "https://registry.yarnpkg.com/react-native-remote-svg/-/react-native-remote-svg-2.0.6.tgz#5f8bc7cefc18f4d37cf02f8158d6b2a9f534891d"
-    integrity sha512-tQbDL+gtfGgG9Evz5TOn5Odmrn/EYsmsLqVZ0Do0VMJevfLBuQRioLiwRsI/BCgOHu1oQLZIIE5p7V/lN9jLrw==
-  
   react-native-safe-area-context@^3.1.9:
     version "3.1.9"
     resolved "https://registry.yarnpkg.com/react-native-safe-area-context/-/react-native-safe-area-context-3.1.9.tgz#48864ea976b0fa57142a2cc523e1fd3314e7247e"
@@ -7206,13 +7248,6 @@ Lockfile:
     version "0.14.9"
     resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-0.14.9.tgz#90ee8383037010d9a5055a97cf97e4c1da1f0c3d"
     integrity sha512-WII/ulhpVyL/qbYb7vydq7dJAfZRBcEhg4/UWt6F6nAKpLa3gAceMOxBxI914ppwSP/TdUsandFy6lkJQE0z4A==
-    dependencies:
-      hoist-non-react-statics "^2.3.1"
-  
-  react-native-safe-area-view@^1.1.1:
-    version "1.1.1"
-    resolved "https://registry.yarnpkg.com/react-native-safe-area-view/-/react-native-safe-area-view-1.1.1.tgz#9833e34c384d0513f4831afcd1e54946f13897b2"
-    integrity sha512-bbLCtF+tqECyPWlgkWbIwx4vDPb0GEufx/ZGcSS4UljMcrpwluachDXoW9DBxhbMCc6k1V0ccqHWN7ntbRdERQ==
     dependencies:
       hoist-non-react-statics "^2.3.1"
   
@@ -7651,6 +7686,13 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/rx-lite/-/rx-lite-4.0.8.tgz#0b1e11af8bc44836f04a6407e92da42467b79444"
     integrity sha1-Cx4Rr4vESDbwSmQH6S2kJGe3lEQ=
   
+  rxjs@^6.6.7:
+    version "6.6.7"
+    resolved "https://registry.yarnpkg.com/rxjs/-/rxjs-6.6.7.tgz#90ac018acabf491bf65044235d5863c4dab804c9"
+    integrity sha512-hTdwr+7yYNIT5n4AMYp85KA6yw2Va0FLa3Rguvbpa4W3I5xynaBZo41cM3XM+4Q6fRMj3sBYIR1VAmZMXYJvRQ==
+    dependencies:
+      tslib "^1.9.0"
+  
   safe-buffer@5.1.2, safe-buffer@~5.1.0, safe-buffer@~5.1.1:
     version "5.1.2"
     resolved "https://registry.yarnpkg.com/safe-buffer/-/safe-buffer-5.1.2.tgz#991ec69d296e0313747d59bdfd2b745c35f8828d"
@@ -7750,6 +7792,13 @@ Lockfile:
     version "7.3.4"
     resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.4.tgz#27aaa7d2e4ca76452f98d3add093a72c943edc97"
     integrity sha512-tCfb2WLjqFAtXn4KEdxIhalnRtoKFN7nAwj0B3ZXCbQloV2tq5eDbcTmT68JJD3nRJq24/XgxtQKFIpQdtvmVw==
+    dependencies:
+      lru-cache "^6.0.0"
+  
+  semver@^7.3.5:
+    version "7.3.5"
+    resolved "https://registry.yarnpkg.com/semver/-/semver-7.3.5.tgz#0b621c879348d8998e4b0e4be94b3f12e6018ef7"
+    integrity sha512-PoeGJYh8HK4BTO/a9Tf6ZG3veo/A7ZVsYrSA6J8ny9nb3B1VrpkuN+z9OE5wfE5p6H4LchYZsegiQgbJD94ZFQ==
     dependencies:
       lru-cache "^6.0.0"
   
@@ -8459,7 +8508,7 @@ Lockfile:
     dependencies:
       punycode "^2.1.1"
   
-  tslib@^1.13.0, tslib@^1.8.1:
+  tslib@^1.13.0, tslib@^1.8.1, tslib@^1.9.0:
     version "1.14.1"
     resolved "https://registry.yarnpkg.com/tslib/-/tslib-1.14.1.tgz#cf2d38bdc34a134bcaf1091c41f6619e2f672d00"
     integrity sha512-Xni35NKzjgMrwevysHTCArtLDpPvye8zV/0E4EyYn43P7/7qvQwPh9BGkHewbMulVntbigmcT7rdX3BNo9wRJg==
@@ -8709,7 +8758,7 @@ Lockfile:
     resolved "https://registry.yarnpkg.com/uuid/-/uuid-2.0.1.tgz#c2a30dedb3e535d72ccf82e343941a50ba8533ac"
     integrity sha1-wqMN7bPlNdcsz4LjQ5QaULqFM6w=
   
-  uuid@^3.3.2:
+  uuid@^3.3.2, uuid@^3.4.0:
     version "3.4.0"
     resolved "https://registry.yarnpkg.com/uuid/-/uuid-3.4.0.tgz#b23e4358afa8a202fe7a100af1f5f883f02007ee"
     integrity sha512-HjSDRw6gZE5JMggctHBcjVak08+KEVhSIiDzFnT9S9aegmp85S/bReBVTb4QTFaRNptJ9kuYaNhnbNEOkbKb/A==
