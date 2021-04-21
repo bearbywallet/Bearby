@@ -22,6 +22,8 @@
 	<string>????</string>
 	<key>CFBundleVersion</key>
 	<string>$(CURRENT_PROJECT_VERSION)</string>
+	<key>LSApplicationCategoryType</key>
+	<string></string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSAppTransportSecurity</key>
@@ -31,6 +33,8 @@
 		<key>NSExceptionDomains</key>
 		<dict/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>ZIlPay Ask use Bluetooth</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Enable camer for scaning.</string>
 	<key>NSFaceIDUsageDescription</key>
@@ -52,9 +56,5 @@
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
 	<false/>
-	<key>LSApplicationCategoryType</key>
-	<string></string>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>ZIlPay Ask use Bluetooth</string>
 </dict>
 </plist>
