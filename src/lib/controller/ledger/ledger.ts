@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
+// import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 
 export class Ledger {
 }

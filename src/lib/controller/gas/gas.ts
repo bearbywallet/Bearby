@@ -39,6 +39,10 @@ export class GasControler {
         state.gasLimit = DEFAULT_GAS.gasLimit;
       }
 
+      if (Number(state.gasPrice) < Number(DEFAULT_GAS.gasPrice)) {
+        state.gasLimit = DEFAULT_GAS.gasLimit;
+      }
+
       gasStoreUpdate(state);
     } catch (err) {
       return null;
