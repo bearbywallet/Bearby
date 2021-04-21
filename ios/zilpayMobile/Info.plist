@@ -33,8 +33,6 @@
 		<key>NSExceptionDomains</key>
 		<dict/>
 	</dict>
-	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>ZIlPay Ask use Bluetooth</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Enable camer for scaning.</string>
 	<key>NSFaceIDUsageDescription</key>

@@ -123,7 +123,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(1)}
+            {amountGas(2)}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -141,7 +141,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(2)}
+            {amountGas(3)}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -159,7 +159,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(3)}
+            {amountGas(4)}
           </Text>
         </TouchableOpacity>
       </View>
