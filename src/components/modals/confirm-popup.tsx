@@ -36,6 +36,7 @@ import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils';
 import { Transaction } from 'app/lib/controller/transaction';
+import { DEFAULT_GAS } from 'app/config';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -72,10 +73,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(transaction.priority);
-  const [gas, setGas] = React.useState<GasState>({
-    gasLimit: String(transaction.gasLimit),
-    gasPrice: transaction.gasPrice
-  });
+  const [gas, setGas] = React.useState<GasState>(DEFAULT_GAS);
 
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[token.symbol];
@@ -86,8 +84,10 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
+    transaction.setGas(gas);
     onConfirm(transaction, () => setIsLoading(false), passowrd);
   }, [
+    gas,
     transaction,
     needPassword,
     passowrd
@@ -202,7 +202,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
             ds={DS}
             isDS={!transaction.data}
             nonce={transaction.nonce}
-            defaultGas={deppUnlink(transaction.fee)}
+            defaultGas={DEFAULT_GAS}
             onDSChanged={setDS}
             onChange={setGas}
             onChangeNonce={(nonce) => transaction.setNonce(nonce)}

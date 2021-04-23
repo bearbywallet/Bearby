@@ -196,6 +196,11 @@ export class Transaction {
     return JSON.stringify(this.self);
   }
 
+  public setGas(gas: GasState) {
+    this.gasLimit = Long.fromNumber(Number(gas.gasLimit));
+    this.gasPrice = gas.gasPrice;
+  }
+
   public setPriority(priority: boolean) {
     this.priority = priority;
   }

@@ -56,8 +56,8 @@ export const GasSelector: React.FC<Prop> = ({
   const _2 = Big(2);
   const _3 = Big(3);
 
-  const amountGas = (increse: number) => {
-    const incresedGasPrice = Number(DEFAULT_GAS.gasPrice) * increse;
+  const amountGas = (increse: Big) => {
+    const incresedGasPrice = Big(DEFAULT_GAS.gasPrice).mul(increse);
     const { fee } = gasToFee(gasLimit, String(incresedGasPrice));
     const [zilliqa] = tokensState;
 
@@ -123,7 +123,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(2)}
+            {amountGas(_1)}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -141,7 +141,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(3)}
+            {amountGas(_2)}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -159,7 +159,7 @@ export const GasSelector: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {amountGas(4)}
+            {amountGas(_3)}
           </Text>
         </TouchableOpacity>
       </View>
