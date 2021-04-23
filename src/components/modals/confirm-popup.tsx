@@ -68,12 +68,13 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
+  const gasState = keystore.gas.store.useValue();
 
   const [passowrd, setPassowrd] = React.useState<string>('');
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(transaction.priority);
-  const [gas, setGas] = React.useState<GasState>(DEFAULT_GAS);
+  const [gas, setGas] = React.useState<GasState>(gasState);
 
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[token.symbol];
