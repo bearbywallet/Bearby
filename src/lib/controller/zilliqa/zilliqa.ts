@@ -237,6 +237,18 @@ export class ZilliqaControl {
     return data.result;
   }
 
+  public async getMinimumGasPrice() {
+    const request = this._json(Methods.GetMinimumGasPrice, []);
+    const responce = await fetch(this._network.http, request);
+    const data = await responce.json();
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data.result;
+  }
+
   public async getTransaction(hash: string) {
     hash = tohexString(hash);
 

@@ -12,15 +12,18 @@ import {
   gasStoreUpdate,
   gasStoreReset
 } from './state';
+import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { STORAGE_FIELDS, DEFAULT_GAS } from 'app/config';
 import { GasState } from 'types';
 
 export class GasControler {
   public readonly store = gasStore;
   private _storage: MobileStorage;
+  private _zilliqa: ZilliqaControl;
 
-  constructor(storage: MobileStorage) {
+  constructor(storage: MobileStorage, zilliqa: ZilliqaControl) {
     this._storage = storage;
+    this._zilliqa = zilliqa;
   }
 
   public async sync() {
@@ -49,11 +52,16 @@ export class GasControler {
     }
   }
 
-  public reset() {
+  public async reset() {
     gasStoreReset();
 
+    const minGas = await this._zilliqa.getMinimumGasPrice();
+    const state = this.store.get();
+
+    state.gasPrice = String(Number(minGas) / 10 ** 6);
+
     return this._storage.set(
-      buildObject(STORAGE_FIELDS.GAS, this.store.get())
+      buildObject(STORAGE_FIELDS.GAS, state)
     );
   }
 

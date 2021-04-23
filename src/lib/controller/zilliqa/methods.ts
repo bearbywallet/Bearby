@@ -17,5 +17,6 @@ export enum Methods {
   CreateTransaction = 'CreateTransaction',
   GetTransactionStatus = 'GetTransactionStatus',
   GetLatestTxBlock = 'GetLatestTxBlock',
-  GetRecentTransactions = 'GetRecentTransactions'
+  GetRecentTransactions = 'GetRecentTransactions',
+  GetMinimumGasPrice = 'GetMinimumGasPrice'
 }
