@@ -27,6 +27,7 @@ import { SSnController } from 'app/lib/controller/ssn';
 import { WorkerController } from 'app/lib/controller/worker';
 import { NotificationManager } from 'app/lib/controller/notification';
 import { AppsController } from 'app/lib/controller/apps';
+import { IPFS } from 'app/lib/controller/ipfs';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -45,6 +46,7 @@ export class WalletControler extends Mnemonic {
   public readonly contacts = new ContactsControler(_storage);
   public readonly zilliqa = new ZilliqaControl(this.network);
   public readonly gas = new GasControler(_storage, this.zilliqa);
+  public readonly ipfs = new IPFS(_storage);
   public readonly searchEngine = new SearchController(_storage, this.ud);
   public readonly token = new TokenControll(this.zilliqa, _storage, this.network);
   public readonly ssn = new SSnController(_storage, this.zilliqa, this.network);
@@ -168,6 +170,7 @@ export class WalletControler extends Mnemonic {
     await this.ssn.sync();
     await this.notificationManager.sync();
     await this.transaction.sync();
+    await this.ipfs.sync();
     this.worker.start();
   }
 }

@@ -165,6 +165,7 @@ export default {
   restore_btn: 'Continue',
   advanced_title: 'Advanced',
   advanced_selector_title: 'Address format',
+  advanced_ipfs_title: 'IPFS Gateway',
   contacts_title: 'Contacts',
   contacts_btn: 'Add',
   contacts_name: 'Contact name',

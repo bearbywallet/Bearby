@@ -7,11 +7,12 @@
  * Copyright (c) 2020 ZilPay
  */
 import namehash from '@unstoppabledomains/resolution/build/zns/namehash';
-import { PINTA, NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
+import { NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
 import { DomainResolver } from 'types';
 import { fromBech32Address } from 'app/utils';
+import { keystore } from 'app/keystore';
 
 /**
  * Unstoppabledomains service domain resolver.
@@ -107,15 +108,16 @@ export class UnstoppableDomains {
 
     try {
       const resolver = await this.resolve(value);
+      const ipfsURL = keystore.ipfs.selected;
 
       if (resolver[ipfs0]) {
-        return `${PINTA}/${resolver[ipfs0]}`;
+        return `${ipfsURL}/${resolver[ipfs0]}`;
       } else if (resolver[ipfs1]) {
-        return `${PINTA}/${resolver[ipfs1]}`;
+        return `${ipfsURL}/${resolver[ipfs1]}`;
       } else if (resolver[ipfsr]) {
-        return `${PINTA}/${resolver[ipfsr]}`;
+        return `${ipfsURL}/${resolver[ipfsr]}`;
       } else if (resolver[redirect]) {
-        return `${PINTA}/${resolver[redirect]}`;
+        return `${ipfsURL}/${resolver[redirect]}`;
       }
     } catch {
       return null;

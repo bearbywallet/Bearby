@@ -21,7 +21,6 @@ import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { PINTA } from 'app/config';
 
 type Prop = {
   onSelect: (name: number) => void;
@@ -51,7 +50,7 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
       {/* <TouchableOpacity onPress={handleBanner}>
         <FastImage
           source={{
-            uri: `${PINTA}/${String(browserState?.banner)}`
+            uri: `${ipfsURL}/${String(browserState?.banner)}`
           }}
           style={[styles.banner, {
             backgroundColor: colors['card1']

@@ -25,7 +25,7 @@ import { CustomButton } from 'app/components/custom-button';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
-import { PINTA } from 'app/config';
+import { keystore } from 'app/keystore';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -35,7 +35,13 @@ type Prop = {
 const { height, width } = Dimensions.get('window');
 export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
+  const ipfsState = keystore.ipfs.store.useValue();
   const [description, setDescription] = React.useState<string>();
+
+  const ipfsURL = React.useMemo(() =>
+    ipfsState.list[ipfsState.selected].url,
+    [ipfsState]
+  );
 
   const handleLaunch = React.useCallback(() => {
     navigation.navigate('Web', {
@@ -44,11 +50,11 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [navigation, route]);
 
   React.useEffect(() => {
-    fetch(`${PINTA}/${route.params.app.description}`)
+    fetch(`${ipfsURL}/${route.params.app.description}`)
       .then((res) => res.text())
       .then((text) => setDescription(text))
       .catch(() => setDescription(''));
-  }, []);
+  }, [ipfsURL]);
 
   return (
     <View>
@@ -57,7 +63,7 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
       }]}>
         <View style={styles.titleContainer}>
           <FastImage
-            source={{ uri: `${PINTA}/${route.params.app.icon}` }}
+            source={{ uri: `${ipfsURL}/${route.params.app.icon}` }}
             style={styles.icon}
           />
           <View>
@@ -87,7 +93,7 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
           {route.params.app.images.map((img, index) => (
             <FastImage
               key={index}
-              source={{ uri: `${PINTA}/${img}` }}
+              source={{ uri: `${ipfsURL}/${img}` }}
               style={[styles.previewImages, {
                 backgroundColor: colors['card1']
               }]}
