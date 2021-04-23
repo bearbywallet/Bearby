@@ -74,7 +74,10 @@ export const ConfirmPopup: React.FC<Prop> = ({
 
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(transaction.priority);
-  const [gas, setGas] = React.useState<GasState>(gasState);
+  const [gas, setGas] = React.useState<GasState>({
+    gasPrice: gasState.gasPrice,
+    gasLimit: transaction.gasLimit.toString()
+  });
 
   const conversion = React.useMemo(() => {
     const rate = settingsState.rate[token.symbol];
