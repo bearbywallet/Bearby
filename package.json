@@ -52,6 +52,7 @@
     "react-native-keyboard-aware-scroll-view": "^0.9.3",
     "react-native-keychain": "^6.2.0",
     "react-native-modal": "^11.7.0",
+    "react-native-pager-view": "^5.1.8",
     "react-native-permissions": "^3.0.1",
     "react-native-push-notification": "^7.3.1",
     "react-native-qrcode-scanner": "^1.5.3",
