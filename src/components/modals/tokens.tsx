@@ -28,7 +28,6 @@ import { LoadSVG } from 'app/components/load-svg';
 
 import { Token, Account } from 'types';
 import { fromZil, toLocaleString } from 'app/filters';
-import { getIcon } from 'app/utils';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -95,7 +94,7 @@ export const TokensModal: React.FC<Prop> = ({
                 <LoadSVG
                   height="30"
                   width="30"
-                  url={getIcon(token.symbol)}
+                  addr={token.address[network]}
                 />
               ) : null}
               <View style={styles.wrapper}>

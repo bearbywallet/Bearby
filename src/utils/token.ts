@@ -6,7 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { TOKEN_ICONS } from 'app/config';
 
 interface InitItem {
   type: string;
@@ -20,10 +19,6 @@ enum Fields {
   Symbol = 'symbol',
   Decimals = 'decimals',
   Address = '_this_address'
-}
-
-export function getIcon(symbol: string) {
-  return `${TOKEN_ICONS}/${symbol}.svg`;
 }
 
 export function toZRC1(init: InitItem[]) {

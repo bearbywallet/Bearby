@@ -27,7 +27,6 @@ import {
 } from 'app/filters';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
-import { getIcon } from 'app/utils';
 
 export type Prop = {
   token: Token;
@@ -125,7 +124,7 @@ export const TokenCard: React.FC<Prop> = ({
           <LoadSVG
             height="30"
             width="30"
-            url={getIcon(token.symbol)}
+            addr={token.address[net]}
           />
         </View>
         <View>

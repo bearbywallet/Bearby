@@ -279,11 +279,7 @@ export class AccountControler {
     const balances = Object.fromEntries(entries);
 
     for (const t of this._token.store.get()) {
-      try {
-        balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
-      } catch {
-        balances[net][t.symbol] = '0';
-      }
+      balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
     }
 
     return balances;

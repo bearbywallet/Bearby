@@ -10,7 +10,6 @@
 import React from 'react';
 import {
   View,
-  StyleSheet,
   FlatList,
   Alert,
   RefreshControl
@@ -166,8 +165,5 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     </React.Fragment>
   );
 };
-
-const styles = StyleSheet.create({
-});
 
 export default HomePage;

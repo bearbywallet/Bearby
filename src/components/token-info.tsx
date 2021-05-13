@@ -20,7 +20,6 @@ import { LoadSVG } from 'app/components/load-svg';
 import i18n from 'app/lib/i18n';
 import { toLocaleString, toConversion, fromZil } from 'app/filters';
 import { fonts } from 'app/styles';
-import { getIcon } from 'app/utils';
 
 export type Prop = {
   decimals: number;
@@ -39,6 +38,7 @@ export const TokenInfo: React.FC<Prop> = ({
   symbol,
   decimals,
   name,
+  address,
   currency,
   style,
   balance = '0',
@@ -84,7 +84,7 @@ export const TokenInfo: React.FC<Prop> = ({
         <LoadSVG
           height="30"
           width="30"
-          url={getIcon(symbol)}
+          addr={address}
         />
       </View>
       <View>

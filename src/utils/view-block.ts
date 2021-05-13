@@ -8,8 +8,10 @@
  */
 import {
   VIEW_BLOCK_METHODS,
-  VIEW_BLOCK_URL
+  VIEW_BLOCK_URL,
+  NIL_ADDRESS
 } from 'app/config';
+import { toBech32Address } from 'app/utils';
 
 export function viewAddress(address: string, netwrok: string) {
   const url = VIEW_BLOCK_URL;
@@ -30,4 +32,10 @@ export function viewBlockNumber(blockNumber: string | number, netwrok: string) {
   const type = VIEW_BLOCK_METHODS.block;
 
   return `${url}/${type}/${blockNumber}?network=${netwrok}`;
+}
+
+export function viewIcon(addr: string, darken: boolean) {
+  addr = addr === NIL_ADDRESS ? 'ZIL' : toBech32Address(addr);
+  const theme = darken ? 'dark' : 'light';
+  return `https://meta.viewblock.io/zilliqa.${addr}/logo?t=${theme}`;
 }

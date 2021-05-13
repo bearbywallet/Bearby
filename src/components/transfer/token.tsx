@@ -26,7 +26,6 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { fromZil, toConversion, toLocaleString } from 'app/filters';
 import { Token, Account } from 'types';
-import { getIcon } from 'app/utils';
 import styles from './styles';
 
 type Prop = {
@@ -45,7 +44,7 @@ export const TransferToken: React.FC<Prop> = ({
   netwrok,
   onSelect
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
@@ -92,7 +91,7 @@ export const TransferToken: React.FC<Prop> = ({
             <LoadSVG
               height="30"
               width="30"
-              url={getIcon(token.symbol)}
+              addr={token.address[netwrok]}
             />
             <View style={{ marginLeft: 5 }}>
               <View style={[styles.infoWrapper, { width: width - 120 }]}>

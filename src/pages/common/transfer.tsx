@@ -34,7 +34,7 @@ import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
 import { DEFAULT_GAS } from 'app/config';
-import { fromBech32Address, getIcon } from 'app/utils';
+import { fromBech32Address } from 'app/utils';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -43,7 +43,7 @@ type Prop = {
 
 const { width } = Dimensions.get('window');
 export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   const accountState = keystore.account.store.useValue();
   const contactsState = keystore.contacts.store.useValue();
   const tokensState = keystore.token.store.useValue();
@@ -256,7 +256,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           onConfirm={handleSiging}
         >
           <LoadSVG
-            url={getIcon(token.symbol)}
+            addr={token.address[networkState.selected]}
             height="30"
             width="30"
           />
