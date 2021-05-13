@@ -18,13 +18,13 @@
     "@react-native-community/clipboard": "^1.5.1",
     "@react-native-community/masked-view": "^0.1.11",
     "@react-native-community/push-notification-ios": "^1.8.0",
-    "@react-native-community/viewpager": "^5.0.11",
     "@react-navigation/bottom-tabs": "^5.11.8",
     "@react-navigation/native": "^5.9.3",
     "@react-navigation/stack": "^5.14.3",
     "@unimodules/core": "^7.1.0",
     "@unstoppabledomains/resolution": "1.0.0",
     "@zilliqa-js/proto": "^2.2.0",
+    "add": "^2.0.6",
     "big.js": "^6.1.1",
     "bn.js": "^5.2.0",
     "buffer": "^6.0.3",
@@ -68,7 +68,8 @@
     "react-native-webview": " ^11.4.4",
     "react-navigation": "^4.4.4",
     "react-ridge-state": "^4.1.6",
-    "url-parse": "^1.5.1"
+    "url-parse": "^1.5.1",
+    "yarn": "^1.22.10"
   },
   "devDependencies": {
     "@babel/core": "^7.13.8",
