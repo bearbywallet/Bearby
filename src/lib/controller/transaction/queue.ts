@@ -134,10 +134,13 @@ export class TransactionsQueue {
 
   public async checkProcessedTx() {
     const list = this.store.get();
+    const now = new Date().getTime();
+    const dilaySeconds = 5000;
     let rejectAll = null;
 
     for (let index = list.length - 1; index >= 0; index--) {
       const element = list[index];
+      const title = i18n.t('transaction');
 
       if (rejectAll) {
         element.info = rejectAll.info;
@@ -152,39 +155,52 @@ export class TransactionsQueue {
         continue;
       }
 
-      const title = i18n.t('transaction');
-      const result = await this._zilliqa.getTransactionStatus(element.hash);
+      try {
+        const result = await this._zilliqa.getTransactionStatus(element.hash);
 
-      switch (result.status) {
-        case StatusCodes.Confirmed:
-          element.status = result.status;
-          element.confirmed = true;
-          element.nonce = result.nonce;
-          element.info = `node_status_${result.status}`;
-          this._makeNotify(title, element.hash, element.info);
-          continue;
-        case StatusCodes.Pending:
-          element.status = result.status;
-          element.confirmed = result.success;
-          element.info = `node_status_${result.status}`;
-          continue;
-        case StatusCodes.PendingAwait:
-          element.status = result.status;
-          element.confirmed = true;
-          element.info = `node_status_${result.status}`;
-          this._makeNotify(title, element.hash, element.info);
-          continue;
-        default:
-          element.status = result.status;
+        switch (result.status) {
+          case StatusCodes.Confirmed:
+            element.status = result.status;
+            element.confirmed = true;
+            element.nonce = result.nonce;
+            element.info = `node_status_${result.status}`;
+            this._makeNotify(title, element.hash, element.info);
+            continue;
+          case StatusCodes.Pending:
+            element.status = result.status;
+            element.confirmed = result.success;
+            element.info = `node_status_${result.status}`;
+            continue;
+          case StatusCodes.PendingAwait:
+            element.status = result.status;
+            element.confirmed = true;
+            element.info = `node_status_${result.status}`;
+            this._makeNotify(title, element.hash, element.info);
+            continue;
+          default:
+            element.status = result.status;
+            element.confirmed = true;
+            element.nonce = 0;
+            element.info = `node_status_${result.status}`;
+            rejectAll = {
+              info: element.info,
+              status: result.status
+            };
+            this._makeNotify(title, element.hash, element.info);
+            continue;
+        }
+      } catch {
+        if ((now - element.timestamp) > dilaySeconds) {
+          element.status = 0;
           element.confirmed = true;
           element.nonce = 0;
-          element.info = `node_status_${result.status}`;
+          element.info = `node_status_0`;
           rejectAll = {
             info: element.info,
-            status: result.status
+            status: element.status
           };
           this._makeNotify(title, element.hash, element.info);
-          continue;
+        }
       }
     }
 
