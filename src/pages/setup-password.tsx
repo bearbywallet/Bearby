@@ -104,7 +104,14 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
     }
 
     setLoading(false);
-  }, [password, mnemonicPhrase, accountName, isBiometric, setLoading]);
+  }, [
+    password,
+    passwordConfirm,
+    mnemonicPhrase,
+    accountName,
+    isBiometric,
+    setLoading
+  ]);
 
   React.useEffect(() => {
     const { accessControl } = authState;
