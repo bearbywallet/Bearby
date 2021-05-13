@@ -19,7 +19,6 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
-import { Selector } from 'app/components/selector';
 import { CustomTextInput } from 'app/components/custom-text-input';
 import { Passwordinput } from 'app/components/password-input';
 import ProfileSVG from 'app/assets/icons/profile.svg';
@@ -46,7 +45,7 @@ export const ImportAccount: React.FC<Prop> = ({
   const accountState = keystore.account.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
-  const [selected, setSelected] = React.useState(variants[0]);
+  const [selected] = React.useState(variants[0]); // TODO: add the ledger type.
   const [lastindex, setlastindex] = React.useState(keystore.account.lastIndexLedger);
   const [accName, setAccName] = React.useState(`Imported ${lastindex}`);
   const [ledgerIndex, setLedgerIndex] = React.useState(
@@ -55,7 +54,7 @@ export const ImportAccount: React.FC<Prop> = ({
   const [privateKey, setPrivateKey] = React.useState<string | null>(null);
   const [privKeyErr, setPrivKeyErr] = React.useState('');
   const [password, setPassword] = React.useState<string | undefined>();
-  const [passwordError, setPasswordError] = React.useState(' ');
+  const [passwordError] = React.useState(' '); // TODO: add password error.
 
   const disabled = React.useMemo(() => {
     if (variants[0] === selected) {
@@ -93,10 +92,6 @@ export const ImportAccount: React.FC<Prop> = ({
       setLedgerIndex(index);
     }
   }, [setLedgerIndex]);
-  const handleChangeType = React.useCallback((value) => {
-    setSelected(value);
-    setPrivKeyErr('');
-  }, [setSelected, setAccName]);
   const hanldeChangePrivKey = React.useCallback((value) => {
     setPrivKeyErr('');
     setPrivateKey(value);
@@ -116,16 +111,13 @@ export const ImportAccount: React.FC<Prop> = ({
 
   return (
     <KeyboardAwareScrollView>
-      <Selector
-        style={{ backgroundColor: 'transparent' }}
-        items={variants}
-        selected={selected}
-        onSelect={handleChangeType}
-      />
       <CustomTextInput
         Icon={ProfileSVG}
         defaultValue={accName}
         onChangeText={setAccName}
+        style={{
+          marginTop: 16
+        }}
         placeholder={i18n.t('pass_setup_input0')}
         labelText={i18n.t('pass_setup_label0')}
       />
