@@ -7,9 +7,10 @@
  * Copyright (c) 2020 ZilPay
  */
 import React from 'react';
-import { StyleSheet } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
 import { TabBar, SceneRendererProps } from 'react-native-tab-view';
 import { useTheme } from '@react-navigation/native';
+import { fonts } from 'app/styles';
 
 export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props: SceneRendererProps) => {
   const { colors } = useTheme();
@@ -21,9 +22,13 @@ export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props: SceneRe
       indicatorStyle={{
         backgroundColor: colors.primary
       }}
-      labelStyle={{
-        color: colors.text
-      }}
+      renderLabel={({ route }) => (
+        <Text style={[styles.tabTitle, {
+          color: colors.text
+        }]}>
+          {route.title}
+        </Text>
+      )}
       style={styles.bars}
     />
   );
@@ -32,5 +37,10 @@ export const CreateAccountNavBar: React.FC<SceneRendererProps> = (props: SceneRe
 const styles = StyleSheet.create({
   bars: {
     backgroundColor: 'transparent'
+  },
+  tabTitle: {
+    textAlign: 'center',
+    fontFamily: fonts.Demi,
+    fontSize: 16
   }
 });
