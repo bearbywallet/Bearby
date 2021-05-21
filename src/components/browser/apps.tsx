@@ -20,13 +20,17 @@ import { useTheme } from '@react-navigation/native';
 import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
-import { keystore } from 'app/keystore';
+import { Device } from 'app/utils';
 
 type Prop = {
   onSelect: (name: number) => void;
   onBanner: (url: string) => void;
 };
-export const categories = [
+export const categories = Device.isIos() ? [
+  1,
+  2,
+  4
+] : [
   0,
   1,
   2,
@@ -58,13 +62,13 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
         />
       </TouchableOpacity> */}
       <View style={styles.categoriesWrapper}>
-        {categories.map((_, index) => (
+        {categories.map((el) => (
           <BrowserCarditem
             style={{ marginTop: 15 }}
-            key={index}
-            el={index}
-            title={i18n.t(`category_${index}`)}
-            onPress={() => onSelect(index)}
+            key={el}
+            el={el}
+            title={i18n.t(`category_${el}`)}
+            onPress={() => onSelect(el)}
           />
         ))}
       </View>
@@ -85,7 +89,8 @@ const styles = StyleSheet.create({
   categoriesWrapper: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    paddingVertical: 10
+    justifyContent: 'space-between',
+    paddingVertical: 10,
+    paddingHorizontal: 10
   }
 });
