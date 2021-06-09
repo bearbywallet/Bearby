@@ -15,9 +15,7 @@ import {
   NativeModules
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { CustomButton } from 'app/components/custom-button';

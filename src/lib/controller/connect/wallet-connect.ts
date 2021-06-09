@@ -25,7 +25,6 @@ type MessageResponse = {
 
 const PUB_KEY = 'pub-c-59f9788d-7754-46e8-b653-71566255aac1';
 const SUB_KEY = 'sub-c-2b8cbe56-766b-11eb-b2c3-2e58680e8335';
-const EXPIRED_CODE_TIMEOUT = 30000;
 
 export class PubNubWrapper {
 	public static FIELD = 'zilpay-sync';

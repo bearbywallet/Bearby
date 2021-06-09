@@ -437,19 +437,21 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         onMessage={handleMessage}
         onLoadProgress={handleLoaded}
       />
-      <ConnectModal
-        app={appConnect}
-        visible={Boolean(appConnect)}
-        onTriggered={() => handleConnect(false)}
-        onConfirm={() => handleConnect(true)}
-      />
+      {appConnect ? (
+        <ConnectModal
+          app={appConnect}
+          visible={Boolean(appConnect)}
+          onTriggered={() => handleConnect(false)}
+          onConfirm={() => handleConnect(true)}
+        />
+      ) : null}
       <SignMessageModal
         title={i18n.t('sign_request')}
         visible={Boolean(signMessage)}
-        icon={signMessage?.icon}
+        icon={signMessage?.icon || ''}
         account={account}
         needPassword={!authState.biometricEnable}
-        appTitle={signMessage?.title}
+        appTitle={signMessage?.title || ''}
         payload={String(signMessage?.data)}
         onTriggered={() => setSignMessage(undefined)}
         onSign={handleSignMessage}
@@ -459,7 +461,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           transaction={transaction.params}
           token={tokenState[0]}
           account={account}
-          error={confirmError}
+          error={confirmError || ''}
           title={i18n.t('confirm')}
           needPassword={!authState.biometricEnable}
           visible={Boolean(transaction)}

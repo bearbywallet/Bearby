@@ -26,11 +26,7 @@ type Prop = {
   onSelect: (name: number) => void;
   onBanner: (url: string) => void;
 };
-export const categories = Device.isIos() ? [
-  1,
-  2,
-  4
-] : [
+export const categories = [
   0,
   1,
   2,
@@ -61,17 +57,19 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect, onBanner }) => {
           }]}
         />
       </TouchableOpacity> */}
-      <View style={styles.categoriesWrapper}>
-        {categories.map((el) => (
-          <BrowserCarditem
-            style={{ marginTop: 15 }}
-            key={el}
-            el={el}
-            title={i18n.t(`category_${el}`)}
-            onPress={() => onSelect(el)}
-          />
-        ))}
-      </View>
+      {Device.isIos() ? null : (
+        <View style={styles.categoriesWrapper}>
+          {categories.map((el) => (
+            <BrowserCarditem
+              style={{ marginTop: 15 }}
+              key={el}
+              el={el}
+              title={i18n.t(`category_${el}`)}
+              onPress={() => onSelect(el)}
+            />
+          ))}
+        </View>
+      )}
     </ScrollView>
   );
 };
