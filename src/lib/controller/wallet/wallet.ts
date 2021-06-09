@@ -74,7 +74,8 @@ export class WalletControler extends Mnemonic {
     this.account,
     this.zilliqa,
     _storage,
-    this.app
+    this.app,
+    this.theme
   );
 
   public async initWallet(password: string, mnemonic: string) {

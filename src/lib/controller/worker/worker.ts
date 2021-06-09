@@ -8,6 +8,7 @@
  */
 import { TransactionsQueue } from 'app/lib/controller/transaction';
 import { AccountControler } from 'app/lib/controller/account';
+import { ThemeControler } from 'app/lib/controller/theme';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { AppsController } from 'app/lib/controller/apps';
 import { MobileStorage } from 'app/lib/storage';
@@ -20,6 +21,7 @@ export class WorkerController {
 
   private _transactions: TransactionsQueue;
   private _account: AccountControler;
+  private _theme: ThemeControler;
   private _apps: AppsController;
 
   constructor(
@@ -27,12 +29,14 @@ export class WorkerController {
     account: AccountControler,
     zilliqa: ZilliqaControl,
     storage: MobileStorage,
-    apps: AppsController
+    apps: AppsController,
+    theme: ThemeControler
   ) {
     this._account = account;
     this._apps = apps;
     this._transactions = transactions;
     this.block = new BlockControl(storage, zilliqa);
+    this._theme  = theme;
   }
 
   public async step() {
@@ -48,6 +52,8 @@ export class WorkerController {
     } catch {
       //
     }
+
+    this._theme.updateColors();
   }
 
   public async start() {

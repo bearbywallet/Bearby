@@ -189,7 +189,7 @@ export class TransactionsQueue {
             this._makeNotify(title, element.hash, element.info);
             continue;
         }
-      } catch {
+      } catch (err) {
         if ((now - element.timestamp) > dilaySeconds) {
           element.status = 0;
           element.confirmed = true;

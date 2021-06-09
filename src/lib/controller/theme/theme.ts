@@ -31,7 +31,7 @@ export class ThemeControler {
 
   public set(type: string) {
     themesStoreUpdate(type);
-    this._updateColors();
+    this.updateColors();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.THEME, type)
@@ -40,7 +40,7 @@ export class ThemeControler {
 
   public reset() {
     themesStoreReset();
-    this._updateColors();
+    this.updateColors();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.THEME, this.store.get())
@@ -56,10 +56,10 @@ export class ThemeControler {
       themesStoreUpdate(type);
     }
 
-    this._updateColors();
+    this.updateColors();
   }
 
-  private _updateColors() {
+  public updateColors() {
     if (Device.isAndroid()) {
       const type = this.store.get();
       const { dark, colors } = theme[type];

@@ -227,7 +227,7 @@ export class ZilliqaControl {
     hash = tohexString(hash);
 
     const request = this._json(Methods.GetTransactionStatus, [hash]);
-    const responce = await fetch(this._network.http, request);
+    const responce = await fetch(this._network.nativeHttp, request);
     const data = await responce.json();
 
     if (data.error) {

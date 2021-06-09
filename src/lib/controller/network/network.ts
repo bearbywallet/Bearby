@@ -58,6 +58,10 @@ export class NetworkControll {
     return this._getHTTP(this.selected);
   }
 
+  public get nativeHttp() {
+    return ZILLIQA[this.selected].PROVIDER;
+  }
+
   public get ws() {
     return this._getWS(this.selected);
   }

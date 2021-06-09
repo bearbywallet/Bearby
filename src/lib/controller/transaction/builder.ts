@@ -106,8 +106,8 @@ export class Transaction {
     this.priority = priority;
     this.pubKey = account.pubKey;
     this.toAddr = toChecksumAddress(toAddr);
-    this.version = version;
-    this.signature = signature;
+    this.version = version || 0;
+    this.signature = signature || '';
     this.net = net;
     this.nonce = nonce;
   }
