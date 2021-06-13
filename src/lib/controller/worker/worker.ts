@@ -40,24 +40,35 @@ export class WorkerController {
   }
 
   public async step() {
-    await this.block.sync();
+    try {
+      await this.block.sync();
+    } catch (err) {
+      console.warn('block.sync', err);
+      //
+    }
+
     try {
       await this._transactions.checkProcessedTx();
-    } catch {
+    } catch (err) {
+      console.warn('checkProcessedTx', err);
       //
     }
 
     try {
       await this._account.balanceUpdate();
-    } catch {
-      //
+    } catch (err) {
+      console.warn('balanceUpdate', err);
     }
 
     this._theme.updateColors();
   }
 
   public async start() {
-    await this.block.sync();
+    try {
+      await this.block.sync();
+    } catch {
+      //
+    }
 
     // const blocknumber = this.store.get();
 

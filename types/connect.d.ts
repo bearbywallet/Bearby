@@ -102,3 +102,8 @@ export interface EncryptedWallet {
   decryptImported: PrivateKeyWallet[];
   decryptSeed: string;
 }
+
+export interface BleState {
+  available: boolean;
+  type: string;
+}

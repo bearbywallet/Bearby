@@ -9,3 +9,4 @@
 export * from './connect';
 export * from './store';
 export * from './wallet-connect';
+export * from './ledger';

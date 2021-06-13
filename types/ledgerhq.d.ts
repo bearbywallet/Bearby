@@ -8,3 +8,4 @@
  */
 
 declare module '@ledgerhq/react-native-hw-transport-ble';
+declare module 'react-native-android-location-services-dialog-box';

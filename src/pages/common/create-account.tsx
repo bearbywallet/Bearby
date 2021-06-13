@@ -21,7 +21,8 @@ import { TabView, SceneMap } from 'react-native-tab-view';
 import {
   AddAccount,
   CreateAccountNavBar,
-  ImportAccount
+  ImportAccount,
+  ScanningDevice
 } from 'app/components/create-account';
 
 import i18n from 'app/lib/i18n';
@@ -37,8 +38,9 @@ const { width } = Dimensions.get('window');
 const initialLayout = { width };
 
 enum Tabs {
-  add = 'add',
-  import = 'import'
+  Add = 'add',
+  Import = 'import',
+  Ledger = 'ledger'
 }
 
 export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
@@ -47,8 +49,9 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
 
   const [index, setIndex] = React.useState(0);
   const [routes] = React.useState([
-    { key: Tabs.add, title: i18n.t('add_account') },
-    { key: Tabs.import, title: i18n.t('import_account') }
+    { key: Tabs.Add, title: i18n.t('add_account') },
+    { key: Tabs.Import, title: i18n.t('import_account') },
+    { key: Tabs.Ledger, title: i18n.t('import_ledger') }
   ]);
 
   const handleCreate = React.useCallback(() => {
@@ -58,18 +61,21 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   }, []);
 
   const renderScene = SceneMap({
-    [Tabs.add]: () => (
+    [Tabs.Add]: () => (
       <AddAccount
         biometricEnable={authState.biometricEnable}
         newIndex={keystore.account.lastIndexSeed}
         onAdded={handleCreate}
       />
     ),
-    [Tabs.import]: () => (
+    [Tabs.Import]: () => (
       <ImportAccount
         biometricEnable={authState.biometricEnable}
         onImported={handleCreate}
       />
+    ),
+    [Tabs.Ledger]: () => (
+      <ScanningDevice />
     )
   });
 

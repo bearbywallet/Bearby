@@ -9,3 +9,4 @@
 export * from './add';
 export * from './import';
 export * from './nav-bar';
+export * from './scanning';
