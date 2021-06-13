@@ -12,3 +12,11 @@ export interface Connect {
   icon: string;
   title: string;
 }
+
+export interface LedgerTransport {
+  descriptor: {
+    id: string;
+    name: string;
+  }
+  type: string;
+}

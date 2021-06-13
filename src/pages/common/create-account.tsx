@@ -9,9 +9,7 @@
 
 import React from 'react';
 import {
-  Text,
   Dimensions,
-  StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
@@ -28,7 +26,6 @@ import {
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
-import { fonts } from 'app/styles';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -81,11 +78,6 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
 
   return (
     <SafeWrapper>
-      <Text style={[styles.title, {
-        color: colors.text
-      }]}>
-        {i18n.t('create_account_title')}
-      </Text>
       <TabView
         style={{
           backgroundColor: colors.background
@@ -99,11 +91,3 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
     </SafeWrapper>
   );
 };
-
-const styles = StyleSheet.create({
-  title: {
-    textAlign: 'center',
-    fontFamily: fonts.Bold,
-    fontSize: 30
-  }
-});

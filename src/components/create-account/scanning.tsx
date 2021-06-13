@@ -11,9 +11,11 @@ import React from 'react';
 import {
   StyleSheet,
   View,
+  Text,
   PermissionsAndroid,
   FlatList
 } from 'react-native';
+import { useTheme } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Geolocation from '@react-native-community/geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
@@ -27,35 +29,45 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { Device } from 'app/utils';
 import { LedgerController } from 'app/lib/controller/connect/ledger';
-import { BleState } from 'types';
+import { BleState, LedgerTransport } from 'types';
+import { fonts } from 'app/styles';
+
+interface LedgerItem {
+  mac: string;
+  name: string;
+  type: string;
+}
 
 type Prop = {
 };
 const ledger = new LedgerController();
 export const ScanningDevice: React.FC<Prop> = () => {
+  const { colors } = useTheme();
   const [ble, setBle] = React.useState<boolean | null>(null);
   const [geo, setGeo] = React.useState<boolean | null>(null);
+  const [items, setItems] = React.useState<LedgerItem[]>([]);
 
   const PermissionsAndroidRequest = React.useCallback(async() => {
     const granted = await PermissionsAndroid.check(
       PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
     );
+
+    if (granted) {
+      setGeo(granted);
+
+      return null;
+    }
+
     Geolocation.getCurrentPosition(
-      async info => {
-          if (info) {
-              if (granted) {
-                setGeo(granted);
-              } else {
-                  const requested = await PermissionsAndroid.request(
-                      PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
-                  );
-                  setGeo(requested === PermissionsAndroid.RESULTS.GRANTED);
-              }
-          } else {
-            setGeo(false);
-          }
+      async (info) => {
+        if (info) {
+          const requested = await PermissionsAndroid.request(
+              PermissionsAndroid.PERMISSIONS.ACCESS_FINE_LOCATION
+          );
+          setGeo(requested === PermissionsAndroid.RESULTS.GRANTED);
+        }
       },
-      (error) => setGeo(false),
+      () => null,
       {
         enableHighAccuracy: false,
         timeout: 20000,
@@ -76,22 +88,43 @@ export const ScanningDevice: React.FC<Prop> = () => {
       // Nothing to do: location is still disabled
     }
   }, []);
+  const hanldeAddDevice = React.useCallback((el: LedgerItem) => {
+    const devices = items;
+
+    devices.push(el);
+
+    setItems(devices);
+  }, [items]);
 
   React.useEffect(() => {
     const subscription = ledger.transport.observeState({
-      next: (e: BleState) => {
+      next: async(e: BleState) => {
         setBle(e.available);
 
         if (e.available && Device.isAndroid()) {
-          PermissionsAndroidRequest();
+          await PermissionsAndroidRequest();
         }
       },
       complete: () => null,
       error: () => null
     });
+    const listen =  ledger.transport.listen({
+      complete: () => null,
+      next: async (event: LedgerTransport) => {
+        const { descriptor, type } = event;
+
+        hanldeAddDevice({
+          type,
+          mac: descriptor.id,
+          name: descriptor.name
+        });
+      },
+      error: () => null
+    });
 
     return () => {
       subscription.unsubscribe();
+      listen.unsubscribe();
     };
   }, []);
 
@@ -116,6 +149,20 @@ export const ScanningDevice: React.FC<Prop> = () => {
           />
         </React.Fragment>
       ) : null}
+      {geo && ble ? (
+        <View>
+          <Text style={styles.title}>
+            {i18n.t('scanning_title')}
+          </Text>
+          <Text
+            style={[styles.message, {
+              color: colors.notification
+            }]}
+          >
+            {i18n.t('scanning_message')}
+          </Text>
+        </View>
+      ) : null}
     </KeyboardAwareScrollView>
   );
 };
@@ -126,5 +173,15 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 16
+  },
+  title: {
+    fontFamily: fonts.Bold,
+    fontSize: 20,
+    textAlign: 'center'
+  },
+  message: {
+    fontFamily: fonts.Regular,
+    fontSize: 16,
+    textAlign: 'center'
   }
 });
