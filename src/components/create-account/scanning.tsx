@@ -11,9 +11,10 @@ import React from 'react';
 import {
   StyleSheet,
   View,
+  ActivityIndicator,
+  TouchableOpacity,
   Text,
-  PermissionsAndroid,
-  FlatList
+  PermissionsAndroid
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -21,27 +22,22 @@ import Geolocation from '@react-native-community/geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 import { CustomButton } from 'app/components/custom-button';
-import { Passwordinput } from 'app/components/password-input';
-import { CustomTextInput } from 'app/components/custom-text-input';
 import { ErrorMessage } from './error-message';
 
 import i18n from 'app/lib/i18n';
-import { keystore } from 'app/keystore';
 import { Device } from 'app/utils';
 import { LedgerController } from 'app/lib/controller/connect/ledger';
 import { BleState, LedgerTransport } from 'types';
 import { fonts } from 'app/styles';
+import LedgerIcon from 'app/assets/icons/ledger.svg';
 
 interface LedgerItem {
   mac: string;
   name: string;
   type: string;
 }
-
-type Prop = {
-};
 const ledger = new LedgerController();
-export const ScanningDevice: React.FC<Prop> = () => {
+export const ScanningDevice: React.FC = () => {
   const { colors } = useTheme();
   const [ble, setBle] = React.useState<boolean | null>(null);
   const [geo, setGeo] = React.useState<boolean | null>(null);
@@ -89,11 +85,11 @@ export const ScanningDevice: React.FC<Prop> = () => {
     }
   }, []);
   const hanldeAddDevice = React.useCallback((el: LedgerItem) => {
-    const devices = items;
+    if (items.some((e) => e.mac === el.mac)) {
+      return null;
+    }
 
-    devices.push(el);
-
-    setItems(devices);
+    setItems([...items, el]);
   }, [items]);
 
   React.useEffect(() => {
@@ -151,7 +147,9 @@ export const ScanningDevice: React.FC<Prop> = () => {
       ) : null}
       {geo && ble ? (
         <View>
-          <Text style={styles.title}>
+          <Text style={[styles.title, {
+            color: colors.text
+          }]}>
             {i18n.t('scanning_title')}
           </Text>
           <Text
@@ -163,6 +161,24 @@ export const ScanningDevice: React.FC<Prop> = () => {
           </Text>
         </View>
       ) : null}
+      {items.length === 0 ? (
+        <ActivityIndicator
+          animating={items.length === 0}
+          color={colors.primary}
+        />
+      ) : null}
+      {items.map((item) => (
+        <TouchableOpacity style={[styles.itemWrapper, {
+          borderColor: colors.border
+        }]}>
+          <LedgerIcon />
+          <Text style={[styles.itemTitle, {
+            color: colors.text
+          }]}>
+            {item.name}
+          </Text>
+        </TouchableOpacity>
+      ))}
     </KeyboardAwareScrollView>
   );
 };
@@ -183,5 +199,19 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Regular,
     fontSize: 16,
     textAlign: 'center'
+  },
+  itemWrapper: {
+    borderRadius: 5,
+    borderWidth: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: 16,
+    marginHorizontal: 30,
+    paddingHorizontal: 16
+  },
+  itemTitle: {
+    fontFamily: fonts.Demi,
+    fontSize: 16,
+    marginLeft: 36
   }
 });
