@@ -17,12 +17,14 @@ import {
   PermissionsAndroid
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import Geolocation from '@react-native-community/geolocation';
 import LocationServicesDialogBox from 'react-native-android-location-services-dialog-box';
 
 import { CustomButton } from 'app/components/custom-button';
 import { ErrorMessage } from './error-message';
+import { LedgerAddModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { Device } from 'app/utils';
@@ -36,12 +38,12 @@ interface LedgerItem {
   name: string;
   type: string;
 }
-const ledger = new LedgerController();
 export const ScanningDevice: React.FC = () => {
   const { colors } = useTheme();
   const [ble, setBle] = React.useState<boolean | null>(null);
   const [geo, setGeo] = React.useState<boolean | null>(null);
   const [items, setItems] = React.useState<LedgerItem[]>([]);
+  const [selected, setSelected] = React.useState<LedgerItem | undefined>();
 
   const PermissionsAndroidRequest = React.useCallback(async() => {
     const granted = await PermissionsAndroid.check(
@@ -84,6 +86,11 @@ export const ScanningDevice: React.FC = () => {
       // Nothing to do: location is still disabled
     }
   }, []);
+  const hanldeOpenDevice = React.useCallback(async(item: LedgerItem) => {
+    const transport = await TransportBLE.open(item.mac);
+    const ledger = new LedgerController(transport);
+    await ledger.getPublicAddress(0);
+  }, []);
   const hanldeAddDevice = React.useCallback((el: LedgerItem) => {
     if (items.some((e) => e.mac === el.mac)) {
       return null;
@@ -93,7 +100,7 @@ export const ScanningDevice: React.FC = () => {
   }, [items]);
 
   React.useEffect(() => {
-    const subscription = ledger.transport.observeState({
+    const subscription = TransportBLE.observeState({
       next: async(e: BleState) => {
         setBle(e.available);
 
@@ -104,11 +111,12 @@ export const ScanningDevice: React.FC = () => {
       complete: () => null,
       error: () => null
     });
-    const listen =  ledger.transport.listen({
+    const listen =  TransportBLE.listen({
       complete: () => null,
       next: async (event: LedgerTransport) => {
         const { descriptor, type } = event;
 
+        listen.unsubscribe();
         hanldeAddDevice({
           type,
           mac: descriptor.id,
@@ -167,10 +175,14 @@ export const ScanningDevice: React.FC = () => {
           color={colors.primary}
         />
       ) : null}
-      {items.map((item) => (
-        <TouchableOpacity style={[styles.itemWrapper, {
-          borderColor: colors.border
-        }]}>
+      {items.map((item, index) => (
+        <TouchableOpacity
+          style={[styles.itemWrapper, {
+            borderColor: colors.border
+          }]}
+          key={index}
+          onPress={() => setSelected(item)}
+        >
           <LedgerIcon />
           <Text style={[styles.itemTitle, {
             color: colors.text
@@ -179,6 +191,14 @@ export const ScanningDevice: React.FC = () => {
           </Text>
         </TouchableOpacity>
       ))}
+      <LedgerAddModal
+        title={i18n.t('ledger_connect')}
+        mac={selected?.mac || ''}
+        visible={Boolean(selected)}
+        btnTitle={i18n.t('connect')}
+        onTriggered={() => setSelected(undefined)}
+        onConfirmed={() => setSelected(undefined)}
+      />
     </KeyboardAwareScrollView>
   );
 };

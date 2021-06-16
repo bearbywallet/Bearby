@@ -60,6 +60,7 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
   const renderScene = SceneMap({
     [Tabs.Add]: () => (
       <AddAccount
+        key={Tabs.Add}
         biometricEnable={authState.biometricEnable}
         newIndex={keystore.account.lastIndexSeed}
         onAdded={handleCreate}
@@ -67,12 +68,13 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
     ),
     [Tabs.Import]: () => (
       <ImportAccount
+        key={Tabs.Import}
         biometricEnable={authState.biometricEnable}
         onImported={handleCreate}
       />
     ),
     [Tabs.Ledger]: () => (
-      <ScanningDevice />
+      <ScanningDevice key={Tabs.Ledger}/>
     )
   });
 

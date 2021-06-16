@@ -22,6 +22,7 @@ import {
 
 type Prop = {
   style?: ViewStyle;
+  maxWidth?: number;
   defaultValue?: string;
   Icon?: React.FunctionComponent<ImagePropsBase | ViewProps>;
   placeholder?: string;
@@ -36,6 +37,7 @@ export const CustomTextInput: React.FC<Prop> = ({
   style,
   placeholder,
   defaultValue,
+  maxWidth,
   labelText = '',
   secureTextEntry = false,
   onChangeText
@@ -56,7 +58,8 @@ export const CustomTextInput: React.FC<Prop> = ({
         <TextInput
           style={[styles.textInput, {
             color: colors.text,
-            borderBottomColor: colors.border
+            borderBottomColor: colors.border,
+            maxWidth
           }]}
           defaultValue={defaultValue}
           secureTextEntry={secureTextEntry}

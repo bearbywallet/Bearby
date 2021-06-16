@@ -94,6 +94,25 @@ export class WalletControler extends Mnemonic {
     return this.account.add(account);
   }
 
+  public async addLedgerAccount(name: string, publicKey: string, index: number, mac: string) {
+    const keyPairs = {
+      index,
+      publicKey,
+      privateKey: ''
+    };
+    const account = await this.account.fromKeyPairs(
+      keyPairs,
+      AccountTypes.Ledger,
+      name
+    );
+
+    account.mac = mac;
+
+    await this.account.add(account);
+
+    return account;
+  }
+
   public async addNextAccount(name: string, password?: string) {
     const { identities } = this.account.store.get();
     const nextIndex = identities.filter(

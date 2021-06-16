@@ -33,7 +33,7 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
-import { DEFAULT_GAS } from 'app/config';
+import { AccountTypes, DEFAULT_GAS } from 'app/config';
 import { fromBech32Address } from 'app/utils';
 
 type Prop = {
@@ -77,11 +77,15 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
     setConfirmError(undefined);
     try {
       const chainID = await keystore.zilliqa.getNetworkId();
-      const keyPair = await keystore.getkeyPairs(account, password);
 
       transaction.setVersion(chainID);
 
-      await transaction.sign(keyPair.privateKey);
+      if (account.type === AccountTypes.Ledger) {
+        await transaction.ledgerSign(account);
+      } else {
+        const keyPair = await keystore.getkeyPairs(account, password);
+        await transaction.sign(keyPair.privateKey);
+      }
 
       transaction.hash = await keystore.zilliqa.send(transaction);
 
@@ -246,12 +250,12 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
       {tx ? (
         <ConfirmPopup
           transaction={tx}
-          error={confirmError}
+          error={confirmError || ''}
           token={token}
           account={account}
           title={i18n.t('confirm')}
           visible={confirmModal}
-          needPassword={!authState.biometricEnable}
+          needPassword={!authState.biometricEnable && account.type !== AccountTypes.Ledger}
           onTriggered={() => setConfirmModal(false)}
           onConfirm={handleSiging}
         >

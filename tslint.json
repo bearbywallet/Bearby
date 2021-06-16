@@ -15,6 +15,7 @@
         "no-implicit-dependencies": false,
         "trailing-comma": false,
         "no-bitwise": false,
+        "radix": false,
         "semicolon": [
             true,
             "always",

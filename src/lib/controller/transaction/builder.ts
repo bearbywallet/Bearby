@@ -10,6 +10,7 @@ import { GasState, Account, TxParams } from 'types';
 import { ZilliqaMessage } from '@zilliqa-js/proto';
 import BN from 'bn.js';
 import Long from 'long';
+import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 
 import {
   tohexString,
@@ -22,6 +23,7 @@ import {
 import { toLi, fromLI, gasToFee } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';
+import { LedgerController } from 'app/lib/controller/connect/ledger';
 import { DEFAULT_GAS } from 'app/config';
 
 export enum TransactionMethods {
@@ -218,11 +220,22 @@ export class Transaction {
     return this.version;
   }
 
+  public async ledgerSign(account: Account) {
+    const transport = await TransportBLE.open(account.mac);
+    const ledger = new LedgerController(transport);
+
+    this.signature = await ledger.signTxn(account.index, this);
+  }
+
   public async sign(privKey: string) {
     const bytes = this._encodeTransactionProto();
     const schnorrControl = new SchnorrControl(privKey);
 
     this.signature = await schnorrControl.getSignature(bytes);
+  }
+
+  public encodedProto() {
+    return this._encodeTransactionProto();
   }
 
   private _encodeTransactionProto() {

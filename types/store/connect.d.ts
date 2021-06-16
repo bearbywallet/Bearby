@@ -20,3 +20,8 @@ export interface LedgerTransport {
   }
   type: string;
 }
+
+export interface NativeTransport<T> {
+  decorateAppAPIMethods: (a:T, args: string[], key: string) => void;
+  send: (cla: number, method: number, p1: number, p2: number, payload?: Buffer) => Promise<Buffer>;
+}

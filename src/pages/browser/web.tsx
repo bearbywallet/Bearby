@@ -32,7 +32,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { keystore } from 'app/keystore';
 import { version } from '../../../package.json';
-import { Messages } from 'app/config';
+import { AccountTypes, Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
 import { MessagePayload, TxMessage } from 'types';
@@ -274,10 +274,16 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
     try {
       const chainID = await keystore.zilliqa.getNetworkId();
-      const keyPair = await keystore.getkeyPairs(account, password);
 
       tx.setVersion(chainID);
-      await tx.sign(keyPair.privateKey);
+
+      if (account.type === AccountTypes.Ledger) {
+        await tx.ledgerSign(account);
+      } else {
+        const keyPair = await keystore.getkeyPairs(account, password);
+        await tx.sign(keyPair.privateKey);
+      }
+
       tx.hash = await keystore.zilliqa.send(tx);
 
       await keystore.transaction.add(tx);
@@ -301,6 +307,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       setConfirmError(err.message);
     }
   }, [
+    account,
     accountState,
     transaction,
     webViewRef

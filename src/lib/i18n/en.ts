@@ -44,6 +44,7 @@ export default {
   sign: 'Sign',
   cancel: 'Cancel',
   havent_connections: 'You have no connections yet.',
+  ledger_connect: 'Ledger connect',
   acc_name_key: 'Imported %{index}',
   acc_name_ledger: 'Ledger %{index}',
   settings: 'Settings',
