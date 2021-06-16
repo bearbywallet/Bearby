@@ -43,21 +43,21 @@ export class WorkerController {
     try {
       await this.block.sync();
     } catch (err) {
-      console.warn('block.sync', err);
+      console.error('block.sync', err);
       //
     }
 
     try {
       await this._transactions.checkProcessedTx();
     } catch (err) {
-      console.warn('checkProcessedTx', err);
+      console.error('checkProcessedTx', err);
       //
     }
 
     try {
       await this._account.balanceUpdate();
     } catch (err) {
-      console.warn('balanceUpdate', err);
+      console.error('balanceUpdate', err);
     }
 
     this._theme.updateColors();

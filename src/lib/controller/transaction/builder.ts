@@ -221,6 +221,10 @@ export class Transaction {
   }
 
   public async ledgerSign(account: Account) {
+    if (!account.mac) {
+      throw new Error('Account is not ledger type.');
+    }
+
     const transport = await TransportBLE.open(account.mac);
     const ledger = new LedgerController(transport);
 

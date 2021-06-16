@@ -470,7 +470,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           account={account}
           error={confirmError || ''}
           title={i18n.t('confirm')}
-          needPassword={!authState.biometricEnable}
+          needPassword={!authState.biometricEnable && account.type !== AccountTypes.Ledger}
           visible={Boolean(transaction)}
           onTriggered={hanldeRejectTransaction}
           onConfirm={handleConfirmTransaction}

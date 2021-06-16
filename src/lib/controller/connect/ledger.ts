@@ -160,13 +160,12 @@ export class LedgerController {
       });
   }
 
-  public async signHash(keyIndex: number, message: string) {
+  public async signHash(keyIndex: number, hash: string) {
     const P1 = 0x00;
     const P2 = 0x00;
-    const hashStr = await sha256(message);
     const indexBytes = Buffer.alloc(4);
     indexBytes.writeInt32LE(keyIndex);
-    const hashBytes = Buffer.from(hashStr, "hex");
+    const hashBytes = Buffer.from(hash, "hex");
     const hashLen = hashBytes.length;
     if (hashLen <= 0) {
       throw Error(`Hash length ${hashLen} is invalid`);
@@ -175,7 +174,7 @@ export class LedgerController {
       hashBytes.slice(0, HashByteLen);
     }
     const payload = Buffer.concat([indexBytes, hashBytes]);
-    const result: Buffer = this._transport.send(CLA, INS.signHash, P1, P2, payload);
+    const result: Buffer = await this._transport.send(CLA, INS.signHash, P1, P2, payload);
 
     return (result.toString('hex').slice(0, SigByteLen * 2));
   }

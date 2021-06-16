@@ -16,6 +16,7 @@ import {
 } from 'react-native';
 import Modal from 'react-native-modal';
 import { useTheme } from '@react-navigation/native';
+import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 import FastImage from 'react-native-fast-image';
 
 import { ModalTitle } from 'app/components/modal-title';
@@ -27,10 +28,12 @@ import { ErrorMessage } from 'app/components/error-message';
 
 import i18n from 'app/lib/i18n';
 import { Signature, Account } from 'types';
+import { LedgerController } from 'app/lib/controller/connect/ledger';
 import { sha256 } from 'app/lib/crypto/sha256';
 import { keystore } from 'app/keystore';
 import { SchnorrControl } from 'app/lib/controller';
 import { fonts } from 'app/styles';
+import { AccountTypes } from 'app/config';
 
 type Prop = {
   style?: ViewStyle;
@@ -60,30 +63,43 @@ export const SignMessageModal: React.FC<Prop> = ({
 }) => {
   const { colors } = useTheme();
   const [isHash, setIsHash] = React.useState(false);
+  const [loading, setLoading] = React.useState(false);
   const [hash, setHash] = React.useState('');
   const [passowrd, setPassowrd] = React.useState<string>('');
   const [error, setError] = React.useState<string>();
 
   const handleSign = React.useCallback(async() => {
+    setLoading(true);
     setError(undefined);
     if (!payload || !hash) {
       return null;
     }
 
     try {
-      const bytes = Buffer.from(hash, 'hex');
-      const keyPair = await keystore.getkeyPairs(account, passowrd);
-      const schnorrControl = new SchnorrControl(keyPair.privateKey);
-      const signature = await schnorrControl.getSignature(bytes);
+      let signature = '';
+
+      if (account.type === AccountTypes.Ledger) {
+        const transport = await TransportBLE.open(account.mac);
+        const ledger = new LedgerController(transport);
+
+        signature = await ledger.signHash(account.index, hash);
+      } else {
+        const bytes = Buffer.from(hash, 'hex');
+        const keyPair = await keystore.getkeyPairs(account, passowrd);
+        const schnorrControl = new SchnorrControl(keyPair.privateKey);
+
+        signature = await schnorrControl.getSignature(bytes);
+      }
 
       onSign({
         signature,
         message: payload,
-        publicKey: keyPair.publicKey
+        publicKey: account.pubKey
       });
     } catch (err) {
       setError(err.message);
     }
+    setLoading(false);
   }, [hash, account, payload, passowrd]);
 
   React.useEffect(() => {
@@ -144,7 +160,7 @@ export const SignMessageModal: React.FC<Prop> = ({
               {isHash ? hash : payload}
             </Text>
           </View>
-          {needPassword ? (
+          {needPassword && account.type !== AccountTypes.Ledger ? (
             <Passwordinput
               style={{
                 marginVertical: 15
@@ -156,7 +172,8 @@ export const SignMessageModal: React.FC<Prop> = ({
           <CustomButton
             style={styles.signBtn}
             title={i18n.t('sign')}
-            disabled={needPassword && !passowrd}
+            isLoading={loading}
+            disabled={Boolean((needPassword && account.type !== AccountTypes.Ledger) && !passowrd)}
             onPress={handleSign}
           />
         </View>
@@ -200,7 +217,8 @@ const styles = StyleSheet.create({
     minHeight: 100
   },
   signBtn: {
-    minWidth: width / 2
+    minWidth: width / 2,
+    marginTop: 16
   },
   cancelBtn: {
     minWidth: width / 4
