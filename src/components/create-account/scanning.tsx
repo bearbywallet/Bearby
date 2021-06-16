@@ -28,7 +28,6 @@ import { LedgerAddModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { Device } from 'app/utils';
-import { LedgerController } from 'app/lib/controller/connect/ledger';
 import { BleState, LedgerTransport } from 'types';
 import { fonts } from 'app/styles';
 import LedgerIcon from 'app/assets/icons/ledger.svg';
@@ -85,11 +84,6 @@ export const ScanningDevice: React.FC = () => {
     } catch (err) {
       // Nothing to do: location is still disabled
     }
-  }, []);
-  const hanldeOpenDevice = React.useCallback(async(item: LedgerItem) => {
-    const transport = await TransportBLE.open(item.mac);
-    const ledger = new LedgerController(transport);
-    await ledger.getPublicAddress(0);
   }, []);
   const hanldeAddDevice = React.useCallback((el: LedgerItem) => {
     if (items.some((e) => e.mac === el.mac)) {

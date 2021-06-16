@@ -37,6 +37,10 @@
 	<string>Enable camer for scaning.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZIlPay Authentication with TouchId or FaceID</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>ZilPay need Acces to Location for use Ledger devices.</string>
+	<key>NSLocationWhenInUseUsageDescription</key>
+	<string>ZilPay need Acces to Location for use Ledger devices.</string>
 	<key>UIAppFonts</key>
 	<array>
 		<string>AvenirNextLTPro-Bold.otf</string>
