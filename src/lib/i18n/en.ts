@@ -59,6 +59,7 @@ export default {
   add_account: 'Add',
   import_account: 'PrivateKey',
   import_ledger: 'Ledger',
+  node_error: 'Oops, something wrong with node.',
   ble_disabled_title: 'Sorry, it looks like Bluetooth is disabled.',
   ble_disabled_message: 'Please enable Bluetooth in your phone settings',
   geo_disabled_title: 'Location services required',

@@ -21,6 +21,7 @@ import {
   SCAM_TOKEN,
   DEFAULT_SSN
 } from 'app/config';
+import i18n from 'app/lib/i18n';
 
 type Params = TxParams[] | string[] | number[] | (string | string[] | number[])[];
 type Balance = {
@@ -43,6 +44,11 @@ export class ZilliqaControl {
 
     const request = this._json(Methods.getBalance, [address]);
     const responce = await fetch(this._network.http, request);
+
+    if (responce.status !== 200) {
+      throw new Error(i18n.t('node_error'));
+    }
+
     const data = await responce.json();
 
     if (data && data.result && data.result.balance) {
@@ -125,6 +131,11 @@ export class ZilliqaControl {
       [contract, field, params]
     );
     const responce = await fetch(this._network.http, request);
+
+    if (responce.status !== 200) {
+      throw new Error(i18n.t('node_error'));
+    }
+
     const data = await responce.json();
 
     if (data.error) {
@@ -228,6 +239,11 @@ export class ZilliqaControl {
 
     const request = this._json(Methods.GetTransactionStatus, [hash]);
     const responce = await fetch(this._network.nativeHttp, request);
+
+    if (responce.status !== 200) {
+      throw new Error(i18n.t('node_error'));
+    }
+
     const data = await responce.json();
 
     if (data.error) {
