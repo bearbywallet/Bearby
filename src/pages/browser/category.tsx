@@ -39,7 +39,7 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route, navigation }) => {
   const [refreshing, setRefreshing] = React.useState(false);
   const [list, setList] = React.useState<DApp[]>([]);
 
-  const update = async(force = false) => {
+  const update = async(force = false): Promise<DApp[] | undefined> => {
     try {
       const result = await keystore.app.getAppsByCategory(
         route.params.category,
@@ -68,14 +68,18 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route, navigation }) => {
 
     const result = await update(force);
 
-    setList(result);
+    if (result) {
+      setList(result);
+    }
 
     setRefreshing(false);
   }, [route]);
 
   React.useEffect(() => {
     update().then((result) => {
-      setList(result);
+      if (result) {
+        setList(result);
+      }
       setLoading(false);
     });
   }, []);

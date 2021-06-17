@@ -249,9 +249,11 @@ export class AccountControler {
     const accounts = this.store.get();
     const account = accounts.identities[accounts.selectedAddress];
 
-    account.balance = await this._tokenBalance(account.base16);
+    if (accounts.identities.length > 0) {
+      account.balance = await this._tokenBalance(account.base16);
 
-    await this.update(deppUnlink(accounts));
+      await this.update(deppUnlink(accounts));
+    }
   }
 
   private async _checkAccount(account: Account) {

@@ -281,6 +281,7 @@ const styles = StyleSheet.create({
   host: {
     fontFamily: fonts.Demi,
     fontSize: 17,
+    padding: 5,
     textAlign: 'left',
     width: '100%'
   },

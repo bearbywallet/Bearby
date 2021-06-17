@@ -176,21 +176,37 @@ export class WalletControler extends Mnemonic {
 
   public async sync() {
     await this.theme.sync();
+    // console.log('await this.theme.sync();');
     await this.guard.sync();
+    // console.log('await this.guard.sync();');
     await this.network.sync();
+    // console.log('await this.network.sync();');
     await this.account.sync();
+    // console.log('await this.account.sync();');
     await this.token.sync();
+    // console.log('await this.token.sync();');
     await this.settings.sync();
+    // console.log('await this.settings.sync();');
     await this.currency.sync();
+    // console.log('await this.currency.sync();');
     await this.contacts.sync();
+    // console.log('await this.contacts.sync();');
     await this.gas.sync();
+    // console.log('await this.gas.sync();');
     await this.searchEngine.sync();
+    // console.log('await this.searchEngine.sync();');
     await this.connect.sync();
+    // console.log('await this.connect.sync();');
     await this.inpage.sync();
+    // console.log('await this.inpage.sync();');
     await this.ssn.sync();
+    // console.log('await this.ssn.sync();');
     await this.notificationManager.sync();
+    // console.log('await this.notificationManager.sync();');
     await this.transaction.sync();
+    // console.log('await this.transaction.sync();');
     await this.ipfs.sync();
+    console.info('sync done');
     this.worker.start();
   }
 }

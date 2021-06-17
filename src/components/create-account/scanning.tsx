@@ -117,7 +117,11 @@ export const ScanningDevice: React.FC = () => {
           name: descriptor.name
         });
       },
-      error: () => null
+      error: (err: Error) => {
+        if (err && err['errorCode'] === 601) {
+          setGeo(false);
+        }
+      }
     });
 
     return () => {
@@ -163,7 +167,7 @@ export const ScanningDevice: React.FC = () => {
           </Text>
         </View>
       ) : null}
-      {items.length === 0 ? (
+      {geo && items.length === 0 ? (
         <ActivityIndicator
           animating={items.length === 0}
           color={colors.primary}

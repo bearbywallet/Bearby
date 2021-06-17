@@ -42,7 +42,8 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
 
       navigation.navigate('App', { screen: 'Home' });
     })
-    .catch(() => {
+    .catch((err) => {
+      console.error('AuthLoadingPage.sync', err);
       return navigation.navigate('Unauthorized', { screen: 'GetStarted' });
     });
   }, [navigation]);

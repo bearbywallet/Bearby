@@ -105,7 +105,16 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       .account
       .balanceUpdate()
       .then(() => keystore.settings.rateUpdate())
-      .then(() => keystore.settings.getDexRate());
+      .then(() => keystore.settings.getDexRate())
+      .catch((err) => {
+        Alert.alert(
+          i18n.t('update'),
+          err.message,
+          [
+            { text: "OK" }
+          ]
+        );
+      });
   }, []);
 
   return (
