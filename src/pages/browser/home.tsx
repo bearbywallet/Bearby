@@ -117,7 +117,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <View>
+    <SafeWrapper>
       <View style={styles.header}>
         <View style={styles.headerWraper}>
           <Text style={[styles.headerTitle, {
@@ -189,7 +189,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           initialLayout={initialLayout}
         />
       </View>
-    </View>
+    </SafeWrapper>
   );
 };
 

@@ -52,19 +52,6 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
           ))}
         </View>
       )}
-            {Device.isIos() ? null : (
-        <View style={styles.categoriesWrapper}>
-          {categories.map((el) => (
-            <BrowserCarditem
-              style={{ marginTop: 15 }}
-              key={el}
-              el={el}
-              title={i18n.t(`category_${el}`)}
-              onPress={() => onSelect(el)}
-            />
-          ))}
-        </View>
-      )}
     </ScrollView>
   );
 };
@@ -72,7 +59,7 @@ export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 100,
-    marginBottom: 200
+    marginBottom: 225
   },
   categoriesWrapper: {
     flexDirection: 'row',
