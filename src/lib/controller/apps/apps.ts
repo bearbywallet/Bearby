@@ -23,13 +23,14 @@ export class AppsController {
 
   private _app = 'app_list';
   private _ad = 'ad_list';
+  private _max = 5;
 
   private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
   private _netwrok: NetworkControll;
 
   constructor(storage: MobileStorage) {
-    this._netwrok = new NetworkControll(storage, true);
+    this._netwrok = new NetworkControll(storage);
     this._zilliqa = new ZilliqaControl(this._netwrok);
     this._storage = storage;
   }
@@ -52,11 +53,7 @@ export class AppsController {
         throw new Error();
       }
 
-      const [random] = shuffle<Poster>(parsed);
-
-      if (random) {
-        adStoreUpdate(random);
-      }
+      adStoreUpdate(shuffle<Poster>(parsed));
 
       return parsed;
     } catch {
@@ -71,13 +68,12 @@ export class AppsController {
     if (result && result[this._ad]) {
       const key = 'arguments';
       const posters = Object.values<object>(result[this._ad]).map((p) => ({
-        block: p[key][0],
-        url: p[key][1],
-        banner: p[key][2]
-      })).filter((p: Poster) => Number(p.block) >= blockNumber);
-      const [random] = shuffle<Poster>(posters);
+        block: p[key][1],
+        url: p[key][2],
+        banner: p[key][3]
+      })).slice(0, this._max).filter((p: Poster) => Number(p.block) >= blockNumber);
 
-      adStoreUpdate(random);
+      adStoreUpdate(shuffle<Poster>(posters));
 
       await this._cahce(posters, STORAGE_FIELDS.POSTERS);
 

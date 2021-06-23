@@ -70,13 +70,13 @@ export class WorkerController {
       //
     }
 
-    // const blocknumber = this.store.get();
+    const blocknumber = this.store.get();
 
-    // await this._apps.getBanners(blocknumber);
+    await this._apps.getBanners(blocknumber);
 
     this.block.subscriber(async(block) => {
       await this.step();
-      // await this._apps.getBanners(block);
+      await this._apps.getBanners(block);
     });
   }
 }

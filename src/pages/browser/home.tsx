@@ -15,7 +15,9 @@ import {
   TextInput,
   StyleSheet,
   ActivityIndicator,
-  LayoutAnimation
+  LayoutAnimation,
+  ScrollView,
+  TouchableOpacity
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -34,6 +36,7 @@ import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { fonts } from 'app/styles';
+import FastImage from 'react-native-fast-image';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -50,6 +53,8 @@ const initialLayout = { width };
 export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const connectState = keystore.connect.store.useValue();
+  const browserState = keystore.app.store.useValue();
+  const ipfsState = keystore.ipfs.store.useValue();
 
   const [search, setSearch] = React.useState<string>('');
   const [isLoading, setIsLoading] = React.useState(false);
@@ -59,6 +64,11 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     { key: Tabs.apps, title: i18n.t('apps') },
     { key: Tabs.favorites, title: i18n.t('connections_title') }
   ]);
+
+  const ipfsURL = React.useMemo(() =>
+    ipfsState.list[ipfsState.selected].url,
+    [ipfsState]
+  );
 
   const hanldeBanner = React.useCallback(async(bannerURL: string) => {
     setIsLoading(true);
@@ -95,10 +105,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
   const renderScene = SceneMap({
     [Tabs.apps]: () => (
-      <BrowserApps
-        onSelect={hanldeSelectCategory}
-        onBanner={hanldeBanner}
-      />
+      <BrowserApps onSelect={hanldeSelectCategory} />
     ),
     [Tabs.favorites]: () => (
       <BrowserFavorites
@@ -110,7 +117,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
   });
 
   return (
-    <SafeWrapper>
+    <View>
       <View style={styles.header}>
         <View style={styles.headerWraper}>
           <Text style={[styles.headerTitle, {
@@ -147,8 +154,34 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
             onSubmitEditing={hanldeSearch}
           />
         </View>
+        <View style={{
+          height: height / 5
+        }}>
+          <ScrollView
+            contentContainerStyle={{
+              justifyContent: 'center'
+            }}
+            horizontal={true}
+            scrollEventThrottle={16}
+            pagingEnabled={true}
+            showsHorizontalScrollIndicator={false}
+          >
+            {browserState.map((poster, key) => (
+              <TouchableOpacity
+                key={key}
+                onPress={() => hanldeBanner(poster.url)}
+              >
+                <FastImage
+                  source={{ uri: `${ipfsURL}/${poster.banner}` }}
+                  style={[styles.previewImages, {
+                    backgroundColor: colors['card1']
+                  }]}
+                />
+              </TouchableOpacity>
+            ))}
+          </ScrollView>
+        </View>
         <TabView
-          style={styles.tabView}
           renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
           navigationState={{ index, routes }}
           renderScene={renderScene}
@@ -156,7 +189,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           initialLayout={initialLayout}
         />
       </View>
-    </SafeWrapper>
+    </View>
   );
 };
 
@@ -174,10 +207,11 @@ const styles = StyleSheet.create({
     width: '100%'
   },
   main: {
-    height: height - 100,
+    height: height + 100,
     borderTopEndRadius: 16,
     borderTopStartRadius: 16,
-    padding: 15
+    padding: 15,
+    justifyContent: 'flex-start'
   },
   textInput: {
     fontSize: 17,
@@ -191,8 +225,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'space-between'
   },
-  tabView: {
-    marginTop: 15
+  previewImages: {
+    marginTop: 16,
+    height: height / 6,
+    width: width - 50,
+    borderRadius: 8,
+    marginHorizontal: 5
   }
 });
 

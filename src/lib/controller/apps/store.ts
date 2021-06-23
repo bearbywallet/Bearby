@@ -10,10 +10,10 @@ import { newRidgeState } from 'react-ridge-state';
 import { Poster } from 'types';
 import { deppUnlink } from 'app/utils';
 
-const initalState: Poster | null = null;
-export const adStore = newRidgeState<Poster | null>(initalState);
+const initalState: Poster[] = [];
+export const adStore = newRidgeState<Poster[]>(initalState);
 
-export function adStoreUpdate(payload: Poster) {
+export function adStoreUpdate(payload: Poster[]) {
   adStore.set(() => deppUnlink(payload));
 }
 export function adStoreReset() {
