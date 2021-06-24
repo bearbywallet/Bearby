@@ -74,7 +74,10 @@ export const CreateAccountPage: React.FC<Prop> = ({ navigation }) => {
       />
     ),
     [Tabs.Ledger]: () => (
-      <ScanningDevice key={Tabs.Ledger}/>
+      <ScanningDevice
+        key={Tabs.Ledger}
+        onHome={handleCreate}
+      />
     )
   });
 

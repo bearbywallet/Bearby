@@ -32,12 +32,16 @@ import { BleState, LedgerTransport } from 'types';
 import { fonts } from 'app/styles';
 import LedgerIcon from 'app/assets/icons/ledger.svg';
 
+type Prop = {
+  onHome: () => void;
+};
+
 interface LedgerItem {
   mac: string;
   name: string;
   type: string;
 }
-export const ScanningDevice: React.FC = () => {
+export const ScanningDevice: React.FC<Prop> = ({ onHome }) => {
   const { colors } = useTheme();
   const [ble, setBle] = React.useState<boolean | null>(null);
   const [geo, setGeo] = React.useState<boolean | null>(null);
@@ -92,6 +96,12 @@ export const ScanningDevice: React.FC = () => {
 
     setItems([...items, el]);
   }, [items]);
+  const hanldeImported = React.useCallback(() => {
+    setSelected(undefined);
+    setTimeout(() => {
+      onHome();
+    }, 500);
+  }, []);
 
   React.useEffect(() => {
     const subscription = TransportBLE.observeState({
@@ -100,6 +110,10 @@ export const ScanningDevice: React.FC = () => {
 
         if (e.available && Device.isAndroid()) {
           await PermissionsAndroidRequest();
+        }
+
+        if  (e.available && Device.isIos()) {
+          setGeo(true);
         }
       },
       complete: () => null,
@@ -195,7 +209,7 @@ export const ScanningDevice: React.FC = () => {
         visible={Boolean(selected)}
         btnTitle={i18n.t('connect')}
         onTriggered={() => setSelected(undefined)}
-        onConfirmed={() => setSelected(undefined)}
+        onConfirmed={hanldeImported}
       />
     </KeyboardAwareScrollView>
   );
@@ -216,7 +230,8 @@ const styles = StyleSheet.create({
   message: {
     fontFamily: fonts.Regular,
     fontSize: 16,
-    textAlign: 'center'
+    textAlign: 'center',
+    marginVertical: 16
   },
   itemWrapper: {
     borderRadius: 5,

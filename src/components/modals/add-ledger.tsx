@@ -84,7 +84,6 @@ export const LedgerAddModal: React.FC<Prop> = ({
         index,
         mac
       );
-
       onConfirmed();
     } catch {
       //
