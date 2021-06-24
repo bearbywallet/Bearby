@@ -14,6 +14,7 @@ import { AppsController } from 'app/lib/controller/apps';
 import { MobileStorage } from 'app/lib/storage';
 import { BlockControl } from './block';
 import { blockStore } from './store';
+import { Device } from 'app/utils';
 
 export class WorkerController {
   public store = blockStore;
@@ -73,16 +74,20 @@ export class WorkerController {
 
     const blocknumber = this.store.get();
 
-    await this._apps.getBanners(blocknumber);
+    if (Device.isAndroid()) {
+      await this._apps.getBanners(blocknumber);
+    }
 
     this.block.subscriber(async(block) => {
       await this.step();
 
-      k++;
+      if (Device.isAndroid()) {
+        k++;
 
-      if (k > 10) {
-        await this._apps.getBanners(block);
-        k = 0;
+        if (k > 10) {
+          await this._apps.getBanners(block);
+          k = 0;
+        }
       }
     });
   }
