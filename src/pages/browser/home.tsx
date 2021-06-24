@@ -16,12 +16,13 @@ import {
   StyleSheet,
   ActivityIndicator,
   LayoutAnimation,
-  ScrollView,
-  TouchableOpacity
+  TouchableOpacity,
+  ListRenderItemInfo
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
+import Carousel from 'react-native-snap-carousel';
 
 import SearchIconSVG from 'app/assets/icons/search.svg';
 
@@ -37,6 +38,7 @@ import i18n from 'app/lib/i18n';
 import { BrwoserStackParamList } from 'app/navigator/browser';
 import { fonts } from 'app/styles';
 import FastImage from 'react-native-fast-image';
+import { Poster } from 'types';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -155,31 +157,26 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           />
         </View>
         <View style={{
-          height: height / 5
+          height: height * 0.20
         }}>
-          <ScrollView
-            contentContainerStyle={{
-              justifyContent: 'center'
-            }}
-            horizontal={true}
-            scrollEventThrottle={16}
-            pagingEnabled={true}
-            showsHorizontalScrollIndicator={false}
-          >
-            {browserState.map((poster, key) => (
-              <TouchableOpacity
-                key={key}
-                onPress={() => hanldeBanner(poster.url)}
-              >
+          <Carousel
+            data={browserState}
+            renderItem={(data: ListRenderItemInfo<Poster>) => (
+              <TouchableOpacity onPress={() => hanldeBanner(data.item.url)}>
                 <FastImage
-                  source={{ uri: `${ipfsURL}/${poster.banner}` }}
+                  source={{ uri: `${ipfsURL}/${data.item.banner}` }}
                   style={[styles.previewImages, {
                     backgroundColor: colors['card1']
                   }]}
                 />
               </TouchableOpacity>
-            ))}
-          </ScrollView>
+            )}
+            sliderWidth={sliderWidth}
+            itemWidth={slideWidth}
+            sliderHeight={slideHeight}
+            useScrollView={true}
+            loop
+          />
         </View>
         <TabView
           renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
@@ -192,6 +189,19 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     </SafeWrapper>
   );
 };
+
+function wp (percentage: number) {
+  const value = (percentage * width) / 100;
+  return Math.round(value);
+}
+
+const slideHeight = height * 0.36;
+const slideWidth = wp(75);
+const itemHorizontalMargin = wp(2);
+
+export const sliderWidth = width;
+export const itemWidth = slideWidth + itemHorizontalMargin * 2;
+
 
 const styles = StyleSheet.create({
   header: {
@@ -228,7 +238,6 @@ const styles = StyleSheet.create({
   previewImages: {
     marginTop: 16,
     height: height / 6,
-    width: width - 50,
     borderRadius: 8,
     marginHorizontal: 5
   }

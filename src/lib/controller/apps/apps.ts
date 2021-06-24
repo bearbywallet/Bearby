@@ -23,7 +23,7 @@ export class AppsController {
 
   private _app = 'app_list';
   private _ad = 'ad_list';
-  private _max = 5;
+  private _max = MIN_POSTERS_CAHCE;
 
   private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
@@ -49,7 +49,7 @@ export class AppsController {
 
       await this._cahce(parsed, STORAGE_FIELDS.POSTERS);
 
-      if (parsed.length <= MIN_POSTERS_CAHCE) {
+      if (parsed.length <= MIN_POSTERS_CAHCE / 2) {
         throw new Error();
       }
 
@@ -67,13 +67,15 @@ export class AppsController {
 
     if (result && result[this._ad]) {
       const key = 'arguments';
-      const posters = Object.values<object>(result[this._ad]).map((p) => ({
+      let posters = Object.values<object>(result[this._ad]).map((p) => ({
         block: p[key][1],
         url: p[key][2],
         banner: p[key][3]
-      })).slice(0, this._max).filter((p: Poster) => Number(p.block) >= blockNumber);
+      })).filter((p: Poster) => Number(p.block) >= blockNumber);
+      posters = shuffle<Poster>(posters);
+      posters = posters.slice(0, this._max);
 
-      adStoreUpdate(shuffle<Poster>(posters));
+      adStoreUpdate(posters);
 
       await this._cahce(posters, STORAGE_FIELDS.POSTERS);
 

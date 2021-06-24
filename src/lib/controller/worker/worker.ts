@@ -64,6 +64,7 @@ export class WorkerController {
   }
 
   public async start() {
+    let k = 0;
     try {
       await this.block.sync();
     } catch {
@@ -76,7 +77,13 @@ export class WorkerController {
 
     this.block.subscriber(async(block) => {
       await this.step();
-      await this._apps.getBanners(block);
+
+      k++;
+
+      if (k > 10) {
+        await this._apps.getBanners(block);
+        k = 0;
+      }
     });
   }
 }
