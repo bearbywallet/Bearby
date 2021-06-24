@@ -13,12 +13,10 @@ import {
   ScrollView,
   StyleSheet
 } from 'react-native';
-import { useTheme } from '@react-navigation/native';
 
 import { BrowserCarditem } from 'app/components/browser';
 
 import i18n from 'app/lib/i18n';
-import { Device } from 'app/utils';
 
 type Prop = {
   onSelect: (name: number) => void;
@@ -32,26 +30,22 @@ export const categories = [
   5
 ];
 export const BrowserApps: React.FC<Prop> = ({ onSelect }) => {
-  const { colors } = useTheme();
-
   return (
     <ScrollView
       style={styles.container}
       showsVerticalScrollIndicator={false}
     >
-      {Device.isIos() ? null : (
-        <View style={styles.categoriesWrapper}>
-          {categories.map((el) => (
-            <BrowserCarditem
-              style={{ marginTop: 15 }}
-              key={el}
-              el={el}
-              title={i18n.t(`category_${el}`)}
-              onPress={() => onSelect(el)}
-            />
-          ))}
-        </View>
-      )}
+      <View style={styles.categoriesWrapper}>
+        {categories.map((el) => (
+          <BrowserCarditem
+            style={{ marginTop: 15 }}
+            key={el}
+            el={el}
+            title={i18n.t(`category_${el}`)}
+            onPress={() => onSelect(el)}
+          />
+        ))}
+      </View>
     </ScrollView>
   );
 };

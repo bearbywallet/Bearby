@@ -39,6 +39,7 @@ import { BrwoserStackParamList } from 'app/navigator/browser';
 import { fonts } from 'app/styles';
 import FastImage from 'react-native-fast-image';
 import { Poster } from 'types';
+import { Device } from 'app/utils';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -156,35 +157,45 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
             onSubmitEditing={hanldeSearch}
           />
         </View>
-        <View style={{
-          height: height * 0.20
-        }}>
-          <Carousel
-            data={browserState}
-            renderItem={(data: ListRenderItemInfo<Poster>) => (
-              <TouchableOpacity onPress={() => hanldeBanner(data.item.url)}>
-                <FastImage
-                  source={{ uri: `${ipfsURL}/${data.item.banner}` }}
-                  style={[styles.previewImages, {
-                    backgroundColor: colors['card1']
-                  }]}
-                />
-              </TouchableOpacity>
-            )}
-            sliderWidth={width}
-            itemWidth={wp(75)}
-            sliderHeight={height * 0.36}
-            useScrollView={true}
-            loop
+        {browserState.length > 0 ? (
+          <View style={{
+            height: height * 0.20
+          }}>
+            <Carousel
+              data={browserState}
+              renderItem={(data: ListRenderItemInfo<Poster>) => (
+                <TouchableOpacity onPress={() => hanldeBanner(data.item.url)}>
+                  <FastImage
+                    source={{ uri: `${ipfsURL}/${data.item.banner}` }}
+                    style={[styles.previewImages, {
+                      backgroundColor: colors['card1']
+                    }]}
+                  />
+                </TouchableOpacity>
+              )}
+              sliderWidth={width}
+              itemWidth={wp(75)}
+              sliderHeight={height * 0.36}
+              useScrollView={true}
+              loop
+            />
+          </View>
+        ) : null}
+        {Device.isIos() ? (
+          <BrowserFavorites
+            connections={connectState}
+            onGoConnection={handleConnect}
+            onRemove={(connect) => keystore.connect.rm(connect)}
           />
-        </View>
-        <TabView
-          renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
-          navigationState={{ index, routes }}
-          renderScene={renderScene}
-          onIndexChange={setIndex}
-          initialLayout={initialLayout}
-        />
+        ) : (
+          <TabView
+            renderTabBar={(props: SceneRendererProps) => <CreateAccountNavBar {...props}/>}
+            navigationState={{ index, routes }}
+            renderScene={renderScene}
+            onIndexChange={setIndex}
+            initialLayout={initialLayout}
+          />
+        )}
       </View>
     </SafeWrapper>
   );
