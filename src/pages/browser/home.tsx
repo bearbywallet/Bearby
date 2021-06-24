@@ -171,9 +171,9 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
                 />
               </TouchableOpacity>
             )}
-            sliderWidth={sliderWidth}
-            itemWidth={slideWidth}
-            sliderHeight={slideHeight}
+            sliderWidth={width}
+            itemWidth={wp(75)}
+            sliderHeight={height * 0.36}
             useScrollView={true}
             loop
           />
@@ -194,10 +194,6 @@ function wp (percentage: number) {
   const value = (percentage * width) / 100;
   return Math.round(value);
 }
-
-const slideHeight = height * 0.36;
-const slideWidth = wp(75);
-const sliderWidth = width;
 
 const styles = StyleSheet.create({
   header: {
