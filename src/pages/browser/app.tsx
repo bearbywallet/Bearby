@@ -13,12 +13,14 @@ import {
   View,
   ScrollView,
   Dimensions,
-  Text
+  Text,
+  ListRenderItemInfo
 } from 'react-native';
 import URL from 'url-parse';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import FastImage from 'react-native-fast-image';
+import Carousel from 'react-native-snap-carousel';
 
 import { CustomButton } from 'app/components/custom-button';
 
@@ -79,27 +81,22 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
             </Text>
           </View>
         </View>
-        <ScrollView
-          style={styles.scrollView}
-          contentContainerStyle={{
-            justifyContent: 'center',
-            alignItems: 'center'
-          }}
-          horizontal={true}
-          scrollEventThrottle={16}
-          pagingEnabled={true}
-          showsHorizontalScrollIndicator={false}
-        >
-          {route.params.app.images.map((img, index) => (
+        <Carousel
+          data={route.params.app.images}
+          renderItem={(data: ListRenderItemInfo<string>) => (
             <FastImage
-              key={index}
-              source={{ uri: `${ipfsURL}/${img}` }}
+              source={{ uri: `${ipfsURL}/${data.item}` }}
               style={[styles.previewImages, {
                 backgroundColor: colors['card1']
               }]}
             />
-          ))}
-        </ScrollView>
+          )}
+          sliderWidth={width}
+          itemWidth={width - 16}
+          sliderHeight={height * 0.50}
+          useScrollView={true}
+          loop
+        />
         {description ? (
           <Text style={[styles.description, {
             color: colors.text
@@ -144,15 +141,9 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginTop: 5
   },
-  scrollView: {
-    flex: 1,
-    maxHeight: height - 50
-  },
   previewImages: {
     height: height / 3,
-    width: width - 20,
-    borderRadius: 8,
-    marginHorizontal: 5
+    borderRadius: 8
   },
   description: {
     fontFamily: fonts.Regular,

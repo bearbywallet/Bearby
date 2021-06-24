@@ -230,8 +230,7 @@ const styles = StyleSheet.create({
   previewImages: {
     marginTop: 16,
     height: height / 6,
-    borderRadius: 8,
-    marginHorizontal: 5
+    borderRadius: 8
   }
 });
 
