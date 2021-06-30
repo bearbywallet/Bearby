@@ -150,7 +150,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {
-      setPasswordError(i18n.t('lock_error'));
+      setPasswordError(err.message);
     }
 
     setIsLoading(false);

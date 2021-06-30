@@ -30,7 +30,7 @@ export class AppsController {
   private _netwrok: NetworkControll;
 
   constructor(storage: MobileStorage) {
-    this._netwrok = new NetworkControll(storage);
+    this._netwrok = new NetworkControll(storage, true);
     this._zilliqa = new ZilliqaControl(this._netwrok);
     this._storage = storage;
   }

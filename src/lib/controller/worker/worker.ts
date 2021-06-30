@@ -65,30 +65,30 @@ export class WorkerController {
   }
 
   public async start() {
-    let k = 0;
+    // let k = 0;
     try {
       await this.block.sync();
     } catch {
       //
     }
 
-    const blocknumber = this.store.get();
+    // const blocknumber = this.store.get();
 
-    if (Device.isAndroid()) {
-      await this._apps.getBanners(blocknumber);
-    }
+    // if (Device.isAndroid()) {
+    //   await this._apps.getBanners(blocknumber);
+    // }
 
     this.block.subscriber(async(block) => {
       await this.step();
 
-      if (Device.isAndroid()) {
-        k++;
+      // if (Device.isAndroid()) {
+      //   k++;
 
-        if (k > 10) {
-          await this._apps.getBanners(block);
-          k = 0;
-        }
-      }
+      //   if (k > 10) {
+      //     await this._apps.getBanners(block);
+      //     k = 0;
+      //   }
+      // }
     });
   }
 }

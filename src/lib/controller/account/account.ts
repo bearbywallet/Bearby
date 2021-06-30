@@ -219,7 +219,7 @@ export class AccountControler {
     const type = AccountTypes.privateKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
-    const balance = await this._tokenBalance(base16);
+    const balance = await this._tokenBalance(base16, true);
     const index = this.lastIndexPrivKey;
 
     return {
@@ -274,14 +274,22 @@ export class AccountControler {
     return accounts;
   }
 
-  private async _tokenBalance(base16: string) {
+  private async _tokenBalance(base16: string, skipError: boolean = false) {
     const net = this._netwrok.selected;
     const tokens = this._token.store.get().map((t) => [t.symbol, '0']);
     const entries = ZILLIQA_KEYS.map((n) => [n, Object.fromEntries(tokens)]);
     const balances = Object.fromEntries(entries);
 
     for (const t of this._token.store.get()) {
-      balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+      if (skipError) {
+        try {
+          balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+        } catch {
+          balances[net][t.symbol] = '0';
+        }
+      } else {
+        balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+      }
     }
 
     return balances;
