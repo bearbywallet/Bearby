@@ -113,7 +113,7 @@ export class AccountControler {
     const pubKey = acc.publicKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
-    const balance = await this._tokenBalance(base16);
+    const balance = await this._tokenBalance(base16, true);
 
     return {
       base16,
