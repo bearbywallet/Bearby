@@ -92,8 +92,6 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
               {i18n.t('mnemonic_des')}
             </Text>
             <TextInput
-              multiline={true}
-              numberOfLines={10}
               autoCorrect={false}
               style={[styles.text, {
                 borderColor: errorMessage ? colors['danger'] : colors.border,
@@ -143,12 +141,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Regular
   },
   text: {
-    height: height / 5,
+    height: 50,
     fontFamily: fonts.Regular,
     borderWidth: 1,
     borderRadius: 8,
-    padding: 20,
-    fontSize: 23
+    padding: 5,
+    fontSize: 16
   }
 });
 
