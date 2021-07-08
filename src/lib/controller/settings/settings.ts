@@ -93,6 +93,11 @@ export class SettingsControler {
       }
 
       const tokenAddress = token.address[this._netwrok.selected];
+
+      if (!tokenAddress) {
+        continue;
+      }
+
       const pool = await this._zilliqa.getSmartContractSubState(
         contract,
         fieldname,
