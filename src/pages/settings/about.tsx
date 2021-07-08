@@ -22,15 +22,14 @@ import { Button } from 'app/components/button';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { fonts } from 'app/styles';
-import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
 const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
-const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
-const TERMS_URL = 'https://zilpay.xyz/Terms/';
+const PRIVACY_URL = 'https://zilpay.io/policy';
+const TERMS_URL = 'https://zilpay.io/terms';
 const ISSUES = 'https://github.com/zilpay/zilpay-mobile/issues';
 export const AboutPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
