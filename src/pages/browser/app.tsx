@@ -53,8 +53,8 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
 
   React.useEffect(() => {
     fetch(`${ipfsURL}/${route.params.app.description}`)
-      .then((res) => res.text())
-      .then((text) => setDescription(text))
+      .then((res) => res.json())
+      .then((value) => setDescription(value.text))
       .catch(() => setDescription(''));
   }, [ipfsURL]);
 

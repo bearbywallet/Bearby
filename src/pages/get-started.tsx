@@ -12,7 +12,10 @@ import {
   StyleSheet,
   Text,
   ScrollView,
-  Dimensions
+  Dimensions,
+  Image,
+  ImageStyle,
+  StyleProp
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -22,9 +25,9 @@ import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Button } from 'app/components/button';
 
-import GetStartedFirst from 'app/assets/get_started_1.svg';
-import GetStartedSecond from 'app/assets/get_started_2.svg';
-import GetStartedThird from 'app/assets/get_started_3.svg';
+import GetStartedFirst from 'app/assets/images/get_started_0.webp';
+import GetStartedSecond from 'app/assets/images/get_started_1.webp';
+import GetStartedThird from 'app/assets/images/get_started_2.webp';
 
 import { fonts } from 'app/styles';
 
@@ -33,19 +36,24 @@ type Prop = {
 };
 
 const { width, height } = Dimensions.get('window');
+const imageStyles: StyleProp<ImageStyle> = {
+  width: 'auto',
+  height: '50%',
+  resizeMode: 'contain'
+};
 const pages = [
   {
-    img: <GetStartedFirst width={width} height={'50%'}/>,
+    img: <Image source={GetStartedFirst} style={imageStyles}/>,
     title: i18n.t('get_started_title_1'),
     description: i18n.t('get_started_description_1')
   },
   {
-    img: <GetStartedSecond width={width} height={'50%'} />,
+    img: <Image source={GetStartedSecond} style={imageStyles}/>,
     title: i18n.t('get_started_title_2'),
     description: i18n.t('get_started_description_2')
   },
   {
-    img: <GetStartedThird width={width} height={'50%'} />,
+    img: <Image source={GetStartedThird} style={imageStyles}/>,
     title: i18n.t('get_started_title_3'),
     description: i18n.t('get_started_description_3')
   }
@@ -131,8 +139,11 @@ const styles = StyleSheet.create({
     flex: 1,
     maxHeight: height - 50
   },
+  previewImage: {
+    width,
+    height: '50%'
+  },
   slideContainer: {
-    alignItems: 'center'
   },
   wrapper: {
     justifyContent: 'center',

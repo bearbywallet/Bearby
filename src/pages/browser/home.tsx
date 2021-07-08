@@ -173,7 +173,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
                   />
                 </TouchableOpacity>
               )}
-              sliderWidth={width}
+              sliderWidth={width - 30}
               itemWidth={wp(75)}
               sliderHeight={height * 0.36}
               useScrollView={true}

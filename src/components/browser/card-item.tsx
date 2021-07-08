@@ -15,15 +15,16 @@ import {
   ViewStyle,
   View
 } from 'react-native';
-import { categories } from './apps';
 import { useTheme } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
-import Social from 'app/assets/social.svg';
-import Exchange from 'app/assets/exchange.svg';
-import Finance from 'app/assets/finance.svg';
-import Gambling from 'app/assets/gambling.svg';
-import Games from 'app/assets/games.svg';
-import HighRisk from 'app/assets/high-risk.svg';
+import Social from 'app/assets/images/2.webp';
+import Exchange from 'app/assets/images/4.webp';
+import Finance from 'app/assets/images/1.webp';
+import Gambling from 'app/assets/images/5.webp';
+import Games from 'app/assets/images/0.webp';
+import HighRisk from 'app/assets/images/3.webp';
+
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -33,31 +34,36 @@ type Prop = {
   onPress?: () => void;
 };
 const { width } = Dimensions.get('window');
+const imageStyles = {
+  width: 90,
+  height: '100%',
+  resizeMode: 'contain'
+};
 const Imgaes = [
-  <Games
-    width={width / 3}
-    height={width / 7}
+  <FastImage
+    source={Games}
+    style={imageStyles}
   />,
-  <Finance
-    width={width / 3}
-    height={width / 7}
+  <FastImage
+    source={Finance}
+    style={imageStyles}
   />,
-  <Social
-    width={width / 3}
-    height={width / 5}
+  <FastImage
+    source={Social}
+    style={imageStyles}
   />,
-  <HighRisk
-    width={width / 3}
-    height={width / 7}
+  <FastImage
+    source={HighRisk}
+    style={imageStyles}
   />,
-  <Exchange
-    width={width / 3}
-    height={width / 5}
+  <FastImage
+    source={Exchange}
+    style={imageStyles}
   />,
-  <Gambling
-    width={width / 3}
-    height={width / 5}
-  />,
+  <FastImage
+    source={Gambling}
+    style={imageStyles}
+  />
 ];
 
 export const BrowserCarditem: React.FC<Prop> = ({ el, title, style, onPress }) => {

@@ -11,6 +11,7 @@ import {
   View,
   StyleSheet,
   TouchableOpacity,
+  Image,
   Text,
   TextInput,
   Dimensions
@@ -19,7 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@react-navigation/native';
 
-import CreateBackground from 'app/assets/get_started_1.svg';
+import CreateBackground from 'app/assets/images/get_started_0.webp';
 import LockSVG from 'app/assets/icons/lock.svg';
 import FingerPrintIconSVG from 'app/assets/icons/fingerprint.svg';
 
@@ -80,9 +81,9 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
       backgroundColor: colors.background
     }]}>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
-        <CreateBackground
-          width={width + width / 6}
-          height={width + width / 6}
+        <Image
+          source={CreateBackground}
+          style={styles.imageStyles}
         />
       </View>
       <View style={styles.pageContainer}>
@@ -146,6 +147,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 190
+  },
+  imageStyles: {
+    width,
+    resizeMode: 'contain'
   },
   textInput: {
     fontSize: 17,

@@ -12,7 +12,8 @@ import {
   View,
   StyleSheet,
   Dimensions,
-  Text
+  Text,
+  Image
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -21,7 +22,7 @@ import { useTheme } from '@react-navigation/native';
 import { RootParamList } from 'app/navigator';
 import { Button } from 'app/components/button';
 
-import CreateBackground from 'app/assets/get_started_1.svg';
+import CreateBackground from 'app/assets/images/get_started_0.webp';
 
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
@@ -40,9 +41,9 @@ export const InitSuccessfullyPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <SafeWrapper>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
-        <CreateBackground
-          width={width + width / 4}
-          height={width + width / 4}
+        <Image
+          source={CreateBackground}
+          style={styles.imageStyles}
         />
       </View>
       <View style={styles.wrapper}>
@@ -66,6 +67,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: '40%'
+  },
+  imageStyles: {
+    width,
+    height: '90%',
+    resizeMode: 'contain'
   },
   wrapper: {
     height: '80%',

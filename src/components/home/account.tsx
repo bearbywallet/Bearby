@@ -14,10 +14,12 @@ import {
   Dimensions
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
+import FastImage from 'react-native-fast-image';
 
 import { AccountMenu } from 'app/components/account-menu';
-import CreateBackground from 'app/assets/logo.svg';
 import { Button } from 'app/components/button';
+
+import CreateBackground from 'app/assets/images/get_started_0.webp';
 
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
@@ -68,9 +70,9 @@ export const HomeAccount: React.FC<Prop> = ({
 
   return (
     <View style={styles.container}>
-      <CreateBackground
-        width={width + width / 2}
-        height={width + width / 1.5}
+      <FastImage
+        source={CreateBackground}
+        style={styles.imageStyles}
       />
       <View style={[StyleSheet.absoluteFill, styles.content]}>
         <AccountMenu
@@ -135,6 +137,11 @@ const styles = StyleSheet.create({
   amount: {
     fontSize: 40,
     fontFamily: fonts.Bold
+  },
+  imageStyles: {
+    width: width + 100,
+    height: height / 2,
+    resizeMode: 'contain'
   },
   symbol: {
     fontSize: 17,

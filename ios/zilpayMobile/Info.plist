@@ -33,6 +33,10 @@
 		<key>NSExceptionDomains</key>
 		<dict/>
 	</dict>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>ZIlPay is using Bluetooth for connect Ledger device.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>ZilPay use Bluetooth for scan and connect ledger device.</string>
 	<key>NSCameraUsageDescription</key>
 	<string>Enable camer for scaning.</string>
 	<key>NSFaceIDUsageDescription</key>

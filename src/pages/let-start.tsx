@@ -11,6 +11,7 @@ import {
   StyleSheet,
   Dimensions,
   Text,
+  Image,
   View
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
@@ -21,7 +22,7 @@ import i18n from 'app/lib/i18n';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import { Button } from 'app/components/button';
 
-import CreateBackground from 'app/assets/get_started_1.svg';
+import CreateBackground from 'app/assets/images/get_started_0.webp';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -35,9 +36,9 @@ export const LetStartPage: React.FC<Prop> = ({ navigation }) => {
   return (
     <SafeWrapper>
       <View style={[StyleSheet.absoluteFill, styles.backgroundImage]}>
-        <CreateBackground
-          width={width + width / 6}
-          height={width + width / 6}
+        <Image
+          source={CreateBackground}
+          style={styles.imageStyles}
         />
       </View>
       <View style={styles.pageContainer}>
@@ -78,6 +79,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 300
+  },
+  imageStyles: {
+    width,
+    height: '90%',
+    resizeMode: 'contain'
   },
   pageContainer: {
     justifyContent: 'flex-end',
