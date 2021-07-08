@@ -102,11 +102,7 @@ export class NotificationManager {
     this._navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        params: {
-          url,
-          name: new URL(url).host,
-          type: URLTypes.web
-        }
+        url
       }
     });
   }

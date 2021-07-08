@@ -48,11 +48,7 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const handleLaunch = React.useCallback(() => {
     navigation.navigate('Web', {
-      params: {
-        type: URLTypes.web,
-        url: route.params.app.url,
-        name: new URL(route.params.app.url).hash
-      }
+      url: route.params.app.url
     });
   }, [navigation, route]);
 

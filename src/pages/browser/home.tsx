@@ -78,7 +78,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     const params = await keystore.searchEngine.onUrlSubmit(bannerURL);
     setIsLoading(false);
     navigation.navigate('Web', {
-      params
+      url: params.url
     });
   }, [navigation]);
   const hanldeSearch = React.useCallback(async() => {
@@ -86,7 +86,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     const params = await keystore.searchEngine.onUrlSubmit(search);
     setIsLoading(false);
     navigation.navigate('Web', {
-      params
+      url: params.url
     });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   }, [search]);
@@ -101,7 +101,7 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
     const params = await keystore.searchEngine.onUrlSubmit(connect.domain);
     setIsLoading(false);
     navigation.navigate('Web', {
-      params
+      url: params.url
     });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   }, []);

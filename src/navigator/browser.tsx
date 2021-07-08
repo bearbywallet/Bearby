@@ -26,7 +26,7 @@ export type BrwoserStackParamList = {
     category: number;
   },
   Web: {
-    params: URLType;
+    url: string;
   };
   BrowserApp: {
     app: DApp;

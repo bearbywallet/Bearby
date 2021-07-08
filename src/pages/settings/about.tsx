@@ -39,11 +39,7 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
     navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        params: {
-          url,
-          name: new URL(url).host,
-          type: URLTypes.web
-        }
+        url
       }
     });
   }, [navigation]);
