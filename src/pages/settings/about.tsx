@@ -11,12 +11,13 @@ import {
   View,
   StyleSheet,
   Text,
+  Image,
   Dimensions
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 
-import CreateBackground from 'app/assets/get_started_1.svg';
+import CreateBackground from 'app/assets/images/get_started_0.webp';
 import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
@@ -31,7 +32,6 @@ const GIHTUB_URL = 'https://github.com/zilpay/zilpay-mobile';
 const PRIVACY_URL = 'https://zilpay.xyz/PrivacyPolicy/';
 const TERMS_URL = 'https://zilpay.xyz/Terms/';
 const ISSUES = 'https://github.com/zilpay/zilpay-mobile/issues';
-const { width } = Dimensions.get('window');
 export const AboutPage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
 
@@ -51,9 +51,9 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
       }]}>
         {i18n.t('about_title')}
       </Text>
-      <CreateBackground
-        width={width}
-        height={width}
+      <Image
+        source={CreateBackground}
+        style={styles.imageStyles}
       />
       <View>
         <Button
@@ -87,6 +87,11 @@ const styles = StyleSheet.create({
     fontSize: 30,
     fontFamily: fonts.Bold,
     marginTop: '5%'
+  },
+  imageStyles: {
+    width: 'auto',
+    height: '60%',
+    resizeMode: 'contain'
   }
 });
 
