@@ -25,6 +25,7 @@ import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
 import { viewAddress } from 'app/utils';
 import { Token } from 'types';
+import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -59,7 +60,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        url
+        params: {
+          url,
+          name: new URL(url).host,
+          type: URLTypes.web
+        }
       }
     });
   }, [networkState, navigation]);
@@ -67,7 +72,11 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        url
+        params: {
+          url,
+          name: new URL(url).host,
+          type: URLTypes.web
+        }
       }
     });
   }, [networkState, navigation]);
@@ -101,6 +110,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, [account, setIsConfirmModal]);
 
   React.useEffect(() => {
+    keystore.theme.updateColors();
     keystore
       .account
       .balanceUpdate()

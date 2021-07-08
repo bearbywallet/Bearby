@@ -28,6 +28,7 @@ import { BrwoserStackParamList } from 'app/navigator/browser';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 import { keystore } from 'app/keystore';
+import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;
@@ -47,7 +48,11 @@ export const BrowserAppPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const handleLaunch = React.useCallback(() => {
     navigation.navigate('Web', {
-      url: route.params.app.url
+      params: {
+        type: URLTypes.web,
+        url: route.params.app.url,
+        name: new URL(route.params.app.url).hash
+      }
     });
   }, [navigation, route]);
 

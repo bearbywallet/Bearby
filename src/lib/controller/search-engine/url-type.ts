@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './search-engine';
-export * from './store';
-export * from './url-type';
+export enum URLTypes {
+  web,
+  dweb
+}

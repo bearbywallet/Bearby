@@ -11,8 +11,7 @@ import {
   View,
   StyleSheet,
   Text,
-  Image,
-  Dimensions
+  Image
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
@@ -23,6 +22,7 @@ import { Button } from 'app/components/button';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { fonts } from 'app/styles';
+import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -39,7 +39,11 @@ export const AboutPage: React.FC<Prop> = ({ navigation }) => {
     navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        url
+        params: {
+          url,
+          name: new URL(url).host,
+          type: URLTypes.web
+        }
       }
     });
   }, [navigation]);

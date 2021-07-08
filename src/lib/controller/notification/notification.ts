@@ -20,6 +20,7 @@ import { MobileStorage, buildObject, NetworkControll } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
 import { NotificationState } from 'types';
 import { viewTransaction, Device } from 'app/utils';
+import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 export type MessageNotification = {
   title: string;
@@ -101,7 +102,11 @@ export class NotificationManager {
     this._navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        url
+        params: {
+          url,
+          name: new URL(url).host,
+          type: URLTypes.web
+        }
       }
     });
   }

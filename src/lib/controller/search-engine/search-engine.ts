@@ -16,6 +16,13 @@ import { buildObject, MobileStorage } from 'app/lib';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { SearchEngineStoreType } from 'types';
 import { deppUnlink } from 'app/utils';
+import { URLTypes } from './url-type';
+
+export interface URLType {
+  type: URLTypes;
+  url: string;
+  name: string;
+}
 
 export class SearchController {
   public readonly store = searchEngineStore;
@@ -101,14 +108,18 @@ export class SearchController {
    * @param defaultProtocol - Protocol string to append to URLs that have none
    * @returns - String corresponding to sanitized input depending if it's a search or url
    */
-  public async onUrlSubmit(input: string, defaultProtocol = 'https://') {
+  public async onUrlSubmit(input: string, defaultProtocol = 'https://'): Promise<URLType> {
     input = input.toLowerCase();
 
     if (this.store.get().dweb) {
       const cryptoDomain = await this._ud.tryResolveDweb(input);
 
       if (cryptoDomain) {
-        return cryptoDomain;
+        return {
+          type: URLTypes.dweb,
+          url: cryptoDomain,
+          name: input
+        };
       }
     }
     // Check if it's a url or a keyword
@@ -118,13 +129,30 @@ export class SearchController {
       // Add exception for localhost
       if (!input.startsWith('http://localhost') && !input.startsWith('localhost')) {
         // In case of keywords we default to google search
-        return this.getURLSearchEngine(escape(input));
+
+        return {
+          type: URLTypes.web,
+          url: this.getURLSearchEngine(escape(input)),
+          name: input
+        };
       }
     }
 
     const hasProtocol = input.match(/^[a-z]*:\/\//);
 
-    return hasProtocol ? input : `${defaultProtocol}${input}`;
+    if (hasProtocol) {
+      return {
+        type: URLTypes.web,
+        url: input,
+        name: input
+      };
+    }
+
+    return {
+      type: URLTypes.web,
+      url: `${defaultProtocol}${input}`,
+      name: input
+    };
   }
 
   private async _update(state: SearchEngineStoreType) {

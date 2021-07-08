@@ -75,18 +75,18 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
   const hanldeBanner = React.useCallback(async(bannerURL: string) => {
     setIsLoading(true);
-    const url = await keystore.searchEngine.onUrlSubmit(bannerURL);
+    const params = await keystore.searchEngine.onUrlSubmit(bannerURL);
     setIsLoading(false);
     navigation.navigate('Web', {
-      url
+      params
     });
   }, [navigation]);
   const hanldeSearch = React.useCallback(async() => {
     setIsLoading(true);
-    const url = await keystore.searchEngine.onUrlSubmit(search);
+    const params = await keystore.searchEngine.onUrlSubmit(search);
     setIsLoading(false);
     navigation.navigate('Web', {
-      url
+      params
     });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   }, [search]);
@@ -98,10 +98,10 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
 
   const handleConnect = React.useCallback(async(connect) => {
     setIsLoading(true);
-    const url = await keystore.searchEngine.onUrlSubmit(connect.domain);
+    const params = await keystore.searchEngine.onUrlSubmit(connect.domain);
     setIsLoading(false);
     navigation.navigate('Web', {
-      url
+      params
     });
     LayoutAnimation.configureNext(LayoutAnimation.Presets.spring);
   }, []);

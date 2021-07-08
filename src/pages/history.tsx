@@ -33,6 +33,7 @@ import { StoredTx } from 'types';
 
 import ZIlliqaLogo from 'app/assets/zilliqa.svg';
 import { fonts } from 'app/styles';
+import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -101,7 +102,11 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     navigation.navigate('Browser', {
       screen: 'Web',
       params: {
-        url
+        params: {
+          url,
+          name: new URL(url).host,
+          type: URLTypes.web
+        }
       }
     });
     setTransactionModal(false);

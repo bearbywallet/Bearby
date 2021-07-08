@@ -18,6 +18,7 @@ import {
 } from 'app/pages/browser';
 
 import { DApp } from 'types';
+import { URLType } from 'src/lib/controller/search-engine';
 
 export type BrwoserStackParamList = {
   Browser: undefined;
@@ -25,7 +26,7 @@ export type BrwoserStackParamList = {
     category: number;
   },
   Web: {
-    url: string;
+    params: URLType;
   };
   BrowserApp: {
     app: DApp;

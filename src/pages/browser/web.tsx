@@ -57,7 +57,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const webViewRef = React.useRef<null | WebView>(null);
 
-  const [url, setUrl] = React.useState(new URL(route.params.url));
+  const [url, setUrl] = React.useState(new URL(route.params.params.url));
   const [urlPach, setUrlPach] = React.useState(url);
   const [loadingProgress, setLoadingProgress] = React.useState(0);
   const [canGoBack, setCanGoBack] = React.useState(false);
@@ -115,9 +115,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       return null;
     }
 
-    const _url = await keystore.searchEngine.onUrlSubmit(search);
+    const webParams = await keystore.searchEngine.onUrlSubmit(search);
 
-    setUrlPach(new URL(_url));
+    setUrlPach(new URL(webParams.url));
   }, [webViewRef]);
   const hanldeoNavigationStateChange = React.useCallback((event) => {
     setUrl(new URL(event.url));
@@ -341,7 +341,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, []);
 
   React.useEffect(() => {
-    hanldeSearch(route.params.url);
+    hanldeSearch(route.params.params.url);
   }, [route]);
 
   /**
