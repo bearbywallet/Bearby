@@ -140,7 +140,7 @@ const styles = StyleSheet.create({
   },
   imageStyles: {
     width: width + 100,
-    height: height / 2,
+    height: height - 200,
     resizeMode: 'contain'
   },
   symbol: {
