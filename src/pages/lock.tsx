@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
   },
   imageStyles: {
     width,
-    height: height / 2,
+    height: height - 100,
     resizeMode: 'contain'
   },
   textInput: {
