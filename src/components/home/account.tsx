@@ -98,19 +98,30 @@ export const HomeAccount: React.FC<Prop> = ({
           </Text>
         </View>
         <View style={styles.buttons}>
-          <Button
-            color={colors.primary}
-            title={I18n.t('send')}
-            onPress={onSend}
-          />
-          <View style={[styles.seporate, {
-            backgroundColor: colors.notification
-          }]}/>
-          <Button
-            color={colors.primary}
-            title={I18n.t('receive')}
-            onPress={onReceive}
-          />
+          <View style={{
+            flexDirection: 'row',
+            alignItems: 'center'
+          }}>
+            <Button
+              color={colors.primary}
+              style={{
+                marginRight: 5
+              }}
+              title={I18n.t('send')}
+              onPress={onSend}
+            />
+            <View style={[styles.seporate, {
+              backgroundColor: colors.notification
+            }]}/>
+            <Button
+              color={colors.primary}
+              style={{
+                marginLeft: 5
+              }}
+              title={I18n.t('receive')}
+              onPress={onReceive}
+            />
+          </View>
         </View>
       </View>
     </View>
@@ -153,11 +164,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Avenir'
   },
   buttons: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
     alignItems: 'center',
-    width: 150,
-    marginLeft: 20
+    width
   },
   seporate: {
     width: 1,
