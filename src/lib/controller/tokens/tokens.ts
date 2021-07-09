@@ -79,6 +79,10 @@ export class TokenControll {
         [userAddress]
       );
 
+      if (!balance) {
+        balance = '0';
+      }
+
       try {
         balance = balance[field][userAddress];
         totalSupply = totalSupply[totalSupplyField];
