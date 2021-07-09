@@ -74,6 +74,8 @@ export const LockPage: React.FC<Prop> = ({ navigation }) => {
     if (authState.biometricEnable) {
       hanldeBiometricUnlock();
     }
+
+    keystore.theme.updateColors();
   }, []);
 
   return (

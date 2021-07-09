@@ -114,7 +114,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
       <BrowserFavorites
         connections={connectState}
         onGoConnection={handleConnect}
-        onRemove={(connect) => keystore.connect.rm(connect)}
       />
     )
   });
@@ -185,7 +184,6 @@ export const BrowserHomePage: React.FC<Prop> = ({ navigation }) => {
           <BrowserFavorites
             connections={connectState}
             onGoConnection={handleConnect}
-            onRemove={(connect) => keystore.connect.rm(connect)}
           />
         ) : (
           <TabView

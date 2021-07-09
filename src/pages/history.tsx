@@ -33,7 +33,6 @@ import { StoredTx } from 'types';
 
 import ZIlliqaLogo from 'app/assets/zilliqa.svg';
 import { fonts } from 'app/styles';
-import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -107,6 +106,10 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     });
     setTransactionModal(false);
   }, [navigation]);
+
+  React.useEffect(() => {
+    keystore.theme.updateColors();
+  }, []);
 
   return (
     <SafeWrapper>
