@@ -35,7 +35,7 @@ type Prop = {
 };
 const { width } = Dimensions.get('window');
 const imageStyles = {
-  width: 90,
+  width: 95,
   height: '100%',
   resizeMode: 'contain'
 };
@@ -96,10 +96,7 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end'
   },
   bgImage: {
-    width: '100%',
-    height: '100%',
-    alignItems: 'flex-end',
-    justifyContent: 'flex-end'
+    alignItems: 'flex-end'
   },
   title: {
     fontSize: 17,
