@@ -161,6 +161,16 @@ export class Transaction {
   }
 
   public get recipient() {
+    try {
+      if (this.tag === TransactionMethods.Transfer) {
+        const parsed = JSON.parse(this.data);
+
+        return toBech32Address(parsed.params[0].value);
+      }
+    } catch {
+      //
+    }
+
     return toBech32Address(this.toAddr);
   }
 

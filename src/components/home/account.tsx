@@ -105,7 +105,8 @@ export const HomeAccount: React.FC<Prop> = ({
             <Button
               color={colors.primary}
               style={{
-                marginRight: 5
+                marginRight: 5,
+                minWidth: 90
               }}
               title={I18n.t('send')}
               onPress={onSend}
@@ -116,7 +117,8 @@ export const HomeAccount: React.FC<Prop> = ({
             <Button
               color={colors.primary}
               style={{
-                marginLeft: 5
+                marginLeft: 5,
+                minWidth: 90
               }}
               title={I18n.t('receive')}
               onPress={onReceive}
