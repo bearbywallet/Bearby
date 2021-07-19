@@ -106,7 +106,10 @@ export const HomeAccount: React.FC<Prop> = ({
               color={colors.primary}
               style={{
                 marginRight: 5,
-                minWidth: 90
+                minWidth: 100
+              }}
+              textStyle={{
+                textAlign: 'right'
               }}
               title={I18n.t('send')}
               onPress={onSend}
@@ -118,7 +121,10 @@ export const HomeAccount: React.FC<Prop> = ({
               color={colors.primary}
               style={{
                 marginLeft: 5,
-                minWidth: 90
+                minWidth: 100
+              }}
+              textStyle={{
+                textAlign: 'left'
               }}
               title={I18n.t('receive')}
               onPress={onReceive}

@@ -28,7 +28,8 @@ export interface StoredTx {
   token: {
     decimals: number;
     symbol: string;
-  },
+  };
+  success?: boolean;
   info?: string;
   teg: string;
   amount: string;

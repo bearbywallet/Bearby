@@ -12,6 +12,7 @@ import {
   TouchableOpacity,
   StyleSheet,
   Text,
+  Animated,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -52,6 +53,10 @@ export const TransactionItem: React.FC<Prop> = ({
   }, [transaction, tokens, netwrok]);
 
   const statusColor = React.useMemo(() => {
+    if (typeof transaction.success !== 'undefined' && !transaction.success) {
+      return colors['danger'];
+    }
+
     switch (transaction.status) {
       case StatusCodes.Confirmed:
         return colors['success'];
@@ -78,6 +83,14 @@ export const TransactionItem: React.FC<Prop> = ({
     };
   }, [colors, transaction, token]);
   const amount = React.useMemo(() => {
+    if (typeof transaction.success !== 'undefined' && !transaction.success) {
+      return {
+        converted: 0,
+        value: toLocaleString(0),
+        symbol: transaction.token.symbol
+      };
+    }
+
     const value = fromZil(transaction.amount, transaction.token.decimals);
     const rate = token ? settings.rate[token.symbol] : 0;
     const converted = toConversion(transaction.amount, rate, transaction.token.decimals);

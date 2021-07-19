@@ -162,24 +162,28 @@ export class TransactionsQueue {
           case StatusCodes.Confirmed:
             element.status = result.status;
             element.confirmed = true;
+            element.success = result.success;
             element.nonce = result.nonce;
             element.info = `node_status_${result.status}`;
             this._makeNotify(title, element.hash, element.info);
             continue;
           case StatusCodes.Pending:
             element.status = result.status;
-            element.confirmed = result.success;
+            element.confirmed = true;
+            element.success = result.success;
             element.info = `node_status_${result.status}`;
             continue;
           case StatusCodes.PendingAwait:
             element.status = result.status;
             element.confirmed = true;
+            element.success = result.success;
             element.info = `node_status_${result.status}`;
             this._makeNotify(title, element.hash, element.info);
             continue;
           default:
             element.status = result.status;
             element.confirmed = true;
+            element.success = result.success;
             element.nonce = 0;
             element.info = `node_status_${result.status}`;
             rejectAll = {
@@ -193,6 +197,7 @@ export class TransactionsQueue {
         if ((now - element.timestamp) > dilaySeconds) {
           element.status = 0;
           element.confirmed = true;
+          element.success = false;
           element.nonce = 0;
           element.info = `node_status_0`;
           rejectAll = {

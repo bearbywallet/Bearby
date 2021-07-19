@@ -12,13 +12,15 @@ import {
   Text,
   StyleSheet,
   ViewStyle,
-  TouchableOpacity
+  TouchableOpacity,
+  TextStyle
 } from 'react-native';
 
 type Prop = {
   color: string;
   title: string;
   disabled?: boolean;
+  textStyle?: TextStyle;
   style?: ViewStyle | ViewStyle[];
   onPress?: () => void;
 };
@@ -28,7 +30,8 @@ export const Button: React.FC<Prop> = ({
   title,
   disabled,
   color,
-  onPress
+  onPress,
+  textStyle = {}
 }) => {
   return (
     <TouchableOpacity
@@ -39,6 +42,7 @@ export const Button: React.FC<Prop> = ({
       onPress={onPress}
     >
       <Text style={[styles.title, {
+        ...textStyle,
         color
       }]}>
         {title}

@@ -69,6 +69,13 @@ export const TransactionModal: React.FC<Prop> = ({
 
     return trim(address);
   }, [settingsState, transaction]);
+  const amountValue = React.useMemo(() => {
+    if (typeof transaction.success !== 'undefined' && !transaction.success) {
+      return '0';
+    }
+
+    return `-${fromZil(transaction.amount, transaction.token.decimals)}`;
+  }, [transaction]);
 
   const handleShare = React.useCallback(() => {
     const url = viewTransaction(transaction.hash, keystore.network.selected);
@@ -114,7 +121,7 @@ export const TransactionModal: React.FC<Prop> = ({
             </KeyValue>
           ) : null}
           <KeyValue title={i18n.t('transfer_amount')}>
-            -{fromZil(transaction.amount, transaction.token.decimals)} {transaction.token.symbol}
+            {amountValue} {transaction.token.symbol}
           </KeyValue>
           <KeyValue title={i18n.t('nonce')}>
             #{transaction.nonce}
