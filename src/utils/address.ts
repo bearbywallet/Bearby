@@ -17,7 +17,7 @@ export function tohexString(hex: string) {
 }
 
 export const isByteString = (str: string, len: number) => {
-  return !!tohexString(str).match(`^[0-9a-fA-F]{${len}}$`);
+  return Boolean(tohexString(str).match(`^[0-9a-fA-F]{${len}}$`));
 };
 
 export const isAddress = (address: string) => {

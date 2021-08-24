@@ -90,7 +90,7 @@ export const TokensModal: React.FC<Prop> = ({
               }]}
               onPress={() => handleSelected(index)}
             >
-              {token.symbol ? (
+              {token.symbol && token.address[network] ? (
                 <LoadSVG
                   height="30"
                   width="30"
