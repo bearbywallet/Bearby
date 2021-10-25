@@ -10,10 +10,11 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 
-import { STORAGE_FIELDS, TokenTypes } from 'app/config';
+import { STORAGE_FIELDS, TokenTypes, ZRC2Fields } from 'app/config';
 import { Token, Account } from 'types';
 import { tokensStore, tokensStoreUpdate } from './state';
-import { toZRC1, deppUnlink } from 'app/utils';
+import { toZRC1, deppUnlink, tohexString } from 'app/utils';
+import { Methods } from '../zilliqa/methods';
 
 export class TokenControll {
 
@@ -59,36 +60,32 @@ export class TokenControll {
     }
   }
 
-  public async getToken(address: string, acc?: Account): Promise<Token> {
+  public async getToken(address: string, acc: Account): Promise<Token> {
     let balance = '0';
+    let totalSupply = '0';
     const type = TokenTypes.ZRC2;
-    const init = await this._zilliqa.getSmartContractInit(address);
-    const zrc = toZRC1(init);
-    const field = 'balances';
     const totalSupplyField = 'total_supply';
-    let totalSupply = await this._zilliqa.getSmartContractSubState(
-      address,
-      totalSupplyField
-    );
+    const addr = tohexString(address);
+    const userAddress = acc.base16.toLowerCase();
+    const identities = [
+      this._zilliqa.provider.buildBody(Methods.GetSmartContractInit, [addr]),
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [addr, ZRC2Fields.Balances, [userAddress]]
+      ),
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [addr, totalSupplyField, []]
+      )
+    ];
+    const replies = await this._zilliqa.sendJson(...identities);
+    const zrc = toZRC1(replies[0].result);
 
-    if (acc) {
-      const userAddress = acc.base16.toLowerCase();
-      balance = await this._zilliqa.getSmartContractSubState(
-        address,
-        field,
-        [userAddress]
-      );
-
-      if (!balance) {
-        balance = '0';
-      }
-
-      try {
-        balance = balance[field][userAddress];
-        totalSupply = totalSupply[totalSupplyField];
-      } catch {
-        balance = '0';
-      }
+    if (replies[1].result) {
+      balance = replies[1].result[ZRC2Fields.Balances][userAddress];
+    }
+    if (replies[2].result) {
+      totalSupply = replies[2].result[totalSupplyField];
     }
 
     return {

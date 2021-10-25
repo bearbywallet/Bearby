@@ -13,6 +13,10 @@ export const ORDERS = {
   FAUCET: 'https://dev-wallet.zilliqa.com/faucet'
 };
 
+export enum ZRC2Fields {
+  Balances = 'balances'
+}
+
 export const API_COINGECKO = 'https://api.coingecko.com/api/v3/simple/price';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
 export const UD_CONTRACT_ADDRESS = '0x9611c53be6d1b32058b2747bdececed7e1216793';

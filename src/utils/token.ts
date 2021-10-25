@@ -22,6 +22,9 @@ enum Fields {
 }
 
 export function toZRC1(init: InitItem[]) {
+  if (!init) {
+    throw new Error('Is not ZRC');
+  }
   const contractOwner = init.find((el) => el.vname === Fields.ContractOwner)?.value;
   const name = init.find((el) => el.vname === Fields.Name)?.value || '';
   const symbol = init.find((el) => el.vname === Fields.Symbol)?.value;

@@ -15,7 +15,8 @@ import {
   ZILLIQA_KEYS,
   Messages,
   MAX_NAME_DIFFICULTY,
-  NIL_ADDRESS
+  NIL_ADDRESS,
+  ZRC2Fields
 } from 'app/config';
 import {
   getAddressFromPublicKey,
@@ -39,10 +40,6 @@ import { connectStore } from 'app/lib/controller/connect';
 import { Methods } from '../zilliqa/methods';
 
 Big.PE = 99;
-
-enum ZRC2Fields {
-  Balances = 'balances'
-}
 
 export class AccountControler {
   public store = accountStore;

@@ -18,7 +18,7 @@ import { useTheme } from '@react-navigation/native';
 import { LoadSVG } from 'app/components/load-svg';
 
 import i18n from 'app/lib/i18n';
-import { toLocaleString, toConversion, fromZil } from 'app/filters';
+import { toLocaleString, toConversion, fromZil, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
 
 export type Prop = {
@@ -44,7 +44,7 @@ export const TokenInfo: React.FC<Prop> = ({
   balance = '0',
   totalSupply = '0'
 }) => {
-  const { colors, dark } = useTheme();
+  const { colors } = useTheme();
   /**
    * ZIL(Default token) amount in float.
    */
@@ -52,10 +52,11 @@ export const TokenInfo: React.FC<Prop> = ({
     () => fromZil(balance, decimals),
     [balance, decimals]
   );
-  const tokensSupply = React.useMemo(
-    () => fromZil(totalSupply, decimals),
-    [totalSupply, decimals]
-  );
+  const tokensSupply = React.useMemo(() => {
+    const ts = fromZil(totalSupply, decimals);
+
+    return nFormatter(ts);
+  }, [totalSupply, decimals]);
   /**
    * Converted to BTC/USD/ETH.
    */
@@ -105,7 +106,7 @@ export const TokenInfo: React.FC<Prop> = ({
           <Text style={[styles.convertedAmount, {
             color: colors.notification
           }]}>
-            {i18n.t('total_supply')}: {toLocaleString(tokensSupply)}
+            {i18n.t('total_supply')}: {tokensSupply}
           </Text>
         </View>
       </View>
