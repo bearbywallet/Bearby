@@ -13,7 +13,7 @@ import {
 } from 'react-native';
 import { SafeWrapper } from 'app/components/safe-wrapper';
 
-import LottieView from 'lottie-react-native';
+// import LottieView from 'lottie-react-native';
 
 import { keystore } from 'app/keystore';
 import { RootParamList } from 'app/navigator';
@@ -52,11 +52,11 @@ export const AuthLoadingPage: React.FC<Prop> = ({ navigation }) => {
     <React.Fragment>
       <StatusBar barStyle="light-content" />
       <SafeWrapper>
-        <LottieView
+        {/* <LottieView
           source={require('app/assets/dark')}
           autoPlay
           loop
-        />
+        /> */}
       </SafeWrapper>
     </React.Fragment>
   );

@@ -77,13 +77,16 @@ export class SSnController {
   }
 
   public async updateList() {
-    const list = await this._zilliqa.getSSnList();
+    const [mainnet] = ZILLIQA_KEYS;
+    if (this._network.selected === mainnet) {
+      const list = await this._zilliqa.getSSnList();
 
-    ssnStoreUpdate(list);
+      ssnStoreUpdate(list);
 
-    await this._storage.set(
-      buildObject(this.field, this.store.get())
-    );
+      await this._storage.set(
+        buildObject(this.field, this.store.get())
+      );
+    }
   }
 
   public async reset() {

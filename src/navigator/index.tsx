@@ -31,6 +31,7 @@ const Stack = createStackNavigator<RootParamList>();
 
 export default () => (
   <Stack.Navigator
+    headerMode="none"
     initialRouteName="Loading"
     screenOptions={{ gestureEnabled: false }}
   >

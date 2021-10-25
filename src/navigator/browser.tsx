@@ -18,7 +18,6 @@ import {
 } from 'app/pages/browser';
 
 import { DApp } from 'types';
-import { URLType } from 'src/lib/controller/search-engine';
 
 export type BrwoserStackParamList = {
   Browser: undefined;

@@ -14,13 +14,15 @@ import {
   AccountTypes,
   ZILLIQA_KEYS,
   Messages,
-  MAX_NAME_DIFFICULTY
+  MAX_NAME_DIFFICULTY,
+  NIL_ADDRESS
 } from 'app/config';
 import {
   getAddressFromPublicKey,
   toBech32Address,
   deppUnlink,
-  getPubKeyFromPrivateKey
+  getPubKeyFromPrivateKey,
+  tohexString
 } from 'app/utils';
 import {
   accountStore,
@@ -28,14 +30,19 @@ import {
   accountStoreUpdate,
   accountStoreSelect
 } from './sate';
-import { AccountState, Account, KeyPair } from 'types';
+import { AccountState, Account, KeyPair, RPCResponse } from 'types';
 import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { Message } from 'app/lib/controller/inject/message';
 import { connectStore } from 'app/lib/controller/connect';
+import { Methods } from '../zilliqa/methods';
 
 Big.PE = 99;
+
+enum ZRC2Fields {
+  Balances = 'balances'
+}
 
 export class AccountControler {
   public store = accountStore;
@@ -113,7 +120,7 @@ export class AccountControler {
     const pubKey = acc.publicKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
-    const balance = await this._tokenBalance(base16, true);
+    const balance = await this._tokenBalance(base16);
 
     return {
       base16,
@@ -219,7 +226,7 @@ export class AccountControler {
     const type = AccountTypes.privateKey;
     const base16 = getAddressFromPublicKey(pubKey);
     const bech32 = toBech32Address(base16);
-    const balance = await this._tokenBalance(base16, true);
+    const balance = await this._tokenBalance(base16);
     const index = this.lastIndexPrivKey;
 
     return {
@@ -274,24 +281,48 @@ export class AccountControler {
     return accounts;
   }
 
-  private async _tokenBalance(base16: string, skipError: boolean = false) {
+  private async _tokenBalance(base16: string) {
     const net = this._netwrok.selected;
     const tokens = this._token.store.get().map((t) => [t.symbol, '0']);
     const entries = ZILLIQA_KEYS.map((n) => [n, Object.fromEntries(tokens)]);
     const balances = Object.fromEntries(entries);
 
-    for (const t of this._token.store.get()) {
-      if (skipError) {
-        try {
-          balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
-        } catch {
-          balances[net][t.symbol] = '0';
-        }
-      } else {
-        balances[net][t.symbol] = await this._zilliqa.handleBalance(base16, t);
+    const address = tohexString(base16);
+    const addr = String(base16).toLowerCase();
+    const identities = this._token.store.get().map((token) => {
+      if (token.address[net] === NIL_ADDRESS) {
+        return this._zilliqa.provider.buildBody(
+          Methods.getBalance,
+          [address]
+        );
       }
-    }
 
-    return balances;
+      return this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [tohexString(token.address[net]), ZRC2Fields.Balances, [addr]]
+      );
+    });
+
+    try {
+      const replies: RPCResponse[] = await this._zilliqa.sendJson(...identities);
+      const entries1 = replies.map((res, index) => {
+        const token = this._token.store.get()[index];
+        let balance = [token.symbol, '0'];
+        if (res.result && token.address[net] === NIL_ADDRESS) {
+          balance = [token.symbol, res.result.balance];
+        } else if (res.result) {
+          const bal = res.result[ZRC2Fields.Balances][addr];
+          balance = [token.symbol, bal];
+        }
+
+        return balance;
+      });
+
+      balances[net] = Object.fromEntries(entries1);
+
+      return balances;
+    } catch {
+      return balances;
+    }
   }
 }
