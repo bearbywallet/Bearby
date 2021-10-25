@@ -22,6 +22,9 @@ import {
 } from 'app/config';
 import { ZilliqaControl, TokenControll, NetworkControll } from 'app/lib/controller';
 import { currenciesStore } from 'app/lib/controller/currency/store';
+import { Methods } from '../zilliqa/methods';
+import { tohexString } from 'app/utils';
+import { RPCResponse } from 'types';
 
 export class SettingsControler {
   public readonly store = settingsStore;
@@ -82,49 +85,37 @@ export class SettingsControler {
 
   public async getDexRate() {
     const fieldname = 'pools';
-    const contract = ZIL_SWAP_CONTRACTS[this._netwrok.selected];
+    const net = this._netwrok.selected;
+    const contract = tohexString(ZIL_SWAP_CONTRACTS[net]);
     const state = this.store.get();
     const tokens = this._tokens.store.get();
     const [zil] = tokens;
+    const identities = tokens.filter((t) => t.symbol !== zil.symbol).map((t) => {
+      const tokenAddress = t.address[net].toLowerCase();
 
-    for (const token of tokens) {
-      if (token.symbol === zil.symbol) {
-        continue;
-      }
-
-      const tokenAddress = token.address[this._netwrok.selected];
-
-      if (!tokenAddress) {
-        continue;
-      }
-
-      const pool = await this._zilliqa.getSmartContractSubState(
-        contract,
-        fieldname,
-        [tokenAddress]
+      return this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [contract, fieldname, [tokenAddress]]
       );
-
-      if (!pool || !pool[fieldname] || !pool[fieldname][tokenAddress]) {
-        return {
-          symbol: token.symbol,
-          zilReserve: '0',
-          tokenReserve: '0',
-          exchangeRate: '0',
-          rate: '0'
-        };
-      }
-
-      const [zilReserve, tokenReserve] = pool[fieldname][tokenAddress].arguments;
+    });
+    const replies = await this._zilliqa.sendJson(...identities);
+    const entries = Array.from(replies as RPCResponse[]).map((res, index: number) => {
+      const token = tokens[index + 1];
+      const tokenAddress = token.address[net].toLowerCase();
+      const [zilReserve, tokenReserve] = res.result[fieldname][tokenAddress].arguments;
       const _zilReserve = zilReserve * Math.pow(10, -1 * zil.decimals);
       const _tokenReserve = tokenReserve * Math.pow(10, -1 * token.decimals);
       const exchangeRate = (_zilReserve / _tokenReserve).toFixed(10);
+      const rate = this.rate * Number(exchangeRate);
 
-      state.rate[token.symbol] = this.rate * Number(exchangeRate);
+      return [token.symbol, Math.fround(rate)];
+    });
+    const rates = Object.fromEntries(entries);
 
-      if (!state.rate[token.symbol] || isNaN(state.rate[token.symbol])) {
-        state.rate[token.symbol] = 0;
-      }
-    }
+    state.rate = {
+      ...state.rate,
+      ...rates
+    };
 
     settingsStoreUpdate(state);
     return this._storage.set(
