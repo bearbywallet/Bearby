@@ -12,7 +12,8 @@ import {
   Text,
   Dimensions,
   TouchableOpacity,
-  View
+  View,
+  Alert
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Svg, { Path } from 'react-native-svg';
@@ -85,8 +86,14 @@ export const LedgerAddModal: React.FC<Prop> = ({
         mac
       );
       onConfirmed();
-    } catch {
-      //
+    } catch (err) {
+      Alert.alert(
+        'Ledger connect',
+        (err as Error).message,
+        [
+          { text: "OK" }
+        ]
+      );
     }
     setLoading(false);
   }, [mac, index, name]);
