@@ -72,7 +72,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
       } catch (err) {
         Alert.alert(
           i18n.t('connect_invalid_qr_code_title'),
-          err.message
+          (err as Error).message
         );
       }
     } else {
@@ -150,7 +150,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {
-      setPasswordError(err.message);
+      setPasswordError((err as Error).message);
     }
 
     setIsLoading(false);

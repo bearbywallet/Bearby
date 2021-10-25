@@ -50,7 +50,7 @@ export const BrowserCategoryPage: React.FC<Prop> = ({ route, navigation }) => {
     } catch (err) {
       Alert.alert(
         i18n.t('update'),
-        err.message,
+        (err as Error).message,
         [
           { text: "OK" }
         ]

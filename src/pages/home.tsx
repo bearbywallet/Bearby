@@ -89,7 +89,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       setRefreshing(false);
       Alert.alert(
         i18n.t('update'),
-        err.message,
+        (err as Error).message,
         [
           { text: "OK" }
         ]

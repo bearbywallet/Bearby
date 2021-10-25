@@ -52,7 +52,7 @@ export const AccountMenu: React.FC<Prop> = ({
     } catch (err) {
       Alert.alert(
         i18n.t('update'),
-        err.message,
+        (err as Error).message,
         [
           { text: "OK" }
         ]

@@ -90,7 +90,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
       setRefreshing(false);
       Alert.alert(
         i18n.t('update'),
-        `${ssnState.selected}: ${err.message}`,
+        `${ssnState.selected}: ${(err as Error).message}`,
         [
           { text: "OK" }
         ]

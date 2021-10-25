@@ -6,10 +6,10 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import namehash from '@unstoppabledomains/resolution/build/zns/namehash';
 import { NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
 import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
+import { nameHash } from 'app/utils/namehash';
 import { DomainResolver } from 'types';
 import { fromBech32Address } from 'app/utils';
 import { keystore } from 'app/keystore';
@@ -31,7 +31,7 @@ export class UnstoppableDomains {
   public async getAddressByDomain(domain: string): Promise<DomainResolver> {
     domain = String(domain).toLowerCase();
 
-    const domainHash: string = namehash(domain);
+    const domainHash: string = nameHash(domain);
     const zilRecords = 'crypto.ZIL.address';
     const { records } = await this._zilliqa.getSmartContractSubState(
       UD_CONTRACT_ADDRESS,
@@ -68,7 +68,7 @@ export class UnstoppableDomains {
   }
 
   public async resolve(domain: string) {
-    const domainHash = namehash(domain);
+    const domainHash = nameHash(domain);
 
     const { records } = await this._zilliqa.getSmartContractSubState(
       UD_CONTRACT_ADDRESS,

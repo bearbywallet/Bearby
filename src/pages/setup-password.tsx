@@ -100,7 +100,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     }
 
     setLoading(false);

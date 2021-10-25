@@ -75,7 +75,7 @@ export const ImportAccount: React.FC<Prop> = ({
         );
         onImported();
       } catch (err) {
-        setPrivKeyErr(err.message);
+        setPrivKeyErr((err as Error).message);
       }
     }
 

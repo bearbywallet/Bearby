@@ -97,7 +97,7 @@ export const SignMessageModal: React.FC<Prop> = ({
         publicKey: account.pubKey
       });
     } catch (err) {
-      setError(err.message);
+      setError((err as Error).message);
     }
     setLoading(false);
   }, [hash, account, payload, passowrd]);

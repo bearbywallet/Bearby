@@ -92,7 +92,7 @@ export const AddTokenModal: React.FC<Prop> = ({
 
       setToken(tokenInfo);
     } catch (err) {
-      setErrorMessage(err.message);
+      setErrorMessage((err as Error).message);
     }
   }, [setAddress, address, account, setToken]);
 

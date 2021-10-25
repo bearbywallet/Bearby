@@ -104,7 +104,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
       }, 500);
     } catch (err) {
       cb();
-      setConfirmError(err.message);
+      setConfirmError((err as Error).message);
     }
   }, [
     navigation,
@@ -177,7 +177,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
       setConfirmModal(false);
       Alert.alert(
         i18n.t('transfer_title'),
-        err.message,
+        (err as Error).message,
         [
           { text: "OK" }
         ]

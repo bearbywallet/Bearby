@@ -50,10 +50,8 @@ export const AccountSettingsPage: React.FC = () => {
       name = `Ledger ${index}`;
     }
 
-    keystore.account.updateAccountName({
-      ...account,
-      name
-    });
+    account.name = name;
+    keystore.account.updateAccountName(account);
   }, [account, accountState]);
   const hanldeResetNonce = React.useCallback(async() => {
     setLoading(true);
@@ -61,10 +59,9 @@ export const AccountSettingsPage: React.FC = () => {
     setLoading(false);
   }, [account]);
   const handleChangeName = React.useCallback((name: string) => {
-    keystore.account.updateAccountName({
-      ...account,
-      name
-    });
+    const acc = account;
+    acc.name = name;
+    keystore.account.updateAccountName(acc);
   }, [account, accountState]);
 
   React.useEffect(() => {

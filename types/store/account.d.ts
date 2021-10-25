@@ -23,7 +23,6 @@ export interface Account {
       [key: string]: string;
     };
   };
-  [key: string | undefined]: string;
 }
 export interface AccountState {
   identities: Account[];

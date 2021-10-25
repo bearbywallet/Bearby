@@ -304,7 +304,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       setTransaction(undefined);
     } catch (err) {
       cb();
-      setConfirmError(err.message);
+      setConfirmError((err as Error).message);
     }
   }, [
     account,

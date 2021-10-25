@@ -49,9 +49,7 @@ export const TabNavigator: React.FC = () => {
   }), [colors]);
 
   return (
-    <TabStack.Navigator
-      tabBarOptions={tabBarOptions}
-    >
+    <TabStack.Navigator {...tabBarOptions}>
       <TabStack.Screen
         name="Home"
         component={HomePage}
