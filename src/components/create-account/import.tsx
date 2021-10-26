@@ -187,11 +187,11 @@ const styles = StyleSheet.create({
   },
   text: {
     marginTop: 15,
-    height: height / 10,
+    height: height / 5,
     borderWidth: 1,
     borderRadius: 8,
     padding: 20,
     fontFamily: fonts.Regular,
-    fontSize: 23
+    fontSize: 16
   }
 });
