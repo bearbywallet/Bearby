@@ -85,9 +85,9 @@ export class TransactionsQueue {
   }
 
   public async sync() {
-    const data = await this._storage.get(this._field);
-
     try {
+      const data = await this._storage.get(this._field);
+
       if (Boolean(data) && typeof data === 'string') {
         const list = JSON.parse(data);
 
@@ -105,6 +105,9 @@ export class TransactionsQueue {
   }
 
   public async reset() {
+    if (!this._accounts.getCurrentAccount()) {
+      return null;
+    }
     await this._storage.rm(this._field);
 
     this._notification.setBadgeNumber(0);

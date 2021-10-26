@@ -82,7 +82,9 @@ export const getPubKeyFromPrivateKey = (privateKey: string) => {
 };
 
 export const isPrivateKey = (privateKey: string) => {
+  const errorMessage = 'Incorect priaveKey';
+  privateKey = String(privateKey).toLowerCase();
   if (!isByteString(privateKey, 64)) {
-    throw new Error('Incorect priaveKey');
+    throw new Error(errorMessage);
   }
 };
