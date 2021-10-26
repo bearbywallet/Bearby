@@ -12,7 +12,6 @@ import {
   StyleSheet,
   Text,
   Keyboard,
-  Dimensions,
   TextInput
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
@@ -31,7 +30,6 @@ type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 const placeholder = 'shock silent awful guard long thing early test thought defy treat pink';
-const { height } = Dimensions.get('window');
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const [phrase, setphrase] = React.useState<string>('');

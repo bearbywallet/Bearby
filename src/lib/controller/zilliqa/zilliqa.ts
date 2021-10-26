@@ -106,7 +106,8 @@ export class ZilliqaControl {
     contract = tohexString(contract);
 
     const body = this.provider.buildBody(Methods.GetSmartContractInit, [contract]);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   /**
@@ -126,29 +127,33 @@ export class ZilliqaControl {
       Methods.GetSmartContractSubState,
       [contract, field, params]
     );
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getLatestTxBlock() {
     const body = this.provider.buildBody(Methods.GetLatestTxBlock, []);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getRecentTransactions() {
     const body = this.provider.buildBody(Methods.GetRecentTransactions, []);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getNetworkId() {
     const body = this.provider.buildBody(Methods.GetNetworkId, []);
-    const netID = await this.sendJson(body);
+    const { result } = await this.sendJson(body);
 
-    return Number(netID);
+    return Number(result);
   }
 
   public async throughPxoy(method: string, params: Params) {
     const body = this.provider.buildBody(method, params);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async detectSacmAddress(address: string) {
@@ -202,19 +207,22 @@ export class ZilliqaControl {
   public async getTransactionStatus(hash: string) {
     hash = tohexString(hash);
     const body = this.provider.buildBody(Methods.GetTransactionStatus, [hash]);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getMinimumGasPrice() {
     const body = this.provider.buildBody(Methods.GetMinimumGasPrice, []);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getTransaction(hash: string) {
     hash = tohexString(hash);
 
     const body = this.provider.buildBody(Methods.GetTransaction, [hash]);
-    return this.sendJson(body);
+    const { result } = await this.sendJson(body);
+    return result;
   }
 
   public async getSSnList(): Promise<SSN[]> {
@@ -308,6 +316,6 @@ export class ZilliqaControl {
       throw new Error(data.error.message);
     }
 
-    return data.result;
+    return data;
   }
 }

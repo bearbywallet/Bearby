@@ -10,6 +10,7 @@ import React from 'react';
 import {
   View,
   StyleSheet,
+  Keyboard,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -87,6 +88,7 @@ export const AddTokenModal: React.FC<Prop> = ({
 
     const base16 = fromBech32Address(addr);
 
+    Keyboard.dismiss();
     try {
       const tokenInfo = await keystore.token.getToken(base16, account);
 

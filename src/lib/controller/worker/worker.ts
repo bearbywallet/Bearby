@@ -52,7 +52,6 @@ export class WorkerController {
       await this._transactions.checkProcessedTx();
     } catch (err) {
       console.error('checkProcessedTx', err);
-      //
     }
 
     try {

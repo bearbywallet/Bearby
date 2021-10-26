@@ -6,7 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject } from 'app/lib';
+import { MobileStorage, buildObject, NetworkControll, AccountControler } from 'app/lib';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NotificationManager } from 'app/lib/controller/notification';
 import {
@@ -21,6 +21,7 @@ import { Token, Account } from 'types';
 import { StatusCodes } from './tx-statuses';
 import { tokensStore } from 'app/lib/controller/tokens';
 import { NONCE_DIFFICULTY, STORAGE_FIELDS } from 'app/config';
+import { Methods } from '../zilliqa/methods';
 
 export class TransactionsQueue {
   public store = transactionStore;
@@ -28,19 +29,28 @@ export class TransactionsQueue {
   private _zilliqa: ZilliqaControl;
   private _storage: MobileStorage;
   private _notification: NotificationManager;
+  private _netwrok: NetworkControll;
+  private _accounts: AccountControler;
 
   constructor(
     zilliqa: ZilliqaControl,
     storage: MobileStorage,
-    notification: NotificationManager
+    notification: NotificationManager,
+    netwrok: NetworkControll,
+    accounts: AccountControler
   ) {
     this._zilliqa = zilliqa;
     this._storage = storage;
     this._notification = notification;
+    this._accounts = accounts;
+    this._netwrok = netwrok;
   }
 
   private get _field() {
-    return STORAGE_FIELDS.TRANSACTIONS;
+    const field = STORAGE_FIELDS.TRANSACTIONS;
+    const bech32 = this._accounts.getCurrentAccount().base16;
+    const net = this._netwrok.selected;
+    return `${field}/${bech32}/${net}`;
   }
 
   public async add(tx: Transaction, token?: Token) {
@@ -135,77 +145,65 @@ export class TransactionsQueue {
   public async checkProcessedTx() {
     const list = this.store.get();
     const now = new Date().getTime();
-    const dilaySeconds = 5000;
-    let rejectAll = null;
+    const dilaySeconds = 15000;
+    const title = i18n.t('transaction');
+    const identities = list.filter((t) => {
+      return !t.confirmed && (now - t.timestamp) > dilaySeconds;
+    });
+    if (identities.length === 0) {
+      return null;
+    }
+    const requests = identities.map(({ hash }) => {
+      return this._zilliqa.provider.buildBody(Methods.GetTransactionStatus, [hash]);
+    });
+    let replies = await this._zilliqa.sendJson(...requests);
+    if (!Array.isArray(replies)) {
+      replies = [replies];
+    }
 
-    for (let index = list.length - 1; index >= 0; index--) {
-      const element = list[index];
-      const title = i18n.t('transaction');
+    for (let index = 0; index < replies.length; index++) {
+      const res = replies[index];
+      const indicator = identities[index];
+      const listIndex = list.findIndex((t) => t.hash === indicator.hash);
+      const element = list[listIndex];
 
-      if (rejectAll) {
-        element.info = rejectAll.info;
-        element.status = rejectAll.status;
+      if (res.error) {
+        element.status = 0;
         element.confirmed = true;
+        element.success = false;
         element.nonce = 0;
-
+        element.info = String(res.error.message);
+        this._makeNotify(title, element.hash, element.info);
         continue;
       }
 
-      if (element.confirmed) {
-        continue;
-      }
-
-      try {
-        const result = await this._zilliqa.getTransactionStatus(element.hash);
-
-        switch (result.status) {
-          case StatusCodes.Confirmed:
-            element.status = result.status;
-            element.confirmed = true;
-            element.success = result.success;
-            element.nonce = result.nonce;
-            element.info = `node_status_${result.status}`;
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-          case StatusCodes.Pending:
-            element.status = result.status;
-            element.confirmed = true;
-            element.success = result.success;
-            element.info = `node_status_${result.status}`;
-            continue;
-          case StatusCodes.PendingAwait:
-            element.status = result.status;
-            element.confirmed = true;
-            element.success = result.success;
-            element.info = `node_status_${result.status}`;
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-          default:
-            element.status = result.status;
-            element.confirmed = true;
-            element.success = result.success;
-            element.nonce = 0;
-            element.info = `node_status_${result.status}`;
-            rejectAll = {
-              info: element.info,
-              status: result.status
-            };
-            this._makeNotify(title, element.hash, element.info);
-            continue;
-        }
-      } catch (err) {
-        if ((now - element.timestamp) > dilaySeconds) {
-          element.status = 0;
+      switch (res.result.status) {
+        case StatusCodes.Confirmed:
           element.confirmed = true;
-          element.success = false;
+          element.success = res.result.success;
+          element.nonce = res.result.nonce;
+          element.status = res.result.status;
+          element.info = `node_status_${res.result.status}`;
+          this._makeNotify(title, element.hash, i18n.t(element.info));
+          continue;
+        case StatusCodes.Pending:
+          continue;
+        case StatusCodes.PendingAwait:
+          element.confirmed = true;
+          element.success = res.result.success;
+          element.nonce = res.result.nonce;
+          element.status = res.result.status;
+          element.info = `node_status_${res.result.status}`;
+          this._makeNotify(title, element.hash, i18n.t(element.info));
+          continue;
+        default:
+          element.confirmed = true;
+          element.success = res.result.success;
+          element.status = res.result.status;
           element.nonce = 0;
-          element.info = `node_status_0`;
-          rejectAll = {
-            info: element.info,
-            status: element.status
-          };
-          this._makeNotify(title, element.hash, element.info);
-        }
+          element.info = `node_status_${res.result.status}`;
+          this._makeNotify(title, element.hash, i18n.t(element.info));
+          continue;
       }
     }
 
@@ -217,7 +215,7 @@ export class TransactionsQueue {
   private _makeNotify(title: string, hash: string, message: string) {
     this._notification.localNotification({
       title,
-      message: i18n.t(message),
+      message,
       userInfo: {
         hash
       }

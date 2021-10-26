@@ -53,6 +53,7 @@ export const NetworkPage = () => {
       await keystore.account.balanceUpdate();
       await keystore.ssn.reset();
       await keystore.settings.sync();
+      await keystore.transaction.sync();
     } catch {
       //
     }
@@ -70,6 +71,7 @@ export const NetworkPage = () => {
       await keystore.network.sync();
       await keystore.transaction.sync();
       await keystore.settings.sync();
+      await keystore.transaction.sync();
     } catch (err) {
       // console.log(err);
     }

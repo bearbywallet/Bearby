@@ -65,7 +65,9 @@ export class WalletControler extends Mnemonic {
   public readonly transaction = new TransactionsQueue(
     this.zilliqa,
     _storage,
-    this.notificationManager
+    this.notificationManager,
+    this.network,
+    this.account
   );
   public readonly inpage = new InjectScript(this.account, this.network);
   public readonly connect = new ConnectController(_storage);

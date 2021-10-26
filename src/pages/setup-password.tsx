@@ -93,6 +93,7 @@ export const SetupPasswordPage: React.FC<Prop> = ({ navigation, route }) => {
       await keystore.initWallet(password, mnemonicPhrase);
       await keystore.account.reset();
       await keystore.addAccount(mnemonicPhrase, accountName);
+      await keystore.transaction.sync();
 
       if (isBiometric) {
         await keystore.guard.auth.initKeychain(password);

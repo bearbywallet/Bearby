@@ -109,6 +109,7 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
       await keystore.initWallet(password, decrypted.decryptSeed);
       await keystore.account.reset();
+      await keystore.transaction.sync();
 
       for (const iterator of data.wallet.identities) {
         if (iterator.hwType) {

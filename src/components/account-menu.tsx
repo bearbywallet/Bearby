@@ -49,6 +49,7 @@ export const AccountMenu: React.FC<Prop> = ({
     setIsModal(false);
     try {
       await keystore.account.selectAccount(index);
+      await keystore.transaction.sync();
     } catch (err) {
       Alert.alert(
         i18n.t('update'),
