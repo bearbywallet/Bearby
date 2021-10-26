@@ -148,8 +148,6 @@ export class TransactionsQueue {
   }
 
   public async checkProcessedTx() {
-    const netwrok = new NetworkControll(this._storage, true);
-    const zilliqa = new ZilliqaControl(netwrok);
     const list = this.store.get();
     const now = new Date().getTime();
     const dilaySeconds = 15000;
@@ -161,9 +159,9 @@ export class TransactionsQueue {
       return null;
     }
     const requests = identities.map(({ hash }) => {
-      return zilliqa.provider.buildBody(Methods.GetTransactionStatus, [hash]);
+      return this._zilliqa.provider.buildBody(Methods.GetTransactionStatus, [hash]);
     });
-    let replies = await zilliqa.sendJson(...requests);
+    let replies = await this._zilliqa.sendJsonNative(...requests);
     if (!Array.isArray(replies)) {
       replies = [replies];
     }

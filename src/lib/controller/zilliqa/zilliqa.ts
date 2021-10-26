@@ -298,6 +298,27 @@ export class ZilliqaControl {
     return gotSSN.filter((ssn) => ssn.ok);
   }
 
+  public async sendJsonNative(...body: RPCBody[]) {
+    const request = this.provider.json(...body);
+    const responce = await fetch(this._network.nativeHttp, request);
+
+    if (responce.status !== 200) {
+      throw new Error(i18n.t('node_error'));
+    }
+
+    const data = await responce.json();
+
+    if (Array.isArray(data)) {
+      return data as RPCResponse[];
+    }
+
+    if (data.error) {
+      throw new Error(data.error.message);
+    }
+
+    return data;
+  }
+
   public async sendJson(...body: RPCBody[]) {
     const request = this.provider.json(...body);
     const responce = await fetch(this._network.http, request);
