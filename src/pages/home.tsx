@@ -98,6 +98,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
   }, [setRefreshing]);
   const handleRemoveAccount = React.useCallback(async() => {
     await keystore.account.removeAccount(account);
+    await keystore.transaction.sync();
     setIsConfirmModal(false);
   }, [account, setIsConfirmModal]);
 

@@ -45,8 +45,9 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const settingsState = keystore.settings.store.useValue();
   const ssnState = keystore.ssn.store.useValue();
   const currencyState = keystore.currency.store.useValue();
-  const transactionState = keystore.transaction.store.useValue();
   const networkState = keystore.network.store.useValue();
+  const accountState = keystore.account.store.useValue();
+  const transactionState = keystore.transaction.store.useValue();
 
   const [transactionModal, setTransactionModal] = React.useState(false);
   const [transaction, setTransaction] = React.useState<null | StoredTx>();
@@ -84,6 +85,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
     try {
+      await keystore.transaction.sync();
       await keystore.transaction.checkProcessedTx();
       setRefreshing(false);
     } catch (err) {
@@ -106,10 +108,18 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
     });
     setTransactionModal(false);
   }, [navigation]);
+  const handleClearAll = React.useCallback(async() => {
+    await keystore.transaction.reset();
+  }, []);
 
   React.useEffect(() => {
     keystore.theme.updateColors();
+    keystore.transaction.sync();
   }, []);
+
+  React.useEffect(() => {
+    keystore.transaction.sync();
+  }, [networkState, accountState]);
 
   return (
     <SafeWrapper>
@@ -128,7 +138,7 @@ export const HistoryPage: React.FC<Prop> = ({ navigation }) => {
           <Button
             title={i18n.t('history_btn0')}
             color={colors.primary}
-            onPress={() => keystore.transaction.reset()}
+            onPress={handleClearAll}
           />
         </View>
       </View>

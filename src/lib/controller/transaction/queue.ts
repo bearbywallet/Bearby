@@ -96,6 +96,8 @@ export class TransactionsQueue {
         } else {
           transactionStoreReset();
         }
+      } else {
+        transactionStoreReset();
       }
     } catch {
       await this.reset();
