@@ -23,9 +23,12 @@ interface InputEnc {
 }
 
 function sha3(message: string, _a: InputEnc) {
+  const _b = _a === void 0 ? {} : _a;
+  const _d = _b.inputEnc;
+  const inputEnc: "hex" | undefined = _d === void 0 ? undefined : 'hex';
 
   return sha256()
-    .update(message, 'hex')
+    .update(message, inputEnc)
     .digest('hex');
 }
 
@@ -35,7 +38,7 @@ export function nameHash(name: string, p?: Parent) {
   }
 
   const _b = p === void 0 ? {} : p;
-  const  _c = _b.parent;
+  const _c = _b.parent;
   let parent = _c === void 0 ? null : _c;
   const _d = _b.prefix;
   const prefix = _d === void 0 ? true : _d;
@@ -43,7 +46,7 @@ export function nameHash(name: string, p?: Parent) {
   parent = parent || ZERO_HASH;
 
   if (parent.match(/^0x/)) {
-      parent = parent.substring(2);
+    parent = parent.substring(2);
   }
   const address = [parent]
     .concat(name

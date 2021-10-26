@@ -12,14 +12,15 @@ import {
   Text,
   StyleSheet,
   FlatList,
-  LayoutAnimation
+  LayoutAnimation,
+  TouchableOpacity
 } from 'react-native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { useTheme } from '@react-navigation/native';
+import Swipeable from 'react-native-swipeable';
 
 import { ContactItem } from 'app/components/contact-item';
 import { AddContactModal } from 'app/components/modals';
-import { SwipeRow } from 'app/components/swipe-row';
 import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
@@ -101,11 +102,21 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
       <FlatList
         data={alphabetSorted}
         renderItem={({ item, index}) => (
-          <SwipeRow
-            index={index}
-            swipeThreshold={-150}
-            onSwipe={() => hanldeRemove(item)}
-          >
+          <Swipeable rightButtons={[
+            <TouchableOpacity
+              style={[styles.removeBtn, {
+                backgroundColor: colors['danger'],
+              }]}
+              onPress={() => hanldeRemove(item)}
+            >
+              <Text style={{
+                color: colors.text,
+                marginLeft: 10
+              }}>
+                {i18n.t('account_menu_rm')}
+              </Text>
+            </TouchableOpacity>
+          ]}>
             <ContactItem
               key={index}
               name={item.name}
@@ -114,7 +125,7 @@ export const ContactsPage: React.FC<Prop> = ({ navigation }) => {
               bech32={item.address}
               onSelect={() => handleSelectContect(item.address)}
             />
-          </SwipeRow>
+          </Swipeable>
         )}
         keyExtractor={(item) => item.address}
       />
@@ -144,6 +155,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 30,
     fontFamily: fonts.Bold
+  },
+  removeBtn: {
+    borderRadius: 10,
+    height: '100%',
+    justifyContent: 'center'
   }
 });
 
