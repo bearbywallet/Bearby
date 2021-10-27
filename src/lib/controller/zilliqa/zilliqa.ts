@@ -150,10 +150,20 @@ export class ZilliqaControl {
     return Number(result);
   }
 
-  public async throughPxoy(method: string, params: Params) {
+  public async throughPxoy(method: string, params: Params): Promise<RPCResponse> {
     const body = this.provider.buildBody(method, params);
-    const { result } = await this.sendJson(body);
-    return result;
+    try {
+      return await this.sendJson(body);
+    } catch (err) {
+      return {
+        ...body,
+        error: {
+          code: -0,
+          data: null,
+          message: String((err as Error).message)
+        }
+      };
+    }
   }
 
   public async detectSacmAddress(address: string) {
@@ -204,23 +214,8 @@ export class ZilliqaControl {
     throw new Error(i18n.t('node_error'));
   }
 
-  public async getTransactionStatus(hash: string) {
-    hash = tohexString(hash);
-    const body = this.provider.buildBody(Methods.GetTransactionStatus, [hash]);
-    const { result } = await this.sendJson(body);
-    return result;
-  }
-
   public async getMinimumGasPrice() {
     const body = this.provider.buildBody(Methods.GetMinimumGasPrice, []);
-    const { result } = await this.sendJson(body);
-    return result;
-  }
-
-  public async getTransaction(hash: string) {
-    hash = tohexString(hash);
-
-    const body = this.provider.buildBody(Methods.GetTransaction, [hash]);
     const { result } = await this.sendJson(body);
     return result;
   }

@@ -35,7 +35,7 @@ import { version } from '../../../package.json';
 import { AccountTypes, Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
-import { MessagePayload, TxMessage } from 'types';
+import { MessagePayload, RPCResponse, TxMessage } from 'types';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 
