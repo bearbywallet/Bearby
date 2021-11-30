@@ -33,7 +33,6 @@ export type Prop = {
   token: Token;
   account: Account;
   net: string;
-  rate: number;
   currency: string;
   canRemove: boolean;
   style?: ViewStyle;
@@ -46,7 +45,6 @@ export type Prop = {
 export const TokenCard: React.FC<Prop> = ({
   token,
   net,
-  rate,
   account,
   canRemove,
   currency,
@@ -96,10 +94,10 @@ export const TokenCard: React.FC<Prop> = ({
   const conversion = React.useMemo(() => {
     const [ZIL] = tokensState;
     const balance = account.balance[net][token.symbol];
-    const r = settingsState.rate[ZIL.symbol] || (token.rate || 0);
+    const r = settingsState.rate[ZIL.symbol] * (token.rate || 0);
 
     return toConversion(balance, r, token.decimals);
-  }, [token, account, net, rate, settingsState]);
+  }, [token, account, net, settingsState]);
 
   const hanldeSelect = React.useCallback(({ nativeEvent }) => {
     const { index } = nativeEvent;

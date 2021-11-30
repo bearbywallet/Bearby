@@ -92,7 +92,6 @@ export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
               token={token}
               currency={currencyState}
               net={netwrokState.selected}
-              rate={settingsState.rate[token.symbol]}
               onPress={() => onSendToken(index + 1)}
               onRemove={setTokenForRemove}
               onSend={() => onSendToken(index + 1)}
