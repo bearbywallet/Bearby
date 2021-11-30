@@ -12,7 +12,6 @@ import {
   TouchableOpacity,
   StyleSheet,
   Text,
-  Animated,
   ViewStyle
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
@@ -91,8 +90,11 @@ export const TransactionItem: React.FC<Prop> = ({
       };
     }
 
+    const [ZIL] = tokens;
+    const tokenRate = token?.rate || 0;
+    const rate = settings.rate[ZIL.symbol] * (tokenRate || 0);
     const value = fromZil(transaction.amount, transaction.token.decimals);
-    const rate = token ? settings.rate[token.symbol] : 0;
+
     const converted = toConversion(transaction.amount, rate, transaction.token.decimals);
 
     return {

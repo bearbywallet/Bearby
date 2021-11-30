@@ -13,6 +13,7 @@ import {
   Text,
   ViewStyle
 } from 'react-native';
+import { Token } from 'types';
 import { useTheme } from '@react-navigation/native';
 
 import { LoadSVG } from 'app/components/load-svg';
@@ -20,40 +21,42 @@ import { LoadSVG } from 'app/components/load-svg';
 import i18n from 'app/lib/i18n';
 import { toLocaleString, toConversion, fromZil, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 export type Prop = {
-  decimals: number;
-  balance?: string;
-  symbol: string;
-  address: string;
-  name: string;
-  rate: number;
-  totalSupply?: string;
+  token: Token;
   currency: string;
   style?: ViewStyle;
 };
 
 export const TokenInfo: React.FC<Prop> = ({
-  rate,
-  symbol,
-  decimals,
-  name,
-  address,
+  token,
   currency,
   style,
-  balance = '0',
-  totalSupply = '0'
 }) => {
+  const settingsState = keystore.settings.store.useValue();
+  const netwrokState = keystore.network.store.useValue();
+  const tokensState = keystore.token.store.useValue();
   const { colors } = useTheme();
+  const {
+    balance,
+    decimals,
+    totalSupply,
+    rate,
+    symbol,
+    name,
+    address
+  } = token;
+
   /**
    * ZIL(Default token) amount in float.
    */
   const amount = React.useMemo(
-    () => fromZil(balance, decimals),
+    () => fromZil(balance || '0', decimals),
     [balance, decimals]
   );
   const tokensSupply = React.useMemo(() => {
-    const ts = fromZil(totalSupply, decimals);
+    const ts = fromZil(totalSupply || '0', decimals);
 
     return nFormatter(ts);
   }, [totalSupply, decimals]);
@@ -61,8 +64,10 @@ export const TokenInfo: React.FC<Prop> = ({
    * Converted to BTC/USD/ETH.
    */
   const conversion = React.useMemo(() => {
-    return toConversion(balance, rate, decimals);
-  }, [rate, decimals, balance]);
+    const [ZIL] = tokensState;
+    const r = settingsState.rate[ZIL.symbol] * (Number(rate) || 0);
+    return toConversion(balance || '0', r, decimals);
+  }, [rate, decimals, balance, tokensState, settingsState]);
 
   return (
     <View style={[styles.container, {
@@ -85,7 +90,7 @@ export const TokenInfo: React.FC<Prop> = ({
         <LoadSVG
           height="30"
           width="30"
-          addr={address}
+          addr={address[netwrokState.selected]}
         />
       </View>
       <View>

@@ -27,6 +27,7 @@ import {
 } from 'app/filters';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
+import { keystore } from 'app/keystore';
 
 export type Prop = {
   token: Token;
@@ -55,6 +56,8 @@ export const TokenCard: React.FC<Prop> = ({
   onSend = () => null,
   onView = () => null,
 }) => {
+  const tokensState = keystore.token.store.useValue();
+  const settingsState = keystore.settings.store.useValue();
   const { colors } = useTheme();
   const actions = React.useMemo(() => [
     {
@@ -91,10 +94,12 @@ export const TokenCard: React.FC<Prop> = ({
    * Converted to BTC/USD/ETH.
    */
   const conversion = React.useMemo(() => {
+    const [ZIL] = tokensState;
     const balance = account.balance[net][token.symbol];
+    const r = settingsState.rate[ZIL.symbol] || (token.rate || 0);
 
-    return toConversion(balance, rate, token.decimals);
-  }, [token, account, net, rate]);
+    return toConversion(balance, r, token.decimals);
+  }, [token, account, net, rate, settingsState]);
 
   const hanldeSelect = React.useCallback(({ nativeEvent }) => {
     const { index } = nativeEvent;

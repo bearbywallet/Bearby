@@ -34,7 +34,6 @@ import { Account, GasState, Token } from 'types';
 import i18n from 'app/lib/i18n';
 import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
 import { keystore } from 'app/keystore';
-import { deppUnlink } from 'app/utils';
 import { Transaction } from 'app/lib/controller/transaction';
 import { DEFAULT_GAS } from 'app/config';
 import { fonts } from 'app/styles';
@@ -66,6 +65,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   onConfirm
 }) => {
   const { colors } = useTheme();
+  const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const gasState = keystore.gas.store.useValue();
@@ -80,11 +80,12 @@ export const ConfirmPopup: React.FC<Prop> = ({
   });
 
   const conversion = React.useMemo(() => {
-    const rate = settingsState.rate[token.symbol];
-    const value = toConversion(transaction.amount, rate, token.decimals);
+    const [ZIL] = tokensState;
+    const rate = settingsState.rate[ZIL.symbol] * (token.rate || 0);
+    const value = toConversion(transaction.tokenAmount, rate, token.decimals);
 
     return toLocaleString(value);
-  }, [transaction, settingsState, token]);
+  }, [transaction, settingsState, token, tokensState]);
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);

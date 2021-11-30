@@ -55,9 +55,10 @@ export const TransferToken: React.FC<Prop> = ({
     [tokens, selected]
   );
   const converted = React.useMemo(() => {
+    const [ZIL] = tokens;
     const { decimals, symbol } = token;
     const balanceValue = account.balance[netwrok][symbol];
-    const rate = settingsState.rate[token.symbol];
+    const rate = settingsState.rate[ZIL.symbol] * (token.rate || 0);
     const convert = toConversion(balanceValue, rate, decimals);
 
     return `${toLocaleString(convert)} ${currencyState}`;

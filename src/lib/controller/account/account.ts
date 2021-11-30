@@ -337,7 +337,7 @@ export class AccountControler {
       balances[net] = Object.fromEntries(zrc2Balances);
 
       return balances;
-    } catch {
+    } catch (err) {
       return balances;
     }
   }
