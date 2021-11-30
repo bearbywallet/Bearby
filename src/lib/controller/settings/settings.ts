@@ -53,16 +53,6 @@ export class SettingsControler {
     return state.rate[zil.symbol];
   }
 
-  public getRate(symbol: string) {
-    const rate = this.store.get().rate[symbol];
-
-    if (!rate) {
-      return 0;
-    }
-
-    return rate;
-  }
-
   public async rateUpdate() {
     const currencies = DEFAULT_CURRENCIES.join();
     const url = `${API_COINGECKO}?ids=zilliqa&vs_currencies=${currencies}`;
@@ -78,46 +68,6 @@ export class SettingsControler {
 
     settingsStoreUpdate(state);
 
-    return this._storage.set(
-      buildObject(STORAGE_FIELDS.SETTINGS, state)
-    );
-  }
-
-  public async getDexRate() {
-    const fieldname = 'pools';
-    const net = this._netwrok.selected;
-    const contract = tohexString(ZIL_SWAP_CONTRACTS[net]);
-    const state = this.store.get();
-    const tokens = this._tokens.store.get();
-    const [zil] = tokens;
-    const identities = tokens.filter((t) => t.symbol !== zil.symbol).map((t) => {
-      const tokenAddress = t.address[net].toLowerCase();
-
-      return this._zilliqa.provider.buildBody(
-        Methods.GetSmartContractSubState,
-        [contract, fieldname, [tokenAddress]]
-      );
-    });
-    const replies = await this._zilliqa.sendJson(...identities);
-    const entries = Array.from(replies as RPCResponse[]).map((res, index: number) => {
-      const token = tokens[index + 1];
-      const tokenAddress = token.address[net].toLowerCase();
-      const [zilReserve, tokenReserve] = res.result[fieldname][tokenAddress].arguments;
-      const _zilReserve = zilReserve * Math.pow(10, -1 * zil.decimals);
-      const _tokenReserve = tokenReserve * Math.pow(10, -1 * token.decimals);
-      const exchangeRate = (_zilReserve / _tokenReserve).toFixed(10);
-      const rate = this.rate * Number(exchangeRate);
-
-      return [token.symbol, Math.fround(rate)];
-    });
-    const rates = Object.fromEntries(entries);
-
-    state.rate = {
-      ...state.rate,
-      ...rates
-    };
-
-    settingsStoreUpdate(state);
     return this._storage.set(
       buildObject(STORAGE_FIELDS.SETTINGS, state)
     );

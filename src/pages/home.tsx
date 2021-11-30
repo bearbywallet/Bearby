@@ -25,7 +25,6 @@ import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
 import { viewAddress } from 'app/utils';
 import { Token } from 'types';
-import { URLTypes } from 'app/lib/controller/search-engine/url-type';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -108,7 +107,6 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       .account
       .balanceUpdate()
       .then(() => keystore.settings.rateUpdate())
-      .then(() => keystore.settings.getDexRate())
       .catch((err) => {
         Alert.alert(
           i18n.t('update'),

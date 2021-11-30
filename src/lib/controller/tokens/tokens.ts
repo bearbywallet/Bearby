@@ -10,7 +10,7 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 
-import { STORAGE_FIELDS, TokenTypes, ZRC2Fields } from 'app/config';
+import { STORAGE_FIELDS, TokenTypes, ZIL_SWAP_CONTRACTS, ZRC2Fields } from 'app/config';
 import { Token, Account } from 'types';
 import { tokensStore, tokensStoreUpdate } from './state';
 import { toZRC1, deppUnlink, tohexString } from 'app/utils';
@@ -63,10 +63,12 @@ export class TokenControll {
   public async getToken(address: string, acc: Account): Promise<Token> {
     let balance = '0';
     let totalSupply = '0';
+    let rate = 0;
     const type = TokenTypes.ZRC2;
-    const totalSupplyField = 'total_supply';
     const addr = tohexString(address);
+    const net = this._network.selected;
     const userAddress = acc.base16.toLowerCase();
+    const tokenAddressBase16 = address.toLowerCase();
     const identities = [
       this._zilliqa.provider.buildBody(Methods.GetSmartContractInit, [addr]),
       this._zilliqa.provider.buildBody(
@@ -75,7 +77,15 @@ export class TokenControll {
       ),
       this._zilliqa.provider.buildBody(
         Methods.GetSmartContractSubState,
-        [addr, totalSupplyField, []]
+        [addr, ZRC2Fields.TotalSupply, []]
+      ),
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [
+          tohexString(ZIL_SWAP_CONTRACTS[net]),
+          ZRC2Fields.Pools,
+          [tokenAddressBase16]
+        ]
       )
     ];
     const replies = await this._zilliqa.sendJson(...identities);
@@ -85,13 +95,23 @@ export class TokenControll {
       balance = replies[1].result[ZRC2Fields.Balances][userAddress];
     }
     if (replies[2].result) {
-      totalSupply = replies[2].result[totalSupplyField];
+      totalSupply = replies[2].result[ZRC2Fields.TotalSupply];
+    }
+    if (replies[3].result) {
+      const pool = replies[3].result[ZRC2Fields.Pools];
+      const [zilReserve, tokenReserve] = pool[tokenAddressBase16].arguments;
+      rate = this._calcRate(
+        zilReserve,
+        tokenReserve,
+        zrc.decimals
+      );
     }
 
     return {
       type,
       totalSupply,
       balance,
+      rate,
       name: zrc.name,
       symbol: zrc.symbol,
       decimals: zrc.decimals,
@@ -124,11 +144,47 @@ export class TokenControll {
     return this._update(tokens);
   }
 
+  public async updateRate(pools: object[]) {
+    const tokens = this.store.get();
+    const net = this._network.selected;
+
+    for (const res of pools) {
+      try {
+        const pool = res['result'][ZRC2Fields.Pools];
+        const [base16] = Object.keys(pool);
+        const foundIndex = tokens.findIndex(
+          (t) => t.address[net].toLowerCase() === base16
+        );
+        const foundToken = tokens[foundIndex];
+        const [zilReserve, tokenReserve] = pool[base16].arguments;
+
+        tokens[foundIndex].rate = this._calcRate(
+          zilReserve,
+          tokenReserve,
+          foundToken.decimals
+        );
+      } catch (err) {
+        continue;
+      }
+    }
+
+    await this._update(tokens);
+  }
+
   private async _update(tokens: Token[]) {
     tokensStoreUpdate(deppUnlink(tokens));
 
     await this._storage.set(
       buildObject(STORAGE_FIELDS.TOKENS, tokens)
     );
+  }
+
+  private _calcRate(zilReserve: string, tokenReserve: string, decimals: number) {
+    const [ZIL] = this.store.get();
+    const _zilReserve = Number(zilReserve) * Math.pow(10, -1 * ZIL.decimals);
+    const _tokenReserve = Number(tokenReserve) * Math.pow(10, -1 * decimals);
+    const exchangeRate = (_zilReserve / _tokenReserve).toFixed(6);
+
+    return Number(exchangeRate);
   }
 }

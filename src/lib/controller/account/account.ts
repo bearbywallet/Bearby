@@ -16,7 +16,8 @@ import {
   Messages,
   MAX_NAME_DIFFICULTY,
   NIL_ADDRESS,
-  ZRC2Fields
+  ZRC2Fields,
+  ZIL_SWAP_CONTRACTS
 } from 'app/config';
 import {
   getAddressFromPublicKey,
@@ -280,13 +281,16 @@ export class AccountControler {
 
   private async _tokenBalance(base16: string) {
     const net = this._netwrok.selected;
-    const tokens = this._token.store.get().map((t) => [t.symbol, '0']);
+    const zrc2Identities = this._token.store.get();
+    const [ZIL] = zrc2Identities;
+    const tokens = zrc2Identities.map((t) => [t.symbol, '0']);
     const entries = ZILLIQA_KEYS.map((n) => [n, Object.fromEntries(tokens)]);
     const balances = Object.fromEntries(entries);
 
     const address = tohexString(base16);
     const addr = String(base16).toLowerCase();
-    const identities = this._token.store.get().map((token) => {
+    const dexContract = tohexString(ZIL_SWAP_CONTRACTS[net]);
+    const balanceIdentities = zrc2Identities.map((token) => {
       if (token.address[net] === NIL_ADDRESS) {
         return this._zilliqa.provider.buildBody(
           Methods.getBalance,
@@ -299,11 +303,24 @@ export class AccountControler {
         [tohexString(token.address[net]), ZRC2Fields.Balances, [addr]]
       );
     });
+    const tokensIdentities = zrc2Identities.filter((t) => ZIL.symbol !== t.symbol);
+    const tokensRates = tokensIdentities.map((token) => {
+      const tokenAddress = token.address[net].toLowerCase();
+      return this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [dexContract, ZRC2Fields.Pools, [tokenAddress]]
+      );
+    });
+
+    const identities = [...balanceIdentities, ...tokensRates];
 
     try {
       const replies: RPCResponse[] = await this._zilliqa.sendJson(...identities);
-      const entries1 = replies.map((res, index) => {
+      const pools = replies.slice(balanceIdentities.length);
+      const balanceList = replies.slice(0, balanceIdentities.length);
+      const zrc2Balances = balanceList.map((res, index) => {
         const token = this._token.store.get()[index];
+
         let balance = [token.symbol, '0'];
         if (res.result && token.address[net] === NIL_ADDRESS) {
           balance = [token.symbol, res.result.balance];
@@ -315,7 +332,9 @@ export class AccountControler {
         return balance;
       });
 
-      balances[net] = Object.fromEntries(entries1);
+      await this._token.updateRate(pools);
+
+      balances[net] = Object.fromEntries(zrc2Balances);
 
       return balances;
     } catch {

@@ -19,4 +19,5 @@ export interface Token {
   type: TokenTypes;
   totalSupply?: string;
   balance?: string;
+  rate: number;
 }
