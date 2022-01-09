@@ -64,7 +64,10 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
 
     if (uuid && iv) {
       try {
-        const client = new W3cwebsocket(ZilPayConnect.Host, ZilPayConnect.Protocol);
+        const client = new W3cwebsocket(
+          ZilPayConnect.Host,
+          ZilPayConnect.Protocol
+        );
 
         client.onerror = function() {
           client.close();
