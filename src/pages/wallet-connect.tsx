@@ -16,25 +16,28 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
+import { w3cwebsocket as W3cwebsocket } from "websocket";
 
 import { QRScaner } from 'app/components/modals/qr-scaner';
 import { CustomButton } from 'app/components/custom-button';
 import { Passwordinput } from 'app/components/password-input';
 import { Switcher } from 'app/components/switcher';
-
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
+
 import i18n from 'app/lib/i18n';
+import { ZilPayConnect } from 'app/config/wallet-connect';
 import { fonts } from 'app/styles';
-import { PubNubWrapper } from 'app/lib/controller/connect';
 import { sha256 } from 'app/lib/crypto';
-import { PubNubDataResult, EncryptedWallet } from 'types';
+import { ZilPayConnectContent, EncryptedWallet } from 'types';
 import { keystore } from 'app/keystore';
+import { AccountTypes, TokenTypes, ZILLIQA_KEYS } from 'app/config';
 
 type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 
 const Aes = NativeModules.Aes;
+const [mainnet] = ZILLIQA_KEYS;
 const STEPS = [
   i18n.t('connect_step0'),
   i18n.t('connect_step1'),
@@ -50,25 +53,45 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
   const [isLoading, setIsLoading] = React.useState(false);
   const [password, setPassword] = React.useState<string>();
   const [passwordError, setPasswordError] = React.useState(' ');
-  const [data, setData] = React.useState<PubNubDataResult>();
+  const [data, setData] = React.useState<ZilPayConnectContent>();
   const [isBiometric, setIsBiometric] = React.useState(Boolean(authState.supportedBiometryType));
   const [biometric, setBiometric] = React.useState<string>();
 
-  const handleScan = React.useCallback(async(value) => {
+  const handleScan = React.useCallback(async(value: string) => {
     setIsLoading(true);
 
-    if (value && value.search('zilpay-sync:') !== -1) {
-      const field = PubNubWrapper.FIELD;
-      const [channelName, cipherKey, iv] = value.replace(`${field}:`, '').split('|@|');
-      const pubnubWrapper = new PubNubWrapper(channelName, cipherKey);
+    const [uuid, iv] = value.split('/');
 
+    if (uuid && iv) {
       try {
-        const content = await pubnubWrapper.startSync();
+        const client = new W3cwebsocket(ZilPayConnect.Host, ZilPayConnect.Protocol);
 
-        setData({
-          ...content,
-          iv
-        });
+        client.onerror = function() {
+          client.close();
+        };
+        client.onmessage = function(e) {
+          try {
+            const parsed = JSON.parse(String(e.data));
+            setData({
+              ...parsed.data,
+              iv
+            });
+          } catch (err) {
+            // console.log('parse', err);
+          } finally {
+            client.close();
+          }
+        };
+
+        client.onopen = function() {
+          if (client.readyState === client.OPEN) {
+            client.send(JSON.stringify({
+              type: 'Connect',
+              data: '',
+              uuid
+            }));
+          }
+        };
       } catch (err) {
         Alert.alert(
           i18n.t('connect_invalid_qr_code_title'),
@@ -105,49 +128,68 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
     try {
       const pwd = await sha256(password);
       const content = await Aes.decrypt(data.cipher, pwd, data.iv);
-      const decrypted: EncryptedWallet = JSON.parse(JSON.parse(content));
+      const decrypted: EncryptedWallet = JSON.parse(content);
 
-      await keystore.initWallet(password, decrypted.decryptSeed);
+      await keystore.initWallet(password, decrypted.seed);
       await keystore.account.reset();
       await keystore.transaction.sync();
+      await keystore.token.reset();
+      await keystore.guard.auth.secureKeychain.reset();
 
-      for (const iterator of data.wallet.identities) {
-        if (iterator.hwType) {
+      for (const token of data.zrc2) {
+        try {
+          await keystore.token.addToken({
+            type: TokenTypes.ZRC2,
+            decimals: token.decimals,
+            address: {
+              [mainnet]: token.base16
+            },
+            name: token.name,
+            symbol: token.symbol,
+            rate: token.rate
+          });
+        } catch {
           continue;
-        } else if (iterator.isImport) {
-          const found = decrypted.decryptImported.find(
-            (el) => el.index === iterator.index
-          );
-
-          if (!found) {
-            continue;
-          }
-
-          if (!iterator.name) {
-            iterator.name = `Imported ${iterator.index}`;
-          }
-
-          await keystore.addPrivateKeyAccount(
-            found.privateKey,
-            iterator.name,
-            password
-          );
-        } else {
-          if (!iterator.name) {
-            iterator.name = `Account ${iterator.index}`;
-          }
-
-          await keystore.addAccount(
-            decrypted.decryptSeed,
-            iterator.name,
-            iterator.index
-          );
         }
+      }
+
+      for (const account of data.wallet.identities) {
+        try {
+          if (account.type === AccountTypes.Seed) {
+            await keystore.addAccount(
+              decrypted.seed,
+              account.name,
+              account.index
+            );
+          } else if (account.type === AccountTypes.privateKey) {
+            const found = decrypted.keys.find(
+              (el) => el.index === account.index
+            );
+            if (!found) {
+              continue;
+            }
+            await keystore.addPrivateKeyAccount(
+              found.privateKey,
+              account.name,
+              password
+            );
+          }
+        } catch {
+          continue;
+        }
+      }
+
+      try {
+        await keystore.account.balanceUpdate();
+      } catch {
+        //
       }
 
       if (isBiometric) {
         await keystore.guard.auth.initKeychain(password);
       }
+
+      await keystore.account.selectAccount(data.wallet.selectedAddress);
 
       navigation.navigate('InitSuccessfully');
     } catch (err) {

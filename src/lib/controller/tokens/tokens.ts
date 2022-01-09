@@ -12,7 +12,7 @@ import { NetworkControll } from 'app/lib/controller/network';
 
 import { STORAGE_FIELDS, TokenTypes, ZIL_SWAP_CONTRACTS, ZRC2Fields } from 'app/config';
 import { Token, Account } from 'types';
-import { tokensStore, tokensStoreUpdate } from './state';
+import { tokensStore, tokensStoreUpdate, tokensStoreReset } from './state';
 import { toZRC1, deppUnlink, tohexString } from 'app/utils';
 import { Methods } from '../zilliqa/methods';
 
@@ -25,8 +25,8 @@ export class TokenControll {
       const checkTestnet = testnet && testnet === token.address.testnet;
       const checkPrivate = t.address.private &&
         t.address.private === token.address.private;
-
-      return checkMainnet || checkTestnet || checkPrivate;
+      const samename = token.name === t.name || token.symbol === t.symbol;
+      return checkMainnet || checkTestnet || checkPrivate || samename;
     });
 
     if (isAddress) {
@@ -58,6 +58,11 @@ export class TokenControll {
     } catch {
       await this._update(this.store.get());
     }
+  }
+
+  public async reset() {
+    tokensStoreReset();
+    await this._update(this.store.get());
   }
 
   public async getToken(address: string, acc: Account): Promise<Token> {

@@ -241,7 +241,7 @@ export class AccountControler {
   public async selectAccount(index: number) {
     const { identities } = this.store.get();
 
-    if (identities.length < index) {
+    if (identities.length <= index) {
       return null;
     }
 

@@ -6,10 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export enum WalletConnectTypes {
-  Start = 'start-sync',
-  EndSync = 'end-sync',
-  SyncingData = 'syncing-data',
-  SyncError = 'error-sync',
-  SyncDone = 'sync-done'
-}
+export const ZilPayConnect = {
+  Host: 'ws://5.181.252.166:8080/',
+  Protocol: 'zilpay-connect'
+};
