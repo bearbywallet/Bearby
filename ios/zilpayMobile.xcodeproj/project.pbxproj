@@ -11,7 +11,7 @@
 		13B07FBC1A68108700A75B9A /* AppDelegate.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB01A68108700A75B9A /* AppDelegate.m */; };
 		13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 13B07FB51A68108700A75B9A /* Images.xcassets */; };
 		13B07FC11A68108700A75B9A /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = 13B07FB71A68108700A75B9A /* main.m */; };
-		154B4A45278C576700E1A352 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 154B4A44278C576700E1A352 /* inpage.js */; };
+		154EB5A7278C764700DEEFF1 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 154EB5A6278C764700DEEFF1 /* inpage.js */; };
 		15866DF4264D80E1001DB292 /* File.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15866DF3264D80E1001DB292 /* File.swift */; };
 		158A2BE02544529800D32C44 /* Data+HexString.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BDF2544529800D32C44 /* Data+HexString.m */; };
 		158A2BE82544530400D32C44 /* HDKeyPair.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BE72544530400D32C44 /* HDKeyPair.m */; };
@@ -61,7 +61,7 @@
 		13B07FB51A68108700A75B9A /* Images.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; name = Images.xcassets; path = zilpayMobile/Images.xcassets; sourceTree = "<group>"; };
 		13B07FB61A68108700A75B9A /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; name = Info.plist; path = zilpayMobile/Info.plist; sourceTree = "<group>"; };
 		13B07FB71A68108700A75B9A /* main.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = main.m; path = zilpayMobile/main.m; sourceTree = "<group>"; };
-		154B4A44278C576700E1A352 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-web3.js/dist/inpage.js"; sourceTree = "<group>"; };
+		154EB5A6278C764700DEEFF1 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-web3.js/dist/inpage.js"; sourceTree = "<group>"; };
 		15866DF2264D80E1001DB292 /* zilpayMobile-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "zilpayMobile-Bridging-Header.h"; sourceTree = "<group>"; };
 		15866DF3264D80E1001DB292 /* File.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = File.swift; sourceTree = "<group>"; };
 		158A2BDF2544529800D32C44 /* Data+HexString.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = "Data+HexString.m"; sourceTree = "<group>"; };
@@ -147,7 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
-				154B4A44278C576700E1A352 /* inpage.js */,
+				154EB5A6278C764700DEEFF1 /* inpage.js */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -387,7 +387,7 @@
 				15FE7B48259E2682007BDB4B /* AvenirNextLTPro-Demi.otf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				15FE7B4A259E2682007BDB4B /* AvenirNextLTPro-Regular.otf in Resources */,
-				154B4A45278C576700E1A352 /* inpage.js in Resources */,
+				154EB5A7278C764700DEEFF1 /* inpage.js in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

@@ -161,14 +161,13 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           try {
             const { method, params, uuid } = message.payload;
             const res = await keystore.zilliqa.throughPxoy(method, params);
-            if (res.result) {
-              webViewRef.current.postMessage(
-                new Message(Messages.resProxy).resolve(res, uuid)
-              );
-            }
             if (res.error) {
               webViewRef.current.postMessage(
                 new Message(Messages.resProxy).reject(res.error.message, uuid)
+              );
+            } else {
+              webViewRef.current.postMessage(
+                new Message(Messages.resProxy).resolve(res, uuid)
               );
             }
           } catch (err) {
