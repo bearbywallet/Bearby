@@ -99,6 +99,7 @@ export const SignMessageModal: React.FC<Prop> = ({
     } catch (err) {
       setError((err as Error).message);
     }
+    setPassowrd('');
     setLoading(false);
   }, [hash, account, payload, passowrd]);
 

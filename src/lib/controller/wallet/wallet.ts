@@ -69,7 +69,7 @@ export class WalletControler extends Mnemonic {
     this.network,
     this.account
   );
-  public readonly inpage = new InjectScript(this.account, this.network);
+  public readonly inpage = new InjectScript();
   public readonly connect = new ConnectController(_storage);
   public readonly worker = new WorkerController(
     this.transaction,

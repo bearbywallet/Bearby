@@ -6,15 +6,17 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+const app = 'zil-pay';
+
 export const Messages = {
-  init: '@/init',
-  wallet: '@/wallet',
-  block: '@/block',
-  signResult: '@/res-sign-result',
-  signTx: '@/sign-tx',
-  signMessage: '@/sign-message',
-  appConnect: '@/app_connect',
-  resConnect: '@/res_connect',
-  reqProxy: '@/req-proxy',
-  resProxy: '@/res-proxy'
+  init: `@/${app}/injected-get-wallet-data`,
+  block: `@/${app}/new-block-created`,
+  signResult: `@/${app}/response-tx-result`,
+  signTx: `@/${app}/request-to-sign-tx`,
+  signMessage: `@/${app}/request-to-sign-message`,
+  signMessageRes: `@/${app}/response-sign-message`,
+  appConnect: `@/${app}/request-to-connect-dapp`,
+  resConnect: `@/${app}/response-dapp-connect`,
+  reqProxy: `@/${app}/request-through-content`,
+  resProxy: `@/${app}/response-from-content`,
 };

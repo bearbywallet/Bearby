@@ -165,19 +165,16 @@ export class NetworkControll {
         (c) => c.domain.toLowerCase() === String(this._origin).toLowerCase()
       );
       const { base16, bech32 } = accounts.identities[accounts.selectedAddress];
-      const m = new Message(Messages.wallet, {
-        origin: this._origin,
-        data: {
-          isConnect,
-          account: isConnect ? {
-            base16,
-            bech32
-          } : null,
-          isEnable: true,
-          netwrok: this.selected
-        }
-      });
-      this._webView.postMessage(m.serialize);
+      this._webView.postMessage(new Message(Messages.init).serialize({
+        isConnect,
+        account: isConnect ? {
+          base16,
+          bech32
+        } : null,
+        isEnable: true,
+        netwrok: this.selected,
+        http: this.http
+      }));
     }
   }
 

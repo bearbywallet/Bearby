@@ -9,16 +9,20 @@
 import { Transaction } from 'app/lib/controller';
 
 export interface MessagePayload {
-  origin?: string;
+  domain?: string;
   title?: string;
   icon?: string;
   data?: object;
+  content?: string;
   uuid?: string;
 }
 
 export interface MessageType {
   type: string;
-  payload: MessagePayload;
+  payload: {
+    resolve?: object;
+    reject?: string;
+  };
 }
 
 export interface Signature {
@@ -29,7 +33,7 @@ export interface Signature {
 
 export interface TxMessage {
   params: Transaction;
-  origin: string;
+  domain: string;
   icon: string;
   uuid: string;
 }

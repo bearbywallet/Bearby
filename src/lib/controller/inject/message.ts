@@ -6,19 +6,48 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MessageType, MessagePayload } from 'types';
+import { MessageType } from 'types';
 
 export class Message {
-  private _message: MessageType;
+  private _type: string;
 
-  constructor(type: string, payload: MessagePayload) {
-    this._message = {
-      type,
-      payload
-    };
+  constructor(type: string) {
+    this._type = type;
   }
 
-  public get serialize() {
-    return JSON.stringify(this._message);
+  public serialize(payload: object | null, uuid?: string) {
+    const msg = {
+      type: this._type,
+      payload: {
+        uuid,
+        ...payload
+      }
+    };
+
+    return JSON.stringify(msg);
+  }
+
+  public reject(message = '', uuid?: string) {
+    const msg = {
+      type: this._type,
+      payload: {
+        uuid,
+        reject: message
+      }
+    };
+
+    return JSON.stringify(msg);
+  }
+
+  public resolve(payload: object | null, uuid?: string) {
+    const msg = {
+      type: this._type,
+      payload: {
+        uuid,
+        resolve: payload
+      }
+    };
+
+    return JSON.stringify(msg);
   }
 }

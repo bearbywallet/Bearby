@@ -35,7 +35,7 @@ import { version } from '../../../package.json';
 import { AccountTypes, Messages } from 'app/config';
 import { Message } from 'app/lib/controller/inject/message';
 import { Transaction } from 'app/lib/controller/transaction';
-import { MessagePayload, RPCResponse, TxMessage } from 'types';
+import { MessagePayload, TxMessage } from 'types';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 
@@ -136,19 +136,17 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       switch (message.type) {
         case Messages.init:
           const { base16, bech32 } = keystore.account.getCurrentAccount();
-          const m = new Message(Messages.wallet, {
-            origin: message.payload.origin,
-            data: {
-              isConnect,
-              account: isConnect ? {
-                base16,
-                bech32
-              } : null,
-              isEnable: keystore.guard.isEnable,
-              netwrok: net
-            }
-          });
-          webViewRef.current.postMessage(m.serialize);
+          webViewRef.current.postMessage(new Message(Messages.init).serialize({
+            isConnect,
+            domain: message.payload.domain,
+            account: isConnect ? {
+              base16,
+              bech32
+            } : undefined,
+            isEnable: keystore.guard.isEnable,
+            netwrok: net,
+            http: keystore.network.http
+          }));
           break;
 
         case Messages.appConnect:
@@ -160,12 +158,18 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
 
         case Messages.reqProxy:
-          const { method, params } = message.payload.data;
-          webViewRef.current.postMessage(new Message(Messages.resProxy, {
-            origin: message.payload.origin,
-            uuid: message.payload.uuid,
-            data: await keystore.zilliqa.throughPxoy(method, params)
-          }).serialize);
+          const { method, params, uuid } = message.payload;
+          const res = await keystore.zilliqa.throughPxoy(method, params);
+          if (res.result) {
+            webViewRef.current.postMessage(
+              new Message(Messages.resProxy).resolve(res, uuid)
+            );
+          }
+          if (res.error) {
+            webViewRef.current.postMessage(
+              new Message(Messages.resProxy).reject(res.error.message, uuid)
+            );
+          }
           break;
 
         case Messages.signMessage:
@@ -174,9 +178,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
+          const { hostname } = new URL(message.payload.domain);
           const nonce = await keystore.transaction.calcNextNonce(account);
           const newTX = Transaction.fromPayload(
-            message.payload.data,
+            message.payload,
             account,
             net
           );
@@ -184,7 +189,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           setTransaction({
             params: newTX,
             uuid: message.payload.uuid,
-            origin: message.payload.origin,
+            domain: hostname ? hostname : message.payload.domain,
             icon: message.payload.icon
           });
           break;
@@ -193,7 +198,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
       }
     } catch (err) {
-      // console.error(err);
+      console.error(err); // TODO: check errors
     }
   }, [
     webViewRef,
@@ -202,64 +207,61 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
     isConnect
   ]);
 
-  const handleConnect = React.useCallback((value, app?: MessagePayload) => {
+  const handleConnect = React.useCallback(async(value, app?: MessagePayload) => {
     let connector = app;
 
     if (appConnect) {
       connector = appConnect;
     }
 
-    if (value && connector && connector.title && connector.icon && connector.origin) {
-      keystore.connect.add({
-        title: connector.title,
-        domain: new URL(connector.origin).hostname,
-        icon: connector.icon
-      });
+    if (!webViewRef.current || !connector) {
+      return;
     }
 
-    if (webViewRef.current && connector) {
+    try {
+      if (value && connector && connector.title && connector.icon && connector.domain) {
+        const { hostname } = new URL(connector.domain);
+        await keystore.connect.add({
+          title: connector.title,
+          domain: hostname ? hostname : connector.domain,
+          icon: connector.icon
+        });
+      }
+
       const { base16, bech32 } = keystore.account.getCurrentAccount();
-      const m = new Message(Messages.resConnect, {
-        origin: connector.origin,
-        uuid: connector.uuid,
-        data: {
-          confirm: value,
-          account: value ? {
-            base16,
-            bech32
-          } : null
-        }
-      });
-      webViewRef.current.postMessage(m.serialize);
+      webViewRef.current.postMessage(new Message(Messages.resConnect).resolve(value ? {
+        base16,
+        bech32
+      } : null, connector.uuid));
+    } catch {
+      webViewRef.current.postMessage(
+        new Message(Messages.resConnect).reject('', connector.uuid)
+      );
     }
+
     setAppConnect(undefined);
   }, [appConnect, webViewRef]);
 
   const handleSignMessage = React.useCallback((value) => {
-    if (!webViewRef.current || !signMessage?.origin || !signMessage?.uuid) {
-      return null;
+    if (!webViewRef.current || !signMessage?.uuid) {
+      return;
     }
-
-    const data: {
-      reject: undefined | string;
-      resolve: undefined | object;
-    } = {
-      reject: undefined,
-      resolve: undefined
-    };
-
+    const msg = new Message(Messages.signMessageRes);
     if (!value) {
-      data.reject = 'User rejected';
+      webViewRef.current.postMessage(msg.reject('User rejected', signMessage.uuid));
     } else if (value) {
-      data.resolve = value;
+      webViewRef.current.postMessage(msg.resolve(value, signMessage.uuid));
     }
+    setSignMessage(undefined);
+  }, [webViewRef, signMessage, setSignMessage]);
 
-    const m = new Message(Messages.signResult, {
-      origin: signMessage.origin,
-      uuid: signMessage.uuid,
-      data
-    });
-    webViewRef.current.postMessage(m.serialize);
+  const handleSignMessageReject = React.useCallback(() => {
+    if (!webViewRef.current || !signMessage?.uuid) {
+      setSignMessage(undefined);
+      return;
+    }
+    const msg = new Message(Messages.signMessageRes);
+    webViewRef.current.postMessage(msg.reject('User rejected', signMessage.uuid));
     setSignMessage(undefined);
   }, [webViewRef, signMessage, setSignMessage]);
   /**
@@ -284,21 +286,18 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         await tx.sign(keyPair.privateKey);
       }
 
-      tx.hash = await keystore.zilliqa.send(tx);
+      const res = await keystore.zilliqa.send(tx);
+
+      tx.hash = res.TranID;
 
       await keystore.transaction.add(tx);
 
-      const m = new Message(Messages.signResult, {
-        origin: transaction.origin,
-        uuid: transaction.uuid,
-        data: {
-          resolve: {
-            ID: tx.hash,
-            ...tx.self
-          }
-        }
-      });
-      webViewRef.current.postMessage(m.serialize);
+      webViewRef.current.postMessage(new Message(Messages.signResult).resolve({
+        ID: tx.hash,
+        Info: res.Info,
+        from: account.base16,
+        ...tx.self
+      }, transaction.uuid));
 
       cb();
       setTransaction(undefined);
@@ -320,14 +319,9 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       return null;
     }
 
-    const m = new Message(Messages.signResult, {
-      origin: transaction.origin,
-      uuid: transaction.uuid,
-      data: {
-        reject: 'User rejected'
-      }
-    });
-    webViewRef.current.postMessage(m.serialize);
+    webViewRef.current.postMessage(
+      new Message(Messages.signResult).reject('User rejected', transaction.uuid)
+    );
     setTransaction(undefined);
   }, [transaction]);
 
@@ -374,18 +368,10 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   React.useEffect(() => {
     if (webViewRef.current) {
       const { base16, bech32 } = keystore.account.getCurrentAccount();
-      const m = new Message(Messages.resConnect, {
-        data: {
-          isConnect,
-          account: isConnect ? {
-            base16,
-            bech32
-          } : null,
-          isEnable: keystore.guard.isEnable,
-          netwrok: keystore.network.selected
-        }
-      });
-      webViewRef.current.postMessage(m.serialize);
+      webViewRef.current.postMessage(new Message(Messages.resConnect).resolve(isConnect ? {
+        base16,
+        bech32
+      } : null));
     }
   }, [
     webViewRef,
@@ -459,8 +445,8 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         account={account}
         needPassword={!authState.biometricEnable}
         appTitle={signMessage?.title || ''}
-        payload={String(signMessage?.data)}
-        onTriggered={() => setSignMessage(undefined)}
+        payload={String(signMessage?.content)}
+        onTriggered={handleSignMessageReject}
         onSign={handleSignMessage}
       />
       {transaction ? (

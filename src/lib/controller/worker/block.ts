@@ -61,16 +61,12 @@ export class BlockControl {
 
       if (this._webView && this._origin) {
         const { TxnHashes } = await this._zilliqa.getRecentTransactions();
-        const m = new Message(Messages.block, {
-          origin: this._origin,
-          data: {
-            block: {
-              TxBlock: result,
-              TxHashes: [TxnHashes]
-            }
+        this._webView.postMessage(new Message(Messages.block).serialize({
+          block: {
+            TxBlock: result,
+            TxHashes: [TxnHashes]
           }
-        });
-        this._webView.postMessage(m.serialize);
+        }));
       }
     }, BLOCK_INTERVAL);
   }

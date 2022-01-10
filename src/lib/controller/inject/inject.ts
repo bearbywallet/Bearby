@@ -10,19 +10,9 @@ import RNFS from 'react-native-fs';
 
 import { inpageStore, inpageStoreUpdate } from './store';
 import { Device } from 'app/utils';
-import { NetworkControll } from 'app/lib/controller/network';
-import { AccountControler } from 'app/lib/controller/account';
 
 export class InjectScript {
 	public store = inpageStore;
-
-	private _account: AccountControler;
-	private _netwrok: NetworkControll;
-
-	constructor(account: AccountControler, netwrok: NetworkControll) {
-		this._account = account;
-		this._netwrok = netwrok;
-	}
 
 	public async sync() {
 		if (Device.isIos()) {

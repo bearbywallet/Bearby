@@ -153,6 +153,10 @@ export class ZilliqaControl {
   public async throughPxoy(method: string, params: Params): Promise<RPCResponse> {
     const body = this.provider.buildBody(method, params);
     try {
+      if (method === Methods.GetTransactionStatus) {
+        return await this.sendJsonNative(body);
+      }
+
       return await this.sendJson(body);
     } catch (err) {
       return {
@@ -192,7 +196,10 @@ export class ZilliqaControl {
     }
   }
 
-  public async send(tx: Transaction): Promise<string> {
+  public async send(tx: Transaction): Promise<{
+    TranID: string;
+    Info: string;
+  }> {
     await this.detectSacmAddress(tx.toAddr);
 
     const body = this.provider.buildBody(
@@ -207,11 +214,7 @@ export class ZilliqaControl {
       throw new Error(error.message);
     }
 
-    if (result && result.TranID) {
-      return String(result.TranID);
-    }
-
-    throw new Error(i18n.t('node_error'));
+    return result;
   }
 
   public async getMinimumGasPrice() {

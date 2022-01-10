@@ -163,19 +163,16 @@ export class AccountControler {
         (c) => c.domain.toLowerCase() === String(this._origin).toLowerCase()
       );
       const { base16, bech32 } = this.getCurrentAccount();
-      const m = new Message(Messages.wallet, {
-        origin: this._origin,
-        data: {
-          isConnect,
-          account: isConnect ? {
-            base16,
-            bech32
-          } : null,
-          isEnable: true,
-          netwrok: this._netwrok.selected
-        }
-      });
-      this._webView.postMessage(m.serialize);
+      this._webView.postMessage(new Message(Messages.init).serialize({
+        isConnect,
+        account: isConnect ? {
+          base16,
+          bech32
+        } : null,
+        isEnable: true,
+        netwrok: this._netwrok.selected,
+        http: this._netwrok.http
+      }));
     }
 
     return this._storage.set(
@@ -303,7 +300,9 @@ export class AccountControler {
         [tohexString(token.address[net]), ZRC2Fields.Balances, [addr]]
       );
     });
-    const tokensIdentities = zrc2Identities.filter((t) => ZIL.symbol !== t.symbol);
+    const tokensIdentities = zrc2Identities.filter(
+      (t) => ZIL.symbol !== t.symbol && Boolean(t.address[net])
+    );
     const tokensRates = tokensIdentities.map((token) => {
       const tokenAddress = token.address[net].toLowerCase();
       return this._zilliqa.provider.buildBody(

@@ -29,8 +29,7 @@ const identities: Token[] = [
   {
     type: TokenTypes.ZRC2,
     address: {
-      [mainnet]: '0x173ca6770aa56eb00511dac8e6e13b3d7f16a5a5',
-      [testnet]: '0x7f4a28aabde4cca04b5529eacb64b1449b317e7f'
+      [mainnet]: '0x173ca6770aa56eb00511dac8e6e13b3d7f16a5a5'
     },
     decimals: 6,
     default: true,
@@ -41,7 +40,8 @@ const identities: Token[] = [
   {
     type: TokenTypes.ZRC2,
     address: {
-      [mainnet]: '0xfbd07e692543d3064b9cf570b27faabfd7948da4'
+      [mainnet]: '0xfbd07e692543d3064b9cf570b27faabfd7948da4',
+      [testnet]: '0x6f0b1fbda199dc4abfda28fa2eaa299599b3e8f2'
     },
     decimals: 18,
     default: true,

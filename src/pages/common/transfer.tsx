@@ -90,7 +90,9 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
         await transaction.sign(keyPair.privateKey);
       }
 
-      transaction.hash = await keystore.zilliqa.send(transaction);
+      const res = await keystore.zilliqa.send(transaction);
+
+      transaction.hash = res.TranID;
 
       await keystore.transaction.add(transaction, token);
 

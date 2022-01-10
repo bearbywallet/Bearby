@@ -72,7 +72,7 @@ export const ConnectModal: React.FC<Prop> = ({
               <Text style={[styles.appTitle, {
                 color: colors.text
               }]}>
-                {app.title}({app.origin})
+                {app.title}({app.domain})
               </Text>
               <Text style={[styles.appDes, {
                 color: colors.notification
