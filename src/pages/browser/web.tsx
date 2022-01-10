@@ -112,7 +112,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [webViewRef]);
   const hanldeSearch = React.useCallback(async(search) => {
     if (!webViewRef || !webViewRef.current) {
-      return null;
+      return;
     }
 
     const params = await keystore.searchEngine.onUrlSubmit(search);
@@ -125,7 +125,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
   const handleMessage = React.useCallback(async({ nativeEvent }) => {
     if (!webViewRef.current) {
-      return null;
+      return;
     }
 
     const net = networkState.selected;
@@ -142,7 +142,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
             account: isConnect ? {
               base16,
               bech32
-            } : undefined,
+            } : null,
             isEnable: keystore.guard.isEnable,
             netwrok: net,
             http: keystore.network.http
