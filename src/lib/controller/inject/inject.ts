@@ -19,6 +19,7 @@ export class InjectScript {
 			const entryScrip = await RNFS.readFile(`${RNFS.MainBundlePath}/inpage.js`, 'utf8');
 
 			inpageStoreUpdate(entryScrip);
+			// inpageStoreUpdate(`console.log('injectd');`);
 		}
 
 		if (Device.isAndroid()) {

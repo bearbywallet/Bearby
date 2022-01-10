@@ -245,10 +245,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
       }
 
       const { base16, bech32 } = keystore.account.getCurrentAccount();
-      webViewRef.current.postMessage(new Message(Messages.resConnect).resolve(value ? {
-        base16,
-        bech32
-      } : null, connector.uuid));
+      webViewRef.current.postMessage(new Message(Messages.resConnect).serialize({
+        account: value ? {
+          base16,
+          bech32
+        } : null
+      }, connector.uuid));
     } catch {
       webViewRef.current.postMessage(
         new Message(Messages.resConnect).reject('', connector.uuid)
