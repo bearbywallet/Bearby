@@ -18,6 +18,7 @@
 		158A2BFA254453C100D32C44 /* KeyIndexPath.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2BF9254453C100D32C44 /* KeyIndexPath.m */; };
 		158A2C012544540800D32C44 /* Mnemonic.m in Sources */ = {isa = PBXBuildFile; fileRef = 158A2C002544540800D32C44 /* Mnemonic.m */; };
 		1593FFB425404282003A377C /* Crypto.m in Sources */ = {isa = PBXBuildFile; fileRef = 1593FFB325404282003A377C /* Crypto.m */; };
+		15B6AA4C278C321900B376E9 /* inpage.js in Resources */ = {isa = PBXBuildFile; fileRef = 15B6AA4B278C321800B376E9 /* inpage.js */; };
 		15FE7B48259E2682007BDB4B /* AvenirNextLTPro-Demi.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B44259E2682007BDB4B /* AvenirNextLTPro-Demi.otf */; };
 		15FE7B49259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B45259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf */; };
 		15FE7B4A259E2682007BDB4B /* AvenirNextLTPro-Regular.otf in Resources */ = {isa = PBXBuildFile; fileRef = 15FE7B46259E2682007BDB4B /* AvenirNextLTPro-Regular.otf */; };
@@ -74,6 +75,7 @@
 		158A2C002544540800D32C44 /* Mnemonic.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Mnemonic.m; sourceTree = "<group>"; };
 		1593FFB225404277003A377C /* Crypto.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = Crypto.h; sourceTree = "<group>"; };
 		1593FFB325404282003A377C /* Crypto.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = Crypto.m; sourceTree = "<group>"; };
+		15B6AA4B278C321800B376E9 /* inpage.js */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.javascript; name = inpage.js; path = "../../zilpay-web3.js/dist/inpage.js"; sourceTree = "<group>"; };
 		15FE7B44259E2682007BDB4B /* AvenirNextLTPro-Demi.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-Demi.otf"; sourceTree = "<group>"; };
 		15FE7B45259E2682007BDB4B /* AvenirNextLTPro-MediumCn.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-MediumCn.otf"; sourceTree = "<group>"; };
 		15FE7B46259E2682007BDB4B /* AvenirNextLTPro-Regular.otf */ = {isa = PBXFileReference; lastKnownFileType = file; path = "AvenirNextLTPro-Regular.otf"; sourceTree = "<group>"; };
@@ -145,6 +147,7 @@
 			isa = PBXGroup;
 			children = (
 				008F07F21AC5B25A0029DE68 /* main.jsbundle */,
+				15B6AA4B278C321800B376E9 /* inpage.js */,
 				13B07FAF1A68108700A75B9A /* AppDelegate.h */,
 				13B07FB01A68108700A75B9A /* AppDelegate.m */,
 				13B07FB51A68108700A75B9A /* Images.xcassets */,
@@ -384,6 +387,7 @@
 				15FE7B48259E2682007BDB4B /* AvenirNextLTPro-Demi.otf in Resources */,
 				81AB9BB82411601600AC10FF /* LaunchScreen.storyboard in Resources */,
 				15FE7B4A259E2682007BDB4B /* AvenirNextLTPro-Regular.otf in Resources */,
+				15B6AA4C278C321900B376E9 /* inpage.js in Resources */,
 				13B07FBF1A68108700A75B9A /* Images.xcassets in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

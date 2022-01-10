@@ -158,16 +158,24 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           break;
 
         case Messages.reqProxy:
-          const { method, params, uuid } = message.payload;
-          const res = await keystore.zilliqa.throughPxoy(method, params);
-          if (res.result) {
+          try {
+            const { method, params, uuid } = message.payload;
+            const res = await keystore.zilliqa.throughPxoy(method, params);
+            if (res.result) {
+              webViewRef.current.postMessage(
+                new Message(Messages.resProxy).resolve(res, uuid)
+              );
+            }
+            if (res.error) {
+              webViewRef.current.postMessage(
+                new Message(Messages.resProxy).reject(res.error.message, uuid)
+              );
+            }
+          } catch (err) {
             webViewRef.current.postMessage(
-              new Message(Messages.resProxy).resolve(res, uuid)
-            );
-          }
-          if (res.error) {
-            webViewRef.current.postMessage(
-              new Message(Messages.resProxy).reject(res.error.message, uuid)
+              new Message(Messages.resProxy).reject(
+                (err as Error).message, message.payload.uuid
+              )
             );
           }
           break;
@@ -178,20 +186,28 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
 
         case Messages.signTx:
           setConfirmError(undefined);
-          const { hostname } = new URL(message.payload.domain);
-          const nonce = await keystore.transaction.calcNextNonce(account);
-          const newTX = Transaction.fromPayload(
-            message.payload,
-            account,
-            net
-          );
-          newTX.setNonce(nonce);
-          setTransaction({
-            params: newTX,
-            uuid: message.payload.uuid,
-            domain: hostname ? hostname : message.payload.domain,
-            icon: message.payload.icon
-          });
+          try {
+            const { hostname } = new URL(message.payload.domain);
+            const nonce = await keystore.transaction.calcNextNonce(account);
+            const newTX = Transaction.fromPayload(
+              message.payload,
+              account,
+              net
+            );
+            newTX.setNonce(nonce);
+            setTransaction({
+              params: newTX,
+              uuid: message.payload.uuid,
+              domain: hostname ? hostname : message.payload.domain,
+              icon: message.payload.icon
+            });
+          } catch (err) {
+            webViewRef.current.postMessage(
+              new Message(Messages.signResult).reject(
+                (err as Error).message, message.payload.uuid
+              )
+            );
+          }
           break;
 
         default:
