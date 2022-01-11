@@ -11,9 +11,8 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { tokensStore } from 'app/lib/controller/tokens/state';
 import { JsonRPCCodes } from './codes';
 import { Methods } from './methods';
-import { tohexString } from 'app/utils/address';
+import { tohexString, toChecksumAddress } from 'app/utils/address';
 import { Transaction } from '../transaction';
-import { toChecksumAddress } from 'app/utils';
 import {
   SSN_ADDRESS,
   ZILLIQA,

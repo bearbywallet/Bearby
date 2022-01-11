@@ -8,7 +8,7 @@
  */
 import { newRidgeState } from 'react-ridge-state';
 import { Poster } from 'types';
-import { deppUnlink } from 'app/utils';
+import { deppUnlink } from 'app/utils/deep-unlink';
 
 const initalState: Poster[] = [];
 export const adStore = newRidgeState<Poster[]>(initalState);

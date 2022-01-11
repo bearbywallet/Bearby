@@ -11,7 +11,7 @@ import {
   VIEW_BLOCK_URL,
   NIL_ADDRESS
 } from 'app/config';
-import { toBech32Address } from 'app/utils';
+import { toBech32Address } from 'app/utils/bech32';
 
 export function viewAddress(address: string, netwrok: string) {
   const url = VIEW_BLOCK_URL;

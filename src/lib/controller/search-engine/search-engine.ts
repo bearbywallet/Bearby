@@ -15,7 +15,7 @@ import { STORAGE_FIELDS } from 'app/config';
 import { buildObject, MobileStorage } from 'app/lib';
 import { UnstoppableDomains } from 'app/lib/controller/unstoppabledomains';
 import { SearchEngineStoreType } from 'types';
-import { deppUnlink } from 'app/utils';
+import { deppUnlink } from 'app/utils/deep-unlink';
 import { URLTypes } from './url-type';
 
 export interface URLType {

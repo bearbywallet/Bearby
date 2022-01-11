@@ -22,7 +22,7 @@ import { QrCodeInput } from 'app/components/qr-code-input';
 
 import i18n from 'app/lib/i18n';
 import { Contact } from 'types';
-import { isBech32 } from 'app/utils';
+import { isBech32 } from 'app/utils/address';
 import { fonts } from 'app/styles';
 
 type Prop = {

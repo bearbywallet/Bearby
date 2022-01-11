@@ -9,7 +9,7 @@
 import RNFS from 'react-native-fs';
 
 import { inpageStore, inpageStoreUpdate } from './store';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 export class InjectScript {
 	public store = inpageStore;

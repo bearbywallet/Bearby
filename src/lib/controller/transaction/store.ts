@@ -9,7 +9,7 @@
 import { newRidgeState } from 'react-ridge-state';
 import { StoredTx } from 'types';
 import { MAX_TX_QUEUE } from 'app/config';
-import { deppUnlink } from 'app/utils';
+import { deppUnlink } from 'app/utils/deep-unlink';
 
 const initalState: StoredTx[] = [];
 export const transactionStore = newRidgeState<StoredTx[]>(initalState);

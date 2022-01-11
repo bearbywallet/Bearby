@@ -23,7 +23,7 @@ import { QRScaner } from 'app/components/modals/qr-scaner';
 import QrcodeIconSVG from 'app/assets/icons/qrcode.svg';
 
 import { keystore } from 'app/keystore';
-import { toBech32Address } from 'app/utils';
+import { toBech32Address } from 'app/utils/bech32';
 import { fonts } from 'app/styles';
 
 type Prop = {

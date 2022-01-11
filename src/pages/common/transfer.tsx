@@ -34,7 +34,7 @@ import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
 import { AccountTypes, DEFAULT_GAS } from 'app/config';
-import { fromBech32Address } from 'app/utils';
+import { fromBech32Address } from 'app/utils/bech32';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;

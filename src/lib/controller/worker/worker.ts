@@ -14,7 +14,7 @@ import { AppsController } from 'app/lib/controller/apps';
 import { MobileStorage } from 'app/lib/storage';
 import { BlockControl } from './block';
 import { blockStore } from './store';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 export class WorkerController {
   public store = blockStore;

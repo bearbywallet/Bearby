@@ -24,10 +24,8 @@ import { TokenInfo } from 'app/components/token-info';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import {
-  isBech32,
-  fromBech32Address
-} from 'app/utils';
+import { isBech32 } from 'app/utils/address';
+import { fromBech32Address } from 'app/utils/bech32';
 import { Account, Token } from 'types';
 
 type Prop = {

@@ -18,7 +18,7 @@ import {
   STORAGE_FIELDS
 } from 'app/config';
 import { theme } from 'app/styles';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 export class ThemeControler {
   public readonly store = themesStore;

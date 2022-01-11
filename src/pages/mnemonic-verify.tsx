@@ -20,7 +20,7 @@ import { StackNavigationProp } from '@react-navigation/stack';
 import { Chip } from 'app/components/chip';
 import { Button } from 'app/components/button';
 
-import { shuffle } from 'app/utils';
+import { shuffle } from 'app/utils/shuffle';
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';

@@ -17,7 +17,7 @@ import FastImage from 'react-native-fast-image';
 
 import HelpIconSVG from 'app/assets/icons/help.svg';
 
-import { viewIcon } from 'app/utils';
+import { viewIcon } from 'app/utils/view-block';
 
 type Prop = {
   addr: string;

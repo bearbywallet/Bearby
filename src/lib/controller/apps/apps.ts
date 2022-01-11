@@ -16,7 +16,7 @@ import {
   MIN_POSTERS_CAHCE
 } from 'app/config';
 import { DApp, Poster } from 'types';
-import { shuffle } from 'app/utils';
+import { shuffle } from 'app/utils/shuffle';
 
 export class AppsController {
   public store = adStore;

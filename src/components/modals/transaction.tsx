@@ -32,7 +32,9 @@ import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { StoredTx } from 'types';
 import { fromZil, trim } from 'app/filters';
-import { toBech32Address, toChecksumAddress, viewTransaction } from 'app/utils';
+import { viewTransaction } from 'app/utils/view-block';
+import { toBech32Address } from 'app/utils/bech32';
+import { toChecksumAddress } from 'app/utils/address';
 import { ADDRESS_FORMATS } from 'app/config';
 
 type Prop = {

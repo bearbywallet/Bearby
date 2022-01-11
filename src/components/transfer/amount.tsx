@@ -24,7 +24,7 @@ import AmountIconSVG from 'app/assets/icons/amount.svg';
 
 import i18n from 'app/lib/i18n';
 import { fromZil, toQA } from 'app/filters';
-import { Amount } from 'app/utils';
+import { Amount } from 'app/utils/amount';
 import { Token, Account, GasState } from 'types';
 
 import styles from './styles';

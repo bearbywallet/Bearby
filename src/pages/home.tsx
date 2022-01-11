@@ -23,7 +23,7 @@ import { ReceiveModal, SimpleConfirm } from 'app/components/modals';
 import i18n from 'app/lib/i18n';
 import { RootParamList } from 'app/navigator';
 import { keystore } from 'app/keystore';
-import { viewAddress } from 'app/utils';
+import { viewAddress } from 'app/utils/view-block';
 import { Token } from 'types';
 
 type Prop = {

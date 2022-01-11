@@ -11,7 +11,7 @@ import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
 import { MobileStorage } from 'app/lib';
 import { nameHash } from 'app/utils/namehash';
 import { DomainResolver } from 'types';
-import { fromBech32Address } from 'app/utils';
+import { fromBech32Address } from 'app/utils/bech32';
 import { keystore } from 'app/keystore';
 
 /**

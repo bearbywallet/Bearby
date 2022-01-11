@@ -19,8 +19,8 @@ import { RootParamList } from 'app/navigator';
 import { MobileStorage, buildObject, NetworkControll } from 'app/lib';
 import { STORAGE_FIELDS } from 'app/config';
 import { NotificationState } from 'types';
-import { viewTransaction, Device } from 'app/utils';
-import { URLTypes } from 'app/lib/controller/search-engine/url-type';
+import { viewTransaction } from 'app/utils/view-block';
+import { Device } from 'app/utils/device';
 
 export type MessageNotification = {
   title: string;

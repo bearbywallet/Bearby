@@ -10,7 +10,7 @@ import { NativeModules } from 'react-native';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { KeychainControler } from 'app/lib/controller/auth';
 import { STORAGE_FIELDS } from 'app/config';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 const { ScreenshotLock } = NativeModules;
 

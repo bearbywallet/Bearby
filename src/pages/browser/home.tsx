@@ -39,7 +39,7 @@ import { BrwoserStackParamList } from 'app/navigator/browser';
 import { fonts } from 'app/styles';
 import FastImage from 'react-native-fast-image';
 import { Poster } from 'types';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 type Prop = {
   navigation: StackNavigationProp<BrwoserStackParamList>;

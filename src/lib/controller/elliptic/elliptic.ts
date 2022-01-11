@@ -11,7 +11,8 @@ import { Signature } from './signature';
 import hashjs from 'hash.js';
 import DRBG from 'hmac-drbg';
 import BN from 'bn.js';
-import { randomBytes, getPubKeyFromPrivateKey } from 'app/utils';
+import { randomBytes } from 'app/utils/random';
+import { getPubKeyFromPrivateKey } from 'app/utils/address';
 
 // Public key is a point (x, y) on the curve.
 // Each coordinate requires 32 bytes.

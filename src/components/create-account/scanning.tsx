@@ -27,7 +27,7 @@ import { ErrorMessage } from './error-message';
 import { LedgerAddModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 import { BleState, LedgerTransport } from 'types';
 import { fonts } from 'app/styles';
 import LedgerIcon from 'app/assets/icons/ledger.svg';

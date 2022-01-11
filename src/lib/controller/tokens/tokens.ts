@@ -13,7 +13,9 @@ import { NetworkControll } from 'app/lib/controller/network';
 import { STORAGE_FIELDS, TokenTypes, ZIL_SWAP_CONTRACTS, ZRC2Fields } from 'app/config';
 import { Token, Account } from 'types';
 import { tokensStore, tokensStoreUpdate, tokensStoreReset } from './state';
-import { toZRC1, deppUnlink, tohexString } from 'app/utils';
+import { deppUnlink } from 'app/utils/deep-unlink';
+import { toZRC1 } from 'app/utils/token';
+import { tohexString } from 'app/utils/address';
 import { Methods } from '../zilliqa/methods';
 
 export class TokenControll {

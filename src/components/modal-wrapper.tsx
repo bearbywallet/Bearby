@@ -15,7 +15,7 @@ import {
   Keyboard,
   View
 } from 'react-native';
-import { Device } from 'app/utils';
+import { Device } from 'app/utils/device';
 
 type Prop = {
   style?: ViewStyle;

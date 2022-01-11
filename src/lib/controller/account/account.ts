@@ -21,11 +21,11 @@ import {
 } from 'app/config';
 import {
   getAddressFromPublicKey,
-  toBech32Address,
-  deppUnlink,
   getPubKeyFromPrivateKey,
   tohexString
-} from 'app/utils';
+} from 'app/utils/address';
+import { toBech32Address } from 'app/utils/bech32';
+import { deppUnlink } from 'app/utils/deep-unlink';
 import {
   accountStore,
   accountStoreReset,

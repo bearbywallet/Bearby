@@ -14,12 +14,14 @@ import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 
 import {
   tohexString,
-  pack,
-  hexToByteArray,
-  toBech32Address,
   isAddress,
   toChecksumAddress
-} from 'app/utils';
+} from 'app/utils/address';
+import { toBech32Address } from 'app/utils/bech32';
+import {
+  pack,
+  hexToByteArray
+} from 'app/utils/bytes';
 import { toLi, fromLI, gasToFee } from 'app/filters';
 import { networkStore } from 'app/lib/controller/network';
 import { SchnorrControl } from 'app/lib/controller/elliptic';

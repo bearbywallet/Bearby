@@ -24,7 +24,7 @@ import ArrowIconSVG from 'app/assets/icons/arrow.svg';
 
 import { GasState } from 'types';
 import i18n from 'app/lib/i18n';
-import { deppUnlink } from 'app/utils';
+import { deppUnlink } from 'app/utils/deep-unlink';
 import { fonts } from 'app/styles';
 
 type Prop = {

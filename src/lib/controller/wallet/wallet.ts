@@ -31,7 +31,7 @@ import { IPFS } from 'app/lib/controller/ipfs';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
-import { isPrivateKey } from 'app/utils';
+import { isPrivateKey } from 'app/utils/address';
 
 const _storage = new MobileStorage();
 
@@ -52,9 +52,7 @@ export class WalletControler extends Mnemonic {
   public readonly ssn = new SSnController(_storage, this.zilliqa, this.network);
   public readonly settings = new SettingsControler(
     _storage,
-    this.zilliqa,
-    this.token,
-    this.network
+    this.token
   );
   public readonly account = new AccountControler(
     _storage,

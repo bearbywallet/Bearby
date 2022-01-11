@@ -18,32 +18,22 @@ import {
   ADDRESS_FORMATS,
   API_COINGECKO,
   DEFAULT_CURRENCIES,
-  ZIL_SWAP_CONTRACTS
 } from 'app/config';
-import { ZilliqaControl, TokenControll, NetworkControll } from 'app/lib/controller';
+import { TokenControll } from 'app/lib/controller';
 import { currenciesStore } from 'app/lib/controller/currency/store';
-import { Methods } from '../zilliqa/methods';
-import { tohexString } from 'app/utils';
-import { RPCResponse } from 'types';
 
 export class SettingsControler {
   public readonly store = settingsStore;
   public readonly formats = ADDRESS_FORMATS;
   private _storage: MobileStorage;
-  private _zilliqa: ZilliqaControl;
   private _tokens: TokenControll;
-  private _netwrok: NetworkControll;
 
   constructor(
     storage: MobileStorage,
-    zilliqa: ZilliqaControl,
-    tokens: TokenControll,
-    netwrok: NetworkControll
+    tokens: TokenControll
   ) {
     this._storage = storage;
-    this._zilliqa = zilliqa;
     this._tokens = tokens;
-    this._netwrok = netwrok;
   }
 
   public get rate() {

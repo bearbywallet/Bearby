@@ -33,7 +33,7 @@ import { ViewButton } from 'app/components/view-button';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { trim } from 'app/filters';
-import { viewAddress } from 'app/utils';
+import { viewAddress } from 'app/utils/view-block';
 import { QrcodeType, Account } from 'types';
 import { ORDERS } from 'app/config';
 import { fonts } from 'app/styles';
