@@ -13,7 +13,6 @@ import {
   View,
   ScrollView,
   TextInput,
-  StatusBar,
   Text
 } from 'react-native';
 import URL from 'url-parse';
