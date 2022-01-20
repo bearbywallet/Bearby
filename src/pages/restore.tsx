@@ -11,8 +11,8 @@ import {
   View,
   StyleSheet,
   Text,
-  Keyboard,
-  TextInput
+  TextInput,
+  Dimensions
 } from 'react-native';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { useTheme } from '@react-navigation/native';
@@ -22,7 +22,6 @@ import { Button } from 'app/components/button';
 
 import { UnauthorizedStackParamList } from 'app/navigator/unauthorized';
 import i18n from 'app/lib/i18n';
-import { Mnemonic } from 'app/lib/controller/mnemonic';
 import { fonts } from 'app/styles';
 import { keystore } from 'app/keystore';
 
@@ -30,6 +29,7 @@ type Prop = {
   navigation: StackNavigationProp<UnauthorizedStackParamList>;
 };
 const placeholder = 'shock silent awful guard long thing early test thought defy treat pink';
+const { height } = Dimensions.get('window');
 export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const { colors } = useTheme();
   const [phrase, setphrase] = React.useState<string>('');
@@ -38,27 +38,12 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
   const hanldeChange = React.useCallback(async(value: string) => {
     setErrorMessage('');
     value = String(value).toLowerCase();
-    const mnemonic = new Mnemonic();
-    const isValid = await mnemonic.validateMnemonic(value);
 
     setphrase(value);
-
-    if (isValid) {
-      Keyboard.dismiss();
-    }
   }, []);
   const hanldecreateWallet = React.useCallback(async() => {
     if (phrase.split(' ').length < 12) {
       setErrorMessage(i18n.t('mnemonic_error0'));
-
-      return null;
-    }
-
-    const mnemonic = new Mnemonic();
-    const isValid = await mnemonic.validateMnemonic(phrase);
-
-    if (!isValid) {
-      setErrorMessage(i18n.t('mnemonic_error1'));
 
       return null;
     }
@@ -91,6 +76,7 @@ export const RestorePage: React.FC<Prop> = ({ navigation }) => {
             </Text>
             <TextInput
               autoCorrect={false}
+              multiline={true}
               style={[styles.text, {
                 borderColor: errorMessage ? colors['danger'] : colors.border,
                 color: colors.text
@@ -139,12 +125,12 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Regular
   },
   text: {
-    height: 50,
+    height: height / 3,
     fontFamily: fonts.Regular,
     borderWidth: 1,
     borderRadius: 8,
-    padding: 5,
-    fontSize: 16
+    padding: 10,
+    fontSize: 20
   }
 });
 

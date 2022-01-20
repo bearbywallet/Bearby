@@ -33,7 +33,7 @@ import { fonts } from 'app/styles';
 import i18n from 'app/lib/i18n';
 
 type Prop = {
-  url: URL;
+  url: URL<string>;
   canGoForward: boolean;
   connected: boolean;
   onBack: () => void;
