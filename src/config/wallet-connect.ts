@@ -7,6 +7,6 @@
  * Copyright (c) 2020 ZilPay
  */
 export const ZilPayConnect = {
-  Host: 'ws://5.181.252.166:8080/',
+  Host: 'wss://ws.zilpay.io',
   Protocol: 'zilpay-connect'
 };
