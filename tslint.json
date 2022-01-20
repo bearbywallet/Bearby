@@ -1,7 +1,6 @@
 {
     "extends": "tslint:latest",
     "rules": {
-        "prettier": true,
         "cyclomatic-complexity": false,
         "increment-decrement": false,
         "newline-before-return": false,
