@@ -13,13 +13,11 @@ import {
 } from './store';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
-  DEFAULT_CURRENCIES,
   STORAGE_FIELDS
 } from 'app/config';
 
 export class CurrencyControler {
   public readonly store = currenciesStore;
-  public readonly currencies = DEFAULT_CURRENCIES;
   private _storage: MobileStorage;
 
   constructor(storage: MobileStorage) {

@@ -10,12 +10,16 @@ import { ADDRESS_FORMATS } from 'app/config';
 import { newRidgeState } from 'react-ridge-state';
 import { Settings } from 'types';
 import { tokensStore } from 'app/lib/controller/tokens/state';
+import { DEFAULT_CURRENCIES } from 'app/config/currency';
 
-const [zil] = tokensStore.get();
+const [usd, eth, btc] = DEFAULT_CURRENCIES;
+
 const initalState: Settings = {
   addressFormat: ADDRESS_FORMATS[0],
   rate: {
-    [zil.symbol]: 0
+    [usd]: 0,
+    [eth]: 0,
+    [btc]: 0
   }
 };
 export const settingsStore = newRidgeState<Settings>(initalState);

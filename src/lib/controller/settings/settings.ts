@@ -16,7 +16,7 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
   STORAGE_FIELDS,
   ADDRESS_FORMATS,
-  API_COINGECKO,
+  API_RATE,
   DEFAULT_CURRENCIES,
 } from 'app/config';
 import { TokenControll } from 'app/lib/controller';
@@ -44,17 +44,14 @@ export class SettingsControler {
   }
 
   public async rateUpdate() {
-    const currencies = DEFAULT_CURRENCIES.join();
-    const url = `${API_COINGECKO}?ids=zilliqa&vs_currencies=${currencies}`;
+    const url = `${API_RATE}`;
 
     const response = await fetch(url);
-    const data = await response.json();
-    const rate = data.zilliqa;
-    const currency = currenciesStore.get();
+    const rate = await response.json();
+    delete rate['id'];
     const state = this.store.get();
-    const [zil] = this._tokens.store.get();
 
-    state.rate[zil.symbol] = rate[currency];
+    state.rate = rate;
 
     settingsStoreUpdate(state);
 

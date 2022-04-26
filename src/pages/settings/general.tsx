@@ -22,12 +22,22 @@ import { Switcher } from 'app/components/switcher';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { fonts } from 'app/styles';
+import { DropMenu } from 'app/components/drop-menu';
+
 
 export const GeneralPage = () => {
   const { colors } = useTheme();
   const currencyState = keystore.currency.store.useValue();
+  const settingsState = keystore.settings.store.useValue();
   const themeState = keystore.theme.store.useValue();
   const notificationState = keystore.notificationManager.store.useValue();
+
+  const currencyList = React.useMemo(() => {
+    return Object.keys(settingsState.rate).map((key) => ({
+      name: key.toUpperCase(),
+      value: `${settingsState.rate[key]} ZIL`
+    }));
+  }, [settingsState]);
 
   const hanldeReset = React.useCallback(() => {
     keystore.currency.reset();
@@ -40,8 +50,12 @@ export const GeneralPage = () => {
   }, [notificationState]);
 
   const hanldeSelectedCurrency = React.useCallback(async(item) => {
-    keystore.currency.set(item);
-  }, []);
+    const newCurrency = String(item.name).toLowerCase();
+
+    if (settingsState.rate[newCurrency]) {
+      keystore.currency.set(newCurrency);
+    }
+  }, [settingsState]);
 
   return (
     <React.Fragment>
@@ -58,11 +72,20 @@ export const GeneralPage = () => {
         />
       </View>
       <ScrollView style={styles.list}>
-        <Selector
+        {/* <Selector
           style={styles.selector}
           items={keystore.currency.currencies}
           selected={currencyState}
           title={i18n.t('currency')}
+          onSelect={hanldeSelectedCurrency}
+        /> */}
+        <DropMenu
+          selected={{
+            name: String(currencyState).toUpperCase()
+          }}
+          title={i18n.t('currency')}
+          list={currencyList}
+          onUpdate={() => keystore.settings.rateUpdate()}
           onSelect={hanldeSelectedCurrency}
         />
         <Selector
