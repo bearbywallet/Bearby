@@ -28,7 +28,7 @@ export class TokenControll {
       const checkTestnet = testnet && testnet === token.address.testnet;
       const checkPrivate = t.address.private &&
         t.address.private === token.address.private;
-      const samename = token.name === t.name || token.symbol === t.symbol;
+      const samename = token.symbol === t.symbol;
       return checkMainnet || checkTestnet || checkPrivate || samename;
     });
 
