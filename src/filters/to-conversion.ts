@@ -16,5 +16,5 @@ export function toConversion(value: string, rate: number, decimals: number) {
   const inFloat = Number(fromZil(value, decimals));
   const converted = inFloat * rate;
 
-  return (converted).toFixed(3);
+  return converted;
 }

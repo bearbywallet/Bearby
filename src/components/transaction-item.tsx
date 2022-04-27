@@ -17,7 +17,7 @@ import {
 import { useTheme } from '@react-navigation/native';
 
 import { Token, StoredTx, Settings } from 'types';
-import { fromZil, toLocaleString, toConversion } from 'app/filters';
+import { fromZil, toLocaleString, toConversion, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
 import { StatusCodes } from 'app/lib/controller/transaction';
 
@@ -85,24 +85,24 @@ export const TransactionItem: React.FC<Prop> = ({
     if (typeof transaction.success !== 'undefined' && !transaction.success) {
       return {
         converted: 0,
-        value: toLocaleString(0),
+        value: nFormatter(0),
         symbol: transaction.token.symbol
       };
     }
 
-    const [ZIL] = tokens;
-    const tokenRate = token?.rate || 0;
-    const rate = settings.rate[ZIL.symbol] * (tokenRate || 0);
+    const rate = settings.rate[currency];
     const value = fromZil(transaction.amount, transaction.token.decimals);
+
+    // TODO: add token convert.
 
     const converted = toConversion(transaction.amount, rate, transaction.token.decimals);
 
     return {
       converted,
-      value: toLocaleString(value),
+      value: nFormatter(value),
       symbol: transaction.token.symbol
     };
-  }, [transaction, tokens, settings, token]);
+  }, [transaction, tokens, settings, token, currency]);
   const time = React.useMemo(() => {
     const date = new Date(transaction.timestamp);
 

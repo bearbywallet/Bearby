@@ -31,7 +31,7 @@ import { KeyValue } from 'app/components/key-value';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
 import { StoredTx } from 'types';
-import { fromZil, trim } from 'app/filters';
+import { fromZil, nFormatter, trim } from 'app/filters';
 import { viewTransaction } from 'app/utils/view-block';
 import { toBech32Address } from 'app/utils/bech32';
 import { toChecksumAddress } from 'app/utils/address';
@@ -76,7 +76,7 @@ export const TransactionModal: React.FC<Prop> = ({
       return '0';
     }
 
-    return `-${fromZil(transaction.amount, transaction.token.decimals)}`;
+    return `-${nFormatter(fromZil(transaction.amount, transaction.token.decimals))}`;
   }, [transaction]);
 
   const handleShare = React.useCallback(() => {

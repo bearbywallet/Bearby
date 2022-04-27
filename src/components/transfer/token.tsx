@@ -24,7 +24,7 @@ import { LoadSVG } from 'app/components/load-svg';
 
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { fromZil, toConversion, toLocaleString } from 'app/filters';
+import { fromZil, nFormatter, toConversion, toLocaleString } from 'app/filters';
 import { Token, Account } from 'types';
 import styles from './styles';
 
@@ -55,13 +55,14 @@ export const TransferToken: React.FC<Prop> = ({
     [tokens, selected]
   );
   const converted = React.useMemo(() => {
-    const [ZIL] = tokens;
     const { decimals, symbol } = token;
     const balanceValue = account.balance[netwrok][symbol];
-    const rate = settingsState.rate[ZIL.symbol] * (token.rate || 0);
+    const rate = settingsState.rate[currencyState];
     const convert = toConversion(balanceValue, rate, decimals);
 
-    return `${toLocaleString(convert)} ${currencyState}`;
+    // TODO: add token rate convert.
+
+    return `${nFormatter(convert)} ${currencyState}`;
   }, [token, selected, netwrok, currencyState]);
   const balance = React.useMemo(() => {
     const { symbol, decimals } = token;
@@ -70,7 +71,7 @@ export const TransferToken: React.FC<Prop> = ({
       decimals
     );
 
-    return toLocaleString(amount);
+    return nFormatter(amount);
   }, [netwrok, account, token]);
 
   return (

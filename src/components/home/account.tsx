@@ -23,7 +23,7 @@ import CreateBackground from 'app/assets/images/get_started_0.webp';
 
 import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
-import { fromZil, toConversion, nFormatter } from 'app/filters';
+import { toConversion, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
 
 type Prop = {
@@ -53,17 +53,12 @@ export const HomeAccount: React.FC<Prop> = ({
   const { colors } = useTheme();
 
   /**
-   * ZIL(Default token) amount in float.
-   */
-  const amount = React.useMemo(
-    () => fromZil(account.balance[netwrok][token.symbol], token.decimals),
-    [token, account, netwrok]
-  );
-  /**
-   * Converted to BTC/USD/ETH.
+   * Converted to BTC/USD/ETH...
    */
   const conversion = React.useMemo(() => {
     const balance = account.balance[netwrok][token.symbol];
+
+    // TODO: add convert all tokens to currency.
 
     return toConversion(balance, rate, token.decimals);
   }, [token, account, netwrok, rate]);
@@ -84,17 +79,12 @@ export const HomeAccount: React.FC<Prop> = ({
           <Text style={[styles.amount, {
             color: colors.text
           }]}>
-            {nFormatter(amount)}
+            {nFormatter(conversion)}
             <Text style={[styles.symbol, {
               color: colors.text
             }]}>
-              {token.symbol}
+              {currency.toUpperCase()}
             </Text>
-          </Text>
-          <Text style={[styles.convertedAmount, {
-            color: colors.text
-          }]}>
-            {nFormatter(conversion)} {currency.toUpperCase()}
           </Text>
         </View>
         <View style={styles.buttons}>
@@ -139,7 +129,7 @@ export const HomeAccount: React.FC<Prop> = ({
 const styles = StyleSheet.create({
   container: {
     width: '100%',
-    height: height / 3,
+    height: height / 3.5,
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: '5%'
@@ -166,10 +156,6 @@ const styles = StyleSheet.create({
     fontSize: 17,
     fontFamily: fonts.Demi,
     fontWeight: 'normal'
-  },
-  convertedAmount: {
-    fontSize: 13,
-    fontFamily: 'Avenir'
   },
   buttons: {
     alignItems: 'center',

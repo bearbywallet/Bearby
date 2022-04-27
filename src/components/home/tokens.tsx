@@ -34,7 +34,6 @@ const { width, height } = Dimensions.get('window');
 export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
   const { colors } = useTheme();
 
-  const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const netwrokState = keystore.network.store.useValue();
   const accountState = keystore.account.store.useValue();
@@ -45,7 +44,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
   const tokensList = React.useMemo(
     () => tokens.filter(
       // Filtering the only selected netwrok tokens.
-      (token) => Boolean(token.address[netwrokState.selected] && token.symbol !== 'ZIL')
+      (token) => Boolean(token.address[netwrokState.selected])
     ),
     [tokens, netwrokState.selected]
   );
@@ -92,9 +91,9 @@ export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
               token={token}
               currency={currencyState}
               net={netwrokState.selected}
-              onPress={() => onSendToken(index + 1)}
+              onPress={() => onSendToken(index)}
               onRemove={setTokenForRemove}
-              onSend={() => onSendToken(index + 1)}
+              onSend={() => onSendToken(index)}
               onView={onViewToken}
             />
           ))}

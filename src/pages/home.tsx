@@ -134,7 +134,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
             <View>
               <HomeAccount
                 token={tokensState[0]}
-                rate={settingsState.rate[tokensState[0].symbol]}
+                rate={settingsState.rate[currencyState]}
                 currency={currencyState}
                 netwrok={networkState.selected}
                 account={account}

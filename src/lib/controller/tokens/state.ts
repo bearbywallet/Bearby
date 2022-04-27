@@ -29,17 +29,6 @@ const identities: Token[] = [
   {
     type: TokenTypes.ZRC2,
     address: {
-      [mainnet]: '0x173ca6770aa56eb00511dac8e6e13b3d7f16a5a5'
-    },
-    decimals: 6,
-    default: true,
-    name: 'Singapore dollar',
-    symbol: 'XSGD',
-    rate: 0
-  },
-  {
-    type: TokenTypes.ZRC2,
-    address: {
       [mainnet]: '0xfbd07e692543d3064b9cf570b27faabfd7948da4',
       [testnet]: '0x6f0b1fbda199dc4abfda28fa2eaa299599b3e8f2'
     },
@@ -47,17 +36,6 @@ const identities: Token[] = [
     default: true,
     name: 'ZilPay wallet',
     symbol: 'ZLP',
-    rate: 0
-  },
-  {
-    type: TokenTypes.ZRC2,
-    address: {
-      [mainnet]: '0xa845c1034cd077bd8d32be0447239c7e4be6cb21'
-    },
-    decimals: 15,
-    default: true,
-    name: 'Governance ZIL',
-    symbol: 'gZIL',
     rate: 0
   }
 ];

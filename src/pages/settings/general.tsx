@@ -72,13 +72,6 @@ export const GeneralPage = () => {
         />
       </View>
       <ScrollView style={styles.list}>
-        {/* <Selector
-          style={styles.selector}
-          items={keystore.currency.currencies}
-          selected={currencyState}
-          title={i18n.t('currency')}
-          onSelect={hanldeSelectedCurrency}
-        /> */}
         <DropMenu
           selected={{
             name: String(currencyState).toUpperCase()
@@ -123,7 +116,8 @@ export const GeneralPage = () => {
 
 const styles = StyleSheet.create({
   list: {
-    paddingBottom: 100
+    paddingBottom: 100,
+    paddingTop: 30
   },
   titleWrapper: {
     flexDirection: 'row',

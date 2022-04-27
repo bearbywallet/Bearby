@@ -54,7 +54,6 @@ export const TokenCard: React.FC<Prop> = ({
   onSend = () => null,
   onView = () => null,
 }) => {
-  const tokensState = keystore.token.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const { colors } = useTheme();
   const actions = React.useMemo(() => [
@@ -92,12 +91,13 @@ export const TokenCard: React.FC<Prop> = ({
    * Converted to BTC/USD/ETH.
    */
   const conversion = React.useMemo(() => {
-    const [ZIL] = tokensState;
     const balance = account.balance[net][token.symbol];
-    const r = settingsState.rate[ZIL.symbol] * (token.rate || 0);
+    const zilRate = settingsState.rate[currency];
 
-    return toConversion(balance, r, token.decimals);
-  }, [token, account, net, settingsState]);
+    // TODO: add dex rates.
+
+    return toConversion(balance, zilRate, token.decimals);
+  }, [token, account, net, settingsState, currency]);
 
   const hanldeSelect = React.useCallback(({ nativeEvent }) => {
     const { index } = nativeEvent;

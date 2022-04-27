@@ -32,7 +32,7 @@ import { LabelValue } from 'app/components/label-value';
 
 import { Account, GasState, Token } from 'types';
 import i18n from 'app/lib/i18n';
-import { fromZil, toConversion, trim, toLocaleString } from 'app/filters';
+import { fromZil, toConversion, trim, toLocaleString, nFormatter } from 'app/filters';
 import { keystore } from 'app/keystore';
 import { Transaction } from 'app/lib/controller/transaction';
 import { DEFAULT_GAS } from 'app/config';
@@ -80,12 +80,13 @@ export const ConfirmPopup: React.FC<Prop> = ({
   });
 
   const conversion = React.useMemo(() => {
-    const [ZIL] = tokensState;
-    const rate = settingsState.rate[ZIL.symbol] * (token.rate || 0);
+    const rate = settingsState.rate[currencyState];
     const value = toConversion(transaction.tokenAmount, rate, token.decimals);
 
-    return toLocaleString(value);
-  }, [transaction, settingsState, token, tokensState]);
+    // TODO: add token converter.
+
+    return nFormatter(value);
+  }, [transaction, settingsState, token, tokensState, currencyState]);
 
   const handleSend = React.useCallback(async() => {
     setIsLoading(true);
