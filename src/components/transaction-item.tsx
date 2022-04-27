@@ -90,12 +90,10 @@ export const TransactionItem: React.FC<Prop> = ({
       };
     }
 
-    const rate = settings.rate[currency];
+    const zilRate = settings.rate[currency];
     const value = fromZil(transaction.amount, transaction.token.decimals);
-
-    // TODO: add token convert.
-
-    const converted = toConversion(transaction.amount, rate, transaction.token.decimals);
+    const tokenRate = (token?.rate || 0) * zilRate;
+    const converted = toConversion(transaction.amount, tokenRate, transaction.token.decimals);
 
     return {
       converted: nFormatter(converted),

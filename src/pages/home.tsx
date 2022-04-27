@@ -133,7 +133,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
           renderItem={() => (
             <View>
               <HomeAccount
-                token={tokensState[0]}
+                tokens={tokensState}
                 rate={settingsState.rate[currencyState]}
                 currency={currencyState}
                 netwrok={networkState.selected}

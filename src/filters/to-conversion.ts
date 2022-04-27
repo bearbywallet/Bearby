@@ -10,7 +10,7 @@ import { fromZil } from './from-zil';
 
 export function toConversion(value: string, rate: number, decimals: number) {
   if (isNaN(rate) || Number(value) <= 0) {
-    return '0';
+    return 0;
   }
 
   const inFloat = Number(fromZil(value, decimals));

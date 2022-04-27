@@ -80,10 +80,8 @@ export const ConfirmPopup: React.FC<Prop> = ({
   });
 
   const conversion = React.useMemo(() => {
-    const rate = settingsState.rate[currencyState];
+    const rate = settingsState.rate[currencyState] * (token.rate || 0);
     const value = toConversion(transaction.tokenAmount, rate, token.decimals);
-
-    // TODO: add token converter.
 
     return nFormatter(value);
   }, [transaction, settingsState, token, tokensState, currencyState]);

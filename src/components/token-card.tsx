@@ -94,10 +94,9 @@ export const TokenCard: React.FC<Prop> = ({
   const conversion = React.useMemo(() => {
     const balance = account.balance[net][token.symbol];
     const zilRate = settingsState.rate[currency];
+    const tokenRate = (token.rate || 0) * zilRate;
 
-    // TODO: add dex rates.
-
-    return toConversion(balance, zilRate, token.decimals);
+    return toConversion(balance, tokenRate, token.decimals);
   }, [token, account, net, settingsState, currency]);
 
   const hanldeSelect = React.useCallback(({ nativeEvent }) => {

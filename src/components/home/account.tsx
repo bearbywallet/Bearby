@@ -28,7 +28,7 @@ import { fonts } from 'app/styles';
 
 type Prop = {
   account: Account;
-  token: Token;
+  tokens: Token[];
   netwrok: string;
   currency: string;
   rate: number;
@@ -41,7 +41,7 @@ type Prop = {
 const { width, height } = Dimensions.get('window');
 export const HomeAccount: React.FC<Prop> = ({
   account,
-  token,
+  tokens,
   netwrok,
   rate,
   currency,
@@ -56,12 +56,17 @@ export const HomeAccount: React.FC<Prop> = ({
    * Converted to BTC/USD/ETH...
    */
   const conversion = React.useMemo(() => {
-    const balance = account.balance[netwrok][token.symbol];
+    let amount = 0;
 
-    // TODO: add convert all tokens to currency.
+    for (const token of tokens) {
+      const balance = account.balance[netwrok][token.symbol];
+      const tokenRate = rate * (token.rate || 0);
 
-    return toConversion(balance, rate, token.decimals);
-  }, [token, account, netwrok, rate]);
+      amount += toConversion(balance, tokenRate, token.decimals);
+    }
+
+    return amount;
+  }, [tokens, account, netwrok, rate]);
 
   return (
     <View style={styles.container}>
