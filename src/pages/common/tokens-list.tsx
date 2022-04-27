@@ -209,10 +209,14 @@ export const TokensListPage: React.FC<Prop> = ({ route, navigation }) => {
               onChange={() => hanldeAddToken(el)}
             >
               <View style={styles.tokenRow}>
-                <Text style={styles.tokenSymbol}>
+                <Text style={[styles.tokenSymbol, {
+                  color: colors.text
+                }]}>
                   {el.symbol}
                 </Text>
-                <Text style={styles.tokenName}>
+                <Text style={[styles.tokenName, {
+                  color: colors.border
+                }]}>
                   {el.name}
                 </Text>
               </View>
