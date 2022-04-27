@@ -22,6 +22,7 @@ import i18n from 'app/lib/i18n';
 import { toLocaleString, toConversion, fromZil, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
 import { keystore } from 'app/keystore';
+import { toBech32Address } from 'app/utils/bech32';
 
 export type Prop = {
   token: Token;
@@ -90,7 +91,7 @@ export const TokenInfo: React.FC<Prop> = ({
         <LoadSVG
           height="30"
           width="30"
-          addr={address[netwrokState.selected]}
+          addr={toBech32Address(address[netwrokState.selected])}
         />
       </View>
       <View>

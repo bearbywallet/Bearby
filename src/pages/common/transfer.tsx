@@ -34,7 +34,7 @@ import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
 import { Transaction } from 'app/lib/controller';
 import { AccountTypes, DEFAULT_GAS } from 'app/config';
-import { fromBech32Address } from 'app/utils/bech32';
+import { fromBech32Address, toBech32Address } from 'app/utils/bech32';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
@@ -265,7 +265,7 @@ export const TransferPage: React.FC<Prop> = ({ route, navigation }) => {
           onConfirm={handleSiging}
         >
           <LoadSVG
-            addr={token.address[networkState.selected]}
+            addr={toBech32Address(token.address[networkState.selected])}
             height="30"
             width="30"
           />

@@ -8,6 +8,8 @@
  */
 export default {
   my_tokens: 'Токены',
+  search_token: 'Найти токен',
+  add_tokens: 'Добавить Токен',
   my_accounts: 'Аккаунты',
   my_contacts: 'Контакты',
   token: 'Валюта',

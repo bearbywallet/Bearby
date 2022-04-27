@@ -28,10 +28,15 @@ import { fonts } from 'app/styles';
 type Prop = {
   onSendToken: (index: number) => void;
   onViewToken: (token: Token) => void;
+  onAddToken: () => void;
 };
 
 const { width, height } = Dimensions.get('window');
-export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
+export const HomeTokens: React.FC<Prop> = ({
+  onSendToken,
+  onViewToken,
+  onAddToken
+}) => {
   const { colors } = useTheme();
 
   const currencyState = keystore.currency.store.useValue();
@@ -53,15 +58,6 @@ export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
     [accountState]
   );
 
-  const hanldeAddtoken = React.useCallback(async(token, cb) => {
-    try {
-      await keystore.token.addToken(token);
-
-      cb();
-    } catch {
-      //
-    }
-  }, []);
   const hanldeRemoveToken = React.useCallback(async() => {
     if (tokenForRemove) {
       await keystore.token.removeToken(tokenForRemove);
@@ -99,8 +95,7 @@ export const HomeTokens: React.FC<Prop> = ({ onSendToken, onViewToken }) => {
           ))}
           <AddToken
             style={styles.token}
-            account={account}
-            onAddToken={hanldeAddtoken}
+            onAdd={onAddToken}
           />
         </View>
         <SimpleConfirm

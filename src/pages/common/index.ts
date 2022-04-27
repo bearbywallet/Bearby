@@ -8,3 +8,4 @@
  */
 export * from './create-account';
 export * from './transfer';
+export * from './tokens-list';

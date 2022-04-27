@@ -6,12 +6,13 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import type { Token, Account, ServerResponse } from 'types';
+
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 
-import { STORAGE_FIELDS, TokenTypes, ZIL_SWAP_CONTRACTS, ZRC2Fields } from 'app/config';
-import { Token, Account } from 'types';
+import { API_RATE, STORAGE_FIELDS, TokenTypes, ZIL_SWAP_CONTRACTS, ZRC2Fields } from 'app/config';
 import { tokensStore, tokensStoreUpdate, tokensStoreReset } from './state';
 import { deppUnlink } from 'app/utils/deep-unlink';
 import { toZRC1 } from 'app/utils/token';
@@ -136,6 +137,14 @@ export class TokenControll {
     tokens.push(token);
 
     await this._update(tokens);
+  }
+
+  public async loadingFromServer(limit = 30, offset = 0): Promise<ServerResponse> {
+    const url = `${API_RATE}/tokens?limit=${limit}&${offset}=0&type=1`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    return data;
   }
 
   public removeToken(token: Token) {

@@ -27,6 +27,7 @@ import { keystore } from 'app/keystore';
 import { fromZil, nFormatter, toConversion, toLocaleString } from 'app/filters';
 import { Token, Account } from 'types';
 import styles from './styles';
+import { toBech32Address } from 'app/utils/bech32';
 
 type Prop = {
   tokens: Token[];
@@ -93,7 +94,7 @@ export const TransferToken: React.FC<Prop> = ({
             <LoadSVG
               height="30"
               width="30"
-              addr={token.address[netwrok]}
+              addr={toBech32Address(token.address[netwrok])}
             />
             <View style={{ marginLeft: 5 }}>
               <View style={[styles.infoWrapper, { width: width - 120 }]}>

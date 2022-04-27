@@ -98,7 +98,7 @@ export const TransactionItem: React.FC<Prop> = ({
     const converted = toConversion(transaction.amount, rate, transaction.token.decimals);
 
     return {
-      converted,
+      converted: nFormatter(converted),
       value: nFormatter(value),
       symbol: transaction.token.symbol
     };

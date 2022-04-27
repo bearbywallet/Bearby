@@ -8,6 +8,8 @@
  */
 export default {
   my_tokens: 'My tokens',
+  add_tokens: 'Add token',
+  search_token: 'Search token',
   my_accounts: 'My accounts',
   my_contacts: 'My contacts',
   token: 'Token',

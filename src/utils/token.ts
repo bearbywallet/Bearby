@@ -29,9 +29,9 @@ export function toZRC1(init: InitItem[]) {
   const name = init.find((el) => el.vname === Fields.Name)?.value || '';
   const symbol = init.find((el) => el.vname === Fields.Symbol)?.value;
   const address = init.find((el) => el.vname === Fields.Address)?.value;
-  const decimals = init.find((el) => el.vname === Fields.Decimals)?.value;
+  const decimals = init.find((el) => el.vname === Fields.Decimals)?.value || 0;
 
-  if (!contractOwner || !name || !symbol || !address || !decimals) {
+  if (!contractOwner || !name || !symbol || !address) {
     throw new Error('Is not ZRC');
   }
 

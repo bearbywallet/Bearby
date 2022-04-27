@@ -15,20 +15,13 @@ import {
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
-import { AddTokenModal } from 'app/components/modals';
-
-import i18n from 'app/lib/i18n';
-import { Account, Token } from 'types';
-
 export type Prop = {
   style?: ViewStyle;
-  account: Account;
-  onAddToken: (token: Token, cb: () => void) => void;
+  onAdd: () => void;
 };
 
-export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
+export const AddToken: React.FC<Prop> = ({ style, onAdd }) => {
   const { colors } = useTheme();
-  const [modalVisible, setModalVisible] = React.useState(false);
 
   return (
     <React.Fragment>
@@ -36,7 +29,7 @@ export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
         style={[styles.container, style, {
           backgroundColor: colors['card1']
         }]}
-        onPress={() => setModalVisible(true)}
+        onPress={onAdd}
       >
         <View style={[styles.line, styles.line0, {
           backgroundColor: colors.primary
@@ -45,13 +38,6 @@ export const AddToken: React.FC<Prop> = ({ style, account, onAddToken }) => {
           backgroundColor: colors.primary
         }]}/>
       </TouchableOpacity>
-      <AddTokenModal
-        account={account}
-        title={i18n.t('add_token')}
-        visible={modalVisible}
-        onTriggered={() => setModalVisible(false)}
-        onAddToken={onAddToken}
-      />
     </React.Fragment>
   );
 };

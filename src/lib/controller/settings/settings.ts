@@ -44,7 +44,7 @@ export class SettingsControler {
   }
 
   public async rateUpdate() {
-    const url = `${API_RATE}`;
+    const url = `${API_RATE}/rates`;
 
     const response = await fetch(url);
     const rate = await response.json();

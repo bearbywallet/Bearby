@@ -29,6 +29,7 @@ import { LoadSVG } from 'app/components/load-svg';
 import { Token, Account } from 'types';
 import { fromZil, toLocaleString } from 'app/filters';
 import { fonts } from 'app/styles';
+import { toBech32Address } from 'app/utils/bech32';
 
 type Prop = {
   style?: ViewStyle;
@@ -94,7 +95,7 @@ export const TokensModal: React.FC<Prop> = ({
                 <LoadSVG
                   height="30"
                   width="30"
-                  addr={token.address[network]}
+                  addr={toBech32Address(token.address[network])}
                 />
               ) : null}
               <View style={styles.wrapper}>

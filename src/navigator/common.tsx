@@ -12,7 +12,8 @@ import { useTheme } from '@react-navigation/native';
 
 import {
   CreateAccountPage,
-  TransferPage
+  TransferPage,
+  TokensListPage
 } from 'app/pages/common';
 
 import i18n from 'app/lib/i18n';
@@ -23,6 +24,7 @@ export type CommonStackParamList = {
     recipient?: string;
     selectedToken?: number;
   };
+  Tokens: undefined;
 };
 
 const CommonStack = createStackNavigator<CommonStackParamList>();
@@ -57,6 +59,14 @@ export const Common: React.FC = () => {
         options={{
           ...headerOptions,
           title: i18n.t('transfer_title')
+        }}
+      />
+      <CommonStack.Screen
+        name="Tokens"
+        component={TokensListPage}
+        options={{
+          ...headerOptions,
+          title: i18n.t('add_tokens')
         }}
       />
     </CommonStack.Navigator>

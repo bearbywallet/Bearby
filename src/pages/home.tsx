@@ -151,6 +151,9 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                   }
                 })}
                 onViewToken={hanldeViewBlock}
+                onAddToken={() => navigation.navigate('Common', {
+                  screen: 'Tokens'
+                })}
               />
             </View>
           )}

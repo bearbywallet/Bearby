@@ -28,6 +28,7 @@ import {
 import i18n from 'app/lib/i18n';
 import { fonts } from 'app/styles';
 import { keystore } from 'app/keystore';
+import { toBech32Address } from 'app/utils/bech32';
 
 export type Prop = {
   token: Token;
@@ -127,7 +128,7 @@ export const TokenCard: React.FC<Prop> = ({
           <LoadSVG
             height="30"
             width="30"
-            addr={token.address[net]}
+            addr={toBech32Address(token.address[net])}
           />
         </View>
         <View>

@@ -11,7 +11,6 @@ import {
   VIEW_BLOCK_URL,
   NIL_ADDRESS
 } from 'app/config';
-import { toBech32Address } from 'app/utils/bech32';
 
 export function viewAddress(address: string, netwrok: string) {
   const url = VIEW_BLOCK_URL;
@@ -35,7 +34,7 @@ export function viewBlockNumber(blockNumber: string | number, netwrok: string) {
 }
 
 export function viewIcon(addr: string, darken: boolean) {
-  addr = addr === NIL_ADDRESS ? 'ZIL' : toBech32Address(addr);
+  addr = addr === NIL_ADDRESS ? 'ZIL' : addr;
   const theme = darken ? 'dark' : 'light';
   return `https://meta.viewblock.io/zilliqa.${addr}/logo?t=${theme}`;
 }

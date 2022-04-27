@@ -21,3 +21,20 @@ export interface Token {
   balance?: string;
   rate: number;
 }
+
+export interface ServerToken {
+  id: number;
+  bech32: string;
+  base16: string;
+  decimals: number;
+  name: string;
+  symbol: string;
+  baseUri: string | null;
+  scope: number;
+  type: number;
+}
+
+export interface ServerResponse {
+  list: ServerToken[];
+  count: number;
+}
