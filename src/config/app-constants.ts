@@ -21,6 +21,7 @@ export enum ZRC2Fields {
 
 export const API_RATE = 'https://api.zilpay.io/api/v1';
 export const NIL_ADDRESS = '0x0000000000000000000000000000000000000000';
+export const NIL_ADDRESS_BECH32 = 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz';
 export const UD_CONTRACT_ADDRESS = '0x9611c53be6d1b32058b2747bdececed7e1216793';
 export const SCAM_TOKEN = '0xe66593414Ba537e965b5e0eB723a58b4d1fACc89';
 export const APP_EXPLORER = '0xf27a87c0a82f7ddb1daed81904fcbee253d9fc29';

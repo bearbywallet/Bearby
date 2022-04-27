@@ -9,7 +9,7 @@
 import {
   VIEW_BLOCK_METHODS,
   VIEW_BLOCK_URL,
-  NIL_ADDRESS
+  NIL_ADDRESS_BECH32
 } from 'app/config';
 
 export function viewAddress(address: string, netwrok: string) {
@@ -34,7 +34,7 @@ export function viewBlockNumber(blockNumber: string | number, netwrok: string) {
 }
 
 export function viewIcon(addr: string, darken: boolean) {
-  addr = addr === NIL_ADDRESS ? 'ZIL' : addr;
+  addr = addr === NIL_ADDRESS_BECH32 ? 'ZIL' : addr;
   const theme = darken ? 'dark' : 'light';
   return `https://meta.viewblock.io/zilliqa.${addr}/logo?t=${theme}`;
 }
