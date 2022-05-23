@@ -62,7 +62,7 @@ export const Common: React.FC = () => {
         component={SwapPage}
         options={{
           ...headerOptions,
-          title: i18n.t('transfer_title')
+          title: i18n.t('swap')
         }}
       />
       <CommonStack.Screen

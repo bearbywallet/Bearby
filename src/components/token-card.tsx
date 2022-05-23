@@ -41,6 +41,7 @@ export type Prop = {
   onRemove?: (token: Token) => void;
   onSend?: (token: Token) => void;
   onView?: (token: Token) => void;
+  onSwap?: (token: Token) => void;
 };
 
 export const TokenCard: React.FC<Prop> = ({
@@ -54,6 +55,7 @@ export const TokenCard: React.FC<Prop> = ({
   onRemove = () => null,
   onSend = () => null,
   onView = () => null,
+  onSwap = () => null
 }) => {
   const settingsState = keystore.settings.store.useValue();
   const { colors } = useTheme();
@@ -70,8 +72,8 @@ export const TokenCard: React.FC<Prop> = ({
     {
       title: i18n.t('trade'),
       systemIcon: 'circlebadge',
-      disabled: true,
-      press: onView
+      disabled: token.symbol === 'ZIL',
+      press: onSwap
     },
     {
       title: i18n.t('hide'),

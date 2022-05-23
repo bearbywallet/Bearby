@@ -27,6 +27,7 @@ import { fonts } from 'app/styles';
 
 type Prop = {
   onSendToken: (index: number) => void;
+  onTradToken: (index: number) => void;
   onViewToken: (token: Token) => void;
   onAddToken: () => void;
 };
@@ -35,7 +36,8 @@ const { width, height } = Dimensions.get('window');
 export const HomeTokens: React.FC<Prop> = ({
   onSendToken,
   onViewToken,
-  onAddToken
+  onAddToken,
+  onTradToken
 }) => {
   const { colors } = useTheme();
 
@@ -91,6 +93,7 @@ export const HomeTokens: React.FC<Prop> = ({
               onRemove={setTokenForRemove}
               onSend={() => onSendToken(index)}
               onView={onViewToken}
+              onSwap={() => onTradToken(index)}
             />
           ))}
           <AddToken

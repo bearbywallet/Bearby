@@ -158,6 +158,12 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                     selectedToken
                   }
                 })}
+                onTradToken={(selectedToken) => navigation.navigate('Common', {
+                  screen: 'SwapPage',
+                  params: {
+                    selectedToken
+                  }
+                })}
                 onViewToken={hanldeViewBlock}
                 onAddToken={() => navigation.navigate('Common', {
                   screen: 'Tokens'
