@@ -8,11 +8,19 @@
  */
 import { newRidgeState } from 'react-ridge-state';
 import { SSN, SSNState } from 'types';
-import { DEFAULT_SSN } from 'app/config';
+import { DEFAULT_SSN, ZILLIQA, ZILLIQA_KEYS } from 'app/config';
 
+const [mainnet] = ZILLIQA_KEYS;
 const initalState: SSNState = {
   selected: DEFAULT_SSN,
-  list: []
+  list: [{
+      address: '',
+      name: DEFAULT_SSN,
+      api: ZILLIQA[mainnet].PROVIDER,
+      ok: true,
+      id: 1,
+      time: 291.0395320057869
+  }]
 };
 export const ssnStore = newRidgeState<SSNState>(initalState);
 

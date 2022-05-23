@@ -42,8 +42,7 @@ export class SSnController {
 
     try {
       if (!ssnList || typeof ssnList !== 'string') {
-        await this.updateList();
-        await this.reset();
+        return;
       }
 
       const parsed = JSON.parse(ssnList as string);
@@ -52,8 +51,7 @@ export class SSnController {
         StoreUpdate(parsed);
       }
     } catch {
-      await this.updateList();
-      await this.reset();
+      ////
     }
   }
 

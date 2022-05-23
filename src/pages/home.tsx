@@ -83,6 +83,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
     setRefreshing(true);
     try {
       await keystore.account.balanceUpdate();
+      await keystore.settings.rateUpdate();
       setRefreshing(false);
     } catch (err) {
       setRefreshing(false);
