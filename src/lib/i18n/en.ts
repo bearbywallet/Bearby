@@ -14,6 +14,7 @@ export default {
   my_contacts: 'My contacts',
   token: 'Token',
   all: 'All',
+  swap: 'Swap',
   from: 'From',
   close: 'Close',
   method: 'Method',

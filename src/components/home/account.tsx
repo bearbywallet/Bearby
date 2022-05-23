@@ -36,6 +36,7 @@ type Prop = {
   onReceive: () => void;
   onSend: () => void;
   onRemove: () => void;
+  onSwap: () => void;
 };
 
 const { width, height } = Dimensions.get('window');
@@ -48,7 +49,8 @@ export const HomeAccount: React.FC<Prop> = ({
   onCreateAccount,
   onReceive,
   onSend,
-  onRemove
+  onRemove,
+  onSwap
 }) => {
   const { colors } = useTheme();
 
@@ -100,8 +102,7 @@ export const HomeAccount: React.FC<Prop> = ({
             <Button
               color={colors.primary}
               style={{
-                marginRight: 5,
-                minWidth: 100
+                marginRight: 5
               }}
               textStyle={{
                 textAlign: 'right'
@@ -115,14 +116,27 @@ export const HomeAccount: React.FC<Prop> = ({
             <Button
               color={colors.primary}
               style={{
-                marginLeft: 5,
-                minWidth: 100
+                marginHorizontal: 5
               }}
               textStyle={{
                 textAlign: 'left'
               }}
               title={I18n.t('receive')}
               onPress={onReceive}
+            />
+            <View style={[styles.seporate, {
+              backgroundColor: colors.notification
+            }]}/>
+            <Button
+              color={colors.primary}
+              style={{
+                marginLeft: 5
+              }}
+              textStyle={{
+                textAlign: 'right'
+              }}
+              title={I18n.t('swap')}
+              onPress={onSwap}
             />
           </View>
         </View>

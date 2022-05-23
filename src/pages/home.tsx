@@ -79,6 +79,12 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
       }
     });
   }, []);
+  const handleSwap = React.useCallback(() => {
+    navigation.navigate('Common', {
+      screen: 'SwapPage',
+      params: {}
+    });
+  }, []);
   const hanldeRefresh = React.useCallback(async() => {
     setRefreshing(true);
     try {
@@ -142,6 +148,7 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
                 onCreateAccount={handleCreateAccount}
                 onReceive={() => setIsReceiveModal(true)}
                 onSend={handleSend}
+                onSwap={handleSwap}
                 onRemove={() => setIsConfirmModal(true)}
               />
               <HomeTokens

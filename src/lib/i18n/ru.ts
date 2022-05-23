@@ -13,6 +13,7 @@ export default {
   my_accounts: 'Аккаунты',
   my_contacts: 'Контакты',
   token: 'Валюта',
+  swap: 'Обмен',
   all: 'Все',
   from: 'С',
   close: 'Закрыть',

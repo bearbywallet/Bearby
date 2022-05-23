@@ -13,7 +13,8 @@ import { useTheme } from '@react-navigation/native';
 import {
   CreateAccountPage,
   TransferPage,
-  TokensListPage
+  TokensListPage,
+  SwapPage
 } from 'app/pages/common';
 
 import i18n from 'app/lib/i18n';
@@ -25,6 +26,9 @@ export type CommonStackParamList = {
     selectedToken?: number;
   };
   Tokens: undefined;
+  SwapPage: {
+    selectedToken?: number;
+  };
 };
 
 const CommonStack = createStackNavigator<CommonStackParamList>();
@@ -51,6 +55,14 @@ export const Common: React.FC = () => {
         options={{
           ...headerOptions,
           title: ''
+        }}
+      />
+      <CommonStack.Screen
+        name="SwapPage"
+        component={SwapPage}
+        options={{
+          ...headerOptions,
+          title: i18n.t('transfer_title')
         }}
       />
       <CommonStack.Screen
