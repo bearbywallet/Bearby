@@ -98,10 +98,11 @@ export const SwapInput: React.FC<Prop> = ({
       </Text>
       <View style={styles.inputWrapper}>
         <TextInput
-          style={styles.input}
+          style={[styles.input, {
+            color: colors.text
+          }]}
           keyboardType={'numeric'}
-          placeholder={i18n.t('transfer_amount')}
-          placeholderTextColor={colors.border}
+          selectionColor={colors.notification}
           value={value}
           editable={!disabled}
           onChangeText={onChange}

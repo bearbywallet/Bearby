@@ -12,10 +12,12 @@ import type { TokenValue } from 'types/store';
 import React from 'react';
 import Big from 'big.js';
 import {
+  RefreshControl,
   StyleSheet,
   TouchableOpacity,
   View
 } from 'react-native';
+import { SvgXml } from 'react-native-svg';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
@@ -23,12 +25,12 @@ import { SwapInput } from 'app/components/swap';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwapIconSVG } from 'app/components/svg/swap';
 import { TokensModal } from 'app/components/modals';
+import { SwapInfo } from 'app/components/swap/swap-info';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
-import { SvgXml } from 'react-native-svg';
 
 
 type Prop = {
@@ -44,6 +46,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
+  const [loading, setLoading] = React.useState(false);
   const [inputTokenModal, setInputTokenModal] = React.useState(false);
   const [outputTokenModal, setOutputTokenModal] = React.useState(false);
   const [pair, setPair] = React.useState<TokenValue[]>([
@@ -64,6 +67,20 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     [accountState]
   );
 
+
+  const hanldeRefresh = React.useCallback(() => {
+    setLoading(true);
+    try {
+      const newPair = deppUnlink<TokenValue[]>(pair);
+
+      pair[1].value = keystore.dex.getRealAmount(newPair).amount.toString();
+
+      setPair(newPair);
+    } catch {
+      ////
+    }
+    setLoading(false);
+  }, [pair]);
 
   const hanldeInput = React.useCallback((value: string) => {
     try {
@@ -125,6 +142,12 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       style={[styles.container, {
         backgroundColor: colors.background
       }]}
+      refreshControl={
+        <RefreshControl
+          refreshing={loading}
+          onRefresh={() => hanldeRefresh()}
+        />
+      }
     >
       <View>
         <SwapInput
@@ -157,9 +180,11 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           onChose={() => hanldeOnChose(1)}
         />
       </View>
+      <SwapInfo />
       <CustomButton
         title={i18n.t('swap')}
         style={styles.button}
+        isLoading={loading}
       />
       <TokensModal
         title={i18n.t('transfer_modal_title0')}
