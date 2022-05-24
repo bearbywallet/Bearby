@@ -86,6 +86,7 @@ export const SwapInput: React.FC<Prop> = ({
     }
   }, [balance, token]);
 
+
   return (
     <View style={[styles.container, {
       backgroundColor: colors.card

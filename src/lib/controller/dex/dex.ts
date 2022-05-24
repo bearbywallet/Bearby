@@ -8,6 +8,7 @@
  */
 import type { Token, TokenValue } from 'types/store';
 
+import BN from 'bn.js';
 import Big from 'big.js';
 
 import { NetworkControll } from 'app/lib/controller/network';
@@ -34,7 +35,7 @@ enum GasLimits {
 }
 
 export class ZIlPayDex {
-  public static FEE_DEMON = BigInt(10000);
+  public static FEE_DEMON = new BN(10000);
 
   private _token: TokenControll;
   private _zilliqa: ZilliqaControl;
@@ -151,7 +152,7 @@ export class ZIlPayDex {
   }
 
 
-  public async swapExactZILForTokens(exact: bigint, limit: bigint, token: string, deadlineBlock: number) {
+  public async swapExactZILForTokens(exact: BN, limit: BN, token: string, deadlineBlock: number) {
     const tag = 'SwapExactZILForTokens';
     const params = [
       {
@@ -178,7 +179,7 @@ export class ZIlPayDex {
     return this.sendParams(params, tag, GasLimits.SwapExactZILForTokens, String(exact), this.contract);
   }
 
-  public async swapExactTokensForZIL(exact: bigint, limit: bigint, token: string, deadlineBlock: number) {
+  public async swapExactTokensForZIL(exact: BN, limit: BN, token: string, deadlineBlock: number) {
     const tag = 'SwapExactTokensForZIL';
     const params = [
       {
@@ -211,7 +212,7 @@ export class ZIlPayDex {
     return this.sendParams(params, tag, GasLimits.SwapExactTokensForZIL, String(0), this.contract);
   }
 
-  public async swapExactTokensForTokens(exact: bigint, limit: bigint, deadlineBlock: number, inputToken: string, outputToken: string) {
+  public async swapExactTokensForTokens(exact: BN, limit: BN, deadlineBlock: number, inputToken: string, outputToken: string) {
     const tag = 'SwapExactTokensForTokens';
     const params = [
       {
@@ -283,14 +284,15 @@ export class ZIlPayDex {
   }
 
 
-  public afterSlippage(amount: bigint) {
+  public afterSlippage(amount: BN) {
     if (this.state.slippage <= 0) {
       return amount;
     }
 
-    const _slippage = ZIlPayDex.FEE_DEMON - BigInt(this.state.slippage * 100);
+    const _slp = new BN(this.state.slippage * 100);
+    const _slippage = ZIlPayDex.FEE_DEMON.sub(_slp);
 
-    return amount * _slippage / ZIlPayDex.FEE_DEMON;
+    return amount.mul(_slippage).div(ZIlPayDex.FEE_DEMON);
   }
 
   public calcBigSlippage(value: string, slippage: number) {
@@ -314,11 +316,11 @@ export class ZIlPayDex {
     const [exactToken, limitToken] = pair;
     const exactAmount = Big(exactToken.value);
     const bigAmount = exactAmount.mul(this.toDecimails(exactToken.meta.decimals)).round();
-    const _amount = BigInt(String(bigAmount));
+    const _amount = new BN(String(bigAmount));
     const localRate = Number(this.localRate) || 0;
 
     if (exactToken.meta.address[this.netwrok] === NIL_ADDRESS) {
-      const pool = limitToken.meta.pool.map(BigInt);
+      const pool = limitToken.meta.pool.map((n) => new BN(n));
       const _limitAmount = this._zilToTokens(_amount, pool);
       const bigLimitAmount = Big(String(_limitAmount));
 
@@ -328,7 +330,7 @@ export class ZIlPayDex {
 
       return data;
     } else if (limitToken.meta.address[this.netwrok] === NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
-      const pool = exactToken.meta.pool.map(BigInt);
+      const pool = exactToken.meta.pool.map((n) => new BN(n));
       const _limitAmount = this._tokensToZil(_amount, pool);
       const bigLimitAmount = Big(String(_limitAmount));
 
@@ -343,8 +345,8 @@ export class ZIlPayDex {
       return data;
     } else if (limitToken.meta.address[this.netwrok] !== NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
       const [ZIL] = this.tokens;
-      const inputPool = exactToken.meta.pool.map(BigInt);
-      const outputPool = limitToken.meta.pool.map(BigInt);
+      const inputPool = exactToken.meta.pool.map((n) => new BN(n));
+      const outputPool = limitToken.meta.pool.map((n) => new BN(n));
       const [zils, _limitAmount] = this._tokensToTokens(_amount, inputPool, outputPool);
       const bigLimitAmount = Big(String(_limitAmount));
       const zilAmount = Big(String(zils)).div(this.toDecimails(ZIL.decimals));
@@ -446,48 +448,63 @@ export class ZIlPayDex {
   }
 
   private _valueToBigInt(amount: string, token: Token) {
-    return BigInt(
+    return new BN(
       Big(amount).mul(this.toDecimails(token.decimals)).round().toString()
     );
   }
 
-  private _zilToTokens(amount: bigint, inputPool: bigint[]) {
+  private _zilToTokens(amount: BN, inputPool: BN[]) {
     const [zilReserve, tokenReserve] = inputPool;
-    const amountAfterFee = this.state.protocolFee === 0 ? amount : amount - (amount / BigInt(this.state.protocolFee));
-    return this._outputFor(amountAfterFee, BigInt(zilReserve), BigInt(tokenReserve));
+    let amountAfterFee = amount;
+
+    if (this.state.protocolFee !== 0) {
+      const diff = amount.div(new BN(this.state.protocolFee));
+      amountAfterFee = amount.sub(diff);
+    }
+
+    return this._outputFor(amountAfterFee, zilReserve, tokenReserve);
   }
 
-  private _tokensToZil(amount: bigint, inputPool: bigint[]) {
+  private _tokensToZil(amount: BN, inputPool: BN[]) {
     const [zilReserve, tokenReserve] = inputPool;
-    const zils = this._outputFor(amount, BigInt(tokenReserve), BigInt(zilReserve));
+    const zils = this._outputFor(amount, tokenReserve, zilReserve);
 
-    return this.state.protocolFee === 0 ? zils : zils - (zils / BigInt(this.state.protocolFee));
+    if (this.state.protocolFee === 0) {
+      return zils;
+    }
+
+    const diff = zils.div(new BN(this.state.protocolFee));
+    return zils.sub(diff);
   }
 
-  private _tokensToTokens(amount: bigint, inputPool: bigint[], outputPool: bigint[]) {
+  private _tokensToTokens(amount: BN, inputPool: BN[], outputPool: BN[]) {
     const [inputZilReserve, inputTokenReserve] = inputPool;
     const [outputZilReserve, outputTokenReserve] = outputPool;
     const zilIntermediateAmount = this._outputFor(
       amount,
-      BigInt(inputTokenReserve),
-      BigInt(inputZilReserve),
+      new BN(inputTokenReserve),
+      new BN(inputZilReserve),
       ZIlPayDex.FEE_DEMON
     );
-    const zils = this.state.protocolFee === 0 ?
-      zilIntermediateAmount : zilIntermediateAmount - (zilIntermediateAmount / BigInt(this.state.protocolFee));
+    let zils = zilIntermediateAmount;
+
+    if (this.state.protocolFee !== 0) {
+      const diff = zilIntermediateAmount.div(new BN(this.state.protocolFee));
+      zils = zilIntermediateAmount.sub(diff);
+    }
 
     return [
       zils,
-      this._outputFor(zils, BigInt(outputZilReserve), BigInt(outputTokenReserve))
+      this._outputFor(zils, new BN(outputZilReserve), new BN(outputTokenReserve))
     ];
   }
 
-  private _outputFor(exactAmount: bigint, inputReserve: bigint, outputReserve: bigint, fee: bigint = BigInt(this.state.liquidityFee)) {
-    const exactAmountAfterFee = exactAmount * fee;
-    const numerator = exactAmountAfterFee * outputReserve;
-    const inputReserveAfterFee = inputReserve * ZIlPayDex.FEE_DEMON;
-    const denominator = inputReserveAfterFee + exactAmountAfterFee;
+  private _outputFor(exactAmount: BN, inputReserve: BN, outputReserve: BN, fee: BN = new BN(this.state.liquidityFee)) {
+    const exactAmountAfterFee = exactAmount.mul(fee);
+    const numerator = exactAmountAfterFee.mul(outputReserve);
+    const inputReserveAfterFee = inputReserve.mul(ZIlPayDex.FEE_DEMON);
+    const denominator = inputReserveAfterFee.add(exactAmountAfterFee);
 
-    return numerator / denominator;
+    return numerator.div(denominator);
   }
 }

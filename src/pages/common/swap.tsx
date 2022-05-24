@@ -20,6 +20,7 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { CustomButton } from 'app/components/custom-button';
 import { SwapInput } from 'app/components/swap';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { TokensModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
@@ -40,6 +41,8 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
+  const [inputTokenModal, setInputTokenModal] = React.useState(false);
+  const [outputTokenModal, setOutputTokenModal] = React.useState(false);
   const [pair, setPair] = React.useState<TokenValue[]>([
     {
       value: '0',
@@ -69,15 +72,34 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       newPair[1].value = String(amount);
 
       setPair(newPair);
-    } catch {
-      ///
+    } catch (err) {
+      console.error(err);
     }
   }, [pair]);
 
   const hanldeOnChose = React.useCallback((index: number) => {
-    // console.log(index);
+    if (index === 0) {
+      setInputTokenModal(true);
+    } else {
+      setOutputTokenModal(true);
+    }
   }, []);
 
+  const hanldeSelectInput = React.useCallback((index: number) => {
+    const newPair = deppUnlink<TokenValue[]>(pair);
+
+    newPair[0].meta = tokensState[index];
+
+    setPair(newPair);
+  }, [tokensState, pair]);
+
+  const hanldeSelectOutput = React.useCallback((index: number) => {
+    const newPair = deppUnlink<TokenValue[]>(pair);
+
+    newPair[1].meta = tokensState[index];
+
+    setPair(newPair);
+  }, [tokensState, pair]);
 
   return (
     <KeyboardAwareScrollView style={[styles.container, {
@@ -112,6 +134,26 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       <CustomButton
         title={i18n.t('swap')}
         style={styles.button}
+      />
+      <TokensModal
+        title={i18n.t('transfer_modal_title0')}
+        visible={inputTokenModal}
+        network={networkState.selected}
+        account={account}
+        tokens={tokensState}
+        selected={tokensState.findIndex((t) => t.symbol === pair[0].meta.symbol)}
+        onTriggered={() => setInputTokenModal(false)}
+        onSelect={hanldeSelectInput}
+      />
+      <TokensModal
+        title={i18n.t('transfer_modal_title0')}
+        visible={outputTokenModal}
+        network={networkState.selected}
+        account={account}
+        tokens={tokensState}
+        selected={tokensState.findIndex((t) => t.symbol === pair[0].meta.symbol)}
+        onTriggered={() => setOutputTokenModal(false)}
+        onSelect={hanldeSelectOutput}
       />
     </KeyboardAwareScrollView>
   );
