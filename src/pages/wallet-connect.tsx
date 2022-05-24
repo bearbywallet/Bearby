@@ -149,7 +149,8 @@ export const WalletConnectPage: React.FC<Prop> = ({ navigation }) => {
             },
             name: token.name,
             symbol: token.symbol,
-            rate: token.rate
+            rate: token.rate,
+            pool: token.pool
           });
         } catch {
           continue;

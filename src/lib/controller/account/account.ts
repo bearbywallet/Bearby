@@ -6,6 +6,8 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import type { AccountState, Account, KeyPair, RPCResponse } from 'types';
+
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import WebView from 'react-native-webview';
 import Big from 'big.js';
@@ -16,8 +18,7 @@ import {
   Messages,
   MAX_NAME_DIFFICULTY,
   NIL_ADDRESS,
-  ZRC2Fields,
-  ZIL_SWAP_CONTRACTS
+  ZRC2Fields
 } from 'app/config';
 import {
   getAddressFromPublicKey,
@@ -32,13 +33,13 @@ import {
   accountStoreUpdate,
   accountStoreSelect
 } from './sate';
-import { AccountState, Account, KeyPair, RPCResponse } from 'types';
 import { TokenControll } from 'app/lib/controller/tokens';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NetworkControll } from 'app/lib/controller/network';
 import { Message } from 'app/lib/controller/inject/message';
 import { connectStore } from 'app/lib/controller/connect';
-import { Methods } from '../zilliqa/methods';
+import { Methods } from 'app/lib/controller/zilliqa/methods';
+import { dexStore } from 'app/lib/controller/dex';
 
 Big.PE = 99;
 
@@ -61,6 +62,11 @@ export class AccountControler {
     this._token = token;
     this._zilliqa = zilliqa;
     this._netwrok = netwrok;
+  }
+
+  public get deContract() {
+    const state = dexStore.get();
+    return state.contract[this._netwrok.selected];
   }
 
   public get lastIndexPrivKey() {
@@ -286,7 +292,7 @@ export class AccountControler {
 
     const address = tohexString(base16);
     const addr = String(base16).toLowerCase();
-    const dexContract = tohexString(ZIL_SWAP_CONTRACTS[net]);
+    const dexContract = tohexString(this.deContract);
     const balanceIdentities = zrc2Identities.map((token) => {
       if (token.address[net] === NIL_ADDRESS) {
         return this._zilliqa.provider.buildBody(

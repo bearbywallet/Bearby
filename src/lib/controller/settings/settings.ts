@@ -16,11 +16,9 @@ import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
   STORAGE_FIELDS,
   ADDRESS_FORMATS,
-  API_RATE,
-  DEFAULT_CURRENCIES,
+  API_RATE
 } from 'app/config';
 import { TokenControll } from 'app/lib/controller';
-import { currenciesStore } from 'app/lib/controller/currency/store';
 
 export class SettingsControler {
   public readonly store = settingsStore;

@@ -18,7 +18,8 @@ import {
   ZILLIQA,
   ZILLIQA_KEYS,
   SCAM_TOKEN,
-  DEFAULT_SSN
+  DEFAULT_SSN,
+  ZRC2Fields
 } from 'app/config';
 import i18n from 'app/lib/i18n';
 import { HttpProvider } from './http-provider';
@@ -147,6 +148,21 @@ export class ZilliqaControl {
     const { result } = await this.sendJson(body);
 
     return Number(result);
+  }
+
+  public async getTokenAllowances(token: string, owner: string, contract: string) {
+    owner = String(owner).toLowerCase();
+    contract = String(contract).toLowerCase();
+
+    const res = await this.getSmartContractSubState(
+      tohexString(token),
+      ZRC2Fields.Allowances,
+      [owner, contract]
+    );
+
+    // console.log(res);
+
+    return '0';
   }
 
   public async throughPxoy(method: string, params: Params): Promise<RPCResponse> {

@@ -24,7 +24,8 @@ const identities: Token[] = [
     default: true,
     name: 'Zilliqa',
     symbol: 'ZIL',
-    rate: 1
+    rate: 1,
+    pool: ['0', '0']
   },
   {
     type: TokenTypes.ZRC2,
@@ -36,7 +37,8 @@ const identities: Token[] = [
     default: true,
     name: 'ZilPay wallet',
     symbol: 'ZLP',
-    rate: 0
+    rate: 0,
+    pool: ['0', '0']
   }
 ];
 

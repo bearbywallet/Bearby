@@ -7,20 +7,19 @@
  * Copyright (c) 2021 ZilPay
  */
 
-import type { Token } from 'types';
+import type { TokenValue } from 'types/store';
 
 import React from 'react';
+import Big from 'big.js';
 import {
   StyleSheet,
   View
 } from 'react-native';
-import Big from 'big.js';
 import { RouteProp, useTheme } from '@react-navigation/native';
-
-import { SafeWrapper } from 'app/components/safe-wrapper';
 
 import { CustomButton } from 'app/components/custom-button';
 import { SwapInput } from 'app/components/swap';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
@@ -32,11 +31,6 @@ type Prop = {
   route: RouteProp<CommonStackParamList, 'SwapPage'>;
 };
 
-interface Pair {
-  value: string;
-  meta: Token
-}
-
 export const SwapPage: React.FC<Prop> = ({ route }) => {
   const { colors } = useTheme();
 
@@ -46,14 +40,16 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
 
-  const [pair, setPair] = React.useState<Pair[]>([
+  const [pair, setPair] = React.useState<TokenValue[]>([
     {
-      value: '50',
-      meta: tokensState[0]
+      value: '0',
+      meta: tokensState[0],
+      approved: Big(0)
     },
     {
       value: '0',
-      meta: tokensState[1]
+      meta: tokensState[1],
+      approved: Big(0)
     }
   ]);
 
@@ -65,18 +61,26 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
 
   const hanldeInput = React.useCallback((value: string) => {
     try {
-      const newPair = deppUnlink<Pair[]>(pair);
-      newPair[0].value = value;
+      const newPair = deppUnlink<TokenValue[]>(pair);
+      newPair[0].value = Boolean(value) ? Big(value).toString() : '0';
+
+      const { amount } = keystore.dex.getRealAmount(newPair);
+
+      newPair[1].value = String(amount);
 
       setPair(newPair);
     } catch {
-      ////
+      ///
     }
   }, [pair]);
 
+  const hanldeOnChose = React.useCallback((index: number) => {
+    // console.log(index);
+  }, []);
+
 
   return (
-    <SafeWrapper style={[styles.container, {
+    <KeyboardAwareScrollView style={[styles.container, {
       backgroundColor: colors.background
     }]}>
       <View>
@@ -90,6 +94,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           balance={account.balance[networkState.selected][pair[0].meta.symbol]}
           containerStyles={styles.input}
           onChange={hanldeInput}
+          onChose={() => hanldeOnChose(0)}
         />
         <SwapInput
           token={pair[1].meta}
@@ -101,19 +106,26 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           pecrents={[]}
           disabled
           containerStyles={styles.input}
+          onChose={() => hanldeOnChose(1)}
         />
       </View>
-      <CustomButton title={i18n.t('swap')}/>
-    </SafeWrapper>
+      <CustomButton
+        title={i18n.t('swap')}
+        style={styles.button}
+      />
+    </KeyboardAwareScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    padding: 10
+    flex: 1
   },
   input: {
-    marginVertical: 5
+    marginVertical: 5,
+    margin: 10
+  },
+  button: {
+    margin: 10
   }
 });

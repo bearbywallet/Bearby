@@ -28,6 +28,7 @@ import { WorkerController } from 'app/lib/controller/worker';
 import { NotificationManager } from 'app/lib/controller/notification';
 import { AppsController } from 'app/lib/controller/apps';
 import { IPFS } from 'app/lib/controller/ipfs';
+import { ZIlPayDex } from 'app/lib/controller/dex';
 
 import { AccountTypes } from 'app/config';
 import { Account } from 'types';
@@ -76,6 +77,15 @@ export class WalletControler extends Mnemonic {
     _storage,
     this.app,
     this.theme
+  );
+  public readonly dex = new ZIlPayDex(
+    this.token,
+    this.zilliqa,
+    this.network,
+    this.gas,
+    this.currency,
+    this.settings,
+    this.account
   );
 
   public async initWallet(password: string, mnemonic: string) {

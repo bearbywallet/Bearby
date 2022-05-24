@@ -4,7 +4,7 @@
  * -----
  * Modified By: the developer formerly known as Rinat(lich666dead) at <lich666black@gmail.com>
  * -----
- * Copyright (c) 2020 ZilPay
+ * Copyright (c) 2021 ZilPay
  */
 
 import type { Token } from 'types';
@@ -149,7 +149,7 @@ const styles = StyleSheet.create({
     fontFamily: fonts.Demi,
     fontSize: 20,
     paddingVertical: 6,
-    width: width - 140
+    width: width - 150
   },
   container: {
     paddingHorizontal: 10,

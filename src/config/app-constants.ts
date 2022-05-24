@@ -16,7 +16,8 @@ export const ORDERS = {
 export enum ZRC2Fields {
   Balances = 'balances',
   TotalSupply = 'total_supply',
-  Pools = 'pools'
+  Pools = 'pools',
+  Allowances = 'allowances'
 }
 
 export const API_RATE = 'https://api.zilpay.io/api/v1';
@@ -55,10 +56,6 @@ export const DEFAULT_SSN = 'Main';
 export const SSN_ADDRESS = {
   [mainnet]: '0xa7c67d49c82c7dc1b73d231640b2e4d0661d37c1',
   [testnet]: '0x05c2ddec2e4449160436130cb4f9b84de9f7ee5b'
-};
-export const ZIL_SWAP_CONTRACTS = {
-  [mainnet]: '0x459cb2d3baf7e61cfbd5fe362f289ae92b2babb0',
-  [testnet]: '0x1a62Dd9C84b0C8948cb51FC664ba143e7A34985c'
 };
 
 export const MNEMONIC_PACH = "m/44'/313'/0'/0/index";

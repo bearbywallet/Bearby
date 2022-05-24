@@ -20,3 +20,4 @@ export * from './search-engine';
 export * from './domain';
 export * from './notification';
 export * from './apps';
+export * from './dex';

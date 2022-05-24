@@ -41,6 +41,7 @@ export interface ZilPayConnectContent {
     name: string;
     symbol: string;
     rate: number;
+    pool: string[];
   }[];
   uuid: string;
   iv: string;
