@@ -31,6 +31,7 @@ import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
+import { GasLimits } from 'app/lib/controller/dex';
 
 
 type Prop = {
@@ -45,6 +46,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const accountState = keystore.account.store.useValue();
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
+  const gasStore = keystore.gas.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
   const [inputTokenModal, setInputTokenModal] = React.useState(false);
@@ -61,6 +63,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       approved: String(0)
     }
   ]);
+  const [gasLimit, setGasLimit] = React.useState(GasLimits.SwapExactZILForTokens);
 
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
@@ -72,10 +75,12 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     setLoading(true);
     try {
       const newPair = deppUnlink<TokenValue[]>(pair);
+      const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
-      pair[1].value = keystore.dex.getRealAmount(newPair).amount.toString();
+      pair[1].value = amount.toString();
 
       setPair(newPair);
+      setGasLimit(gas);
     } catch {
       ////
     }
@@ -87,13 +92,14 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       const newPair = deppUnlink<TokenValue[]>(pair);
       newPair[0].value = Boolean(value) ? Big(value).toString() : '0';
 
-      const { amount } = keystore.dex.getRealAmount(newPair);
+      const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
       newPair[1].value = String(amount);
 
       setPair(newPair);
-    } catch (err) {
-      console.error(err);
+      setGasLimit(gas);
+    } catch {
+      ////
     }
   }, [pair]);
 
@@ -107,11 +113,13 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
 
   const hanldeOnSwapPair = React.useCallback(() => {
     const newPair = deppUnlink<TokenValue[]>(pair).reverse();
+    const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
-    pair[1].value = keystore.dex.getRealAmount(newPair).amount.toString();
+    pair[1].value = amount.toString();
 
     setPair(newPair);
-  }, [pair]);
+    setGasLimit(gas);
+    }, [pair]);
 
   const hanldeSelectInput = React.useCallback((index: number) => {
     const newPair = deppUnlink<TokenValue[]>(pair);
@@ -123,7 +131,10 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
       newPair[1].value = '0';
       newPair[1].approved = '0';
       newPair[0].approved = '0';
+      const { gas } = keystore.dex.getRealAmount(newPair);
+
       setPair(newPair);
+      setGasLimit(gas);
     }
   }, [tokensState, pair]);
 
@@ -133,7 +144,13 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     newPair[1].meta = tokensState[index];
 
     if (newPair[1].meta.symbol !== newPair[0].meta.symbol) {
+      const { gas } = keystore.dex.getRealAmount(newPair);
+      newPair[0].value = '0';
+      newPair[1].value = '0';
+      newPair[1].approved = '0';
+      newPair[0].approved = '0';
       setPair(newPair);
+      setGasLimit(gas);
     }
   }, [tokensState, pair]);
 
@@ -180,7 +197,13 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           onChose={() => hanldeOnChose(1)}
         />
       </View>
-      <SwapInfo />
+      <SwapInfo
+        pair={pair}
+        currency={currencyState}
+        gasLimit={gasLimit}
+        gasPrice={Number(gasStore.gasPrice)}
+        rate={settingsState.rate[currencyState]}
+      />
       <CustomButton
         title={i18n.t('swap')}
         style={styles.button}

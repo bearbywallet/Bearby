@@ -61,7 +61,7 @@ export const SwapInput: React.FC<Prop> = ({
   currency,
   balance = '0',
   disabled = false,
-  pecrents = [10, 25, 50, 70, 100],
+  pecrents = [0, 10, 25, 50, 70, 100],
   onChose = () => null,
   onChange = () => null
 }) => {

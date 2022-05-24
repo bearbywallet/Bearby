@@ -26,7 +26,7 @@ import { NIL_ADDRESS } from 'app/config';
 Big.PE = 99;
 
 
-enum GasLimits {
+export enum GasLimits {
   SwapExactZILForTokens = 2637,
   SwapExactTokensForZIL = 3163,
   SwapExactTokensForTokens = 4183,
@@ -36,6 +36,7 @@ enum GasLimits {
 
 export class ZIlPayDex {
   public static FEE_DEMON = new BN(10000);
+  public store = dexStore;
 
   private _token: TokenControll;
   private _zilliqa: ZilliqaControl;
