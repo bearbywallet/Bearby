@@ -173,7 +173,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           rate={settingsState.rate[currencyState]}
           net={networkState.selected}
           value={pair[0].value}
-          title={'You pay'}
+          title={i18n.t('you_pay')}
           balance={account.balance[networkState.selected][pair[0].meta.symbol]}
           containerStyles={styles.input}
           onChange={hanldeInput}
@@ -190,7 +190,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           rate={settingsState.rate[currencyState]}
           net={networkState.selected}
           value={pair[1].value}
-          title={'you get'}
+          title={i18n.t('you_get')}
           pecrents={[]}
           disabled
           containerStyles={styles.input}
@@ -210,7 +210,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         isLoading={loading}
       />
       <TokensModal
-        title={i18n.t('transfer_modal_title0')}
+        title={i18n.t('you_pay')}
         visible={inputTokenModal}
         network={networkState.selected}
         account={account}
@@ -220,7 +220,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         onSelect={hanldeSelectInput}
       />
       <TokensModal
-        title={i18n.t('transfer_modal_title0')}
+        title={i18n.t('you_get')}
         visible={outputTokenModal}
         network={networkState.selected}
         account={account}

@@ -13,25 +13,15 @@ import React from 'react';
 import {
   View,
   Text,
-  TouchableOpacity,
-  TextInput,
-  StyleSheet,
-  ViewStyle,
-  Dimensions,
-  StyleProp
+  StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 import Big from 'big.js';
 
-import { LoadSVG } from 'app/components/load-svg';
-import ArrowIconSVG from 'app/assets/icons/arrow.svg';
-import { Button } from 'app/components/button';
-
 import i18n from 'app/lib/i18n';
 
 import { fonts } from 'app/styles';
-import { toBech32Address } from 'app/utils/bech32';
-import { nFormatter, toConversion } from 'app/filters';
+import { nFormatter } from 'app/filters';
 import { keystore } from 'app/keystore';
 
 Big.PE = 99;
@@ -44,7 +34,6 @@ type Prop = {
   rate: number;
 };
 
-const { width } = Dimensions.get('window');
 export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, rate }) => {
   const { colors } = useTheme();
 
@@ -69,7 +58,7 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
         <Text style={[styles.key, {
           color: colors.notification
         }]}>
-          Rate
+          {i18n.t('rate')}
         </Text>
         <Text style={[{
           color: colors.text
@@ -85,7 +74,7 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
         <Text style={[styles.key, {
           color: colors.notification
         }]}>
-          Transaction fee
+          {i18n.t('txfee')}
         </Text>
         <Text style={[{
           color: colors.text
@@ -101,7 +90,7 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
         <Text style={[styles.key, {
           color: colors.notification
         }]}>
-          Price impact
+          {i18n.t('price_impact')}
         </Text>
         <Text style={[{
           color: colors.text
@@ -113,7 +102,7 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
         <Text style={[styles.key, {
           color: colors.notification
         }]}>
-          Received after slippage
+          {i18n.t('after_slippage')}
         </Text>
         <Text style={[{
           color: colors.text
@@ -121,8 +110,6 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
           {String(afterSlippage)} {pair[1].meta.symbol}
         </Text>
       </View>
-      <View></View>
-      <View></View>
     </View>
   );
 };
