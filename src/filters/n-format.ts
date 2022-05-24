@@ -11,8 +11,9 @@ import numbro from 'numbro';
 
 const options: numbro.Format = {
   thousandSeparated: true,
-  mantissa: 3,
-  average: true
+  mantissa: 5,
+  average: true,
+  trimMantissa: true
 };
 
 

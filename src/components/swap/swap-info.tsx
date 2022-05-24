@@ -61,7 +61,7 @@ export const SwapInfo: React.FC<Prop> = ({ pair, currency, gasLimit, gasPrice, r
         <Text style={[{
           color: colors.text
         }]}>
-          1 {pair[0].meta.symbol} = {String(virtualParams.rate.round(9))} {pair[1].meta.symbol} <Text style={[styles.key, {
+          1 {pair[0].meta.symbol} = {String(virtualParams.rate.round(5))} {pair[1].meta.symbol} <Text style={[styles.key, {
             color: colors.notification
           }]}>
             ({nFormatter(virtualParams.converted)}{currency})

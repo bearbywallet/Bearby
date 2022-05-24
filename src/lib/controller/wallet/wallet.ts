@@ -86,6 +86,7 @@ export class WalletControler extends Mnemonic {
     this.currency,
     this.settings,
     this.account,
+    this.transaction,
     _storage
   );
 

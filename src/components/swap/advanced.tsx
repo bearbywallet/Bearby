@@ -42,7 +42,7 @@ export const SwapAdvanced: React.FC<Prop> = ({ slippage, blocks }) => {
 
   const hanldeBlocksChange = React.useCallback((v: number) => {
     if (v > 1) {
-      keystore.dex.updateSlippage(v);
+      keystore.dex.updateBlocks(v);
     }
   }, []);
 

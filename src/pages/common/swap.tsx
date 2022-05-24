@@ -18,28 +18,37 @@ import {
   View
 } from 'react-native';
 import { SvgXml } from 'react-native-svg';
+import { StackNavigationProp } from '@react-navigation/stack';
 import { RouteProp, useTheme } from '@react-navigation/native';
 
 import { CustomButton } from 'app/components/custom-button';
 import { SwapInput } from 'app/components/swap';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
 import { SwapIconSVG } from 'app/components/svg/swap';
-import { TokensModal } from 'app/components/modals';
+import { ConfirmPopup, TokensModal } from 'app/components/modals';
 import { SwapInfo } from 'app/components/swap/swap-info';
 import { SwapAdvanced } from 'app/components/swap/advanced';
+import { LoadSVG } from 'app/components/load-svg';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
 import { GasLimits } from 'app/lib/controller/dex';
+import { AccountTypes, NIL_ADDRESS_BECH32 } from 'app/config';
+import { Transaction } from 'app/lib/controller';
+import { RootParamList } from 'app/navigator';
+
+
+Big.PE = 99;
 
 
 type Prop = {
   route: RouteProp<CommonStackParamList, 'SwapPage'>;
+  navigation: StackNavigationProp<RootParamList>;
 };
 
-export const SwapPage: React.FC<Prop> = ({ route }) => {
+export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
 
   const tokensState = keystore.token.store.useValue();
@@ -49,10 +58,12 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const currencyState = keystore.currency.store.useValue();
   const gasStore = keystore.gas.store.useValue();
   const dexStore = keystore.dex.store.useValue();
+  const authState = keystore.guard.auth.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
   const [inputTokenModal, setInputTokenModal] = React.useState(false);
   const [outputTokenModal, setOutputTokenModal] = React.useState(false);
+  const [confirmModal, setConfirmModal] = React.useState(false);
   const [pair, setPair] = React.useState<TokenValue[]>([
     {
       value: '0',
@@ -66,16 +77,33 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     }
   ]);
   const [gasLimit, setGasLimit] = React.useState(GasLimits.SwapExactZILForTokens);
+  const [tx, setTx] = React.useState<Transaction>();
+  const [confirmError, setConfirmError] = React.useState('');
 
   const account = React.useMemo(
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
 
+  const disabled = React.useMemo(() => {
+    const [{ meta, value }] = pair;
 
-  const hanldeRefresh = React.useCallback(() => {
+    if (Number(value) === 0) {
+      return true;
+    }
+
+    const balance = Big(account.balance[networkState.selected][meta.symbol]);
+    const amount = Big(value).mul(keystore.dex.toDecimails(meta.decimals)).round();
+
+    return balance.lt(amount);
+  }, [account, networkState, pair]);
+
+
+  const hanldeRefresh = React.useCallback(async() => {
     setLoading(true);
     try {
+      await keystore.account.balanceUpdate();
+
       const newPair = deppUnlink<TokenValue[]>(pair);
       const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
@@ -156,6 +184,53 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     }
   }, [tokensState, pair]);
 
+  const hanldeSwap = React.useCallback(async() => {
+    setLoading(true);
+    try {
+      const transaction = await keystore.dex.swap(pair);
+
+      setTx(transaction);
+      setConfirmModal(true);
+    } catch {
+      ////
+    }
+    setLoading(false);
+  }, [pair]);
+
+  const handleSiging = React.useCallback(async(transaction: Transaction, cb, password?: string) => {
+    setConfirmError('');
+    try {
+      const chainID = await keystore.zilliqa.getNetworkId();
+
+      transaction.setVersion(chainID);
+
+      if (account.type === AccountTypes.Ledger) {
+        await transaction.ledgerSign(account);
+      } else {
+        const keyPair = await keystore.getkeyPairs(account, password);
+        await transaction.sign(keyPair.privateKey);
+      }
+
+      const res = await keystore.zilliqa.send(transaction);
+
+      transaction.hash = res.TranID;
+
+      await keystore.transaction.add(transaction, pair[0].meta);
+
+      cb();
+      setConfirmModal(false);
+
+      setTimeout(() => {
+        navigation.navigate('App', {
+          screen: 'History'
+        });
+      }, 500);
+    } catch (err) {
+      cb();
+      setConfirmError((err as Error).message);
+    }
+  }, [pair, account]);
+
   return (
     <KeyboardAwareScrollView
       style={[styles.container, {
@@ -216,6 +291,8 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         title={i18n.t('swap')}
         style={styles.button}
         isLoading={loading}
+        disabled={disabled}
+        onPress={hanldeSwap}
       />
       <TokensModal
         title={i18n.t('you_pay')}
@@ -237,6 +314,25 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         onTriggered={() => setOutputTokenModal(false)}
         onSelect={hanldeSelectOutput}
       />
+      {tx ? (
+        <ConfirmPopup
+          transaction={tx}
+          error={confirmError || ''}
+          token={pair[0].meta}
+          account={account}
+          title={i18n.t('confirm')}
+          visible={confirmModal}
+          needPassword={!authState.biometricEnable && account.type !== AccountTypes.Ledger}
+          onTriggered={() => setConfirmModal(false)}
+          onConfirm={handleSiging}
+        >
+          <LoadSVG
+            addr={NIL_ADDRESS_BECH32}
+            height="30"
+            width="30"
+          />
+        </ConfirmPopup>
+      ) : null}
     </KeyboardAwareScrollView>
   );
 };
