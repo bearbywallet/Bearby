@@ -13,12 +13,12 @@ import React from 'react';
 import {
   View,
   Text,
-  StyleSheet
+  StyleSheet,
+  TouchableOpacity
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
 
 import ArrowIconSVG from 'app/assets/icons/arrow.svg';
-import { Button } from 'app/components/button';
 import { Indexer } from 'app/components/indexer';
 
 import i18n from 'app/lib/i18n';
@@ -48,18 +48,20 @@ export const SwapAdvanced: React.FC<Prop> = ({ slippage, blocks }) => {
 
   return (
     <>
-      <View style={styles.advanced}>
-        <Button
-          title={i18n.t('advanced_title')}
-          color={colors.primary}
-          style={styles.btn}
-          onPress={() => setShow(!show)}
-        />
+      <TouchableOpacity
+        style={styles.advanced}
+        onPress={() => setShow(!show)}
+      >
+        <Text style={[styles.btn, {
+          color: colors.primary
+        }]}>
+          {i18n.t('advanced_title')}
+        </Text>
         <ArrowIconSVG
           fill={colors.primary}
           style={{ transform: [{ rotate: show ? '-180deg' : '0deg' }]}}
         />
-      </View>
+      </TouchableOpacity>
       {show ? (
         <View style={styles.container}>
           <View style={styles.inputWrapper}>
@@ -100,7 +102,8 @@ const styles = StyleSheet.create({
     alignItems: 'center'
   },
   btn: {
-    marginHorizontal: 5
+    marginHorizontal: 5,
+    fontSize: 16
   },
   inputWrapper: {
     marginVertical: 5
