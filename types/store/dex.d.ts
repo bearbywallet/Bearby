@@ -25,5 +25,5 @@ export interface TokenValue {
   value: string;
   meta: Token;
   converted?: number;
-  approved: Big;
+  approved: string;
 }

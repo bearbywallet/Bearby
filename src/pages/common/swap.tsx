@@ -13,6 +13,7 @@ import React from 'react';
 import Big from 'big.js';
 import {
   StyleSheet,
+  TouchableOpacity,
   View
 } from 'react-native';
 import { RouteProp, useTheme } from '@react-navigation/native';
@@ -20,12 +21,14 @@ import { RouteProp, useTheme } from '@react-navigation/native';
 import { CustomButton } from 'app/components/custom-button';
 import { SwapInput } from 'app/components/swap';
 import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { SwapIconSVG } from 'app/components/svg/swap';
 import { TokensModal } from 'app/components/modals';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
+import { SvgXml } from 'react-native-svg';
 
 
 type Prop = {
@@ -47,12 +50,12 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     {
       value: '0',
       meta: tokensState[0],
-      approved: Big(0)
+      approved: String(0)
     },
     {
       value: '0',
       meta: tokensState[1],
-      approved: Big(0)
+      approved: String(0)
     }
   ]);
 
@@ -85,12 +88,26 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
     }
   }, []);
 
+  const hanldeOnSwapPair = React.useCallback(() => {
+    const newPair = deppUnlink<TokenValue[]>(pair).reverse();
+
+    pair[1].value = keystore.dex.getRealAmount(newPair).amount.toString();
+
+    setPair(newPair);
+  }, [pair]);
+
   const hanldeSelectInput = React.useCallback((index: number) => {
     const newPair = deppUnlink<TokenValue[]>(pair);
 
     newPair[0].meta = tokensState[index];
 
-    setPair(newPair);
+    if (newPair[1].meta.symbol !== newPair[0].meta.symbol) {
+      newPair[0].value = '0';
+      newPair[1].value = '0';
+      newPair[1].approved = '0';
+      newPair[0].approved = '0';
+      setPair(newPair);
+    }
   }, [tokensState, pair]);
 
   const hanldeSelectOutput = React.useCallback((index: number) => {
@@ -98,13 +115,17 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
 
     newPair[1].meta = tokensState[index];
 
-    setPair(newPair);
+    if (newPair[1].meta.symbol !== newPair[0].meta.symbol) {
+      setPair(newPair);
+    }
   }, [tokensState, pair]);
 
   return (
-    <KeyboardAwareScrollView style={[styles.container, {
-      backgroundColor: colors.background
-    }]}>
+    <KeyboardAwareScrollView
+      style={[styles.container, {
+        backgroundColor: colors.background
+      }]}
+    >
       <View>
         <SwapInput
           token={pair[0].meta}
@@ -118,6 +139,11 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
           onChange={hanldeInput}
           onChose={() => hanldeOnChose(0)}
         />
+        <View style={styles.wrapper}>
+          <TouchableOpacity onPress={hanldeOnSwapPair}>
+            <SvgXml xml={SwapIconSVG(colors.primary)}/>
+          </TouchableOpacity>
+        </View>
         <SwapInput
           token={pair[1].meta}
           currency={currencyState}
@@ -151,7 +177,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         network={networkState.selected}
         account={account}
         tokens={tokensState}
-        selected={tokensState.findIndex((t) => t.symbol === pair[0].meta.symbol)}
+        selected={tokensState.findIndex((t) => t.symbol === pair[1].meta.symbol)}
         onTriggered={() => setOutputTokenModal(false)}
         onSelect={hanldeSelectOutput}
       />
@@ -162,6 +188,10 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1
+  },
+  wrapper: {
+    alignItems: 'flex-end',
+    paddingHorizontal: 20
   },
   input: {
     marginVertical: 5,

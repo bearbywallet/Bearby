@@ -114,7 +114,7 @@ export class ZIlPayDex {
 
       return;
     } else if (limitToken.meta.address[this.netwrok] === NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
-      const approved = exactToken.approved.gte(Big(exactToken.value));
+      const approved = Big(exactToken.approved).gte(Big(exactToken.value));
 
       await this.swapExactTokensForZIL(
         exact,
@@ -130,7 +130,7 @@ export class ZIlPayDex {
 
       return;
     } else if (limitToken.meta.address[this.netwrok] !== NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
-      const approved = exactToken.approved.gte(Big(exactToken.value));
+      const approved = Big(exactToken.approved).gte(Big(exactToken.value));
 
       await this.swapExactTokensForTokens(
         exact,
@@ -338,7 +338,7 @@ export class ZIlPayDex {
       data.converted = localRate * Number(data.amount);
       data.gas = GasLimits.SwapExactTokensForZIL;
 
-      if (exactToken.approved.lt(exactAmount)) {
+      if (Big(exactToken.approved).lt(exactAmount)) {
         data.gas += GasLimits.IncreaseAllowance;
       }
 
@@ -355,7 +355,7 @@ export class ZIlPayDex {
       data.amount = bigLimitAmount.div(this.toDecimails(limitToken.meta.decimals));
       data.gas = GasLimits.SwapExactTokensForTokens;
 
-      if (exactToken.approved.lt(exactAmount)) {
+      if (Big(exactToken.approved).lt(exactAmount)) {
         data.gas += GasLimits.IncreaseAllowance;
       }
 

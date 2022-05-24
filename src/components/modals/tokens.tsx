@@ -27,7 +27,7 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import { LoadSVG } from 'app/components/load-svg';
 
 import { Token, Account } from 'types';
-import { fromZil, toLocaleString } from 'app/filters';
+import { fromZil, nFormatter, toLocaleString } from 'app/filters';
 import { fonts } from 'app/styles';
 import { toBech32Address } from 'app/utils/bech32';
 
@@ -62,7 +62,7 @@ export const TokensModal: React.FC<Prop> = ({
   }, [onSelect, onTriggered]);
 
 
-  const getAmount = (balance: string, token: Token) => toLocaleString(
+  const getAmount = (balance: string, token: Token) => nFormatter(
     fromZil(balance, token.decimals)
   );
 
