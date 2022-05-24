@@ -8,15 +8,11 @@
  */
 import React from 'react';
 import {
-  StyleSheet,
-  Text,
   Dimensions,
-  TouchableOpacity,
   View,
   Alert
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Svg, { Path } from 'react-native-svg';
 import Modal from 'react-native-modal';
 import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 
@@ -24,13 +20,13 @@ import { CustomButton } from 'app/components/custom-button';
 import { ModalTitle } from 'app/components/modal-title';
 import { ModalWrapper } from 'app/components/modal-wrapper';
 import { CustomTextInput } from 'app/components/custom-text-input';
+import { Indexer } from 'app/components/indexer';
 
 import ProfileSVG from 'app/assets/icons/profile.svg';
 
 import { LedgerController } from 'app/lib/controller/connect/ledger';
 import i18n from 'app/lib/i18n';
 import { keystore } from 'app/keystore';
-import { fonts } from 'app/styles';
 
 type Prop = {
   visible: boolean;
@@ -125,49 +121,10 @@ export const LedgerAddModal: React.FC<Prop> = ({
             placeholder={i18n.t('pass_setup_input0')}
             onChangeText={hanldeChangeName}
           />
-          <View style={[styles.incWrapper, {
-            backgroundColor: colors['bg1']
-          }]}>
-            <TouchableOpacity
-              style={styles.btn}
-              onPress={() => hanldeChangeIndex(Math.abs(index - 1))}
-            >
-              <Svg
-                width="36"
-                height="2"
-                viewBox="0 0 36 2"
-                fill="none"
-              >
-                <Path
-                  d="M0 1H36"
-                  stroke={colors.text}
-                  strokeWidth="2"
-                />
-              </Svg>
-            </TouchableOpacity>
-            <Text style={[styles.plusText, {
-              color: colors.text
-            }]}>
-              {index}
-            </Text>
-            <TouchableOpacity
-              style={styles.btn}
-              onPress={() => hanldeChangeIndex(index + 1)}
-            >
-              <Svg
-                width="36"
-                height="36"
-                viewBox="0 0 36 36"
-                fill="none"
-              >
-                <Path
-                  d="M0 17H36M19 0L19 36"
-                  stroke={colors.text}
-                  strokeWidth="2"
-                />
-              </Svg>
-            </TouchableOpacity>
-          </View>
+          <Indexer
+            value={index}
+            onChange={hanldeChangeIndex}
+          />
         </View>
         <CustomButton
           title={btnTitle}
@@ -178,24 +135,3 @@ export const LedgerAddModal: React.FC<Prop> = ({
     </Modal>
   );
 };
-
-const styles = StyleSheet.create({
-  plusText: {
-    fontSize: 50,
-    fontFamily: fonts.Demi
-  },
-  btn: {
-    minWidth: 50,
-    minHeight: 50,
-    alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16
-  },
-  incWrapper: {
-    flexDirection: 'row',
-    borderRadius: 16,
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    margin: 16
-  }
-});

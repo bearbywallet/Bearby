@@ -85,7 +85,8 @@ export class WalletControler extends Mnemonic {
     this.gas,
     this.currency,
     this.settings,
-    this.account
+    this.account,
+    _storage
   );
 
   public async initWallet(password: string, mnemonic: string) {
@@ -214,6 +215,7 @@ export class WalletControler extends Mnemonic {
     await this.notificationManager.sync();
     // console.log('await this.notificationManager.sync();');
     await this.transaction.sync();
+    await this.dex.sync();
     // console.log('await this.transaction.sync();');
     await this.ipfs.sync();
     console.info('sync done');

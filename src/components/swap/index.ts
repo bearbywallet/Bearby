@@ -7,3 +7,4 @@
  * Copyright (c) 2021 ZilPay
  */
 export * from './swap-input';
+export * from './swap-info';

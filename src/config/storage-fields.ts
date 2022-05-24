@@ -31,5 +31,6 @@ export const STORAGE_FIELDS = {
   SSN_LIST: `${prefix}ssn_list`,
   SETTINGS: `${prefix}settings`,
   NOTIFICATION: `${prefix}notification`,
-  IPFS: `${prefix}ipfs`
+  IPFS: `${prefix}ipfs`,
+  DEX_SETTINGS: `${prefix}dex-settings`
 };

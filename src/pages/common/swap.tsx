@@ -26,6 +26,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { SwapIconSVG } from 'app/components/svg/swap';
 import { TokensModal } from 'app/components/modals';
 import { SwapInfo } from 'app/components/swap/swap-info';
+import { SwapAdvanced } from 'app/components/swap/advanced';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
@@ -47,6 +48,7 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
   const settingsState = keystore.settings.store.useValue();
   const currencyState = keystore.currency.store.useValue();
   const gasStore = keystore.gas.store.useValue();
+  const dexStore = keystore.dex.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
   const [inputTokenModal, setInputTokenModal] = React.useState(false);
@@ -204,6 +206,12 @@ export const SwapPage: React.FC<Prop> = ({ route }) => {
         gasPrice={Number(gasStore.gasPrice)}
         rate={settingsState.rate[currencyState]}
       />
+      <View style={styles.advanced}>
+        <SwapAdvanced
+          slippage={dexStore.slippage}
+          blocks={dexStore.blocks}
+        />
+      </View>
       <CustomButton
         title={i18n.t('swap')}
         style={styles.button}
@@ -247,5 +255,8 @@ const styles = StyleSheet.create({
   },
   button: {
     margin: 10
+  },
+  advanced: {
+    alignItems: 'center'
   }
 });

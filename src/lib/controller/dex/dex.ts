@@ -18,6 +18,8 @@ import { GasControler } from 'app/lib/controller/gas';
 import { CurrencyControler } from 'app/lib/controller/currency';
 import { SettingsControler } from 'app/lib/controller/settings';
 import { AccountControler } from 'app/lib/controller/account';
+import { MobileStorage } from 'app/lib/storage/storage';
+import { DexStorage } from './dex-storage';
 
 import { dexStore } from './state';
 import { NIL_ADDRESS } from 'app/config';
@@ -34,7 +36,7 @@ export enum GasLimits {
   Default = 5000
 }
 
-export class ZIlPayDex {
+export class ZIlPayDex extends DexStorage {
   public static FEE_DEMON = new BN(10000);
   public store = dexStore;
 
@@ -53,8 +55,10 @@ export class ZIlPayDex {
     gas: GasControler,
     currency: CurrencyControler,
     settings: SettingsControler,
-    account: AccountControler
+    account: AccountControler,
+    storage: MobileStorage
   ) {
+    super(storage);
     this._token = token;
     this._zilliqa = zilliqa;
     this._netwrok = netwrok;

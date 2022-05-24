@@ -43,6 +43,11 @@ export function dexStoreSetSettings(slippage: number, blocks: number) {
   }));
 }
 
+export function dexStoreUpdate(payload: DexState) {
+  dexStore.set(() => payload);
+}
+
+
 export function dexStoreReset() {
   dexStore.reset();
 }

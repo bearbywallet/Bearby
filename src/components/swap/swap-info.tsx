@@ -16,7 +16,6 @@ import {
   StyleSheet
 } from 'react-native';
 import { useTheme } from '@react-navigation/native';
-import Big from 'big.js';
 
 import i18n from 'app/lib/i18n';
 
@@ -24,7 +23,6 @@ import { fonts } from 'app/styles';
 import { nFormatter } from 'app/filters';
 import { keystore } from 'app/keystore';
 
-Big.PE = 99;
 
 type Prop = {
   pair: TokenValue[];
