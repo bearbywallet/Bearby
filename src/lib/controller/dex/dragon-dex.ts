@@ -36,7 +36,7 @@ export enum GasLimits {
   SwapExactZILForTokens = 2637,
   SwapExactTokensForZIL = 3163,
   SwapExactTokensForTokens = 4183,
-  IncreaseAllowance = 600,
+  IncreaseAllowance = 1000,
   Default = 5000
 }
 
@@ -165,7 +165,7 @@ export class ZIlPayDex extends DexStorage {
       {
         vname: 'recipient_address',
         type: 'ByStr20',
-        value: this.account.base16
+        value: String(this.account.base16).toLowerCase()
       }
     ];
     const data = JSON.stringify({
@@ -215,7 +215,7 @@ export class ZIlPayDex extends DexStorage {
       {
         vname: 'recipient_address',
         type: 'ByStr20',
-        value: this.account.base16
+        value: String(this.account.base16).toLowerCase()
       }
     ];
     const data = JSON.stringify({
@@ -229,7 +229,7 @@ export class ZIlPayDex extends DexStorage {
     const nonce = await this._transaction.calcNextNonce(this.account);
 
     return new Transaction(
-      String(exact),
+      String(0),
       gas,
       this.account,
       this.contract,
@@ -270,7 +270,7 @@ export class ZIlPayDex extends DexStorage {
       {
         vname: 'recipient_address',
         type: 'ByStr20',
-        value: this.account.base16
+        value: String(this.account.base16).toLowerCase()
       }
     ];
     const data = JSON.stringify({
@@ -279,12 +279,12 @@ export class ZIlPayDex extends DexStorage {
     });
     const gas: GasState = {
       gasLimit: String(GasLimits.SwapExactTokensForTokens),
-      gasPrice: DEX_GASPRICE
+      gasPrice: String(Number(DEX_GASPRICE) - 100)
     };
     const nonce = await this._transaction.calcNextNonce(this.account);
 
     return new Transaction(
-      String(exact),
+      String(0),
       gas,
       this.account,
       this.contract,
@@ -295,39 +295,42 @@ export class ZIlPayDex extends DexStorage {
     );
   }
 
-  public async increaseAllowance(spender: string, amount: string, token: string) {
-    const tag = 'IncreaseAllowance';
+  public async increaseAllowance(pair: TokenValue[]) {
+    const [{ meta }] = pair;
+    const balance = this.account.balance[this.netwrok][meta.symbol];
     const params = [
       {
         vname: 'spender',
         type: 'ByStr20',
-        value: spender.toLowerCase()
+        value: this.contract
       },
       {
         vname: 'amount',
         type: 'Uint128',
-        value: amount
+        value: balance
       }
     ];
+    const data = JSON.stringify({
+      params,
+      _tag: 'IncreaseAllowance'
+    });
+    const gas: GasState = {
+      gasLimit: String(GasLimits.IncreaseAllowance),
+      gasPrice: DEX_GASPRICE
+    };
+    const nonce = await this._transaction.calcNextNonce(this.account);
 
-    return this.sendParams(params, tag, GasLimits.IncreaseAllowance, String(0), token);
+    return new Transaction(
+      String(0),
+      gas,
+      this.account,
+      meta.address[this.netwrok],
+      this.netwrok,
+      nonce,
+      '',
+      data
+    );
   }
-
-  public async isAllowed(pair: TokenValue[]) {
-    const [exactToken] = pair;
-
-    if (exactToken.meta.address[this.netwrok] === NIL_ADDRESS) {
-      return Big(-1);
-    }
-
-    const allowances = Big(await this._zilliqa.getTokenAllowances(
-      exactToken.meta.address[this.netwrok],
-      this.account.base16,
-      this.contract
-    ));
-    return allowances.div(this.toDecimails(exactToken.meta.decimals));
-  }
-
 
   public afterSlippage(amount: BN) {
     if (this.state.slippage <= 0) {
@@ -487,10 +490,6 @@ export class ZIlPayDex extends DexStorage {
     return Big(10).pow(decimals);
   }
 
-
-  public sendParams(params: object, tag: string, gasLimit: GasLimits, amount: string, toAddr: string) {
-    // console.log(params);
-  }
 
   private _valueToBigInt(amount: string, token: Token) {
     return new BN(

@@ -35,7 +35,7 @@ import { CommonStackParamList } from 'app/navigator/common';
 import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
 import { GasLimits } from 'app/lib/controller/dex';
-import { AccountTypes, NIL_ADDRESS_BECH32 } from 'app/config';
+import { AccountTypes, NIL_ADDRESS, NIL_ADDRESS_BECH32 } from 'app/config';
 import { Transaction } from 'app/lib/controller/transaction';
 import { RootParamList } from 'app/navigator';
 
@@ -48,6 +48,7 @@ type Prop = {
   navigation: StackNavigationProp<RootParamList>;
 };
 
+let approving = false;
 export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const { colors } = useTheme();
 
@@ -59,8 +60,10 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const gasStore = keystore.gas.store.useValue();
   const dexStore = keystore.dex.store.useValue();
   const authState = keystore.guard.auth.store.useValue();
+  const blockNumber = keystore.worker.store.useValue();
 
   const [loading, setLoading] = React.useState(false);
+  const [refreshing, setRefreshing] = React.useState(false);
   const [inputTokenModal, setInputTokenModal] = React.useState(false);
   const [outputTokenModal, setOutputTokenModal] = React.useState(false);
   const [confirmModal, setConfirmModal] = React.useState(false);
@@ -85,6 +88,22 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     [accountState]
   );
 
+  const qaAmount = React.useMemo(() => {
+    const [{ meta, value }] = pair;
+
+    return Big(value).mul(keystore.dex.toDecimails(meta.decimals)).round();
+  }, [pair]);
+
+  const approved = React.useMemo(() => {
+    const [exactToken] = pair;
+    if (exactToken.meta.address[networkState.selected] === NIL_ADDRESS) {
+      return true;
+    }
+    const approvals = Big(exactToken.approved);
+
+    return approvals.gte(qaAmount);
+  }, [qaAmount, pair, networkState]);
+
   const disabled = React.useMemo(() => {
     const [{ meta, value }] = pair;
 
@@ -93,28 +112,58 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     }
 
     const balance = Big(account.balance[networkState.selected][meta.symbol]);
-    const amount = Big(value).mul(keystore.dex.toDecimails(meta.decimals)).round();
 
-    return balance.lt(amount);
-  }, [account, networkState, pair]);
+    return balance.lt(qaAmount);
+  }, [account, networkState, pair, qaAmount]);
 
 
-  const hanldeRefresh = React.useCallback(async() => {
+  const handleUpdateApprovals = React.useCallback(async(newPair: TokenValue[]) => {
+    const net = networkState.selected;
+    const token = newPair[0].meta.address[net];
+
+    if (token === NIL_ADDRESS) {
+      return newPair;
+    }
+
     setLoading(true);
+    try {
+      newPair[0].approved = await keystore.zilliqa.getTokenAllowances(
+        token,
+        account.base16,
+        keystore.dex.contract
+      );
+      setPair(newPair);
+    } catch (err) {
+      console.error(err);
+    }
+    setLoading(false);
+
+    return newPair;
+  }, [networkState, account]);
+
+  const hanldeUpdate = React.useCallback(async(newPair: TokenValue[]) => {
     try {
       await keystore.account.balanceUpdate();
 
-      const newPair = deppUnlink<TokenValue[]>(pair);
       const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
-      pair[1].value = amount.toString();
+      newPair[1].value = amount.toString();
 
-      setPair(newPair);
       setGasLimit(gas);
     } catch {
       ////
     }
-    setLoading(false);
+
+    return newPair;
+  }, []);
+
+  const hanldeRefresh = React.useCallback(async() => {
+    setRefreshing(true);
+    let newPair = deppUnlink<TokenValue[]>(pair);
+    newPair = await handleUpdateApprovals(newPair);
+    newPair = await hanldeUpdate(newPair);
+    setPair(newPair);
+    setRefreshing(false);
   }, [pair]);
 
   const hanldeInput = React.useCallback((value: string) => {
@@ -141,18 +190,19 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, []);
 
-  const hanldeOnSwapPair = React.useCallback(() => {
-    const newPair = deppUnlink<TokenValue[]>(pair).reverse();
+  const hanldeOnSwapPair = React.useCallback(async() => {
+    let newPair = deppUnlink<TokenValue[]>(pair).reverse();
     const { amount, gas } = keystore.dex.getRealAmount(newPair);
 
-    pair[1].value = amount.toString();
+    newPair[1].value = amount.toString();
+    newPair = await handleUpdateApprovals(newPair);
 
     setPair(newPair);
     setGasLimit(gas);
     }, [pair]);
 
-  const hanldeSelectInput = React.useCallback((index: number) => {
-    const newPair = deppUnlink<TokenValue[]>(pair);
+  const hanldeSelectInput = React.useCallback(async(index: number) => {
+    let newPair = deppUnlink<TokenValue[]>(pair);
 
     newPair[0].meta = tokensState[index];
 
@@ -163,13 +213,14 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       newPair[0].approved = '0';
       const { gas } = keystore.dex.getRealAmount(newPair);
 
+      newPair = await handleUpdateApprovals(newPair);
       setPair(newPair);
       setGasLimit(gas);
     }
   }, [tokensState, pair]);
 
-  const hanldeSelectOutput = React.useCallback((index: number) => {
-    const newPair = deppUnlink<TokenValue[]>(pair);
+  const hanldeSelectOutput = React.useCallback(async(index: number) => {
+    let newPair = deppUnlink<TokenValue[]>(pair);
 
     newPair[1].meta = tokensState[index];
 
@@ -179,6 +230,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       newPair[1].value = '0';
       newPair[1].approved = '0';
       newPair[0].approved = '0';
+      newPair = await handleUpdateApprovals(newPair);
       setPair(newPair);
       setGasLimit(gas);
     }
@@ -187,7 +239,14 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const hanldeSwap = React.useCallback(async() => {
     setLoading(true);
     try {
-      const transaction = await keystore.dex.swap(pair);
+      let transaction: Transaction;
+
+      if (approved) {
+        transaction = await keystore.dex.swap(pair);
+      } else {
+        transaction = await keystore.dex.increaseAllowance(pair);
+        approving = true;
+      }
 
       setTx(transaction);
       setConfirmModal(true);
@@ -195,7 +254,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       ////
     }
     setLoading(false);
-  }, [pair]);
+  }, [pair, approved]);
 
   const handleSiging = React.useCallback(async(transaction: Transaction, cb, password?: string) => {
     setConfirmError('');
@@ -217,6 +276,15 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
 
       await keystore.transaction.add(transaction, pair[0].meta);
 
+      if (approving) {
+        const newTransaction = await keystore.dex.swap(pair);
+        setTx(newTransaction);
+        cb();
+        approving = false;
+
+        return;
+      }
+
       cb();
       setConfirmModal(false);
 
@@ -231,6 +299,14 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     }
   }, [pair, account]);
 
+  React.useEffect(() => {
+    if (!confirmModal) {
+      const newPair = deppUnlink<TokenValue[]>(pair);
+      hanldeUpdate(newPair)
+        .then((p) => setPair(p));
+    }
+  }, [blockNumber, confirmModal]);
+
   return (
     <KeyboardAwareScrollView
       style={[styles.container, {
@@ -238,7 +314,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       }]}
       refreshControl={
         <RefreshControl
-          refreshing={loading}
+          refreshing={refreshing}
           onRefresh={() => hanldeRefresh()}
         />
       }
@@ -288,9 +364,9 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
         />
       </View>
       <CustomButton
-        title={i18n.t('swap')}
+        title={approved ? i18n.t('swap') : i18n.t('approve')}
         style={styles.button}
-        isLoading={loading}
+        isLoading={refreshing || loading}
         disabled={disabled}
         onPress={hanldeSwap}
       />

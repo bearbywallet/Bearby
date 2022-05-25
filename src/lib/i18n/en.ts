@@ -92,6 +92,7 @@ export default {
   faucet: 'Test faucet',
   buy: 'Buy ZIL',
   rate: 'Rate',
+  approve: 'Approve',
   you_pay: 'You Pay',
   you_get: 'You Get',
   price_impact: 'Price impact',

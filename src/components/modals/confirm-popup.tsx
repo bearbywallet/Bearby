@@ -75,7 +75,7 @@ export const ConfirmPopup: React.FC<Prop> = ({
   const [isLoading, setIsLoading] = React.useState(false);
   const [DS, setDS] = React.useState(transaction.priority);
   const [gas, setGas] = React.useState<GasState>({
-    gasPrice: gasState.gasPrice,
+    gasPrice: transaction.gasPrice,
     gasLimit: transaction.gasLimit.toString()
   });
 

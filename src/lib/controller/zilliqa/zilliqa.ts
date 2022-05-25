@@ -160,7 +160,9 @@ export class ZilliqaControl {
       [owner, contract]
     );
 
-    // console.log(res);
+    if (res && res[ZRC2Fields.Allowances]) {
+      return res[ZRC2Fields.Allowances][owner][contract];
+    }
 
     return '0';
   }
