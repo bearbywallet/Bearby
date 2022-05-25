@@ -6,6 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { WalletControler } from 'app/lib/controller';
+import { WalletControler } from 'app/lib/controller/wallet/core';
 
 export const keystore = new WalletControler();

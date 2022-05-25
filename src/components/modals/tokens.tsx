@@ -27,7 +27,7 @@ import { ModalWrapper } from 'app/components/modal-wrapper';
 import { LoadSVG } from 'app/components/load-svg';
 
 import { Token, Account } from 'types';
-import { fromZil, nFormatter, toLocaleString } from 'app/filters';
+import { fromZil, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
 import { toBech32Address } from 'app/utils/bech32';
 

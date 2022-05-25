@@ -18,7 +18,7 @@ import {
   ADDRESS_FORMATS,
   API_RATE
 } from 'app/config';
-import { TokenControll } from 'app/lib/controller';
+import { TokenControll } from 'app/lib/controller/tokens';
 
 export class SettingsControler {
   public readonly store = settingsStore;

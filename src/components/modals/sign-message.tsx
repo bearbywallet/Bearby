@@ -31,7 +31,7 @@ import { Signature, Account } from 'types';
 import { LedgerController } from 'app/lib/controller/connect/ledger';
 import { sha256 } from 'app/lib/crypto/sha256';
 import { keystore } from 'app/keystore';
-import { SchnorrControl } from 'app/lib/controller';
+import { SchnorrControl } from 'app/lib/controller/elliptic';
 import { fonts } from 'app/styles';
 import { AccountTypes } from 'app/config';
 

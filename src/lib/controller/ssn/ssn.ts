@@ -7,7 +7,8 @@
  * Copyright (c) 2020 ZilPay
  */
 import { MobileStorage, buildObject } from 'app/lib/storage';
-import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
+import { NetworkControll } from 'app/lib/controller/network';
+import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { STORAGE_FIELDS, DEFAULT_SSN, ZILLIQA_KEYS } from 'app/config';
 import {
   ssnStore,

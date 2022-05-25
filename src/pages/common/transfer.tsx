@@ -32,7 +32,7 @@ import { RootParamList } from 'app/navigator';
 import { RouteProp, useTheme } from '@react-navigation/native';
 import { CommonStackParamList } from 'app/navigator/common';
 import { toQA } from 'app/filters';
-import { Transaction } from 'app/lib/controller';
+import { Transaction } from 'app/lib/controller/transaction';
 import { AccountTypes, DEFAULT_GAS } from 'app/config';
 import { fromBech32Address, toBech32Address } from 'app/utils/bech32';
 

@@ -36,7 +36,7 @@ import { keystore } from 'app/keystore';
 import { deppUnlink } from 'app/utils/deep-unlink';
 import { GasLimits } from 'app/lib/controller/dex';
 import { AccountTypes, NIL_ADDRESS_BECH32 } from 'app/config';
-import { Transaction } from 'app/lib/controller';
+import { Transaction } from 'app/lib/controller/transaction';
 import { RootParamList } from 'app/navigator';
 
 

@@ -7,20 +7,21 @@
  * Copyright (c) 2022 ZilPay
  */
 import type { GasState, Token, TokenValue } from 'types/store';
+import type { TransactionsQueue } from 'app/lib/controller/transaction/index';
+import type { NetworkControll } from 'app/lib/controller/network';
+import type { TokenControll } from 'app/lib/controller/tokens';
+import type { ZilliqaControl } from 'app/lib/controller/zilliqa';
+import type { GasControler } from 'app/lib/controller/gas';
+import type { CurrencyControler } from 'app/lib/controller/currency';
+import type { SettingsControler } from 'app/lib/controller/settings';
+import type { AccountControler } from 'app/lib/controller/account';
+import type { MobileStorage } from 'app/lib/storage/storage';
 
 import BN from 'bn.js';
 import Big from 'big.js';
 
-import { NetworkControll } from 'app/lib/controller/network';
-import { TokenControll } from 'app/lib/controller/tokens';
-import { ZilliqaControl } from 'app/lib/controller/zilliqa';
-import { GasControler } from 'app/lib/controller/gas';
-import { CurrencyControler } from 'app/lib/controller/currency';
-import { SettingsControler } from 'app/lib/controller/settings';
-import { AccountControler } from 'app/lib/controller/account';
-import { MobileStorage } from 'app/lib/storage/storage';
-import { Transaction, TransactionsQueue } from 'app/lib/controller';
 import { DexStorage } from './dex-storage';
+import { Transaction } from 'app/lib/controller/transaction/builder';
 
 import { dexStore } from './state';
 import { NIL_ADDRESS } from 'app/config';

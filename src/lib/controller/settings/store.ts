@@ -9,7 +9,6 @@
 import { ADDRESS_FORMATS } from 'app/config';
 import { newRidgeState } from 'react-ridge-state';
 import { Settings } from 'types';
-import { tokensStore } from 'app/lib/controller/tokens/state';
 import { DEFAULT_CURRENCIES } from 'app/config/currency';
 
 const [usd, eth, btc] = DEFAULT_CURRENCIES;

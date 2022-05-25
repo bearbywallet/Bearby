@@ -176,7 +176,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: 5
   },
   percent: {
-    fontSize: 14,
+    fontSize: width / 27,
     paddingHorizontal: 4
   }
 });

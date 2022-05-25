@@ -6,5 +6,5 @@
  * -----
  * Copyright (c) 2021 ZilPay
  */
-export * from './dex';
+export * from './dragon-dex';
 export * from './state';

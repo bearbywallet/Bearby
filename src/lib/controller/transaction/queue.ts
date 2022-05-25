@@ -6,7 +6,9 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MobileStorage, buildObject, NetworkControll, AccountControler } from 'app/lib';
+import { MobileStorage, buildObject } from 'app/lib';
+import { AccountControler } from 'app/lib/controller/account';
+import { NetworkControll } from 'app/lib/controller/network';
 import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { NotificationManager } from 'app/lib/controller/notification';
 import {

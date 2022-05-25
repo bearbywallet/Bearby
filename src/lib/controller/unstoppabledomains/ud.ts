@@ -7,7 +7,8 @@
  * Copyright (c) 2020 ZilPay
  */
 import { NIL_ADDRESS, UD_CONTRACT_ADDRESS } from 'app/config';
-import { ZilliqaControl, NetworkControll } from 'app/lib/controller';
+import { NetworkControll } from 'app/lib/controller/network';
+import { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import { MobileStorage } from 'app/lib';
 import { nameHash } from 'app/utils/namehash';
 import { DomainResolver } from 'types';

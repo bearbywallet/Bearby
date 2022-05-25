@@ -6,4 +6,4 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-export * from './wallet';
+export * from './core';

@@ -16,7 +16,8 @@ import {
 
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootParamList } from 'app/navigator';
-import { MobileStorage, buildObject, NetworkControll } from 'app/lib';
+import { MobileStorage, buildObject } from 'app/lib';
+import { NetworkControll } from 'app/lib/controller/network';
 import { STORAGE_FIELDS } from 'app/config';
 import { NotificationState } from 'types';
 import { viewTransaction } from 'app/utils/view-block';

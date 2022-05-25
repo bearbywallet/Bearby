@@ -1,9 +1,6 @@
 import TransportBLE from '@ledgerhq/react-native-hw-transport-ble';
 import { Transaction } from 'app/lib/controller/transaction';
-import { sha256 } from 'app/lib/crypto/sha256';
 import { NativeTransport } from 'types';
-// import { Platform, PermissionsAndroid } from 'react-native';
-// import Geolocation from '@react-native-community/geolocation';
 
 const CLA = 0xe0;
 const INS = {

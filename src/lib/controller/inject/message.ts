@@ -6,8 +6,6 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
-import { MessageType } from 'types';
-
 export class Message {
   private _type: string;
 
