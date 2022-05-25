@@ -25,6 +25,7 @@ import I18n from 'app/lib/i18n';
 import { Account, Token } from 'types';
 import { toConversion, nFormatter } from 'app/filters';
 import { fonts } from 'app/styles';
+import { ZILLIQA_KEYS } from 'app/config';
 
 type Prop = {
   account: Account;
@@ -39,6 +40,7 @@ type Prop = {
   onSwap: () => void;
 };
 
+const [, testnet] = ZILLIQA_KEYS;
 const { width, height } = Dimensions.get('window');
 export const HomeAccount: React.FC<Prop> = ({
   account,
@@ -135,6 +137,7 @@ export const HomeAccount: React.FC<Prop> = ({
               textStyle={{
                 textAlign: 'right'
               }}
+              disabled={netwrok !== testnet}
               title={I18n.t('swap')}
               onPress={onSwap}
             />

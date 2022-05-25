@@ -37,12 +37,14 @@ import { fonts } from 'app/styles';
 import { keystore } from 'app/keystore';
 import { AddTokenModal } from 'app/components/modals';
 import { toBech32Address } from 'app/utils/bech32';
+import { ZILLIQA_KEYS } from 'app/config';
 
 type Prop = {
   navigation: StackNavigationProp<RootParamList>;
   route: RouteProp<CommonStackParamList, 'Transfer'>;
 };
 
+const [mainnet] = ZILLIQA_KEYS;
 const { width } = Dimensions.get('window');
 const limit = 100;
 export const TokensListPage: React.FC<Prop> = ({ route, navigation }) => {
@@ -76,6 +78,11 @@ export const TokensListPage: React.FC<Prop> = ({ route, navigation }) => {
   }, [search, list, tokensState]);
 
   const hanldeUpdate = React.useCallback(async(load: boolean) => {
+    if (networkState.selected !== mainnet) {
+      setLoading(false);
+      return;
+    }
+
     setLoading(true);
 
     if (load) {
@@ -84,7 +91,7 @@ export const TokensListPage: React.FC<Prop> = ({ route, navigation }) => {
 
     try {
       const res = await keystore.token.loadingFromServer(limit);
-      const currentTokens = tokensState.slice(1).map((t) => ({
+      const currentTokens = tokensState.filter((t) => Boolean(t.address[networkState.selected])).slice(1).map((t) => ({
         id: 0,
         bech32: toBech32Address(t.address[networkState.selected]),
         base16: t.address[networkState.selected],
