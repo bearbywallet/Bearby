@@ -19,4 +19,5 @@ export const Messages = {
   resConnect: `@/${app}/response-dapp-connect`,
   reqProxy: `@/${app}/request-through-content`,
   resProxy: `@/${app}/response-from-content`,
+  reqDisconnect: `@/${app}/request-to-disconnect-dapp`
 };

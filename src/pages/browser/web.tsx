@@ -209,6 +209,12 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           }
           break;
 
+        case Messages.reqDisconnect:
+          await keystore.connect.rm(message.payload);
+          webViewRef.current.postMessage(new Message(Messages.resConnect).serialize({
+            account: null
+          }, message.payload.uuid));
+          break;
         default:
           break;
       }
