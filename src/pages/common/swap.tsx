@@ -75,7 +75,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     },
     {
       value: '0',
-      meta: tokensState[1],
+      meta: tokensState[route.params.selectedToken || 1],
       approved: String(0)
     }
   ]);
@@ -278,6 +278,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
 
       if (approving) {
         const newTransaction = await keystore.dex.swap(pair);
+        setTx(undefined);
         setTx(newTransaction);
         cb();
         approving = false;
