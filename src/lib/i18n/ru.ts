@@ -30,6 +30,8 @@ export default {
   total_supply: 'Token Supply',
   home: 'Главная',
   rate: 'Цена',
+  add_lp: 'Добавить ликвидности',
+  approve: 'Одобрить',
   you_pay: 'На оплату',
   you_get: 'На получения',
   price_impact: 'Impact',

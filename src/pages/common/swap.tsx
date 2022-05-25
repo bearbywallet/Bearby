@@ -29,6 +29,7 @@ import { ConfirmPopup, TokensModal } from 'app/components/modals';
 import { SwapInfo } from 'app/components/swap/swap-info';
 import { SwapAdvanced } from 'app/components/swap/advanced';
 import { LoadSVG } from 'app/components/load-svg';
+import { Button } from 'app/components/button';
 
 import i18n from 'app/lib/i18n';
 import { CommonStackParamList } from 'app/navigator/common';
@@ -321,6 +322,18 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       }
     >
       <View>
+        <View style={styles.wrapper}>
+          <Button
+            title={i18n.t('add_lp')}
+            color={colors.notification}
+            onPress={() => navigation.navigate('Browser', {
+              screen: 'Web',
+              params: {
+                url: 'https://zilpay.io/pool'
+              }
+            })}
+          />
+        </View>
         <SwapInput
           token={pair[0].meta}
           currency={currencyState}
@@ -370,6 +383,16 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
         isLoading={refreshing || loading}
         disabled={disabled}
         onPress={hanldeSwap}
+      />
+      <Button
+        title="Terms of Service"
+        color={colors.notification}
+        onPress={() => navigation.navigate('Browser', {
+          screen: 'Web',
+          params: {
+            url: 'https://zilpay.io/dex-policy'
+          }
+        })}
       />
       <TokensModal
         title={i18n.t('you_pay')}

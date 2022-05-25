@@ -93,6 +93,7 @@ export default {
   buy: 'Buy ZIL',
   rate: 'Rate',
   approve: 'Approve',
+  add_lp: 'Add liquidity',
   you_pay: 'You Pay',
   you_get: 'You Get',
   price_impact: 'Price impact',
