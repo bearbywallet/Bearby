@@ -16,7 +16,6 @@ import {
 import { useTheme } from '@react-navigation/native';
 
 import { GasSelector } from 'app/components/gas-selector';
-import { Selector } from 'app/components/selector';
 import { Button } from 'app/components/button';
 import { DropMenu } from 'app/components/drop-menu';
 
@@ -24,6 +23,7 @@ import { keystore } from 'app/keystore';
 import i18n from 'app/lib/i18n';
 import { DEFAULT_GAS } from 'app/config';
 import { fonts } from 'app/styles';
+import { Switcher } from 'app/components/switcher';
 
 export const AdvancedPage: React.FC = () => {
   const { colors } = useTheme();
@@ -49,6 +49,14 @@ export const AdvancedPage: React.FC = () => {
       await keystore.ipfs.setSelected(foundIndex);
     }
   }, [ipfsState]);
+
+  const halndeOnToggleFormat = React.useCallback(async(value: boolean) => {
+    if (value) {
+      await keystore.settings.setFormat(keystore.settings.formats[1]);
+    } else {
+      await keystore.settings.setFormat(keystore.settings.formats[0]);
+    }
+  }, []);
 
   return (
     <View>
@@ -83,13 +91,28 @@ export const AdvancedPage: React.FC = () => {
           onUpdate={handleUpdateIPFS}
           onSelect={handleChangeIPFS}
         />
-        <Selector
-          style={{ marginVertical: 16 }}
-          title={i18n.t('advanced_selector_title')}
-          items={keystore.settings.formats}
-          selected={settingsState.addressFormat}
-          onSelect={(format) => keystore.settings.setFormat(format)}
-        />
+        <Switcher
+          style={{
+            backgroundColor: colors.card,
+            padding: 15,
+            marginVertical: 16
+          }}
+          enabled={settingsState.addressFormat === keystore.settings.formats[1]}
+          onChange={halndeOnToggleFormat}
+        >
+          <View style={styles.switcherWrapper}>
+            <Text style={[styles.someText, {
+              color: colors.text
+            }]}>
+              Base16
+            </Text>
+            <Text style={[styles.someLable, {
+              color: colors.border
+            }]}>
+              {i18n.t('warn_address_format')}
+            </Text>
+          </View>
+        </Switcher>
       </ScrollView>
     </View>
   );
@@ -105,6 +128,19 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 30,
+    fontFamily: fonts.Bold
+  },
+  switcherWrapper: {
+    maxWidth: '70%',
+    marginVertical: 16
+  },
+  someLable: {
+    fontSize: 16,
+    fontFamily: fonts.Regular,
+    marginLeft: 10
+  },
+  someText: {
+    fontSize: 17,
     fontFamily: fonts.Bold
   }
 });
