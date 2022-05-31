@@ -10,7 +10,7 @@ import type { DexState } from 'types/store';
 
 import { newRidgeState } from 'react-ridge-state';
 import { SLIPPAGE, BLOCKS } from 'app/config/dex';
-import { ZILLIQA_KEYS } from 'app/config/app-constants';
+import { NIL_ADDRESS, ZILLIQA_KEYS } from 'app/config/app-constants';
 
 
 const [mainnet, testnet, custom] = ZILLIQA_KEYS;
@@ -19,9 +19,10 @@ const initalState: DexState = {
   protocolFee: 500,
   slippage: SLIPPAGE,
   blocks: BLOCKS,
+  rewarded: NIL_ADDRESS,
   contract: {
     [mainnet]: '0x459cb2d3baf7e61cfbd5fe362f289ae92b2babb0',
-    [testnet]: '0x5f35fbabfe7226147914eb296253a68538ac33ee',
+    [testnet]: '0xb0c677b5ba660925a8f1d5d9687d0c2c379e16ee',
     [custom]: ''
   }
 };
@@ -44,7 +45,10 @@ export function dexStoreSetSettings(slippage: number, blocks: number) {
 }
 
 export function dexStoreUpdate(payload: DexState) {
-  dexStore.set(() => payload);
+  dexStore.set((state) => ({
+    ...payload,
+    contract: state.contract
+  }));
 }
 
 

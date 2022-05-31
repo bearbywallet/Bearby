@@ -6,10 +6,12 @@
  * -----
  * Copyright (c) 2022 ZilPay
  */
+import type { ZilliqaControl } from 'app/lib/controller/zilliqa';
 import {
   STORAGE_FIELDS
 } from 'app/config';
 import { buildObject, MobileStorage } from 'app/lib/storage';
+
 import {
   dexStore,
   dexStoreReset,
@@ -93,4 +95,11 @@ export class DexStorage {
       buildObject(STORAGE_FIELDS.DEX_SETTINGS, this.store.get())
     );
   }
+
+  protected async cache() {
+    return this._storage.set(
+      buildObject(STORAGE_FIELDS.DEX_SETTINGS, this.store.get())
+    );
+  }
+
 }

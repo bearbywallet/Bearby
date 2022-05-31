@@ -23,13 +23,15 @@ import Big from 'big.js';
 import { DexStorage } from './dex-storage';
 import { Transaction } from 'app/lib/controller/transaction/builder';
 
-import { dexStore } from './state';
-import { NIL_ADDRESS } from 'app/config';
+import { dexStore, dexStoreUpdate } from './state';
+import { NIL_ADDRESS, ZRC2Fields } from 'app/config';
+import { Methods } from 'app/lib/controller/zilliqa/methods';
+import { tohexString } from 'app/utils/address';
 
 
 Big.PE = 99;
 
-const DEX_GASPRICE = '2300';
+const DEX_GASPRICE = '2100';
 
 
 export enum GasLimits {
@@ -91,6 +93,10 @@ export class ZIlPayDex extends DexStorage {
     return this._token.store.get();
   }
 
+  public get rewarded() {
+    return this.state.rewarded;
+  }
+
   public get localRate() {
     const settings = this._settings.store.get();
     const currency = this._currency.store.get();
@@ -107,6 +113,37 @@ export class ZIlPayDex extends DexStorage {
     return this.state.contract[this.netwrok];
   }
 
+
+  public async updateState() {
+    const contract = tohexString(this.contract);
+    const identities = [
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [contract, ZRC2Fields.LiquidityFee, []]
+      ),
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [contract, ZRC2Fields.ProtocolFee, []]
+      ),
+      this._zilliqa.provider.buildBody(
+        Methods.GetSmartContractSubState,
+        [contract, ZRC2Fields.RewardsPool, []]
+      )
+    ];
+    const replies = await this._zilliqa.sendJson(...identities);
+    const liquidityFee = replies[0].result[ZRC2Fields.LiquidityFee];
+    const protocolFee = replies[1].result[ZRC2Fields.ProtocolFee];
+    const rewardsPool = replies[2].result[ZRC2Fields.RewardsPool];
+    const state = this.state;
+
+    state.liquidityFee = Number(liquidityFee);
+    state.protocolFee = Number(protocolFee);
+    state.rewarded = String(rewardsPool);
+
+    dexStoreUpdate(state);
+
+    await this.cache();
+  }
 
   public async swap(pair: TokenValue[]) {
     const [exactToken, limitToken] = pair;
@@ -362,6 +399,8 @@ export class ZIlPayDex extends DexStorage {
       gas: GasLimits.Default
     };
     const [exactToken, limitToken] = pair;
+    const cashback = this.rewarded !== String(exactToken.meta.address[this.netwrok]).toLowerCase()
+      && this.rewarded !== String(limitToken.meta.address[this.netwrok]).toLowerCase();
     const exactAmount = Big(exactToken.value);
     const bigAmount = exactAmount.mul(this.toDecimails(exactToken.meta.decimals)).round();
     const _amount = new BN(String(bigAmount));
@@ -369,7 +408,7 @@ export class ZIlPayDex extends DexStorage {
 
     if (exactToken.meta.address[this.netwrok] === NIL_ADDRESS) {
       const pool = limitToken.meta.pool.map((n) => new BN(n));
-      const _limitAmount = this._zilToTokens(_amount, pool);
+      const _limitAmount = this._zilToTokens(_amount, pool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
 
       data.amount = bigLimitAmount.div(this.toDecimails(limitToken.meta.decimals));
@@ -379,7 +418,7 @@ export class ZIlPayDex extends DexStorage {
       return data;
     } else if (limitToken.meta.address[this.netwrok] === NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
       const pool = exactToken.meta.pool.map((n) => new BN(n));
-      const _limitAmount = this._tokensToZil(_amount, pool);
+      const _limitAmount = this._tokensToZil(_amount, pool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
 
       data.amount = bigLimitAmount.div(this.toDecimails(limitToken.meta.decimals));
@@ -395,7 +434,7 @@ export class ZIlPayDex extends DexStorage {
       const [ZIL] = this.tokens;
       const inputPool = exactToken.meta.pool.map((n) => new BN(n));
       const outputPool = limitToken.meta.pool.map((n) => new BN(n));
-      const [zils, _limitAmount] = this._tokensToTokens(_amount, inputPool, outputPool);
+      const [zils, _limitAmount] = this._tokensToTokens(_amount, inputPool, outputPool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
       const zilAmount = Big(String(zils)).div(this.toDecimails(ZIL.decimals));
 
@@ -497,11 +536,11 @@ export class ZIlPayDex extends DexStorage {
     );
   }
 
-  private _zilToTokens(amount: BN, inputPool: BN[]) {
+  private _zilToTokens(amount: BN, inputPool: BN[], cashback: boolean) {
     const [zilReserve, tokenReserve] = inputPool;
     let amountAfterFee = amount;
 
-    if (this.state.protocolFee !== 0) {
+    if (this.state.protocolFee !== 0 && cashback) {
       const diff = amount.div(new BN(this.state.protocolFee));
       amountAfterFee = amount.sub(diff);
     }
@@ -509,11 +548,11 @@ export class ZIlPayDex extends DexStorage {
     return this._outputFor(amountAfterFee, zilReserve, tokenReserve);
   }
 
-  private _tokensToZil(amount: BN, inputPool: BN[]) {
+  private _tokensToZil(amount: BN, inputPool: BN[], cashback: boolean) {
     const [zilReserve, tokenReserve] = inputPool;
     const zils = this._outputFor(amount, tokenReserve, zilReserve);
 
-    if (this.state.protocolFee === 0) {
+    if (this.state.protocolFee === 0 || !cashback) {
       return zils;
     }
 
@@ -521,7 +560,7 @@ export class ZIlPayDex extends DexStorage {
     return zils.sub(diff);
   }
 
-  private _tokensToTokens(amount: BN, inputPool: BN[], outputPool: BN[]) {
+  private _tokensToTokens(amount: BN, inputPool: BN[], outputPool: BN[], cashback: boolean) {
     const [inputZilReserve, inputTokenReserve] = inputPool;
     const [outputZilReserve, outputTokenReserve] = outputPool;
     const zilIntermediateAmount = this._outputFor(
@@ -532,7 +571,7 @@ export class ZIlPayDex extends DexStorage {
     );
     let zils = zilIntermediateAmount;
 
-    if (this.state.protocolFee !== 0) {
+    if (this.state.protocolFee !== 0 && cashback) {
       const diff = zilIntermediateAmount.div(new BN(this.state.protocolFee));
       zils = zilIntermediateAmount.sub(diff);
     }

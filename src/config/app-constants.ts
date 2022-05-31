@@ -17,7 +17,10 @@ export enum ZRC2Fields {
   Balances = 'balances',
   TotalSupply = 'total_supply',
   Pools = 'pools',
-  Allowances = 'allowances'
+  Allowances = 'allowances',
+  LiquidityFee = 'liquidity_fee',
+  ProtocolFee = 'protocol_fee',
+  RewardsPool = 'rewards_pool'
 }
 
 export const API_RATE = 'https://api.zilpay.io/api/v1';

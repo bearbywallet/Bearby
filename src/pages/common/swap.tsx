@@ -145,6 +145,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const hanldeUpdate = React.useCallback(async(newPair: TokenValue[]) => {
     try {
       await keystore.account.balanceUpdate();
+      await keystore.dex.updateState();
 
       const { amount, gas } = keystore.dex.getRealAmount(newPair);
 

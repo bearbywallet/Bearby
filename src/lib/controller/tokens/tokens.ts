@@ -82,7 +82,6 @@ export class TokenControll {
     let pool = ['0', '0'];
     const type = TokenTypes.ZRC2;
     const addr = tohexString(address);
-    const net = this._network.selected;
     const userAddress = acc.base16.toLowerCase();
     const tokenAddressBase16 = address.toLowerCase();
     const identities = [
