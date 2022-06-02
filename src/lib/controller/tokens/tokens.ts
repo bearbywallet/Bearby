@@ -170,7 +170,10 @@ export class TokenControll {
   }
 
   public async updateRate(pools: object[]) {
-    const tokens = this.store.get();
+    const tokens: Token[] = this.store.get().map((t) => ({
+      ...t,
+      pool: undefined
+    }));
     const net = this._network.selected;
 
     tokens[0].pool = ['0', '0'];
@@ -191,7 +194,7 @@ export class TokenControll {
           tokenReserve,
           foundToken.decimals
         );
-      } catch (err) {
+      } catch {
         continue;
       }
     }

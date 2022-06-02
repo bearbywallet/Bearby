@@ -37,8 +37,7 @@ const identities: Token[] = [
     default: true,
     name: 'ZilPay wallet',
     symbol: 'ZLP',
-    rate: 0,
-    pool: ['0', '0']
+    rate: 0
   }
 ];
 

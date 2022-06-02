@@ -21,7 +21,7 @@ const initalState: DexState = {
   blocks: BLOCKS,
   rewarded: NIL_ADDRESS,
   contract: {
-    [mainnet]: '0x459cb2d3baf7e61cfbd5fe362f289ae92b2babb0',
+    [mainnet]: '0x30dfe64740ed459ea115b517bd737bbadf21b838',
     [testnet]: '0xb0c677b5ba660925a8f1d5d9687d0c2c379e16ee',
     [custom]: ''
   }

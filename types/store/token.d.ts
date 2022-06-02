@@ -20,7 +20,7 @@ export interface Token {
   totalSupply?: string;
   balance?: string;
   rate: number;
-  pool: string[];
+  pool?: string[];
 }
 
 export interface ServerToken {

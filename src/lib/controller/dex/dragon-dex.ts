@@ -32,6 +32,10 @@ import { tohexString } from 'app/utils/address';
 Big.PE = 99;
 
 const DEX_GASPRICE = '2100';
+const NIL_POOL = [
+  new BN(0),
+  new BN(0)
+];
 
 
 export enum GasLimits {
@@ -407,7 +411,7 @@ export class ZIlPayDex extends DexStorage {
     const localRate = Number(this.localRate) || 0;
 
     if (exactToken.meta.address[this.netwrok] === NIL_ADDRESS) {
-      const pool = limitToken.meta.pool.map((n) => new BN(n));
+      const pool = limitToken.meta.pool ? limitToken.meta.pool.map((n) => new BN(n)) : NIL_POOL;
       const _limitAmount = this._zilToTokens(_amount, pool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
 
@@ -417,7 +421,7 @@ export class ZIlPayDex extends DexStorage {
 
       return data;
     } else if (limitToken.meta.address[this.netwrok] === NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
-      const pool = exactToken.meta.pool.map((n) => new BN(n));
+      const pool = exactToken.meta.pool ? exactToken.meta.pool.map((n) => new BN(n)) : NIL_POOL;
       const _limitAmount = this._tokensToZil(_amount, pool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
 
@@ -432,8 +436,8 @@ export class ZIlPayDex extends DexStorage {
       return data;
     } else if (limitToken.meta.address[this.netwrok] !== NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
       const [ZIL] = this.tokens;
-      const inputPool = exactToken.meta.pool.map((n) => new BN(n));
-      const outputPool = limitToken.meta.pool.map((n) => new BN(n));
+      const inputPool = exactToken.meta.pool ? exactToken.meta.pool.map((n) => new BN(n)) : NIL_POOL;
+      const outputPool = limitToken.meta.pool ? limitToken.meta.pool.map((n) => new BN(n)) : NIL_POOL;
       const [zils, _limitAmount] = this._tokensToTokens(_amount, inputPool, outputPool, cashback);
       const bigLimitAmount = Big(String(_limitAmount));
       const zilAmount = Big(String(zils)).div(this.toDecimails(ZIL.decimals));
@@ -469,8 +473,9 @@ export class ZIlPayDex extends DexStorage {
     const localRate = Number(this.localRate) || 0;
 
     if (exactToken.meta.address[this.netwrok] === NIL_ADDRESS) {
-      const zilReserve = Big(limitToken.meta.pool[0]).div(this.toDecimails(exactToken.meta.decimals));
-      const tokenReserve = Big(limitToken.meta.pool[1]).div(this.toDecimails(limitToken.meta.decimals));
+      const pool = limitToken.meta.pool ? limitToken.meta.pool : ['0', '0'];
+      const zilReserve = Big(pool[0]).div(this.toDecimails(exactToken.meta.decimals));
+      const tokenReserve = Big(pool[1]).div(this.toDecimails(limitToken.meta.decimals));
       const rate = zilReserve.div(tokenReserve);
 
       data.rate = tokenReserve.div(zilReserve);
@@ -479,8 +484,9 @@ export class ZIlPayDex extends DexStorage {
 
       return data;
     } else if (limitToken.meta.address[this.netwrok] === NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
-      const zilReserve = Big(exactToken.meta.pool[0]).div(this.toDecimails(limitToken.meta.decimals));
-      const tokenReserve = Big(exactToken.meta.pool[1]).div(this.toDecimails(exactToken.meta.decimals));
+      const pool = exactToken.meta.pool ? exactToken.meta.pool : ['0', '0'];
+      const zilReserve = Big(pool[0]).div(this.toDecimails(limitToken.meta.decimals));
+      const tokenReserve = Big(pool[1]).div(this.toDecimails(exactToken.meta.decimals));
       const rate = tokenReserve.div(zilReserve);
 
       data.rate = zilReserve.div(tokenReserve);
@@ -491,10 +497,13 @@ export class ZIlPayDex extends DexStorage {
     } else if (limitToken.meta.address[this.netwrok] !== NIL_ADDRESS && exactToken.meta.address[this.netwrok] !== NIL_ADDRESS) {
       const [ZIL] = this.tokens;
 
-      const inputZils = Big(exactToken.meta.pool[0]).div(this.toDecimails(ZIL.decimals));
-      const inputTokens = Big(exactToken.meta.pool[1]).div(this.toDecimails(exactToken.meta.decimals));
-      const outpuZils = Big(limitToken.meta.pool[0]).div(this.toDecimails(ZIL.decimals));
-      const outputTokens = Big(limitToken.meta.pool[1]).div(this.toDecimails(limitToken.meta.decimals));
+      const inputPool = exactToken.meta.pool ? exactToken.meta.pool : ['0', '0'];
+      const outputPool = limitToken.meta.pool ? limitToken.meta.pool : ['0', '0'];
+
+      const inputZils = Big(inputPool[0]).div(this.toDecimails(ZIL.decimals));
+      const inputTokens = Big(inputPool[1]).div(this.toDecimails(exactToken.meta.decimals));
+      const outpuZils = Big(outputPool[0]).div(this.toDecimails(ZIL.decimals));
+      const outputTokens = Big(outputPool[1]).div(this.toDecimails(limitToken.meta.decimals));
 
       const inputRate = inputTokens.div(inputZils);
       const outpuRate = outputTokens.div(outpuZils);

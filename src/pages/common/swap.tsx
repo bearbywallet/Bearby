@@ -88,6 +88,9 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
     () => accountState.identities[accountState.selectedAddress],
     [accountState]
   );
+  const listedTokens = React.useMemo(() => {
+    return tokensState.filter((t) => Boolean(t.pool));
+  }, [tokensState]);
 
   const qaAmount = React.useMemo(() => {
     const [{ meta, value }] = pair;
@@ -224,7 +227,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
   const hanldeSelectOutput = React.useCallback(async(index: number) => {
     let newPair = deppUnlink<TokenValue[]>(pair);
 
-    newPair[1].meta = tokensState[index];
+    newPair[1].meta = listedTokens[index];
 
     if (newPair[1].meta.symbol !== newPair[0].meta.symbol) {
       const { gas } = keystore.dex.getRealAmount(newPair);
@@ -236,7 +239,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
       setPair(newPair);
       setGasLimit(gas);
     }
-  }, [tokensState, pair]);
+  }, [pair, listedTokens]);
 
   const hanldeSwap = React.useCallback(async() => {
     setLoading(true);
@@ -400,8 +403,8 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
         visible={inputTokenModal}
         network={networkState.selected}
         account={account}
-        tokens={tokensState}
-        selected={tokensState.findIndex((t) => t.symbol === pair[0].meta.symbol)}
+        tokens={listedTokens}
+        selected={listedTokens.findIndex((t) => t.symbol === pair[0].meta.symbol)}
         onTriggered={() => setInputTokenModal(false)}
         onSelect={hanldeSelectInput}
       />
@@ -410,8 +413,8 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
         visible={outputTokenModal}
         network={networkState.selected}
         account={account}
-        tokens={tokensState}
-        selected={tokensState.findIndex((t) => t.symbol === pair[1].meta.symbol)}
+        tokens={listedTokens}
+        selected={listedTokens.findIndex((t) => t.symbol === pair[1].meta.symbol)}
         onTriggered={() => setOutputTokenModal(false)}
         onSelect={hanldeSelectOutput}
       />
