@@ -6,6 +6,7 @@
  * -----
  * Copyright (c) 2020 ZilPay
  */
+import { keystore } from 'app/keystore';
 import numbro from 'numbro';
 
 
@@ -18,6 +19,12 @@ const options: numbro.Format = {
 
 
 export function nFormatter(num: string | number, opt?: numbro.Format) {
+  const { formated } = keystore.settings.store.get();
+
+  if (!formated) {
+    return num;
+  }
+
   if (Number(num) === 0) {
     return '0';
   }

@@ -10,7 +10,8 @@ import {
   settingsStore,
   settingsStoreSetAddressFormat,
   settingsStoreUpdate,
-  settingsStoreReset
+  settingsStoreReset,
+  settingsToggleFormat
 } from './store';
 import { MobileStorage, buildObject } from 'app/lib/storage';
 import {
@@ -60,6 +61,14 @@ export class SettingsControler {
 
   public setFormat(format: string) {
     settingsStoreSetAddressFormat(format);
+
+    return this._storage.set(
+      buildObject(STORAGE_FIELDS.SETTINGS, this.store.get())
+    );
+  }
+
+  public toggleNumberFormat() {
+    settingsToggleFormat();
 
     return this._storage.set(
       buildObject(STORAGE_FIELDS.SETTINGS, this.store.get())

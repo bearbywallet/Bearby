@@ -58,6 +58,10 @@ export const AdvancedPage: React.FC = () => {
     }
   }, []);
 
+  const hanldeChangeFormating = React.useCallback(async() => {
+    await keystore.settings.toggleNumberFormat();
+  }, [settingsState]);
+
   return (
     <View>
       <View style={styles.titleWrapper}>
@@ -91,6 +95,28 @@ export const AdvancedPage: React.FC = () => {
           onUpdate={handleUpdateIPFS}
           onSelect={handleChangeIPFS}
         />
+        <Switcher
+          style={{
+            backgroundColor: colors.card,
+            padding: 15,
+            marginVertical: 16
+          }}
+          enabled={settingsState.formated}
+          onChange={hanldeChangeFormating}
+        >
+          <View style={styles.switcherWrapper}>
+            <Text style={[styles.someText, {
+              color: colors.text
+            }]}>
+              {i18n.t('title_number_format')}
+            </Text>
+            <Text style={[styles.someLable, {
+              color: colors.border
+            }]}>
+              {i18n.t('warn_number_format')}
+            </Text>
+          </View>
+        </Switcher>
         <Switcher
           style={{
             backgroundColor: colors.card,

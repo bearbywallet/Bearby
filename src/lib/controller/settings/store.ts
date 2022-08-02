@@ -19,17 +19,27 @@ const initalState: Settings = {
     [usd]: 0,
     [eth]: 0,
     [btc]: 0
-  }
+  },
+  formated: true
 };
 export const settingsStore = newRidgeState<Settings>(initalState);
 
 export function settingsStoreUpdate(payload: Settings) {
-  settingsStore.set(() => payload);
+  settingsStore.set(() => ({
+    ...initalState,
+    ...payload
+  }));
 }
 export function settingsStoreSetAddressFormat(addressFormat: string) {
   settingsStore.set((prevState) => ({
     ...prevState,
     addressFormat
+  }));
+}
+export function settingsToggleFormat() {
+  settingsStore.set((prevState) => ({
+    ...prevState,
+    formated: !prevState.formated
   }));
 }
 export function settingsStoreReset() {

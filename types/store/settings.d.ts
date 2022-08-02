@@ -13,4 +13,5 @@ export interface Settings {
   rate: {
     [key: string]: number;
   };
+  formated: boolean;
 }

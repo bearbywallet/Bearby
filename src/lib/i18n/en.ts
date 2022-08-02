@@ -18,6 +18,8 @@ export default {
   from: 'From',
   close: 'Close',
   method: 'Method',
+  title_number_format: 'Balance formating',
+  warn_number_format: 'Show short numbers, for balance.',
   warn_address_format: 'Be careful, do not send tokens to this address!',
   reload: 'Reload',
   timestamp: 'Timestamp',

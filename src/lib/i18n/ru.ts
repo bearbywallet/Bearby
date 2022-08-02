@@ -21,6 +21,8 @@ export default {
   reload: 'Обновить',
   timestamp: 'Отметка времени',
   transaction: 'Транзакция',
+  title_number_format: 'Формат баланса',
+  warn_number_format: 'Показывать короткие числа, для баланса',
   havent_apps: 'Еще нет предложений',
   havent_txns: 'Еще нет Транзакций',
   hide: 'Скрыть',
