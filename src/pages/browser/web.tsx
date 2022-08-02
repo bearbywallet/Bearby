@@ -466,7 +466,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
         visible={Boolean(signMessage)}
         icon={signMessage?.icon || ''}
         account={account}
-        needPassword={!authState.biometricEnable}
+        needPassword={!authState.supportedBiometryType || (!authState.biometricEnable && account.type !== AccountTypes.Ledger)}
         appTitle={signMessage?.title || ''}
         payload={String(signMessage?.content)}
         onTriggered={handleSignMessageReject}
@@ -479,7 +479,7 @@ export const WebViewPage: React.FC<Prop> = ({ route, navigation }) => {
           account={account}
           error={confirmError || ''}
           title={i18n.t('confirm')}
-          needPassword={!authState.biometricEnable && account.type !== AccountTypes.Ledger}
+          needPassword={!authState.supportedBiometryType || (!authState.biometricEnable && account.type !== AccountTypes.Ledger)}
           visible={Boolean(transaction)}
           onTriggered={hanldeRejectTransaction}
           onConfirm={handleConfirmTransaction}

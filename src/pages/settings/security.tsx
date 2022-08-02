@@ -67,7 +67,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
    * Export PrivateKey from current account.
    */
   const hanldeRevealPrivateKey = React.useCallback(async() => {
-    if (authState.biometricEnable) {
+    if (authState.biometricEnable && authState.supportedBiometryType) {
       const currentAccount = keystore.account.getCurrentAccount();
       const account = await keystore.getkeyPairs(currentAccount);
 
@@ -89,7 +89,7 @@ export const SecurityPage: React.FC<Prop> = ({ navigation }) => {
    * Export secret phrase.
    */
   const hanldeRevealSecretPhrase = React.useCallback(async() => {
-    if (authState.biometricEnable) {
+    if (authState.biometricEnable && authState.supportedBiometryType) {
       const SecretPhrase = await keystore.guard.getMnemonic();
 
       return navigation.navigate('SettingsPages', {

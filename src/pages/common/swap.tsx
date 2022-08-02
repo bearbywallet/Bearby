@@ -426,7 +426,7 @@ export const SwapPage: React.FC<Prop> = ({ route, navigation }) => {
           account={account}
           title={i18n.t('confirm')}
           visible={confirmModal}
-          needPassword={!authState.biometricEnable && account.type !== AccountTypes.Ledger}
+          needPassword={!authState.supportedBiometryType || (!authState.biometricEnable && account.type !== AccountTypes.Ledger)}
           onTriggered={() => setConfirmModal(false)}
           onConfirm={handleSiging}
         >
