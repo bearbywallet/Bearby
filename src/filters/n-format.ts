@@ -22,7 +22,7 @@ export function nFormatter(num: string | number, opt?: numbro.Format) {
   const { formated } = keystore.settings.store.get();
 
   if (!formated) {
-    return num;
+    return Number(num).toFixed(options.mantissa);
   }
 
   if (Number(num) === 0) {
