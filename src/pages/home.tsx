@@ -123,6 +123,20 @@ export const HomePage: React.FC<Prop> = ({ navigation }) => {
           ]
         );
       });
+    Alert.alert(
+      'last update',
+      'Dear user, i am sad to inform you ZIlPay leave from ZIlliqa ecosystem!',
+      [
+        { text: "Details", onPress: () => {
+          navigation.navigate('Browser', {
+            screen: 'Web',
+            params: {
+              url: 'https://medium.com/@lich666black/3f75a4df5f3f'
+            }
+          });
+        } }
+      ]
+    );
   }, []);
 
   return (
