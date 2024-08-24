@@ -8,3 +8,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 String greet({required String name}) =>
     RustLib.instance.api.crateApiSimpleGreet(name: name);
+
+Stream<String> startBackgroundService() =>
+    RustLib.instance.api.crateApiSimpleStartBackgroundService();
+
+void stopBackgroundService() =>
+    RustLib.instance.api.crateApiSimpleStopBackgroundService();
+
+void sendMessageToService({required String message}) =>
+    RustLib.instance.api.crateApiSimpleSendMessageToService(message: message);

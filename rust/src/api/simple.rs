@@ -1,6 +1,24 @@
+use crate::api::bg;
+use crate::frb_generated::StreamSink;
+
 #[flutter_rust_bridge::frb(sync)] // Synchronous mode for simplicity of the demo
 pub fn greet(name: String) -> String {
     format!("Hello, {name}!")
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn start_background_service(sink: StreamSink<String>) -> Result<(), String> {
+    bg::start_background_service(sink)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn stop_background_service() -> Result<(), String> {
+    bg::stop_background_service()
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn send_message_to_service(message: String) -> Result<(), String> {
+    bg::send_message_to_service(message)
 }
 
 #[flutter_rust_bridge::frb(init)]

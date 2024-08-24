@@ -21,6 +21,14 @@ Future<void> main() async {
   runApp(const MyApp());
 
   printApplicationDocumentsDirectory();
+
+  Stream<String> serviceStream = startBackgroundService();
+
+  serviceStream.forEach((String message) {
+    print('Received message: $message');
+  });
+
+  sendMessageToService(message: 'test');
 }
 
 class MyApp extends StatelessWidget {
