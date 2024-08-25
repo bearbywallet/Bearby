@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'routes.dart';
+import 'theme/app_theme.dart';
 
 class ZilPayApp extends StatelessWidget {
   const ZilPayApp({Key? key}) : super(key: key);
@@ -8,11 +9,8 @@ class ZilPayApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'My Flutter App',
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-        visualDensity: VisualDensity.adaptivePlatformDensity,
-      ),
-      initialRoute: '/settings',
+      theme: AppTheme.darkTheme,
+      initialRoute: '/login',
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }
