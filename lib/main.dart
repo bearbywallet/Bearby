@@ -1,9 +1,9 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/src/rust/api/simple.dart';
 import 'package:zilpay/src/rust/frb_generated.dart';
-import 'package:path_provider/path_provider.dart';
+import 'app.dart';
 
 Future<void> printApplicationDocumentsDirectory() async {
   try {
@@ -16,34 +16,19 @@ Future<void> printApplicationDocumentsDirectory() async {
 }
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  
   await RustLib.init();
-
-  runApp(const MyApp());
 
   printApplicationDocumentsDirectory();
 
   Stream<String> serviceStream = startBackgroundService();
 
-  serviceStream.forEach((String message) {
+  serviceStream.listen((String message) {
     print('Received message: $message');
   });
 
-  sendMessageToService(message: 'test');
-}
+  // sendMessageToService(message: 'test');
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home: Scaffold(
-        appBar: AppBar(title: const Text('flutter_rust_bridge quickstart')),
-        body: Center(
-          child: Text(
-              'Action: Call Rust `greet("Tom")`\nResult: `${greet(name: "Tom")}`'),
-        ),
-      ),
-    );
-  }
+  runApp(const ZilPayApp());
 }
