@@ -49,3 +49,4 @@ android/.project
 android/app/.project
 android/app/bin/
 *.keystore
+.dart_tool/*
