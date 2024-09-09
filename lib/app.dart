@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'routes.dart';
 import 'theme/app_theme.dart';
 
@@ -7,11 +7,19 @@ class ZilPayApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'My Flutter App',
-      theme: AppTheme.darkTheme,
+    return WidgetsApp(
+      title: 'ZilPay App',
+      color: AppTheme.primaryColor, 
       initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
+      builder: (context, child) {
+        // Применяем глобальные стили здесь
+        return Container(
+          color: AppTheme.backgroundColor,
+          child: child,
+        );
+      },
+      textStyle: AppTheme.bodyMedium, 
     );
   }
 }
