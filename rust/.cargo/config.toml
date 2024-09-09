@@ -1,6 +1,1 @@
 
-[target.i686-linux-android]
-rustflags = [
-  "-C",
-  "link-arg=-Wl,-rpath,/home/rinat/.android/openssl-i686-android/usr/local/lib",
-]
