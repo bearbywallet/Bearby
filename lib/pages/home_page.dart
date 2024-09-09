@@ -35,6 +35,12 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  void _tryInitBip39() {
+    setState(() {
+      _rustGreeting = generateWallet(message: "green process gate doctor slide whip priority shrug diamond crumble average help");
+    });
+  }
+
   void _sendMessageToService() {
     sendMessageToService(message: 'Hello from HomePage');
   }
@@ -56,6 +62,10 @@ class _HomePageState extends State<HomePage> {
             ElevatedButton(
               onPressed: _sendMessageToService,
               child: const Text('Send Message to Service'),
+            ),
+            ElevatedButton(
+              onPressed: _tryInitBip39,
+              child: const Text('try init bip39'),
             ),
             ElevatedButton(
               child: const Text('Go to Settings'),

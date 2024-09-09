@@ -17,3 +17,6 @@ void stopBackgroundService() =>
 
 void sendMessageToService({required String message}) =>
     RustLib.instance.api.crateApiSimpleSendMessageToService(message: message);
+
+String generateWallet({required String message}) =>
+    RustLib.instance.api.crateApiSimpleGenerateWallet(message: message);

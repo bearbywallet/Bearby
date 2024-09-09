@@ -10,7 +10,7 @@ class ZilPayApp extends StatelessWidget {
     return MaterialApp(
       title: 'My Flutter App',
       theme: AppTheme.darkTheme,
-      initialRoute: '/login',
+      initialRoute: '/',
       onGenerateRoute: RouteGenerator.generateRoute,
     );
   }

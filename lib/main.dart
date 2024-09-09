@@ -17,18 +17,6 @@ Future<void> printApplicationDocumentsDirectory() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
   await RustLib.init();
-
-  printApplicationDocumentsDirectory();
-
-  Stream<String> serviceStream = startBackgroundService();
-
-  serviceStream.listen((String message) {
-    print('Received message: $message');
-  });
-
-  // sendMessageToService(message: 'test');
-
   runApp(const ZilPayApp());
 }
