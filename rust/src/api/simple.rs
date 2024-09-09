@@ -1,3 +1,5 @@
+use zilpay::background::Background;
+
 use crate::api::bg;
 use crate::frb_generated::StreamSink;
 
@@ -19,6 +21,14 @@ pub fn stop_background_service() -> Result<(), String> {
 #[flutter_rust_bridge::frb(sync)]
 pub fn send_message_to_service(message: String) -> Result<(), String> {
     bg::send_message_to_service(message)
+}
+
+#[flutter_rust_bridge::frb(sync)]
+pub fn generate_wallet(message: String) -> Result<String, String> {
+    let mut bg = Background::from_storage_path("/data/data/com.zilpaymobile").unwrap();
+    let key = bg.wallet_from_bip39("test", &message, &[0, 1, 2, 3]);
+
+    Ok(key)
 }
 
 #[flutter_rust_bridge::frb(init)]

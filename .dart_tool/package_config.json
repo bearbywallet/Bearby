@@ -302,10 +302,10 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-08-23T11:37:06.519696Z",
+  "generated": "2024-09-09T07:06:04.716078Z",
   "generator": "pub",
-  "generatorVersion": "3.5.1",
+  "generatorVersion": "3.5.2",
   "flutterRoot": "file:///home/rinat/source/flutter",
-  "flutterVersion": "3.24.1",
+  "flutterVersion": "3.24.2",
   "pubCache": "file:///home/rinat/.pub-cache"
 }
