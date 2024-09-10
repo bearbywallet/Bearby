@@ -1,30 +1,94 @@
+import 'dart:async';
+
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
-import 'package:zilpay/src/rust/api/simple.dart';
-import 'settings_page.dart';
-import '../components/button.dart';
+import 'package:rounded_loading_button_plus/rounded_loading_button.dart';
 
 class HomePage extends StatelessWidget {
-  Future<void> handleUnlock() async {
-    await Future.delayed(Duration(seconds: 2)); 
+  final RoundedLoadingButtonController _btnController1 =
+    RoundedLoadingButtonController();
+
+  final RoundedLoadingButtonController _btnController2 =
+    RoundedLoadingButtonController();
+
+  void _doSomething(RoundedLoadingButtonController controller) async {
+    Timer(Duration(seconds: 10), () {
+      controller.success();
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Container(
-      color: Color(0xFF2C2C2C), 
+      color: Color(0xFF2C2C2C), // Темный фон
       child: Center(
-        child: CustomButton(
-          text: "Unlock",
-          color: Color(0xFF9C27B0),
-          width: 200,
-          height: 48,
-          borderRadius: 24,
-          fontSize: 16,
-          onPressed: handleUnlock,
-          loaderColor: Color(0xFFFFFFFF),
-        ),
+        child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              RoundedLoadingButton(
+                successIcon: Icons.cloud,
+                failedIcon: Icons.cottage,
+                child: Text('Tap me!', style: TextStyle(color: Colors.white)),
+                controller: _btnController1,
+                onPressed: () => _doSomething(_btnController1),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              RoundedLoadingButton(
+                color: Colors.amber,
+                successColor: Colors.amber,
+                controller: _btnController2,
+                onPressed: () => _doSomething(_btnController2),
+                valueColor: Colors.black,
+                borderRadius: 10,
+                child: Text('''Tap me i have a huge text''', style: TextStyle(color: Colors.white)),
+              ),
+              SizedBox(
+                height: 50,
+              ),
+              OutlinedButton(
+                  style: ButtonStyle(
+                    shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30))),
+                  ),
+                  onPressed: () {
+                    _btnController1.reset();
+                    _btnController2.reset();
+                  },
+                  child: Text('Reset')),
+              SizedBox(
+                height: 20,
+              ),
+              OutlinedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30))),
+                ),
+                onPressed: () {
+                  _btnController1.error();
+                  _btnController2.error();
+                },
+                child: Text('Error'),
+              ),
+              SizedBox(
+                height: 20,
+              ),
+              OutlinedButton(
+                style: ButtonStyle(
+                  shape: MaterialStateProperty.all(RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30))),
+                ),
+                onPressed: () {
+                  _btnController1.success();
+                  _btnController2.success();
+                  print(_btnController1.currentState);
+                },
+                child: Text('Success'),
+              )
+            ],
+          ),
       ),
     );
   }
 }
-

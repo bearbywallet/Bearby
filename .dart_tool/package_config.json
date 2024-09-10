@@ -212,10 +212,22 @@
       "languageVersion": "3.0"
     },
     {
+      "name": "rounded_loading_button_plus",
+      "rootUri": "file:///home/rinat/.pub-cache/hosted/pub.dev/rounded_loading_button_plus-3.0.1",
+      "packageUri": "lib/",
+      "languageVersion": "3.1"
+    },
+    {
       "name": "rust_lib_zilpay",
       "rootUri": "../rust_builder",
       "packageUri": "lib/",
       "languageVersion": "3.3"
+    },
+    {
+      "name": "rxdart",
+      "rootUri": "file:///home/rinat/.pub-cache/hosted/pub.dev/rxdart-0.28.0",
+      "packageUri": "lib/",
+      "languageVersion": "2.12"
     },
     {
       "name": "sky_engine",
@@ -302,7 +314,7 @@
       "languageVersion": "3.5"
     }
   ],
-  "generated": "2024-09-09T10:09:29.429791Z",
+  "generated": "2024-09-09T10:49:35.213406Z",
   "generator": "pub",
   "generatorVersion": "3.5.2",
   "flutterRoot": "file:///home/rinat/source/flutter",
