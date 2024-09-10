@@ -4,7 +4,7 @@ class AuthGuard {
 
   Future<void> initialize() async {
     await Future.delayed(Duration(seconds: 1));
-    enabled = false;
-    ready = false;
+    enabled = true;
+    ready = true;
   }
 }

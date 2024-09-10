@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
-import 'pages/home_page.dart';
+import 'pages/main_page.dart';
 import 'pages/login_page.dart';
 import 'pages/initial_page.dart';
 import 'pages/history_page.dart';
@@ -25,7 +25,7 @@ class AppRouter {
 
     switch (settings.name) {
       case '/':
-          return MaterialPageRoute(builder: (_) => HomePage());
+          return MaterialPageRoute(builder: (_) => MainPage());
       case '/history':
         return MaterialPageRoute(builder: (_) => HistoryPage());
       case '/browser':
@@ -33,7 +33,7 @@ class AppRouter {
       case '/settings':
         return MaterialPageRoute(builder: (_) => SettingsPage());
       default:
-        return MaterialPageRoute(builder: (_) => HomePage());
+        return MaterialPageRoute(builder: (_) => MainPage()); // TODO: make an error page
     }
   }
 }
