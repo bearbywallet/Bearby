@@ -78,6 +78,10 @@ meta
 2.12
 file:///home/rinat/.pub-cache/hosted/pub.dev/meta-1.15.0/
 file:///home/rinat/.pub-cache/hosted/pub.dev/meta-1.15.0/lib/
+nested
+2.12
+file:///home/rinat/.pub-cache/hosted/pub.dev/nested-1.0.0/
+file:///home/rinat/.pub-cache/hosted/pub.dev/nested-1.0.0/lib/
 path
 3.0
 file:///home/rinat/.pub-cache/hosted/pub.dev/path-1.9.0/
@@ -118,6 +122,10 @@ process
 3.0
 file:///home/rinat/.pub-cache/hosted/pub.dev/process-5.0.2/
 file:///home/rinat/.pub-cache/hosted/pub.dev/process-5.0.2/lib/
+provider
+2.12
+file:///home/rinat/.pub-cache/hosted/pub.dev/provider-6.1.2/
+file:///home/rinat/.pub-cache/hosted/pub.dev/provider-6.1.2/lib/
 rounded_loading_button_plus
 3.1
 file:///home/rinat/.pub-cache/hosted/pub.dev/rounded_loading_button_plus-3.0.1/
