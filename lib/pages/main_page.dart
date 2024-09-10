@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
-import "home_page.dart";
+import '../components/bottom_nav_bar.dart';
+import './home_page.dart';
 
 class MainPage extends StatefulWidget {
   @override
@@ -26,20 +27,11 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _pages.elementAt(_selectedIndex),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.account_balance_wallet),
-            label: 'Wallet',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.flash_on),
-            label: 'History',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.language),
-            label: 'Browser',
-          ),
+      bottomNavigationBar: CustomBottomNavigationBar(
+        items: [
+          CustomBottomNavigationBarItem(icon: Icons.account_balance_wallet),
+          CustomBottomNavigationBarItem(icon: Icons.flash_on),
+          CustomBottomNavigationBarItem(icon: Icons.language),
         ],
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
