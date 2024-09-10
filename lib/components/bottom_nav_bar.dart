@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final List<CustomBottomNavigationBarItem> items;
@@ -14,7 +15,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      height: 56,
+      height: 80,
       color: Colors.black,
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -27,10 +28,11 @@ class CustomBottomNavigationBar extends StatelessWidget {
               onTap: () => onTap(index),
               child: Container(
                 color: Colors.transparent,
-                child: Icon(
-                  item.icon,
+                  child: SvgPicture.asset(
+                  item.iconPath,
                   color: index == currentIndex ? Colors.purple : Colors.grey,
-                  size: 24,
+                  width: 40,
+                  height: 40,
                 ),
               ),
             ),
@@ -42,8 +44,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
 }
 
 class CustomBottomNavigationBarItem {
-  final IconData icon;
+  final String iconPath;
 
-  CustomBottomNavigationBarItem({required this.icon});
+  CustomBottomNavigationBarItem({required this.iconPath});
 }
 
