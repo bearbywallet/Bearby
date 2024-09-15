@@ -6,6 +6,7 @@ import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
 import 'package:zilpay/src/rust/frb_generated.dart';
+import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
 
 

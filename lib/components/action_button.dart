@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
+import 'package:provider/provider.dart';
+import '../theme/theme_provider.dart';
 
 class CustomActionButton extends StatefulWidget {
   final String label;
@@ -23,6 +24,8 @@ class _CustomActionButtonState extends State<CustomActionButton> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) => setState(() => _isPressed = false),
@@ -35,7 +38,7 @@ class _CustomActionButtonState extends State<CustomActionButton> {
           width: 70,
           height: 70,
           decoration: BoxDecoration(
-            color: Colors.grey[900]!.withOpacity(0.6),
+            color: theme.buttonBackground.withOpacity(0.6),
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
@@ -53,13 +56,13 @@ class _CustomActionButtonState extends State<CustomActionButton> {
                 widget.iconPath,
                 width: 24,
                 height: 24,
-                color: Colors.purple[300],
+                color: theme.primaryPurple,
               ),
               SizedBox(height: 6),
               Text(
                 widget.label,
                 style: TextStyle(
-                  color: Colors.purple[300],
+                  color: theme.buttonText,
                   fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),

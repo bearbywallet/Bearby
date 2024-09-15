@@ -1,86 +1,68 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
 
-class AppTheme {
-  static const Color primaryColor = Color(0xFF9C27B0);
-  static const Color accentColor = Color(0xFFE91E63);
-  static const Color backgroundColor = Color(0xFF2C2C2C);
-  static const Color surfaceColor = Color(0xFF3C3C3C);
-  static const Color textColor = Color(0xFFFFFFFF);
-  static const Color secondaryTextColor = Color(0xFF9E9E9E);
+abstract class AppTheme {
+  Color get primaryPurple;
+  Color get secondaryPurple;
+  Color get background;
+  Color get cardBackground;
+  Color get textPrimary;
+  Color get textSecondary;
+  Color get buttonBackground;
+  Color get buttonText;
 
-  static const double borderRadius = 8.0;
+  Color get gradientStart;
+  Color get gradientMiddle;
+  Color get gradientEnd;
+}
 
-  static const TextStyle bodyLarge = TextStyle(
-    color: textColor,
-    fontSize: 16,
-    fontWeight: FontWeight.normal,
-  );
+class DarkTheme implements AppTheme {
+  @override
+  Color get primaryPurple => Color(0xFF8A2BE2);
+  @override
+  Color get secondaryPurple => Color(0xFFB23AEE);
+  @override
+  Color get background => Color(0xFF1A1A1A);
+  @override
+  Color get cardBackground => Color(0xFF2A2A2A);
+  @override
+  Color get textPrimary => Colors.white;
+  @override
+  Color get textSecondary => Color(0xFFB3B3B3);
+  @override
+  Color get buttonBackground => Color(0xFF3A3A3A);
+  @override
+  Color get buttonText => Color(0xFFE0E0E0);
 
-  static const TextStyle bodyMedium = TextStyle(
-    color: textColor,
-    fontSize: 14,
-    fontWeight: FontWeight.normal,
-  );
+  @override
+  Color get gradientStart => Color(0xFF4A0E4E);
+  @override
+  Color get gradientMiddle => Color(0xFF220A23);
+  @override
+  Color get gradientEnd => Colors.black;
+}
 
-  static const TextStyle titleLarge = TextStyle(
-    color: textColor,
-    fontSize: 20,
-    fontWeight: FontWeight.bold,
-  );
+class LightTheme implements AppTheme {
+  @override
+  Color get primaryPurple => Color(0xFF6A1B9A);
+  @override
+  Color get secondaryPurple => Color(0xFF9C27B0);
+  @override
+  Color get background => Color(0xFFF5F5F5);
+  @override
+  Color get cardBackground => Colors.white;
+  @override
+  Color get textPrimary => Color(0xFF212121);
+  @override
+  Color get textSecondary => Color(0xFF757575);
+  @override
+  Color get buttonBackground => Color(0xFFE0E0E0);
+  @override
+  Color get buttonText => Color(0xFF212121);
 
-  static BoxDecoration inputDecoration = BoxDecoration(
-    color: surfaceColor,
-    borderRadius: BorderRadius.circular(borderRadius),
-  );
-
-  static BoxDecoration buttonDecoration = BoxDecoration(
-    color: primaryColor,
-    borderRadius: BorderRadius.circular(borderRadius),
-  );
-
-  static const TextStyle buttonTextStyle = TextStyle(
-    color: textColor,
-    fontSize: 16,
-    fontWeight: FontWeight.bold,
-  );
-
-  static const EdgeInsets buttonPadding = EdgeInsets.symmetric(
-    vertical: 12,
-    horizontal: 16,
-  );
-
-  static Widget buildCustomAppBar({required String title, List<Widget>? actions}) {
-    return Container(
-      padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      color: backgroundColor,
-      child: Row(
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: titleLarge,
-            ),
-          ),
-          if (actions != null) ...actions,
-        ],
-      ),
-    );
-  }
-
-  static Widget buildElevatedButton({
-    required String text,
-    required VoidCallback onPressed,
-  }) {
-    return GestureDetector(
-      onTap: onPressed,
-      child: Container(
-        decoration: buttonDecoration,
-        padding: buttonPadding,
-        child: Text(
-          text,
-          style: buttonTextStyle,
-        ),
-      ),
-    );
-  }
+  @override
+  Color get gradientStart => Color(0xFFE6E6FA);
+  @override
+  Color get gradientMiddle => Color(0xFFD8BFD8);
+  @override
+  Color get gradientEnd => Color(0xFFF0F8FF);
 }
