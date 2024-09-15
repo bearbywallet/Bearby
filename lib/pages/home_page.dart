@@ -8,25 +8,34 @@ import '../theme/theme_provider.dart';
 import '../theme/app_theme.dart';
 
 class HomePage extends StatelessWidget {
+  Future<void> _refreshData() async {
+    await Future.delayed(Duration(seconds: 2));
+    print('Data refreshed');
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
-    return SafeArea(
+    return RefreshIndicator(
+      onRefresh: _refreshData,
       child: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildHeader(theme),
-              SizedBox(height: 20),
-              _buildTotalBalance(theme),
-              SizedBox(height: 20),
-              _buildActionButtons(),
-              SizedBox(height: 20),
-              _buildCryptoList(),
-            ],
+        physics: AlwaysScrollableScrollPhysics(), 
+        child: SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildHeader(theme),
+                SizedBox(height: 20),
+                _buildTotalBalance(theme),
+                SizedBox(height: 20),
+                _buildActionButtons(),
+                SizedBox(height: 20),
+                _buildCryptoList(),
+              ],
+            ),
           ),
         ),
       ),

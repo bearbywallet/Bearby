@@ -38,7 +38,7 @@ class _CustomActionButtonState extends State<CustomActionButton> {
           width: 70,
           height: 70,
           decoration: BoxDecoration(
-            color: theme.buttonBackground.withOpacity(0.6),
+            color: theme.cardBackground,
             borderRadius: BorderRadius.circular(16),
             boxShadow: [
               BoxShadow(
