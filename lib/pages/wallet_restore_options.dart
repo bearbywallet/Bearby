@@ -4,7 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/theme_provider.dart';
 import '../components/view_item.dart';
 
-class AddWalletOptionsPage extends StatelessWidget {
+class RestoreWalletOptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
@@ -23,7 +23,7 @@ class AddWalletOptionsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add Wallet', style: TextStyle(color: theme.textPrimary)),
+        title: Text('Restore Wallet', style: TextStyle(color: theme.textPrimary)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -32,61 +32,37 @@ class AddWalletOptionsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               WalletListItem(
-                title: 'New Wallet',
-                subtitle: 'Create new wallet',
+                title: 'BIP39',
+                subtitle: 'Restore with Mnemonic phrase',
                 icon: SvgPicture.asset(
-                  'assets/icons/add.svg',
+                  'assets/icons/document.svg',
                   width: 35,
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/gen_options');
-                },
+                onTap: () {/* Handle BIP39 restoration */},
               ),
               WalletListItem(
-                title: 'Existing Wallet',
-                subtitle: 'Import wallet with a 24 secret recovery words',
+                title: 'SLIP-0039',
+                subtitle: 'Restore with Shared Mnemonic phrase',
                 icon: SvgPicture.asset(
-                  'assets/icons/import.svg',
+                  'assets/icons/puzzle.svg',
                   width: 35,
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/restore_options');
-                },
+                onTap: () {/* Handle SLIP-0039 restoration */},
               ),
               WalletListItem(
-                title: 'Pair with Ledger',
-                subtitle: 'Hardware module, Bluetooth',
+                title: 'Private Key',
+                subtitle: 'Restore with private key',
                 icon: SvgPicture.asset(
-                  'assets/icons/ledger.svg',
-                  width: 25,
-                  height: 25,
-                  color: theme.primaryPurple,
-                ),
-                onTap: () {/* Handle pairing with Ledger */},
-              ),
-              SizedBox(height: 24),
-              Padding(
-                padding: const EdgeInsets.only(left: 16.0),
-                child: Text(
-                  'Other options',
-                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
-                ),
-              ),
-              SizedBox(height: 16),
-              WalletListItem(
-                title: 'Watch Account',
-                subtitle: 'For monitor wallet activity without recovery phrase',
-                icon: SvgPicture.asset(
-                  'assets/icons/looking.svg',
+                  'assets/icons/bincode.svg',
                   width: 35,
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {/* Handle watch account */},
+                onTap: () {/* Handle private key restoration */},
               ),
             ],
           ),
