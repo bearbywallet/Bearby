@@ -9,6 +9,7 @@ import 'pages/initial_page.dart';
 import 'pages/history_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/settings_page.dart';
+import 'pages/new_wallet_options.dart';
 
 class AppRouter {
   final AuthGuard authGuard;
@@ -17,6 +18,11 @@ class AppRouter {
   AppRouter({required this.authGuard, required this.appState});
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case '/new_wallet_options':
+          return MaterialPageRoute(builder: (_) => AddWalletOptionsPage());
+    }
+
     if (!authGuard.ready) {
       return MaterialPageRoute(builder: (_) => InitialPage());
     } else if (!authGuard.enabled) {
