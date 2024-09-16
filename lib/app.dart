@@ -31,7 +31,7 @@ class ZilPayApp extends StatelessWidget {
               primaryColor: currentTheme.primaryPurple,
               scaffoldBackgroundColor: currentTheme.background
             ),
-            initialRoute: '/',
+            initialRoute: '/new_wallet_options',
             onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState).onGenerateRoute,
           );
         },

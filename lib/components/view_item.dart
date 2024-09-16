@@ -6,7 +6,7 @@ import '../theme/theme_provider.dart';
 class WalletListItem extends StatelessWidget {
   final String title;
   final String subtitle;
-  final IconData icon;
+  final dynamic icon;
   final VoidCallback onTap;
 
   const WalletListItem({
@@ -33,7 +33,7 @@ class WalletListItem extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                Icon(icon, color: theme.primaryPurple, size: 24),
+                _buildIcon(),
                 SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -63,6 +63,21 @@ class WalletListItem extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Widget _buildIcon() {
+    if (icon is IconData) {
+      return Icon(icon as IconData);
+    } else if (icon is Widget) {
+      return icon;
+    } else if (icon is String) {
+      return Image.asset(
+        icon,
+        width: 24,
+        height: 24,
+      );
+    }
+    return Container();
   }
 }
 

@@ -19,7 +19,7 @@ class AddWalletOptionsPage extends StatelessWidget {
             'assets/icons/back.svg',
             width: 24,
             height: 24,
-            color: theme.primaryPurple,
+            color: theme.secondaryPurple,
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -31,28 +31,37 @@ class AddWalletOptionsPage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
-                'Create a new wallet or add\nan existing one.',
-                style: TextStyle(color: theme.textSecondary, fontSize: 16),
-                textAlign: TextAlign.center,
-              ),
-              SizedBox(height: 24),
               WalletListItem(
                 title: 'New Wallet',
                 subtitle: 'Create new wallet',
-                icon: Icons.add,
+                icon: SvgPicture.asset(
+                  'assets/icons/add.svg',
+                  width: 35,
+                  height: 35,
+                  color: theme.primaryPurple,
+                ),
                 onTap: () {/* Handle new wallet creation */},
               ),
               WalletListItem(
                 title: 'Existing Wallet',
                 subtitle: 'Import wallet with a 24 secret recovery words',
-                icon: Icons.input,
+                icon: SvgPicture.asset(
+                  'assets/icons/import.svg',
+                  width: 35,
+                  height: 35,
+                  color: theme.primaryPurple,
+                ),
                 onTap: () {/* Handle existing wallet import */},
               ),
               WalletListItem(
                 title: 'Pair with Ledger',
-                subtitle: 'Hardware module, Bluetooth, limited TON features',
-                icon: Icons.security,
+                subtitle: 'Hardware module, Bluetooth',
+                icon: SvgPicture.asset(
+                  'assets/icons/ledger.svg',
+                  width: 25,
+                  height: 25,
+                  color: theme.primaryPurple,
+                ),
                 onTap: () {/* Handle pairing with Ledger */},
               ),
               SizedBox(height: 24),
@@ -67,7 +76,12 @@ class AddWalletOptionsPage extends StatelessWidget {
               WalletListItem(
                 title: 'Watch Account',
                 subtitle: 'For monitor wallet activity without recovery phrase',
-                icon: Icons.remove_red_eye,
+                icon: SvgPicture.asset(
+                  'assets/icons/looking.svg',
+                  width: 35,
+                  height: 35,
+                  color: theme.primaryPurple,
+                ),
                 onTap: () {/* Handle watch account */},
               ),
             ],
