@@ -50,3 +50,4 @@ android/app/.project
 android/app/bin/
 *.keystore
 .dart_tool/*
+.dart_tool

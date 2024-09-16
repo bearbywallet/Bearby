@@ -13,7 +13,7 @@ class InitialPage extends StatelessWidget {
             ElevatedButton(
               child: Text('Go to Main Page'),
               onPressed: () {
-                Navigator.of(context).pushReplacementNamed('/new_wallet_options');
+                Navigator.of(context).pushNamed('/new_wallet_options');
               },
             ),
           ],
