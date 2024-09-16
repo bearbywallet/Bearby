@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 
@@ -50,7 +51,12 @@ class WalletListItem extends StatelessWidget {
                     ],
                   ),
                 ),
-                Icon(Icons.chevron_right, color: theme.textSecondary),
+                SvgPicture.asset(
+                  'assets/icons/chevron_right.svg',
+                  width: 24,
+                  height: 24,
+                  color: theme.textSecondary,
+                ),
               ],
             ),
           ),
