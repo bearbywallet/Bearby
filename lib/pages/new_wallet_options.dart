@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/theme_provider.dart';
 import '../components/view_item.dart';
 
@@ -13,13 +14,16 @@ class AddWalletOptionsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
-        title: Text('Add Wallet', style: TextStyle(color: theme.textPrimary)),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.close, color: theme.textPrimary),
-            onPressed: () => Navigator.of(context).pop(),
+        leading: IconButton(
+          icon: SvgPicture.asset(
+            'assets/icons/back.svg',
+            width: 24,
+            height: 24,
+            color: theme.primaryPurple,
           ),
-        ],
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+        title: Text('Add Wallet', style: TextStyle(color: theme.textPrimary)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -52,9 +56,12 @@ class AddWalletOptionsPage extends StatelessWidget {
                 onTap: () {/* Handle pairing with Ledger */},
               ),
               SizedBox(height: 24),
-              Text(
-                'Other options',
-                style: TextStyle(color: theme.textSecondary, fontSize: 14),
+              Padding(
+                padding: const EdgeInsets.only(left: 16.0),
+                child: Text(
+                  'Other options',
+                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                ),
               ),
               SizedBox(height: 16),
               WalletListItem(
