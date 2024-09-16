@@ -10,6 +10,7 @@ import 'pages/history_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/new_wallet_options.dart';
+import 'pages/gen_wallet_options.dart';
 
 class AppRouter {
   final AuthGuard authGuard;
@@ -19,6 +20,8 @@ class AppRouter {
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/gen_options':
+          return MaterialPageRoute(builder: (_) => GenWalletOptionsPage(), settings: settings);
       case '/new_wallet_options':
           return MaterialPageRoute(builder: (_) => AddWalletOptionsPage(), settings: settings);
       case '/initial':
