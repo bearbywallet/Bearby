@@ -12,6 +12,7 @@ import 'pages/settings_page.dart';
 import 'pages/new_wallet_options.dart';
 import 'pages/gen_wallet_options.dart';
 import 'pages/wallet_restore_options.dart';
+import './pages/gen_bip39.dart';
 
 class AppRouter {
   final AuthGuard authGuard;
@@ -21,6 +22,8 @@ class AppRouter {
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/gen_bip39':
+          return MaterialPageRoute(builder: (_) => SecretPhraseGeneratorPage(), settings: settings);
       case '/restore_options':
           return MaterialPageRoute(builder: (_) => RestoreWalletOptionsPage(), settings: settings);
       case '/gen_options':

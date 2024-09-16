@@ -40,7 +40,9 @@ class GenWalletOptionsPage extends StatelessWidget {
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {/* Handle BIP39 generation */},
+                onTap: () {
+                  Navigator.of(context).pushNamed('/gen_bip39');
+                },
               ),
               WalletListItem(
                 title: 'SLIP-0039',
