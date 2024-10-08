@@ -9,7 +9,7 @@ import '../theme/app_theme.dart';
 
 class HomePage extends StatelessWidget {
   Future<void> _refreshData() async {
-    await Future.delayed(Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 2));
     print('Data refreshed');
   }
 
@@ -20,7 +20,7 @@ class HomePage extends StatelessWidget {
     return RefreshIndicator(
       onRefresh: _refreshData,
       child: SingleChildScrollView(
-        physics: AlwaysScrollableScrollPhysics(), 
+        physics: const AlwaysScrollableScrollPhysics(),
         child: SafeArea(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -28,11 +28,11 @@ class HomePage extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _buildHeader(theme),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildTotalBalance(theme),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildActionButtons(),
-                SizedBox(height: 20),
+                const SizedBox(height: 20),
                 _buildCryptoList(),
               ],
             ),

@@ -23,17 +23,24 @@ class AppRouter {
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
       case '/gen_bip39':
-          return MaterialPageRoute(builder: (_) => SecretPhraseGeneratorPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => const SecretPhraseGeneratorPage(),
+            settings: settings);
       case '/restore_options':
-          return MaterialPageRoute(builder: (_) => RestoreWalletOptionsPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => RestoreWalletOptionsPage(), settings: settings);
       case '/gen_options':
-          return MaterialPageRoute(builder: (_) => GenWalletOptionsPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => GenWalletOptionsPage(), settings: settings);
       case '/new_wallet_options':
-          return MaterialPageRoute(builder: (_) => AddWalletOptionsPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => AddWalletOptionsPage(), settings: settings);
       case '/initial':
-          return MaterialPageRoute(builder: (_) => InitialPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => InitialPage(), settings: settings);
       case '/login':
-          return MaterialPageRoute(builder: (_) => LoginPage(), settings: settings);
+        return MaterialPageRoute(
+            builder: (_) => LoginPage(), settings: settings);
     }
 
     if (!authGuard.ready) {

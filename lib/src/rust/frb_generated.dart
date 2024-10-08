@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.3.0';
 
   @override
-  int get rustContentHash => -305623149;
+  int get rustContentHash => -378976316;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -99,7 +99,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiBgStopBackgroundService();
 
-  String crateApiSimpleGenerateWallet({required String message});
+  Future<String> crateApiSimpleGenBip39Words({required int count});
 
   String crateApiSimpleGreet({required String name});
 
@@ -341,27 +341,28 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String crateApiSimpleGenerateWallet({required String message}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
+  Future<String> crateApiSimpleGenBip39Words({required int count}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(message, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
+        sse_encode_u_8(count, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiSimpleGenerateWalletConstMeta,
-      argValues: [message],
+      constMeta: kCrateApiSimpleGenBip39WordsConstMeta,
+      argValues: [count],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleGenerateWalletConstMeta =>
+  TaskConstMeta get kCrateApiSimpleGenBip39WordsConstMeta =>
       const TaskConstMeta(
-        debugName: "generate_wallet",
-        argNames: ["message"],
+        debugName: "gen_bip39_words",
+        argNames: ["count"],
       );
 
   @override

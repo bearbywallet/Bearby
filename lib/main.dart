@@ -6,9 +6,7 @@ import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 
 import 'package:zilpay/src/rust/frb_generated.dart';
-import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
-
 
 Future<void> printApplicationDocumentsDirectory() async {
   try {
@@ -26,10 +24,9 @@ Future<void> main() async {
 
   final authGuard = AuthGuard();
   await authGuard.initialize();
-  
+
   final appState = AppState();
   await appState.initialize();
-  
+
   runApp(ZilPayApp(authGuard: authGuard, appState: appState));
 }
-

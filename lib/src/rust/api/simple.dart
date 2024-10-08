@@ -18,5 +18,5 @@ void stopBackgroundService() =>
 void sendMessageToService({required String message}) =>
     RustLib.instance.api.crateApiSimpleSendMessageToService(message: message);
 
-String generateWallet({required String message}) =>
-    RustLib.instance.api.crateApiSimpleGenerateWallet(message: message);
+Future<String> genBip39Words({required int count}) =>
+    RustLib.instance.api.crateApiSimpleGenBip39Words(count: count);

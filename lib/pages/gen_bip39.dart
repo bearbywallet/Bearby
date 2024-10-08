@@ -1,18 +1,28 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/mnemonic_word_input.dart';
+import 'package:zilpay/src/rust/api/simple.dart';
 import '../theme/theme_provider.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
+  const SecretPhraseGeneratorPage({super.key});
+
   @override
-  _SecretPhraseGeneratorPageState createState() => _SecretPhraseGeneratorPageState();
+  _SeedPhraseGeneratorPageState createState() =>
+      _SeedPhraseGeneratorPageState();
 }
 
-class _SecretPhraseGeneratorPageState extends State<SecretPhraseGeneratorPage> {
-  bool isBackupConfirmed = false;
-  String selectedLanguage = 'English';
-  int wordCount = 24;
-  List<String> words = List.generate(24, (index) => 'word${index + 1}');
+class _SeedPhraseGeneratorPageState extends State<SecretPhraseGeneratorPage> {
+  List<String> _mnemonicWords = [];
+  final _count = 12;
+  bool _hasBackupWords = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _regenerateMnemonicWords();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,105 +42,139 @@ class _SecretPhraseGeneratorPageState extends State<SecretPhraseGeneratorPage> {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Secret Phrase Generator', style: TextStyle(color: theme.textPrimary)),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 16.0),
+            child: IconButton(
+              icon: SvgPicture.asset(
+                'assets/icons/reload.svg',
+                width: 30,
+                height: 30,
+                color: theme.textPrimary,
+              ),
+              onPressed: _regenerateMnemonicWords,
+            ),
+          ),
+        ],
       ),
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Text(
-              'Generate a unique secret phrase to secure your wallet. Write down these words in order and keep them safe.',
-              style: TextStyle(color: theme.textSecondary, fontSize: 16),
-              textAlign: TextAlign.center,
-            ),
-            SizedBox(height: 24),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                ElevatedButton(
-                  child: Text(selectedLanguage),
-                  onPressed: () {
-                    // Logic to change language
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(theme.buttonBackground),
-                    foregroundColor: MaterialStateProperty.all(theme.buttonText),
-                  ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Text(
+                'Create Account',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
                 ),
-                ElevatedButton(
-                  child: Text('$wordCount'),
-                  onPressed: () {
-                    // Logic to change word count
-                  },
-                  style: ButtonStyle(
-                    backgroundColor: MaterialStateProperty.all(theme.buttonBackground),
-                    foregroundColor: MaterialStateProperty.all(theme.buttonText),
-                  ),
-                ),
-              ],
-            ),
-            SizedBox(height: 24),
-            for (int i = 0; i < words.length; i++)
-              Padding(
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Row(
-                  children: [
-                    SizedBox(
-                      width: 30,
-                      child: Text(
-                        '${i + 1}.',
-                        style: TextStyle(color: theme.textSecondary, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: [
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: theme.cardBackground,
+                        borderRadius: BorderRadius.circular(8),
                       ),
+                      child: const Text('12',
+                          style: TextStyle(color: Colors.white)),
                     ),
-                    Text(
-                      words[i],
-                      style: TextStyle(color: theme.textPrimary, fontSize: 16),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 8, horizontal: 16),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2C2C2E),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: const Text('English',
+                          style: TextStyle(color: Colors.white)),
                     ),
-                  ],
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Create seed phrase',
+                style: TextStyle(color: Colors.white, fontSize: 18),
+              ),
+              const Text(
+                'Write down or copy the phrase, or save it safely',
+                style: TextStyle(color: Colors.grey),
+              ),
+              const SizedBox(height: 20),
+              Expanded(
+                child: ListView.builder(
+                  itemCount: _mnemonicWords.length,
+                  itemBuilder: (context, index) {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 8.0),
+                      child: MnemonicWordInput(
+                        index: index + 1,
+                        word: _mnemonicWords[index],
+                        isEditable: false,
+                      ),
+                    );
+                  },
                 ),
               ),
-            SizedBox(height: 24),
-            Row(
-              children: [
-                Checkbox(
-                  value: isBackupConfirmed,
-                  onChanged: (value) {
-                    setState(() {
-                      isBackupConfirmed = value ?? false;
-                    });
-                  },
-                  fillColor: MaterialStateProperty.all(theme.primaryPurple),
-                ),
-                Expanded(
-                  child: Text(
-                    'I have made a backup of my secret phrase',
-                    style: TextStyle(color: theme.textPrimary),
+              Row(
+                children: [
+                  Checkbox(
+                    value: _hasBackupWords,
+                    onChanged: (bool? value) {
+                      setState(() {
+                        _hasBackupWords = value ?? false;
+                      });
+                    },
+                  ),
+                  const Text(
+                    'I have backup words',
+                    style: TextStyle(color: Colors.purple),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  child: const Text('Next'),
+                  onPressed: _hasBackupWords ? _onNextPressed : null,
+                  style: ElevatedButton.styleFrom(
+                    foregroundColor: theme.secondaryPurple,
+                    // onPrimary: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8),
+                    ),
                   ),
                 ),
-              ],
-            ),
-            SizedBox(height: 24),
-            ElevatedButton(
-              child: Text('Continue'),
-              onPressed: isBackupConfirmed ? () {
-                // Logic to proceed
-              } : null,
-              style: ButtonStyle(
-                backgroundColor: MaterialStateProperty.resolveWith<Color>(
-                  (Set<MaterialState> states) {
-                    if (states.contains(MaterialState.disabled)) {
-                      return theme.buttonBackground.withOpacity(0.5);
-                    }
-                    return theme.primaryPurple;
-                  },
-                ),
-                foregroundColor: MaterialStateProperty.all(theme.buttonText),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
+  }
+
+  void _regenerateMnemonicWords() async {
+    String words = await genBip39Words(count: _count);
+
+    setState(() {
+      _mnemonicWords = words.split(" ");
+      ;
+    });
+  }
+
+  void _onNextPressed() {
+    print('Next button pressed');
   }
 }

@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.3.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -305623149;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -378976316;
 
 // Section: executor
 
@@ -373,16 +373,17 @@ fn wire__crate__api__bg__stop_background_service_impl(
         },
     )
 }
-fn wire__crate__api__simple__generate_wallet_impl(
+fn wire__crate__api__simple__gen_bip39_words_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
     data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "generate_wallet",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
+            debug_name: "gen_bip39_words",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
         move || {
             let message = unsafe {
@@ -394,12 +395,14 @@ fn wire__crate__api__simple__generate_wallet_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_message = <String>::sse_decode(&mut deserializer);
+            let api_count = <u8>::sse_decode(&mut deserializer);
             deserializer.end();
-            transform_result_sse::<_, String>((move || {
-                let output_ok = crate::api::simple::generate_wallet(api_message)?;
-                Ok(output_ok)
-            })())
+            move |context| {
+                transform_result_sse::<_, String>((move || {
+                    let output_ok = crate::api::simple::gen_bip39_words(api_count)?;
+                    Ok(output_ok)
+                })())
+            }
         },
     )
 }
@@ -681,6 +684,7 @@ fn pde_ffi_dispatcher_primary_impl(
         6 => wire__crate__api__bg__send_message_to_service_impl(port, ptr, rust_vec_len, data_len),
         7 => wire__crate__api__bg__start_background_service_impl(port, ptr, rust_vec_len, data_len),
         8 => wire__crate__api__bg__stop_background_service_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__simple__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
         11 => wire__crate__api__simple__init_app_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
@@ -694,7 +698,6 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        9 => wire__crate__api__simple__generate_wallet_impl(ptr, rust_vec_len, data_len),
         10 => wire__crate__api__simple__greet_impl(ptr, rust_vec_len, data_len),
         12 => wire__crate__api__simple__send_message_to_service_impl(ptr, rust_vec_len, data_len),
         13 => wire__crate__api__simple__start_background_service_impl(ptr, rust_vec_len, data_len),
