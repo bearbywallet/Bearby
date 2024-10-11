@@ -6,17 +6,12 @@ import 'services/auth_guard.dart';
 import 'state/app_state.dart';
 import './theme/theme_provider.dart';
 
-import 'pages/main_page.dart';
-
 class ZilPayApp extends StatelessWidget {
   final AuthGuard authGuard;
   final AppState appState;
 
-  const ZilPayApp({
-    Key? key,
-    required this.authGuard,
-    required this.appState
-  }) : super(key: key);
+  const ZilPayApp({Key? key, required this.authGuard, required this.appState})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -28,11 +23,11 @@ class ZilPayApp extends StatelessWidget {
           return MaterialApp(
             title: 'ZilPay Wallet',
             theme: ThemeData(
-              primaryColor: currentTheme.primaryPurple,
-              scaffoldBackgroundColor: currentTheme.background
-            ),
-            initialRoute: '/new_wallet_options',
-            onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState).onGenerateRoute,
+                primaryColor: currentTheme.primaryPurple,
+                scaffoldBackgroundColor: currentTheme.background),
+            initialRoute: '/',
+            onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState)
+                .onGenerateRoute,
           );
         },
       ),

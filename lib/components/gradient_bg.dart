@@ -21,7 +21,7 @@ class GradientBackground extends StatelessWidget {
             theme.gradientMiddle,
             theme.gradientEnd,
           ],
-          stops: [0.0, 0.5, 1.0],
+          stops: const [0.0, 0.5, 1.0],
         ),
       ),
       child: child,

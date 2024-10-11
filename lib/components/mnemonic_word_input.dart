@@ -34,7 +34,7 @@ class MnemonicWordInput extends StatelessWidget {
           Expanded(
             child: TextField(
               controller: TextEditingController(text: word),
-              style: const TextStyle(color: Colors.white),
+              style: TextStyle(color: theme.textSecondary),
               enabled: isEditable,
               decoration: const InputDecoration(
                 border: InputBorder.none,

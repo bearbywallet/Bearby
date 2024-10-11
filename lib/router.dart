@@ -24,8 +24,7 @@ class AppRouter {
     switch (settings.name) {
       case '/gen_bip39':
         return MaterialPageRoute(
-            builder: (_) => const SecretPhraseGeneratorPage(),
-            settings: settings);
+            builder: (_) => SecretPhraseGeneratorPage(), settings: settings);
       case '/restore_options':
         return MaterialPageRoute(
             builder: (_) => RestoreWalletOptionsPage(), settings: settings);
@@ -46,12 +45,12 @@ class AppRouter {
     if (!authGuard.ready) {
       return MaterialPageRoute(
         builder: (_) => InitialPage(),
-        settings: RouteSettings(name: '/initial'),
+        settings: const RouteSettings(name: '/initial'),
       );
     } else if (!authGuard.enabled) {
       return MaterialPageRoute(
         builder: (_) => LoginPage(),
-        settings: RouteSettings(name: '/login'),
+        settings: const RouteSettings(name: '/login'),
       );
     }
 
@@ -79,7 +78,7 @@ class AppRouter {
       default:
         return MaterialPageRoute(
           builder: (_) => MainPage(),
-          settings: RouteSettings(name: '/'),
+          settings: const RouteSettings(name: '/'),
         );
     }
   }

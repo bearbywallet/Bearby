@@ -62,7 +62,7 @@ class LightTheme implements AppTheme {
   @override
   Color get gradientStart => Color(0xFFE6E6FA);
   @override
-  Color get gradientMiddle => Color(0xFFD8BFD8);
+  Color get gradientMiddle => const Color(0xFFD8BFD8);
   @override
-  Color get gradientEnd => Color(0xFFF0F8FF);
+  Color get gradientEnd => const Color(0xFFF0F8FF);
 }

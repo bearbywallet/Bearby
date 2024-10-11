@@ -13,7 +13,7 @@ class MainPage extends StatefulWidget {
 
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
-  
+
   static List<Widget> _pages = <Widget>[
     GradientBackground(child: HomePage()),
     GradientBackground(child: HistoryPage()),

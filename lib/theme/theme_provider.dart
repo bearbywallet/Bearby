@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import './app_theme.dart';
 
 class ThemeProvider extends ChangeNotifier {
-  AppTheme _currentTheme = LightTheme();
-  // AppTheme _currentTheme = DarkTheme();
+  // AppTheme _currentTheme = LightTheme();
+  AppTheme _currentTheme = DarkTheme();
 
   AppTheme get currentTheme => _currentTheme;
 

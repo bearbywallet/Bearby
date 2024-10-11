@@ -12,7 +12,7 @@ class AppState extends ChangeNotifier {
       case AppTheme.dark:
         return ThemeData.dark();
       case AppTheme.system:
-        return ThemeData.light();
+        return ThemeData.dark();
     }
   }
 
