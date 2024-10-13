@@ -7,11 +7,13 @@ class MnemonicWordInput extends StatelessWidget {
   final String word;
   final bool isEditable;
   final Color? borderColor;
+  final double opacity;
 
   const MnemonicWordInput({
     super.key,
     required this.index,
     required this.word,
+    this.opacity = 1,
     this.isEditable = false,
     this.borderColor,
   });
@@ -23,7 +25,7 @@ class MnemonicWordInput extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: theme.cardBackground,
+        color: theme.cardBackground.withOpacity(opacity),
         borderRadius: BorderRadius.circular(16),
         border: borderColor != null
             ? Border.all(color: borderColor!, width: 1)

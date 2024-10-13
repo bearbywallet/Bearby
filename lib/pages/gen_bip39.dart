@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/custom_dropdown.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/src/rust/api/simple.dart';
@@ -9,8 +9,12 @@ import '../theme/theme_provider.dart';
 import '../components/gradient_bg.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
+  const SecretPhraseGeneratorPage({
+    super.key,
+  });
+
   @override
-  _CreateAccountPageState createState() => _CreateAccountPageState();
+  State<SecretPhraseGeneratorPage> createState() => _CreateAccountPageState();
 }
 
 class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
@@ -70,25 +74,37 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         children: [
                           const SizedBox(width: 16),
                           Expanded(
-                            child: DropdownButton<String>(
-                              value: _selectedLanguage,
-                              items: ['English', 'Spanish'].map((String value) {
-                                return DropdownMenuItem<String>(
-                                  value: value,
-                                  child: Text(value,
-                                      style:
-                                          TextStyle(color: theme.textPrimary)),
-                                );
-                              }).toList(),
+                            child: CustomDropdown(
+                              items: const ["English", "Russian", "Spanish"],
+                              selectedItem: _count,
                               onChanged: (newValue) {
                                 setState(() {
-                                  _selectedLanguage = newValue!;
+                                  _count = newValue;
+                                  _regenerateMnemonicWords();
                                 });
                               },
-                              dropdownColor: theme.cardBackground,
-                              style: TextStyle(color: theme.textPrimary),
                             ),
                           ),
+                          // Expanded(
+                          //   child: DropdownButton<String>(
+                          //     value: _selectedLanguage,
+                          //     items: ['English', 'Spanish'].map((String value) {
+                          //       return DropdownMenuItem<String>(
+                          //         value: value,
+                          //         child: Text(value,
+                          //             style:
+                          //                 TextStyle(color: theme.textPrimary)),
+                          //       );
+                          //     }).toList(),
+                          //     onChanged: (newValue) {
+                          //       setState(() {
+                          //         _selectedLanguage = newValue!;
+                          //       });
+                          //     },
+                          //     dropdownColor: theme.cardBackground,
+                          //     style: TextStyle(color: theme.textPrimary),
+                          //   ),
+                          // ),
                         ],
                       ),
                       const SizedBox(height: 16),
@@ -103,6 +119,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                                 index: index + 1,
                                 word: _mnemonicWords[index],
                                 isEditable: false,
+                                opacity: 0.5,
                                 // borderColor: theme.textSecondary,
                               ),
                             );
