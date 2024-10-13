@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
+import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/src/rust/api/simple.dart';
 import '../theme/theme_provider.dart';
 import '../components/gradient_bg.dart';
@@ -33,7 +34,8 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
           child: Column(
             children: [
               Padding(
-                padding: EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
@@ -60,7 +62,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
               ),
               Expanded(
                 child: Padding(
-                  padding: EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(16.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -73,29 +75,19 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         ),
                       ),
                       const SizedBox(height: 16),
+                      WordCountSelector(
+                        wordCounts: const [12, 15, 18, 21, 24],
+                        selectedCount: _count,
+                        onCountChanged: (newCount) {
+                          setState(() {
+                            _count = newCount;
+                            _regenerateMnemonicWords();
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 16),
                       Row(
                         children: [
-                          Expanded(
-                            child: DropdownButton<int>(
-                              value: _count,
-                              items: [12, 15, 18, 20, 24].map((int value) {
-                                return DropdownMenuItem<int>(
-                                  value: value,
-                                  child: Text('$value',
-                                      style:
-                                          TextStyle(color: theme.textPrimary)),
-                                );
-                              }).toList(),
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _count = newValue!;
-                                  _regenerateMnemonicWords();
-                                });
-                              },
-                              dropdownColor: theme.cardBackground,
-                              style: TextStyle(color: theme.textPrimary),
-                            ),
-                          ),
                           const SizedBox(width: 16),
                           Expanded(
                             child: DropdownButton<String>(
@@ -120,22 +112,6 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         ],
                       ),
                       const SizedBox(height: 16),
-                      Text(
-                        'Create seed phrase',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                        ),
-                      ),
-                      Text(
-                        'Write down or copy the phrase, or save it safely',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: theme.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
                       Expanded(
                         child: ListView.builder(
                           itemCount: _mnemonicWords.length,
@@ -147,6 +123,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                                 index: index + 1,
                                 word: _mnemonicWords[index],
                                 isEditable: false,
+                                borderColor: theme.textSecondary,
                               ),
                             );
                           },
