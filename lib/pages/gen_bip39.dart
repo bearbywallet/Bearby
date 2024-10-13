@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/src/rust/api/simple.dart';
@@ -33,32 +34,11 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
         child: SafeArea(
           child: Column(
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16.0, vertical: 8.0),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    IconButton(
-                      icon: SvgPicture.asset(
-                        'assets/icons/back.svg',
-                        width: 24,
-                        height: 24,
-                        color: theme.secondaryPurple,
-                      ),
-                      onPressed: () => Navigator.pop(context),
-                    ),
-                    IconButton(
-                      icon: SvgPicture.asset(
-                        'assets/icons/reload.svg',
-                        width: 30,
-                        height: 30,
-                        color: theme.textPrimary,
-                      ),
-                      onPressed: _regenerateMnemonicWords,
-                    ),
-                  ],
-                ),
+              CustomAppBar(
+                title: 'Create Account',
+                onBackPressed: () => Navigator.pop(context),
+                actionIconPath: 'assets/icons/reload.svg',
+                onActionPressed: _regenerateMnemonicWords,
               ),
               Expanded(
                 child: Padding(
@@ -123,7 +103,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                                 index: index + 1,
                                 word: _mnemonicWords[index],
                                 isEditable: false,
-                                borderColor: theme.textSecondary,
+                                // borderColor: theme.textSecondary,
                               ),
                             );
                           },
