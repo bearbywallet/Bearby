@@ -1,8 +1,24 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
+import 'package:zilpay/components/mnemonic_word_input.dart';
 import '../theme/theme_provider.dart';
+
+List<int> getRandomNumbers(int min, int max, int count) {
+  final random = Random();
+  Set<int> numbers = {};
+  while (numbers.length < count) {
+    int randomNumber = min + random.nextInt(max - min + 1);
+    numbers.add(randomNumber);
+  }
+
+  return numbers.toList();
+}
+
+const maxNumbers = 4;
 
 class SecretPhraseVerifyPage extends StatefulWidget {
   const SecretPhraseVerifyPage({
@@ -14,7 +30,10 @@ class SecretPhraseVerifyPage extends StatefulWidget {
 }
 
 class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
-  List<String>? _bip39_list;
+  List<String>? _bip39List;
+  List<int> _indexes = getRandomNumbers(1, 12, maxNumbers);
+  final List<String> _verifyWords =
+      List<String>.filled(maxNumbers, '', growable: false);
 
   @override
   void didChangeDependencies() {
@@ -28,7 +47,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
       });
     } else {
       setState(() {
-        _bip39_list = args['bip39'];
+        _bip39List = args['bip39'];
+
+        print(_bip39List);
+
+        if (_bip39List != null) {
+          _indexes = getRandomNumbers(1, _bip39List!.length + 1, maxNumbers);
+        }
       });
     }
   }
@@ -47,7 +72,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                 onBackPressed: () => Navigator.pop(context),
               ),
               Expanded(
-                child: _bip39_list == null
+                child: _bip39List == null
                     ? const Center(child: CircularProgressIndicator())
                     : Padding(
                         padding: const EdgeInsets.all(16.0),
@@ -62,6 +87,45 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                                 color: theme.textPrimary,
                               ),
                             ),
+                            const SizedBox(height: 16),
+                            Expanded(
+                              child: ListView.builder(
+                                itemCount: maxNumbers,
+                                itemBuilder: (context, index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 8.0),
+                                    child: MnemonicWordInput(
+                                      index: _indexes[index],
+                                      word: _verifyWords[index],
+                                      isEditable: true,
+                                      borderColor: _verifyWords[index] == ''
+                                          ? theme.textSecondary
+                                          : _bip39List![_indexes[index] - 1] ==
+                                                  _verifyWords[index]
+                                              ? Colors.green
+                                              : Colors.red,
+                                      onChanged: (_, newWord) {
+                                        setState(() {
+                                          _verifyWords[index] = newWord;
+                                        });
+                                      },
+                                    ),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+                            CustomButton(
+                              text: 'Next',
+                              onPressed: () {
+                                print("words");
+                              },
+                              backgroundColor: theme.primaryPurple,
+                              borderRadius: 30.0,
+                              height: 56.0,
+                              disabled: !isVerified,
+                            )
                           ],
                         ),
                       ),
@@ -71,5 +135,28 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
         ),
       ),
     );
+  }
+
+  bool get isVerified {
+    if (_bip39List == null ||
+        _indexes.length != maxNumbers ||
+        _verifyWords.length != maxNumbers) {
+      return false;
+    }
+
+    for (int i = 0; i < maxNumbers; i++) {
+      int bip39Index = _indexes[i] - 1;
+
+      if (bip39Index < 0 || bip39Index >= _bip39List!.length) {
+        return false;
+      }
+
+      if (_bip39List![bip39Index].trim().toLowerCase() !=
+          _verifyWords[i].trim().toLowerCase()) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }
