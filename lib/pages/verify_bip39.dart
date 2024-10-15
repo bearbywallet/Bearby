@@ -49,8 +49,6 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
       setState(() {
         _bip39List = args['bip39'];
 
-        print(_bip39List);
-
         if (_bip39List != null) {
           _indexes = getRandomNumbers(1, _bip39List!.length + 1, maxNumbers);
         }

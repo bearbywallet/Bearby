@@ -35,6 +35,14 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
   }
 
   @override
+  void didUpdateWidget(MnemonicWordInput oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.word != oldWidget.word) {
+      _controller.text = widget.word;
+    }
+  }
+
+  @override
   void dispose() {
     _controller.removeListener(_onTextChanged);
     _controller.dispose();
@@ -42,7 +50,9 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
   }
 
   void _onTextChanged() {
-    widget.onChanged!(widget.index, _controller.text);
+    if (widget.onChanged != null) {
+      widget.onChanged!(widget.index, _controller.text);
+    }
   }
 
   @override
