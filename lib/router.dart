@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zilpay/pages/verify_bip39.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -26,6 +27,9 @@ class AppRouter {
         return MaterialPageRoute(
             builder: (_) => const SecretPhraseGeneratorPage(),
             settings: settings);
+      case '/verify_bip39':
+        return MaterialPageRoute(
+            builder: (_) => const SecretPhraseVerifyPage(), settings: settings);
       case '/restore_options':
         return MaterialPageRoute(
             builder: (_) => RestoreWalletOptionsPage(), settings: settings);

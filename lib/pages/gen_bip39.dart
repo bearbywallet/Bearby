@@ -82,7 +82,6 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                                 word: _mnemonicWords[index],
                                 isEditable: false,
                                 opacity: 0.5,
-                                // borderColor: theme.textSecondary,
                               ),
                             );
                           },
@@ -106,7 +105,8 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                       CustomButton(
                         text: 'Next',
                         onPressed: () {
-                          // Navigator.of(context).pushNamed('/');
+                          Navigator.of(context).pushNamed('/verify_bip39',
+                              arguments: {'bip39': _mnemonicWords});
                         },
                         backgroundColor: theme.primaryPurple,
                         borderRadius: 30.0,
