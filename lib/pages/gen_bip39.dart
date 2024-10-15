@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/custom_dropdown.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/src/rust/api/simple.dart';
@@ -70,44 +70,6 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         },
                       ),
                       const SizedBox(height: 16),
-                      Row(
-                        children: [
-                          const SizedBox(width: 16),
-                          Expanded(
-                            child: CustomDropdown(
-                              items: const ["English", "Russian", "Spanish"],
-                              selectedItem: _count,
-                              onChanged: (newValue) {
-                                setState(() {
-                                  _count = newValue;
-                                  _regenerateMnemonicWords();
-                                });
-                              },
-                            ),
-                          ),
-                          // Expanded(
-                          //   child: DropdownButton<String>(
-                          //     value: _selectedLanguage,
-                          //     items: ['English', 'Spanish'].map((String value) {
-                          //       return DropdownMenuItem<String>(
-                          //         value: value,
-                          //         child: Text(value,
-                          //             style:
-                          //                 TextStyle(color: theme.textPrimary)),
-                          //       );
-                          //     }).toList(),
-                          //     onChanged: (newValue) {
-                          //       setState(() {
-                          //         _selectedLanguage = newValue!;
-                          //       });
-                          //     },
-                          //     dropdownColor: theme.cardBackground,
-                          //     style: TextStyle(color: theme.textPrimary),
-                          //   ),
-                          // ),
-                        ],
-                      ),
-                      const SizedBox(height: 16),
                       Expanded(
                         child: ListView.builder(
                           itemCount: _mnemonicWords.length,
@@ -141,19 +103,16 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         activeColor: theme.primaryPurple,
                       ),
                       const SizedBox(height: 16),
-                      ElevatedButton(
-                        child: Text('Next'),
-                        onPressed: _hasBackupWords
-                            ? () {
-                                // Implement next step functionality
-                              }
-                            : null,
-                        style: ElevatedButton.styleFrom(
-                          // primary: theme.primaryPurple,
-                          // onPrimary: theme.buttonText,
-                          minimumSize: const Size(double.infinity, 50),
-                        ),
-                      ),
+                      CustomButton(
+                        text: 'Unlock',
+                        onPressed: () {
+                          //
+                        },
+                        backgroundColor: theme.primaryPurple,
+                        borderRadius: 30.0,
+                        height: 56.0,
+                        disabled: !_hasBackupWords,
+                      )
                     ],
                   ),
                 ),
@@ -170,6 +129,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
 
     setState(() {
       _mnemonicWords = words.split(" ");
+      _hasBackupWords = false;
     });
   }
 }

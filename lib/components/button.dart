@@ -1,81 +1,79 @@
-import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;
-  final Color color;
+  final VoidCallback onPressed;
+  final double borderRadius;
+  final Color textColor;
+  final Color backgroundColor;
   final double width;
   final double height;
-  final double borderRadius;
-  final double fontSize;
-  final Future<void> Function() onPressed;
-  final Color loaderColor;
+  final EdgeInsetsGeometry padding;
+  final bool disabled;
 
   const CustomButton({
-    Key? key,
+    super.key,
     required this.text,
-    this.color = const Color(0xFF9C27B0),
-    this.width = double.infinity,
-    this.height = 48,
-    this.borderRadius = 24,
-    this.fontSize = 16,
     required this.onPressed,
-    this.loaderColor = const Color(0xFFFFFFFF),
-  }) : super(key: key);
+    this.borderRadius = 30.0,
+    this.textColor = const Color(0xFFFFFFFF),
+    this.backgroundColor = const Color(0xFF8A2BE2),
+    this.width = double.infinity,
+    this.height = 56.0,
+    this.padding = const EdgeInsets.symmetric(horizontal: 16.0),
+    this.disabled = false,
+  });
 
   @override
-  _CustomButtonState createState() => _CustomButtonState();
+  State<CustomButton> createState() => _CustomButtonState();
 }
 
 class _CustomButtonState extends State<CustomButton> {
-  bool _isLoading = false;
-
-  void _handlePress() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      await widget.onPressed();
-    } finally {
-      if (mounted) {
-        setState(() {
-          _isLoading = false;
-        });
-      }
-    }
-  }
+  bool _isHovered = false;
+  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _isLoading ? null : _handlePress,
-      child: Container(
-        width: widget.width,
-        height: widget.height,
-        decoration: BoxDecoration(
-          color: widget.color,
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-        ),
-        child: Center(
-          child: _isLoading
-              ? SizedBox(
-                  width: widget.height / 2,
-                  height: widget.height / 2,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(widget.loaderColor),
-                    strokeWidth: 3,
-                  ),
-                )
-              : Text(
-                  widget.text,
-                  style: TextStyle(
-                    color: const Color(0xFFFFFFFF),
-                    fontSize: widget.fontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+      onTap: widget.disabled ? null : widget.onPressed,
+      onTapDown: (_) => setState(() => _isHovered = true),
+      onTapUp: (_) => setState(() => _isHovered = false),
+      onTapCancel: () => setState(() => _isHovered = false),
+      child: Focus(
+        onFocusChange: (hasFocus) => setState(() => _isFocused = hasFocus),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          width: widget.width,
+          height: widget.height,
+          padding: widget.padding,
+          decoration: BoxDecoration(
+            color: _getBackgroundColor(),
+            borderRadius: BorderRadius.circular(widget.borderRadius),
+          ),
+          child: Center(
+            child: Text(
+              widget.text,
+              style: TextStyle(
+                color: widget.disabled
+                    ? widget.textColor.withOpacity(0.5)
+                    : widget.textColor,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
         ),
       ),
     );
+  }
+
+  Color _getBackgroundColor() {
+    if (widget.disabled) {
+      return widget.backgroundColor.withOpacity(0.5);
+    } else if (_isHovered || _isFocused) {
+      return widget.backgroundColor.withOpacity(0.8);
+    } else {
+      return widget.backgroundColor;
+    }
   }
 }
