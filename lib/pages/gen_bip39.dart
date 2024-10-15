@@ -39,7 +39,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
           child: Column(
             children: [
               CustomAppBar(
-                title: 'Create Account',
+                title: 'New Wallet',
                 onBackPressed: () => Navigator.pop(context),
                 actionIconPath: 'assets/icons/reload.svg',
                 onActionPressed: _regenerateMnemonicWords,
@@ -51,7 +51,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Create Account',
+                        'Generate Bip39 Wallet',
                         style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -104,9 +104,9 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                       ),
                       const SizedBox(height: 16),
                       CustomButton(
-                        text: 'Unlock',
+                        text: 'Next',
                         onPressed: () {
-                          //
+                          // Navigator.of(context).pushNamed('/');
                         },
                         backgroundColor: theme.primaryPurple,
                         borderRadius: 30.0,

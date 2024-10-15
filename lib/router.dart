@@ -24,7 +24,8 @@ class AppRouter {
     switch (settings.name) {
       case '/gen_bip39':
         return MaterialPageRoute(
-            builder: (_) => SecretPhraseGeneratorPage(), settings: settings);
+            builder: (_) => const SecretPhraseGeneratorPage(),
+            settings: settings);
       case '/restore_options':
         return MaterialPageRoute(
             builder: (_) => RestoreWalletOptionsPage(), settings: settings);
