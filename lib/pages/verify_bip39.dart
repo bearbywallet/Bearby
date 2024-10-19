@@ -117,7 +117,8 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                             CustomButton(
                               text: 'Next',
                               onPressed: () {
-                                print("words");
+                                Navigator.of(context).pushNamed('/net_setup',
+                                    arguments: {'bip39': _bip39List});
                               },
                               backgroundColor: theme.primaryPurple,
                               borderRadius: 30.0,

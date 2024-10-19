@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
 
 import 'services/auth_guard.dart';
@@ -23,6 +24,9 @@ class AppRouter {
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/net_setup':
+        return MaterialPageRoute(
+            builder: (_) => const BlockchainSettingsPage(), settings: settings);
       case '/gen_bip39':
         return MaterialPageRoute(
             builder: (_) => const SecretPhraseGeneratorPage(),
