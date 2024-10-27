@@ -3,12 +3,12 @@ import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 
 class OptionItem {
-  final String title;
+  final Widget child;
   final bool isSelected;
   final VoidCallback onSelect;
 
   OptionItem({
-    required this.title,
+    required this.child,
     required this.isSelected,
     required this.onSelect,
   });
@@ -65,14 +65,7 @@ class OptionsList extends StatelessWidget {
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Expanded(
-                                child: Text(
-                                  option.title,
-                                  style: TextStyle(
-                                    color: theme.textPrimary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
+                                child: option.child,
                               ),
                               AnimatedContainer(
                                 duration: const Duration(milliseconds: 300),
