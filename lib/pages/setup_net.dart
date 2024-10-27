@@ -6,6 +6,30 @@ import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/toggle_item.dart';
 import '../theme/theme_provider.dart';
 
+class BlockchainNetwork {
+  final String title;
+  final String subtitle;
+  bool value;
+
+  BlockchainNetwork({
+    required this.title,
+    required this.subtitle,
+    this.value = false,
+  });
+}
+
+class EVMNetwork {
+  final String title;
+  final String subtitle;
+  bool value;
+
+  EVMNetwork({
+    required this.title,
+    required this.subtitle,
+    this.value = false,
+  });
+}
+
 class BlockchainSettingsPage extends StatefulWidget {
   const BlockchainSettingsPage({
     super.key,
@@ -16,24 +40,66 @@ class BlockchainSettingsPage extends StatefulWidget {
 }
 
 class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
+  List<String>? _bip39List;
+
   final TextEditingController _rpcUrlController = TextEditingController();
-  final List<Map<String, dynamic>> _evmNet = [
-    {"title": "Zilliqa", "subtitle": "Zilliqa network", "value": true},
-    {"title": "Ethereum", "subtitle": "Ethereum network", "value": true},
-    {
-      "title": "BSC chain",
-      "subtitle": "Binance smart chain network",
-      "value": true
-    }
+  final List<EVMNetwork> _evmNetworks = [
+    EVMNetwork(
+      title: "Zilliqa",
+      subtitle: "Zilliqa network",
+      value: true,
+    ),
+    EVMNetwork(
+      title: "Ethereum",
+      subtitle: "Ethereum network",
+      value: true,
+    ),
+    EVMNetwork(
+      title: "BSC chain",
+      subtitle: "Binance smart chain network",
+      value: true,
+    ),
+  ];
+  final List<BlockchainNetwork> _blockchainNetworks = [
+    BlockchainNetwork(
+      title: "Bitcoin",
+      subtitle: "Bitcoin network",
+    ),
+    BlockchainNetwork(
+      title: "Solana",
+      subtitle: "Solana blockchain",
+    ),
+    BlockchainNetwork(
+      title: "Tron",
+      subtitle: "TRON network",
+    ),
+    BlockchainNetwork(
+      title: "Massa",
+      subtitle: "Massa blockchain",
+    ),
+    BlockchainNetwork(
+      title: "NEAR",
+      subtitle: "NEAR Protocol",
+    ),
   ];
 
-  final List<Map<String, dynamic>> _blockchainNetworks = [
-    {"title": "Bitcoin", "subtitle": "Bitcoin network", "value": false},
-    {"title": "Solana", "subtitle": "Solana blockchain", "value": false},
-    {"title": "Tron", "subtitle": "TRON network", "value": false},
-    {"title": "Massa", "subtitle": "Massa blockchain", "value": false},
-    {"title": "NEAR", "subtitle": "NEAR Protocol", "value": false}
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args = ModalRoute.of(context)?.settings.arguments
+        as Map<String, List<String>>?;
+
+    if (args == null || args['bip39'] == null || args['bip39']!.isEmpty) {
+      // TODO: make it enable if bip39 doesnt exists
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      // });
+    } else {
+      setState(() {
+        _bip39List = args['bip39'];
+      });
+    }
+  }
 
   @override
   void dispose() {
@@ -44,9 +110,9 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   void _updateNetworkValue(int index, bool newValue, bool state) {
     setState(() {
       if (state) {
-        _evmNet[index]['value'] = newValue;
+        _evmNetworks[index].value = newValue;
       } else {
-        _blockchainNetworks[index]['value'] = newValue;
+        _blockchainNetworks[index].value = newValue;
       }
     });
   }
@@ -77,8 +143,8 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                             borderRadius: BorderRadius.circular(16),
                           ),
                           child: Column(
-                            children:
-                                List.generate(_evmNet.length * 2 - 1, (index) {
+                            children: List.generate(_evmNetworks.length * 2 - 1,
+                                (index) {
                               if (index.isOdd) {
                                 return Padding(
                                   padding: const EdgeInsets.symmetric(
@@ -90,11 +156,11 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                                 );
                               }
                               final networkIndex = index ~/ 2;
-                              final network = _evmNet[networkIndex];
+                              final network = _evmNetworks[networkIndex];
                               return ToggleItem(
-                                title: network['title'],
-                                subtitle: network['subtitle'],
-                                value: network['value'],
+                                title: network.title,
+                                subtitle: network.subtitle,
+                                value: network.value,
                                 onChanged: (newValue) => _updateNetworkValue(
                                     networkIndex, newValue, true),
                               );
@@ -123,9 +189,9 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                               final networkIndex = index ~/ 2;
                               final network = _blockchainNetworks[networkIndex];
                               return ToggleItem(
-                                title: network['title'],
-                                subtitle: network['subtitle'],
-                                value: network['value'],
+                                title: network.title,
+                                subtitle: network.subtitle,
+                                value: network.value,
                                 onChanged: (newValue) => _updateNetworkValue(
                                     networkIndex, newValue, false),
                               );
@@ -141,7 +207,10 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                 padding: const EdgeInsets.all(16.0),
                 child: CustomButton(
                   text: 'Next',
-                  onPressed: () {},
+                  onPressed: () {
+                    Navigator.of(context)
+                        .pushNamed('/cipher_setup', arguments: {'bip39': []});
+                  },
                   backgroundColor: theme.primaryPurple,
                   borderRadius: 30.0,
                   height: 56.0,

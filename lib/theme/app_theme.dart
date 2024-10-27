@@ -17,50 +17,50 @@ abstract class AppTheme {
 
 class DarkTheme implements AppTheme {
   @override
-  Color get primaryPurple => Color(0xFF8A2BE2);
+  Color get primaryPurple => const Color(0xFF8A2BE2);
   @override
-  Color get secondaryPurple => Color(0xFFB23AEE);
+  Color get secondaryPurple => const Color(0xFFB23AEE);
   @override
-  Color get background => Color(0xFF1A1A1A);
+  Color get background => const Color(0xFF1A1A1A);
   @override
-  Color get cardBackground => Color(0xFF2A2A2A);
+  Color get cardBackground => const Color(0xFF2A2A2A);
   @override
   Color get textPrimary => Colors.white;
   @override
-  Color get textSecondary => Color(0xFFB3B3B3);
+  Color get textSecondary => const Color(0xFFB3B3B3);
   @override
-  Color get buttonBackground => Color(0xFF3A3A3A);
+  Color get buttonBackground => const Color(0xFF3A3A3A);
   @override
-  Color get buttonText => Color(0xFFE0E0E0);
+  Color get buttonText => const Color(0xFFE0E0E0);
 
   @override
-  Color get gradientStart => Color(0xFF4A0E4E);
+  Color get gradientStart => const Color(0xFF4A0E4E);
   @override
-  Color get gradientMiddle => Color(0xFF220A23);
+  Color get gradientMiddle => const Color(0xFF220A23);
   @override
   Color get gradientEnd => Colors.black;
 }
 
 class LightTheme implements AppTheme {
   @override
-  Color get primaryPurple => Color(0xFF6A1B9A);
+  Color get primaryPurple => const Color(0xFF6A1B9A);
   @override
-  Color get secondaryPurple => Color(0xFF9C27B0);
+  Color get secondaryPurple => const Color(0xFF9C27B0);
   @override
-  Color get background => Color(0xFFF5F5F5);
+  Color get background => const Color(0xFFF5F5F5);
   @override
   Color get cardBackground => Colors.white;
   @override
-  Color get textPrimary => Color(0xFF212121);
+  Color get textPrimary => const Color(0xFF212121);
   @override
-  Color get textSecondary => Color(0xFF757575);
+  Color get textSecondary => const Color(0xFF757575);
   @override
-  Color get buttonBackground => Color(0xFFE0E0E0);
+  Color get buttonBackground => const Color(0xFFE0E0E0);
   @override
-  Color get buttonText => Color(0xFF212121);
+  Color get buttonText => const Color(0xFF212121);
 
   @override
-  Color get gradientStart => Color(0xFFE6E6FA);
+  Color get gradientStart => const Color(0xFFE6E6FA);
   @override
   Color get gradientMiddle => const Color(0xFFD8BFD8);
   @override

@@ -10,8 +10,7 @@ class ZilPayApp extends StatelessWidget {
   final AuthGuard authGuard;
   final AppState appState;
 
-  const ZilPayApp({Key? key, required this.authGuard, required this.appState})
-      : super(key: key);
+  const ZilPayApp({super.key, required this.authGuard, required this.appState});
 
   @override
   Widget build(BuildContext context) {
@@ -25,7 +24,7 @@ class ZilPayApp extends StatelessWidget {
             theme: ThemeData(
                 primaryColor: currentTheme.primaryPurple,
                 scaffoldBackgroundColor: currentTheme.background),
-            initialRoute: '/net_setup',
+            initialRoute: '/cipher_setup',
             onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState)
                 .onGenerateRoute,
           );
