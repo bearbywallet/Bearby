@@ -9,11 +9,11 @@ class CustomActionButton extends StatefulWidget {
   final VoidCallback onPressed;
 
   const CustomActionButton({
-    Key? key,
+    super.key,
     required this.label,
     required this.iconPath,
     required this.onPressed,
-  }) : super(key: key);
+  });
 
   @override
   _CustomActionButtonState createState() => _CustomActionButtonState();
@@ -32,7 +32,7 @@ class _CustomActionButtonState extends State<CustomActionButton> {
       onTapCancel: () => setState(() => _isPressed = false),
       onTap: widget.onPressed,
       child: AnimatedOpacity(
-        duration: Duration(milliseconds: 150),
+        duration: const Duration(milliseconds: 150),
         opacity: _isPressed ? 0.5 : 1.0,
         child: Container(
           width: 70,
@@ -45,7 +45,7 @@ class _CustomActionButtonState extends State<CustomActionButton> {
                 color: Colors.black.withOpacity(0.2),
                 spreadRadius: 1,
                 blurRadius: 4,
-                offset: Offset(0, 2),
+                offset: const Offset(0, 2),
               ),
             ],
           ),
@@ -58,7 +58,7 @@ class _CustomActionButtonState extends State<CustomActionButton> {
                 height: 24,
                 color: theme.primaryPurple,
               ),
-              SizedBox(height: 6),
+              const SizedBox(height: 6),
               Text(
                 widget.label,
                 style: TextStyle(

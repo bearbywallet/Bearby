@@ -10,12 +10,12 @@ class WalletListItem extends StatelessWidget {
   final VoidCallback onTap;
 
   const WalletListItem({
-    Key? key,
+    super.key,
     required this.title,
     required this.subtitle,
     required this.icon,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -34,19 +34,23 @@ class WalletListItem extends StatelessWidget {
             child: Row(
               children: [
                 _buildIcon(),
-                SizedBox(width: 16),
+                const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         title,
-                        style: TextStyle(color: theme.textPrimary, fontSize: 16, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            color: theme.textPrimary,
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold),
                       ),
-                      SizedBox(height: 4),
+                      const SizedBox(height: 4),
                       Text(
                         subtitle,
-                        style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                        style:
+                            TextStyle(color: theme.textSecondary, fontSize: 14),
                       ),
                     ],
                   ),
@@ -80,4 +84,3 @@ class WalletListItem extends StatelessWidget {
     return Container();
   }
 }
-

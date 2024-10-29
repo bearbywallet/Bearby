@@ -10,12 +10,12 @@ class HoverSvgIcon extends StatefulWidget {
   final VoidCallback onTap;
 
   const HoverSvgIcon({
-    Key? key,
+    super.key,
     required this.assetName,
     required this.width,
     required this.height,
     required this.onTap,
-  }) : super(key: key);
+  });
 
   @override
   _HoverSvgIconState createState() => _HoverSvgIconState();

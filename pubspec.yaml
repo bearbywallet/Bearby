@@ -39,7 +39,6 @@ dependencies:
     path: rust_builder
   flutter_rust_bridge: 2.3.0
   path_provider: ^2.0.11
-  rounded_loading_button_plus: ^3.0.1
   provider: ^6.1.2
   flutter_svg: ^2.0.10+1
 
