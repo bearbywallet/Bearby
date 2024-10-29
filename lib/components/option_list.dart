@@ -17,11 +17,15 @@ class OptionItem {
 class OptionsList extends StatelessWidget {
   final List<OptionItem> options;
   final double unselectedOpacity;
+  final bool disabled;
+  final double disabledOpacity;
 
   const OptionsList({
     super.key,
     required this.options,
     this.unselectedOpacity = 0.5,
+    this.disabled = false,
+    this.disabledOpacity = 0.5,
   });
 
   @override
@@ -35,11 +39,13 @@ class OptionsList extends StatelessWidget {
                 padding: const EdgeInsets.symmetric(vertical: 6.0),
                 child: AnimatedOpacity(
                   duration: const Duration(milliseconds: 200),
-                  opacity: hasSelectedOption && !option.isSelected
-                      ? unselectedOpacity
-                      : 1.0,
+                  opacity: disabled
+                      ? disabledOpacity
+                      : hasSelectedOption && !option.isSelected
+                          ? unselectedOpacity
+                          : 1.0,
                   child: GestureDetector(
-                    onTap: option.onSelect,
+                    onTap: disabled ? null : option.onSelect,
                     child: TweenAnimationBuilder<double>(
                       duration: const Duration(milliseconds: 300),
                       tween:
@@ -55,7 +61,9 @@ class OptionsList extends StatelessWidget {
                             border: Border.all(
                               color: Color.lerp(
                                 theme.cardBackground,
-                                theme.primaryPurple,
+                                disabled
+                                    ? theme.textSecondary
+                                    : theme.primaryPurple,
                                 value * 0.5,
                               )!,
                               width: 1.5,
@@ -75,7 +83,9 @@ class OptionsList extends StatelessWidget {
                                   shape: BoxShape.circle,
                                   border: Border.all(
                                     color: option.isSelected
-                                        ? theme.primaryPurple
+                                        ? disabled
+                                            ? theme.textSecondary
+                                            : theme.primaryPurple
                                         : theme.textSecondary,
                                     width: 2,
                                   ),
@@ -89,7 +99,9 @@ class OptionsList extends StatelessWidget {
                                       height: 12,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: theme.primaryPurple,
+                                        color: disabled
+                                            ? theme.textSecondary
+                                            : theme.primaryPurple,
                                       ),
                                     ),
                                   ),

@@ -2,7 +2,6 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
@@ -22,6 +21,7 @@ class CipherSettingsPage extends StatefulWidget {
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
   final _btnController = RoundedLoadingButtonController();
   int selectedCipherIndex = 2;
+  bool optionsDisabled = false;
 
   final List<Map<String, String>> cipherDescriptions = [
     {
@@ -48,6 +48,27 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   void reassemble() {
     super.reassemble();
     _btnController.reset();
+
+    setState(() {
+      optionsDisabled = false;
+    });
+  }
+
+  void _createWallet() async {
+    setState(() {
+      optionsDisabled = true;
+    });
+    _btnController.start();
+    try {
+      Timer(const Duration(seconds: 5), () {
+        _btnController.success();
+      });
+    } catch (e) {
+      setState(() {
+        optionsDisabled = false;
+      });
+      _btnController.error();
+    }
   }
 
   @override
@@ -88,6 +109,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                         ),
                         const SizedBox(height: 24),
                         OptionsList(
+                          disabled: optionsDisabled,
                           options: List.generate(
                             cipherDescriptions.length,
                             (index) => OptionItem(
@@ -151,37 +173,22 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                       ),
                     RoundedLoadingButton(
                       controller: _btnController,
-                      onPressed: () async {
-                        _btnController.start();
-                        try {
-                          Timer(const Duration(seconds: 5), () {
-                            _btnController.success();
-                          });
-                        } catch (e) {
-                          _btnController.error();
-                        }
-                      },
+                      onPressed: _createWallet,
                       successIcon: SvgPicture.asset(
                         'assets/icons/ok.svg',
                         width: 24,
                         height: 24,
-                        colorFilter:
-                            ColorFilter.mode(Colors.white, BlendMode.srcIn),
+                        colorFilter: ColorFilter.mode(
+                            theme.textPrimary, BlendMode.srcIn),
                       ),
                       child: const Text(
                         'Confirm',
                         style: TextStyle(color: Colors.white),
                       ),
+                    ),
+                    const SizedBox(
+                      height: 16,
                     )
-                    // CustomButton(
-                    //   text: 'Confirm',
-                    //   onPressed: () {
-                    //     // Navigator.pushNamed(context, '/next_route');
-                    //   },
-                    //   backgroundColor: theme.primaryPurple,
-                    //   borderRadius: 30.0,
-                    //   height: 56.0,
-                    // ),
                   ],
                 ),
               )

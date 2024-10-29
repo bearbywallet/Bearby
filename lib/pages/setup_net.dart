@@ -9,11 +9,13 @@ import '../theme/theme_provider.dart';
 class BlockchainNetwork {
   final String title;
   final String subtitle;
+  final int code;
   bool value;
 
   BlockchainNetwork({
     required this.title,
     required this.subtitle,
+    required this.code,
     this.value = false,
   });
 }
@@ -90,10 +92,9 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
         as Map<String, List<String>>?;
 
     if (args == null || args['bip39'] == null || args['bip39']!.isEmpty) {
-      // TODO: make it enable if bip39 doesnt exists
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
-      // });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      });
     } else {
       setState(() {
         _bip39List = args['bip39'];
@@ -208,8 +209,8 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                 child: CustomButton(
                   text: 'Next',
                   onPressed: () {
-                    Navigator.of(context)
-                        .pushNamed('/cipher_setup', arguments: {'bip39': []});
+                    Navigator.of(context).pushNamed('/cipher_setup',
+                        arguments: {'bip39': _bip39List});
                   },
                   backgroundColor: theme.primaryPurple,
                   borderRadius: 30.0,
