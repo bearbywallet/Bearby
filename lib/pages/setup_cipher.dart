@@ -114,22 +114,6 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Choose encryption method',
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          'Select the level of encryption for your wallet security',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
                         const SizedBox(height: 24),
                         OptionsList(
                           disabled: optionsDisabled,
