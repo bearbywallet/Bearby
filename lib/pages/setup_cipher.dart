@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/option_list.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import '../theme/theme_provider.dart';
 
 class CipherSettingsPage extends StatefulWidget {
@@ -97,6 +98,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       body: GradientBackground(
@@ -110,11 +112,10 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(adaptivePadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const SizedBox(height: 24),
                         OptionsList(
                           disabled: optionsDisabled,
                           options: List.generate(

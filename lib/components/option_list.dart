@@ -31,6 +31,7 @@ class OptionsList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+
     bool hasSelectedOption = options.any((option) => option.isSelected);
 
     return Column(
