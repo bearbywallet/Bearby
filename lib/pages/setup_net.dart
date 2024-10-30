@@ -4,6 +4,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/toggle_item.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import '../theme/theme_provider.dart';
 
 class BlockchainNetwork {
@@ -132,6 +133,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       body: GradientBackground(
@@ -145,7 +147,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
               Expanded(
                 child: SingleChildScrollView(
                   child: Padding(
-                    padding: const EdgeInsets.all(16.0),
+                    padding: EdgeInsets.all(adaptivePadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -179,7 +181,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                             }),
                           ),
                         ),
-                        const SizedBox(height: 16),
+                        SizedBox(height: adaptivePadding),
                         Container(
                           decoration: BoxDecoration(
                             color: theme.cardBackground,
