@@ -51,3 +51,8 @@ android/app/bin/
 *.keystore
 .dart_tool/*
 .dart_tool
+
+/target/
+/rust/target/
+**/*.rs.bk
+Cargo.lock
