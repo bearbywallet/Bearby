@@ -51,7 +51,7 @@ impl BackgroundService {
     }
 }
 
-static BACKGROUND_SERVICE: Lazy<Mutex<BackgroundService>> =
+pub static BACKGROUND_SERVICE: Lazy<Mutex<BackgroundService>> =
     Lazy::new(|| Mutex::new(BackgroundService::new()));
 
 pub fn start_background_service(sink: StreamSink<String>) -> Result<(), String> {

@@ -4327,6 +4327,7 @@ name = "zilpay"
 version = "0.1.0"
 dependencies = [
  "background",
+ "crypto",
  "zil_errors",
 ]
 
@@ -4337,6 +4338,7 @@ dependencies = [
  "alloy",
  "background",
  "bip39",
+ "crypto",
  "hex",
  "ntrulp",
  "num256",
