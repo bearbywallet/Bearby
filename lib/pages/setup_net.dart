@@ -66,22 +66,27 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     BlockchainNetwork(
       title: "Bitcoin",
       subtitle: "Bitcoin network",
+      code: 0,
     ),
     BlockchainNetwork(
       title: "Solana",
       subtitle: "Solana blockchain",
+      code: 1,
     ),
     BlockchainNetwork(
       title: "Tron",
       subtitle: "TRON network",
+      code: 2,
     ),
     BlockchainNetwork(
       title: "Massa",
       subtitle: "Massa blockchain",
+      code: 3,
     ),
     BlockchainNetwork(
       title: "NEAR",
       subtitle: "NEAR Protocol",
+      code: 4,
     ),
   ];
 

@@ -91,7 +91,9 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
             parent: _buttonController,
             curve: Curves.easeInOutCirc,
           ),
-        );
+        )..addListener(() {
+            setState(() {});
+          });
 
         Widget successIcon = Container(
           alignment: Alignment.center,
@@ -160,20 +162,28 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
           child: childContent,
         );
 
-        return SizedBox(
-          height: widget.height,
-          child: ValueListenableBuilder<ButtonState>(
-            valueListenable: _stateNotifier,
-            builder: (context, state, _) {
-              return Center(
-                child: state == ButtonState.error
-                    ? errorIcon
-                    : state == ButtonState.success
-                        ? successIcon
-                        : button,
-              );
-            },
-          ),
+        return AnimatedBuilder(
+          animation: _buttonController,
+          builder: (context, child) {
+            return SizedBox(
+              height: widget.height,
+              child: ValueListenableBuilder<ButtonState>(
+                valueListenable: _stateNotifier,
+                builder: (context, state, _) {
+                  return Center(
+                    child: state == ButtonState.error
+                        ? errorIcon
+                        : state == ButtonState.success
+                            ? successIcon
+                            : SizedBox(
+                                width: _squeezeAnimation.value,
+                                child: button,
+                              ),
+                  );
+                },
+              ),
+            );
+          },
         );
       },
     );
