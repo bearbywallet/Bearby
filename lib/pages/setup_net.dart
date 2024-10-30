@@ -23,10 +23,12 @@ class BlockchainNetwork {
 class EVMNetwork {
   final String title;
   final String subtitle;
+  final int code;
   bool value;
 
   EVMNetwork({
     required this.title,
+    required this.code,
     required this.subtitle,
     this.value = false,
   });
@@ -50,43 +52,46 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
       title: "Zilliqa",
       subtitle: "Zilliqa network",
       value: true,
+      code: 0,
     ),
     EVMNetwork(
       title: "Ethereum",
       subtitle: "Ethereum network",
       value: true,
+      code: 1,
     ),
     EVMNetwork(
       title: "BSC chain",
       subtitle: "Binance smart chain network",
       value: true,
+      code: 2,
     ),
   ];
   final List<BlockchainNetwork> _blockchainNetworks = [
     BlockchainNetwork(
       title: "Bitcoin",
       subtitle: "Bitcoin network",
-      code: 0,
+      code: 3,
     ),
     BlockchainNetwork(
       title: "Solana",
       subtitle: "Solana blockchain",
-      code: 1,
+      code: 4,
     ),
     BlockchainNetwork(
       title: "Tron",
       subtitle: "TRON network",
-      code: 2,
+      code: 5,
     ),
     BlockchainNetwork(
       title: "Massa",
       subtitle: "Massa blockchain",
-      code: 3,
+      code: 6,
     ),
     BlockchainNetwork(
       title: "NEAR",
       subtitle: "NEAR Protocol",
-      code: 4,
+      code: 7,
     ),
   ];
 
@@ -97,9 +102,10 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
         as Map<String, List<String>>?;
 
     if (args == null || args['bip39'] == null || args['bip39']!.isEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/gen_bip39');
-      });
+      // TODO: unlock it
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      // });
     } else {
       setState(() {
         _bip39List = args['bip39'];
@@ -214,8 +220,16 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                 child: CustomButton(
                   text: 'Next',
                   onPressed: () {
-                    Navigator.of(context).pushNamed('/cipher_setup',
-                        arguments: {'bip39': _bip39List});
+                    final List<int> codes = [
+                      ..._evmNetworks.map((e) => e.code),
+                      ..._blockchainNetworks.map((e) => e.code)
+                    ];
+
+                    Navigator.of(context)
+                        .pushNamed('/cipher_setup', arguments: {
+                      'bip39': _bip39List,
+                      'codes': codes,
+                    });
                   },
                   backgroundColor: theme.primaryPurple,
                   borderRadius: 30.0,

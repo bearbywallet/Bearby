@@ -19,6 +19,8 @@ class CipherSettingsPage extends StatefulWidget {
 }
 
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
+  List<String>? _bip39List;
+  List<int>? _codes;
   final _btnController = RoundedLoadingButtonController();
   int selectedCipherIndex = 2;
   bool optionsDisabled = false;
@@ -52,6 +54,27 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     setState(() {
       optionsDisabled = false;
     });
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bip39 = args?['bip39'] as List<String>?;
+    final codes = args?['codes'] as List<int>?;
+
+    if (bip39 == null || codes == null) {
+      // TODO: unlock it
+      // WidgetsBinding.instance.addPostFrameCallback((_) {
+      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      // });
+    } else {
+      setState(() {
+        _bip39List = bip39;
+        _codes = codes;
+      });
+    }
   }
 
   void _createWallet() async {

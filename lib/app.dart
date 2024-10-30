@@ -24,7 +24,7 @@ class ZilPayApp extends StatelessWidget {
             theme: ThemeData(
                 primaryColor: currentTheme.primaryPurple,
                 scaffoldBackgroundColor: currentTheme.background),
-            initialRoute: '/cipher_setup',
+            initialRoute: '/net_setup',
             onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState)
                 .onGenerateRoute,
           );
