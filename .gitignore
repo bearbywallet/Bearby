@@ -56,3 +56,17 @@ android/app/bin/
 /rust/target/
 **/*.rs.bk
 Cargo.lock
+
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+.idea/
+.vscode/
+*.iml
+*.log
+.DS_Store
+
+flutter_*.png
+flutter_jank_metrics_*.json
