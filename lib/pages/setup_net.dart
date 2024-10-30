@@ -226,7 +226,6 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                       ..._evmNetworks.map((e) => e.code),
                       ..._blockchainNetworks.map((e) => e.code)
                     ];
-
                     Navigator.of(context)
                         .pushNamed('/cipher_setup', arguments: {
                       'bip39': _bip39List,

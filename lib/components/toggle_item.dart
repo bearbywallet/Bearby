@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import '../theme/theme_provider.dart';
 
 class ToggleItem extends StatelessWidget {
@@ -19,11 +20,17 @@ class ToggleItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final adaptiveHorizontalPadding =
+        AdaptiveSize.getAdaptivePadding(context, 20);
+    final adaptiveVerticalPadding =
+        AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Column(
       children: [
         Container(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+          padding: EdgeInsets.symmetric(
+              horizontal: adaptiveHorizontalPadding,
+              vertical: adaptiveVerticalPadding),
           decoration: BoxDecoration(
             color: theme.cardBackground,
             borderRadius: BorderRadius.circular(16),

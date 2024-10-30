@@ -164,12 +164,12 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(adaptivePadding),
                 child: Column(
                   children: [
                     if (selectedCipherIndex == 2)
                       Padding(
-                        padding: const EdgeInsets.only(bottom: 16.0),
+                        padding: EdgeInsets.only(bottom: adaptivePadding),
                         child: Text(
                           'Post-quantum encryption might affect performance',
                           style: TextStyle(
@@ -189,9 +189,13 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                         colorFilter: ColorFilter.mode(
                             theme.textPrimary, BlendMode.srcIn),
                       ),
-                      child: const Text(
+                      child: Text(
                         'Confirm',
-                        style: TextStyle(color: Colors.white),
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
                     const SizedBox(
