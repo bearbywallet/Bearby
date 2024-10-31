@@ -1,7 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
@@ -75,23 +73,6 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
         _bip39List = bip39;
         _codes = codes;
       });
-    }
-  }
-
-  void _createWallet() async {
-    setState(() {
-      optionsDisabled = true;
-    });
-    _btnController.start();
-    try {
-      Timer(const Duration(seconds: 5), () {
-        _btnController.success();
-      });
-    } catch (e) {
-      setState(() {
-        optionsDisabled = false;
-      });
-      _btnController.error();
     }
   }
 
@@ -179,27 +160,19 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                           ),
                         ),
                       ),
-                    RoundedLoadingButton(
-                      controller: _btnController,
-                      onPressed: _createWallet,
-                      successIcon: SvgPicture.asset(
-                        'assets/icons/ok.svg',
-                        width: 24,
-                        height: 24,
-                        colorFilter: ColorFilter.mode(
-                            theme.textPrimary, BlendMode.srcIn),
-                      ),
-                      child: Text(
-                        'Confirm',
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(
-                      height: 16,
+                    CustomButton(
+                      text: 'Confirm',
+                      onPressed: () {
+                        Navigator.of(context).pushNamed('/pass_setup',
+                            arguments: {
+                              'bip39': _bip39List,
+                              'codes': _codes,
+                              'cipher': selectedCipherIndex
+                            });
+                      },
+                      backgroundColor: theme.primaryPurple,
+                      borderRadius: 30.0,
+                      height: 56.0,
                     )
                   ],
                 ),

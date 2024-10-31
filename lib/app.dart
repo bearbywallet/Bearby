@@ -31,10 +31,6 @@ class ZilPayApp extends StatelessWidget {
                 textScale = 0.8;
               } else if (screenWidth <= 390) {
                 textScale = 0.85;
-              } else if (screenWidth <= 414) {
-                textScale = 0.9;
-              } else if (screenWidth <= 428) {
-                textScale = 0.95;
               }
 
               return MediaQuery(

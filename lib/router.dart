@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
@@ -25,6 +26,9 @@ class AppRouter {
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
     switch (settings.name) {
+      case '/pass_setup':
+        return MaterialPageRoute(
+            builder: (_) => const PasswordSetupPage(), settings: settings);
       case '/cipher_setup':
         return MaterialPageRoute(
             builder: (_) => const CipherSettingsPage(), settings: settings);
