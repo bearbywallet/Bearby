@@ -34,8 +34,10 @@ pub fn add_bip39_wallet(
     password: &str,
     mnemonic_str: &str,
     indexes: &[usize],
+    net_codes: &[usize],
 ) -> Result<String, String> {
     let derive = Bip49DerivationPath::Zilliqa;
+    // let testbg = Background::from_storage_path();
 
     Ok(String::new())
     // Background::add_bip39_wallet(password, mnemonic_str, indexes, , ).map_err(|e| e.to_string())

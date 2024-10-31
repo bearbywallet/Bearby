@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -8,6 +9,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/src/rust/api/simple.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 
@@ -136,6 +138,17 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       Timer(const Duration(seconds: 5), () {
         _btnController.success();
       });
+
+      Uint64List networkIndexes = Uint64List.fromList(_codes!);
+      Uint64List accountsIndexes =
+          Uint64List.fromList([0]); // TODO: maybe make ui/ux
+
+      await addBip39Wallet(
+        password: _passwordController.text,
+        mnemonicStr: _bip39List!.join(' '),
+        indexes: accountsIndexes,
+        netCodes: networkIndexes,
+      );
     } catch (e) {
       setState(() {
         _disabled = false;

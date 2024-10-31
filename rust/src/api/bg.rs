@@ -2,10 +2,12 @@ use crate::frb_generated::StreamSink;
 use once_cell::sync::Lazy;
 use std::sync::{Arc, Mutex};
 use std::thread;
+use zilpay::background::Background;
 
 pub struct BackgroundService {
     running: Arc<Mutex<bool>>,
     message_queue: Arc<Mutex<Vec<String>>>,
+    app: Option<Arc<Mutex<Background>>>,
 }
 
 impl Default for BackgroundService {
@@ -19,6 +21,7 @@ impl BackgroundService {
         BackgroundService {
             running: Arc::new(Mutex::new(false)),
             message_queue: Arc::new(Mutex::new(Vec::new())),
+            app: None,
         }
     }
 

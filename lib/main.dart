@@ -22,11 +22,18 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
 
-  final authGuard = AuthGuard();
-  await authGuard.initialize();
+  try {
+    Directory appDocDir = await getApplicationDocumentsDirectory();
+    String appDocPath = appDocDir.path;
 
-  final appState = AppState();
-  await appState.initialize();
+    final authGuard = AuthGuard();
+    await authGuard.initialize();
 
-  runApp(ZilPayApp(authGuard: authGuard, appState: appState));
+    final appState = AppState();
+    await appState.initialize();
+
+    runApp(ZilPayApp(authGuard: authGuard, appState: appState));
+  } catch (e) {
+    print('Error getting directory: $e');
+  }
 }
