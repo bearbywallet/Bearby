@@ -21,6 +21,7 @@ class SmartInput extends StatefulWidget {
   final double? fontSize;
   final EdgeInsets? padding;
   final EdgeInsets? iconPadding;
+  final bool disabled;
 
   const SmartInput({
     super.key,
@@ -40,6 +41,7 @@ class SmartInput extends StatefulWidget {
     this.fontSize = 16,
     this.padding,
     this.iconPadding,
+    this.disabled = false,
   });
 
   @override
@@ -132,12 +134,17 @@ class SmartInputState extends State<SmartInput>
             height: widget.height,
             width: widget.width,
             decoration: BoxDecoration(
-              color: theme.cardBackground,
+              color: widget.disabled
+                  ? theme.cardBackground.withOpacity(0.5)
+                  : theme.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: _isFocused
-                    ? (widget.focusedBorderColor ?? defaultFocusedBorderColor)
-                    : (widget.borderColor ?? defaultBorderColor),
+                color: widget.disabled
+                    ? defaultBorderColor.withOpacity(0.3)
+                    : _isFocused
+                        ? (widget.focusedBorderColor ??
+                            defaultFocusedBorderColor)
+                        : (widget.borderColor ?? defaultBorderColor),
                 width: 1.0,
               ),
             ),
@@ -147,7 +154,7 @@ class SmartInputState extends State<SmartInput>
                   _buildIcon(
                         iconPath: widget.leftIconPath,
                         color: iconColor,
-                        onTap: widget.onLeftIconTap,
+                        onTap: widget.disabled ? null : widget.onLeftIconTap,
                       ) ??
                       const SizedBox(),
                 Expanded(
@@ -164,18 +171,25 @@ class SmartInputState extends State<SmartInput>
                       focusNode: _focusNode,
                       obscureText: widget.obscureText,
                       onChanged: widget.onChanged,
+                      enabled: !widget.disabled,
                       onFieldSubmitted: (_) {
-                        widget.onSubmitted?.call();
+                        if (!widget.disabled) {
+                          widget.onSubmitted?.call();
+                        }
                       },
                       style: TextStyle(
-                        color: theme.textPrimary,
+                        color: widget.disabled
+                            ? theme.textPrimary.withOpacity(0.5)
+                            : theme.textPrimary,
                         fontSize: widget.fontSize,
                       ),
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: widget.hint,
                         hintStyle: TextStyle(
-                          color: theme.textSecondary,
+                          color: widget.disabled
+                              ? theme.textSecondary.withOpacity(0.5)
+                              : theme.textSecondary,
                           fontSize: widget.fontSize,
                         ),
                       ),
@@ -186,7 +200,7 @@ class SmartInputState extends State<SmartInput>
                   _buildIcon(
                         iconPath: widget.rightIconPath,
                         color: iconColor,
-                        onTap: widget.onRightIconTap,
+                        onTap: widget.disabled ? null : widget.onRightIconTap,
                       ) ??
                       const SizedBox(),
               ],

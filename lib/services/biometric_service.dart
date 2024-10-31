@@ -15,13 +15,10 @@ class AuthService {
 
       if (isSupported && canCheckBiometrics) {
         final availableBiometrics = await _auth.getAvailableBiometrics();
-        final biometricInfo = await _getBiometricInfo();
 
-        if (biometricInfo.contains('face')) {
+        if (availableBiometrics.contains(BiometricType.face)) {
           methods.add(AuthMethod.faceId);
-        } else if (biometricInfo.contains('fingerprint') ||
-            biometricInfo.contains('thumb') ||
-            biometricInfo.contains('finger')) {
+        } else if (availableBiometrics.contains(BiometricType.fingerprint)) {
           methods.add(AuthMethod.fingerprint);
         } else if (availableBiometrics.contains(BiometricType.strong) ||
             availableBiometrics.contains(BiometricType.weak)) {
@@ -36,31 +33,6 @@ class AuthService {
       return methods.isEmpty ? [AuthMethod.none] : methods;
     } on PlatformException catch (_) {
       return [AuthMethod.none];
-    }
-  }
-
-  Future<String> _getBiometricInfo() async {
-    try {
-      final String biometricHint = await _auth.getAvailableBiometrics().then(
-        (types) async {
-          if (types.isNotEmpty) {
-            final authenticated = await _auth
-                .authenticate(
-                  localizedReason: '',
-                  options: const AuthenticationOptions(
-                    biometricOnly: true,
-                    useErrorDialogs: false,
-                  ),
-                )
-                .catchError((_) => false);
-            return '';
-          }
-          return '';
-        },
-      );
-      return biometricHint.toLowerCase();
-    } catch (e) {
-      return '';
     }
   }
 

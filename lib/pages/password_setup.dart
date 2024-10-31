@@ -37,12 +37,12 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   @override
   void initState() {
     super.initState();
+
     _checkAuthMethods();
   }
 
   @override
   void dispose() {
-    _checkAuthMethods();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
 
@@ -50,7 +50,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   }
 
   bool _validatePasswords() {
-    if (_passwordController.text.length < 8) {
+    if (_passwordController.text.length < 6) {
       _passwordInputKey.currentState?.shake();
 
       setState(() {
@@ -179,6 +179,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             hint: "Confirm Password",
                             height: 56,
                             fontSize: 18,
+                            disabled: true,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             obscureText: _obscureConfirmPassword,
                             rightIconPath: _obscureConfirmPassword
