@@ -24,6 +24,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   bool _useDeviceAuth = false;
 
   String _errorMessage = '';
+  bool _disabled = false;
 
   final _btnController = RoundedLoadingButtonController();
   final _passwordController = TextEditingController();
@@ -55,6 +56,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       setState(() {
         _errorMessage = 'Password must be at least 8 characters';
+        _disabled = false;
       });
 
       return false;
@@ -64,6 +66,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       _confirmPasswordInputKey.currentState?.shake();
 
       setState(() {
+        _disabled = false;
         _errorMessage = 'Passwords do not match';
       });
 
@@ -76,6 +79,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   void _createWallet() async {
     setState(() {
       _errorMessage = '';
+      _disabled = true;
     });
 
     if (!_validatePasswords()) {
@@ -93,6 +97,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         setState(() => _useDeviceAuth = authenticated);
 
         if (!authenticated) {
+          setState(() {
+            _disabled = true;
+          });
+
           return;
         }
       }
@@ -103,7 +111,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _btnController.success();
       });
     } catch (e) {
-      setState(() => _errorMessage = e.toString());
+      setState(() {
+        _disabled = false;
+        _errorMessage = e.toString();
+      });
       _btnController.error();
     }
   }
@@ -146,7 +157,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                               fontSize: 16,
                             ),
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 16),
                           SmartInput(
                             key: _passwordInputKey,
                             controller: _passwordController,
@@ -155,6 +166,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             height: 56,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             focusedBorderColor: theme.primaryPurple,
+                            disabled: _disabled,
                             obscureText: _obscurePassword,
                             rightIconPath: _obscurePassword
                                 ? "assets/icons/close_eye.svg"
@@ -179,7 +191,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             hint: "Confirm Password",
                             height: 56,
                             fontSize: 18,
-                            disabled: true,
+                            disabled: _disabled,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             obscureText: _obscureConfirmPassword,
                             rightIconPath: _obscureConfirmPassword
@@ -217,9 +229,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                 ),
                 Padding(
                   padding: EdgeInsets.only(
-                      bottom: adaptivePadding,
-                      left: adaptivePadding,
-                      right: adaptivePadding),
+                    bottom: adaptivePadding,
+                  ),
                   child: RoundedLoadingButton(
                     controller: _btnController,
                     onPressed: _createWallet,
@@ -288,9 +299,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           ),
           Switch(
             value: _useDeviceAuth,
-            onChanged: (value) async {
-              setState(() => _useDeviceAuth = value);
-            },
+            onChanged: _disabled
+                ? null
+                : (value) async {
+                    setState(() => _useDeviceAuth = value);
+                  },
             activeColor: theme.primaryPurple,
             activeTrackColor: theme.primaryPurple.withOpacity(0.4),
           ),
