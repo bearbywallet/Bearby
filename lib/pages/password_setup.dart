@@ -7,6 +7,8 @@ import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 
 class PasswordSetupPage extends StatefulWidget {
@@ -17,6 +19,10 @@ class PasswordSetupPage extends StatefulWidget {
 }
 
 class _PasswordSetupPageState extends State<PasswordSetupPage> {
+  final AuthService _authService = AuthService();
+  List<AuthMethod> _authMethods = [AuthMethod.none];
+  bool _useDeviceAuth = false;
+
   final _btnController = RoundedLoadingButtonController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -25,10 +31,16 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
-  bool _useBiometric = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkAuthMethods();
+  }
 
   @override
   void dispose() {
+    _checkAuthMethods();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     super.dispose();
@@ -109,7 +121,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             hint: "Password",
                             fontSize: 18,
                             height: 56,
-                            borderColor: theme.textSecondary,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             focusedBorderColor: theme.primaryPurple,
                             obscureText: _obscurePassword,
@@ -143,39 +154,38 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             },
                           ),
                           const SizedBox(height: 24),
-                          // Biometric option with Switch
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 4),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text(
-                                  'Enable Face ID / Touch ID',
-                                  style: TextStyle(
-                                    color: theme.textPrimary,
-                                    fontSize: 16,
-                                  ),
-                                ),
-                                Switch(
-                                  value: _useBiometric,
-                                  onChanged: (value) {
-                                    setState(() {
-                                      _useBiometric = value;
-                                    });
-                                  },
-                                  activeColor: theme.primaryPurple,
-                                  activeTrackColor:
-                                      theme.primaryPurple.withOpacity(0.4),
-                                ),
-                              ],
-                            ),
-                          ),
+                          _buildAuthOption(theme),
+                          // Padding(
+                          //   padding: const EdgeInsets.symmetric(horizontal: 4),
+                          //   child: Row(
+                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          //     children: [
+                          //       Text(
+                          //         'Enable Face ID / Touch ID',
+                          //         style: TextStyle(
+                          //           color: theme.textPrimary,
+                          //           fontSize: 16,
+                          //         ),
+                          //       ),
+                          //       Switch(
+                          //         value: _useBiometric,
+                          //         onChanged: (value) {
+                          //           setState(() {
+                          //             _useBiometric = value;
+                          //           });
+                          //         },
+                          //         activeColor: theme.primaryPurple,
+                          //         activeTrackColor:
+                          //             theme.primaryPurple.withOpacity(0.4),
+                          //       ),
+                          //     ],
+                          //   ),
+                          // ),
                         ],
                       ),
                     ),
                   ),
                 ),
-                // Bottom button
                 Padding(
                   padding: EdgeInsets.only(
                       bottom: adaptivePadding,
@@ -209,5 +219,98 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         ),
       ),
     );
+  }
+
+  Widget _buildAuthOption(AppTheme theme) {
+    if (_authMethods.contains(AuthMethod.none)) {
+      return const SizedBox.shrink();
+    }
+
+    final authText = _getAuthMethodText();
+    final iconPath = _getAuthMethodIcon();
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                iconPath,
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.textPrimary,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(
+                width: 4,
+              ),
+              Text(
+                authText,
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          Switch(
+            value: _useDeviceAuth,
+            onChanged: (value) async {
+              if (value) {
+                final authenticated = await _authService.authenticate(
+                  allowPinCode: _authMethods.contains(AuthMethod.pinCode),
+                  reason: 'Please authenticate to enable quick access',
+                );
+                if (authenticated) {
+                  setState(() => _useDeviceAuth = true);
+                }
+                setState(() => _useDeviceAuth = true);
+              } else {
+                setState(() => _useDeviceAuth = false);
+              }
+            },
+            activeColor: theme.primaryPurple,
+            activeTrackColor: theme.primaryPurple.withOpacity(0.4),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _getAuthMethodText() {
+    if (_authMethods.contains(AuthMethod.faceId)) {
+      return 'Enable Face ID';
+    } else if (_authMethods.contains(AuthMethod.fingerprint)) {
+      return 'Enable Fingerprint';
+    } else if (_authMethods.contains(AuthMethod.biometric)) {
+      return 'Enable Biometric Login';
+    } else if (_authMethods.contains(AuthMethod.pinCode)) {
+      return 'Enable Device PIN';
+    }
+    return '';
+  }
+
+  String _getAuthMethodIcon() {
+    if (_authMethods.contains(AuthMethod.faceId)) {
+      return 'assets/icons/face_id.svg';
+    } else if (_authMethods.contains(AuthMethod.fingerprint)) {
+      return 'assets/icons/fingerprint.svg';
+    } else if (_authMethods.contains(AuthMethod.biometric)) {
+      return 'assets/icons/biometric.svg';
+    } else if (_authMethods.contains(AuthMethod.pinCode)) {
+      return 'assets/icons/pin.svg';
+    }
+    return '';
+  }
+
+  Future<void> _checkAuthMethods() async {
+    final methods = await _authService.getAvailableAuthMethods();
+    setState(() {
+      _authMethods = methods;
+    });
   }
 }

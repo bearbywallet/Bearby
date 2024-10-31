@@ -165,7 +165,6 @@ class SmartInputState extends State<SmartInput>
                       obscureText: widget.obscureText,
                       onChanged: widget.onChanged,
                       onFieldSubmitted: (_) {
-                        shake();
                         widget.onSubmitted?.call();
                       },
                       style: TextStyle(

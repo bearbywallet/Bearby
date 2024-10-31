@@ -1,5 +1,10 @@
 # This is a generated file; do not edit or check into version control.
+flutter_plugin_android_lifecycle=/home/rinat/.pub-cache/hosted/pub.dev/flutter_plugin_android_lifecycle-2.0.23/
 integration_test=/home/rinat/source/flutter/packages/integration_test/
+local_auth=/home/rinat/.pub-cache/hosted/pub.dev/local_auth-2.3.0/
+local_auth_android=/home/rinat/.pub-cache/hosted/pub.dev/local_auth_android-1.0.46/
+local_auth_darwin=/home/rinat/.pub-cache/hosted/pub.dev/local_auth_darwin-1.4.1/
+local_auth_windows=/home/rinat/.pub-cache/hosted/pub.dev/local_auth_windows-1.0.11/
 path_provider=/home/rinat/.pub-cache/hosted/pub.dev/path_provider-2.1.4/
 path_provider_android=/home/rinat/.pub-cache/hosted/pub.dev/path_provider_android-2.2.10/
 path_provider_foundation=/home/rinat/.pub-cache/hosted/pub.dev/path_provider_foundation-2.4.0/
