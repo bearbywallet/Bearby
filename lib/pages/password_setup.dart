@@ -23,6 +23,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _useDeviceAuth = false;
 
+  String _errorMessage = '';
+
   final _btnController = RoundedLoadingButtonController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
@@ -43,17 +45,28 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     _checkAuthMethods();
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+
     super.dispose();
   }
 
   bool _validatePasswords() {
     if (_passwordController.text.length < 8) {
       _passwordInputKey.currentState?.shake();
+
+      setState(() {
+        _errorMessage = 'Password must be at least 8 characters';
+      });
+
       return false;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       _confirmPasswordInputKey.currentState?.shake();
+
+      setState(() {
+        _errorMessage = 'Passwords do not match';
+      });
+
       return false;
     }
 
@@ -61,17 +74,36 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   }
 
   void _createWallet() async {
+    setState(() {
+      _errorMessage = '';
+    });
+
     if (!_validatePasswords()) {
       _btnController.reset();
       return;
     }
 
-    _btnController.start();
     try {
+      if (_useDeviceAuth) {
+        final authenticated = await _authService.authenticate(
+          allowPinCode: _authMethods.contains(AuthMethod.pinCode),
+          reason: 'Please authenticate to enable quick access',
+        );
+
+        setState(() => _useDeviceAuth = authenticated);
+
+        if (!authenticated) {
+          return;
+        }
+      }
+
+      _btnController.start();
+
       Timer(const Duration(seconds: 5), () {
         _btnController.success();
       });
     } catch (e) {
+      setState(() => _errorMessage = e.toString());
       _btnController.error();
     }
   }
@@ -127,7 +159,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             rightIconPath: _obscurePassword
                                 ? "assets/icons/close_eye.svg"
                                 : "assets/icons/open_eye.svg",
-                            onSubmitted: () {},
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
+                                setState(() {
+                                  _errorMessage = '';
+                                });
+                              }
+                            },
                             onRightIconTap: () {
                               setState(() {
                                 _obscurePassword = !_obscurePassword;
@@ -152,35 +190,25 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                     !_obscureConfirmPassword;
                               });
                             },
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
+                                setState(() {
+                                  _errorMessage = '';
+                                });
+                              }
+                            },
+                            onSubmitted: _createWallet,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 8),
+                          Text(
+                            _errorMessage,
+                            style: TextStyle(
+                              color: theme.danger,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                           _buildAuthOption(theme),
-                          // Padding(
-                          //   padding: const EdgeInsets.symmetric(horizontal: 4),
-                          //   child: Row(
-                          //     mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          //     children: [
-                          //       Text(
-                          //         'Enable Face ID / Touch ID',
-                          //         style: TextStyle(
-                          //           color: theme.textPrimary,
-                          //           fontSize: 16,
-                          //         ),
-                          //       ),
-                          //       Switch(
-                          //         value: _useBiometric,
-                          //         onChanged: (value) {
-                          //           setState(() {
-                          //             _useBiometric = value;
-                          //           });
-                          //         },
-                          //         activeColor: theme.primaryPurple,
-                          //         activeTrackColor:
-                          //             theme.primaryPurple.withOpacity(0.4),
-                          //       ),
-                          //     ],
-                          //   ),
-                          // ),
                         ],
                       ),
                     ),
@@ -260,18 +288,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           Switch(
             value: _useDeviceAuth,
             onChanged: (value) async {
-              if (value) {
-                final authenticated = await _authService.authenticate(
-                  allowPinCode: _authMethods.contains(AuthMethod.pinCode),
-                  reason: 'Please authenticate to enable quick access',
-                );
-                if (authenticated) {
-                  setState(() => _useDeviceAuth = true);
-                }
-                setState(() => _useDeviceAuth = true);
-              } else {
-                setState(() => _useDeviceAuth = false);
-              }
+              setState(() => _useDeviceAuth = value);
             },
             activeColor: theme.primaryPurple,
             activeTrackColor: theme.primaryPurple.withOpacity(0.4),
