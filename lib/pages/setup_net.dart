@@ -218,7 +218,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                 ),
               ),
               Padding(
-                padding: const EdgeInsets.all(16.0),
+                padding: EdgeInsets.all(adaptivePadding),
                 child: CustomButton(
                   text: 'Next',
                   onPressed: () {

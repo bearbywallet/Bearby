@@ -19,6 +19,10 @@ class PasswordSetupPage extends StatefulWidget {
 }
 
 class _PasswordSetupPageState extends State<PasswordSetupPage> {
+  List<String>? _bip39List;
+  List<int>? _codes;
+  int? _cipher;
+
   final AuthService _authService = AuthService();
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _useDeviceAuth = false;
@@ -34,6 +38,28 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bip39 = args?['bip39'] as List<String>?;
+    final codes = args?['codes'] as List<int>?;
+    final int? cipher = args?['cipher'];
+
+    if (bip39 == null || codes == null || cipher == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      });
+    } else {
+      setState(() {
+        _bip39List = bip39;
+        _codes = codes;
+        _cipher = cipher;
+      });
+    }
+  }
 
   @override
   void initState() {
