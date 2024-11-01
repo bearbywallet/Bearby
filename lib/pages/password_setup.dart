@@ -146,7 +146,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         netCodes: networkIndexes,
       );
 
-      print(key);
       _btnController.success();
       // TODO: navigate to next page.
     } catch (e) {
