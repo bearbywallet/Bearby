@@ -163,37 +163,12 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                     CustomButton(
                       text: 'Confirm',
                       onPressed: () {
-                        // TODO: remove it after test
-                        List<String> tmpbip39 = [
-                          "napkin",
-                          "ritual",
-                          "humble",
-                          "jungle",
-                          "fat",
-                          "grid",
-                          "donor",
-                          "hollow",
-                          "ankle",
-                          "sock",
-                          "dignity",
-                          "shock"
-                        ];
-                        List<int> tmpcodes = [0, 1, 2, 3];
-                        int tmpcipher = 2;
-
                         Navigator.of(context).pushNamed('/pass_setup',
                             arguments: {
-                              'bip39': tmpbip39,
-                              'codes': tmpcodes,
-                              'cipher': tmpcipher
+                              'bip39': _bip39List,
+                              'codes': _codes,
+                              'cipher': selectedCipherIndex
                             });
-
-                        // Navigator.of(context).pushNamed('/pass_setup',
-                        //     arguments: {
-                        //       'bip39': _bip39List,
-                        //       'codes': _codes,
-                        //       'cipher': selectedCipherIndex
-                        //     });
                       },
                       backgroundColor: theme.primaryPurple,
                       borderRadius: 30.0,
