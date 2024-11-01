@@ -86,8 +86,6 @@ pub async fn add_bip39_wallet(
     // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;
 
-    // Ok(String::new())
-
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let key = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?

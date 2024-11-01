@@ -135,26 +135,30 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       _btnController.start();
 
-      Timer(const Duration(seconds: 5), () {
-        _btnController.success();
-      });
-
       Uint64List networkIndexes = Uint64List.fromList(_codes!);
       Uint64List accountsIndexes =
           Uint64List.fromList([0]); // TODO: maybe make ui/ux
 
-      await addBip39Wallet(
+      String key = await addBip39Wallet(
         password: _passwordController.text,
         mnemonicStr: _bip39List!.join(' '),
         indexes: accountsIndexes,
         netCodes: networkIndexes,
       );
+
+      print(key);
+      _btnController.success();
+      // TODO: navigate to next page.
     } catch (e) {
       setState(() {
         _disabled = false;
         _errorMessage = e.toString();
       });
       _btnController.error();
+
+      Timer(const Duration(seconds: 1), () {
+        _btnController.reset();
+      });
     }
   }
 

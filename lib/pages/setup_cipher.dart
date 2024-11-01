@@ -165,18 +165,18 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                       onPressed: () {
                         // TODO: remove it after test
                         List<String> tmpbip39 = [
-                          'sand',
-                          'cupboard',
-                          'tool',
-                          'tortoise',
-                          'sadness',
-                          'achieve',
-                          'leisure',
-                          'lock',
-                          'total',
-                          'kid',
-                          'boat',
-                          'toast'
+                          "napkin",
+                          "ritual",
+                          "humble",
+                          "jungle",
+                          "fat",
+                          "grid",
+                          "donor",
+                          "hollow",
+                          "ankle",
+                          "sock",
+                          "dignity",
+                          "shock"
                         ];
                         List<int> tmpcodes = [0, 1, 2, 3];
                         int tmpcipher = 2;

@@ -1,6 +1,7 @@
 import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -25,6 +26,8 @@ Future<void> main() async {
   try {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
+
+    await startService(path: appDocPath);
 
     final authGuard = AuthGuard();
     await authGuard.initialize();
