@@ -32,18 +32,18 @@ Future<String> addBip39Wallet(
         indexes: indexes,
         netCodes: netCodes);
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Background>>
-abstract class Background implements RustOpaqueInterface {}
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
+abstract class ArcBackground implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
 abstract class Serivce implements RustOpaqueInterface {
-  Background get core;
+  ArcBackground get core;
 
   RustStreamSink<String>? get messageSink;
 
   bool get running;
 
-  set core(Background core);
+  set core(ArcBackground core);
 
   set messageSink(RustStreamSink<String>? messageSink);
 

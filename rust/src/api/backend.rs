@@ -1,34 +1,15 @@
 use crate::frb_generated::StreamSink;
 use lazy_static::lazy_static;
+use std::sync::Arc;
 use tokio::sync::RwLock;
-use zilpay::background::Background;
-use zilpay::crypto::bip49::Bip49DerivationPath;
 
-// fn background_worker() {
-//     while {
-//         let service = BACKGROUND_SERVICE.read();
-//         service.as_ref().map(|s| s.running).unwrap_or(false)
-//     } {
-//         let service = BACKGROUND_SERVICE.read();
-
-//         if let Some(background) = service.as_ref() {
-//             if let Some(sink) = &background.message_sink {
-//                 // sink.add("Background message").unwrap_or_else(|e| {
-//                 //     eprintln!("Error sending message: {}", e);
-//                 // });
-//             }
-//         }
-
-//         drop(service);
-
-//         thread::sleep(std::time::Duration::from_secs(1));
-//     }
-// }
+pub use zilpay::background::Background;
+pub use zilpay::crypto::bip49::Bip49DerivationPath;
 
 pub struct Serivce {
     pub running: bool,
     pub message_sink: Option<StreamSink<String>>,
-    pub core: Background,
+    pub core: Arc<Background>,
 }
 
 lazy_static! {
@@ -40,18 +21,11 @@ impl Serivce {
         let core = Background::from_storage_path(path).map_err(|e| e.to_string())?;
 
         Ok(Self {
-            core,
+            core: Arc::new(core),
             running: true,
             message_sink: None,
         })
     }
-
-    // fn new(sink: StreamSink<String>) -> Self {
-    //     Self {
-    //         running: true,
-    //         message_sink: Some(sink),
-    //     }
-    // }
 
     fn stop(&mut self) {
         self.running = false;
@@ -83,7 +57,7 @@ pub async fn stop_service() -> Result<(), String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn start_worker(sink: StreamSink<String>) -> Result<(), String> {
+pub async fn start_worker(_sink: StreamSink<String>) -> Result<(), String> {
     let service = BACKGROUND_SERVICE.read().await;
 
     if service.is_some() {
@@ -112,9 +86,11 @@ pub async fn add_bip39_wallet(
     // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;
 
+    // Ok(String::new())
+
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let key = service
-            .core
+        let key = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
             .add_bip39_wallet(password, mnemonic_str, indexes, derive)
             .map_err(|e| e.to_string())?;
         let key_str = hex::encode(key);
