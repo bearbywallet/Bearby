@@ -1,6 +1,5 @@
 use crate::frb_generated::StreamSink;
 use lazy_static::lazy_static;
-use std::thread;
 use tokio::sync::RwLock;
 use zilpay::background::Background;
 use zilpay::crypto::bip49::Bip49DerivationPath;
@@ -108,14 +107,20 @@ pub async fn add_bip39_wallet(
     password: &str,
     mnemonic_str: &str,
     indexes: &[usize],
-    net_codes: &[usize],
+    net_codes: &[usize], // TODO: add netowrk codes for wallet
 ) -> Result<String, String> {
+    // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;
-    let service = BACKGROUND_SERVICE.read().await.as_ref();
 
-    Ok(String::new())
-    // BACKGROUND_SERVICE.read().and_then(|guard| {}) {
-    // if let Some(service) = BACKGROUND_SERVICE.read() {}
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let key = service
+            .core
+            .add_bip39_wallet(password, mnemonic_str, indexes, derive)
+            .map_err(|e| e.to_string())?;
+        let key_str = hex::encode(key);
 
-    // Background::add_bip39_wallet(password, mnemonic_str, indexes, , ).map_err(|e| e.to_string())
+        Ok(key_str)
+    } else {
+        Err("Service is not running".to_string())
+    }
 }
