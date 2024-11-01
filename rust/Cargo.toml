@@ -9,4 +9,4 @@ crate-type = ["cdylib", "staticlib"]
 [dependencies]
 flutter_rust_bridge = "=2.5.1"
 once_cell = "1.19.0"
-zilpay_core = { path = "/Users/rinat/projects/zilpay/zilpay-core" }
+zilpay_core = { path = "/home/rinat/projects/zilpay/zilpa-core" }
