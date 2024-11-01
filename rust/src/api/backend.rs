@@ -58,7 +58,7 @@ impl Serivce {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn start_service(path: &str) -> Result<(), String> {
     let mut service = BACKGROUND_SERVICE.write().await;
 
@@ -69,7 +69,7 @@ pub async fn start_service(path: &str) -> Result<(), String> {
     Ok(())
 }
 
-#[flutter_rust_bridge::frb(sync)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn stop_service() -> Result<(), String> {
     let mut service = BACKGROUND_SERVICE.write().await;
 
@@ -82,7 +82,7 @@ pub async fn stop_service() -> Result<(), String> {
     }
 }
 
-#[flutter_rust_bridge::frb(sync)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn start_worker(sink: StreamSink<String>) -> Result<(), String> {
     let service = BACKGROUND_SERVICE.read().await;
 
@@ -97,7 +97,7 @@ pub async fn start_worker(sink: StreamSink<String>) -> Result<(), String> {
     Ok(())
 }
 
-#[flutter_rust_bridge::frb(sync)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn is_service_running() -> bool {
     BACKGROUND_SERVICE.read().await.is_some()
 }
@@ -107,7 +107,7 @@ pub async fn add_bip39_wallet(
     password: &str,
     mnemonic_str: &str,
     indexes: &[usize],
-    net_codes: &[usize], // TODO: add netowrk codes for wallet
+    _net_codes: &[usize], // TODO: add netowrk codes for wallet
 ) -> Result<String, String> {
     // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;

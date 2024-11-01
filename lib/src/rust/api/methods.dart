@@ -8,14 +8,3 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<String> genBip39Words({required int count}) =>
     RustLib.instance.api.crateApiMethodsGenBip39Words(count: count);
-
-Future<String> addBip39Wallet(
-        {required String password,
-        required String mnemonicStr,
-        required Uint64List indexes,
-        required Uint64List netCodes}) =>
-    RustLib.instance.api.crateApiMethodsAddBip39Wallet(
-        password: password,
-        mnemonicStr: mnemonicStr,
-        indexes: indexes,
-        netCodes: netCodes);
