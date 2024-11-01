@@ -9,16 +9,6 @@ import 'state/app_state.dart';
 import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
 
-Future<void> printApplicationDocumentsDirectory() async {
-  try {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
-    print('Application Documents Directory: $appDocPath');
-  } catch (e) {
-    print('Error getting directory: $e');
-  }
-}
-
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
@@ -27,10 +17,10 @@ Future<void> main() async {
     Directory appDocDir = await getApplicationDocumentsDirectory();
     String appDocPath = appDocDir.path;
 
-    await startService(path: appDocPath);
+    List<WalletInfo> wallets = await startService(path: appDocPath);
 
     final authGuard = AuthGuard();
-    await authGuard.initialize();
+    await authGuard.initialize(wallets.isNotEmpty);
 
     final appState = AppState();
     await appState.initialize();

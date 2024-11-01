@@ -99,17 +99,17 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args = ModalRoute.of(context)?.settings.arguments
-        as Map<String, List<String>>?;
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final bip39 = args?['bip39'] as List<String>?;
 
-    if (args == null || args['bip39'] == null || args['bip39']!.isEmpty) {
-      // TODO: unlock it
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
-      // });
+    if (bip39 == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      });
     } else {
       setState(() {
-        _bip39List = args['bip39'];
+        _bip39List = bip39;
       });
     }
   }

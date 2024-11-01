@@ -4338,6 +4338,8 @@ version = "0.1.0"
 dependencies = [
  "background",
  "crypto",
+ "settings",
+ "wallet",
  "zil_errors",
 ]
 
@@ -4359,9 +4361,11 @@ dependencies = [
  "ripemd",
  "serde",
  "serde_json",
+ "settings",
  "sha2 0.10.8",
  "thiserror",
  "tokio",
+ "wallet",
  "zil_errors",
  "zilpay",
 ]

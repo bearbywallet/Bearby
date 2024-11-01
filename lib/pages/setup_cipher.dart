@@ -64,10 +64,9 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     final codes = args?['codes'] as List<int>?;
 
     if (bip39 == null || codes == null) {
-      // TODO: unlock it
-      // WidgetsBinding.instance.addPostFrameCallback((_) {
-      //   Navigator.of(context).pushReplacementNamed('/gen_bip39');
-      // });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+      });
     } else {
       setState(() {
         _bip39List = bip39;

@@ -10,7 +10,6 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/services/secure_storage.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -28,7 +27,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   int? _cipher;
 
   final AuthService _authService = AuthService();
-  // final SecureStorage _secureStorage = SecureStorage();
   late AuthGuard _authGuard;
 
   List<AuthMethod> _authMethods = [AuthMethod.none];

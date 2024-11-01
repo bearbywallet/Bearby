@@ -5,6 +5,9 @@ use tokio::sync::RwLock;
 
 pub use zilpay::background::Background;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
+pub use zilpay::settings::wallet_settings::WalletSettings;
+pub use zilpay::wallet::account::Account;
+pub use zilpay::wallet::wallet_types::WalletTypes;
 
 pub struct Serivce {
     pub running: bool,
@@ -32,15 +35,65 @@ impl Serivce {
     }
 }
 
+#[derive(Debug)]
+pub struct WalletInfo {
+    pub wallet_type: WalletTypes,
+    pub settings: WalletSettings,
+    pub wallet_address: String,
+    pub accounts: Vec<Account>,
+    pub selected_account: usize,
+    pub enabled: bool,
+}
+
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn start_service(path: &str) -> Result<(), String> {
+pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
+    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
+        let core = Arc::as_ref(&service.core);
+        let wallets: Vec<WalletInfo> = core
+            .wallets
+            .iter()
+            .map(|w| WalletInfo {
+                wallet_type: w.data.wallet_type,
+                settings: w.data.settings.clone(),
+                wallet_address: w.data.wallet_address.clone(),
+                accounts: w.data.accounts.clone(),
+                selected_account: w.data.selected_account,
+                enabled: w.is_enabled(),
+            })
+            .collect();
+
+        Ok(wallets)
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn start_service(path: &str) -> Result<Vec<WalletInfo>, String> {
     let mut service = BACKGROUND_SERVICE.write().await;
 
     if service.is_none() {
-        *service = Some(Serivce::from_path(path)?);
+        let bg = Serivce::from_path(path)?;
+        let wallets: Vec<WalletInfo> = bg
+            .core
+            .wallets
+            .iter()
+            .map(|w| WalletInfo {
+                wallet_type: w.data.wallet_type,
+                settings: w.data.settings.clone(),
+                wallet_address: w.data.wallet_address.clone(),
+                accounts: w.data.accounts.clone(),
+                selected_account: w.data.selected_account,
+                enabled: w.is_enabled(),
+            })
+            .collect();
+
+        *service = Some(bg);
+
+        return Ok(wallets);
     }
 
-    Ok(())
+    Err("service already running".to_string())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]

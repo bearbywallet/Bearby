@@ -35,9 +35,9 @@ class AuthGuard extends ChangeNotifier {
     return key;
   }
 
-  Future<void> initialize() async {
+  Future<void> initialize(bool ready) async {
     _enabled = false;
-    _ready = false;
+    _ready = ready;
 
     notifyListeners();
   }
