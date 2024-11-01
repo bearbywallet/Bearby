@@ -5,7 +5,7 @@ import '../theme/theme_provider.dart';
 class CryptoList extends StatelessWidget {
   final List<CryptoListItem> items;
 
-  const CryptoList({Key? key, required this.items}) : super(key: key);
+  const CryptoList({super.key, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -18,7 +18,7 @@ class CryptoList extends StatelessWidget {
       ),
       child: ListView.separated(
         shrinkWrap: true,
-        physics: NeverScrollableScrollPhysics(),
+        physics: const NeverScrollableScrollPhysics(),
         itemCount: items.length,
         separatorBuilder: (context, index) => Divider(
           color: theme.textSecondary.withOpacity(0.2),
@@ -39,12 +39,12 @@ class CryptoListItem extends StatelessWidget {
   final List<Widget> icons;
 
   const CryptoListItem({
-    Key? key,
+    super.key,
     required this.name,
     required this.balance,
     required this.balanceInUsd,
     required this.icons,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -66,7 +66,7 @@ class CryptoListItem extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 4),
                 Text(
                   balanceInUsd,
                   style: TextStyle(
@@ -88,7 +88,7 @@ class CryptoListItem extends StatelessWidget {
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              SizedBox(height: 4),
+              const SizedBox(height: 4),
               Row(
                 children: icons,
               ),

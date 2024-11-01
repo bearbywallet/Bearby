@@ -7,6 +7,8 @@ import './history_page.dart';
 import './browser_page.dart';
 
 class MainPage extends StatefulWidget {
+  const MainPage({super.key});
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -14,10 +16,10 @@ class MainPage extends StatefulWidget {
 class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
-  static List<Widget> _pages = <Widget>[
-    GradientBackground(child: HomePage()),
-    GradientBackground(child: HistoryPage()),
-    GradientBackground(child: BrowserPage())
+  static final List<Widget> _pages = <Widget>[
+    const GradientBackground(child: HomePage()),
+    const GradientBackground(child: HistoryPage()),
+    const GradientBackground(child: BrowserPage())
   ];
 
   void _onItemTapped(int index) {

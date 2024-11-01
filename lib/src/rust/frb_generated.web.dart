@@ -6,8 +6,9 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/backend.dart';
 import 'api/bg.dart';
-import 'api/simple.dart';
+import 'api/methods.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';

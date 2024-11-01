@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class InitialPage extends StatelessWidget {
+  const InitialPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -8,10 +10,10 @@ class InitialPage extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Text('Initial Page'),
-            SizedBox(height: 20),
+            const Text('Initial Page'),
+            const SizedBox(height: 20),
             ElevatedButton(
-              child: Text('Go to Main Page'),
+              child: const Text('Go to Main Page'),
               onPressed: () {
                 Navigator.of(context).pushNamed('/new_wallet_options');
               },

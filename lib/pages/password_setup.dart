@@ -9,7 +9,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/src/rust/api/simple.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 

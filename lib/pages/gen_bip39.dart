@@ -4,7 +4,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
-import 'package:zilpay/src/rust/api/simple.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import '../theme/theme_provider.dart';
 import '../components/gradient_bg.dart';
 
@@ -21,7 +21,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
   List<String> _mnemonicWords = [];
   var _count = 12;
   bool _hasBackupWords = false;
-  String _selectedLanguage = 'English';
+  final String _selectedLanguage = 'English';
 
   @override
   void initState() {

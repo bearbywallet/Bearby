@@ -5,6 +5,8 @@ import '../theme/theme_provider.dart';
 import '../components/view_item.dart';
 
 class AddWalletOptionsPage extends StatelessWidget {
+  const AddWalletOptionsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
@@ -68,7 +70,7 @@ class AddWalletOptionsPage extends StatelessWidget {
                 ),
                 onTap: () {/* Handle pairing with Ledger */},
               ),
-              SizedBox(height: 24),
+              const SizedBox(height: 24),
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
@@ -76,7 +78,7 @@ class AddWalletOptionsPage extends StatelessWidget {
                   style: TextStyle(color: theme.textSecondary, fontSize: 14),
                 ),
               ),
-              SizedBox(height: 16),
+              const SizedBox(height: 16),
               WalletListItem(
                 title: 'Watch Account',
                 subtitle: 'For monitor wallet activity without recovery phrase',

@@ -6,27 +6,15 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-String greet({required String name}) =>
-    RustLib.instance.api.crateApiSimpleGreet(name: name);
-
-Stream<String> startBackgroundService() =>
-    RustLib.instance.api.crateApiSimpleStartBackgroundService();
-
-void stopBackgroundService() =>
-    RustLib.instance.api.crateApiSimpleStopBackgroundService();
-
-void sendMessageToService({required String message}) =>
-    RustLib.instance.api.crateApiSimpleSendMessageToService(message: message);
-
 Future<String> genBip39Words({required int count}) =>
-    RustLib.instance.api.crateApiSimpleGenBip39Words(count: count);
+    RustLib.instance.api.crateApiMethodsGenBip39Words(count: count);
 
 Future<String> addBip39Wallet(
         {required String password,
         required String mnemonicStr,
         required Uint64List indexes,
         required Uint64List netCodes}) =>
-    RustLib.instance.api.crateApiSimpleAddBip39Wallet(
+    RustLib.instance.api.crateApiMethodsAddBip39Wallet(
         password: password,
         mnemonicStr: mnemonicStr,
         indexes: indexes,

@@ -5,6 +5,8 @@ import '../theme/theme_provider.dart';
 import '../components/view_item.dart';
 
 class RestoreWalletOptionsPage extends StatelessWidget {
+  const RestoreWalletOptionsPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
@@ -23,7 +25,8 @@ class RestoreWalletOptionsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Restore Wallet', style: TextStyle(color: theme.textPrimary)),
+        title:
+            Text('Restore Wallet', style: TextStyle(color: theme.textPrimary)),
       ),
       body: SingleChildScrollView(
         child: Padding(

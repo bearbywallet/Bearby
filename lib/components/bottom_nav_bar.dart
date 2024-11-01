@@ -8,7 +8,8 @@ class CustomBottomNavigationBar extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
 
-  CustomBottomNavigationBar({
+  const CustomBottomNavigationBar({
+    super.key,
     required this.items,
     required this.currentIndex,
     required this.onTap,
@@ -34,7 +35,9 @@ class CustomBottomNavigationBar extends StatelessWidget {
                 color: Colors.transparent,
                 child: SvgPicture.asset(
                   item.iconPath,
-                  color: index == currentIndex ? theme.primaryPurple : theme.textSecondary,
+                  color: index == currentIndex
+                      ? theme.primaryPurple
+                      : theme.textSecondary,
                   width: 40,
                   height: 40,
                 ),

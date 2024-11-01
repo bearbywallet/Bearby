@@ -35,7 +35,7 @@ class ZilPayApp extends StatelessWidget {
 
               return MediaQuery(
                 data: mediaQuery.copyWith(
-                  textScaleFactor: textScale,
+                  textScaler: TextScaler.linear(textScale),
                 ),
                 child: child!,
               );

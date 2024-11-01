@@ -8,6 +8,8 @@ import '../theme/theme_provider.dart';
 import '../theme/app_theme.dart';
 
 class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   Future<void> _refreshData() async {
     await Future.delayed(const Duration(seconds: 2));
     print('Data refreshed');
@@ -48,7 +50,7 @@ class HomePage extends StatelessWidget {
       children: [
         Row(
           children: [
-            SizedBox(width: 8),
+            const SizedBox(width: 8),
             Text(
               'Main wallet',
               style: TextStyle(
@@ -127,9 +129,9 @@ class HomePage extends StatelessWidget {
           balanceInUsd: '\$ 2148',
           icons: [
             SvgPicture.asset('assets/icons/eth.svg', width: 16, height: 16),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             SvgPicture.asset('assets/icons/icon1.svg', width: 16, height: 16),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             SvgPicture.asset('assets/icons/icon2.svg', width: 16, height: 16),
           ],
         ),
@@ -139,7 +141,7 @@ class HomePage extends StatelessWidget {
           balanceInUsd: '\$ 7333',
           icons: [
             SvgPicture.asset('assets/icons/zil.svg', width: 16, height: 16),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             SvgPicture.asset('assets/icons/icon3.svg', width: 16, height: 16),
           ],
         ),
@@ -149,9 +151,9 @@ class HomePage extends StatelessWidget {
           balanceInUsd: '\$ 8521',
           icons: [
             SvgPicture.asset('assets/icons/bnb.svg', width: 16, height: 16),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             SvgPicture.asset('assets/icons/icon4.svg', width: 16, height: 16),
-            SizedBox(width: 4),
+            const SizedBox(width: 4),
             SvgPicture.asset('assets/icons/icon5.svg', width: 16, height: 16),
           ],
         ),

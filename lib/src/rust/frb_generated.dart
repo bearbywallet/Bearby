@@ -3,8 +3,9 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/backend.dart';
 import 'api/bg.dart';
-import 'api/simple.dart';
+import 'api/methods.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -58,7 +59,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
   @override
   Future<void> executeRustInitializers() async {
-    await api.crateApiSimpleInitApp();
+    await api.crateApiMethodsInitApp();
   }
 
   @override
@@ -69,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -1393293376;
+  int get rustContentHash => -729935652;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -80,6 +81,12 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
+  Future<String> crateApiBackendAddBip39Wallet(
+      {required String password,
+      required String mnemonicStr,
+      required Uint64List indexes,
+      required Uint64List netCodes});
+
   Future<BackgroundService> crateApiBgBackgroundServiceDefault();
 
   Future<BackgroundService> crateApiBgBackgroundServiceNew();
@@ -99,23 +106,15 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiBgStopBackgroundService();
 
-  Future<String> crateApiSimpleAddBip39Wallet(
+  Future<String> crateApiMethodsAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
       required Uint64List indexes,
       required Uint64List netCodes});
 
-  Future<String> crateApiSimpleGenBip39Words({required int count});
+  Future<String> crateApiMethodsGenBip39Words({required int count});
 
-  String crateApiSimpleGreet({required String name});
-
-  Future<void> crateApiSimpleInitApp();
-
-  void crateApiSimpleSendMessageToService({required String message});
-
-  Stream<String> crateApiSimpleStartBackgroundService();
-
-  void crateApiSimpleStopBackgroundService();
+  Future<void> crateApiMethodsInitApp();
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_BackgroundService;
@@ -136,12 +135,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
+  Future<String> crateApiBackendAddBip39Wallet(
+      {required String password,
+      required String mnemonicStr,
+      required Uint64List indexes,
+      required Uint64List netCodes}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(password, serializer);
+        sse_encode_String(mnemonicStr, serializer);
+        sse_encode_list_prim_usize_strict(indexes, serializer);
+        sse_encode_list_prim_usize_strict(netCodes, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 1, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendAddBip39WalletConstMeta,
+      argValues: [password, mnemonicStr, indexes, netCodes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendAddBip39WalletConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_bip39_wallet",
+        argNames: ["password", "mnemonicStr", "indexes", "netCodes"],
+      );
+
+  @override
   Future<BackgroundService> crateApiBgBackgroundServiceDefault() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 1, port: port_);
+            funcId: 2, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -166,7 +197,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 2, port: port_);
+            funcId: 3, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -195,7 +226,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_String(message, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 3, port: port_);
+            funcId: 4, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -224,7 +255,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             that, serializer);
         sse_encode_StreamSink_String_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 4, port: port_);
+            funcId: 5, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -252,7 +283,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerBackgroundService(
             that, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 6, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -277,7 +308,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(message, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 7, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -303,7 +334,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_StreamSink_String_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -328,7 +359,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -347,7 +378,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<String> crateApiSimpleAddBip39Wallet(
+  Future<String> crateApiMethodsAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
       required Uint64List indexes,
@@ -360,74 +391,51 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_list_prim_usize_strict(indexes, serializer);
         sse_encode_list_prim_usize_strict(netCodes, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiSimpleAddBip39WalletConstMeta,
-      argValues: [password, mnemonicStr, indexes, netCodes],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleAddBip39WalletConstMeta =>
-      const TaskConstMeta(
-        debugName: "add_bip39_wallet",
-        argNames: ["password", "mnemonicStr", "indexes", "netCodes"],
-      );
-
-  @override
-  Future<String> crateApiSimpleGenBip39Words({required int count}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_u_8(count, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiSimpleGenBip39WordsConstMeta,
+      constMeta: kCrateApiMethodsAddBip39WalletConstMeta,
+      argValues: [password, mnemonicStr, indexes, netCodes],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsAddBip39WalletConstMeta =>
+      const TaskConstMeta(
+        debugName: "add_bip39_wallet",
+        argNames: ["password", "mnemonicStr", "indexes", "netCodes"],
+      );
+
+  @override
+  Future<String> crateApiMethodsGenBip39Words({required int count}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8(count, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 11, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiMethodsGenBip39WordsConstMeta,
       argValues: [count],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleGenBip39WordsConstMeta =>
+  TaskConstMeta get kCrateApiMethodsGenBip39WordsConstMeta =>
       const TaskConstMeta(
         debugName: "gen_bip39_words",
         argNames: ["count"],
       );
 
   @override
-  String crateApiSimpleGreet({required String name}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(name, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: null,
-      ),
-      constMeta: kCrateApiSimpleGreetConstMeta,
-      argValues: [name],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleGreetConstMeta => const TaskConstMeta(
-        debugName: "greet",
-        argNames: ["name"],
-      );
-
-  @override
-  Future<void> crateApiSimpleInitApp() {
+  Future<void> crateApiMethodsInitApp() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -438,87 +446,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiSimpleInitAppConstMeta,
+      constMeta: kCrateApiMethodsInitAppConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiSimpleInitAppConstMeta => const TaskConstMeta(
+  TaskConstMeta get kCrateApiMethodsInitAppConstMeta => const TaskConstMeta(
         debugName: "init_app",
-        argNames: [],
-      );
-
-  @override
-  void crateApiSimpleSendMessageToService({required String message}) {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(message, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 13)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiSimpleSendMessageToServiceConstMeta,
-      argValues: [message],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleSendMessageToServiceConstMeta =>
-      const TaskConstMeta(
-        debugName: "send_message_to_service",
-        argNames: ["message"],
-      );
-
-  @override
-  Stream<String> crateApiSimpleStartBackgroundService() {
-    final sink = RustStreamSink<String>();
-    handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_StreamSink_String_Sse(sink, serializer);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 14)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiSimpleStartBackgroundServiceConstMeta,
-      argValues: [sink],
-      apiImpl: this,
-    ));
-    return sink.stream;
-  }
-
-  TaskConstMeta get kCrateApiSimpleStartBackgroundServiceConstMeta =>
-      const TaskConstMeta(
-        debugName: "start_background_service",
-        argNames: ["sink"],
-      );
-
-  @override
-  void crateApiSimpleStopBackgroundService() {
-    return handler.executeSync(SyncTask(
-      callFfi: () {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiSimpleStopBackgroundServiceConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSimpleStopBackgroundServiceConstMeta =>
-      const TaskConstMeta(
-        debugName: "stop_background_service",
         argNames: [],
       );
 

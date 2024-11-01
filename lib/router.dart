@@ -44,29 +44,30 @@ class AppRouter {
             builder: (_) => const SecretPhraseVerifyPage(), settings: settings);
       case '/restore_options':
         return MaterialPageRoute(
-            builder: (_) => RestoreWalletOptionsPage(), settings: settings);
+            builder: (_) => const RestoreWalletOptionsPage(),
+            settings: settings);
       case '/gen_options':
         return MaterialPageRoute(
-            builder: (_) => GenWalletOptionsPage(), settings: settings);
+            builder: (_) => const GenWalletOptionsPage(), settings: settings);
       case '/new_wallet_options':
         return MaterialPageRoute(
-            builder: (_) => AddWalletOptionsPage(), settings: settings);
+            builder: (_) => const AddWalletOptionsPage(), settings: settings);
       case '/initial':
         return MaterialPageRoute(
-            builder: (_) => InitialPage(), settings: settings);
+            builder: (_) => const InitialPage(), settings: settings);
       case '/login':
         return MaterialPageRoute(
-            builder: (_) => LoginPage(), settings: settings);
+            builder: (_) => const LoginPage(), settings: settings);
     }
 
     if (!authGuard.ready) {
       return MaterialPageRoute(
-        builder: (_) => InitialPage(),
+        builder: (_) => const InitialPage(),
         settings: const RouteSettings(name: '/initial'),
       );
     } else if (!authGuard.enabled) {
       return MaterialPageRoute(
-        builder: (_) => LoginPage(),
+        builder: (_) => const LoginPage(),
         settings: const RouteSettings(name: '/login'),
       );
     }
@@ -74,27 +75,27 @@ class AppRouter {
     switch (settings.name) {
       case '/':
         return MaterialPageRoute(
-          builder: (_) => MainPage(),
+          builder: (_) => const MainPage(),
           settings: settings,
         );
       case '/history':
         return MaterialPageRoute(
-          builder: (_) => HistoryPage(),
+          builder: (_) => const HistoryPage(),
           settings: settings,
         );
       case '/browser':
         return MaterialPageRoute(
-          builder: (_) => BrowserPage(),
+          builder: (_) => const BrowserPage(),
           settings: settings,
         );
       case '/settings':
         return MaterialPageRoute(
-          builder: (_) => SettingsPage(),
+          builder: (_) => const SettingsPage(),
           settings: settings,
         );
       default:
         return MaterialPageRoute(
-          builder: (_) => MainPage(),
+          builder: (_) => const MainPage(),
           settings: const RouteSettings(name: '/'),
         );
     }
