@@ -19,6 +19,8 @@ Future<void> main() async {
 
     List<WalletInfo> wallets = await startService(path: appDocPath);
 
+    print( wallets);
+
     final authGuard = AuthGuard();
     await authGuard.initialize(wallets.isNotEmpty);
 

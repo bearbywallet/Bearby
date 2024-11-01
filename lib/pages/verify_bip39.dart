@@ -124,7 +124,18 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                               borderRadius: 30.0,
                               height: 56.0,
                               disabled: !isVerified,
+                            ),
+                            CustomButton(
+                              text: 'Skip',
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/net_setup',
+                                    arguments: {'bip39': _bip39List});
+                              },
+                              backgroundColor: theme.primaryPurple,
+                              borderRadius: 30.0,
+                              height: 20.0,
                             )
+
                           ],
                         ),
                       ),
