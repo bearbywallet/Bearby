@@ -6,6 +6,21 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
+// These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `initialize`
+
+void startService({required String path}) =>
+    RustLib.instance.api.crateApiBackendStartService(path: path);
+
+void stopService() => RustLib.instance.api.crateApiBackendStopService();
+
+Stream<String> startWorker() =>
+    RustLib.instance.api.crateApiBackendStartWorker();
+
+bool isServiceRunning() =>
+    RustLib.instance.api.crateApiBackendIsServiceRunning();
+
 Future<String> addBip39Wallet(
         {required String password,
         required String mnemonicStr,
@@ -16,3 +31,21 @@ Future<String> addBip39Wallet(
         mnemonicStr: mnemonicStr,
         indexes: indexes,
         netCodes: netCodes);
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Background>>
+abstract class Background implements RustOpaqueInterface {}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
+abstract class Serivce implements RustOpaqueInterface {
+  Background get core;
+
+  RustStreamSink<String>? get messageSink;
+
+  bool get running;
+
+  set core(Background core);
+
+  set messageSink(RustStreamSink<String>? messageSink);
+
+  set running(bool running);
+}

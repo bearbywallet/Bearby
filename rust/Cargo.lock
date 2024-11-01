@@ -3113,7 +3113,10 @@ name = "rust_lib_zilpay"
 version = "0.1.0"
 dependencies = [
  "flutter_rust_bridge",
+ "hex",
+ "lazy_static",
  "once_cell",
+ "tokio",
  "zilpay_core",
 ]
 
