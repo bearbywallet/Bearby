@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-
 import 'package:provider/provider.dart';
 import 'router.dart';
 import 'services/auth_guard.dart';
@@ -14,38 +13,50 @@ class ZilPayApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (_) => ThemeProvider(),
-      child: Consumer<ThemeProvider>(
-        builder: (context, themeProvider, _) {
-          final currentTheme = themeProvider.currentTheme;
-          return MaterialApp(
-            title: 'ZilPay Wallet',
-            builder: (context, child) {
-              final mediaQuery = MediaQuery.of(context);
-              final screenWidth = mediaQuery.size.width;
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider.value(value: authGuard),
+        ChangeNotifierProvider.value(value: appState),
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
+      ],
+      child: Builder(
+        builder: (context) {
+          return Consumer<ThemeProvider>(
+            builder: (context, themeProvider, _) {
+              final currentTheme = themeProvider.currentTheme;
 
-              double textScale = 1.0;
+              return MaterialApp(
+                title: 'ZilPay Wallet',
+                builder: (context, child) {
+                  final mediaQuery = MediaQuery.of(context);
+                  final screenWidth = mediaQuery.size.width;
 
-              if (screenWidth <= 375) {
-                textScale = 0.8;
-              } else if (screenWidth <= 390) {
-                textScale = 0.85;
-              }
+                  double textScale = 1.0;
 
-              return MediaQuery(
-                data: mediaQuery.copyWith(
-                  textScaler: TextScaler.linear(textScale),
+                  if (screenWidth <= 375) {
+                    textScale = 0.8;
+                  } else if (screenWidth <= 390) {
+                    textScale = 0.85;
+                  }
+
+                  return MediaQuery(
+                    data: mediaQuery.copyWith(
+                      textScaler: TextScaler.linear(textScale),
+                    ),
+                    child: child!,
+                  );
+                },
+                theme: ThemeData(
+                  primaryColor: currentTheme.primaryPurple,
+                  scaffoldBackgroundColor: currentTheme.background,
                 ),
-                child: child!,
+                initialRoute: '/cipher_setup',
+                onGenerateRoute: AppRouter(
+                  authGuard: Provider.of<AuthGuard>(context, listen: false),
+                  appState: Provider.of<AppState>(context, listen: false),
+                ).onGenerateRoute,
               );
             },
-            theme: ThemeData(
-                primaryColor: currentTheme.primaryPurple,
-                scaffoldBackgroundColor: currentTheme.background),
-            initialRoute: '/net_setup',
-            onGenerateRoute: AppRouter(authGuard: authGuard, appState: appState)
-                .onGenerateRoute,
           );
         },
       ),

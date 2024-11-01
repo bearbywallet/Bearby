@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
@@ -25,79 +26,67 @@ class AppRouter {
   AppRouter({required this.authGuard, required this.appState});
 
   Route<dynamic> onGenerateRoute(RouteSettings settings) {
+    return MaterialPageRoute(
+      settings: settings,
+      builder: (context) => _buildRoute(context, settings),
+    );
+  }
+
+  Widget _buildRoute(BuildContext context, RouteSettings settings) {
+    Widget wrapWithProviders(Widget child) {
+      return MultiProvider(
+        providers: [
+          ChangeNotifierProvider.value(value: authGuard),
+          ChangeNotifierProvider.value(value: appState),
+        ],
+        child: child,
+      );
+    }
+
+    if (!authGuard.enabled) {
+      switch (settings.name) {
+        case '/login':
+          if (authGuard.ready) {
+            return wrapWithProviders(const LoginPage());
+          } else {
+            return wrapWithProviders(const InitialPage());
+          }
+        case '/pass_setup':
+          return wrapWithProviders(const PasswordSetupPage());
+        case '/cipher_setup':
+          return wrapWithProviders(const CipherSettingsPage());
+        case '/net_setup':
+          return wrapWithProviders(const BlockchainSettingsPage());
+        case '/gen_bip39':
+          return wrapWithProviders(const SecretPhraseGeneratorPage());
+        case '/verify_bip39':
+          return wrapWithProviders(const SecretPhraseVerifyPage());
+        case '/restore_options':
+          return wrapWithProviders(const RestoreWalletOptionsPage());
+        case '/gen_options':
+          return wrapWithProviders(const GenWalletOptionsPage());
+        case '/new_wallet_options':
+          return wrapWithProviders(const AddWalletOptionsPage());
+        case '/initial':
+          return wrapWithProviders(const InitialPage());
+        default:
+          return wrapWithProviders(const InitialPage());
+      }
+    }
+
     switch (settings.name) {
-      case '/pass_setup':
-        return MaterialPageRoute(
-            builder: (_) => const PasswordSetupPage(), settings: settings);
-      case '/cipher_setup':
-        return MaterialPageRoute(
-            builder: (_) => const CipherSettingsPage(), settings: settings);
-      case '/net_setup':
-        return MaterialPageRoute(
-            builder: (_) => const BlockchainSettingsPage(), settings: settings);
-      case '/gen_bip39':
-        return MaterialPageRoute(
-            builder: (_) => const SecretPhraseGeneratorPage(),
-            settings: settings);
-      case '/verify_bip39':
-        return MaterialPageRoute(
-            builder: (_) => const SecretPhraseVerifyPage(), settings: settings);
-      case '/restore_options':
-        return MaterialPageRoute(
-            builder: (_) => const RestoreWalletOptionsPage(),
-            settings: settings);
-      case '/gen_options':
-        return MaterialPageRoute(
-            builder: (_) => const GenWalletOptionsPage(), settings: settings);
-      case '/new_wallet_options':
-        return MaterialPageRoute(
-            builder: (_) => const AddWalletOptionsPage(), settings: settings);
-      case '/initial':
-        return MaterialPageRoute(
-            builder: (_) => const InitialPage(), settings: settings);
       case '/login':
-        return MaterialPageRoute(
-            builder: (_) => const LoginPage(), settings: settings);
-    }
-
-    if (!authGuard.ready) {
-      return MaterialPageRoute(
-        builder: (_) => const InitialPage(),
-        settings: const RouteSettings(name: '/initial'),
-      );
-    } else if (!authGuard.enabled) {
-      return MaterialPageRoute(
-        builder: (_) => const LoginPage(),
-        settings: const RouteSettings(name: '/login'),
-      );
-    }
-
-    switch (settings.name) {
+        return wrapWithProviders(const LoginPage());
       case '/':
-        return MaterialPageRoute(
-          builder: (_) => const MainPage(),
-          settings: settings,
-        );
+        return wrapWithProviders(const MainPage());
       case '/history':
-        return MaterialPageRoute(
-          builder: (_) => const HistoryPage(),
-          settings: settings,
-        );
+        return wrapWithProviders(const HistoryPage());
       case '/browser':
-        return MaterialPageRoute(
-          builder: (_) => const BrowserPage(),
-          settings: settings,
-        );
+        return wrapWithProviders(const BrowserPage());
       case '/settings':
-        return MaterialPageRoute(
-          builder: (_) => const SettingsPage(),
-          settings: settings,
-        );
+        return wrapWithProviders(const SettingsPage());
       default:
-        return MaterialPageRoute(
-          builder: (_) => const MainPage(),
-          settings: const RouteSettings(name: '/'),
-        );
+        return wrapWithProviders(const MainPage());
     }
   }
 }

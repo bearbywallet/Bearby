@@ -8,7 +8,9 @@ import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/secure_storage.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -26,6 +28,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   int? _cipher;
 
   final AuthService _authService = AuthService();
+  // final SecureStorage _secureStorage = SecureStorage();
+  late AuthGuard _authGuard;
+
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _useDeviceAuth = false;
 
@@ -67,6 +72,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   void initState() {
     super.initState();
 
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _checkAuthMethods();
   }
 
@@ -146,8 +152,17 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         netCodes: networkIndexes,
       );
 
+      if (_useDeviceAuth) {
+        await _authGuard.setSession(key);
+      }
+
       _btnController.success();
-      // TODO: navigate to next page.
+
+      Timer(const Duration(seconds: 1), () {
+        Navigator.of(context).pushNamed(
+          '/',
+        );
+      });
     } catch (e) {
       setState(() {
         _disabled = false;
@@ -252,7 +267,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                 });
                               }
                             },
-                            onSubmitted: _createWallet,
                           ),
                           const SizedBox(height: 8),
                           Text(
