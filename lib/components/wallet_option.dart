@@ -28,26 +28,25 @@ class WalletOption extends StatelessWidget {
     return GestureDetector(
       onTap: onTap,
       child: Container(
-        margin: const EdgeInsets.symmetric(vertical: 6.0),
         decoration: BoxDecoration(
-          color: theme.cardBackground.withOpacity(0.8),
+          color: theme.cardBackground.withOpacity(0.7),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? theme.primaryPurple : Colors.transparent,
-            width: 2,
+            width: 1,
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              blurRadius: 10,
-              spreadRadius: 0,
-            ),
-          ],
+          // boxShadow: [
+          //   BoxShadow(
+          //     color: Colors.black.withOpacity(0.1),
+          //     blurRadius: 10,
+          //     spreadRadius: 0,
+          //   ),
+          // ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: BackdropFilter(
-            filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
+            filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Padding(
               padding: const EdgeInsets.all(16.0),
               child: Row(
