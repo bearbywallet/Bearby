@@ -25,6 +25,10 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  List<WalletInfo> get wallets {
+    return _state.wallets;
+  }
+
   Future<void> initialize() async {
     // TODO: init theme form storage
   }

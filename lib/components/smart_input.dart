@@ -12,6 +12,7 @@ class SmartInput extends StatefulWidget {
   final Function()? onLeftIconTap;
   final Function()? onRightIconTap;
   final Function()? onSubmitted;
+  final Function(bool)? onFocusChanged;
   final String? leftIconPath;
   final String? rightIconPath;
   final Color? borderColor;
@@ -32,6 +33,7 @@ class SmartInput extends StatefulWidget {
     this.onLeftIconTap,
     this.onRightIconTap,
     this.onSubmitted,
+    this.onFocusChanged,
     this.leftIconPath,
     this.rightIconPath,
     this.borderColor,
@@ -67,11 +69,19 @@ class SmartInputState extends State<SmartInput>
         .chain(CurveTween(curve: const InputShakeCurve()))
         .animate(_shakeController);
 
-    _focusNode.addListener(() {
-      setState(() {
-        _isFocused = _focusNode.hasFocus;
-      });
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    if (!mounted) return;
+
+    setState(() {
+      _isFocused = _focusNode.hasFocus;
     });
+
+    if (widget.onFocusChanged != null) {
+      widget.onFocusChanged!(_focusNode.hasFocus);
+    }
   }
 
   void shake() {
@@ -82,6 +92,7 @@ class SmartInputState extends State<SmartInput>
 
   @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
     _shakeController.dispose();
     _focusNode.dispose();
     super.dispose();
@@ -89,7 +100,7 @@ class SmartInputState extends State<SmartInput>
 
   double get _iconSize {
     final containerHeight = widget.height ?? 48;
-    return containerHeight * 0.416; // ~20px when height is 48
+    return containerHeight * 0.416;
   }
 
   Widget? _buildIcon({

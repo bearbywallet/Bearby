@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 
@@ -11,6 +10,7 @@ class WalletOption extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final Widget? icon;
+  final EdgeInsetsGeometry? padding;
 
   const WalletOption({
     super.key,
@@ -19,6 +19,7 @@ class WalletOption extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.icon,
+    this.padding = const EdgeInsets.all(16.0),
   });
 
   @override
@@ -35,20 +36,13 @@ class WalletOption extends StatelessWidget {
             color: isSelected ? theme.primaryPurple : Colors.transparent,
             width: 1,
           ),
-          // boxShadow: [
-          //   BoxShadow(
-          //     color: Colors.black.withOpacity(0.1),
-          //     blurRadius: 10,
-          //     spreadRadius: 0,
-          //   ),
-          // ],
         ),
         child: ClipRRect(
           borderRadius: BorderRadius.circular(16),
           child: BackdropFilter(
             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
             child: Padding(
-              padding: const EdgeInsets.all(16.0),
+              padding: padding!,
               child: Row(
                 children: [
                   Container(
@@ -90,13 +84,6 @@ class WalletOption extends StatelessWidget {
                       ],
                     ),
                   ),
-                  if (isSelected)
-                    SvgPicture.asset(
-                      'assets/icons/ok.svg',
-                      width: 24,
-                      height: 24,
-                      color: theme.primaryPurple,
-                    ),
                 ],
               ),
             ),
