@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
@@ -9,18 +10,51 @@ import 'state/app_state.dart';
 import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
 
+Future<String> getStoragePath() async {
+  if (!kReleaseMode) {
+    if (Platform.isAndroid) {
+      final directory = await getExternalStorageDirectory();
+      final devDir = Directory('${directory?.path}/dev_storage');
+      if (!await devDir.exists()) {
+        await devDir.create(recursive: true);
+      }
+      return devDir.path;
+    } else if (Platform.isIOS) {
+      final directory = await getApplicationSupportDirectory();
+      final devDir = Directory('${directory.path}/dev_storage');
+      if (!await devDir.exists()) {
+        await devDir.create(recursive: true);
+      }
+      return devDir.path;
+    }
+  }
+
+  final appDocDir = await getApplicationDocumentsDirectory();
+  return appDocDir.path;
+}
+
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
 
+  List<WalletInfo> wallets = [];
+
   try {
-    Directory appDocDir = await getApplicationDocumentsDirectory();
-    String appDocPath = appDocDir.path;
+    String appDocPath = await getStoragePath();
 
-    List<WalletInfo> wallets = await startService(path: appDocPath);
+    print(appDocPath);
 
-    print( wallets);
+    wallets = await startService(path: appDocPath);
+  } catch (e) {
+    if (e == "service already running") {
+      wallets = await getWallets();
+    } else {
+      print("try start service: $e");
+    }
+  }
 
+  try {
+    print(wallets);
     final authGuard = AuthGuard();
     await authGuard.initialize(wallets.isNotEmpty);
 
@@ -29,6 +63,6 @@ Future<void> main() async {
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));
   } catch (e) {
-    print('Error getting directory: $e');
+    print('Error try start page: $e');
   }
 }
