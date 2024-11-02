@@ -11,23 +11,23 @@ import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
 
 Future<String> getStoragePath() async {
-  if (!kReleaseMode) {
-    if (Platform.isAndroid) {
-      final directory = await getExternalStorageDirectory();
-      final devDir = Directory('${directory?.path}/dev_storage');
-      if (!await devDir.exists()) {
-        await devDir.create(recursive: true);
-      }
-      return devDir.path;
-    } else if (Platform.isIOS) {
-      final directory = await getApplicationSupportDirectory();
-      final devDir = Directory('${directory.path}/dev_storage');
-      if (!await devDir.exists()) {
-        await devDir.create(recursive: true);
-      }
-      return devDir.path;
-    }
-  }
+  // if (!kReleaseMode) {
+  //   if (Platform.isAndroid) {
+  //     final directory = await getExternalStorageDirectory();
+  //     final devDir = Directory('${directory?.path}/dev_storage');
+  //     if (!await devDir.exists()) {
+  //       await devDir.create(recursive: true);
+  //     }
+  //     return devDir.path;
+  //   } else if (Platform.isIOS) {
+  //     final directory = await getApplicationSupportDirectory();
+  //     final devDir = Directory('${directory.path}/dev_storage');
+  //     if (!await devDir.exists()) {
+  //       await devDir.create(recursive: true);
+  //     }
+  //     return devDir.path;
+  //   }
+  // }
 
   final appDocDir = await getApplicationDocumentsDirectory();
   return appDocDir.path;
@@ -42,9 +42,7 @@ Future<void> main() async {
   try {
     String appDocPath = await getStoragePath();
 
-    print(appDocPath);
-
-    wallets = await startService(path: appDocPath);
+    wallets = await startService(path: "$appDocPath/storage");
   } catch (e) {
     if (e == "service already running") {
       wallets = await getWallets();
