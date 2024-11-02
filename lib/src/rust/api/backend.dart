@@ -9,12 +9,12 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
 // These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `fmt`, `initialize`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `deref`, `fmt`, `fmt`, `initialize`
 
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
 
-Future<List<WalletInfo>> startService({required String path}) =>
+Future<BackgroundState> startService({required String path}) =>
     RustLib.instance.api.crateApiBackendStartService(path: path);
 
 Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
@@ -38,6 +38,21 @@ Future<String> addBip39Wallet(
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<BackgroundState>>
+abstract class BackgroundState implements RustOpaqueInterface {
+  BigInt get selected;
+
+  CommonSettings get settings;
+
+  List<WalletInfo> get wallets;
+
+  set selected(BigInt selected);
+
+  set settings(CommonSettings settings);
+
+  set wallets(List<WalletInfo> wallets);
+}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
 abstract class Serivce implements RustOpaqueInterface {

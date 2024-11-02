@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
-import '../state/app_state.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final appState = AppState();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Settings'),

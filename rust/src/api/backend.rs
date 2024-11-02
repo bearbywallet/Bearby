@@ -5,6 +5,7 @@ use tokio::sync::RwLock;
 
 pub use zilpay::background::Background;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
+pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
 pub use zilpay::wallet::wallet_types::WalletTypes;
@@ -35,7 +36,7 @@ impl Serivce {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct WalletInfo {
     pub wallet_type: WalletTypes,
     pub settings: WalletSettings,
@@ -68,8 +69,15 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     }
 }
 
+#[derive(Debug)]
+pub struct BackgroundState {
+    pub wallets: Vec<WalletInfo>,
+    pub settings: CommonSettings,
+    pub selected: usize,
+}
+
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn start_service(path: &str) -> Result<Vec<WalletInfo>, String> {
+pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
     let mut service = BACKGROUND_SERVICE.write().await;
 
     if service.is_none() {
@@ -87,10 +95,21 @@ pub async fn start_service(path: &str) -> Result<Vec<WalletInfo>, String> {
                 enabled: w.is_enabled(),
             })
             .collect();
+        let selected = bg
+            .core
+            .wallets
+            .iter()
+            .position(|w| w.data.wallet_address == hex::encode(bg.core.selected))
+            .unwrap_or(0);
+        let state = BackgroundState {
+            wallets,
+            selected,
+            settings: bg.core.settings.clone(),
+        };
 
         *service = Some(bg);
 
-        return Ok(wallets);
+        return Ok(state);
     }
 
     Err("service already running".to_string())

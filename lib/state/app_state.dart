@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 
 enum AppTheme { system, dark, light }
 
 class AppState extends ChangeNotifier {
   AppTheme _currentThemeMode = AppTheme.system;
+  BackgroundState _state;
 
   ThemeData get currentTheme {
     switch (_currentThemeMode) {
@@ -15,6 +17,8 @@ class AppState extends ChangeNotifier {
         return ThemeData.dark();
     }
   }
+
+  AppState({required BackgroundState state}) : _state = state;
 
   void setTheme(AppTheme theme) {
     _currentThemeMode = theme;

@@ -1,5 +1,3 @@
-import 'dart:io';
-import 'package:flutter/foundation.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
@@ -37,30 +35,19 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await RustLib.init();
 
-  List<WalletInfo> wallets = [];
+  BackgroundState state;
 
   try {
     String appDocPath = await getStoragePath();
 
-    wallets = await startService(path: "$appDocPath/storage");
-  } catch (e) {
-    if (e == "service already running") {
-      wallets = await getWallets();
-    } else {
-      print("try start service: $e");
-    }
-  }
-
-  try {
-    print(wallets);
+    state = await startService(path: "$appDocPath/storage");
     final authGuard = AuthGuard();
-    await authGuard.initialize(wallets.isNotEmpty);
+    final appState = AppState(state: state);
 
-    final appState = AppState();
-    await appState.initialize();
+    await authGuard.initialize(state.wallets.isNotEmpty);
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));
   } catch (e) {
-    print('Error try start page: $e');
+    print("try start, Error: $e");
   }
 }
