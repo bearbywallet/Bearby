@@ -43,35 +43,86 @@ class AppRouter {
       );
     }
 
-    if (!authGuard.enabled) {
-      switch (settings.name) {
-        case '/login':
-          if (authGuard.ready) {
-            return wrapWithProviders(const LoginPage());
-          } else {
-            return wrapWithProviders(const InitialPage());
-          }
-        case '/pass_setup':
-          return wrapWithProviders(const PasswordSetupPage());
-        case '/cipher_setup':
-          return wrapWithProviders(const CipherSettingsPage());
-        case '/net_setup':
-          return wrapWithProviders(const BlockchainSettingsPage());
-        case '/gen_bip39':
-          return wrapWithProviders(const SecretPhraseGeneratorPage());
-        case '/verify_bip39':
-          return wrapWithProviders(const SecretPhraseVerifyPage());
-        case '/restore_options':
-          return wrapWithProviders(const RestoreWalletOptionsPage());
-        case '/gen_options':
-          return wrapWithProviders(const GenWalletOptionsPage());
-        case '/new_wallet_options':
-          return wrapWithProviders(const AddWalletOptionsPage());
-        case '/initial':
-          return wrapWithProviders(const InitialPage());
-        default:
-          return wrapWithProviders(const InitialPage());
+    final List<String> setupRoutes = [
+      '/pass_setup',
+      '/cipher_setup',
+      '/net_setup',
+      '/gen_bip39',
+      '/verify_bip39',
+      '/restore_options',
+      '/gen_options',
+      '/new_wallet_options',
+      '/initial'
+    ];
+
+    if (settings.name == '/' || settings.name == null) {
+      if (!authGuard.ready) {
+        return wrapWithProviders(const InitialPage());
+      } else if (!authGuard.enabled) {
+        return wrapWithProviders(const LoginPage());
+      } else {
+        return wrapWithProviders(const MainPage());
       }
+    }
+
+    if (!authGuard.ready) {
+      if (setupRoutes.contains(settings.name)) {
+        switch (settings.name) {
+          case '/pass_setup':
+            return wrapWithProviders(const PasswordSetupPage());
+          case '/cipher_setup':
+            return wrapWithProviders(const CipherSettingsPage());
+          case '/net_setup':
+            return wrapWithProviders(const BlockchainSettingsPage());
+          case '/gen_bip39':
+            return wrapWithProviders(const SecretPhraseGeneratorPage());
+          case '/verify_bip39':
+            return wrapWithProviders(const SecretPhraseVerifyPage());
+          case '/restore_options':
+            return wrapWithProviders(const RestoreWalletOptionsPage());
+          case '/gen_options':
+            return wrapWithProviders(const GenWalletOptionsPage());
+          case '/new_wallet_options':
+            return wrapWithProviders(const AddWalletOptionsPage());
+          case '/initial':
+            return wrapWithProviders(const InitialPage());
+          default:
+            return wrapWithProviders(const InitialPage());
+        }
+      }
+      return wrapWithProviders(const InitialPage());
+    }
+
+    if (!authGuard.enabled) {
+      if (settings.name == '/login') {
+        return wrapWithProviders(const LoginPage());
+      }
+
+      if (setupRoutes.contains(settings.name)) {
+        switch (settings.name) {
+          case '/pass_setup':
+            return wrapWithProviders(const PasswordSetupPage());
+          case '/cipher_setup':
+            return wrapWithProviders(const CipherSettingsPage());
+          case '/net_setup':
+            return wrapWithProviders(const BlockchainSettingsPage());
+          case '/gen_bip39':
+            return wrapWithProviders(const SecretPhraseGeneratorPage());
+          case '/verify_bip39':
+            return wrapWithProviders(const SecretPhraseVerifyPage());
+          case '/restore_options':
+            return wrapWithProviders(const RestoreWalletOptionsPage());
+          case '/gen_options':
+            return wrapWithProviders(const GenWalletOptionsPage());
+          case '/new_wallet_options':
+            return wrapWithProviders(const AddWalletOptionsPage());
+          case '/initial':
+            return wrapWithProviders(const InitialPage());
+          default:
+            return wrapWithProviders(const LoginPage());
+        }
+      }
+      return wrapWithProviders(const LoginPage());
     }
 
     switch (settings.name) {
@@ -85,6 +136,24 @@ class AppRouter {
         return wrapWithProviders(const BrowserPage());
       case '/settings':
         return wrapWithProviders(const SettingsPage());
+      case '/pass_setup':
+        return wrapWithProviders(const PasswordSetupPage());
+      case '/cipher_setup':
+        return wrapWithProviders(const CipherSettingsPage());
+      case '/net_setup':
+        return wrapWithProviders(const BlockchainSettingsPage());
+      case '/gen_bip39':
+        return wrapWithProviders(const SecretPhraseGeneratorPage());
+      case '/verify_bip39':
+        return wrapWithProviders(const SecretPhraseVerifyPage());
+      case '/restore_options':
+        return wrapWithProviders(const RestoreWalletOptionsPage());
+      case '/gen_options':
+        return wrapWithProviders(const GenWalletOptionsPage());
+      case '/new_wallet_options':
+        return wrapWithProviders(const AddWalletOptionsPage());
+      case '/initial':
+        return wrapWithProviders(const InitialPage());
       default:
         return wrapWithProviders(const MainPage());
     }
