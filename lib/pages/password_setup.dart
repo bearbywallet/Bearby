@@ -132,7 +132,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     try {
       if (_useDeviceAuth) {
         final authenticated = await _authService.authenticate(
-          allowPinCode: _authMethods.contains(AuthMethod.pinCode),
+          allowPinCode: true,
           reason: 'Please authenticate to enable quick access',
         );
 

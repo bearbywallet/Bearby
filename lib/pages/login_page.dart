@@ -5,6 +5,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/wallet_option.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/theme_provider.dart';
 
@@ -18,6 +19,7 @@ class LoginPage extends StatefulWidget {
 class _LoginPage extends State<LoginPage> {
   final passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
+  final AuthService _authService = AuthService();
 
   bool obscurePassword = true;
   bool obscureButton = true;
@@ -30,6 +32,21 @@ class _LoginPage extends State<LoginPage> {
       const Color(0xFF4ECFB0),
     ];
     return colors[index % colors.length];
+  }
+
+  Future<void> unlock() async {
+    try {
+      final authenticated = await _authService.authenticate(
+        allowPinCode: true,
+        reason: 'Please authenticate to enable quick access',
+      );
+
+      print(authenticated);
+
+      //
+    } catch (e) {
+      print(e);
+    }
   }
 
   @override
@@ -192,7 +209,7 @@ class _LoginPage extends State<LoginPage> {
                         if (obscureButton)
                           CustomButton(
                             text: 'Confirm',
-                            onPressed: () {},
+                            onPressed: unlock,
                             backgroundColor: theme.primaryPurple,
                             borderRadius: 30.0,
                             height: 50.0,
