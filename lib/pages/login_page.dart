@@ -21,7 +21,7 @@ class _LoginPage extends State<LoginPage> {
 
   bool obscurePassword = true;
   bool obscureButton = true;
-  int sellectedWallet = 0;
+  int sellectedWallet = -1;
 
   Color _getWalletColor(int index) {
     final colors = [
@@ -121,8 +121,15 @@ class _LoginPage extends State<LoginPage> {
                                         padding: EdgeInsets.all(
                                             adaptivePaddingWalletOption),
                                         onTap: () {
-                                          sellectedWallet = index;
+                                          setState(() {
+                                            sellectedWallet = index;
+                                          });
                                         },
+                                        icons: [
+                                          'assets/icons/ledger.svg',
+                                          'assets/icons/pin.svg',
+                                          'assets/icons/biometric.svg',
+                                        ],
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),
                                           decoration: BoxDecoration(
@@ -135,7 +142,7 @@ class _LoginPage extends State<LoginPage> {
                                       ),
                                     ],
                                   );
-                                }).toList(),
+                                }),
                               ],
                             ),
                           ),

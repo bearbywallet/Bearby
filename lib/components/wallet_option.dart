@@ -1,6 +1,6 @@
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
 
@@ -10,6 +10,7 @@ class WalletOption extends StatelessWidget {
   final bool isSelected;
   final VoidCallback onTap;
   final Widget? icon;
+  final List<String>? icons;
   final EdgeInsetsGeometry? padding;
 
   const WalletOption({
@@ -19,6 +20,7 @@ class WalletOption extends StatelessWidget {
     required this.isSelected,
     required this.onTap,
     this.icon,
+    this.icons,
     this.padding = const EdgeInsets.all(16.0),
   });
 
@@ -34,7 +36,7 @@ class WalletOption extends StatelessWidget {
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? theme.primaryPurple : Colors.transparent,
-            width: 1,
+            width: 2,
           ),
         ),
         child: ClipRRect(
@@ -84,6 +86,27 @@ class WalletOption extends StatelessWidget {
                       ],
                     ),
                   ),
+                  if (icons != null) ...[
+                    const SizedBox(width: 8),
+                    Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: icons!
+                          .map((iconPath) => Padding(
+                                padding: const EdgeInsets.all(4),
+                                child: SvgPicture.asset(
+                                  iconPath,
+                                  width: 24,
+                                  height: 24,
+                                  colorFilter: ColorFilter.mode(
+                                      isSelected
+                                          ? theme.primaryPurple
+                                          : theme.textPrimary,
+                                      BlendMode.srcIn),
+                                ),
+                              ))
+                          .toList(),
+                    ),
+                  ],
                 ],
               ),
             ),

@@ -95,12 +95,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 enabled: w.is_enabled(),
             })
             .collect();
-        let selected = bg
-            .core
-            .wallets
-            .iter()
-            .position(|w| w.data.wallet_address == hex::encode(bg.core.selected))
-            .unwrap_or(0);
+        let selected = 0;
         let state = BackgroundState {
             wallets,
             selected,
