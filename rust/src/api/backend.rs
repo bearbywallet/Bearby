@@ -38,7 +38,7 @@ impl Serivce {
 
 #[derive(Debug, Clone)]
 pub struct WalletInfo {
-    pub wallet_type: WalletTypes,
+    pub wallet_type: u8,
     pub settings: WalletSettings,
     pub wallet_address: String,
     pub accounts: Vec<Account>,
@@ -54,7 +54,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
-                wallet_type: w.data.wallet_type,
+                wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
@@ -87,7 +87,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
-                wallet_type: w.data.wallet_type,
+                wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),

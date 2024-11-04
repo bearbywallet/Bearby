@@ -121,14 +121,20 @@ class _LoginPage extends State<LoginPage> {
                                         padding: EdgeInsets.all(
                                             adaptivePaddingWalletOption),
                                         onTap: () {
+                                          print(wallet.walletType);
                                           setState(() {
                                             sellectedWallet = index;
                                           });
                                         },
                                         icons: [
-                                          'assets/icons/ledger.svg',
-                                          'assets/icons/pin.svg',
-                                          'assets/icons/biometric.svg',
+                                          if (wallet.walletType == 0)
+                                            'assets/icons/ledger.svg',
+                                          if (wallet.walletType == 1)
+                                            'assets/icons/document.svg',
+                                          if (wallet.walletType == 2)
+                                            'assets/icons/bincode.svg',
+                                          // 'assets/icons/pin.svg',
+                                          // 'assets/icons/biometric.svg',
                                         ],
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),

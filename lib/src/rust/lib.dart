@@ -14,6 +14,3 @@ abstract class CommonSettings implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletSettings>>
 abstract class WalletSettings implements RustOpaqueInterface {}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletTypes>>
-abstract class WalletTypes implements RustOpaqueInterface {}
