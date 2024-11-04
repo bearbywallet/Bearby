@@ -115,13 +115,14 @@ class _LoginPage extends State<LoginPage> {
                                     children: [
                                       if (index > 0) const SizedBox(height: 4),
                                       WalletOption(
-                                        title: "Wallet ${index + 1}",
+                                        title: wallet.walletName.isEmpty
+                                            ? "Wallet ${index + 1}"
+                                            : wallet.walletName,
                                         address: wallet.walletAddress,
                                         isSelected: sellectedWallet == index,
                                         padding: EdgeInsets.all(
                                             adaptivePaddingWalletOption),
                                         onTap: () {
-                                          print(wallet.walletType);
                                           setState(() {
                                             sellectedWallet = index;
                                           });
@@ -133,8 +134,14 @@ class _LoginPage extends State<LoginPage> {
                                             'assets/icons/document.svg',
                                           if (wallet.walletType == 2)
                                             'assets/icons/bincode.svg',
-                                          // 'assets/icons/pin.svg',
-                                          // 'assets/icons/biometric.svg',
+                                          if (wallet.authType == "faceId")
+                                            'assets/icons/face_id.svg',
+                                          if (wallet.authType == "fingerprint")
+                                            'assets/icons/fingerprint.svg',
+                                          if (wallet.authType == "biometric")
+                                            'assets/icons/biometric.svg',
+                                          if (wallet.authType == "pinCode")
+                                            'assets/icons/pin.svg',
                                         ],
                                         icon: Container(
                                           padding: const EdgeInsets.all(4),

@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.5.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -661651469;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1363177745;
 
 // Section: executor
 
@@ -1407,6 +1407,57 @@ fn wire__crate__api__backend__WalletInfo_auto_accessor_set_wallet_type_impl(
         },
     )
 }
+fn wire__crate__api__backend__add_bip39_wallet_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "add_bip39_wallet",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_password = <String>::sse_decode(&mut deserializer);
+            let api_mnemonic_str = <String>::sse_decode(&mut deserializer);
+            let api_indexes = <Vec<usize>>::sse_decode(&mut deserializer);
+            let api_passphrase = <String>::sse_decode(&mut deserializer);
+            let api_wallet_name = <String>::sse_decode(&mut deserializer);
+            let api_biometric_type = <String>::sse_decode(&mut deserializer);
+            let api__net_codes = <Vec<usize>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::backend::add_bip39_wallet(
+                            api_password,
+                            api_mnemonic_str,
+                            &api_indexes,
+                            api_passphrase,
+                            api_wallet_name,
+                            api_biometric_type,
+                            &api__net_codes,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__backend__get_wallets_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1885,6 +1936,18 @@ impl SseDecode for Vec<u8> {
     }
 }
 
+impl SseDecode for Vec<usize> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<usize>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Option<StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1934,13 +1997,14 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        29 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__backend__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -2380,6 +2444,16 @@ impl SseEncode for Vec<u8> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <u8>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<usize> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <usize>::sse_encode(item, serializer);
         }
     }
 }

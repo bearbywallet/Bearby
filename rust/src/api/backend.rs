@@ -8,6 +8,7 @@ pub use zilpay::crypto::bip49::Bip49DerivationPath;
 pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
+pub use zilpay::wallet::wallet_data::AuthMethod;
 pub use zilpay::wallet::wallet_types::WalletTypes;
 
 pub struct Serivce {
@@ -150,8 +151,13 @@ pub async fn is_service_running() -> bool {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_bip39_wallet<'a>(
-    params: Bip39Params<'a>,
+pub async fn add_bip39_wallet(
+    password: String,
+    mnemonic_str: String,
+    indexes: &[usize],
+    passphrase: String,
+    wallet_name: String,
+    biometric_type: String,
     _net_codes: &[usize], // TODO: add netowrk codes for wallet
 ) -> Result<String, String> {
     // TODO: // detect by networks.
@@ -160,7 +166,17 @@ pub async fn add_bip39_wallet<'a>(
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let key = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
-            .add_bip39_wallet(params, derive)
+            .add_bip39_wallet(
+                Bip39Params {
+                    password: &password,
+                    mnemonic_str: &mnemonic_str,
+                    indexes,
+                    passphrase: &passphrase,
+                    wallet_name,
+                    biometric_type: biometric_type.into(),
+                },
+                derive,
+            )
             .map_err(|e| e.to_string())?;
         let key_str = hex::encode(key);
 

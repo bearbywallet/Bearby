@@ -11,6 +11,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/state/app_state.dart' show AppState;
 import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 
@@ -28,14 +29,18 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
   final AuthService _authService = AuthService();
   late AuthGuard _authGuard;
+  late AppState _appState;
 
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _useDeviceAuth = false;
 
   String _errorMessage = '';
   bool _disabled = false;
+  bool _focused = false;
 
   final _btnController = RoundedLoadingButtonController();
+
+  final _walletNameController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -71,6 +76,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     super.initState();
 
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
+    _appState = Provider.of<AppState>(context, listen: false);
+
+    _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
+
     _checkAuthMethods();
   }
 
@@ -78,6 +87,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   void dispose() {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
+    _walletNameController.dispose();
 
     super.dispose();
   }
@@ -147,6 +157,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         password: _passwordController.text,
         mnemonicStr: _bip39List!.join(' '),
         indexes: accountsIndexes,
+        passphrase: "", // TODO: maybe make it
+        walletName: _walletNameController.text,
+        biometricType: _authMethods[0].name,
         netCodes: networkIndexes,
       );
 
@@ -179,6 +192,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
+    const inputHeight = 50.0;
+
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
@@ -204,21 +219,35 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Your password must be at least 8 characters',
-                            style: TextStyle(
-                              color: theme.textSecondary,
-                              fontSize: 16,
-                            ),
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            controller: _walletNameController,
+                            hint: "Wallet Name",
+                            fontSize: 18,
+                            height: inputHeight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            disabled: _disabled,
+                            onFocusChanged: (isFocused) {
+                              setState(() {
+                                _focused = isFocused;
+                              });
+                            },
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
+                                setState(() {
+                                  _errorMessage = '';
+                                });
+                              }
+                            },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: adaptivePadding),
                           SmartInput(
                             key: _passwordInputKey,
                             controller: _passwordController,
                             hint: "Password",
                             fontSize: 18,
-                            height: 56,
+                            height: inputHeight,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             focusedBorderColor: theme.primaryPurple,
                             disabled: _disabled,
@@ -233,18 +262,23 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                 });
                               }
                             },
+                            onFocusChanged: (isFocused) {
+                              setState(() {
+                                _focused = isFocused;
+                              });
+                            },
                             onRightIconTap: () {
                               setState(() {
                                 _obscurePassword = !_obscurePassword;
                               });
                             },
                           ),
-                          const SizedBox(height: 16),
+                          SizedBox(height: adaptivePadding),
                           SmartInput(
                             key: _confirmPasswordInputKey,
                             controller: _confirmPasswordController,
                             hint: "Confirm Password",
-                            height: 56,
+                            height: inputHeight,
                             fontSize: 18,
                             disabled: _disabled,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -256,6 +290,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                               setState(() {
                                 _obscureConfirmPassword =
                                     !_obscureConfirmPassword;
+                              });
+                            },
+                            onFocusChanged: (isFocused) {
+                              setState(() {
+                                _focused = isFocused;
                               });
                             },
                             onChanged: (value) {
@@ -281,32 +320,33 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.only(
-                    bottom: adaptivePadding,
-                  ),
-                  child: RoundedLoadingButton(
-                    controller: _btnController,
-                    onPressed: _createWallet,
-                    successIcon: SvgPicture.asset(
-                      'assets/icons/ok.svg',
-                      width: 24,
-                      height: 24,
-                      colorFilter: ColorFilter.mode(
-                        theme.textPrimary,
-                        BlendMode.srcIn,
+                if (!_focused)
+                  Padding(
+                    padding: EdgeInsets.only(
+                      bottom: adaptivePadding,
+                    ),
+                    child: RoundedLoadingButton(
+                      controller: _btnController,
+                      onPressed: _createWallet,
+                      successIcon: SvgPicture.asset(
+                        'assets/icons/ok.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          theme.textPrimary,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      child: Text(
+                        'Create Password',
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                     ),
-                    child: Text(
-                      'Create Password',
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
                   ),
-                ),
               ],
             ),
           ),
