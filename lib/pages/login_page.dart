@@ -111,6 +111,11 @@ class _LoginPage extends State<LoginPage> {
                                   final index = entry.key;
                                   final wallet = entry.value;
 
+                                  if (!obscureButton &&
+                                      sellectedWallet != index) {
+                                    return const SizedBox.shrink();
+                                  }
+
                                   return Column(
                                     children: [
                                       if (index > 0) const SizedBox(height: 4),
@@ -167,6 +172,7 @@ class _LoginPage extends State<LoginPage> {
                           hint: "Password",
                           fontSize: 18,
                           height: 50,
+                          disabled: sellectedWallet == -1,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           focusedBorderColor: theme.primaryPurple,
                           obscureText: obscurePassword,
