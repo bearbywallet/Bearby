@@ -3,7 +3,7 @@ use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 
-pub use zilpay::background::Background;
+pub use zilpay::background::{Background, Bip39Params};
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
 pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
@@ -39,6 +39,8 @@ impl Serivce {
 #[derive(Debug, Clone)]
 pub struct WalletInfo {
     pub wallet_type: u8,
+    pub wallet_name: String,
+    pub auth_type: String,
     pub settings: WalletSettings,
     pub wallet_address: String,
     pub accounts: Vec<Account>,
@@ -54,6 +56,8 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
+                auth_type: w.data.biometric_type.into(),
+                wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
@@ -87,6 +91,8 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
+                auth_type: w.data.biometric_type.into(),
+                wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
@@ -144,10 +150,8 @@ pub async fn is_service_running() -> bool {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_bip39_wallet(
-    password: &str,
-    mnemonic_str: &str,
-    indexes: &[usize],
+pub async fn add_bip39_wallet<'a>(
+    params: Bip39Params<'a>,
     _net_codes: &[usize], // TODO: add netowrk codes for wallet
 ) -> Result<String, String> {
     // TODO: // detect by networks.
@@ -156,7 +160,7 @@ pub async fn add_bip39_wallet(
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let key = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
-            .add_bip39_wallet(password, mnemonic_str, indexes, derive)
+            .add_bip39_wallet(params, derive)
             .map_err(|e| e.to_string())?;
         let key_str = hex::encode(key);
 

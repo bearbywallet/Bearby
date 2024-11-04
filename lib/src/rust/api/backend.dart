@@ -8,6 +8,7 @@ import '../lib.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
+// These functions are ignored because they have generic arguments: `add_bip39_wallet`
 // These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `deref`, `fmt`, `fmt`, `initialize`
 
@@ -24,17 +25,6 @@ Stream<String> startWorker() =>
 
 Future<bool> isServiceRunning() =>
     RustLib.instance.api.crateApiBackendIsServiceRunning();
-
-Future<String> addBip39Wallet(
-        {required String password,
-        required String mnemonicStr,
-        required Uint64List indexes,
-        required Uint64List netCodes}) =>
-    RustLib.instance.api.crateApiBackendAddBip39Wallet(
-        password: password,
-        mnemonicStr: mnemonicStr,
-        indexes: indexes,
-        netCodes: netCodes);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
@@ -73,6 +63,8 @@ abstract class Serivce implements RustOpaqueInterface {
 abstract class WalletInfo implements RustOpaqueInterface {
   List<Account> get accounts;
 
+  String get authType;
+
   bool get enabled;
 
   BigInt get selectedAccount;
@@ -81,9 +73,13 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   String get walletAddress;
 
+  String get walletName;
+
   int get walletType;
 
   set accounts(List<Account> accounts);
+
+  set authType(String authType);
 
   set enabled(bool enabled);
 
@@ -92,6 +88,8 @@ abstract class WalletInfo implements RustOpaqueInterface {
   set settings(WalletSettings settings);
 
   set walletAddress(String walletAddress);
+
+  set walletName(String walletName);
 
   set walletType(int walletType);
 }
