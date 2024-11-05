@@ -1,4 +1,6 @@
 import 'dart:async';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -169,11 +171,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       _btnController.success();
 
-      Timer(const Duration(seconds: 1), () {
-        Navigator.of(context).pushNamed(
-          '/',
-        );
-      });
+      Navigator.of(context).pushNamed(
+        '/',
+      );
     } catch (e) {
       setState(() {
         _disabled = false;
