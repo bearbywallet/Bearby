@@ -83,8 +83,6 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   String get authType;
 
-  bool get enabled;
-
   BigInt get selectedAccount;
 
   WalletSettings get settings;
@@ -98,8 +96,6 @@ abstract class WalletInfo implements RustOpaqueInterface {
   set accounts(List<Account> accounts);
 
   set authType(String authType);
-
-  set enabled(bool enabled);
 
   set selectedAccount(BigInt selectedAccount);
 

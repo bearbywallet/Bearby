@@ -46,7 +46,6 @@ pub struct WalletInfo {
     pub wallet_address: String,
     pub accounts: Vec<Account>,
     pub selected_account: usize,
-    pub enabled: bool,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -64,7 +63,6 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
                 selected_account: w.data.selected_account,
-                enabled: w.is_enabled(),
             })
             .collect();
 
@@ -99,7 +97,6 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
                 selected_account: w.data.selected_account,
-                enabled: w.is_enabled(),
             })
             .collect();
         let selected = 0;
@@ -165,7 +162,7 @@ pub async fn add_bip39_wallet(
     let derive = Bip49DerivationPath::Zilliqa;
 
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let key = Arc::get_mut(&mut service.core)
+        let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
             .add_bip39_wallet(
                 Bip39Params {
@@ -175,13 +172,14 @@ pub async fn add_bip39_wallet(
                     passphrase: &passphrase,
                     wallet_name,
                     biometric_type: biometric_type.into(),
+                    device_indicators: identifiers,
                 },
                 derive,
             )
             .map_err(|e| e.to_string())?;
-        let key_str = hex::encode(key);
+        let cipher_session = hex::encode(session);
 
-        Ok(key_str)
+        Ok(cipher_session)
     } else {
         Err("Service is not running".to_string())
     }
