@@ -1,6 +1,4 @@
 import 'dart:async';
-import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -12,6 +10,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 import 'package:zilpay/theme/app_theme.dart';
@@ -155,6 +154,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       Uint64List accountsIndexes =
           Uint64List.fromList([0]); // TODO: maybe make ui/ux
 
+      DeviceInfoService device = DeviceInfoService();
+      List<String> identifiers = await device.getDeviceIdentifiers();
+
       String key = await addBip39Wallet(
         password: _passwordController.text,
         mnemonicStr: _bip39List!.join(' '),
@@ -163,6 +165,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         walletName: _walletNameController.text,
         biometricType: _authMethods[0].name,
         netCodes: networkIndexes,
+        identifiers: identifiers,
       );
 
       if (_useDeviceAuth) {

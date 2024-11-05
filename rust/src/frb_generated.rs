@@ -1436,6 +1436,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
             let api_wallet_name = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
             let api__net_codes = <Vec<usize>>::sse_decode(&mut deserializer);
+            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1448,6 +1449,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
                             api_wallet_name,
                             api_biometric_type,
                             &api__net_codes,
+                            &api_identifiers,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1919,6 +1921,18 @@ impl SseDecode for Vec<WalletInfo> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<WalletInfo>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<String>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -2434,6 +2448,16 @@ impl SseEncode for Vec<WalletInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <WalletInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <String>::sse_encode(item, serializer);
         }
     }
 }

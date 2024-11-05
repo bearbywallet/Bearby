@@ -159,6 +159,7 @@ pub async fn add_bip39_wallet(
     wallet_name: String,
     biometric_type: String,
     _net_codes: &[usize], // TODO: add netowrk codes for wallet
+    identifiers: &[String],
 ) -> Result<String, String> {
     // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;

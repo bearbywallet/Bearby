@@ -171,7 +171,8 @@ abstract class RustLibApi extends BaseApi {
       required String passphrase,
       required String walletName,
       required String biometricType,
-      required Uint64List netCodes});
+      required Uint64List netCodes,
+      required List<String> identifiers});
 
   Future<List<WalletInfo>> crateApiBackendGetWallets();
 
@@ -1041,7 +1042,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required String passphrase,
       required String walletName,
       required String biometricType,
-      required Uint64List netCodes}) {
+      required Uint64List netCodes,
+      required List<String> identifiers}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1052,6 +1054,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(walletName, serializer);
         sse_encode_String(biometricType, serializer);
         sse_encode_list_prim_usize_strict(netCodes, serializer);
+        sse_encode_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 29, port: port_);
       },
@@ -1067,7 +1070,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         passphrase,
         walletName,
         biometricType,
-        netCodes
+        netCodes,
+        identifiers
       ],
       apiImpl: this,
     ));
@@ -1083,7 +1087,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "passphrase",
           "walletName",
           "biometricType",
-          "netCodes"
+          "netCodes",
+          "identifiers"
         ],
       );
 
@@ -1521,6 +1526,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<String> dco_decode_list_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -1791,6 +1802,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(
           sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
               deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<String> sse_decode_list_String(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <String>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_String(deserializer));
     }
     return ans_;
   }
@@ -2087,6 +2110,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
           item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_String(List<String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_String(item, serializer);
     }
   }
 

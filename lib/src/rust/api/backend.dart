@@ -32,7 +32,8 @@ Future<String> addBip39Wallet(
         required String passphrase,
         required String walletName,
         required String biometricType,
-        required Uint64List netCodes}) =>
+        required Uint64List netCodes,
+        required List<String> identifiers}) =>
     RustLib.instance.api.crateApiBackendAddBip39Wallet(
         password: password,
         mnemonicStr: mnemonicStr,
@@ -40,7 +41,8 @@ Future<String> addBip39Wallet(
         passphrase: passphrase,
         walletName: walletName,
         biometricType: biometricType,
-        netCodes: netCodes);
+        netCodes: netCodes,
+        identifiers: identifiers);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
