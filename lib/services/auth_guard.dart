@@ -1,38 +1,69 @@
-import 'package:zilpay/services/secure_storage.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
 
 class AuthGuard extends ChangeNotifier {
-  final SecureStorage _secureStorage = SecureStorage();
+  final FlutterSecureStorage _storage;
+  final AuthService _authService;
 
   bool _ready = false;
-  bool _enabled = false;
+  bool _enabled = false; // TODO: remake it to many wallets
 
   bool get ready => _ready;
   bool get enabled => _enabled;
 
-  Future<void> setSession(String key) async {
-    await _secureStorage.saveSessionKey(key);
+  AuthGuard({AuthService? authService})
+      : _storage = const FlutterSecureStorage(
+          aOptions: AndroidOptions(
+            encryptedSharedPreferences: true,
+          ),
+          iOptions: IOSOptions(
+            accessibility: KeychainAccessibility.first_unlock,
+            synchronizable: true,
+          ),
+        ),
+        _authService = authService ?? AuthService();
 
+  Future<void> setSession(String key) async {
     _enabled = true;
     _ready = true;
 
     notifyListeners();
   }
 
-  Future<String> getSession() async {
-    String? key = await _secureStorage.getSessionKey(
-      reason: 'Please authenticate to unlock your wallet',
-    );
+  Future<void> saveSessionKey(String sessionKey, String sessionValue) async {
+    try {
+      final authMethods = await _authService.getAvailableAuthMethods();
 
-    if (key == null) {
-      throw StorageException('Session key is empty');
+      if (authMethods.contains(AuthMethod.none)) {
+        throw 'Device does not support secure storage. Please enable device lock.';
+      }
+
+      await _storage.write(
+        key: sessionKey,
+        value: sessionValue,
+      );
+    } catch (e) {
+      throw 'Failed to save session key: $e';
+    }
+  }
+
+  Future<String> getSession({
+    required String sessionKey,
+    bool requireAuth = true,
+    String reason = 'Please authenticate to access your wallet',
+  }) async {
+    final value = await _storage.read(key: sessionKey);
+
+    if (value == null) {
+      throw 'Session key is empty';
     }
 
     _enabled = true;
 
     notifyListeners();
 
-    return key;
+    return value;
   }
 
   Future<void> initialize(bool ready) async {

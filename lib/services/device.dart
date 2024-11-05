@@ -1,18 +1,16 @@
 import 'dart:io';
 import 'package:device_info_plus/device_info_plus.dart';
 import 'package:package_info_plus/package_info_plus.dart';
-import 'package:local_auth/local_auth.dart';
+import 'package:zilpay/services/biometric_service.dart';
 
 class DeviceInfoService {
   final DeviceInfoPlugin _deviceInfo = DeviceInfoPlugin();
-  final LocalAuthentication _localAuth = LocalAuthentication();
 
   Future<List<String>> getDeviceIdentifiers() async {
     final packageInfo = await PackageInfo.fromPlatform();
-    final canCheckBiometrics = await _localAuth.canCheckBiometrics;
-    final biometrics = canCheckBiometrics
-        ? (await _localAuth.getAvailableBiometrics())
-        : <BiometricType>[];
+    final AuthService authService = AuthService();
+    final methods =
+        (await authService.getAvailableAuthMethods()).map((e) => e.name);
 
     if (Platform.isAndroid) {
       final info = await _deviceInfo.androidInfo;
@@ -27,7 +25,7 @@ class DeviceInfoService {
         info.isPhysicalDevice.toString(),
         packageInfo.packageName,
         packageInfo.buildSignature,
-        biometrics.isNotEmpty ? biometrics.first.toString() : 'none'
+        ...methods
       ];
     }
 
@@ -40,7 +38,7 @@ class DeviceInfoService {
         info.isPhysicalDevice.toString(),
         packageInfo.packageName,
         packageInfo.buildSignature,
-        biometrics.isNotEmpty ? biometrics.first.toString() : 'none'
+        ...methods
       ];
     }
 
@@ -49,10 +47,6 @@ class DeviceInfoService {
 
   Future<Map<String, String>> getDeviceInfo() async {
     final packageInfo = await PackageInfo.fromPlatform();
-    final canCheckBiometrics = await _localAuth.canCheckBiometrics;
-    final biometrics = canCheckBiometrics
-        ? (await _localAuth.getAvailableBiometrics())
-        : <BiometricType>[];
 
     if (Platform.isAndroid) {
       final info = await _deviceInfo.androidInfo;
@@ -67,8 +61,6 @@ class DeviceInfoService {
         'isPhysicalDevice': info.isPhysicalDevice.toString(),
         'appId': packageInfo.packageName,
         'buildSignature': packageInfo.buildSignature,
-        'biometricType':
-            biometrics.isNotEmpty ? biometrics.first.toString() : 'none'
       };
     }
 
@@ -81,8 +73,6 @@ class DeviceInfoService {
         'isPhysicalDevice': info.isPhysicalDevice.toString(),
         'appId': packageInfo.packageName,
         'buildSignature': packageInfo.buildSignature,
-        'biometricType':
-            biometrics.isNotEmpty ? biometrics.first.toString() : 'none'
       };
     }
 
