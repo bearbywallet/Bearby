@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/wallet_option.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/theme_provider.dart';
 
@@ -20,8 +25,11 @@ class LoginPage extends StatefulWidget {
 class _LoginPage extends State<LoginPage> {
   final passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
+  final _btnController = RoundedLoadingButtonController();
+
   final AuthService _authService = AuthService();
 
+  late AuthGuard _authGuard;
   late AppState _appState;
 
   bool obscurePassword = true;
@@ -32,7 +40,16 @@ class _LoginPage extends State<LoginPage> {
   void initState() {
     super.initState();
 
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    passwordController.dispose();
+    _btnController.dispose();
+
+    super.dispose();
   }
 
   Color _getWalletColor(int index) {
@@ -61,21 +78,54 @@ class _LoginPage extends State<LoginPage> {
       }
 
       if (wallet.authType != "none") {
+        _btnController.start();
+
         final authenticated = await _authService.authenticate(
           allowPinCode: true,
           reason: 'Please authenticate',
         );
 
         if (!authenticated) {
+          _btnController.error();
+
+          Timer(const Duration(seconds: 1), () {
+            _btnController.reset();
+          });
+
           return;
         }
 
-        // TODO: add session check
+        String session =
+            await _authGuard.getSession(sessionKey: wallet.walletAddress);
 
-        toHome();
+        DeviceInfoService device = DeviceInfoService();
+        List<String> identifiers = await device.getDeviceIdentifiers();
+
+        bool unlocked = await tryUnlockWithSession(
+            sessionCipher: session,
+            walletIndex: BigInt.from(index),
+            identifiers: identifiers);
+
+        if (unlocked) {
+          _btnController.success();
+
+          toHome();
+        } else {
+          _btnController.error();
+
+          Timer(const Duration(seconds: 1), () {
+            _btnController.reset();
+          });
+        }
       }
     } catch (e) {
       print("try unlock with biometric $e");
+
+      _btnController.error();
+
+      Timer(const Duration(seconds: 1), () {
+        _btnController.reset();
+      });
     }
   }
 
@@ -90,25 +140,40 @@ class _LoginPage extends State<LoginPage> {
       }
 
       if (passwordController.text.isNotEmpty) {
-        // TODO: add password check.
-        return;
-      }
+        DeviceInfoService device = DeviceInfoService();
+        List<String> identifiers = await device.getDeviceIdentifiers();
 
-      if (wallet.authType != "none") {
-        final authenticated = await _authService.authenticate(
-          allowPinCode: true,
-          reason: 'Please authenticate',
-        );
+        bool unlocked = await tryUnlockWithPassword(
+            password: passwordController.text,
+            walletIndex: BigInt.from(sellectedWallet),
+            identifiers: identifiers);
 
-        if (!authenticated) {
+        if (unlocked) {
+          _btnController.success();
+
+          return toHome();
+        } else {
+          _passwordInputKey.currentState?.shake();
+          _btnController.reset();
+
           return;
         }
-
-        toHome();
       }
     } catch (e) {
-      print("try unlock with biometric $e");
+      print("try unlock with password $e");
+
+      if (passwordController.text.isNotEmpty) {
+        _passwordInputKey.currentState?.shake();
+      } else {
+        _btnController.reset();
+      }
+
+      Timer(const Duration(seconds: 1), () {
+        _btnController.reset();
+      });
     }
+
+    await walletTap(sellectedWallet);
   }
 
   @override
@@ -259,13 +324,32 @@ class _LoginPage extends State<LoginPage> {
                         ),
                         const SizedBox(height: 8),
                         if (obscureButton)
-                          CustomButton(
-                            text: 'Confirm',
-                            onPressed: unlock,
-                            backgroundColor: theme.primaryPurple,
-                            borderRadius: 30.0,
-                            height: 50.0,
-                          ),
+                          Padding(
+                            padding: EdgeInsets.only(
+                              bottom: adaptivePadding,
+                            ),
+                            child: RoundedLoadingButton(
+                              controller: _btnController,
+                              onPressed: unlock,
+                              successIcon: SvgPicture.asset(
+                                'assets/icons/ok.svg',
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(
+                                  theme.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              child: Text(
+                                'Unlock',
+                                style: TextStyle(
+                                  color: theme.textPrimary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          )
                       ],
                     ),
                   ),

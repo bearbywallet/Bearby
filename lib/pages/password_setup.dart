@@ -89,6 +89,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     _passwordController.dispose();
     _confirmPasswordController.dispose();
     _walletNameController.dispose();
+    _btnController.dispose();
 
     super.dispose();
   }
