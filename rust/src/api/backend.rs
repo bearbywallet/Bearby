@@ -9,6 +9,7 @@ pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
 pub use zilpay::wallet::wallet_data::AuthMethod;
+pub use zilpay::wallet::wallet_data::WalletData;
 pub use zilpay::wallet::wallet_types::WalletTypes;
 
 pub struct Serivce {
@@ -76,7 +77,34 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
 pub struct BackgroundState {
     pub wallets: Vec<WalletInfo>,
     pub settings: CommonSettings,
-    pub selected: usize,
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn get_data() -> Result<BackgroundState, String> {
+    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
+        let wallets: Vec<WalletInfo> = service
+            .core
+            .wallets
+            .iter()
+            .map(|w| WalletInfo {
+                auth_type: w.data.biometric_type.into(),
+                wallet_name: w.data.wallet_name.clone(),
+                wallet_type: w.data.wallet_type.code(),
+                settings: w.data.settings.clone(),
+                wallet_address: w.data.wallet_address.clone(),
+                accounts: w.data.accounts.clone(),
+                selected_account: w.data.selected_account,
+            })
+            .collect();
+        let state = BackgroundState {
+            wallets,
+            settings: service.core.settings.clone(),
+        };
+
+        return Ok(state);
+    }
+
+    Err("service already running".to_string())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -99,10 +127,8 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 selected_account: w.data.selected_account,
             })
             .collect();
-        let selected = 0;
         let state = BackgroundState {
             wallets,
-            selected,
             settings: bg.core.settings.clone(),
         };
 
@@ -157,7 +183,7 @@ pub async fn add_bip39_wallet(
     biometric_type: String,
     _net_codes: &[usize], // TODO: add netowrk codes for wallet
     identifiers: &[String],
-) -> Result<String, String> {
+) -> Result<(String, String), String> {
     // TODO: // detect by networks.
     let derive = Bip49DerivationPath::Zilliqa;
 
@@ -178,8 +204,13 @@ pub async fn add_bip39_wallet(
             )
             .map_err(|e| e.to_string())?;
         let cipher_session = hex::encode(session);
+        let wallet = service
+            .core
+            .wallets
+            .last()
+            .ok_or("Fail to Save wallet".to_string())?;
 
-        Ok(cipher_session)
+        Ok((cipher_session, wallet.data.wallet_address.clone()))
     } else {
         Err("Service is not running".to_string())
     }

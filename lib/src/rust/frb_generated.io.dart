@@ -180,6 +180,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   RustStreamSink<String>? dco_decode_opt_StreamSink_String_Sse(dynamic raw);
 
   @protected
+  (String, String) dco_decode_record_string_string(dynamic raw);
+
+  @protected
   int dco_decode_u_8(dynamic raw);
 
   @protected
@@ -322,6 +325,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   RustStreamSink<String>? sse_decode_opt_StreamSink_String_Sse(
+      SseDeserializer deserializer);
+
+  @protected
+  (String, String) sse_decode_record_string_string(
       SseDeserializer deserializer);
 
   @protected
@@ -474,6 +481,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_StreamSink_String_Sse(
       RustStreamSink<String>? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_string_string(
+      (String, String) self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);

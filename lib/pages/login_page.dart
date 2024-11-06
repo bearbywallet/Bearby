@@ -41,6 +41,7 @@ class _LoginPage extends State<LoginPage> {
         allowPinCode: true,
         reason: 'Please authenticate to enable quick access',
       );
+      // WalletInfo wallet
 
       print(authenticated);
 
@@ -80,7 +81,6 @@ class _LoginPage extends State<LoginPage> {
           ),
           SafeArea(
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
               children: [
                 Padding(
                   padding: EdgeInsets.all(adaptivePadding),
@@ -116,71 +116,61 @@ class _LoginPage extends State<LoginPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        SizedBox(
-                          child: SingleChildScrollView(
+                        Expanded(
+                          child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                ...appState.wallets
-                                    .asMap()
-                                    .entries
-                                    .map((entry) {
-                                  final index = entry.key;
-                                  final wallet = entry.value;
+                            itemCount: appState.wallets.length,
+                            itemBuilder: (context, index) {
+                              final wallet = appState.wallets[index];
 
-                                  if (!obscureButton &&
-                                      sellectedWallet != index) {
-                                    return const SizedBox.shrink();
-                                  }
+                              if (!obscureButton && sellectedWallet != index) {
+                                return const SizedBox.shrink();
+                              }
 
-                                  return Column(
-                                    children: [
-                                      if (index > 0) const SizedBox(height: 4),
-                                      WalletOption(
-                                          title: wallet.walletName.isEmpty
-                                              ? "Wallet ${index + 1}"
-                                              : wallet.walletName,
-                                          address: wallet.walletAddress,
-                                          isSelected: sellectedWallet == index,
-                                          padding: EdgeInsets.all(
-                                              adaptivePaddingWalletOption),
-                                          onTap: () {
-                                            setState(() {
-                                              sellectedWallet = index;
-                                            });
-                                          },
-                                          icons: [
-                                            if (wallet.walletType == 0)
-                                              'assets/icons/ledger.svg',
-                                            if (wallet.walletType == 1)
-                                              'assets/icons/document.svg',
-                                            if (wallet.walletType == 2)
-                                              'assets/icons/bincode.svg',
-                                            if (wallet.authType == "faceId")
-                                              'assets/icons/face_id.svg',
-                                            if (wallet.authType ==
-                                                "fingerprint")
-                                              'assets/icons/fingerprint.svg',
-                                            if (wallet.authType == "biometric")
-                                              'assets/icons/biometric.svg',
-                                            if (wallet.authType == "pinCode")
-                                              'assets/icons/pin.svg',
-                                          ],
-                                          icon: Container(
-                                              padding: const EdgeInsets.all(4),
-                                              child: Blockies(
-                                                seed: wallet.walletAddress,
-                                                color: _getWalletColor(index),
-                                                bgColor: theme.primaryPurple,
-                                                spotColor: theme.background,
-                                                size: 8,
-                                              ))),
-                                    ],
-                                  );
-                                }),
-                              ],
-                            ),
+                              return Padding(
+                                padding:
+                                    EdgeInsets.only(top: index > 0 ? 4 : 0),
+                                child: WalletOption(
+                                  title: wallet.walletName.isEmpty
+                                      ? "Wallet ${index + 1}"
+                                      : wallet.walletName,
+                                  address: wallet.walletAddress,
+                                  isSelected: sellectedWallet == index,
+                                  padding: EdgeInsets.all(
+                                      adaptivePaddingWalletOption),
+                                  onTap: () {
+                                    setState(() {
+                                      sellectedWallet = index;
+                                    });
+                                  },
+                                  icons: [
+                                    if (wallet.walletType == 0)
+                                      'assets/icons/ledger.svg',
+                                    if (wallet.walletType == 1)
+                                      'assets/icons/document.svg',
+                                    if (wallet.walletType == 2)
+                                      'assets/icons/bincode.svg',
+                                    if (wallet.authType == "faceId")
+                                      'assets/icons/face_id.svg',
+                                    if (wallet.authType == "fingerprint")
+                                      'assets/icons/fingerprint.svg',
+                                    if (wallet.authType == "biometric")
+                                      'assets/icons/biometric.svg',
+                                    if (wallet.authType == "pinCode")
+                                      'assets/icons/pin.svg',
+                                  ],
+                                  icon: Container(
+                                      padding: const EdgeInsets.all(4),
+                                      child: Blockies(
+                                        seed: wallet.walletAddress,
+                                        color: _getWalletColor(index),
+                                        bgColor: theme.primaryPurple,
+                                        spotColor: theme.background,
+                                        size: 8,
+                                      )),
+                                ),
+                              );
+                            },
                           ),
                         ),
                         const SizedBox(height: 16),

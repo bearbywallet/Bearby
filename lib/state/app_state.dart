@@ -29,6 +29,11 @@ class AppState extends ChangeNotifier {
     return _state.wallets;
   }
 
+  Future<void> syncData() async {
+    _state = await getData();
+    notifyListeners();
+  }
+
   Future<void> initialize() async {
     // TODO: init theme form storage
   }

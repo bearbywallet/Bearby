@@ -157,8 +157,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
-      String cipherSession = await addBip39Wallet(
-        // TODO: return also a wallet_address
+      (String, String) session = await addBip39Wallet(
         password: _passwordController.text,
         mnemonicStr: _bip39List!.join(' '),
         indexes: accountsIndexes,
@@ -170,8 +169,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       );
 
       if (_useDeviceAuth) {
-        // await _authGuard.setSession(key);
+        await _authGuard.setSession(session.$2, session.$1);
       }
+
+      await _appState.syncData();
 
       _btnController.success();
 

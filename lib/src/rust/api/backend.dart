@@ -14,6 +14,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
 
+Future<BackgroundState> getData() =>
+    RustLib.instance.api.crateApiBackendGetData();
+
 Future<BackgroundState> startService({required String path}) =>
     RustLib.instance.api.crateApiBackendStartService(path: path);
 
@@ -25,7 +28,7 @@ Stream<String> startWorker() =>
 Future<bool> isServiceRunning() =>
     RustLib.instance.api.crateApiBackendIsServiceRunning();
 
-Future<String> addBip39Wallet(
+Future<(String, String)> addBip39Wallet(
         {required String password,
         required String mnemonicStr,
         required Uint64List indexes,
@@ -49,13 +52,9 @@ abstract class ArcBackground implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<BackgroundState>>
 abstract class BackgroundState implements RustOpaqueInterface {
-  BigInt get selected;
-
   CommonSettings get settings;
 
   List<WalletInfo> get wallets;
-
-  set selected(BigInt selected);
 
   set settings(CommonSettings settings);
 

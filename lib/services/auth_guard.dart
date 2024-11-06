@@ -24,14 +24,7 @@ class AuthGuard extends ChangeNotifier {
         ),
         _authService = authService ?? AuthService();
 
-  Future<void> setSession(String key) async {
-    _enabled = true;
-    _ready = true;
-
-    notifyListeners();
-  }
-
-  Future<void> saveSessionKey(String sessionKey, String sessionValue) async {
+  Future<void> setSession(String sessionKey, String sessionValue) async {
     try {
       final authMethods = await _authService.getAvailableAuthMethods();
 
@@ -43,6 +36,11 @@ class AuthGuard extends ChangeNotifier {
         key: sessionKey,
         value: sessionValue,
       );
+
+      _enabled = true;
+      _ready = true;
+
+      notifyListeners();
     } catch (e) {
       throw 'Failed to save session key: $e';
     }
