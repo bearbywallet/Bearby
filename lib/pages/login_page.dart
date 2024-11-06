@@ -179,11 +179,8 @@ class _LoginPage extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
-
     final screenSize = MediaQuery.of(context).size;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final adaptivePaddingWalletOption =
-        AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -223,135 +220,126 @@ class _LoginPage extends State<LoginPage> {
                     ),
                   ),
                 ),
+                Text(
+                  'Welcome back',
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 32,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Expanded(
-                  child: Padding(
-                    padding: EdgeInsets.all(adaptivePadding),
-                    child: Column(
-                      children: [
-                        const Spacer(),
-                        Center(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                    itemCount: _appState.wallets.length,
+                    itemBuilder: (context, index) {
+                      final wallet = _appState.wallets[index];
+
+                      if (!obscureButton && sellectedWallet != index) {
+                        return const SizedBox.shrink();
+                      }
+
+                      return Padding(
+                        padding: EdgeInsets.only(top: index > 0 ? 4 : 0),
+                        child: WalletOption(
+                          title: wallet.walletName.isEmpty
+                              ? "Wallet ${index + 1}"
+                              : wallet.walletName,
+                          address: wallet.walletAddress,
+                          isSelected: sellectedWallet == index,
+                          padding: const EdgeInsets.all(16),
+                          onTap: () {
+                            setState(() {
+                              sellectedWallet = index;
+                            });
+                            walletTap(index);
+                          },
+                          icons: [
+                            if (wallet.walletType == 0)
+                              'assets/icons/ledger.svg',
+                            if (wallet.walletType == 1)
+                              'assets/icons/document.svg',
+                            if (wallet.walletType == 2)
+                              'assets/icons/bincode.svg',
+                            if (wallet.authType == "faceId")
+                              'assets/icons/face_id.svg',
+                            if (wallet.authType == "fingerprint")
+                              'assets/icons/fingerprint.svg',
+                            if (wallet.authType == "biometric")
+                              'assets/icons/biometric.svg',
+                            if (wallet.authType == "pinCode")
+                              'assets/icons/pin.svg',
+                          ],
+                          icon: Container(
+                            padding: const EdgeInsets.all(4),
+                            child: Blockies(
+                              seed: wallet.walletAddress,
+                              color: _getWalletColor(index),
+                              bgColor: theme.primaryPurple,
+                              spotColor: theme.background,
+                              size: 8,
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(adaptivePadding),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      SmartInput(
+                        key: _passwordInputKey,
+                        controller: passwordController,
+                        hint: "Password",
+                        fontSize: 18,
+                        height: 50,
+                        disabled: sellectedWallet == -1,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        focusedBorderColor: theme.primaryPurple,
+                        obscureText: obscurePassword,
+                        onFocusChanged: (isFocused) {
+                          setState(() {
+                            obscureButton = !isFocused;
+                          });
+                        },
+                        rightIconPath: obscurePassword
+                            ? "assets/icons/close_eye.svg"
+                            : "assets/icons/open_eye.svg",
+                        onRightIconTap: () {
+                          setState(() {
+                            obscurePassword = !obscurePassword;
+                          });
+                        },
+                      ),
+                      const SizedBox(height: 8),
+                      if (obscureButton)
+                        RoundedLoadingButton(
+                          controller: _btnController,
+                          onPressed: unlock,
+                          successIcon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              theme.textPrimary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
                           child: Text(
-                            'Welcome back',
+                            'Unlock',
                             style: TextStyle(
                               color: theme.textPrimary,
-                              fontSize: 32,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        const SizedBox(height: 8),
-                        Expanded(
-                          child: ListView.builder(
-                            physics: const BouncingScrollPhysics(),
-                            itemCount: _appState.wallets.length,
-                            itemBuilder: (context, index) {
-                              final wallet = _appState.wallets[index];
-
-                              if (!obscureButton && sellectedWallet != index) {
-                                return const SizedBox.shrink();
-                              }
-
-                              return Padding(
-                                padding:
-                                    EdgeInsets.only(top: index > 0 ? 4 : 0),
-                                child: WalletOption(
-                                  title: wallet.walletName.isEmpty
-                                      ? "Wallet ${index + 1}"
-                                      : wallet.walletName,
-                                  address: wallet.walletAddress,
-                                  isSelected: sellectedWallet == index,
-                                  padding: EdgeInsets.all(
-                                      adaptivePaddingWalletOption),
-                                  onTap: () {
-                                    setState(() {
-                                      sellectedWallet = index;
-                                    });
-
-                                    walletTap(index);
-                                  },
-                                  icons: [
-                                    if (wallet.walletType == 0)
-                                      'assets/icons/ledger.svg',
-                                    if (wallet.walletType == 1)
-                                      'assets/icons/document.svg',
-                                    if (wallet.walletType == 2)
-                                      'assets/icons/bincode.svg',
-                                    if (wallet.authType == "faceId")
-                                      'assets/icons/face_id.svg',
-                                    if (wallet.authType == "fingerprint")
-                                      'assets/icons/fingerprint.svg',
-                                    if (wallet.authType == "biometric")
-                                      'assets/icons/biometric.svg',
-                                    if (wallet.authType == "pinCode")
-                                      'assets/icons/pin.svg',
-                                  ],
-                                  icon: Container(
-                                      padding: const EdgeInsets.all(4),
-                                      child: Blockies(
-                                        seed: wallet.walletAddress,
-                                        color: _getWalletColor(index),
-                                        bgColor: theme.primaryPurple,
-                                        spotColor: theme.background,
-                                        size: 8,
-                                      )),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                        SmartInput(
-                          key: _passwordInputKey,
-                          controller: passwordController,
-                          hint: "Password",
-                          fontSize: 18,
-                          height: 50,
-                          disabled: sellectedWallet == -1,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          focusedBorderColor: theme.primaryPurple,
-                          obscureText: obscurePassword,
-                          onFocusChanged: (isFocused) {
-                            obscureButton = !isFocused;
-                          },
-                          rightIconPath: obscurePassword
-                              ? "assets/icons/close_eye.svg"
-                              : "assets/icons/open_eye.svg",
-                          onRightIconTap: () {
-                            setState(() {
-                              obscurePassword = !obscurePassword;
-                            });
-                          },
-                        ),
-                        const SizedBox(height: 8),
-                        if (obscureButton)
-                          Padding(
-                            padding: EdgeInsets.only(
-                              bottom: adaptivePadding,
-                            ),
-                            child: RoundedLoadingButton(
-                              controller: _btnController,
-                              onPressed: unlock,
-                              successIcon: SvgPicture.asset(
-                                'assets/icons/ok.svg',
-                                width: 24,
-                                height: 24,
-                                colorFilter: ColorFilter.mode(
-                                  theme.textPrimary,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                              child: Text(
-                                'Unlock',
-                                style: TextStyle(
-                                  color: theme.textPrimary,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                          )
-                      ],
-                    ),
+                    ],
                   ),
                 ),
               ],
