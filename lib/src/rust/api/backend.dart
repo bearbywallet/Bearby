@@ -17,6 +17,22 @@ Future<List<WalletInfo>> getWallets() =>
 Future<BackgroundState> getData() =>
     RustLib.instance.api.crateApiBackendGetData();
 
+Future<bool> tryUnlockWithPassword(
+        {required String password,
+        required BigInt walletIndex,
+        required List<String> identifiers}) =>
+    RustLib.instance.api.crateApiBackendTryUnlockWithPassword(
+        password: password, walletIndex: walletIndex, identifiers: identifiers);
+
+Future<bool> tryUnlockWithSession(
+        {required String sessionCipher,
+        required BigInt walletIndex,
+        required List<String> identifiers}) =>
+    RustLib.instance.api.crateApiBackendTryUnlockWithSession(
+        sessionCipher: sessionCipher,
+        walletIndex: walletIndex,
+        identifiers: identifiers);
+
 Future<BackgroundState> startService({required String path}) =>
     RustLib.instance.api.crateApiBackendStartService(path: path);
 

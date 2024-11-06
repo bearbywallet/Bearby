@@ -22,9 +22,18 @@ class _LoginPage extends State<LoginPage> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final AuthService _authService = AuthService();
 
+  late AppState _appState;
+
   bool obscurePassword = true;
   bool obscureButton = true;
   int sellectedWallet = -1;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _appState = Provider.of<AppState>(context, listen: false);
+  }
 
   Color _getWalletColor(int index) {
     final colors = [
@@ -35,26 +44,76 @@ class _LoginPage extends State<LoginPage> {
     return colors[index % colors.length];
   }
 
-  Future<void> unlock() async {
+  void toHome() {
+    Navigator.of(context).pushNamed(
+      '/',
+    );
+  }
+
+  Future<void> walletTap(int index) async {
+    final wallet = _appState.wallets[index];
+
     try {
-      final authenticated = await _authService.authenticate(
-        allowPinCode: true,
-        reason: 'Please authenticate to enable quick access',
-      );
-      // WalletInfo wallet
+      // if Ledger device
+      if (wallet.walletType == 0) {
+        toHome();
+        return;
+      }
 
-      print(authenticated);
+      if (wallet.authType != "none") {
+        final authenticated = await _authService.authenticate(
+          allowPinCode: true,
+          reason: 'Please authenticate',
+        );
 
-      //
+        if (!authenticated) {
+          return;
+        }
+
+        // TODO: add session check
+
+        toHome();
+      }
     } catch (e) {
-      print(e);
+      print("try unlock with biometric $e");
+    }
+  }
+
+  Future<void> unlock() async {
+    final wallet = _appState.wallets[sellectedWallet];
+
+    try {
+      // if Ledger device
+      if (wallet.walletType == 0) {
+        toHome();
+        return;
+      }
+
+      if (passwordController.text.isNotEmpty) {
+        // TODO: add password check.
+        return;
+      }
+
+      if (wallet.authType != "none") {
+        final authenticated = await _authService.authenticate(
+          allowPinCode: true,
+          reason: 'Please authenticate',
+        );
+
+        if (!authenticated) {
+          return;
+        }
+
+        toHome();
+      }
+    } catch (e) {
+      print("try unlock with biometric $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
-    final appState = Provider.of<AppState>(context);
 
     final screenSize = MediaQuery.of(context).size;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
@@ -119,9 +178,9 @@ class _LoginPage extends State<LoginPage> {
                         Expanded(
                           child: ListView.builder(
                             physics: const BouncingScrollPhysics(),
-                            itemCount: appState.wallets.length,
+                            itemCount: _appState.wallets.length,
                             itemBuilder: (context, index) {
-                              final wallet = appState.wallets[index];
+                              final wallet = _appState.wallets[index];
 
                               if (!obscureButton && sellectedWallet != index) {
                                 return const SizedBox.shrink();
@@ -142,6 +201,8 @@ class _LoginPage extends State<LoginPage> {
                                     setState(() {
                                       sellectedWallet = index;
                                     });
+
+                                    walletTap(index);
                                   },
                                   icons: [
                                     if (wallet.walletType == 0)

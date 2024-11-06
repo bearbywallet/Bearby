@@ -104,7 +104,45 @@ pub async fn get_data() -> Result<BackgroundState, String> {
         return Ok(state);
     }
 
-    Err("service already running".to_string())
+    Err("service is not running".to_string())
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn try_unlock_with_password(
+    password: String,
+    wallet_index: usize,
+    identifiers: &[String],
+) -> Result<bool, String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .unlock_wallet_with_password(&password, identifiers, wallet_index)
+            .map_err(|e| e.to_string())?;
+
+        return Ok(true);
+    }
+
+    Err("service is not running".to_string())
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn try_unlock_with_session(
+    session_cipher: String,
+    wallet_index: usize,
+    identifiers: &[String],
+) -> Result<bool, String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let session = hex::decode(session_cipher).map_err(|_| "Invalid Session cipher")?;
+
+        Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .unlock_wallet_with_session(session, identifiers, wallet_index)
+            .map_err(|e| e.to_string())?;
+
+        return Ok(true);
+    }
+
+    Err("service is not running".to_string())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]

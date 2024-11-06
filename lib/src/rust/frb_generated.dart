@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -258859811;
+  int get rustContentHash => -649500401;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -173,6 +173,16 @@ abstract class RustLibApi extends BaseApi {
   Stream<String> crateApiBackendStartWorker();
 
   Future<void> crateApiBackendStopService();
+
+  Future<bool> crateApiBackendTryUnlockWithPassword(
+      {required String password,
+      required BigInt walletIndex,
+      required List<String> identifiers});
+
+  Future<bool> crateApiBackendTryUnlockWithSession(
+      {required String sessionCipher,
+      required BigInt walletIndex,
+      required List<String> identifiers});
 
   Future<String> crateApiMethodsGenBip39Words({required int count});
 
@@ -1120,13 +1130,73 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<bool> crateApiBackendTryUnlockWithPassword(
+      {required String password,
+      required BigInt walletIndex,
+      required List<String> identifiers}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(password, serializer);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_list_String(identifiers, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 32, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendTryUnlockWithPasswordConstMeta,
+      argValues: [password, walletIndex, identifiers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendTryUnlockWithPasswordConstMeta =>
+      const TaskConstMeta(
+        debugName: "try_unlock_with_password",
+        argNames: ["password", "walletIndex", "identifiers"],
+      );
+
+  @override
+  Future<bool> crateApiBackendTryUnlockWithSession(
+      {required String sessionCipher,
+      required BigInt walletIndex,
+      required List<String> identifiers}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(sessionCipher, serializer);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_list_String(identifiers, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 33, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendTryUnlockWithSessionConstMeta,
+      argValues: [sessionCipher, walletIndex, identifiers],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendTryUnlockWithSessionConstMeta =>
+      const TaskConstMeta(
+        debugName: "try_unlock_with_session",
+        argNames: ["sessionCipher", "walletIndex", "identifiers"],
+      );
+
+  @override
   Future<String> crateApiMethodsGenBip39Words({required int count}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8(count, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 32, port: port_);
+            funcId: 34, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1150,7 +1220,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 33, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
