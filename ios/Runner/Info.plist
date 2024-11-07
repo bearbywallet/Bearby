@@ -26,6 +26,10 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
+	<key>NSBluetoothPeripheralUsageDescription</key>
+	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZilPay biometric auth</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
