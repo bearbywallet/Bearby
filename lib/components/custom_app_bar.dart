@@ -8,6 +8,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final VoidCallback onBackPressed;
   final VoidCallback? onActionPressed;
   final String? actionIconPath;
+  final String? actionText;
 
   const CustomAppBar({
     super.key,
@@ -15,6 +16,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     required this.onBackPressed,
     this.onActionPressed,
     this.actionIconPath,
+    this.actionText,
   });
 
   @override
@@ -48,7 +50,19 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-            if (actionIconPath != null && onActionPressed != null)
+            if (actionText != null && onActionPressed != null)
+              TextButton(
+                onPressed: onActionPressed,
+                child: Text(
+                  actionText!,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              )
+            else if (actionIconPath != null && onActionPressed != null)
               IconButton(
                 icon: SvgPicture.asset(
                   actionIconPath!,

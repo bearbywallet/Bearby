@@ -158,13 +158,19 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
+      AuthMethod biometricType = AuthMethod.none;
+
+      if (_useDeviceAuth) {
+        biometricType = _authMethods[0];
+      }
+
       (String, String) session = await addBip39Wallet(
         password: _passwordController.text,
         mnemonicStr: _bip39List!.join(' '),
         indexes: accountsIndexes,
         passphrase: "", // TODO: maybe make it
         walletName: _walletNameController.text,
-        biometricType: _authMethods[0].name,
+        biometricType: biometricType.name,
         netCodes: networkIndexes,
         identifiers: identifiers,
       );
@@ -197,163 +203,172 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-
+    final screenWidth = MediaQuery.of(context).size.width;
     const inputHeight = 50.0;
+
+    final shouldHideButton = screenWidth <= 480 && _focused;
 
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Padding(
-            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-            child: Column(
-              children: [
-                CustomAppBar(
-                  title: '',
-                  onBackPressed: () => Navigator.pop(context),
-                ),
-                Expanded(
-                  child: Center(
-                    child: SingleChildScrollView(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                child: Column(
+                  children: [
+                    CustomAppBar(
+                      title: '',
+                      onBackPressed: () => Navigator.pop(context),
+                    ),
+                    Expanded(
+                      child: Center(
+                        child: SingleChildScrollView(
+                          physics: const BouncingScrollPhysics(),
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Text(
+                                'Create Password',
+                                style: TextStyle(
+                                  color: theme.textPrimary,
+                                  fontSize: 24,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: adaptivePadding),
+                              SmartInput(
+                                controller: _walletNameController,
+                                hint: "Wallet Name",
+                                fontSize: 18,
+                                height: inputHeight,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                focusedBorderColor: theme.primaryPurple,
+                                disabled: _disabled,
+                                onFocusChanged: (isFocused) {
+                                  setState(() {
+                                    _focused = isFocused;
+                                  });
+                                },
+                                onChanged: (value) {
+                                  if (_errorMessage != '') {
+                                    setState(() {
+                                      _errorMessage = '';
+                                    });
+                                  }
+                                },
+                              ),
+                              SizedBox(height: adaptivePadding),
+                              SmartInput(
+                                key: _passwordInputKey,
+                                controller: _passwordController,
+                                hint: "Password",
+                                fontSize: 18,
+                                height: inputHeight,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                focusedBorderColor: theme.primaryPurple,
+                                disabled: _disabled,
+                                obscureText: _obscurePassword,
+                                rightIconPath: _obscurePassword
+                                    ? "assets/icons/close_eye.svg"
+                                    : "assets/icons/open_eye.svg",
+                                onChanged: (value) {
+                                  if (_errorMessage != '') {
+                                    setState(() {
+                                      _errorMessage = '';
+                                    });
+                                  }
+                                },
+                                onFocusChanged: (isFocused) {
+                                  setState(() {
+                                    _focused = isFocused;
+                                  });
+                                },
+                                onRightIconTap: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                              SizedBox(height: adaptivePadding),
+                              SmartInput(
+                                key: _confirmPasswordInputKey,
+                                controller: _confirmPasswordController,
+                                hint: "Confirm Password",
+                                height: inputHeight,
+                                fontSize: 18,
+                                disabled: _disabled,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                obscureText: _obscureConfirmPassword,
+                                rightIconPath: _obscureConfirmPassword
+                                    ? "assets/icons/close_eye.svg"
+                                    : "assets/icons/open_eye.svg",
+                                onRightIconTap: () {
+                                  setState(() {
+                                    _obscureConfirmPassword =
+                                        !_obscureConfirmPassword;
+                                  });
+                                },
+                                onFocusChanged: (isFocused) {
+                                  setState(() {
+                                    _focused = isFocused;
+                                  });
+                                },
+                                onChanged: (value) {
+                                  if (_errorMessage != '') {
+                                    setState(() {
+                                      _errorMessage = '';
+                                    });
+                                  }
+                                },
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                _errorMessage,
+                                style: TextStyle(
+                                  color: theme.danger,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              _buildAuthOption(theme),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                    if (!shouldHideButton)
+                      Padding(
+                        padding: EdgeInsets.only(bottom: adaptivePadding),
+                        child: RoundedLoadingButton(
+                          controller: _btnController,
+                          onPressed: _createWallet,
+                          successIcon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              theme.textPrimary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          child: Text(
                             'Create Password',
                             style: TextStyle(
                               color: theme.textPrimary,
-                              fontSize: 24,
+                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: adaptivePadding),
-                          SmartInput(
-                            controller: _walletNameController,
-                            hint: "Wallet Name",
-                            fontSize: 18,
-                            height: inputHeight,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            focusedBorderColor: theme.primaryPurple,
-                            disabled: _disabled,
-                            onFocusChanged: (isFocused) {
-                              setState(() {
-                                _focused = isFocused;
-                              });
-                            },
-                            onChanged: (value) {
-                              if (_errorMessage != '') {
-                                setState(() {
-                                  _errorMessage = '';
-                                });
-                              }
-                            },
-                          ),
-                          SizedBox(height: adaptivePadding),
-                          SmartInput(
-                            key: _passwordInputKey,
-                            controller: _passwordController,
-                            hint: "Password",
-                            fontSize: 18,
-                            height: inputHeight,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            focusedBorderColor: theme.primaryPurple,
-                            disabled: _disabled,
-                            obscureText: _obscurePassword,
-                            rightIconPath: _obscurePassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
-                            onChanged: (value) {
-                              if (_errorMessage != '') {
-                                setState(() {
-                                  _errorMessage = '';
-                                });
-                              }
-                            },
-                            onFocusChanged: (isFocused) {
-                              setState(() {
-                                _focused = isFocused;
-                              });
-                            },
-                            onRightIconTap: () {
-                              setState(() {
-                                _obscurePassword = !_obscurePassword;
-                              });
-                            },
-                          ),
-                          SizedBox(height: adaptivePadding),
-                          SmartInput(
-                            key: _confirmPasswordInputKey,
-                            controller: _confirmPasswordController,
-                            hint: "Confirm Password",
-                            height: inputHeight,
-                            fontSize: 18,
-                            disabled: _disabled,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            obscureText: _obscureConfirmPassword,
-                            rightIconPath: _obscureConfirmPassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
-                            onRightIconTap: () {
-                              setState(() {
-                                _obscureConfirmPassword =
-                                    !_obscureConfirmPassword;
-                              });
-                            },
-                            onFocusChanged: (isFocused) {
-                              setState(() {
-                                _focused = isFocused;
-                              });
-                            },
-                            onChanged: (value) {
-                              if (_errorMessage != '') {
-                                setState(() {
-                                  _errorMessage = '';
-                                });
-                              }
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            _errorMessage,
-                            style: TextStyle(
-                              color: theme.danger,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                          _buildAuthOption(theme),
-                        ],
+                        ),
                       ),
-                    ),
-                  ),
+                  ],
                 ),
-                if (!_focused)
-                  Padding(
-                    padding: EdgeInsets.only(
-                      bottom: adaptivePadding,
-                    ),
-                    child: RoundedLoadingButton(
-                      controller: _btnController,
-                      onPressed: _createWallet,
-                      successIcon: SvgPicture.asset(
-                        'assets/icons/ok.svg',
-                        width: 24,
-                        height: 24,
-                        colorFilter: ColorFilter.mode(
-                          theme.textPrimary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                      child: Text(
-                        'Create Password',
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ),
-              ],
+              ),
             ),
           ),
         ),

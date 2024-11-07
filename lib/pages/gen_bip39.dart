@@ -36,88 +36,98 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'New Wallet',
-                onBackPressed: () => Navigator.pop(context),
-                actionIconPath: 'assets/icons/reload.svg',
-                onActionPressed: _regenerateMnemonicWords,
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Generate Bip39 Wallet',
-                        style: TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: theme.textPrimary,
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      WordCountSelector(
-                        wordCounts: const [12, 15, 18, 21, 24],
-                        selectedCount: _count,
-                        onCountChanged: (newCount) {
-                          setState(() {
-                            _count = newCount;
-                            _regenerateMnemonicWords();
-                          });
-                        },
-                      ),
-                      const SizedBox(height: 16),
-                      Expanded(
-                        child: ListView.builder(
-                          itemCount: _mnemonicWords.length,
-                          itemBuilder: (context, index) {
-                            return Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 8.0),
-                              child: MnemonicWordInput(
-                                index: index + 1,
-                                word: _mnemonicWords[index],
-                                isEditable: false,
-                                opacity: 0.5,
-                              ),
-                            );
-                          },
-                        ),
-                      ),
-                      CheckboxListTile(
-                        title: Text(
-                          'I have backup words',
-                          style: TextStyle(color: theme.textSecondary),
-                        ),
-                        value: _hasBackupWords,
-                        onChanged: (newValue) {
-                          setState(() {
-                            _hasBackupWords = newValue!;
-                          });
-                        },
-                        controlAffinity: ListTileControlAffinity.leading,
-                        activeColor: theme.primaryPurple,
-                      ),
-                      const SizedBox(height: 16),
-                      CustomButton(
-                        text: 'Next',
-                        onPressed: () {
-                          Navigator.of(context).pushNamed('/verify_bip39',
-                              arguments: {'bip39': _mnemonicWords});
-                        },
-                        backgroundColor: theme.primaryPurple,
-                        borderRadius: 30.0,
-                        height: 56.0,
-                        disabled: !_hasBackupWords,
-                      )
-                    ],
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: 'New Wallet',
+                    onBackPressed: () => Navigator.pop(context),
+                    actionIconPath: 'assets/icons/reload.svg',
+                    onActionPressed: _regenerateMnemonicWords,
                   ),
-                ),
+                  Expanded(
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'Generate Bip39 Wallet',
+                            style: TextStyle(
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
+                              color: theme.textPrimary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          WordCountSelector(
+                            wordCounts: const [12, 15, 18, 21, 24],
+                            selectedCount: _count,
+                            onCountChanged: (newCount) {
+                              setState(() {
+                                _count = newCount;
+                                _regenerateMnemonicWords();
+                              });
+                            },
+                          ),
+                          const SizedBox(height: 16),
+                          Expanded(
+                            child: ListView.builder(
+                              physics: const BouncingScrollPhysics(),
+                              itemCount: _mnemonicWords.length,
+                              itemBuilder: (context, index) {
+                                return Padding(
+                                  padding:
+                                      const EdgeInsets.symmetric(vertical: 8.0),
+                                  child: MnemonicWordInput(
+                                    index: index + 1,
+                                    word: _mnemonicWords[index],
+                                    isEditable: false,
+                                    opacity: 0.5,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          CheckboxListTile(
+                            title: Text(
+                              'I have backup words',
+                              style: TextStyle(color: theme.textSecondary),
+                            ),
+                            value: _hasBackupWords,
+                            onChanged: (newValue) {
+                              setState(() {
+                                _hasBackupWords = newValue!;
+                              });
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            activeColor: theme.primaryPurple,
+                          ),
+                          const SizedBox(height: 16),
+                          Padding(
+                            padding: const EdgeInsets.only(bottom: 16),
+                            child: CustomButton(
+                              text: 'Next',
+                              onPressed: () {
+                                Navigator.of(context).pushNamed('/verify_bip39',
+                                    arguments: {'bip39': _mnemonicWords});
+                              },
+                              backgroundColor: theme.primaryPurple,
+                              borderRadius: 30.0,
+                              height: 56.0,
+                              disabled: !_hasBackupWords,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

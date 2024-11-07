@@ -63,84 +63,90 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'Verify Secret',
-                onBackPressed: () => Navigator.pop(context),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: 'Verify Secret',
+                    onBackPressed: () => Navigator.pop(context),
+                    actionText: 'Skip',
+                    onActionPressed: () {
+                      Navigator.of(context).pushNamed('/net_setup',
+                          arguments: {'bip39': _bip39List});
+                    },
+                  ),
+                  Expanded(
+                    child: _bip39List == null
+                        ? const Center(child: CircularProgressIndicator())
+                        : Padding(
+                            padding:
+                                const EdgeInsets.symmetric(horizontal: 16.0),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  'Verify Bip39 Secret',
+                                  style: TextStyle(
+                                    fontSize: 24,
+                                    fontWeight: FontWeight.bold,
+                                    color: theme.textPrimary,
+                                  ),
+                                ),
+                                const SizedBox(height: 16),
+                                Expanded(
+                                  child: ListView.builder(
+                                    physics: const BouncingScrollPhysics(),
+                                    itemCount: maxNumbers,
+                                    itemBuilder: (context, index) {
+                                      return Padding(
+                                        padding: const EdgeInsets.symmetric(
+                                            vertical: 8.0),
+                                        child: MnemonicWordInput(
+                                          index: _indexes[index],
+                                          word: _verifyWords[index],
+                                          isEditable: true,
+                                          borderColor: _verifyWords[index] == ''
+                                              ? theme.textSecondary
+                                              : _bip39List![_indexes[index] -
+                                                          1] ==
+                                                      _verifyWords[index]
+                                                  ? Colors.green
+                                                  : Colors.red,
+                                          onChanged: (_, newWord) {
+                                            setState(() {
+                                              _verifyWords[index] = newWord;
+                                            });
+                                          },
+                                        ),
+                                      );
+                                    },
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                      vertical: 16.0),
+                                  child: CustomButton(
+                                    text: 'Next',
+                                    onPressed: () {
+                                      Navigator.of(context).pushNamed(
+                                          '/net_setup',
+                                          arguments: {'bip39': _bip39List});
+                                    },
+                                    backgroundColor: theme.primaryPurple,
+                                    borderRadius: 30.0,
+                                    height: 56.0,
+                                    disabled: !isVerified,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                  ),
+                ],
               ),
-              Expanded(
-                child: _bip39List == null
-                    ? const Center(child: CircularProgressIndicator())
-                    : Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Verify Bip39 Secret',
-                              style: TextStyle(
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                                color: theme.textPrimary,
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            Expanded(
-                              child: ListView.builder(
-                                itemCount: maxNumbers,
-                                itemBuilder: (context, index) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 8.0),
-                                    child: MnemonicWordInput(
-                                      index: _indexes[index],
-                                      word: _verifyWords[index],
-                                      isEditable: true,
-                                      borderColor: _verifyWords[index] == ''
-                                          ? theme.textSecondary
-                                          : _bip39List![_indexes[index] - 1] ==
-                                                  _verifyWords[index]
-                                              ? Colors.green
-                                              : Colors.red,
-                                      onChanged: (_, newWord) {
-                                        setState(() {
-                                          _verifyWords[index] = newWord;
-                                        });
-                                      },
-                                    ),
-                                  );
-                                },
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            CustomButton(
-                              text: 'Next',
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/net_setup',
-                                    arguments: {'bip39': _bip39List});
-                              },
-                              backgroundColor: theme.primaryPurple,
-                              borderRadius: 30.0,
-                              height: 56.0,
-                              disabled: !isVerified,
-                            ),
-                            CustomButton(
-                              text: 'Skip',
-                              onPressed: () {
-                                Navigator.of(context).pushNamed('/net_setup',
-                                    arguments: {'bip39': _bip39List});
-                              },
-                              backgroundColor: theme.primaryPurple,
-                              borderRadius: 30.0,
-                              height: 20.0,
-                            )
-
-                          ],
-                        ),
-                      ),
-              ),
-            ],
+            ),
           ),
         ),
       ),

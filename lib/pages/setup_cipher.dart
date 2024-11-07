@@ -83,100 +83,112 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'Setup Encryption',
-                onBackPressed: () => Navigator.pop(context),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(adaptivePadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        OptionsList(
-                          disabled: optionsDisabled,
-                          options: List.generate(
-                            cipherDescriptions.length,
-                            (index) => OptionItem(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    cipherDescriptions[index]['title']!,
-                                    style: TextStyle(
-                                      color: theme.textPrimary,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 4),
-                                  Text(
-                                    cipherDescriptions[index]['subtitle']!,
-                                    style: TextStyle(
-                                      color: theme.primaryPurple,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    cipherDescriptions[index]['description']!,
-                                    style: TextStyle(
-                                      color: theme.textSecondary,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              isSelected: selectedCipherIndex == index,
-                              onSelect: () =>
-                                  setState(() => selectedCipherIndex = index),
-                            ),
-                          ),
-                          unselectedOpacity: 0.5,
-                        ),
-                      ],
-                    ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: 'Setup Encryption',
+                    onBackPressed: () => Navigator.pop(context),
                   ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(adaptivePadding),
-                child: Column(
-                  children: [
-                    if (selectedCipherIndex == 2)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: adaptivePadding),
-                        child: Text(
-                          'Post-quantum encryption might affect performance',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
-                            fontStyle: FontStyle.italic,
-                          ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            OptionsList(
+                              disabled: optionsDisabled,
+                              options: List.generate(
+                                cipherDescriptions.length,
+                                (index) => OptionItem(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        cipherDescriptions[index]['title']!,
+                                        style: TextStyle(
+                                          color: theme.textPrimary,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        cipherDescriptions[index]['subtitle']!,
+                                        style: TextStyle(
+                                          color: theme.primaryPurple,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        cipherDescriptions[index]
+                                            ['description']!,
+                                        style: TextStyle(
+                                          color: theme.textSecondary,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  isSelected: selectedCipherIndex == index,
+                                  onSelect: () => setState(
+                                      () => selectedCipherIndex = index),
+                                ),
+                              ),
+                              unselectedOpacity: 0.5,
+                            ),
+                          ],
                         ),
                       ),
-                    CustomButton(
-                      text: 'Confirm',
-                      onPressed: () {
-                        Navigator.of(context).pushNamed('/pass_setup',
-                            arguments: {
-                              'bip39': _bip39List,
-                              'codes': _codes,
-                              'cipher': selectedCipherIndex
-                            });
-                      },
-                      backgroundColor: theme.primaryPurple,
-                      borderRadius: 30.0,
-                      height: 56.0,
-                    )
-                  ],
-                ),
-              )
-            ],
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: Column(
+                      children: [
+                        if (selectedCipherIndex == 2)
+                          Padding(
+                            padding: EdgeInsets.only(bottom: adaptivePadding),
+                            child: Text(
+                              'Post-quantum encryption might affect performance',
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 14,
+                                fontStyle: FontStyle.italic,
+                              ),
+                              textAlign: TextAlign.center,
+                            ),
+                          ),
+                        CustomButton(
+                          text: 'Confirm',
+                          onPressed: () {
+                            Navigator.of(context).pushNamed(
+                              '/pass_setup',
+                              arguments: {
+                                'bip39': _bip39List,
+                                'codes': _codes,
+                                'cipher': selectedCipherIndex
+                              },
+                            );
+                          },
+                          backgroundColor: theme.primaryPurple,
+                          borderRadius: 30.0,
+                          height: 56.0,
+                        )
+                      ],
+                    ),
+                  )
+                ],
+              ),
+            ),
           ),
         ),
       ),

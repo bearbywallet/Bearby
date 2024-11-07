@@ -138,106 +138,119 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Column(
-            children: [
-              CustomAppBar(
-                title: 'Blockchain Settings',
-                onBackPressed: () => Navigator.pop(context),
-              ),
-              Expanded(
-                child: SingleChildScrollView(
-                  child: Padding(
-                    padding: EdgeInsets.all(adaptivePadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.cardBackground,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: List.generate(_evmNetworks.length * 2 - 1,
-                                (index) {
-                              if (index.isOdd) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Divider(
-                                    height: 1,
-                                    color: theme.textSecondary.withOpacity(0.2),
-                                  ),
-                                );
-                              }
-                              final networkIndex = index ~/ 2;
-                              final network = _evmNetworks[networkIndex];
-                              return ToggleItem(
-                                title: network.title,
-                                subtitle: network.subtitle,
-                                value: network.value,
-                                onChanged: (newValue) => _updateNetworkValue(
-                                    networkIndex, newValue, true),
-                              );
-                            }),
-                          ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 480),
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: 'Blockchain Settings',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
+                  Expanded(
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: theme.cardBackground,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: List.generate(
+                                    _evmNetworks.length * 2 - 1, (index) {
+                                  if (index.isOdd) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: Divider(
+                                        height: 1,
+                                        color: theme.textSecondary
+                                            .withOpacity(0.2),
+                                      ),
+                                    );
+                                  }
+                                  final networkIndex = index ~/ 2;
+                                  final network = _evmNetworks[networkIndex];
+                                  return ToggleItem(
+                                    title: network.title,
+                                    subtitle: network.subtitle,
+                                    value: network.value,
+                                    onChanged: (newValue) =>
+                                        _updateNetworkValue(
+                                            networkIndex, newValue, true),
+                                  );
+                                }),
+                              ),
+                            ),
+                            SizedBox(height: adaptivePadding),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: theme.cardBackground,
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              child: Column(
+                                children: List.generate(
+                                    _blockchainNetworks.length * 2 - 1,
+                                    (index) {
+                                  if (index.isOdd) {
+                                    return Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 16),
+                                      child: Divider(
+                                        height: 1,
+                                        color: theme.textSecondary
+                                            .withOpacity(0.2),
+                                      ),
+                                    );
+                                  }
+                                  final networkIndex = index ~/ 2;
+                                  final network =
+                                      _blockchainNetworks[networkIndex];
+                                  return ToggleItem(
+                                    title: network.title,
+                                    subtitle: network.subtitle,
+                                    value: network.value,
+                                    onChanged: (newValue) =>
+                                        _updateNetworkValue(
+                                            networkIndex, newValue, false),
+                                  );
+                                }),
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: adaptivePadding),
-                        Container(
-                          decoration: BoxDecoration(
-                            color: theme.cardBackground,
-                            borderRadius: BorderRadius.circular(16),
-                          ),
-                          child: Column(
-                            children: List.generate(
-                                _blockchainNetworks.length * 2 - 1, (index) {
-                              if (index.isOdd) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      horizontal: 16),
-                                  child: Divider(
-                                    height: 1,
-                                    color: theme.textSecondary.withOpacity(0.2),
-                                  ),
-                                );
-                              }
-                              final networkIndex = index ~/ 2;
-                              final network = _blockchainNetworks[networkIndex];
-                              return ToggleItem(
-                                title: network.title,
-                                subtitle: network.subtitle,
-                                value: network.value,
-                                onChanged: (newValue) => _updateNetworkValue(
-                                    networkIndex, newValue, false),
-                              );
-                            }),
-                          ),
-                        ),
-                      ],
+                      ),
                     ),
                   ),
-                ),
+                  Padding(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: CustomButton(
+                      text: 'Next',
+                      onPressed: () {
+                        final List<int> codes = [
+                          ..._evmNetworks.map((e) => e.code),
+                          ..._blockchainNetworks.map((e) => e.code)
+                        ];
+                        Navigator.of(context)
+                            .pushNamed('/cipher_setup', arguments: {
+                          'bip39': _bip39List,
+                          'codes': codes,
+                        });
+                      },
+                      backgroundColor: theme.primaryPurple,
+                      borderRadius: 30.0,
+                      height: 56.0,
+                    ),
+                  )
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.all(adaptivePadding),
-                child: CustomButton(
-                  text: 'Next',
-                  onPressed: () {
-                    final List<int> codes = [
-                      ..._evmNetworks.map((e) => e.code),
-                      ..._blockchainNetworks.map((e) => e.code)
-                    ];
-                    Navigator.of(context)
-                        .pushNamed('/cipher_setup', arguments: {
-                      'bip39': _bip39List,
-                      'codes': codes,
-                    });
-                  },
-                  backgroundColor: theme.primaryPurple,
-                  borderRadius: 30.0,
-                  height: 56.0,
-                ),
-              )
-            ],
+            ),
           ),
         ),
       ),
