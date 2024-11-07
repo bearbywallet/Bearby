@@ -95,6 +95,22 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   }
 
   bool _validatePasswords() {
+    if (_walletNameController.text.trim().isEmpty) {
+      setState(() {
+        _errorMessage = 'Wallet name cannot be empty';
+        _disabled = false;
+      });
+      return false;
+    }
+
+    if (_walletNameController.text.length > 24) {
+      setState(() {
+        _errorMessage = 'Wallet name is too long';
+        _disabled = false;
+      });
+      return false;
+    }
+
     if (_passwordController.text.length < 6) {
       _passwordInputKey.currentState?.shake();
 
