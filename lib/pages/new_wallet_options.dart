@@ -68,7 +68,9 @@ class AddWalletOptionsPage extends StatelessWidget {
                   height: 25,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {/* Handle pairing with Ledger */},
+                onTap: () {
+                  Navigator.of(context).pushNamed('/ledger_connect');
+                },
               ),
               const SizedBox(height: 24),
               Padding(

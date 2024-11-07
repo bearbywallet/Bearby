@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
@@ -52,8 +53,13 @@ class AppRouter {
       '/restore_options',
       '/gen_options',
       '/new_wallet_options',
-      '/initial'
+      '/initial',
+      '/ledger_connect'
     ];
+
+    if (settings.name == '/ledger_connect') {
+      return wrapWithProviders(const LedgerConnectPage());
+    }
 
     if (settings.name == '/' || settings.name == null) {
       if (!authGuard.ready) {
