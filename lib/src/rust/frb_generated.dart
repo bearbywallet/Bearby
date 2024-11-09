@@ -4,7 +4,6 @@
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
 import 'api/backend.dart';
-import 'api/ledger.dart';
 import 'api/methods.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -71,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => 2093136387;
+  int get rustContentHash => -649500401;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -185,8 +184,6 @@ abstract class RustLibApi extends BaseApi {
       required BigInt walletIndex,
       required List<String> identifiers});
 
-  Future<List<LedgerInfo>> crateApiLedgerScanLedgerDevices();
-
   Future<String> crateApiMethodsGenBip39Words({required int count});
 
   Future<void> crateApiMethodsInitApp();
@@ -223,14 +220,6 @@ abstract class RustLibApi extends BaseApi {
 
   CrossPlatformFinalizerArg
       get rust_arc_decrement_strong_count_CommonSettingsPtr;
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_LedgerInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_LedgerInfo;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_LedgerInfoPtr;
 
   RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Serivce;
 
@@ -1201,38 +1190,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<LedgerInfo>> crateApiLedgerScanLedgerDevices() {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 34, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiLedgerScanLedgerDevicesConstMeta,
-      argValues: [],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiLedgerScanLedgerDevicesConstMeta =>
-      const TaskConstMeta(
-        debugName: "scan_ledger_devices",
-        argNames: [],
-      );
-
-  @override
   Future<String> crateApiMethodsGenBip39Words({required int count}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8(count, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
+            funcId: 34, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1256,7 +1220,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1304,14 +1268,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   RustArcDecrementStrongCountFnType
       get rust_arc_decrement_strong_count_CommonSettings => wire
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerCommonSettings;
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_LedgerInfo => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_LedgerInfo => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_Serivce => wire
@@ -1373,14 +1329,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return CommonSettingsImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
-  LedgerInfo
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return LedgerInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1488,14 +1436,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LedgerInfo
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return LedgerInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
   Serivce
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
           dynamic raw) {
@@ -1545,17 +1485,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (raw as List<dynamic>)
         .map(
             dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount)
-        .toList();
-  }
-
-  @protected
-  List<LedgerInfo>
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(
-            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo)
         .toList();
   }
 
@@ -1665,15 +1594,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return CommonSettingsImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
-  LedgerInfo
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return LedgerInfoImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -1795,15 +1715,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  LedgerInfo
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return LedgerInfoImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   Serivce
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
           SseDeserializer deserializer) {
@@ -1861,22 +1772,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(
           sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-              deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
-  List<LedgerInfo>
-      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <LedgerInfo>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(
-          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
               deserializer));
     }
     return ans_;
@@ -2016,15 +1911,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          LedgerInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as LedgerInfoImpl).frbInternalSseEncode(move: true), serializer);
-  }
-
-  @protected
-  void
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
           Serivce self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2148,15 +2034,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          LedgerInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as LedgerInfoImpl).frbInternalSseEncode(move: null), serializer);
-  }
-
-  @protected
-  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
           Serivce self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2216,18 +2093,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          item, serializer);
-    }
-  }
-
-  @protected
-  void
-      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
-          List<LedgerInfo> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerLedgerInfo(
           item, serializer);
     }
   }
@@ -2407,26 +2272,6 @@ class CommonSettingsImpl extends RustOpaque implements CommonSettings {
         RustLib.instance.api.rust_arc_decrement_strong_count_CommonSettings,
     rustArcDecrementStrongCountPtr:
         RustLib.instance.api.rust_arc_decrement_strong_count_CommonSettingsPtr,
-  );
-}
-
-@sealed
-class LedgerInfoImpl extends RustOpaque implements LedgerInfo {
-  // Not to be used by end users
-  LedgerInfoImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  LedgerInfoImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_LedgerInfo,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_LedgerInfo,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_LedgerInfoPtr,
   );
 }
 

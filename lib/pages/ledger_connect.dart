@@ -1,15 +1,15 @@
 import 'dart:async';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ledger_flutter/ledger_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/gradient_bg.dart';
-import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
-import 'package:zilpay/services/device.dart';
-import 'package:zilpay/state/app_state.dart' show AppState;
+import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
 
 class LedgerConnectPage extends StatefulWidget {
@@ -22,99 +22,48 @@ class LedgerConnectPage extends StatefulWidget {
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
   late AuthGuard _authGuard;
   late AppState _appState;
-
-  String _errorMessage = '';
-  bool _disabled = false;
-  bool _focused = false;
-
-  final _btnController = RoundedLoadingButtonController();
-  final _walletNameController = TextEditingController();
-  final _walletNameKey = GlobalKey<SmartInputState>();
+  List<LedgerDevice> _devices = [];
+  bool _isScanning = true;
 
   @override
   void initState() {
     super.initState();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
-    _walletNameController.text = 'Ledger ${_appState.wallets.length + 1}';
+    _startScanning();
   }
 
-  @override
-  void dispose() {
-    _walletNameController.dispose();
-    _btnController.dispose();
-    super.dispose();
-  }
-
-  bool _validateInput() {
-    if (_walletNameController.text.trim().isEmpty) {
-      setState(() {
-        _errorMessage = 'Wallet name cannot be empty';
-        _disabled = false;
-      });
-      return false;
-    }
-
-    if (_walletNameController.text.length > 24) {
-      setState(() {
-        _errorMessage = 'Wallet name is too long';
-        _disabled = false;
-      });
-      return false;
-    }
-
-    return true;
-  }
-
-  Future<void> _connectLedger() async {
-    setState(() {
-      _errorMessage = '';
-      _disabled = true;
-    });
-
-    if (!_validateInput()) {
-      _btnController.reset();
-      return;
-    }
-
+  Future<void> _startScanning() async {
     try {
-      _btnController.start();
+      final options = LedgerOptions(
+        maxScanDuration: const Duration(milliseconds: 5000),
+      );
 
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
+      final ledger = Ledger(options: options);
 
-      // TODO: Replace with actual Ledger connection logic
-      // (String, String) session = await connectLedger(
-      //   walletName: _walletNameController.text,
-      //   identifiers: identifiers,
-      // );
-
-      // await _appState.syncData();
-
-      _btnController.success();
-
-      Navigator.of(context).pushNamed('/');
+      ledger.scan().listen(
+        (device) {
+          setState(() {
+            _devices.add(device);
+          });
+        },
+        onDone: () {
+          setState(() {
+            _isScanning = false;
+          });
+        },
+      );
     } catch (e) {
       setState(() {
-        _disabled = false;
-        _errorMessage = e.toString();
-      });
-      _btnController.error();
-
-      Timer(const Duration(seconds: 1), () {
-        _btnController.reset();
+        _isScanning = false;
       });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final screenWidth = MediaQuery.of(context).size.width;
-    const inputHeight = 50.0;
-
-    final shouldHideButton = screenWidth <= 480 && _focused;
+    final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
     return Scaffold(
       body: GradientBackground(
@@ -122,126 +71,67 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           child: Center(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 480),
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: Column(
-                  children: [
-                    CustomAppBar(
-                      title: 'Connect Ledger',
-                      onBackPressed: () => Navigator.pop(context),
-                    ),
-                    Expanded(
-                      child: Center(
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Container(
-                                decoration: BoxDecoration(
-                                  color: theme.cardBackground,
-                                  borderRadius: BorderRadius.circular(16),
-                                ),
-                                padding: EdgeInsets.all(adaptivePadding),
-                                child: Column(
-                                  children: [
-                                    SvgPicture.asset(
-                                      'assets/icons/ledger.svg',
-                                      width: 64,
-                                      height: 64,
-                                      colorFilter: ColorFilter.mode(
-                                        theme.primaryPurple,
-                                        BlendMode.srcIn,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    Text(
-                                      'Connect your Ledger device',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 18,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      'Make sure your Ledger is connected and unlocked',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              SizedBox(height: adaptivePadding * 2),
-                              SmartInput(
-                                key: _walletNameKey,
-                                controller: _walletNameController,
-                                hint: "Wallet Name",
-                                fontSize: 18,
-                                height: inputHeight,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                focusedBorderColor: theme.primaryPurple,
-                                disabled: _disabled,
-                                onFocusChanged: (isFocused) {
-                                  setState(() {
-                                    _focused = isFocused;
-                                  });
-                                },
-                                onChanged: (value) {
-                                  if (_errorMessage.isNotEmpty) {
-                                    setState(() => _errorMessage = '');
-                                  }
-                                },
-                              ),
-                              if (_errorMessage.isNotEmpty)
-                                Padding(
-                                  padding: const EdgeInsets.only(top: 8),
-                                  child: Text(
-                                    _errorMessage,
-                                    style: TextStyle(
-                                      color: theme.danger,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    ),
-                    if (!shouldHideButton)
-                      Padding(
-                        padding: EdgeInsets.only(bottom: adaptivePadding),
-                        child: RoundedLoadingButton(
-                          controller: _btnController,
-                          onPressed: _connectLedger,
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          child: Text(
-                            'Connect',
+              child: Column(
+                children: [
+                  CustomAppBar(
+                    title: '',
+                    onBackPressed: () => Navigator.pop(context),
+                    actionIconPath: 'assets/icons/reload.svg',
+                    onActionPressed: () {
+                      print("reload ledgers");
+                    },
+                  ),
+                  Expanded(
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            'Looking for devices',
                             style: TextStyle(
-                              color: theme.textPrimary,
-                              fontSize: 18,
+                              fontSize: 24,
                               fontWeight: FontWeight.bold,
+                              color: theme.textPrimary,
                             ),
                           ),
-                        ),
+                          const SizedBox(height: 8),
+                          Text(
+                            'Pleas make sure your Ledger device is unlocked',
+                            style: TextStyle(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w100,
+                              color: theme.textSecondary,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          LedgerItem(
+                            icon: SvgPicture.asset(
+                              "assets/icons/usb.svg",
+                              width: 30,
+                              height: 30,
+                              color: theme.textPrimary,
+                            ),
+                            title: 'Nano x',
+                            id: 'D41FB1B2-7549-8B25-803C...',
+                          ),
+                          const SizedBox(height: 8),
+                          LedgerItem(
+                            icon: SvgPicture.asset(
+                              "assets/icons/ble.svg",
+                              width: 30,
+                              height: 30,
+                              color: theme.textPrimary,
+                            ),
+                            title: 'Nano x',
+                            id: 'D41FB1B2-7549-8B25-803C...',
+                          ),
+                        ],
                       ),
-                  ],
-                ),
+                    ),
+                  ),
+                ],
               ),
             ),
           ),

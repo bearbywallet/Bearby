@@ -14,8 +14,14 @@ PODS:
   - path_provider_foundation (0.0.1):
     - Flutter
     - FlutterMacOS
+  - Protobuf (3.28.3)
+  - reactive_ble_mobile (0.0.1):
+    - Flutter
+    - Protobuf (~> 3.5)
+    - SwiftProtobuf (~> 1.0)
   - rust_lib_zilpay (0.0.1):
     - Flutter
+  - SwiftProtobuf (1.28.2)
 
 DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
@@ -25,7 +31,13 @@ DEPENDENCIES:
   - local_auth_darwin (from `.symlinks/plugins/local_auth_darwin/darwin`)
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
+  - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/ios`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
+
+SPEC REPOS:
+  trunk:
+    - Protobuf
+    - SwiftProtobuf
 
 EXTERNAL SOURCES:
   device_info_plus:
@@ -42,6 +54,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/package_info_plus/ios"
   path_provider_foundation:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
+  reactive_ble_mobile:
+    :path: ".symlinks/plugins/reactive_ble_mobile/ios"
   rust_lib_zilpay:
     :path: ".symlinks/plugins/rust_lib_zilpay/ios"
 
@@ -53,7 +67,10 @@ SPEC CHECKSUMS:
   local_auth_darwin: 66e40372f1c29f383a314c738c7446e2f7fdadc3
   package_info_plus: c0502532a26c7662a62a356cebe2692ec5fe4ec4
   path_provider_foundation: 2b6b4c569c0fb62ec74538f866245ac84301af46
+  Protobuf: 5a8a7781d8e1004302f108977ac2d5b99323146f
+  reactive_ble_mobile: 9ce6723d37ccf701dbffd202d487f23f5de03b4c
   rust_lib_zilpay: 7add2511a40c5dee3bc95b49aa7b04a921d5776f
+  SwiftProtobuf: 4dbaffec76a39a8dc5da23b40af1a5dc01a4c02d
 
 PODFILE CHECKSUM: 819463e6a0290f5a72f145ba7cde16e8b6ef0796
 

@@ -4,6 +4,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import '../theme/theme_provider.dart';
 import '../components/gradient_bg.dart';
@@ -31,6 +32,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
 
   @override
   Widget build(BuildContext context) {
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
     return Scaffold(
@@ -49,7 +51,8 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                   ),
                   Expanded(
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
