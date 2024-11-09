@@ -44,7 +44,7 @@ class LedgerItem extends StatelessWidget {
                 id,
                 style: TextStyle(
                   color: theme.textSecondary,
-                  fontSize: 14,
+                  fontSize: 10,
                 ),
                 overflow: TextOverflow.ellipsis,
               ),
