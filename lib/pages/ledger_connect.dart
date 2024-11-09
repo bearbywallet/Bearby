@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ledger_flutter/ledger_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/gradient_bg.dart';
@@ -57,10 +58,28 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     try {
       final options = LedgerOptions(
-        maxScanDuration: const Duration(milliseconds: 5000),
+        maxScanDuration: const Duration(
+          milliseconds: 5000,
+        ),
       );
 
-      final ledger = Ledger(options: options);
+      final ledger = Ledger(
+        options: options,
+        onPermissionRequest: (status) async {
+          Map<Permission, PermissionStatus> statuses = await [
+            Permission.location,
+            Permission.bluetoothScan,
+            Permission.bluetoothConnect,
+            Permission.bluetoothAdvertise,
+          ].request();
+
+          if (status != BleStatus.ready) {
+            return false;
+          }
+
+          return statuses.values.where((status) => status.isDenied).isEmpty;
+        },
+      );
 
       ledger.scan().listen((device) {
         setState(() {
