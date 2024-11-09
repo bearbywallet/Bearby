@@ -81,6 +81,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         },
       );
 
+      List<LedgerDevice> devices = await ledger.listUsbDevices();
+
+      if (devices.isNotEmpty) {
+        setState(() {
+          _devices = devices;
+        });
+      }
+
       ledger.scan().listen((device) {
         setState(() {
           _devices.add(device);
