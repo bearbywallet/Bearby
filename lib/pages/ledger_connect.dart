@@ -26,7 +26,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   final _btnController = RoundedLoadingButtonController();
 
   List<LedgerDevice> _devices = [];
-  bool _isScanning = true;
+  bool _isScanning = false;
   int _selected = -1;
 
   @override
