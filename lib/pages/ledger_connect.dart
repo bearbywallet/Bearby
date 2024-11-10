@@ -9,6 +9,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/ledger/apps.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -99,16 +100,27 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         }
       }
 
-      _ledger.scan().listen((device) {
+      _ledger.scan().listen((device) async {
         setState(() {
           _devices.add(device);
         });
+        // await _ledger.connect(device);
+
+        List<LedgerInstalledApp> apps =
+            await _ledger.sendOperation<List<LedgerInstalledApp>>(
+          device,
+          GetInstalledAppsOperation(),
+        );
+
+        print(apps);
       }, onDone: () {
+        _ledger.stopScanning();
         setState(() {
           _isScanning = false;
         });
       }, onError: (e) {
         print("scan error $e");
+        _ledger.stopScanning();
 
         setState(() {
           _isScanning = false;
@@ -124,9 +136,20 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   Future<void> _scanInstalledApps(int index) async {
     LedgerDevice device = _devices[index];
-    await _ledger.connect(device);
 
-    // await _ledger.sendOperation(device, );
+    try {
+      await _ledger.connect(device);
+
+      List<LedgerInstalledApp> apps =
+          await _ledger.sendOperation<List<LedgerInstalledApp>>(
+        device,
+        GetInstalledAppsOperation(),
+      );
+
+      print(apps);
+    } catch (e) {
+      print("fail to connect error: ${e.toString()}");
+    }
   }
 
   @override
