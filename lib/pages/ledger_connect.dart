@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ledger_flutter/ledger_flutter.dart';
@@ -23,6 +24,7 @@ class LedgerConnectPage extends StatefulWidget {
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
   late AuthGuard _authGuard;
   late AppState _appState;
+  late Ledger _ledger;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -36,6 +38,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
 
+    _initLedger();
     _startScanning();
   }
 
@@ -46,16 +49,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     super.dispose();
   }
 
-  Future<void> _startScanning() async {
-    if (_isScanning) {
-      return;
-    }
-
-    setState(() {
-      _isScanning = true;
-      _devices.clear();
-    });
-
+  void _initLedger() {
     try {
       final options = LedgerOptions(
         maxScanDuration: const Duration(
@@ -63,7 +57,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         ),
       );
 
-      final ledger = Ledger(
+      _ledger = Ledger(
         options: options,
         onPermissionRequest: (status) async {
           Map<Permission, PermissionStatus> statuses = await [
@@ -80,16 +74,32 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           return statuses.values.where((status) => status.isDenied).isEmpty;
         },
       );
+    } catch (e) {
+      print("ledger init error: $e");
+    }
+  }
 
-      List<LedgerDevice> devices = await ledger.listUsbDevices();
+  Future<void> _startScanning() async {
+    if (_isScanning) {
+      return;
+    }
 
-      if (devices.isNotEmpty) {
-        setState(() {
-          _devices = devices;
-        });
+    setState(() {
+      _isScanning = true;
+      _devices.clear();
+    });
+
+    try {
+      if (Platform.isAndroid) {
+        List<LedgerDevice> devices = await _ledger.listUsbDevices();
+        if (devices.isNotEmpty) {
+          setState(() {
+            _devices = devices;
+          });
+        }
       }
 
-      ledger.scan().listen((device) {
+      _ledger.scan().listen((device) {
         setState(() {
           _devices.add(device);
         });
@@ -110,6 +120,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         _isScanning = false;
       });
     }
+  }
+
+  Future<void> _scanInstalledApps(int index) async {
+    LedgerDevice device = _devices[index];
+    await _ledger.connect(device);
+
+    // await _ledger.sendOperation(device, );
   }
 
   @override
@@ -181,6 +198,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                           return Column(
                             children: [
                               LedgerItem(
+                                onTap: () {
+                                  setState(() {
+                                    _selected = index;
+                                  });
+
+                                  _scanInstalledApps(index);
+                                },
                                 icon: SvgPicture.asset(
                                   icon,
                                   width: 30,
