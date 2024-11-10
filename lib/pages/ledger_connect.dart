@@ -31,6 +31,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   List<LedgerDevice> _devices = [];
   bool _isScanning = false;
+  bool _isConnecting = false;
   int _selected = -1;
 
   @override
@@ -100,27 +101,16 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         }
       }
 
-      _ledger.scan().listen((device) async {
+      _ledger.scan().listen((device) {
         setState(() {
           _devices.add(device);
         });
-        // await _ledger.connect(device);
-
-        List<LedgerInstalledApp> apps =
-            await _ledger.sendOperation<List<LedgerInstalledApp>>(
-          device,
-          GetInstalledAppsOperation(),
-        );
-
-        print(apps);
       }, onDone: () {
-        _ledger.stopScanning();
         setState(() {
           _isScanning = false;
         });
       }, onError: (e) {
         print("scan error $e");
-        _ledger.stopScanning();
 
         setState(() {
           _isScanning = false;
@@ -135,21 +125,44 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _scanInstalledApps(int index) async {
+    setState(() {
+      _isConnecting = true;
+    });
     LedgerDevice device = _devices[index];
 
     try {
       await _ledger.connect(device);
-
-      List<LedgerInstalledApp> apps =
-          await _ledger.sendOperation<List<LedgerInstalledApp>>(
-        device,
-        GetInstalledAppsOperation(),
-      );
-
-      print(apps);
     } catch (e) {
-      print("fail to connect error: ${e.toString()}");
+      print("try connect apps: $e");
     }
+
+    AppData ledgerApp = await _ledger.sendOperation(
+        device.copyWith(),
+        GetInstalledAppsOperation(
+          0xde,
+        ));
+
+    print(ledgerApp.toString());
+
+    ledgerApp = await _ledger.sendOperation(
+        device.copyWith(),
+        GetInstalledAppsOperation(
+          0xdf,
+        ));
+
+    print(ledgerApp.toString());
+
+    ledgerApp = await _ledger.sendOperation(
+        device.copyWith(),
+        GetInstalledAppsOperation(
+          0xdf,
+        ));
+
+    print(ledgerApp.toString());
+
+    setState(() {
+      _isConnecting = false;
+    });
   }
 
   @override
@@ -222,12 +235,16 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                             children: [
                               LedgerItem(
                                 onTap: () {
+                                  if (_isConnecting) {
+                                    return;
+                                  }
                                   setState(() {
                                     _selected = index;
                                   });
 
                                   _scanInstalledApps(index);
                                 },
+                                isLoading: _isConnecting,
                                 icon: SvgPicture.asset(
                                   icon,
                                   width: 30,
