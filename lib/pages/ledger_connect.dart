@@ -1,3 +1,4 @@
+import 'dart:typed_data';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -5,11 +6,11 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ledger_flutter/ledger_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:zilliqa_ledger_flutter/zilliqa_ledger_flutter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/ledger/apps.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -136,29 +137,80 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       print("try connect apps: $e");
     }
 
-    AppData ledgerApp = await _ledger.sendOperation(
-        device.copyWith(),
-        GetInstalledAppsOperation(
-          0xde,
-        ));
+    ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
 
-    print(ledgerApp.toString());
+    ZilliqaVersion version = await ledgerZilliqa.getVersion(device);
+    print(version.toString());
 
-    ledgerApp = await _ledger.sendOperation(
-        device.copyWith(),
-        GetInstalledAppsOperation(
-          0xdf,
-        ));
+    ({String publicKey, String address}) data =
+        await ledgerZilliqa.getPublicAddress(device, 1);
+    print(data);
 
-    print(ledgerApp.toString());
+    Uint8List hash = Uint8List.fromList([
+      0x01,
+      0x23,
+      0x45,
+      0x67,
+      0x89,
+      0xab,
+      0xcd,
+      0xef,
+      0xfe,
+      0xdc,
+      0xba,
+      0x98,
+      0x76,
+      0x54,
+      0x32,
+      0x10,
+      0x00,
+      0x11,
+      0x22,
+      0x33,
+      0x44,
+      0x55,
+      0x66,
+      0x77,
+      0x88,
+      0x99,
+      0xaa,
+      0xbb,
+      0xcc,
+      0xdd,
+      0xee,
+      0xff,
+    ]);
+    String signedHash = await ledgerZilliqa.signHash(device, hash, 1);
 
-    ledgerApp = await _ledger.sendOperation(
-        device.copyWith(),
-        GetInstalledAppsOperation(
-          0xdf,
-        ));
+    print("siged: $signedHash");
 
-    print(ledgerApp.toString());
+    String sig = await ledgerZilliqa.signZilliqaTransaction(device);
+
+    print("tx sig: $sig");
+
+    // AppData ledgerApp = await _ledger.sendOperation(
+    //     device.copyWith(),
+    //     GetInstalledAppsOperation(
+    //       0xd0,
+    //     ));
+
+    // print(ledgerApp.toString());
+
+    // ledgerApp = await _ledger.sendOperation(
+    //     device.copyWith(),
+    //     GetInstalledAppsOperation(
+    //       0xdf,
+    //     ));
+
+    // print(ledgerApp.toString());
+
+    // ledgerApp = await _ledger.sendOperation(
+    //     device.copyWith(),
+    //     GetInstalledAppsOperation(
+    //       0xdf,
+    //     ));
+
+    // print(ledgerApp.toString());
 
     setState(() {
       _isConnecting = false;
