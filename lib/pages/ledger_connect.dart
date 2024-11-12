@@ -184,9 +184,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     print("siged: $signedHash");
 
-    String sig = await ledgerZilliqa.signZilliqaTransaction(device);
+    // String sig = await ledgerZilliqa.signZilliqaTransaction(device);
 
-    print("tx sig: $sig");
+    // print("tx sig: $sig");
 
     // AppData ledgerApp = await _ledger.sendOperation(
     //     device.copyWith(),
