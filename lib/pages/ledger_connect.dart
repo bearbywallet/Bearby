@@ -1,4 +1,3 @@
-import 'dart:typed_data';
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
@@ -12,8 +11,6 @@ import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/services/auth_guard.dart';
-import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
 
 class LedgerConnectPage extends StatefulWidget {
@@ -24,8 +21,6 @@ class LedgerConnectPage extends StatefulWidget {
 }
 
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
-  late AuthGuard _authGuard;
-  late AppState _appState;
   late Ledger _ledger;
 
   final _btnController = RoundedLoadingButtonController();
@@ -34,30 +29,30 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   bool _isScanning = false;
   bool _isConnecting = false;
   int _selected = -1;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
-    _appState = Provider.of<AppState>(context, listen: false);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _initLedger();
 
-    _initLedger();
-    _startScanning();
+      Future.delayed(const Duration(milliseconds: 1000), () {
+        _startScanning();
+      });
+    });
   }
 
   @override
   void dispose() {
     _btnController.dispose();
-
     super.dispose();
   }
 
   void _initLedger() {
     try {
       final options = LedgerOptions(
-        maxScanDuration: const Duration(
-          milliseconds: 5000,
-        ),
+        maxScanDuration: const Duration(milliseconds: 5000),
       );
 
       _ledger = Ledger(
@@ -71,150 +66,80 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           ].request();
 
           if (status != BleStatus.ready) {
+            setState(() => _error = 'Bluetooth is not ready');
             return false;
           }
 
-          return statuses.values.where((status) => status.isDenied).isEmpty;
+          if (statuses.values.where((status) => status.isDenied).isNotEmpty) {
+            setState(() => _error = 'Required permissions were denied');
+            return false;
+          }
+
+          return true;
         },
       );
     } catch (e) {
-      print("ledger init error: $e");
+      setState(() => _error = 'Failed to initialize Ledger: $e');
     }
   }
 
   Future<void> _startScanning() async {
-    if (_isScanning) {
-      return;
-    }
+    if (_isScanning) return;
 
     setState(() {
       _isScanning = true;
       _devices.clear();
+      _error = null;
     });
 
     try {
       if (Platform.isAndroid) {
         List<LedgerDevice> devices = await _ledger.listUsbDevices();
         if (devices.isNotEmpty) {
-          setState(() {
-            _devices = devices;
-          });
+          setState(() => _devices = devices);
         }
       }
 
-      _ledger.scan().listen((device) {
-        setState(() {
-          _devices.add(device);
-        });
-      }, onDone: () {
-        setState(() {
-          _isScanning = false;
-        });
-      }, onError: (e) {
-        print("scan error $e");
-
-        setState(() {
-          _isScanning = false;
-        });
-      });
+      _ledger.scan().listen(
+        (device) {
+          setState(() => _devices.add(device));
+        },
+        onDone: () {
+          setState(() => _isScanning = false);
+        },
+        onError: (e) {
+          setState(() {
+            _isScanning = false;
+            _error = 'Scanning error: $e';
+          });
+        },
+      );
     } catch (e) {
-      print("scan error $e");
       setState(() {
         _isScanning = false;
+        _error = 'Failed to start scanning: $e';
       });
     }
   }
 
-  Future<void> _scanInstalledApps(int index) async {
+  Future<void> _selectDevice(int index) async {
     setState(() {
       _isConnecting = true;
+      _error = null;
     });
-    LedgerDevice device = _devices[index];
 
     try {
+      LedgerDevice device = _devices[index];
       await _ledger.connect(device);
+
+      ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
+      ZilliqaVersion version = await ledgerZilliqa.getVersion(device);
+      print(version.toString());
     } catch (e) {
-      print("try connect apps: $e");
+      setState(() => _error = 'Connection error: $e');
+    } finally {
+      setState(() => _isConnecting = false);
     }
-
-    ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
-
-    ZilliqaVersion version = await ledgerZilliqa.getVersion(device);
-    print(version.toString());
-
-    ({String publicKey, String address}) data =
-        await ledgerZilliqa.getPublicAddress(device, 1);
-    print(data);
-
-    Uint8List hash = Uint8List.fromList([
-      0x01,
-      0x23,
-      0x45,
-      0x67,
-      0x89,
-      0xab,
-      0xcd,
-      0xef,
-      0xfe,
-      0xdc,
-      0xba,
-      0x98,
-      0x76,
-      0x54,
-      0x32,
-      0x10,
-      0x00,
-      0x11,
-      0x22,
-      0x33,
-      0x44,
-      0x55,
-      0x66,
-      0x77,
-      0x88,
-      0x99,
-      0xaa,
-      0xbb,
-      0xcc,
-      0xdd,
-      0xee,
-      0xff,
-    ]);
-    String signedHash = await ledgerZilliqa.signHash(device, hash, 1);
-
-    print("siged: $signedHash");
-
-    // String sig = await ledgerZilliqa.signZilliqaTransaction(device);
-
-    // print("tx sig: $sig");
-
-    // AppData ledgerApp = await _ledger.sendOperation(
-    //     device.copyWith(),
-    //     GetInstalledAppsOperation(
-    //       0xd0,
-    //     ));
-
-    // print(ledgerApp.toString());
-
-    // ledgerApp = await _ledger.sendOperation(
-    //     device.copyWith(),
-    //     GetInstalledAppsOperation(
-    //       0xdf,
-    //     ));
-
-    // print(ledgerApp.toString());
-
-    // ledgerApp = await _ledger.sendOperation(
-    //     device.copyWith(),
-    //     GetInstalledAppsOperation(
-    //       0xdf,
-    //     ));
-
-    // print(ledgerApp.toString());
-
-    setState(() {
-      _isConnecting = false;
-    });
   }
 
   @override
@@ -234,9 +159,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                     title: '',
                     onBackPressed: () => Navigator.pop(context),
                     actionIconPath: 'assets/icons/reload.svg',
-                    onActionPressed: () {
-                      _startScanning();
-                    },
+                    onActionPressed: _startScanning,
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
@@ -244,7 +167,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Looking for devices',
+                          _isScanning
+                              ? 'Looking for devices'
+                              : 'Available devices',
                           style: TextStyle(
                             fontSize: 24,
                             fontWeight: FontWeight.bold,
@@ -253,13 +178,29 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Please make sure your Ledger device is unlocked',
+                          _isScanning
+                              ? 'Please make sure your Ledger device is unlocked'
+                              : _devices.isEmpty
+                                  ? 'No devices found. Pull to refresh or tap reload'
+                                  : 'Select a device to connect',
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w100,
                             color: theme.textSecondary,
                           ),
                         ),
+                        if (_error != null) ...[
+                          const SizedBox(height: 16),
+                          Text(
+                            _error!,
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Colors.red,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                       ],
                     ),
                   ),
@@ -273,30 +214,21 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                         itemCount: _devices.length,
                         itemBuilder: (context, index) {
                           final device = _devices[index];
-                          String icon = "assets/icons/ble.svg";
-
-                          if (device.connectionType == ConnectionType.usb) {
-                            icon = "assets/icons/usb.svg";
-                          }
-
-                          if (device.connectionType == ConnectionType.ble) {
-                            icon = "assets/icons/ble.svg";
-                          }
+                          String icon =
+                              device.connectionType == ConnectionType.usb
+                                  ? "assets/icons/usb.svg"
+                                  : "assets/icons/ble.svg";
 
                           return Column(
                             children: [
                               LedgerItem(
-                                onTap: () {
-                                  if (_isConnecting) {
-                                    return;
-                                  }
-                                  setState(() {
-                                    _selected = index;
-                                  });
-
-                                  _scanInstalledApps(index);
-                                },
-                                isLoading: _isConnecting,
+                                onTap: _isConnecting
+                                    ? null
+                                    : () {
+                                        setState(() => _selected = index);
+                                        _selectDevice(index);
+                                      },
+                                isLoading: _isConnecting && _selected == index,
                                 icon: SvgPicture.asset(
                                   icon,
                                   width: 30,
