@@ -85,10 +85,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _startScanning() async {
-    _showConnectDialog();
-
-    return;
-
     if (_isScanning) return;
 
     setState(() {
@@ -136,10 +132,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     try {
       LedgerDevice device = _devices[index];
       await _ledger.connect(device);
-
-      ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
-      ZilliqaVersion version = await ledgerZilliqa.getVersion(device);
-      print(version.toString());
 
       _showConnectDialog();
     } catch (e) {
@@ -264,14 +256,20 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   void _showConnectDialog() {
     showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
       backgroundColor: Colors.transparent,
       enableDrag: true,
       isDismissible: true,
       builder: (context) => LedgerConnectDialog(
-        onClose: () => Navigator.of(context).pop(),
-        onConnect: () {
-          // Navigator.of(context).pop();
-          // Add your connect logic here
+        onClose: () => Navigator.pop(context),
+        onConnect: (int index) async {
+          LedgerDevice device = _devices[_selected];
+          ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
+
+          ({String publicKey, String address}) pubKey =
+              await ledgerZilliqa.getPublicAddress(device, index);
+
+          print(pubKey);
         },
       ),
     );

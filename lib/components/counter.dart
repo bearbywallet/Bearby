@@ -27,6 +27,7 @@ class Counter extends StatefulWidget {
   final Duration animationDuration;
   final int initialValue;
   final ValueChanged<int>? onChanged;
+  final bool disabled;
 
   const Counter({
     super.key,
@@ -36,6 +37,7 @@ class Counter extends StatefulWidget {
     this.animationDuration = const Duration(milliseconds: 300),
     this.initialValue = 0,
     this.onChanged,
+    this.disabled = false,
   });
 
   @override
@@ -78,19 +80,23 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
   }
 
   void _animate() {
-    _controller.forward(from: 0);
+    if (!widget.disabled) {
+      _controller.forward(from: 0);
+    }
   }
 
   void _increment() {
-    setState(() {
-      _count++;
-      _animate();
-      widget.onChanged?.call(_count);
-    });
+    if (!widget.disabled) {
+      setState(() {
+        _count++;
+        _animate();
+        widget.onChanged?.call(_count);
+      });
+    }
   }
 
   void _decrement() {
-    if (_count > 0) {
+    if (!widget.disabled && _count > 0) {
       setState(() {
         _count--;
         _animate();
@@ -113,58 +119,62 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
-    return SizedBox(
-      width: double.infinity,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          IconButton(
-            icon: SvgPicture.string(
-              CounterIcons.minus,
-              width: widget.iconSize,
-              height: widget.iconSize,
-              colorFilter: ColorFilter.mode(
-                _count > 0
-                    ? widget.iconColor ?? theme.secondaryPurple
-                    : (widget.iconColor ?? theme.secondaryPurple)
-                        .withOpacity(0.3),
-                BlendMode.srcIn,
+    return Opacity(
+      opacity: widget.disabled ? 0.6 : 1.0,
+      child: SizedBox(
+        width: double.infinity,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            IconButton(
+              icon: SvgPicture.string(
+                CounterIcons.minus,
+                width: widget.iconSize,
+                height: widget.iconSize,
+                colorFilter: ColorFilter.mode(
+                  _count > 0 && !widget.disabled
+                      ? widget.iconColor ?? theme.secondaryPurple
+                      : (widget.iconColor ?? theme.secondaryPurple)
+                          .withOpacity(0.3),
+                  BlendMode.srcIn,
+                ),
+              ),
+              onPressed:
+                  widget.disabled ? null : (_count > 0 ? _decrement : null),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+              child: AnimatedBuilder(
+                animation: _scaleAnimation,
+                builder: (context, child) => Transform.scale(
+                  scale: _scaleAnimation.value,
+                  child: child,
+                ),
+                child: Text(
+                  '$_count',
+                  style: widget.numberStyle ??
+                      TextStyle(
+                        fontSize: 14,
+                        color: theme.textSecondary,
+                        fontWeight: FontWeight.w500,
+                      ),
+                ),
               ),
             ),
-            onPressed: _count > 0 ? _decrement : null,
-          ),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16.0),
-            child: AnimatedBuilder(
-              animation: _scaleAnimation,
-              builder: (context, child) => Transform.scale(
-                scale: _scaleAnimation.value,
-                child: child,
+            IconButton(
+              icon: SvgPicture.string(
+                CounterIcons.plus,
+                width: widget.iconSize,
+                height: widget.iconSize,
+                colorFilter: ColorFilter.mode(
+                  widget.iconColor ?? theme.secondaryPurple,
+                  BlendMode.srcIn,
+                ),
               ),
-              child: Text(
-                '$_count',
-                style: widget.numberStyle ??
-                    TextStyle(
-                      fontSize: 14,
-                      color: theme.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-              ),
+              onPressed: widget.disabled ? null : _increment,
             ),
-          ),
-          IconButton(
-            icon: SvgPicture.string(
-              CounterIcons.plus,
-              width: widget.iconSize,
-              height: widget.iconSize,
-              colorFilter: ColorFilter.mode(
-                widget.iconColor ?? theme.secondaryPurple,
-                BlendMode.srcIn,
-              ),
-            ),
-            onPressed: _increment,
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
