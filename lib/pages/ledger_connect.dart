@@ -12,6 +12,11 @@ import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/ledger_connect_dialog.dart';
+import 'package:zilpay/services/auth_guard.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
 
 class LedgerConnectPage extends StatefulWidget {
@@ -25,9 +30,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   late Ledger _ledger;
 
   final _btnController = RoundedLoadingButtonController();
+  late AuthGuard _authGuard;
+  late AppState _appState;
 
   List<LedgerDevice> _devices = [];
-  bool _isScanning = true;
+  bool _isScanning = false;
   bool _isConnecting = false;
   int _selected = -1;
   String? _error;
@@ -35,6 +42,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   @override
   void initState() {
     super.initState();
+
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
+    _appState = Provider.of<AppState>(context, listen: false);
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initLedger();
 
@@ -260,6 +271,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   void _showConnectDialog() {
+    LedgerDevice device = _devices[_selected];
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -267,15 +280,36 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       enableDrag: true,
       isDismissible: true,
       builder: (context) => LedgerConnectDialog(
+        walletName: device.name,
         onClose: () => Navigator.pop(context),
-        onConnect: (int index) async {
-          LedgerDevice device = _devices[_selected];
+        onConnect: (int index, String name) async {
+          LedgerDevice ledgerDevice = _devices[_selected];
           ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
 
-          ({String publicKey, String address}) pubKey =
-              await ledgerZilliqa.getPublicAddress(device, index);
+          ({String publicKey, String address}) key =
+              await ledgerZilliqa.getPublicAddress(ledgerDevice, index);
 
-          print(pubKey);
+          DeviceInfoService device = DeviceInfoService();
+          List<String> identifiers = await device.getDeviceIdentifiers();
+
+          await addLedgerZilliqaWallet(
+            pubKey: key.publicKey,
+            walletIndex: BigInt.from(index),
+            walletName: name,
+            accountName: "Ledger $index",
+            biometricType: AuthMethod.none.name,
+            identifiers: identifiers,
+          );
+
+          await _appState.syncData();
+          _authGuard.setEnabled(true);
+
+          print(
+              "enabled ${_authGuard.enabled}, wallets: ${_appState.wallets.length}");
+
+          Navigator.of(context).pushNamed(
+            '/',
+          );
         },
       ),
     );

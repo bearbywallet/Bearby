@@ -1,18 +1,18 @@
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:flutter/foundation.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class AuthGuard extends ChangeNotifier {
   final FlutterSecureStorage _storage;
-  final AuthService _authService;
+  final AppState _state;
 
-  bool _ready = false;
-  bool _enabled = false; // TODO: remake it to many wallets
+  bool _enabled = false;
 
-  bool get ready => _ready;
+  bool get ready => _state.wallets.isNotEmpty;
   bool get enabled => _enabled;
 
-  AuthGuard({AuthService? authService})
+  AuthGuard({required AppState state})
       : _storage = const FlutterSecureStorage(
           aOptions: AndroidOptions(
             encryptedSharedPreferences: true,
@@ -22,11 +22,17 @@ class AuthGuard extends ChangeNotifier {
             synchronizable: true,
           ),
         ),
-        _authService = authService ?? AuthService();
+        _state = state;
+
+  void setEnabled(bool value) {
+    _enabled = value;
+  }
 
   Future<void> setSession(String sessionKey, String sessionValue) async {
+    final AuthService authService = AuthService();
+
     try {
-      final authMethods = await _authService.getAvailableAuthMethods();
+      final authMethods = await authService.getAvailableAuthMethods();
 
       if (authMethods.contains(AuthMethod.none)) {
         throw 'Device does not support secure storage. Please enable device lock.';
@@ -38,7 +44,6 @@ class AuthGuard extends ChangeNotifier {
       );
 
       _enabled = true;
-      _ready = true;
 
       notifyListeners();
     } catch (e) {
@@ -62,12 +67,5 @@ class AuthGuard extends ChangeNotifier {
     notifyListeners();
 
     return value;
-  }
-
-  Future<void> initialize(bool ready) async {
-    _enabled = false;
-    _ready = ready;
-
-    notifyListeners();
   }
 }

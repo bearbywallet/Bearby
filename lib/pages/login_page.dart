@@ -72,7 +72,8 @@ class _LoginPage extends State<LoginPage> {
 
     try {
       // if Ledger device
-      if (wallet.walletType == 0) {
+      if (wallet.walletType == 2) {
+        _authGuard.setEnabled(true);
         toHome();
         return;
       }
@@ -266,11 +267,11 @@ class _LoginPage extends State<LoginPage> {
                               },
                               icons: [
                                 if (wallet.walletType == 0)
-                                  'assets/icons/ledger.svg',
+                                  'assets/icons/bincode.svg',
                                 if (wallet.walletType == 1)
                                   'assets/icons/document.svg',
                                 if (wallet.walletType == 2)
-                                  'assets/icons/bincode.svg',
+                                  'assets/icons/ledger.svg',
                                 if (wallet.authType == "faceId")
                                   'assets/icons/face_id.svg',
                                 if (wallet.authType == "fingerprint")

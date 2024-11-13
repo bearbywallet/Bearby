@@ -7,21 +7,18 @@ import '../theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class LedgerConnectDialog extends StatefulWidget {
+  final String? walletName;
   final VoidCallback? onClose;
-  final Future<void> Function(int)? onConnect;
+  final Future<void> Function(int, String)? onConnect;
 
-  const LedgerConnectDialog({
-    super.key,
-    this.onClose,
-    this.onConnect,
-  });
+  const LedgerConnectDialog(
+      {super.key, this.onClose, this.onConnect, this.walletName = 'Ledger'});
 
   @override
   State<LedgerConnectDialog> createState() => _LedgerConnectDialog();
 }
 
 class _LedgerConnectDialog extends State<LedgerConnectDialog> {
-  static const defaultName = "Ledger";
   final _btnController = RoundedLoadingButtonController();
   final _walletNameController = TextEditingController();
 
@@ -31,7 +28,8 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
   @override
   void initState() {
     super.initState();
-    _walletNameController.text = '$defaultName $_index';
+
+    _walletNameController.text = widget.walletName!;
   }
 
   Future<void> _onConnect() async {
@@ -40,7 +38,7 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
         setState(() => _loading = true);
         _btnController.start();
 
-        await widget.onConnect!(_index);
+        await widget.onConnect!(_index, _walletNameController.text);
 
         _btnController.success();
         await Future.delayed(const Duration(milliseconds: 300));
@@ -99,35 +97,6 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                     child: Column(
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '',
-                                  style: TextStyle(
-                                    color: theme.textPrimary,
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            IconButton(
-                              onPressed: widget.onClose,
-                              icon: SvgPicture.asset(
-                                'assets/icons/close.svg',
-                                width: 24,
-                                height: 24,
-                                colorFilter: ColorFilter.mode(
-                                  theme.textPrimary,
-                                  BlendMode.srcIn,
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
                         const SizedBox(height: 16),
                         SmartInput(
                           controller: _walletNameController,
@@ -155,9 +124,6 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                                   setState(() {
                                     _index = value;
                                   });
-
-                                  _walletNameController.text =
-                                      "$defaultName $value";
                                 }
                               : null,
                         ),

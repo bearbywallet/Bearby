@@ -23,10 +23,8 @@ Future<void> main() async {
     String appDocPath = await getStoragePath();
 
     state = await startService(path: "$appDocPath/storage");
-    final authGuard = AuthGuard();
     final appState = AppState(state: state);
-
-    await authGuard.initialize(state.wallets.isNotEmpty);
+    final authGuard = AuthGuard(state: appState);
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));
   } catch (e) {
