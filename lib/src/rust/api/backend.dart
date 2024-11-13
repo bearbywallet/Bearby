@@ -63,6 +63,21 @@ Future<(String, String)> addBip39Wallet(
         netCodes: netCodes,
         identifiers: identifiers);
 
+Future<(String, String)> addLedgerZilliqaWallet(
+        {required String pubKey,
+        required BigInt walletIndex,
+        required String walletName,
+        required String accountName,
+        required String biometricType,
+        required List<String> identifiers}) =>
+    RustLib.instance.api.crateApiBackendAddLedgerZilliqaWallet(
+        pubKey: pubKey,
+        walletIndex: walletIndex,
+        walletName: walletName,
+        accountName: accountName,
+        biometricType: biometricType,
+        identifiers: identifiers);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 

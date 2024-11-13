@@ -4,7 +4,9 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 
 pub use zilpay::background::{Background, Bip39Params};
+pub use zilpay::config::key::PUB_KEY_SIZE;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
+pub use zilpay::proto::pubkey::PubKey;
 pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
@@ -239,6 +241,45 @@ pub async fn add_bip39_wallet(
                     device_indicators: identifiers,
                 },
                 derive,
+            )
+            .map_err(|e| e.to_string())?;
+        let cipher_session = hex::encode(session);
+        let wallet = service
+            .core
+            .wallets
+            .last()
+            .ok_or("Fail to Save wallet".to_string())?;
+
+        Ok((cipher_session, wallet.data.wallet_address.clone()))
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn add_ledger_zilliqa_wallet(
+    pub_key: String,
+    wallet_index: usize,
+    wallet_name: String,
+    account_name: String,
+    biometric_type: String,
+    identifiers: &[String],
+) -> Result<(String, String), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let pub_key_bytes: [u8; PUB_KEY_SIZE] = hex::decode(pub_key)
+            .map_err(|e| e.to_string())?
+            .try_into()
+            .map_err(|_| "invlid pub_key".to_string())?;
+        let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
+        let session = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .add_ledger_wallet(
+                wallet_index,
+                &pub_key,
+                wallet_name,
+                account_name,
+                identifiers,
+                biometric_type.into(),
             )
             .map_err(|e| e.to_string())?;
         let cipher_session = hex::encode(session);

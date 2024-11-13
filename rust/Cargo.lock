@@ -4337,7 +4337,9 @@ name = "zilpay"
 version = "0.1.0"
 dependencies = [
  "background",
+ "config",
  "crypto",
+ "proto",
  "settings",
  "wallet",
  "zil_errors",
@@ -4350,11 +4352,13 @@ dependencies = [
  "alloy",
  "background",
  "bip39",
+ "config",
  "crypto",
  "hex",
  "ntrulp",
  "num256",
  "num_cpus",
+ "proto",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
  "reqwest 0.11.27",

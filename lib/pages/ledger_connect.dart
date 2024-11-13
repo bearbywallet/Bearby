@@ -27,7 +27,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   final _btnController = RoundedLoadingButtonController();
 
   List<LedgerDevice> _devices = [];
-  bool _isScanning = false;
+  bool _isScanning = true;
   bool _isConnecting = false;
   int _selected = -1;
   String? _error;
@@ -47,6 +47,12 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   @override
   void dispose() {
     _btnController.dispose();
+    _ledger.close(ConnectionType.ble);
+
+    if (Platform.isAndroid) {
+      _ledger.close(ConnectionType.usb);
+    }
+
     super.dispose();
   }
 
