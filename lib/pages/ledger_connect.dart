@@ -6,6 +6,7 @@ import 'package:ledger_flutter/ledger_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilliqa_ledger_flutter/zilliqa_ledger_flutter.dart';
+import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/ledger_item.dart';
@@ -202,6 +203,17 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                           ),
                         ],
                       ],
+                    ),
+                  ),
+                  Center(
+                    child: Counter(
+                      iconSize: 32,
+                      iconColor: theme.textPrimary,
+                      animationDuration: Duration(milliseconds: 300),
+                      numberStyle: TextStyle(
+                          fontSize: 32,
+                          fontWeight: FontWeight.bold,
+                          color: theme.textPrimary),
                     ),
                   ),
                   const SizedBox(height: 16),
