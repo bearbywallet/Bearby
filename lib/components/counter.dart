@@ -25,6 +25,8 @@ class Counter extends StatefulWidget {
   final Color? iconColor;
   final TextStyle? numberStyle;
   final Duration animationDuration;
+  final int initialValue;
+  final ValueChanged<int>? onChanged;
 
   const Counter({
     super.key,
@@ -32,6 +34,8 @@ class Counter extends StatefulWidget {
     this.iconColor,
     this.numberStyle,
     this.animationDuration = const Duration(milliseconds: 300),
+    this.initialValue = 0,
+    this.onChanged,
   });
 
   @override
@@ -39,13 +43,14 @@ class Counter extends StatefulWidget {
 }
 
 class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
-  int _count = 0;
+  late int _count;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
 
   @override
   void initState() {
     super.initState();
+    _count = widget.initialValue;
     _controller = AnimationController(
       duration: widget.animationDuration,
       vsync: this,
@@ -80,6 +85,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
     setState(() {
       _count++;
       _animate();
+      widget.onChanged?.call(_count);
     });
   }
 
@@ -88,6 +94,17 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
       setState(() {
         _count--;
         _animate();
+        widget.onChanged?.call(_count);
+      });
+    }
+  }
+
+  @override
+  void didUpdateWidget(Counter oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.initialValue != oldWidget.initialValue) {
+      setState(() {
+        _count = widget.initialValue;
       });
     }
   }
@@ -109,7 +126,8 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
               colorFilter: ColorFilter.mode(
                 _count > 0
                     ? widget.iconColor ?? theme.secondaryPurple
-                    : theme.secondaryPurple.withOpacity(0.3),
+                    : (widget.iconColor ?? theme.secondaryPurple)
+                        .withOpacity(0.3),
                 BlendMode.srcIn,
               ),
             ),
