@@ -55,6 +55,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
@@ -73,6 +74,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _cipher = cipher;
         _keys = keys;
       });
+    }
+
+    if (bip39 != null) {
+      _walletNameController.text =
+          'Seed Wallet ${_appState.wallets.length + 1}';
+    } else if (keys != null) {
+      _walletNameController.text = 'Key Wallet ${_appState.wallets.length + 1}';
+    } else {
+      _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
     }
   }
 
