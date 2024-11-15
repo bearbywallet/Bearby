@@ -166,6 +166,7 @@ abstract class RustLibApi extends BaseApi {
       {required String pubKey,
       required BigInt walletIndex,
       required String walletName,
+      required String ledgerId,
       required String accountName,
       required String biometricType,
       required List<String> identifiers});
@@ -995,6 +996,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       {required String pubKey,
       required BigInt walletIndex,
       required String walletName,
+      required String ledgerId,
       required String accountName,
       required String biometricType,
       required List<String> identifiers}) {
@@ -1004,6 +1006,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(pubKey, serializer);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_String(walletName, serializer);
+        sse_encode_String(ledgerId, serializer);
         sse_encode_String(accountName, serializer);
         sse_encode_String(biometricType, serializer);
         sse_encode_list_String(identifiers, serializer);
@@ -1019,6 +1022,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         pubKey,
         walletIndex,
         walletName,
+        ledgerId,
         accountName,
         biometricType,
         identifiers
@@ -1034,6 +1038,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "pubKey",
           "walletIndex",
           "walletName",
+          "ledgerId",
           "accountName",
           "biometricType",
           "identifiers"

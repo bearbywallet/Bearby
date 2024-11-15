@@ -28,6 +28,8 @@ class LedgerConnectPage extends StatefulWidget {
 
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
   late Ledger _ledger;
+  final AuthService _authService = AuthService();
+  List<AuthMethod> _authMethods = [AuthMethod.none];
 
   final _btnController = RoundedLoadingButtonController();
   late AuthGuard _authGuard;
@@ -48,7 +50,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initLedger();
-
+      _checkAuthMethods();
       Future.delayed(const Duration(milliseconds: 1000), () {
         _startScanning();
       });
@@ -65,6 +67,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     }
 
     super.dispose();
+  }
+
+  Future<void> _checkAuthMethods() async {
+    final methods = await _authService.getAvailableAuthMethods();
+    setState(() {
+      _authMethods = methods;
+    });
   }
 
   void _initLedger() {
@@ -272,6 +281,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   void _showConnectDialog() {
     LedgerDevice device = _devices[_selected];
+    AuthMethod preferredAuth = _authMethods.contains(AuthMethod.none)
+        ? AuthMethod.none
+        : _authMethods[0];
 
     showModalBottomSheet(
       context: context,
@@ -281,6 +293,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       isDismissible: true,
       builder: (context) => LedgerConnectDialog(
         walletName: device.name,
+        biometricType: preferredAuth,
         onClose: () => Navigator.pop(context),
         onConnect: (int index, String name) async {
           LedgerDevice ledgerDevice = _devices[_selected];
@@ -303,9 +316,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
           await _appState.syncData();
           _authGuard.setEnabled(true);
-
-          print(
-              "enabled ${_authGuard.enabled}, wallets: ${_appState.wallets.length}");
 
           Navigator.of(context).pushNamed(
             '/',

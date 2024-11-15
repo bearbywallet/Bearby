@@ -13,6 +13,7 @@ pub use zilpay::wallet::account::Account;
 pub use zilpay::wallet::wallet_data::AuthMethod;
 pub use zilpay::wallet::wallet_data::WalletData;
 pub use zilpay::wallet::wallet_types::WalletTypes;
+pub use zilpay::wallet::LedgerParams;
 
 pub struct Serivce {
     pub running: bool,
@@ -261,6 +262,7 @@ pub async fn add_ledger_zilliqa_wallet(
     pub_key: String,
     wallet_index: usize,
     wallet_name: String,
+    ledger_id: String,
     account_name: String,
     biometric_type: String,
     identifiers: &[String],
@@ -271,16 +273,17 @@ pub async fn add_ledger_zilliqa_wallet(
             .try_into()
             .map_err(|_| "invlid pub_key".to_string())?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
+        let parmas = LedgerParams {
+            pub_key: &pub_key,
+            ledger_id: ledger_id.as_bytes().to_vec(),
+            name: account_name,
+            wallet_index,
+            wallet_name,
+            biometric_type: biometric_type.into(),
+        };
         let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
-            .add_ledger_wallet(
-                wallet_index,
-                &pub_key,
-                wallet_name,
-                account_name,
-                identifiers,
-                biometric_type.into(),
-            )
+            .add_ledger_wallet(parmas, identifiers)
             .map_err(|e| e.to_string())?;
         let cipher_session = hex::encode(session);
         let wallet = service

@@ -1291,6 +1291,7 @@ fn wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
             let api_pub_key = <String>::sse_decode(&mut deserializer);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_wallet_name = <String>::sse_decode(&mut deserializer);
+            let api_ledger_id = <String>::sse_decode(&mut deserializer);
             let api_account_name = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
@@ -1302,6 +1303,7 @@ fn wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
                             api_pub_key,
                             api_wallet_index,
                             api_wallet_name,
+                            api_ledger_id,
                             api_account_name,
                             api_biometric_type,
                             &api_identifiers,

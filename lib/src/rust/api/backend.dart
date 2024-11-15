@@ -67,6 +67,7 @@ Future<(String, String)> addLedgerZilliqaWallet(
         {required String pubKey,
         required BigInt walletIndex,
         required String walletName,
+        required String ledgerId,
         required String accountName,
         required String biometricType,
         required List<String> identifiers}) =>
@@ -74,6 +75,7 @@ Future<(String, String)> addLedgerZilliqaWallet(
         pubKey: pubKey,
         walletIndex: walletIndex,
         walletName: walletName,
+        ledgerId: ledgerId,
         accountName: accountName,
         biometricType: biometricType,
         identifiers: identifiers);

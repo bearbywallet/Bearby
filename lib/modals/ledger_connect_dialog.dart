@@ -3,16 +3,22 @@ import 'package:flutter_svg/svg.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/services/biometric_service.dart';
 import '../theme/theme_provider.dart';
 import 'package:provider/provider.dart';
 
 class LedgerConnectDialog extends StatefulWidget {
   final String? walletName;
+  final AuthMethod biometricType;
   final VoidCallback? onClose;
   final Future<void> Function(int, String)? onConnect;
 
   const LedgerConnectDialog(
-      {super.key, this.onClose, this.onConnect, this.walletName = 'Ledger'});
+      {super.key,
+      this.onClose,
+      this.onConnect,
+      this.biometricType = AuthMethod.none,
+      this.walletName = 'Ledger'});
 
   @override
   State<LedgerConnectDialog> createState() => _LedgerConnectDialog();
