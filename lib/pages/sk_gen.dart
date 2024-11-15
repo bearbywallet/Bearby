@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -18,6 +19,7 @@ class SecretKeyGeneratorPage extends StatefulWidget {
 
 class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
   KeyPair _keyPair = KeyPair(sk: "", pk: "");
+  bool _hasBackupWords = false;
 
   @override
   void initState() {
@@ -41,40 +43,77 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
     return Scaffold(
       body: GradientBackground(
         child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                children: [
-                  CustomAppBar(
-                    title: 'Secret Key',
-                    onBackPressed: () => Navigator.pop(context),
-                    actionIconPath: 'assets/icons/reload.svg',
-                    onActionPressed: _regenerateKeys,
-                  ),
-                  Expanded(
-                    child: Padding(
+          child: Column(
+            children: [
+              CustomAppBar(
+                title: 'Secret Key',
+                onBackPressed: () => Navigator.pop(context),
+                actionIconPath: 'assets/icons/reload.svg',
+                onActionPressed: _regenerateKeys,
+              ),
+              Expanded(
+                child: Center(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      constraints: const BoxConstraints(maxWidth: 480),
                       padding:
                           EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           HexKeyDisplay(
                             hexKey: _keyPair.sk,
                             title: "Private Key",
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: 8),
                           HexKeyDisplay(
                             hexKey: _keyPair.sk,
-                            title: "Publick Key",
+                            title: "Public Key",
                           ),
+                          const SizedBox(height: 16),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(12),
+                              color: theme.background.withOpacity(0.5),
+                            ),
+                            child: CheckboxListTile(
+                              title: Text(
+                                'I have backup Keys',
+                                style: TextStyle(
+                                  color: theme.textSecondary,
+                                  fontSize: 16,
+                                ),
+                              ),
+                              value: _hasBackupWords,
+                              onChanged: (newValue) {
+                                setState(() {
+                                  _hasBackupWords = newValue!;
+                                });
+                              },
+                              controlAffinity: ListTileControlAffinity.leading,
+                              activeColor: theme.primaryPurple,
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                          CustomButton(
+                            text: 'Next',
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/net_setup',
+                                  arguments: {'keys': _keyPair});
+                            },
+                            backgroundColor: theme.primaryPurple,
+                            borderRadius: 30.0,
+                            height: 56.0,
+                            disabled: !_hasBackupWords,
+                          ),
+                          SizedBox(height: adaptivePadding),
                         ],
                       ),
                     ),
                   ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
         ),
       ),
