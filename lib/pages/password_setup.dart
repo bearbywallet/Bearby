@@ -83,7 +83,14 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
 
-    _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
+    if (_bip39List != null) {
+      _walletNameController.text =
+          'Seed Wallet ${_appState.wallets.length + 1}';
+    } else if (_keys != null) {
+      _walletNameController.text = 'Key Wallet ${_appState.wallets.length + 1}';
+    } else {
+      _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
+    }
 
     _checkAuthMethods();
   }
@@ -197,7 +204,19 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           netCodes: networkIndexes,
           identifiers: identifiers,
         );
-      } else if (_keys != null) {}
+      } else if (_keys != null) {
+        session = await addSkWallet(
+          sk: _keys!.sk,
+          password: _passwordController.text,
+          walletName: _walletNameController.text,
+          accountName: "Key 0",
+          biometricType: biometricType.name,
+          netCodes: networkIndexes,
+          identifiers: identifiers,
+        );
+      } else {
+        throw "Invalid Wallet gen method";
+      }
 
       if (_useDeviceAuth) {
         await _authGuard.setSession(session.$2, session.$1);
