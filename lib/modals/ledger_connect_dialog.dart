@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -11,14 +12,15 @@ class LedgerConnectDialog extends StatefulWidget {
   final String? walletName;
   final AuthMethod biometricType;
   final VoidCallback? onClose;
-  final Future<void> Function(int, String)? onConnect;
+  final Future<void> Function(int, String, bool)? onConnect;
 
-  const LedgerConnectDialog(
-      {super.key,
-      this.onClose,
-      this.onConnect,
-      this.biometricType = AuthMethod.none,
-      this.walletName = 'Ledger'});
+  const LedgerConnectDialog({
+    super.key,
+    this.onClose,
+    this.onConnect,
+    this.biometricType = AuthMethod.none,
+    this.walletName = 'Ledger',
+  });
 
   @override
   State<LedgerConnectDialog> createState() => _LedgerConnectDialog();
@@ -30,25 +32,41 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
 
   int _index = 0;
   bool _loading = false;
+  bool _useBiometric = false;
+  String _errorMessage = '';
 
   @override
   void initState() {
     super.initState();
-
     _walletNameController.text = widget.walletName!;
   }
 
   Future<void> _onConnect() async {
+    if (_walletNameController.text.trim().isEmpty) {
+      setState(() => _errorMessage = 'Wallet name cannot be empty');
+      return;
+    }
+
+    if (_walletNameController.text.length > 24) {
+      setState(() => _errorMessage = 'Wallet name is too long');
+      return;
+    }
+
     if (widget.onConnect != null) {
       try {
-        setState(() => _loading = true);
+        setState(() {
+          _loading = true;
+          _errorMessage = '';
+        });
         _btnController.start();
 
-        await widget.onConnect!(_index, _walletNameController.text);
+        await widget.onConnect!(
+            _index, _walletNameController.text, _useBiometric);
 
         _btnController.success();
         await Future.delayed(const Duration(milliseconds: 300));
       } catch (e) {
+        setState(() => _errorMessage = e.toString());
         _btnController.error();
         await Future.delayed(const Duration(milliseconds: 500));
       } finally {
@@ -65,7 +83,6 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final viewInsets = MediaQuery.of(context).viewInsets;
     final screenHeight = MediaQuery.of(context).size.height;
-
     final maxHeight = screenHeight - (screenHeight * 0.1);
 
     return AnimatedContainer(
@@ -112,7 +129,24 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           focusedBorderColor: theme.primaryPurple,
                           disabled: _loading,
+                          onChanged: (value) {
+                            if (_errorMessage.isNotEmpty) {
+                              setState(() => _errorMessage = '');
+                            }
+                          },
                         ),
+                        if (_errorMessage.isNotEmpty) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            _errorMessage,
+                            style: TextStyle(
+                              color: theme.danger,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
+                        ],
                         const SizedBox(height: 16),
                         Counter(
                           iconSize: 32,
@@ -132,6 +166,15 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                                   });
                                 }
                               : null,
+                        ),
+                        const SizedBox(height: 16),
+                        BiometricSwitch(
+                          biometricType: widget.biometricType,
+                          value: _useBiometric,
+                          disabled: _loading,
+                          onChanged: (value) {
+                            setState(() => _useBiometric = value);
+                          },
                         ),
                         const SizedBox(height: 16),
                         SizedBox(

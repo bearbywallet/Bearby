@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
@@ -13,7 +14,6 @@ import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
-import 'package:zilpay/theme/app_theme.dart';
 import '../theme/theme_provider.dart';
 
 class PasswordSetupPage extends StatefulWidget {
@@ -351,7 +351,14 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                   fontWeight: FontWeight.w500,
                                 ),
                               ),
-                              _buildAuthOption(theme),
+                              BiometricSwitch(
+                                biometricType: _authMethods.first,
+                                value: _useDeviceAuth,
+                                disabled: _disabled,
+                                onChanged: (value) async {
+                                  setState(() => _useDeviceAuth = value);
+                                },
+                              ),
                             ],
                           ),
                         ),
@@ -390,83 +397,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         ),
       ),
     );
-  }
-
-  Widget _buildAuthOption(AppTheme theme) {
-    if (_authMethods.contains(AuthMethod.none)) {
-      return const SizedBox.shrink();
-    }
-
-    final authText = _getAuthMethodText();
-    final iconPath = _getAuthMethodIcon();
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(
-                width: 4,
-              ),
-              Text(
-                authText,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-          ),
-          Switch(
-            value: _useDeviceAuth,
-            onChanged: _disabled
-                ? null
-                : (value) async {
-                    setState(() => _useDeviceAuth = value);
-                  },
-            activeColor: theme.primaryPurple,
-            activeTrackColor: theme.primaryPurple.withOpacity(0.4),
-          ),
-        ],
-      ),
-    );
-  }
-
-  String _getAuthMethodText() {
-    if (_authMethods.contains(AuthMethod.faceId)) {
-      return 'Enable Face ID';
-    } else if (_authMethods.contains(AuthMethod.fingerprint)) {
-      return 'Enable Fingerprint';
-    } else if (_authMethods.contains(AuthMethod.biometric)) {
-      return 'Enable Biometric Login';
-    } else if (_authMethods.contains(AuthMethod.pinCode)) {
-      return 'Enable Device PIN';
-    }
-    return '';
-  }
-
-  String _getAuthMethodIcon() {
-    if (_authMethods.contains(AuthMethod.faceId)) {
-      return 'assets/icons/face_id.svg';
-    } else if (_authMethods.contains(AuthMethod.fingerprint)) {
-      return 'assets/icons/fingerprint.svg';
-    } else if (_authMethods.contains(AuthMethod.biometric)) {
-      return 'assets/icons/biometric.svg';
-    } else if (_authMethods.contains(AuthMethod.pinCode)) {
-      return 'assets/icons/pin.svg';
-    }
-    return '';
   }
 
   Future<void> _checkAuthMethods() async {

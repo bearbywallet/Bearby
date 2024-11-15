@@ -295,7 +295,18 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         walletName: device.name,
         biometricType: preferredAuth,
         onClose: () => Navigator.pop(context),
-        onConnect: (int index, String name) async {
+        onConnect: (int index, String name, bool useBiometric) async {
+          if (useBiometric) {
+            final authenticated = await _authService.authenticate(
+              allowPinCode: true,
+              reason: 'Please authenticate to enable quick access',
+            );
+
+            if (!authenticated) {
+              throw "Fail biometric";
+            }
+          }
+
           LedgerDevice ledgerDevice = _devices[_selected];
           ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(_ledger);
 
@@ -305,17 +316,24 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           DeviceInfoService device = DeviceInfoService();
           List<String> identifiers = await device.getDeviceIdentifiers();
 
-          await addLedgerZilliqaWallet(
+          (String, String) session = await addLedgerZilliqaWallet(
             pubKey: key.publicKey,
             walletIndex: BigInt.from(index),
             walletName: name,
+            ledgerId: ledgerDevice.id,
             accountName: "Ledger $index",
-            biometricType: AuthMethod.none.name,
+            biometricType:
+                useBiometric ? preferredAuth.name : AuthMethod.none.name,
             identifiers: identifiers,
           );
 
           await _appState.syncData();
-          _authGuard.setEnabled(true);
+
+          if (useBiometric) {
+            await _authGuard.setSession(session.$2, session.$1);
+          } else {
+            _authGuard.setEnabled(true);
+          }
 
           Navigator.of(context).pushNamed(
             '/',
