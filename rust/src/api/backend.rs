@@ -2,11 +2,14 @@ use crate::frb_generated::StreamSink;
 use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use zilpay::config::key::SECRET_KEY_SIZE;
 
+pub use zilpay::background::SKParams;
 pub use zilpay::background::{Background, Bip39Params};
 pub use zilpay::config::key::PUB_KEY_SIZE;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
 pub use zilpay::proto::pubkey::PubKey;
+pub use zilpay::proto::secret_key::SecretKey;
 pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
@@ -243,6 +246,46 @@ pub async fn add_bip39_wallet(
                 },
                 derive,
             )
+            .map_err(|e| e.to_string())?;
+        let cipher_session = hex::encode(session);
+        let wallet = service
+            .core
+            .wallets
+            .last()
+            .ok_or("Fail to Save wallet".to_string())?;
+
+        Ok((cipher_session, wallet.data.wallet_address.clone()))
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn add_sk_wallet(
+    sk: String,
+    password: String,
+    account_name: String,
+    wallet_name: String,
+    biometric_type: String,
+    identifiers: &[String],
+    _net_codes: &[usize], // TODO: add netowrk codes for wallet
+) -> Result<(String, String), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let secret_key: [u8; SECRET_KEY_SIZE] = hex::decode(sk)
+            .map_err(|_| "Fail to decode key".to_string())?
+            .try_into()
+            .map_err(|_| "Invlid Secret key len".to_string())?;
+        let secret_key = SecretKey::Secp256k1Sha256Zilliqa(secret_key); // TODO: detect by network
+        let session = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .add_sk_wallet(SKParams {
+                secret_key: &secret_key,
+                account_name,
+                wallet_name,
+                biometric_type: biometric_type.into(),
+                password: &password,
+                device_indicators: identifiers,
+            })
             .map_err(|e| e.to_string())?;
         let cipher_session = hex::encode(session);
         let wallet = service

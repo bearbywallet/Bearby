@@ -6,6 +6,7 @@ import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import '../theme/theme_provider.dart';
 
 class CipherSettingsPage extends StatefulWidget {
@@ -20,7 +21,10 @@ class CipherSettingsPage extends StatefulWidget {
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
   List<int>? _codes;
+  KeyPair? _keys;
+
   final _btnController = RoundedLoadingButtonController();
+
   int selectedCipherIndex = 2;
   bool optionsDisabled = false;
 
@@ -62,15 +66,17 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
     final codes = args?['codes'] as List<int>?;
+    final keys = args?['keys'] as KeyPair?;
 
-    if (bip39 == null || codes == null) {
+    if (bip39 == null && codes == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+        Navigator.of(context).pushReplacementNamed('/initial');
       });
     } else {
       setState(() {
         _bip39List = bip39;
         _codes = codes;
+        _keys = keys;
       });
     }
   }
@@ -175,6 +181,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                               arguments: {
                                 'bip39': _bip39List,
                                 'codes': _codes,
+                                'keys': _keys,
                                 'cipher': selectedCipherIndex
                               },
                             );

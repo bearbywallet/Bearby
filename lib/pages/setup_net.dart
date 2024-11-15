@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/toggle_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import '../theme/theme_provider.dart';
 
 class BlockchainNetwork {
@@ -46,6 +47,7 @@ class BlockchainSettingsPage extends StatefulWidget {
 
 class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   List<String>? _bip39List;
+  KeyPair? _keys;
 
   final TextEditingController _rpcUrlController = TextEditingController();
   final List<EVMNetwork> _evmNetworks = [
@@ -102,14 +104,16 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
+    final keys = args?['keys'] as KeyPair?;
 
-    if (bip39 == null) {
+    if (bip39 == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+        Navigator.of(context).pushReplacementNamed('/initial');
       });
     } else {
       setState(() {
         _bip39List = bip39;
+        _keys = keys;
       });
     }
   }
@@ -240,6 +244,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                         Navigator.of(context)
                             .pushNamed('/cipher_setup', arguments: {
                           'bip39': _bip39List,
+                          'keys': _keys,
                           'codes': codes,
                         });
                       },

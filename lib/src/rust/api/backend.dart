@@ -63,6 +63,23 @@ Future<(String, String)> addBip39Wallet(
         netCodes: netCodes,
         identifiers: identifiers);
 
+Future<(String, String)> addSkWallet(
+        {required String sk,
+        required String password,
+        required String accountName,
+        required String walletName,
+        required String biometricType,
+        required List<String> identifiers,
+        required Uint64List netCodes}) =>
+    RustLib.instance.api.crateApiBackendAddSkWallet(
+        sk: sk,
+        password: password,
+        accountName: accountName,
+        walletName: walletName,
+        biometricType: biometricType,
+        identifiers: identifiers,
+        netCodes: netCodes);
+
 Future<(String, String)> addLedgerZilliqaWallet(
         {required String pubKey,
         required BigInt walletIndex,

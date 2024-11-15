@@ -13,6 +13,7 @@ import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 import '../theme/theme_provider.dart';
 
@@ -27,6 +28,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<String>? _bip39List;
   List<int>? _codes;
   int? _cipher;
+  KeyPair? _keys;
 
   final AuthService _authService = AuthService();
   late AuthGuard _authGuard;
@@ -58,16 +60,18 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final codes = args?['codes'] as List<int>?;
     final int? cipher = args?['cipher'];
+    final keys = args?['keys'] as KeyPair?;
 
-    if (bip39 == null || codes == null || cipher == null) {
+    if (bip39 == null && codes == null && cipher == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        Navigator.of(context).pushReplacementNamed('/gen_bip39');
+        Navigator.of(context).pushReplacementNamed('/initial');
       });
     } else {
       setState(() {
         _bip39List = bip39;
         _codes = codes;
         _cipher = cipher;
+        _keys = keys;
       });
     }
   }
@@ -180,16 +184,20 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         biometricType = _authMethods[0];
       }
 
-      (String, String) session = await addBip39Wallet(
-        password: _passwordController.text,
-        mnemonicStr: _bip39List!.join(' '),
-        indexes: accountsIndexes,
-        passphrase: "", // TODO: maybe make it
-        walletName: _walletNameController.text,
-        biometricType: biometricType.name,
-        netCodes: networkIndexes,
-        identifiers: identifiers,
-      );
+      (String, String) session;
+
+      if (_bip39List != null) {
+        session = await addBip39Wallet(
+          password: _passwordController.text,
+          mnemonicStr: _bip39List!.join(' '),
+          indexes: accountsIndexes,
+          passphrase: "", // TODO: maybe make it
+          walletName: _walletNameController.text,
+          biometricType: biometricType.name,
+          netCodes: networkIndexes,
+          identifiers: identifiers,
+        );
+      } else if (_keys != null) {}
 
       if (_useDeviceAuth) {
         await _authGuard.setSession(session.$2, session.$1);
