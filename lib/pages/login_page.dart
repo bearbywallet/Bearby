@@ -120,8 +120,6 @@ class _LoginPage extends State<LoginPage> {
         }
       }
     } catch (e) {
-      print("try unlock with biometric $e");
-
       _btnController.error();
 
       Timer(const Duration(seconds: 1), () {
@@ -162,8 +160,6 @@ class _LoginPage extends State<LoginPage> {
         }
       }
     } catch (e) {
-      print("try unlock with password $e");
-
       if (passwordController.text.isNotEmpty) {
         _passwordInputKey.currentState?.shake();
       } else {

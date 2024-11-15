@@ -160,6 +160,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  KeyPair dco_decode_key_pair(dynamic raw);
+
+  @protected
   List<Account>
       dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
           dynamic raw);
@@ -305,6 +308,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   bool sse_decode_bool(SseDeserializer deserializer);
+
+  @protected
+  KeyPair sse_decode_key_pair(SseDeserializer deserializer);
 
   @protected
   List<Account>
@@ -458,6 +464,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_key_pair(KeyPair self, SseSerializer serializer);
 
   @protected
   void

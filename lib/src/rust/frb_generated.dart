@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.5.1';
 
   @override
-  int get rustContentHash => -1482053728;
+  int get rustContentHash => -601645494;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -194,6 +194,8 @@ abstract class RustLibApi extends BaseApi {
       required List<String> identifiers});
 
   Future<String> crateApiMethodsGenBip39Words({required int count});
+
+  Future<KeyPair> crateApiMethodsGenKeypair();
 
   Future<void> crateApiMethodsInitApp();
 
@@ -1278,12 +1280,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiMethodsInitApp() {
+  Future<KeyPair> crateApiMethodsGenKeypair() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 36, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_key_pair,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiMethodsGenKeypairConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiMethodsGenKeypairConstMeta => const TaskConstMeta(
+        debugName: "gen_keypair",
+        argNames: [],
+      );
+
+  @override
+  Future<void> crateApiMethodsInitApp() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 37, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1538,6 +1563,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
+  }
+
+  @protected
+  KeyPair dco_decode_key_pair(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return KeyPair(
+      sk: dco_decode_String(arr[0]),
+      pk: dco_decode_String(arr[1]),
+    );
   }
 
   @protected
@@ -1822,6 +1859,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  KeyPair sse_decode_key_pair(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sk = sse_decode_String(deserializer);
+    var var_pk = sse_decode_String(deserializer);
+    return KeyPair(sk: var_sk, pk: var_pk);
   }
 
   @protected
@@ -2146,6 +2191,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_key_pair(KeyPair self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sk, serializer);
+    sse_encode_String(self.pk, serializer);
   }
 
   @protected

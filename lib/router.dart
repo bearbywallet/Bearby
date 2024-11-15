@@ -4,6 +4,7 @@ import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
+import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
 
 import 'services/auth_guard.dart';
@@ -49,6 +50,7 @@ class AppRouter {
       '/cipher_setup',
       '/net_setup',
       '/gen_bip39',
+      '/gen_sk',
       '/verify_bip39',
       '/restore_options',
       '/gen_options',
@@ -82,6 +84,8 @@ class AppRouter {
             return wrapWithProviders(const BlockchainSettingsPage());
           case '/gen_bip39':
             return wrapWithProviders(const SecretPhraseGeneratorPage());
+          case '/gen_sk':
+            return wrapWithProviders(const SecretKeyGeneratorPage());
           case '/verify_bip39':
             return wrapWithProviders(const SecretPhraseVerifyPage());
           case '/restore_options':
@@ -112,6 +116,8 @@ class AppRouter {
             return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
             return wrapWithProviders(const BlockchainSettingsPage());
+          case '/gen_sk':
+            return wrapWithProviders(const SecretKeyGeneratorPage());
           case '/gen_bip39':
             return wrapWithProviders(const SecretPhraseGeneratorPage());
           case '/verify_bip39':
@@ -148,6 +154,8 @@ class AppRouter {
         return wrapWithProviders(const CipherSettingsPage());
       case '/net_setup':
         return wrapWithProviders(const BlockchainSettingsPage());
+      case '/gen_sk':
+        return wrapWithProviders(const SecretKeyGeneratorPage());
       case '/gen_bip39':
         return wrapWithProviders(const SecretPhraseGeneratorPage());
       case '/verify_bip39':

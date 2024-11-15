@@ -67,7 +67,9 @@ class GenWalletOptionsPage extends StatelessWidget {
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {/* Handle private key generation */},
+                onTap: () {
+                  Navigator.of(context).pushNamed('/gen_sk');
+                },
               ),
             ],
           ),
