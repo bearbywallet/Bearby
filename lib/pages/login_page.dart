@@ -72,7 +72,7 @@ class _LoginPage extends State<LoginPage> {
 
     try {
       // if Ledger device
-      if (wallet.walletType == 0) {
+      if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
         _authGuard.setEnabled(true);
         toHome();
         return;
@@ -135,7 +135,8 @@ class _LoginPage extends State<LoginPage> {
 
     try {
       // if Ledger device
-      if (wallet.walletType == 0) {
+      if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
+        _authGuard.setEnabled(true);
         toHome();
         return;
       }
