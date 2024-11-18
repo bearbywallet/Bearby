@@ -211,7 +211,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           passphrase: "", // TODO: maybe make it
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
-          netCodes: networkIndexes,
+          networks: networkIndexes,
           identifiers: identifiers,
         );
       } else if (_keys != null) {
@@ -219,9 +219,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           sk: _keys!.sk,
           password: _passwordController.text,
           walletName: _walletNameController.text,
-          accountName: "Key 0",
+          accountName: "Key 0", // TODO: maybe make it in modal
           biometricType: biometricType.name,
-          netCodes: networkIndexes,
+          networks: networkIndexes,
           identifiers: identifiers,
         );
       } else {

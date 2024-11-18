@@ -4,8 +4,8 @@ use std::sync::Arc;
 use tokio::sync::RwLock;
 use zilpay::config::key::SECRET_KEY_SIZE;
 
-pub use zilpay::background::SKParams;
-pub use zilpay::background::{Background, Bip39Params};
+pub use zilpay::background::BackgroundSKParams;
+pub use zilpay::background::{Background, BackgroundBip39Params};
 pub use zilpay::config::key::PUB_KEY_SIZE;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
 pub use zilpay::proto::pubkey::PubKey;
@@ -225,17 +225,18 @@ pub async fn add_bip39_wallet(
     passphrase: String,
     wallet_name: String,
     biometric_type: String,
-    _net_codes: &[usize], // TODO: add netowrk codes for wallet
+    networks: Vec<usize>,
     identifiers: &[String],
 ) -> Result<(String, String), String> {
-    // TODO: // detect by networks.
+    // TODO: // detect by networks. here need to think about zilliqa (scilla, evm)
     let derive = Bip49DerivationPath::Zilliqa;
 
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
             .add_bip39_wallet(
-                Bip39Params {
+                BackgroundBip39Params {
+                    network: networks,
                     password: &password,
                     mnemonic_str: &mnemonic_str,
                     indexes,
@@ -268,7 +269,7 @@ pub async fn add_sk_wallet(
     wallet_name: String,
     biometric_type: String,
     identifiers: &[String],
-    _net_codes: &[usize], // TODO: add netowrk codes for wallet
+    networks: Vec<usize>,
 ) -> Result<(String, String), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let secret_key: [u8; SECRET_KEY_SIZE] = hex::decode(sk)
@@ -278,7 +279,8 @@ pub async fn add_sk_wallet(
         let secret_key = SecretKey::Secp256k1Sha256Zilliqa(secret_key); // TODO: detect by network
         let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
-            .add_sk_wallet(SKParams {
+            .add_sk_wallet(BackgroundSKParams {
+                network: networks,
                 secret_key: &secret_key,
                 account_name,
                 wallet_name,
@@ -317,6 +319,7 @@ pub async fn add_ledger_zilliqa_wallet(
             .map_err(|_| "invlid pub_key".to_string())?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
         let parmas = LedgerParams {
+            networks: vec![0], // TODO: 0 means zilliqa
             pub_key: &pub_key,
             ledger_id: ledger_id.as_bytes().to_vec(),
             name: account_name,

@@ -1241,7 +1241,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
             let api_passphrase = <String>::sse_decode(&mut deserializer);
             let api_wallet_name = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
-            let api__net_codes = <Vec<usize>>::sse_decode(&mut deserializer);
+            let api_networks = <Vec<usize>>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -1254,7 +1254,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
                             api_passphrase,
                             api_wallet_name,
                             api_biometric_type,
-                            &api__net_codes,
+                            api_networks,
                             &api_identifiers,
                         )
                         .await?;
@@ -1345,7 +1345,7 @@ fn wire__crate__api__backend__add_sk_wallet_impl(
             let api_wallet_name = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api__net_codes = <Vec<usize>>::sse_decode(&mut deserializer);
+            let api_networks = <Vec<usize>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1357,7 +1357,7 @@ fn wire__crate__api__backend__add_sk_wallet_impl(
                             api_wallet_name,
                             api_biometric_type,
                             &api_identifiers,
-                            &api__net_codes,
+                            api_networks,
                         )
                         .await?;
                         Ok(output_ok)

@@ -159,7 +159,7 @@ abstract class RustLibApi extends BaseApi {
       required String passphrase,
       required String walletName,
       required String biometricType,
-      required Uint64List netCodes,
+      required Uint64List networks,
       required List<String> identifiers});
 
   Future<(String, String)> crateApiBackendAddLedgerZilliqaWallet(
@@ -178,7 +178,7 @@ abstract class RustLibApi extends BaseApi {
       required String walletName,
       required String biometricType,
       required List<String> identifiers,
-      required Uint64List netCodes});
+      required Uint64List networks});
 
   Future<BackgroundState> crateApiBackendGetData();
 
@@ -952,7 +952,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required String passphrase,
       required String walletName,
       required String biometricType,
-      required Uint64List netCodes,
+      required Uint64List networks,
       required List<String> identifiers}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -963,7 +963,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(passphrase, serializer);
         sse_encode_String(walletName, serializer);
         sse_encode_String(biometricType, serializer);
-        sse_encode_list_prim_usize_strict(netCodes, serializer);
+        sse_encode_list_prim_usize_strict(networks, serializer);
         sse_encode_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 25, port: port_);
@@ -980,7 +980,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         passphrase,
         walletName,
         biometricType,
-        netCodes,
+        networks,
         identifiers
       ],
       apiImpl: this,
@@ -997,7 +997,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "passphrase",
           "walletName",
           "biometricType",
-          "netCodes",
+          "networks",
           "identifiers"
         ],
       );
@@ -1064,7 +1064,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required String walletName,
       required String biometricType,
       required List<String> identifiers,
-      required Uint64List netCodes}) {
+      required Uint64List networks}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1074,7 +1074,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(walletName, serializer);
         sse_encode_String(biometricType, serializer);
         sse_encode_list_String(identifiers, serializer);
-        sse_encode_list_prim_usize_strict(netCodes, serializer);
+        sse_encode_list_prim_usize_strict(networks, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 27, port: port_);
       },
@@ -1090,7 +1090,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         walletName,
         biometricType,
         identifiers,
-        netCodes
+        networks
       ],
       apiImpl: this,
     ));
@@ -1105,7 +1105,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "walletName",
           "biometricType",
           "identifiers",
-          "netCodes"
+          "networks"
         ],
       );
 

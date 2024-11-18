@@ -795,6 +795,7 @@ dependencies = [
  "config",
  "crypto",
  "hex",
+ "network",
  "proto",
  "rand 0.8.5",
  "rand_chacha 0.3.1",
@@ -2288,6 +2289,14 @@ dependencies = [
  "security-framework",
  "security-framework-sys",
  "tempfile",
+]
+
+[[package]]
+name = "network"
+version = "0.1.0"
+dependencies = [
+ "zil_errors",
+ "zilliqa",
 ]
 
 [[package]]
@@ -4330,6 +4339,21 @@ version = "0.1.0"
 dependencies = [
  "ntrulp",
  "thiserror",
+]
+
+[[package]]
+name = "zilliqa"
+version = "0.1.0"
+dependencies = [
+ "config",
+ "crypto",
+ "hex",
+ "proto",
+ "reqwest 0.11.27",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zil_errors",
 ]
 
 [[package]]
