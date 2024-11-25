@@ -31,6 +31,7 @@ class _MainPageState extends State<MainPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      extendBody: true,
       body: _pages.elementAt(_selectedIndex),
       bottomNavigationBar: CustomBottomNavigationBar(
         items: [

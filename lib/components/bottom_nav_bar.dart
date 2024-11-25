@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import '../theme/theme_provider.dart';
+import 'dart:ui';
 
 class CustomBottomNavigationBar extends StatelessWidget {
   final List<CustomBottomNavigationBarItem> items;
@@ -19,32 +20,39 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
-    return Container(
-      height: 80,
-      color: theme.background,
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceAround,
-        children: items.asMap().entries.map((entry) {
-          int index = entry.key;
-          CustomBottomNavigationBarItem item = entry.value;
-          return Expanded(
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTap: () => onTap(index),
-              child: Container(
-                color: Colors.transparent,
-                child: SvgPicture.asset(
-                  item.iconPath,
-                  color: index == currentIndex
-                      ? theme.primaryPurple
-                      : theme.textSecondary,
-                  width: 40,
-                  height: 40,
+    return ClipRect(
+      child: BackdropFilter(
+        filter: ImageFilter.blur(
+          sigmaX: 10.0,
+          sigmaY: 10.0,
+        ),
+        child: Container(
+          height: 80,
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceAround,
+            children: items.asMap().entries.map((entry) {
+              int index = entry.key;
+              CustomBottomNavigationBarItem item = entry.value;
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () => onTap(index),
+                  child: Container(
+                    color: Colors.transparent,
+                    child: SvgPicture.asset(
+                      item.iconPath,
+                      color: index == currentIndex
+                          ? theme.primaryPurple
+                          : theme.textSecondary,
+                      width: 40,
+                      height: 40,
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        }).toList(),
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }
