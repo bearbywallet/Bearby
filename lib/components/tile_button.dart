@@ -25,6 +25,7 @@ class _TileButtonState extends State<TileButton>
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
   late Animation<double> _opacityAnimation;
+  bool _isHovered = false;
 
   @override
   void initState() {
@@ -36,10 +37,10 @@ class _TileButtonState extends State<TileButton>
 
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.95,
+      end: 0.97,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOut,
     ));
 
     _opacityAnimation = Tween<double>(
@@ -57,58 +58,80 @@ class _TileButtonState extends State<TileButton>
     super.dispose();
   }
 
-  Future<void> _handleTapDown(TapDownDetails details) async {
-    await _controller.forward();
+  void _handleTapDown(TapDownDetails details) {
+    _controller.forward();
   }
 
-  Future<void> _handleTapUp(TapUpDetails details) async {
-    await _controller.reverse();
+  void _handleTapUp(TapUpDetails details) {
+    _controller.reverse();
     widget.onPressed();
   }
 
-  Future<void> _handleTapCancel() async {
-    await _controller.reverse();
+  void _handleTapCancel() {
+    _controller.reverse();
+  }
+
+  void _handleHoverChanged(bool isHovered) {
+    setState(() {
+      _isHovered = isHovered;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: _handleTapDown,
-      onTapUp: _handleTapUp,
-      onTapCancel: _handleTapCancel,
-      child: AnimatedBuilder(
-        animation: _controller,
-        builder: (context, child) {
-          return Transform.scale(
-            scale: _scaleAnimation.value,
-            child: Opacity(
-              opacity: _opacityAnimation.value,
-              child: Container(
-                width: 80,
-                height: 80,
-                decoration: BoxDecoration(
-                  color: widget.backgroundColor,
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    widget.icon,
-                    const SizedBox(height: 8),
-                    Text(
-                      widget.title,
-                      style: TextStyle(
-                        color: widget.textColor,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
+    return MouseRegion(
+      onEnter: (_) => _handleHoverChanged(true),
+      onExit: (_) => _handleHoverChanged(false),
+      child: GestureDetector(
+        onTapDown: _handleTapDown,
+        onTapUp: _handleTapUp,
+        onTapCancel: _handleTapCancel,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Opacity(
+                opacity: _opacityAnimation.value,
+                child: Container(
+                  width: 72,
+                  height: 72,
+                  decoration: BoxDecoration(
+                    color: widget.backgroundColor,
+                    borderRadius: BorderRadius.circular(24),
+                    boxShadow: [
+                      if (_isHovered)
+                        BoxShadow(
+                          color: widget.textColor.withOpacity(0.1),
+                          blurRadius: 8,
+                          spreadRadius: 1,
+                        ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      SizedBox(
+                        width: 32,
+                        height: 32,
+                        child: widget.icon,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.title,
+                        style: TextStyle(
+                          color: widget.textColor,
+                          fontSize: 11,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
     );
   }
