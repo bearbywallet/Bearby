@@ -45,6 +45,8 @@ class AppRouter {
       );
     }
 
+    return wrapWithProviders(const MainPage());
+
     final List<String> setupRoutes = [
       '/pass_setup',
       '/cipher_setup',

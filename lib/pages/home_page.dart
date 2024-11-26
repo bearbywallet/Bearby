@@ -1,3 +1,4 @@
+import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -16,6 +17,15 @@ class _HomePageState extends State<HomePage> {
   Future<void> _refreshData() async {
     await Future.delayed(const Duration(seconds: 2));
     print('Data refreshed');
+  }
+
+  Color _getWalletColor(int index) {
+    final colors = [
+      const Color(0xFF55A2F2),
+      const Color(0xFFFFB347),
+      const Color(0xFF4ECFB0),
+    ];
+    return colors[index % colors.length];
   }
 
   @override
@@ -37,13 +47,18 @@ class _HomePageState extends State<HomePage> {
                       height: 32,
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
-                        color: theme.primaryPurple.withOpacity(0.1),
+                        border: Border.all(
+                          color: theme.primaryPurple.withOpacity(0.1),
+                          width: 2,
+                        ),
                       ),
-                      child: Center(
-                        child: Icon(
-                          Icons.account_balance_wallet,
-                          color: theme.primaryPurple,
-                          size: 20,
+                      child: ClipOval(
+                        child: Blockies(
+                          seed: "dasdsadsadsa",
+                          color: _getWalletColor(0),
+                          bgColor: theme.primaryPurple,
+                          spotColor: theme.background,
+                          size: 8,
                         ),
                       ),
                     ),
