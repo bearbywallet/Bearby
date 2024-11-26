@@ -2,10 +2,9 @@ import 'package:flutter/widgets.dart';
 
 class TileButton extends StatefulWidget {
   final String title;
-  final IconData icon;
+  final Widget icon;
   final VoidCallback onPressed;
   final Color backgroundColor;
-  final Color iconColor;
   final Color textColor;
 
   const TileButton({
@@ -13,9 +12,8 @@ class TileButton extends StatefulWidget {
     required this.title,
     required this.icon,
     required this.onPressed,
-    this.backgroundColor = const Color(0xFF2C2C2E), // Dark mode style default
-    this.iconColor = const Color(0xFF9D4BFF), // Purple default
-    this.textColor = const Color(0xFF9D4BFF), // Purple default
+    this.backgroundColor = const Color(0xFF2C2C2E),
+    this.textColor = const Color(0xFF9D4BFF),
   });
 
   @override
@@ -86,30 +84,23 @@ class _TileButtonState extends State<TileButton>
             child: Opacity(
               opacity: _opacityAnimation.value,
               child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 24,
-                  vertical: 12,
-                ),
+                width: 80,
+                height: 80,
                 decoration: BoxDecoration(
                   color: widget.backgroundColor,
-                  borderRadius: BorderRadius.circular(12),
+                  borderRadius: BorderRadius.circular(16),
                 ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
+                child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Icon(
-                      widget.icon,
-                      color: widget.iconColor,
-                      size: 20,
-                    ),
-                    const SizedBox(width: 8),
+                    widget.icon,
+                    const SizedBox(height: 8),
                     Text(
                       widget.title,
                       style: TextStyle(
                         color: widget.textColor,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
                       ),
                     ),
                   ],
