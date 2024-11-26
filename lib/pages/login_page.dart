@@ -103,14 +103,15 @@ class _LoginPage extends State<LoginPage> {
         List<String> identifiers = await device.getDeviceIdentifiers();
 
         bool unlocked = await tryUnlockWithSession(
-            sessionCipher: session,
-            walletIndex: BigInt.from(index),
-            identifiers: identifiers);
+          sessionCipher: session,
+          walletIndex: BigInt.from(index),
+          identifiers: identifiers,
+        );
 
         if (unlocked) {
-          _btnController.success();
-
-          toHome();
+          _btnController.reset();
+          _authGuard.setEnabled(true);
+          return toHome();
         } else {
           _btnController.error();
 
@@ -144,12 +145,14 @@ class _LoginPage extends State<LoginPage> {
         List<String> identifiers = await device.getDeviceIdentifiers();
 
         bool unlocked = await tryUnlockWithPassword(
-            password: passwordController.text,
-            walletIndex: BigInt.from(sellectedWallet),
-            identifiers: identifiers);
+          password: passwordController.text,
+          walletIndex: BigInt.from(sellectedWallet),
+          identifiers: identifiers,
+        );
 
         if (unlocked) {
-          _btnController.success();
+          _btnController.reset();
+          _authGuard.setEnabled(true);
 
           return toHome();
         } else {
