@@ -229,24 +229,31 @@ class _HomePageState extends State<HomePage> {
                       child: Column(
                         children: [
                           TokenCard(
-                            tokenAmount: 1234.56,
-                            convertAmount: 100,
+                            tokenAmount: 5437854356.654674,
+                            tokenAddr:
+                                "0x5ab3e1128c6f2ed0f62efc4e26d93f82ef50134e",
+                            convertAmount: 100000,
                             tokenName: "Zilliqa",
                             tokenSymbol: "ZIL",
+                            onTap: () => {print("works")},
                             iconUrl:
                                 "https://cryptologos.cc/logos/zilliqa-zil-logo.png",
                           ),
                           TokenCard(
-                            tokenAmount: 100.0,
-                            convertAmount: 100,
+                            tokenAmount: 549,
+                            tokenAddr:
+                                "0x7c8a02b6fcbd46aa10d8e9b6f9d947d45a2d784a",
+                            convertAmount: 549,
                             tokenName: "ZilPay USD",
                             tokenSymbol: "ZPUSD",
                             iconUrl:
                                 "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
                           ),
                           TokenCard(
-                            tokenAmount: 0.5,
-                            convertAmount: 100,
+                            tokenAmount: 1.5,
+                            tokenAddr:
+                                "0x28f8a18f3a64dc5eeb02fd4627234d6c99c0f154",
+                            convertAmount: 2000000,
                             tokenName: "Bitcoin",
                             tokenSymbol: "BTC",
                             iconUrl:
@@ -254,6 +261,8 @@ class _HomePageState extends State<HomePage> {
                           ),
                           TokenCard(
                             convertAmount: 100,
+                            tokenAddr:
+                                "0x4df7b47293424586f109c51fa127a8ec3219847d",
                             tokenAmount: 0.5,
                             tokenName: "GRIN coin",
                             tokenSymbol: "GRIN",
@@ -262,12 +271,25 @@ class _HomePageState extends State<HomePage> {
                           ),
                           TokenCard(
                             tokenAmount: 0.5,
+                            tokenAddr:
+                                "0x91e3d4bf3e27e98502d79d5c63c96e038ee8cd44",
                             convertAmount: 100,
                             tokenName: "GogeCoin",
                             tokenSymbol: "DOGE",
                             showDivider: false,
                             iconUrl:
                                 "https://cryptologos.cc/logos/dogecoin-doge-logo.png?v=002",
+                          ),
+                          TokenCard(
+                            tokenAmount: 0.5,
+                            convertAmount: 100,
+                            tokenAddr:
+                                "0x91e34bf3e27898502d70d5c63c96e038ee8cd44",
+                            tokenName: "None",
+                            tokenSymbol: "None",
+                            showDivider: false,
+                            iconUrl:
+                                "https://cryptologos.cc/logos/dogecoin-gfdjkghfdjk-logo.png?v=002",
                           ),
                         ],
                       ),
