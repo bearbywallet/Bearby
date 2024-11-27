@@ -8,6 +8,7 @@ class HoverSvgIcon extends StatefulWidget {
   final double width;
   final double height;
   final VoidCallback onTap;
+  final Color? color;
 
   const HoverSvgIcon({
     super.key,
@@ -15,6 +16,7 @@ class HoverSvgIcon extends StatefulWidget {
     required this.width,
     required this.height,
     required this.onTap,
+    this.color,
   });
 
   @override
@@ -27,6 +29,7 @@ class _HoverSvgIconState extends State<HoverSvgIcon> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final iconColor = widget.color ?? theme.textPrimary;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -39,7 +42,10 @@ class _HoverSvgIconState extends State<HoverSvgIcon> {
           widget.assetName,
           width: widget.width,
           height: widget.height,
-          color: theme.textPrimary,
+          colorFilter: ColorFilter.mode(
+            iconColor,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );

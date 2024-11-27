@@ -8,6 +8,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/wallet_option.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -50,15 +51,6 @@ class _LoginPage extends State<LoginPage> {
     _btnController.dispose();
 
     super.dispose();
-  }
-
-  Color _getWalletColor(int index) {
-    final colors = [
-      const Color(0xFF55A2F2),
-      const Color(0xFFFFB347),
-      const Color(0xFF4ECFB0),
-    ];
-    return colors[index % colors.length];
   }
 
   void toHome() {
@@ -285,7 +277,7 @@ class _LoginPage extends State<LoginPage> {
                                 padding: const EdgeInsets.all(4),
                                 child: Blockies(
                                   seed: wallet.walletAddress,
-                                  color: _getWalletColor(index),
+                                  color: getWalletColor(index),
                                   bgColor: theme.primaryPurple,
                                   spotColor: theme.background,
                                   size: 8,

@@ -1,7 +1,7 @@
 import 'package:flutter/widgets.dart';
 
 class TileButton extends StatefulWidget {
-  final String title;
+  final String? title;
   final Widget icon;
   final VoidCallback onPressed;
   final Color backgroundColor;
@@ -9,9 +9,9 @@ class TileButton extends StatefulWidget {
 
   const TileButton({
     super.key,
-    required this.title,
     required this.icon,
     required this.onPressed,
+    this.title,
     this.backgroundColor = const Color(0xFF2C2C2E),
     this.textColor = const Color(0xFF9D4BFF),
   });
@@ -79,6 +79,11 @@ class _TileButtonState extends State<TileButton>
 
   @override
   Widget build(BuildContext context) {
+    final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
+    final double containerSize = hasTitle ? 72.0 : 56.0;
+    final double iconSize = hasTitle ? 32.0 : 24.0;
+    final double borderRadius = hasTitle ? 24.0 : 20.0;
+
     return MouseRegion(
       onEnter: (_) => _handleHoverChanged(true),
       onExit: (_) => _handleHoverChanged(false),
@@ -94,11 +99,11 @@ class _TileButtonState extends State<TileButton>
               child: Opacity(
                 opacity: _opacityAnimation.value,
                 child: Container(
-                  width: 72,
-                  height: 72,
+                  width: containerSize,
+                  height: containerSize,
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
-                    borderRadius: BorderRadius.circular(24),
+                    borderRadius: BorderRadius.circular(borderRadius),
                     boxShadow: [
                       if (_isHovered)
                         BoxShadow(
@@ -112,19 +117,21 @@ class _TileButtonState extends State<TileButton>
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       SizedBox(
-                        width: 32,
-                        height: 32,
+                        width: iconSize,
+                        height: iconSize,
                         child: widget.icon,
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        widget.title,
-                        style: TextStyle(
-                          color: widget.textColor,
-                          fontSize: 11,
-                          fontWeight: FontWeight.w500,
+                      if (hasTitle) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          widget.title!,
+                          style: TextStyle(
+                            color: widget.textColor,
+                            fontSize: 11,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
-                      ),
+                      ],
                     ],
                   ),
                 ),

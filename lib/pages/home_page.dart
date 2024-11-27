@@ -1,9 +1,12 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/tile_button.dart';
+import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/colors.dart';
 import '../theme/theme_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -20,20 +23,12 @@ class _HomePageState extends State<HomePage> {
     print('Data refreshed');
   }
 
-  Color _getWalletColor(int index) {
-    final colors = [
-      const Color(0xFF55A2F2),
-      const Color(0xFFFFB347),
-      const Color(0xFF4ECFB0),
-    ];
-    return colors[index % colors.length];
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    const testAddress = "0x22d9...a1cD"; // Replace with actual address
+    final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
+    const testAddress = "0x22d9...a1cD";
 
     return SafeArea(
       child: Center(
@@ -43,7 +38,7 @@ class _HomePageState extends State<HomePage> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding,
+                  horizontal: 16,
                   vertical: 12,
                 ),
                 child: Row(
@@ -67,7 +62,7 @@ class _HomePageState extends State<HomePage> {
                             child: ClipOval(
                               child: Blockies(
                                 seed: "dasdsadsadsa",
-                                color: _getWalletColor(0),
+                                color: getWalletColor(0),
                                 bgColor: theme.primaryPurple,
                                 spotColor: theme.background,
                                 size: 8,
@@ -86,47 +81,8 @@ class _HomePageState extends State<HomePage> {
                                 ),
                               ),
                               const SizedBox(width: 8),
-                              MouseRegion(
-                                cursor: SystemMouseCursors.click,
-                                child: GestureDetector(
-                                  onTap: () {
-                                    // Copy address functionality
-                                    print('Copy address');
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color:
-                                          theme.textSecondary.withOpacity(0.1),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Text(
-                                          testAddress,
-                                          style: TextStyle(
-                                            color: theme.textSecondary,
-                                            fontSize: 14,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        SvgPicture.asset(
-                                          'assets/icons/copy.svg',
-                                          width: 14,
-                                          height: 14,
-                                          colorFilter: ColorFilter.mode(
-                                            theme.textSecondary,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
+                              CopyAddressButton(
+                                address: testAddress,
                               ),
                             ],
                           ),
@@ -137,6 +93,7 @@ class _HomePageState extends State<HomePage> {
                       assetName: 'assets/icons/gear.svg',
                       width: 30,
                       height: 30,
+                      color: theme.textPrimary,
                       onTap: () {
                         print('Settings tapped');
                       },
@@ -150,7 +107,6 @@ class _HomePageState extends State<HomePage> {
                 child: Row(
                   children: [
                     TileButton(
-                      title: 'Send',
                       icon: SvgPicture.asset(
                         "assets/icons/send.svg",
                         width: 24,
@@ -164,9 +120,8 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: theme.cardBackground,
                       textColor: theme.primaryPurple,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: adaptivePaddingCard),
                     TileButton(
-                      title: 'Receive',
                       icon: SvgPicture.asset(
                         "assets/icons/receive.svg",
                         width: 24,
@@ -180,9 +135,8 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: theme.cardBackground,
                       textColor: theme.primaryPurple,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: adaptivePaddingCard),
                     TileButton(
-                      title: 'Swap',
                       icon: SvgPicture.asset(
                         "assets/icons/swap.svg",
                         width: 24,
@@ -196,9 +150,8 @@ class _HomePageState extends State<HomePage> {
                       backgroundColor: theme.cardBackground,
                       textColor: theme.primaryPurple,
                     ),
-                    const SizedBox(width: 12),
+                    SizedBox(width: adaptivePaddingCard),
                     TileButton(
-                      title: 'Buy',
                       icon: SvgPicture.asset(
                         "assets/icons/buy.svg",
                         width: 24,
@@ -211,6 +164,71 @@ class _HomePageState extends State<HomePage> {
                       onPressed: () {},
                       backgroundColor: theme.cardBackground,
                       textColor: theme.primaryPurple,
+                    ),
+                    SizedBox(width: adaptivePaddingCard),
+                    TileButton(
+                      icon: SvgPicture.asset(
+                        "assets/icons/sell.svg",
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          theme.primaryPurple,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: () {},
+                      backgroundColor: theme.cardBackground,
+                      textColor: theme.primaryPurple,
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: adaptivePadding, vertical: 16),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    HoverSvgIcon(
+                      assetName: 'assets/icons/manage.svg',
+                      width: 30,
+                      height: 30,
+                      color: theme.textSecondary,
+                      onTap: () {
+                        print('tokens manage');
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Expanded(
+                child: ListView(
+                  padding: EdgeInsets.all(adaptivePadding),
+                  children: [
+                    TokenCard(
+                      tokenAmount: 1234.56,
+                      dollarAmount: 2345.67,
+                      tokenName: "Zilliqa",
+                      tokenSymbol: "ZIL",
+                      iconUrl:
+                          "https://cryptologos.cc/logos/zilliqa-zil-logo.png",
+                    ),
+                    SizedBox(height: 12),
+                    TokenCard(
+                      tokenAmount: 100.0,
+                      dollarAmount: 100.0,
+                      tokenName: "ZilPay USD",
+                      tokenSymbol: "ZPUSD",
+                      iconUrl:
+                          "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
+                    ),
+                    SizedBox(height: 12),
+                    TokenCard(
+                      tokenAmount: 0.5,
+                      dollarAmount: 15.75,
+                      tokenName: "gZIL",
+                      tokenSymbol: "GZIL",
+                      iconUrl: "https://zilswap.org/img/gzil.png",
                     ),
                   ],
                 ),
