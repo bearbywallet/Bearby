@@ -25,7 +25,7 @@ class DarkTheme implements AppTheme {
   @override
   Color get background => const Color(0xFF1A1A1A);
   @override
-  Color get cardBackground => const Color(0xFF2A2A2A);
+  Color get cardBackground => const Color(0xFF0D1117);
   @override
   Color get textPrimary => Colors.white;
   @override
