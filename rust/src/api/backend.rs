@@ -2,17 +2,19 @@ use crate::frb_generated::StreamSink;
 use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use zilpay::config::key::SECRET_KEY_SIZE;
+use zilpay::proto::address::Address;
 
 pub use zilpay::background::BackgroundSKParams;
 pub use zilpay::background::{Background, BackgroundBip39Params};
 pub use zilpay::config::key::PUB_KEY_SIZE;
+pub use zilpay::config::key::SECRET_KEY_SIZE;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
 pub use zilpay::proto::pubkey::PubKey;
 pub use zilpay::proto::secret_key::SecretKey;
 pub use zilpay::settings::common_settings::CommonSettings;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
+pub use zilpay::wallet::ft::FToken;
 pub use zilpay::wallet::wallet_data::AuthMethod;
 pub use zilpay::wallet::wallet_data::WalletData;
 pub use zilpay::wallet::wallet_types::WalletTypes;
@@ -297,6 +299,48 @@ pub async fn add_sk_wallet(
             .ok_or("Fail to Save wallet".to_string())?;
 
         Ok((cipher_session, wallet.data.wallet_address.clone()))
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn sync_balances(wallet_index: usize) -> Result<(String, String), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        service
+            .core
+            .sync_ftokens_balances(wallet_index)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
+    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
+        let address = Address::from_zil_base16(&addr);
+
+        if address.is_err() {
+            address = Address::from_zil_bech32(&addr);
+        }
+
+        if address.is_err() {
+            address = Address::from_eth_address(&addr);
+        }
+
+        let parsed_addr = address.map_err(|e| e.to_string())?;
+
+        let token = service
+            .core
+            .get_ftoken_meta(wallet_index, parsed_addr)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        Ok(token)
     } else {
         Err("Service is not running".to_string())
     }

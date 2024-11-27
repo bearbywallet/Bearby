@@ -10,7 +10,7 @@ abstract class AppTheme {
   Color get buttonBackground;
   Color get buttonText;
   Color get danger;
-  Color get success; // Added success color
+  Color get success;
 
   Color get gradientStart;
   Color get gradientMiddle;
@@ -23,7 +23,7 @@ class DarkTheme implements AppTheme {
   @override
   Color get secondaryPurple => const Color(0xFFB23AEE);
   @override
-  Color get background => const Color(0xFF1A1A1A);
+  Color get background => Colors.black;
   @override
   Color get cardBackground => const Color(0xFF0D1117);
   @override
