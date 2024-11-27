@@ -80,6 +80,14 @@ Future<(String, String)> addSkWallet(
         identifiers: identifiers,
         networks: networks);
 
+Future<(String, String)> syncBalances({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiBackendSyncBalances(walletIndex: walletIndex);
+
+Future<FToken> fetchTokenMeta(
+        {required String addr, required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiBackendFetchTokenMeta(addr: addr, walletIndex: walletIndex);
+
 Future<(String, String)> addLedgerZilliqaWallet(
         {required String pubKey,
         required BigInt walletIndex,
@@ -110,6 +118,9 @@ abstract class BackgroundState implements RustOpaqueInterface {
 
   set wallets(List<WalletInfo> wallets);
 }
+
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
+abstract class FToken implements RustOpaqueInterface {}
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
 abstract class Serivce implements RustOpaqueInterface {
