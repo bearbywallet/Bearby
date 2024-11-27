@@ -55,6 +55,7 @@ pub struct WalletInfo {
     pub wallet_address: String,
     pub accounts: Vec<Account>,
     pub selected_account: usize,
+    pub tokens: Vec<FToken>,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -72,6 +73,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
                 selected_account: w.data.selected_account,
+                tokens: w.ftokens.clone(),
             })
             .collect();
 
@@ -102,6 +104,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
                 selected_account: w.data.selected_account,
+                tokens: w.ftokens.clone(),
             })
             .collect();
         let state = BackgroundState {
@@ -171,6 +174,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.clone(),
                 selected_account: w.data.selected_account,
+                tokens: w.ftokens.clone(),
             })
             .collect();
         let state = BackgroundState {
@@ -305,10 +309,10 @@ pub async fn add_sk_wallet(
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn sync_balances(wallet_index: usize) -> Result<(String, String), String> {
+pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        service
-            .core
+        Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
             .sync_ftokens_balances(wallet_index)
             .await
             .map_err(|e| e.to_string())?;
@@ -322,7 +326,7 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(String, String), Stri
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let address = Address::from_zil_base16(&addr);
+        let mut address = Address::from_zil_base16(&addr);
 
         if address.is_err() {
             address = Address::from_zil_bech32(&addr);
