@@ -6,6 +6,7 @@ enum AppTheme { system, dark, light }
 class AppState extends ChangeNotifier {
   AppTheme _currentThemeMode = AppTheme.system;
   BackgroundState _state;
+  int _selectedWallet = 0;
 
   ThemeData get currentTheme {
     switch (_currentThemeMode) {
@@ -25,8 +26,21 @@ class AppState extends ChangeNotifier {
     notifyListeners();
   }
 
+  void setSelectedWallet(int index) {
+    _selectedWallet = index;
+    notifyListeners();
+  }
+
   List<WalletInfo> get wallets {
     return _state.wallets;
+  }
+
+  WalletInfo? get wallet {
+    return _state.wallets[_selectedWallet];
+  }
+
+  int get selectedWallet {
+    return _selectedWallet;
   }
 
   Future<void> syncData() async {

@@ -8,6 +8,8 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
@@ -19,9 +21,29 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  late AppState _appState;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _appState = Provider.of<AppState>(context, listen: false);
+
+    if (_appState.wallet == null) {
+      Navigator.of(context).pop();
+    }
+
+    _refreshData();
+  }
+
   Future<void> _refreshData() async {
-    await Future.delayed(const Duration(seconds: 2));
-    print('Data refreshed');
+    try {
+      BigInt index = BigInt.from(_appState.selectedWallet);
+      await syncBalances(walletIndex: index);
+      await _appState.syncData();
+    } catch (e) {
+      print("error sync balance: $e");
+    }
   }
 
   @override
@@ -29,7 +51,6 @@ class _HomePageState extends State<HomePage> {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
-    const testAddress = "0x22d9...a1cD";
 
     return SafeArea(
       child: Center(
@@ -83,7 +104,8 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   child: ClipOval(
                                     child: Blockies(
-                                      seed: "dasdsadsadsa",
+                                      seed: _appState.wallet!
+                                          .walletAddress, // TODO: replace it with account.
                                       color: getWalletColor(0),
                                       bgColor: theme.primaryPurple,
                                       spotColor: theme.background,
@@ -95,7 +117,7 @@ class _HomePageState extends State<HomePage> {
                                 Row(
                                   children: [
                                     Text(
-                                      'Wallet 1',
+                                      _appState.wallet!.walletName,
                                       style: TextStyle(
                                         color: theme.textPrimary,
                                         fontSize: 24,
@@ -104,7 +126,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     const SizedBox(width: 8),
                                     CopyAddressButton(
-                                      address: testAddress,
+                                      address: _appState.wallet!.walletAddress,
                                     ),
                                   ],
                                 ),
@@ -235,7 +257,7 @@ class _HomePageState extends State<HomePage> {
                             convertAmount: 100000,
                             tokenName: "Zilliqa",
                             tokenSymbol: "ZIL",
-                            onTap: () => {print("works")},
+                            onTap: () => {},
                             iconUrl:
                                 "https://cryptologos.cc/logos/zilliqa-zil-logo.png",
                           ),

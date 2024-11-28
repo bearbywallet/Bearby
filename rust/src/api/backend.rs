@@ -47,13 +47,37 @@ impl Serivce {
 }
 
 #[derive(Debug, Clone)]
+pub struct AccountInfo {
+    pub addr: String,
+    pub name: String,
+}
+
+impl From<Account> for AccountInfo {
+    fn from(account: Account) -> Self {
+        AccountInfo {
+            addr: account.addr.to_string(),
+            name: account.name,
+        }
+    }
+}
+
+impl From<&Account> for AccountInfo {
+    fn from(account: &Account) -> Self {
+        AccountInfo {
+            addr: account.addr.to_string(),
+            name: account.name.clone(),
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
 pub struct WalletInfo {
     pub wallet_type: u8,
     pub wallet_name: String,
     pub auth_type: String,
     pub settings: WalletSettings,
     pub wallet_address: String,
-    pub accounts: Vec<Account>,
+    pub accounts: Vec<AccountInfo>,
     pub selected_account: usize,
     pub tokens: Vec<FToken>,
 }
@@ -71,7 +95,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                 wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
-                accounts: w.data.accounts.clone(),
+                accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.clone(),
             })
@@ -102,7 +126,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
                 wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
-                accounts: w.data.accounts.clone(),
+                accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.clone(),
             })
@@ -172,7 +196,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 wallet_type: w.data.wallet_type.code(),
                 settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
-                accounts: w.data.accounts.clone(),
+                accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.clone(),
             })

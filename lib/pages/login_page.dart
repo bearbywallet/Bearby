@@ -54,6 +54,8 @@ class _LoginPage extends State<LoginPage> {
   }
 
   void toHome() {
+    _appState.setSelectedWallet(sellectedWallet);
+
     Navigator.of(context).pushNamed(
       '/',
     );

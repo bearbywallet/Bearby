@@ -110,7 +110,7 @@ abstract class RustLibApi extends BaseApi {
   void crateApiBackendSerivceAutoAccessorSetRunning(
       {required Serivce that, required bool running});
 
-  List<Account> crateApiBackendWalletInfoAutoAccessorGetAccounts(
+  List<AccountInfo> crateApiBackendWalletInfoAutoAccessorGetAccounts(
       {required WalletInfo that});
 
   String crateApiBackendWalletInfoAutoAccessorGetAuthType(
@@ -135,7 +135,7 @@ abstract class RustLibApi extends BaseApi {
       {required WalletInfo that});
 
   void crateApiBackendWalletInfoAutoAccessorSetAccounts(
-      {required WalletInfo that, required List<Account> accounts});
+      {required WalletInfo that, required List<AccountInfo> accounts});
 
   void crateApiBackendWalletInfoAutoAccessorSetAuthType(
       {required WalletInfo that, required String authType});
@@ -218,12 +218,6 @@ abstract class RustLibApi extends BaseApi {
   Future<KeyPair> crateApiMethodsGenKeypair();
 
   Future<void> crateApiMethodsInitApp();
-
-  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Account;
-
-  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Account;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_AccountPtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_ArcBackground;
@@ -569,7 +563,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  List<Account> crateApiBackendWalletInfoAutoAccessorGetAccounts(
+  List<AccountInfo> crateApiBackendWalletInfoAutoAccessorGetAccounts(
       {required WalletInfo that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -579,8 +573,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 11)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount,
+        decodeSuccessData: sse_decode_list_account_info,
         decodeErrorData: null,
       ),
       constMeta: kCrateApiBackendWalletInfoAutoAccessorGetAccountsConstMeta,
@@ -790,14 +783,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void crateApiBackendWalletInfoAutoAccessorSetAccounts(
-      {required WalletInfo that, required List<Account> accounts}) {
+      {required WalletInfo that, required List<AccountInfo> accounts}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
             that, serializer);
-        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-            accounts, serializer);
+        sse_encode_list_account_info(accounts, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 19)!;
       },
       codec: SseCodec(
@@ -1513,14 +1505,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_Account => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_Account => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount;
-
-  RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_ArcBackground => wire
           .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground;
 
@@ -1580,14 +1564,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
-  }
-
-  @protected
-  Account
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AccountImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1695,14 +1671,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Account
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return AccountImpl.frbInternalDcoDecode(raw as List<dynamic>);
-  }
-
-  @protected
   ArcBackground
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           dynamic raw) {
@@ -1771,6 +1739,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AccountInfo dco_decode_account_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return AccountInfo(
+      addr: dco_decode_String(arr[0]),
+      name: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
@@ -1786,17 +1766,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sk: dco_decode_String(arr[0]),
       pk: dco_decode_String(arr[1]),
     );
-  }
-
-  @protected
-  List<Account>
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(
-            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount)
-        .toList();
   }
 
   @protected
@@ -1825,6 +1794,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<String> dco_decode_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_String).toList();
+  }
+
+  @protected
+  List<AccountInfo> dco_decode_list_account_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_account_info).toList();
   }
 
   @protected
@@ -1881,15 +1856,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
-  }
-
-  @protected
-  Account
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return AccountImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -2010,15 +1976,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Account
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return AccountImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   ArcBackground
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           SseDeserializer deserializer) {
@@ -2096,6 +2053,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AccountInfo sse_decode_account_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_addr = sse_decode_String(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    return AccountInfo(addr: var_addr, name: var_name);
+  }
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
@@ -2107,22 +2072,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_sk = sse_decode_String(deserializer);
     var var_pk = sse_decode_String(deserializer);
     return KeyPair(sk: var_sk, pk: var_pk);
-  }
-
-  @protected
-  List<Account>
-      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <Account>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(
-          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-              deserializer));
-    }
-    return ans_;
   }
 
   @protected
@@ -2165,6 +2114,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <String>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_String(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <AccountInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_account_info(deserializer));
     }
     return ans_;
   }
@@ -2232,15 +2193,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
-  }
-
-  @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          Account self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as AccountImpl).frbInternalSseEncode(move: true), serializer);
   }
 
   @protected
@@ -2368,15 +2320,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          Account self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as AccountImpl).frbInternalSseEncode(move: null), serializer);
-  }
-
-  @protected
-  void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           ArcBackground self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2462,6 +2405,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_account_info(AccountInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.addr, serializer);
+    sse_encode_String(self.name, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
@@ -2472,18 +2422,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.sk, serializer);
     sse_encode_String(self.pk, serializer);
-  }
-
-  @protected
-  void
-      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          List<Account> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerAccount(
-          item, serializer);
-    }
   }
 
   @protected
@@ -2516,6 +2454,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_String(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_account_info(
+      List<AccountInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_account_info(item, serializer);
     }
   }
 
@@ -2576,26 +2524,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putInt32(self);
   }
-}
-
-@sealed
-class AccountImpl extends RustOpaque implements Account {
-  // Not to be used by end users
-  AccountImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  AccountImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_Account,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_Account,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_AccountPtr,
-  );
 }
 
 @sealed
@@ -2761,7 +2689,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
         RustLib.instance.api.rust_arc_decrement_strong_count_WalletInfoPtr,
   );
 
-  List<Account> get accounts =>
+  List<AccountInfo> get accounts =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorGetAccounts(
         that: this,
       );
@@ -2801,7 +2729,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
         that: this,
       );
 
-  set accounts(List<Account> accounts) =>
+  set accounts(List<AccountInfo> accounts) =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorSetAccounts(
           that: this, accounts: accounts);
 

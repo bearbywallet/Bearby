@@ -233,7 +233,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       }
 
       await _appState.syncData();
-
+      _appState.setSelectedWallet(_appState.wallets.length - 1);
       _btnController.success();
 
       Navigator.of(context).pushNamed(

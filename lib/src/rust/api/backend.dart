@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
 // These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `deref`, `fmt`, `fmt`, `initialize`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `from`, `from`, `initialize`
 
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
@@ -136,7 +136,7 @@ abstract class Serivce implements RustOpaqueInterface {
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>
 abstract class WalletInfo implements RustOpaqueInterface {
-  List<Account> get accounts;
+  List<AccountInfo> get accounts;
 
   String get authType;
 
@@ -152,7 +152,7 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   int get walletType;
 
-  set accounts(List<Account> accounts);
+  set accounts(List<AccountInfo> accounts);
 
   set authType(String authType);
 
@@ -167,4 +167,25 @@ abstract class WalletInfo implements RustOpaqueInterface {
   set walletName(String walletName);
 
   set walletType(int walletType);
+}
+
+class AccountInfo {
+  final String addr;
+  final String name;
+
+  const AccountInfo({
+    required this.addr,
+    required this.name,
+  });
+
+  @override
+  int get hashCode => addr.hashCode ^ name.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AccountInfo &&
+          runtimeType == other.runtimeType &&
+          addr == other.addr &&
+          name == other.name;
 }
