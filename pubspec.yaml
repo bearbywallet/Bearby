@@ -48,6 +48,7 @@ dependencies:
   ledger_flutter: ^1.0.1
   permission_handler: ^11.3.1
   zilliqa_ledger_flutter: ^0.0.4
+  http: ^1.2.2
 
 dev_dependencies:
   flutter_test:

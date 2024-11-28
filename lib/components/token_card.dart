@@ -1,10 +1,13 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import '../theme/theme_provider.dart';
+import 'package:http/http.dart' as http;
 
+// TODO: make a cache image loading! remove http
 class TokenCard extends StatefulWidget {
   final double tokenAmount;
   final double convertAmount;
@@ -36,6 +39,113 @@ class TokenCard extends StatefulWidget {
 class _TokenCardState extends State<TokenCard> {
   bool isHovered = false;
   bool isPressed = false;
+  String? contentType;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkImageType();
+  }
+
+  Future<void> _checkImageType() async {
+    setState(() => isLoading = true);
+    try {
+      final response = await http.head(Uri.parse(widget.iconUrl));
+      if (mounted) {
+        setState(() {
+          contentType = response.headers['content-type'];
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          contentType = null;
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Widget _buildIcon(ThemeProvider themeProvider) {
+    if (isLoading) {
+      return SizedBox(
+        width: 32,
+        height: 32,
+        child: Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        ),
+      );
+    }
+
+    if (contentType?.contains('svg') ?? false) {
+      return SvgPicture.network(
+        widget.iconUrl,
+        width: 32,
+        height: 32,
+        placeholderBuilder: (context) => SizedBox(
+          width: 32,
+          height: 32,
+          child: Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+            ),
+          ),
+        ),
+      );
+    }
+
+    return Image.network(
+      widget.iconUrl,
+      width: 32,
+      height: 32,
+      fit: BoxFit.contain,
+      headers: const {
+        'Accept': 'image/jpeg,image/png,image/svg+xml,image/*,*/*;q=0.8',
+      },
+      loadingBuilder: (context, child, loadingProgress) {
+        if (loadingProgress == null) return child;
+        return SizedBox(
+          width: 32,
+          height: 32,
+          child: Center(
+            child: CircularProgressIndicator(
+              value: loadingProgress.expectedTotalBytes != null
+                  ? loadingProgress.cumulativeBytesLoaded /
+                      (loadingProgress.expectedTotalBytes ?? 1)
+                  : null,
+              strokeWidth: 2,
+            ),
+          ),
+        );
+      },
+      errorBuilder: (context, error, stackTrace) {
+        return Container(
+          width: 32,
+          height: 32,
+          decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+              color: themeProvider.currentTheme.primaryPurple.withOpacity(0.1),
+              width: 2,
+            ),
+          ),
+          child: ClipOval(
+            child: Blockies(
+              seed: widget.tokenAddr,
+              color: getWalletColor(0),
+              bgColor: themeProvider.currentTheme.primaryPurple,
+              spotColor: themeProvider.currentTheme.background,
+              size: 8,
+            ),
+          ),
+        );
+      },
+    );
+  }
 
   String formatAmount(double amount) {
     if (amount >= 1e9) {
@@ -135,54 +245,7 @@ class _TokenCardState extends State<TokenCard> {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: Image.network(
-                          widget.iconUrl,
-                          width: 32,
-                          height: 32,
-                          fit: BoxFit.contain,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) {
-                              return child;
-                            }
-                            return SizedBox(
-                              width: 32,
-                              height: 32,
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes !=
-                                          null
-                                      ? loadingProgress.cumulativeBytesLoaded /
-                                          (loadingProgress.expectedTotalBytes ??
-                                              1)
-                                      : null,
-                                  strokeWidth: 2,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              width: 32,
-                              height: 32,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: theme.primaryPurple.withOpacity(0.1),
-                                  width: 2,
-                                ),
-                              ),
-                              child: ClipOval(
-                                child: Blockies(
-                                  seed: widget.tokenAddr,
-                                  color: getWalletColor(0),
-                                  bgColor: theme.primaryPurple,
-                                  spotColor: theme.background,
-                                  size: 8,
-                                ),
-                              ),
-                            );
-                          },
-                        ),
+                        child: _buildIcon(Provider.of<ThemeProvider>(context)),
                       ),
                     ),
                   ],

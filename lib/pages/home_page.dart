@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +10,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
@@ -29,11 +32,14 @@ class _HomePageState extends State<HomePage> {
 
     _appState = Provider.of<AppState>(context, listen: false);
 
-    if (_appState.wallet == null || _appState.account == null) {
-      Navigator.of(context).pop();
-    }
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_appState.wallet == null || _appState.account == null) {
+        Navigator.of(context).pop();
+        return;
+      }
 
-    _refreshData();
+      _refreshData();
+    });
   }
 
   Future<void> _refreshData() async {
@@ -41,6 +47,7 @@ class _HomePageState extends State<HomePage> {
       BigInt index = BigInt.from(_appState.selectedWallet);
       await syncBalances(walletIndex: index);
       await _appState.syncData();
+      setState(() {});
     } catch (e) {
       print("error sync balance: $e");
     }
@@ -248,73 +255,39 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: EdgeInsets.all(adaptivePadding),
                       child: Column(
-                        children: [
-                          TokenCard(
-                            tokenAmount: 5437854356.654674,
-                            tokenAddr:
-                                "0x5ab3e1128c6f2ed0f62efc4e26d93f82ef50134e",
-                            convertAmount: 100000,
-                            tokenName: "Zilliqa",
-                            tokenSymbol: "ZIL",
-                            onTap: () => {},
-                            iconUrl:
-                                "https://cryptologos.cc/logos/zilliqa-zil-logo.png",
-                          ),
-                          TokenCard(
-                            tokenAmount: 549,
-                            tokenAddr:
-                                "0x7c8a02b6fcbd46aa10d8e9b6f9d947d45a2d784a",
-                            convertAmount: 549,
-                            tokenName: "ZilPay USD",
-                            tokenSymbol: "ZPUSD",
-                            iconUrl:
-                                "https://cryptologos.cc/logos/usd-coin-usdc-logo.png",
-                          ),
-                          TokenCard(
-                            tokenAmount: 1.5,
-                            tokenAddr:
-                                "0x28f8a18f3a64dc5eeb02fd4627234d6c99c0f154",
-                            convertAmount: 2000000,
-                            tokenName: "Bitcoin",
-                            tokenSymbol: "BTC",
-                            iconUrl:
-                                "https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=002",
-                          ),
-                          TokenCard(
-                            convertAmount: 100,
-                            tokenAddr:
-                                "0x4df7b47293424586f109c51fa127a8ec3219847d",
-                            tokenAmount: 0.5,
-                            tokenName: "GRIN coin",
-                            tokenSymbol: "GRIN",
-                            iconUrl:
-                                "https://cryptologos.cc/logos/gridcoin-grc-logo.png?v=002",
-                          ),
-                          TokenCard(
-                            tokenAmount: 0.5,
-                            tokenAddr:
-                                "0x91e3d4bf3e27e98502d79d5c63c96e038ee8cd44",
-                            convertAmount: 100,
-                            tokenName: "GogeCoin",
-                            tokenSymbol: "DOGE",
-                            showDivider: false,
-                            iconUrl:
-                                "https://cryptologos.cc/logos/dogecoin-doge-logo.png?v=002",
-                          ),
-                          TokenCard(
-                            tokenAmount: 0.5,
-                            convertAmount: 100,
-                            tokenAddr:
-                                "0x91e34bf3e27898502d70d5c63c96e038ee8cd44",
-                            tokenName: "None",
-                            tokenSymbol: "None",
-                            showDivider: false,
-                            iconUrl:
-                                "https://cryptologos.cc/logos/dogecoin-gfdjkghfdjk-logo.png?v=002",
-                          ),
-                        ],
+                        children: _appState.wallet!.tokens
+                            .asMap()
+                            .entries
+                            .map((entry) {
+                          final token = entry.value;
+                          final isLast =
+                              entry.key == _appState.wallet!.tokens.length - 1;
+                          final account = _appState.account!;
+                          String tokenAmountValue =
+                              token.balances[account.addr] ?? "0";
+                          double tokenAmount = 0;
+
+                          try {
+                            tokenAmount = double.parse(tokenAmountValue);
+                            double divisor = pow(10, token.decimals).toDouble();
+                            tokenAmount = tokenAmount / divisor;
+                          } catch (e) {
+                            ///
+                          }
+
+                          return TokenCard(
+                            tokenAmount: tokenAmount,
+                            tokenAddr: token.addr,
+                            convertAmount: 0, // add the loading rates.
+                            tokenName: token.name,
+                            tokenSymbol: token.symbol,
+                            showDivider: !isLast,
+                            iconUrl: viewIcon(token.addr, "Dark"),
+                            onTap: () => {print("tap token ${token.name}")},
+                          );
+                        }).toList(),
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
