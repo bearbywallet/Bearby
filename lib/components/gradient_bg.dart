@@ -13,17 +13,17 @@ class GradientBackground extends StatelessWidget {
 
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            theme.gradientStart,
-            theme.gradientMiddle,
-            theme.gradientEnd,
-          ],
-          stops: const [0.0, 0.5, 1.0],
-        ),
-      ),
+          // gradient: LinearGradient(
+          //   begin: Alignment.topCenter,
+          //   end: Alignment.bottomCenter,
+          //   colors: [
+          //     theme.gradientStart,
+          //     theme.gradientMiddle,
+          //     theme.gradientEnd,
+          //   ],
+          //   stops: const [0.0, 0.5, 1.0],
+          // ),
+          ),
       child: child,
     );
   }
