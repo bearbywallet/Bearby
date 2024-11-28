@@ -125,7 +125,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                     const SizedBox(width: 8),
                                     CopyAddressButton(
-                                      address: _appState.wallet!.walletAddress,
+                                      address: _appState.account!.addr,
                                     ),
                                   ],
                                 ),

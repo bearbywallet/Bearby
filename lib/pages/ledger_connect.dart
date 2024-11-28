@@ -329,12 +329,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
           await _appState.syncData();
           _appState.setSelectedWallet(_appState.wallets.length - 1);
-
-          if (useBiometric) {
-            await _authGuard.setSession(session.$2, session.$1);
-          } else {
-            _authGuard.setEnabled(true);
-          }
+          await _authGuard.setSession(session.$2, session.$1);
 
           Navigator.of(context).pushNamed(
             '/',

@@ -65,11 +65,33 @@ class _LoginPage extends State<LoginPage> {
     final wallet = _appState.wallets[index];
 
     try {
+      DeviceInfoService device = DeviceInfoService();
+      List<String> identifiers = await device.getDeviceIdentifiers();
+      String session =
+          await _authGuard.getSession(sessionKey: wallet.walletAddress);
+
       // if Ledger device
       if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
-        _authGuard.setEnabled(true);
-        toHome();
-        return;
+        _btnController.start();
+
+        bool unlocked = await tryUnlockWithSession(
+          sessionCipher: session,
+          walletIndex: BigInt.from(index),
+          identifiers: identifiers,
+        );
+
+        if (unlocked) {
+          _authGuard.setEnabled(true);
+          _btnController.reset();
+          toHome();
+        } else {
+          _btnController.error();
+
+          Timer(const Duration(seconds: 1), () {
+            _btnController.reset();
+          });
+          return;
+        }
       }
 
       if (wallet.authType != "none") {
@@ -90,12 +112,6 @@ class _LoginPage extends State<LoginPage> {
           return;
         }
 
-        String session =
-            await _authGuard.getSession(sessionKey: wallet.walletAddress);
-
-        DeviceInfoService device = DeviceInfoService();
-        List<String> identifiers = await device.getDeviceIdentifiers();
-
         bool unlocked = await tryUnlockWithSession(
           sessionCipher: session,
           walletIndex: BigInt.from(index),
@@ -115,6 +131,7 @@ class _LoginPage extends State<LoginPage> {
         }
       }
     } catch (e) {
+      print("unlock error $e");
       _btnController.error();
 
       Timer(const Duration(seconds: 1), () {
@@ -127,17 +144,37 @@ class _LoginPage extends State<LoginPage> {
     final wallet = _appState.wallets[sellectedWallet];
 
     try {
+      DeviceInfoService device = DeviceInfoService();
+      List<String> identifiers = await device.getDeviceIdentifiers();
+
       // if Ledger device
       if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
-        _authGuard.setEnabled(true);
-        toHome();
-        return;
+        String session =
+            await _authGuard.getSession(sessionKey: wallet.walletAddress);
+
+        _btnController.start();
+
+        bool unlocked = await tryUnlockWithSession(
+          sessionCipher: session,
+          walletIndex: BigInt.from(sellectedWallet),
+          identifiers: identifiers,
+        );
+
+        if (unlocked) {
+          _authGuard.setEnabled(true);
+          _btnController.reset();
+          toHome();
+        } else {
+          _btnController.error();
+
+          Timer(const Duration(seconds: 1), () {
+            _btnController.reset();
+          });
+          return;
+        }
       }
 
       if (passwordController.text.isNotEmpty) {
-        DeviceInfoService device = DeviceInfoService();
-        List<String> identifiers = await device.getDeviceIdentifiers();
-
         bool unlocked = await tryUnlockWithPassword(
           password: passwordController.text,
           walletIndex: BigInt.from(sellectedWallet),
