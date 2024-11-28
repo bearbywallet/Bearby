@@ -122,7 +122,7 @@ abstract class RustLibApi extends BaseApi {
   WalletSettings crateApiBackendWalletInfoAutoAccessorGetSettings(
       {required WalletInfo that});
 
-  List<FToken> crateApiBackendWalletInfoAutoAccessorGetTokens(
+  List<FTokenInfo> crateApiBackendWalletInfoAutoAccessorGetTokens(
       {required WalletInfo that});
 
   String crateApiBackendWalletInfoAutoAccessorGetWalletAddress(
@@ -147,7 +147,7 @@ abstract class RustLibApi extends BaseApi {
       {required WalletInfo that, required WalletSettings settings});
 
   void crateApiBackendWalletInfoAutoAccessorSetTokens(
-      {required WalletInfo that, required List<FToken> tokens});
+      {required WalletInfo that, required List<FTokenInfo> tokens});
 
   void crateApiBackendWalletInfoAutoAccessorSetWalletAddress(
       {required WalletInfo that, required String walletAddress});
@@ -673,7 +673,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  List<FToken> crateApiBackendWalletInfoAutoAccessorGetTokens(
+  List<FTokenInfo> crateApiBackendWalletInfoAutoAccessorGetTokens(
       {required WalletInfo that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -683,8 +683,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 15)!;
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken,
+        decodeSuccessData: sse_decode_list_f_token_info,
         decodeErrorData: null,
       ),
       constMeta: kCrateApiBackendWalletInfoAutoAccessorGetTokensConstMeta,
@@ -897,14 +896,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void crateApiBackendWalletInfoAutoAccessorSetTokens(
-      {required WalletInfo that, required List<FToken> tokens}) {
+      {required WalletInfo that, required List<FTokenInfo> tokens}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
             that, serializer);
-        sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-            tokens, serializer);
+        sse_encode_list_f_token_info(tokens, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 23)!;
       },
       codec: SseCodec(
@@ -1671,6 +1669,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Map<String, String> dco_decode_Map_String_String(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return Map.fromEntries(dco_decode_list_record_string_string(raw)
+        .map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
   ArcBackground
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           dynamic raw) {
@@ -1757,6 +1762,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FTokenInfo dco_decode_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return FTokenInfo(
+      name: dco_decode_String(arr[0]),
+      symbol: dco_decode_String(arr[1]),
+      decimals: dco_decode_u_8(arr[2]),
+      addr: dco_decode_String(arr[3]),
+      balances: dco_decode_Map_String_String(arr[4]),
+      default_: dco_decode_bool(arr[5]),
+    );
+  }
+
+  @protected
   KeyPair dco_decode_key_pair(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1766,17 +1787,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       sk: dco_decode_String(arr[0]),
       pk: dco_decode_String(arr[1]),
     );
-  }
-
-  @protected
-  List<FToken>
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(
-            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken)
-        .toList();
   }
 
   @protected
@@ -1803,6 +1813,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_f_token_info).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -1812,6 +1828,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint64List dco_decode_list_prim_usize_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint64List;
+  }
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
   }
 
   @protected
@@ -1976,6 +1998,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Map<String, String> sse_decode_Map_String_String(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_list_record_string_string(deserializer);
+    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
+  }
+
+  @protected
   ArcBackground
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           SseDeserializer deserializer) {
@@ -2067,27 +2097,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_symbol = sse_decode_String(deserializer);
+    var var_decimals = sse_decode_u_8(deserializer);
+    var var_addr = sse_decode_String(deserializer);
+    var var_balances = sse_decode_Map_String_String(deserializer);
+    var var_default_ = sse_decode_bool(deserializer);
+    return FTokenInfo(
+        name: var_name,
+        symbol: var_symbol,
+        decimals: var_decimals,
+        addr: var_addr,
+        balances: var_balances,
+        default_: var_default_);
+  }
+
+  @protected
   KeyPair sse_decode_key_pair(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_sk = sse_decode_String(deserializer);
     var var_pk = sse_decode_String(deserializer);
     return KeyPair(sk: var_sk, pk: var_pk);
-  }
-
-  @protected
-  List<FToken>
-      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <FToken>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(
-          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-              deserializer));
-    }
-    return ans_;
   }
 
   @protected
@@ -2131,6 +2163,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <FTokenInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_f_token_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -2142,6 +2186,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint64List(len_);
+  }
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(String, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
   }
 
   @protected
@@ -2319,6 +2376,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_Map_String_String(
+      Map<String, String> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_record_string_string(
+        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
+  }
+
+  @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           ArcBackground self, SseSerializer serializer) {
@@ -2418,22 +2483,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.symbol, serializer);
+    sse_encode_u_8(self.decimals, serializer);
+    sse_encode_String(self.addr, serializer);
+    sse_encode_Map_String_String(self.balances, serializer);
+    sse_encode_bool(self.default_, serializer);
+  }
+
+  @protected
   void sse_encode_key_pair(KeyPair self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.sk, serializer);
     sse_encode_String(self.pk, serializer);
-  }
-
-  @protected
-  void
-      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          List<FToken> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          item, serializer);
-    }
   }
 
   @protected
@@ -2468,6 +2532,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_f_token_info(
+      List<FTokenInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_f_token_info(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2481,6 +2555,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint64List(self);
+  }
+
+  @protected
+  void sse_encode_list_record_string_string(
+      List<(String, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_string_string(item, serializer);
+    }
   }
 
   @protected
@@ -2709,7 +2793,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
         that: this,
       );
 
-  List<FToken> get tokens =>
+  List<FTokenInfo> get tokens =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorGetTokens(
         that: this,
       );
@@ -2745,7 +2829,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorSetSettings(
           that: this, settings: settings);
 
-  set tokens(List<FToken> tokens) =>
+  set tokens(List<FTokenInfo> tokens) =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorSetTokens(
           that: this, tokens: tokens);
 

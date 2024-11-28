@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
 // These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `from`, `from`, `initialize`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `initialize`
 
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
@@ -119,6 +119,9 @@ abstract class BackgroundState implements RustOpaqueInterface {
   set wallets(List<WalletInfo> wallets);
 }
 
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
+abstract class FToken implements RustOpaqueInterface {}
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
 abstract class Serivce implements RustOpaqueInterface {
   ArcBackground get core;
@@ -144,7 +147,7 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   WalletSettings get settings;
 
-  List<FToken> get tokens;
+  List<FTokenInfo> get tokens;
 
   String get walletAddress;
 
@@ -160,7 +163,7 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   set settings(WalletSettings settings);
 
-  set tokens(List<FToken> tokens);
+  set tokens(List<FTokenInfo> tokens);
 
   set walletAddress(String walletAddress);
 
@@ -188,4 +191,43 @@ class AccountInfo {
           runtimeType == other.runtimeType &&
           addr == other.addr &&
           name == other.name;
+}
+
+class FTokenInfo {
+  final String name;
+  final String symbol;
+  final int decimals;
+  final String addr;
+  final Map<String, String> balances;
+  final bool default_;
+
+  const FTokenInfo({
+    required this.name,
+    required this.symbol,
+    required this.decimals,
+    required this.addr,
+    required this.balances,
+    required this.default_,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      symbol.hashCode ^
+      decimals.hashCode ^
+      addr.hashCode ^
+      balances.hashCode ^
+      default_.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is FTokenInfo &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          symbol == other.symbol &&
+          decimals == other.decimals &&
+          addr == other.addr &&
+          balances == other.balances &&
+          default_ == other.default_;
 }

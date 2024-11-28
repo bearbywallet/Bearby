@@ -1,5 +1,6 @@
 use crate::frb_generated::StreamSink;
 use lazy_static::lazy_static;
+use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
 use zilpay::proto::address::Address;
@@ -52,25 +53,40 @@ pub struct AccountInfo {
     pub name: String,
 }
 
-impl From<Account> for AccountInfo {
-    fn from(account: Account) -> Self {
+impl From<&Account> for AccountInfo {
+    fn from(account: &Account) -> Self {
         AccountInfo {
-            addr: account.addr.to_string(),
-            name: account.name,
+            addr: account.addr.auto_format(),
+            name: account.name.clone(),
         }
     }
 }
 
-impl From<&Account> for AccountInfo {
-    fn from(account: &Account) -> Self {
-        AccountInfo {
-            addr: match account.addr {
-                Address::Secp256k1Sha256Zilliqa(_) => account.addr.get_bech32().unwrap_or_default(),
-                Address::Secp256k1Keccak256Ethereum(_) => {
-                    account.addr.to_eth_checksummed().unwrap_or_default()
-                }
-            },
-            name: account.name.clone(),
+#[derive(Debug, Clone)]
+pub struct FTokenInfo {
+    pub name: String,
+    pub symbol: String,
+    pub decimals: u8,
+    pub addr: String,
+    pub balances: HashMap<String, String>,
+    pub default: bool,
+}
+
+impl From<&FToken> for FTokenInfo {
+    fn from(ft: &FToken) -> Self {
+        let balances: HashMap<String, String> = ft
+            .balances
+            .iter()
+            .map(|(addr, balance)| (addr.auto_format(), balance.to_string()))
+            .collect();
+
+        FTokenInfo {
+            balances,
+            addr: ft.addr.auto_format(),
+            name: ft.name.clone(),
+            symbol: ft.symbol.clone(),
+            decimals: ft.decimals,
+            default: ft.default,
         }
     }
 }
@@ -84,7 +100,7 @@ pub struct WalletInfo {
     pub wallet_address: String,
     pub accounts: Vec<AccountInfo>,
     pub selected_account: usize,
-    pub tokens: Vec<FToken>,
+    pub tokens: Vec<FTokenInfo>,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -102,7 +118,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
-                tokens: w.ftokens.clone(),
+                tokens: w.ftokens.iter().map(|v| v.into()).collect(),
             })
             .collect();
 
@@ -133,7 +149,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
-                tokens: w.ftokens.clone(),
+                tokens: w.ftokens.iter().map(|v| v.into()).collect(),
             })
             .collect();
         let state = BackgroundState {
@@ -203,7 +219,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
-                tokens: w.ftokens.clone(),
+                tokens: w.ftokens.iter().map(|v| v.into()).collect(),
             })
             .collect();
         let state = BackgroundState {

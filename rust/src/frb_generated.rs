@@ -1131,7 +1131,7 @@ fn wire__crate__api__backend__WalletInfo_auto_accessor_set_tokens_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>,
             >>::sse_decode(&mut deserializer);
-            let api_tokens = <Vec<FToken>>::sse_decode(&mut deserializer);
+            let api_tokens = <Vec<crate::api::backend::FTokenInfo>>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;
@@ -2048,6 +2048,14 @@ impl SseDecode for WalletSettings {
     }
 }
 
+impl SseDecode for std::collections::HashMap<String, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <Vec<(String, String)>>::sse_decode(deserializer);
+        return inner.into_iter().collect();
+    }
+}
+
 impl SseDecode
     for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc<Background>>>
 {
@@ -2149,6 +2157,27 @@ impl SseDecode for bool {
     }
 }
 
+impl SseDecode for crate::api::backend::FTokenInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_symbol = <String>::sse_decode(deserializer);
+        let mut var_decimals = <u8>::sse_decode(deserializer);
+        let mut var_addr = <String>::sse_decode(deserializer);
+        let mut var_balances =
+            <std::collections::HashMap<String, String>>::sse_decode(deserializer);
+        let mut var_default_ = <bool>::sse_decode(deserializer);
+        return crate::api::backend::FTokenInfo {
+            name: var_name,
+            symbol: var_symbol,
+            decimals: var_decimals,
+            addr: var_addr,
+            balances: var_balances,
+            default: var_default_,
+        };
+    }
+}
+
 impl SseDecode for crate::api::methods::KeyPair {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2158,18 +2187,6 @@ impl SseDecode for crate::api::methods::KeyPair {
             sk: var_sk,
             pk: var_pk,
         };
-    }
-}
-
-impl SseDecode for Vec<FToken> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<FToken>::sse_decode(deserializer));
-        }
-        return ans_;
     }
 }
 
@@ -2209,6 +2226,18 @@ impl SseDecode for Vec<crate::api::backend::AccountInfo> {
     }
 }
 
+impl SseDecode for Vec<crate::api::backend::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::api::backend::FTokenInfo>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2228,6 +2257,18 @@ impl SseDecode for Vec<usize> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<usize>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(String, String)>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -2597,6 +2638,31 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::AccountInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::backend::FTokenInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.name.into_into_dart().into_dart(),
+            self.symbol.into_into_dart().into_dart(),
+            self.decimals.into_into_dart().into_dart(),
+            self.addr.into_into_dart().into_dart(),
+            self.balances.into_into_dart().into_dart(),
+            self.default.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::backend::FTokenInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::FTokenInfo>
+    for crate::api::backend::FTokenInfo
+{
+    fn into_into_dart(self) -> crate::api::backend::FTokenInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::methods::KeyPair {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -2668,6 +2734,13 @@ impl SseEncode for WalletSettings {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletSettings>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
+    }
+}
+
+impl SseEncode for std::collections::HashMap<String, String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<(String, String)>>::sse_encode(self.into_iter().collect(), serializer);
     }
 }
 
@@ -2773,21 +2846,23 @@ impl SseEncode for bool {
     }
 }
 
+impl SseEncode for crate::api::backend::FTokenInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.symbol, serializer);
+        <u8>::sse_encode(self.decimals, serializer);
+        <String>::sse_encode(self.addr, serializer);
+        <std::collections::HashMap<String, String>>::sse_encode(self.balances, serializer);
+        <bool>::sse_encode(self.default, serializer);
+    }
+}
+
 impl SseEncode for crate::api::methods::KeyPair {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.sk, serializer);
         <String>::sse_encode(self.pk, serializer);
-    }
-}
-
-impl SseEncode for Vec<FToken> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <FToken>::sse_encode(item, serializer);
-        }
     }
 }
 
@@ -2821,6 +2896,16 @@ impl SseEncode for Vec<crate::api::backend::AccountInfo> {
     }
 }
 
+impl SseEncode for Vec<crate::api::backend::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::api::backend::FTokenInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2837,6 +2922,16 @@ impl SseEncode for Vec<usize> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <usize>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(String, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(String, String)>::sse_encode(item, serializer);
         }
     }
 }

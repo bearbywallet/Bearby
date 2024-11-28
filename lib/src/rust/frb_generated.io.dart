@@ -114,6 +114,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
+  Map<String, String> dco_decode_Map_String_String(dynamic raw);
+
+  @protected
   ArcBackground
       dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           dynamic raw);
@@ -161,12 +164,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
-  KeyPair dco_decode_key_pair(dynamic raw);
+  FTokenInfo dco_decode_f_token_info(dynamic raw);
 
   @protected
-  List<FToken>
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          dynamic raw);
+  KeyPair dco_decode_key_pair(dynamic raw);
 
   @protected
   List<WalletInfo>
@@ -180,10 +181,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AccountInfo> dco_decode_list_account_info(dynamic raw);
 
   @protected
+  List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
+
+  @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
   RustStreamSink<String>? dco_decode_opt_StreamSink_String_Sse(dynamic raw);
@@ -269,6 +276,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
+  Map<String, String> sse_decode_Map_String_String(
+      SseDeserializer deserializer);
+
+  @protected
   ArcBackground
       sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           SseDeserializer deserializer);
@@ -317,12 +328,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
-  KeyPair sse_decode_key_pair(SseDeserializer deserializer);
+  FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
   @protected
-  List<FToken>
-      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          SseDeserializer deserializer);
+  KeyPair sse_decode_key_pair(SseDeserializer deserializer);
 
   @protected
   List<WalletInfo>
@@ -336,10 +345,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer);
 
   @protected
+  List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+      SseDeserializer deserializer);
 
   @protected
   RustStreamSink<String>? sse_decode_opt_StreamSink_String_Sse(
@@ -431,6 +447,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           WalletInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_Map_String_String(
+      Map<String, String> self, SseSerializer serializer);
+
+  @protected
   void
       sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
           ArcBackground self, SseSerializer serializer);
@@ -479,12 +499,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
-  void sse_encode_key_pair(KeyPair self, SseSerializer serializer);
+  void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
   @protected
-  void
-      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
-          List<FToken> self, SseSerializer serializer);
+  void sse_encode_key_pair(KeyPair self, SseSerializer serializer);
 
   @protected
   void
@@ -499,12 +517,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<AccountInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_f_token_info(
+      List<FTokenInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_usize_strict(
       Uint64List self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_record_string_string(
+      List<(String, String)> self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_StreamSink_String_Sse(
