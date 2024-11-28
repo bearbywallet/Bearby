@@ -8,6 +8,7 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
+
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
@@ -99,8 +100,8 @@ class _HomePageState extends State<HomePage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Container(
-                                  width: 32,
-                                  height: 32,
+                                  width: 34,
+                                  height: 34,
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     border: Border.all(
@@ -143,9 +144,9 @@ class _HomePageState extends State<HomePage> {
                             assetName: 'assets/icons/gear.svg',
                             width: 30,
                             height: 30,
-                            color: theme.textPrimary,
+                            color: theme.textSecondary,
                             onTap: () {
-                              print('Settings tapped');
+                              Navigator.pushNamed(context, '/settings');
                             },
                           ),
                         ],

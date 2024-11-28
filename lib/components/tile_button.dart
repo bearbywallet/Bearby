@@ -37,10 +37,10 @@ class _TileButtonState extends State<TileButton>
 
     _scaleAnimation = Tween<double>(
       begin: 1.0,
-      end: 0.97,
+      end: 0.90,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeOut,
+      curve: Curves.fastEaseInToSlowEaseOut,
     ));
 
     _opacityAnimation = Tween<double>(
@@ -48,7 +48,7 @@ class _TileButtonState extends State<TileButton>
       end: 0.7,
     ).animate(CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOut,
+      curve: Curves.fastEaseInToSlowEaseOut,
     ));
   }
 

@@ -40,7 +40,7 @@ class _TokenCardState extends State<TokenCard> {
   bool isHovered = false;
   bool isPressed = false;
   String? contentType;
-  bool isLoading = true;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -71,13 +71,8 @@ class _TokenCardState extends State<TokenCard> {
   Widget _buildIcon(ThemeProvider themeProvider) {
     if (isLoading) {
       return SizedBox(
-        width: 32,
-        height: 32,
-        child: Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
-        ),
+        width: 25,
+        height: 25,
       );
     }
 
