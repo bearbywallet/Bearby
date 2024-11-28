@@ -29,7 +29,7 @@ class _HomePageState extends State<HomePage> {
 
     _appState = Provider.of<AppState>(context, listen: false);
 
-    if (_appState.wallet == null) {
+    if (_appState.wallet == null || _appState.account == null) {
       Navigator.of(context).pop();
     }
 
@@ -104,8 +104,7 @@ class _HomePageState extends State<HomePage> {
                                   ),
                                   child: ClipOval(
                                     child: Blockies(
-                                      seed: _appState.wallet!
-                                          .walletAddress, // TODO: replace it with account.
+                                      seed: _appState.account!.addr,
                                       color: getWalletColor(0),
                                       bgColor: theme.primaryPurple,
                                       spotColor: theme.background,
@@ -117,7 +116,7 @@ class _HomePageState extends State<HomePage> {
                                 Row(
                                   children: [
                                     Text(
-                                      _appState.wallet!.walletName,
+                                      _appState.account!.name,
                                       style: TextStyle(
                                         color: theme.textPrimary,
                                         fontSize: 24,

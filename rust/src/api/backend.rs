@@ -64,7 +64,12 @@ impl From<Account> for AccountInfo {
 impl From<&Account> for AccountInfo {
     fn from(account: &Account) -> Self {
         AccountInfo {
-            addr: account.addr.to_string(),
+            addr: match account.addr {
+                Address::Secp256k1Sha256Zilliqa(_) => account.addr.get_bech32().unwrap_or_default(),
+                Address::Secp256k1Keccak256Ethereum(_) => {
+                    account.addr.to_eth_checksummed().unwrap_or_default()
+                }
+            },
             name: account.name.clone(),
         }
     }

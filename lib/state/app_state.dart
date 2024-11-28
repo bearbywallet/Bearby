@@ -39,6 +39,16 @@ class AppState extends ChangeNotifier {
     return _state.wallets[_selectedWallet];
   }
 
+  AccountInfo? get account {
+    if (wallet == null) {
+      return null;
+    }
+
+    int index = wallet!.selectedAccount.toInt();
+
+    return wallet!.accounts[index];
+  }
+
   int get selectedWallet {
     return _selectedWallet;
   }

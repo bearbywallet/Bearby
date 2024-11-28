@@ -46,6 +46,17 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
     super.dispose();
   }
 
+  String shortenAddress(String address, {int leftSize = 6, int rightSize = 3}) {
+    if (address.length < (leftSize + rightSize)) {
+      return address;
+    }
+
+    final left = address.substring(0, leftSize);
+    final right = address.substring(address.length - rightSize);
+
+    return '$left..$right';
+  }
+
   Future<void> _copyToClipboard() async {
     await Clipboard.setData(ClipboardData(text: widget.address));
     if (mounted) {
@@ -95,7 +106,7 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Text(
-                        widget.address,
+                        shortenAddress(widget.address),
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
