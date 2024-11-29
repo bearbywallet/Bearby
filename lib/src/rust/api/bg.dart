@@ -6,27 +6,27 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Stream<String> startBackgroundService() =>
-    RustLib.instance.api.crateApiBgStartBackgroundService();
+// Stream<String> startBackgroundService() =>
+//     RustLib.instance.api.crateApiBgStartBackgroundService();
 
-Future<void> stopBackgroundService() =>
-    RustLib.instance.api.crateApiBgStopBackgroundService();
+// Future<void> stopBackgroundService() =>
+//     RustLib.instance.api.crateApiBgStopBackgroundService();
 
-Future<void> sendMessageToService({required String message}) =>
-    RustLib.instance.api.crateApiBgSendMessageToService(message: message);
+// Future<void> sendMessageToService({required String message}) =>
+//     RustLib.instance.api.crateApiBgSendMessageToService(message: message);
 
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<BackgroundService>>
-abstract class BackgroundService implements RustOpaqueInterface {
-  static Future<BackgroundService> default_() =>
-      RustLib.instance.api.crateApiBgBackgroundServiceDefault();
+// abstract class BackgroundService implements RustOpaqueInterface {
+//   static Future<BackgroundService> default_() =>
+//       RustLib.instance.api.crateApiBgBackgroundServiceDefault();
 
   // HINT: Make it `#[frb(sync)]` to let it become the default constructor of Dart class.
-  static Future<BackgroundService> newInstance() =>
-      RustLib.instance.api.crateApiBgBackgroundServiceNew();
+  // static Future<BackgroundService> newInstance() =>
+  //     RustLib.instance.api.crateApiBgBackgroundServiceNew();
 
-  Future<void> sendMessage({required String message});
+//   Future<void> sendMessage({required String message});
 
-  Stream<String> start();
+//   Stream<String> start();
 
-  Future<void> stop();
-}
+//   Future<void> stop();
+// }

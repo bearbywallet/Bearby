@@ -120,6 +120,7 @@ class _LoginPage extends State<LoginPage> {
         );
 
         if (unlocked) {
+          await _appState.syncData();
           _btnController.reset();
           _authGuard.setEnabled(true);
           return toHome();
@@ -184,6 +185,7 @@ class _LoginPage extends State<LoginPage> {
         );
 
         if (unlocked) {
+          await _appState.syncData();
           _btnController.reset();
           _authGuard.setEnabled(true);
 

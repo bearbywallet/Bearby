@@ -7,7 +7,6 @@ import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilliqa_ledger_flutter/zilliqa_ledger_flutter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -173,105 +172,103 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
 
     return Scaffold(
-      body: GradientBackground(
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                children: [
-                  CustomAppBar(
-                    title: '',
-                    onBackPressed: () => Navigator.pop(context),
-                    actionIconPath: 'assets/icons/reload.svg',
-                    onActionPressed: _startScanning,
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        Text(
-                          _isScanning
-                              ? 'Looking for devices'
-                              : 'Available devices',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textPrimary,
-                          ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: '',
+                  onBackPressed: () => Navigator.pop(context),
+                  actionIconPath: 'assets/icons/reload.svg',
+                  onActionPressed: _startScanning,
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Text(
+                        _isScanning
+                            ? 'Looking for devices'
+                            : 'Available devices',
+                        style: TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: theme.textPrimary,
                         ),
-                        const SizedBox(height: 8),
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        _isScanning
+                            ? 'Please make sure your Ledger device is unlocked'
+                            : _devices.isEmpty
+                                ? 'No devices found. Pull to refresh or tap reload'
+                                : 'Select a device to connect',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.w100,
+                          color: theme.textSecondary,
+                        ),
+                      ),
+                      if (_error != null) ...[
+                        const SizedBox(height: 16),
                         Text(
-                          _isScanning
-                              ? 'Please make sure your Ledger device is unlocked'
-                              : _devices.isEmpty
-                                  ? 'No devices found. Pull to refresh or tap reload'
-                                  : 'Select a device to connect',
+                          _error!,
                           style: TextStyle(
                             fontSize: 14,
-                            fontWeight: FontWeight.w100,
-                            color: theme.textSecondary,
+                            color: Colors.red,
+                            fontWeight: FontWeight.w500,
                           ),
+                          textAlign: TextAlign.center,
                         ),
-                        if (_error != null) ...[
-                          const SizedBox(height: 16),
-                          Text(
-                            _error!,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.red,
-                              fontWeight: FontWeight.w500,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                        ],
                       ],
-                    ),
+                    ],
                   ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: RefreshIndicator(
-                      onRefresh: _startScanning,
-                      child: ListView.builder(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        itemCount: _devices.length,
-                        itemBuilder: (context, index) {
-                          final device = _devices[index];
-                          String icon =
-                              device.connectionType == ConnectionType.usb
-                                  ? "assets/icons/usb.svg"
-                                  : "assets/icons/ble.svg";
+                ),
+                const SizedBox(height: 16),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _startScanning,
+                    child: ListView.builder(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      itemCount: _devices.length,
+                      itemBuilder: (context, index) {
+                        final device = _devices[index];
+                        String icon =
+                            device.connectionType == ConnectionType.usb
+                                ? "assets/icons/usb.svg"
+                                : "assets/icons/ble.svg";
 
-                          return Column(
-                            children: [
-                              LedgerItem(
-                                onTap: _isConnecting
-                                    ? null
-                                    : () {
-                                        setState(() => _selected = index);
-                                        _selectDevice(index);
-                                      },
-                                isLoading: _isConnecting && _selected == index,
-                                icon: SvgPicture.asset(
-                                  icon,
-                                  width: 30,
-                                  height: 30,
-                                  color: theme.textPrimary,
-                                ),
-                                title: device.name,
-                                id: device.id,
+                        return Column(
+                          children: [
+                            LedgerItem(
+                              onTap: _isConnecting
+                                  ? null
+                                  : () {
+                                      setState(() => _selected = index);
+                                      _selectDevice(index);
+                                    },
+                              isLoading: _isConnecting && _selected == index,
+                              icon: SvgPicture.asset(
+                                icon,
+                                width: 30,
+                                height: 30,
+                                color: theme.textPrimary,
                               ),
-                              const SizedBox(height: 8),
-                            ],
-                          );
-                        },
-                      ),
+                              title: device.name,
+                              id: device.id,
+                            ),
+                            const SizedBox(height: 8),
+                          ],
+                        );
+                      },
                     ),
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),

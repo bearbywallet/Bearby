@@ -283,7 +283,7 @@ class _HomePageState extends State<HomePage> {
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,
-                            iconUrl: viewIcon(token.addr, "Dark"),
+                            iconUrl: viewIcon(token.addr, "Light"),
                             onTap: () => {print("tap token ${token.name}")},
                           );
                         }).toList(),

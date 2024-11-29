@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-
 import '../components/bottom_nav_bar.dart';
-import '../components/gradient_bg.dart';
 import './home_page.dart';
 import './history_page.dart';
 import './browser_page.dart';
@@ -17,9 +15,9 @@ class _MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
   static final List<Widget> _pages = <Widget>[
-    const GradientBackground(child: HomePage()),
-    const GradientBackground(child: HistoryPage()),
-    const GradientBackground(child: BrowserPage())
+    const HomePage(),
+    const HistoryPage(),
+    const BrowserPage()
   ];
 
   void _onItemTapped(int index) {

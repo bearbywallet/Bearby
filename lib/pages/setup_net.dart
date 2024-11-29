@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/gradient_bg.dart';
 import 'package:zilpay/components/toggle_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -60,13 +59,13 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     EVMNetwork(
       title: "Ethereum",
       subtitle: "Ethereum network",
-      value: true,
+      value: false,
       code: 1,
     ),
     EVMNetwork(
       title: "BSC chain",
       subtitle: "Binance smart chain network",
-      value: true,
+      value: false,
       code: 2,
     ),
   ];
@@ -140,121 +139,120 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
-      body: GradientBackground(
-        child: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                children: [
-                  CustomAppBar(
-                    title: 'Blockchain Settings',
-                    onBackPressed: () => Navigator.pop(context),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      physics: const BouncingScrollPhysics(),
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                color: theme.cardBackground,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                children: List.generate(
-                                    _evmNetworks.length * 2 - 1, (index) {
-                                  if (index.isOdd) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      child: Divider(
-                                        height: 1,
-                                        color: theme.textSecondary
-                                            .withOpacity(0.2),
-                                      ),
-                                    );
-                                  }
-                                  final networkIndex = index ~/ 2;
-                                  final network = _evmNetworks[networkIndex];
-                                  return ToggleItem(
-                                    title: network.title,
-                                    subtitle: network.subtitle,
-                                    value: network.value,
-                                    onChanged: (newValue) =>
-                                        _updateNetworkValue(
-                                            networkIndex, newValue, true),
-                                  );
-                                }),
-                              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                CustomAppBar(
+                  title: 'Blockchain Settings',
+                  onBackPressed: () => Navigator.pop(context),
+                ),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                            SizedBox(height: adaptivePadding),
-                            Container(
-                              decoration: BoxDecoration(
-                                color: theme.cardBackground,
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              child: Column(
-                                children: List.generate(
-                                    _blockchainNetworks.length * 2 - 1,
-                                    (index) {
-                                  if (index.isOdd) {
-                                    return Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                          horizontal: 16),
-                                      child: Divider(
-                                        height: 1,
-                                        color: theme.textSecondary
-                                            .withOpacity(0.2),
-                                      ),
-                                    );
-                                  }
-                                  final networkIndex = index ~/ 2;
-                                  final network =
-                                      _blockchainNetworks[networkIndex];
-                                  return ToggleItem(
-                                    title: network.title,
-                                    subtitle: network.subtitle,
-                                    value: network.value,
-                                    onChanged: (newValue) =>
-                                        _updateNetworkValue(
-                                            networkIndex, newValue, false),
+                            child: Column(
+                              children: List.generate(
+                                  _evmNetworks.length * 2 - 1, (index) {
+                                if (index.isOdd) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Divider(
+                                      height: 1,
+                                      color:
+                                          theme.textSecondary.withOpacity(0.2),
+                                    ),
                                   );
-                                }),
-                              ),
+                                }
+                                final networkIndex = index ~/ 2;
+                                final network = _evmNetworks[networkIndex];
+                                return ToggleItem(
+                                  title: network.title,
+                                  subtitle: network.subtitle,
+                                  value: network.value,
+                                  onChanged: (newValue) => _updateNetworkValue(
+                                      networkIndex, newValue, true),
+                                );
+                              }),
                             ),
-                          ],
-                        ),
+                          ),
+                          SizedBox(height: adaptivePadding),
+                          Container(
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            child: Column(
+                              children: List.generate(
+                                  _blockchainNetworks.length * 2 - 1, (index) {
+                                if (index.isOdd) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16),
+                                    child: Divider(
+                                      height: 1,
+                                      color:
+                                          theme.textSecondary.withOpacity(0.2),
+                                    ),
+                                  );
+                                }
+                                final networkIndex = index ~/ 2;
+                                final network =
+                                    _blockchainNetworks[networkIndex];
+                                return ToggleItem(
+                                  title: network.title,
+                                  subtitle: network.subtitle,
+                                  value: network.value,
+                                  onChanged: (newValue) => _updateNetworkValue(
+                                      networkIndex, newValue, false),
+                                );
+                              }),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: EdgeInsets.all(adaptivePadding),
-                    child: CustomButton(
-                      text: 'Next',
-                      onPressed: () {
-                        final List<int> codes = [
-                          ..._evmNetworks.map((e) => e.code),
-                          ..._blockchainNetworks.map((e) => e.code)
-                        ];
-                        Navigator.of(context)
-                            .pushNamed('/cipher_setup', arguments: {
-                          'bip39': _bip39List,
-                          'keys': _keys,
-                          'codes': codes,
-                        });
-                      },
-                      backgroundColor: theme.primaryPurple,
-                      borderRadius: 30.0,
-                      height: 56.0,
-                    ),
-                  )
-                ],
-              ),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(adaptivePadding),
+                  child: CustomButton(
+                    text: 'Next',
+                    onPressed: () {
+                      final List<int> codes = [
+                        ..._evmNetworks
+                            .where((e) => e.value)
+                            .map((e) => e.code),
+                        ..._blockchainNetworks
+                            .where((e) => e.value)
+                            .map((e) => e.code)
+                      ];
+                      Navigator.of(context)
+                          .pushNamed('/cipher_setup', arguments: {
+                        'bip39': _bip39List,
+                        'keys': _keys,
+                        'codes': codes,
+                      });
+                    },
+                    backgroundColor: theme.primaryPurple,
+                    borderRadius: 30.0,
+                    height: 56.0,
+                  ),
+                )
+              ],
             ),
           ),
         ),
