@@ -1,16 +1,14 @@
 import 'dart:math';
 
-import 'package:blockies/blockies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
+import 'package:zilpay/components/wallet_header.dart';
 
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -96,48 +94,15 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 34,
-                                  height: 34,
-                                  decoration: BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    border: Border.all(
-                                      color:
-                                          theme.primaryPurple.withOpacity(0.1),
-                                      width: 2,
-                                    ),
-                                  ),
-                                  child: ClipOval(
-                                    child: Blockies(
-                                      seed: _appState.account!.addr,
-                                      color: getWalletColor(0),
-                                      bgColor: theme.primaryPurple,
-                                      spotColor: theme.background,
-                                      size: 8,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Text(
-                                      _appState.account!.name,
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 24,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    CopyAddressButton(
-                                      address: _appState.account!.addr,
-                                    ),
-                                  ],
-                                ),
-                              ],
+                            child: WalletHeader(
+                              walletName: _appState.account!.name,
+                              walletAddress: _appState.account!.addr,
+                              primaryPurple: theme.primaryPurple,
+                              background: theme.background,
+                              textPrimary: theme.textPrimary,
+                              onTap: () {
+                                print('Wallet header tapped');
+                              },
                             ),
                           ),
                           HoverSvgIcon(
