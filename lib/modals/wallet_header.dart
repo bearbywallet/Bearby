@@ -2,15 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:blockies/blockies.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/wallet_card.dart';
+import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/theme_provider.dart';
 
 void showWalletModal({
   required BuildContext context,
-  required String walletName,
-  required String walletAddress,
   VoidCallback? onManageWallet,
   VoidCallback? onAddWallet,
   Function(String)? onWalletSelect,
@@ -23,10 +22,28 @@ void showWalletModal({
     isDismissible: true,
     builder: (BuildContext context) {
       final theme = Provider.of<ThemeProvider>(context).currentTheme;
+      final appState = Provider.of<AppState>(context);
+
+      if (appState.wallet == null) {
+        return Container();
+      }
+
+      final double headerHeight = 200;
+      final double footerHeight = 84;
+      final double walletCardHeight = 72;
+      final double bottomPadding = MediaQuery.of(context).padding.bottom;
+      final double contentHeight = headerHeight +
+          (walletCardHeight * appState.wallet!.accounts.length) +
+          footerHeight +
+          bottomPadding;
+
+      final double screenHeight = MediaQuery.of(context).size.height;
+      final double initialChildSize =
+          (contentHeight / screenHeight).clamp(0.3, 0.85);
 
       return DraggableScrollableSheet(
-        initialChildSize: 0.85,
-        minChildSize: 0.5,
+        initialChildSize: initialChildSize,
+        minChildSize: 0.3,
         maxChildSize: 0.85,
         builder: (_, controller) {
           return Container(
@@ -61,7 +78,7 @@ void showWalletModal({
                   ),
                   child: ClipOval(
                     child: Blockies(
-                      seed: walletAddress,
+                      seed: appState.wallet!.walletAddress,
                       color: getWalletColor(0),
                       bgColor: theme.primaryPurple,
                       spotColor: theme.background,
@@ -70,17 +87,11 @@ void showWalletModal({
                   ),
                 ),
                 Text(
-                  walletName,
+                  appState.wallet!.walletName,
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: CopyAddressButton(
-                    address: walletAddress,
                   ),
                 ),
                 Padding(
@@ -114,36 +125,18 @@ void showWalletModal({
                       horizontal: 24,
                       vertical: 8,
                     ),
-                    children: [
-                      WalletCard(
-                        name: 'Wallet 1',
-                        address: '0x22d9...a1cD',
-                        balance: '\$0.00',
-                        onTap: () => onWalletSelect?.call('0x22d9...a1cD'),
-                        isSelected: false,
-                      ),
-                      WalletCard(
-                        name: 'Wallet 2',
-                        address: '0x79e8...234B',
-                        balance: '\$0.00',
-                        onTap: () => onWalletSelect?.call('0x79e8...234B'),
-                        isSelected: false,
-                      ),
-                      WalletCard(
-                        name: 'Wallet 3',
-                        address: '0xB941...3bF2',
-                        balance: '\$0.00',
-                        onTap: () => onWalletSelect?.call('0xB941...3bF2'),
-                        isSelected: false,
-                      ),
-                      WalletCard(
-                        name: 'Wallet 4',
-                        address: '0xE842...C9A4',
-                        balance: '\$0.00',
-                        onTap: () => onWalletSelect?.call('0xE842...C9A4'),
-                        isSelected: false,
-                      ),
-                    ],
+                    children:
+                        appState.wallet!.accounts.asMap().entries.map((entry) {
+                      final index = entry.key;
+                      final account = entry.value;
+                      return WalletCard(
+                        name: account.name,
+                        address: shortenAddress(account.addr),
+                        balance: '0.00',
+                        onTap: () => onWalletSelect?.call(index.toString()),
+                        isSelected: appState.selectedWallet == index,
+                      );
+                    }).toList(),
                   ),
                 ),
                 Padding(

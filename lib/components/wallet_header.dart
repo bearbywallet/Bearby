@@ -55,15 +55,13 @@ class _WalletHeaderState extends State<WalletHeader>
   void _showWalletModal() {
     showWalletModal(
       context: context,
-      walletName: 'Wallet 6',
-      walletAddress: '0x36Db...0c3d',
       onManageWallet: () {
         // Handle manage wallet
       },
       onAddWallet: () {
         // Handle add wallet
       },
-      onWalletSelect: (address) {
+      onWalletSelect: (index) {
         // Handle wallet selection
       },
     );

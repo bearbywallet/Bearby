@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/addr.dart';
 import '../theme/theme_provider.dart';
 
 class CopyAddressButton extends StatefulWidget {
@@ -44,17 +45,6 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
   void dispose() {
     _controller.dispose();
     super.dispose();
-  }
-
-  String shortenAddress(String address, {int leftSize = 6, int rightSize = 3}) {
-    if (address.length < (leftSize + rightSize)) {
-      return address;
-    }
-
-    final left = address.substring(0, leftSize);
-    final right = address.substring(address.length - rightSize);
-
-    return '$left..$right';
   }
 
   Future<void> _copyToClipboard() async {
