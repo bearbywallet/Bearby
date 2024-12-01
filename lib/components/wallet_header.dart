@@ -2,6 +2,7 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/modals/wallet_header.dart';
 
 class WalletHeader extends StatefulWidget {
   final String walletName;
@@ -51,6 +52,23 @@ class _WalletHeaderState extends State<WalletHeader>
     });
   }
 
+  void _showWalletModal() {
+    showWalletModal(
+      context: context,
+      walletName: 'Wallet 6',
+      walletAddress: '0x36Db...0c3d',
+      onManageWallet: () {
+        // Handle manage wallet
+      },
+      onAddWallet: () {
+        // Handle add wallet
+      },
+      onWalletSelect: (address) {
+        // Handle wallet selection
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Row(
@@ -60,7 +78,10 @@ class _WalletHeaderState extends State<WalletHeader>
           onTapDown: _handleTapDown,
           onTapUp: _handleTapUp,
           onTapCancel: _handleTapCancel,
-          onTap: widget.onTap,
+          onTap: () {
+            _showWalletModal();
+            widget.onTap?.call();
+          },
           child: AnimatedOpacity(
             opacity: _opacity,
             duration: Duration(milliseconds: _isAnimated ? 150 : 0),
