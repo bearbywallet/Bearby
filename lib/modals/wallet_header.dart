@@ -12,7 +12,7 @@ void showWalletModal({
   required BuildContext context,
   VoidCallback? onManageWallet,
   VoidCallback? onAddWallet,
-  Function(String)? onWalletSelect,
+  Function(int)? onWalletSelect,
 }) {
   showModalBottomSheet(
     context: context,
@@ -20,6 +20,8 @@ void showWalletModal({
     isScrollControlled: true,
     enableDrag: true,
     isDismissible: true,
+    useSafeArea: true,
+    barrierColor: Colors.black54,
     builder: (BuildContext context) {
       final theme = Provider.of<ThemeProvider>(context).currentTheme;
       final appState = Provider.of<AppState>(context);
@@ -28,7 +30,7 @@ void showWalletModal({
         return Container();
       }
 
-      final double headerHeight = 200;
+      final double headerHeight = 150;
       final double footerHeight = 84;
       final double walletCardHeight = 72;
       final double bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -44,7 +46,7 @@ void showWalletModal({
       return DraggableScrollableSheet(
         initialChildSize: initialChildSize,
         minChildSize: 0.3,
-        maxChildSize: 0.85,
+        maxChildSize: 0.70,
         builder: (_, controller) {
           return Container(
             decoration: BoxDecoration(
@@ -56,66 +58,52 @@ void showWalletModal({
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Container(
-                  width: 36,
-                  height: 4,
-                  margin: const EdgeInsets.symmetric(vertical: 16),
-                  decoration: BoxDecoration(
-                    color: theme.textSecondary.withOpacity(0.5),
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Container(
-                  width: 50,
-                  height: 50,
-                  margin: const EdgeInsets.only(bottom: 8),
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: theme.primaryPurple.withOpacity(0.1),
-                      width: 2,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: Blockies(
-                      seed: appState.wallet!.walletAddress,
-                      color: getWalletColor(0),
-                      bgColor: theme.primaryPurple,
-                      spotColor: theme.background,
-                      size: 8,
+                GestureDetector(
+                  onTap: () => Navigator.pop(context),
+                  child: Container(
+                    width: 36,
+                    height: 4,
+                    margin: const EdgeInsets.symmetric(vertical: 16),
+                    decoration: BoxDecoration(
+                      color: theme.textSecondary.withOpacity(0.5),
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
                 ),
-                Text(
-                  appState.wallet!.walletName,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 24,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(24, 8, 24, 8),
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: TextButton(
-                      onPressed: onManageWallet,
-                      style: TextButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        backgroundColor: theme.textPrimary.withOpacity(0.1),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                GestureDetector(
+                  onTap: onManageWallet,
+                  child: Column(
+                    children: [
+                      Container(
+                        width: 50,
+                        height: 50,
+                        margin: const EdgeInsets.only(bottom: 8),
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: theme.primaryPurple.withOpacity(0.1),
+                            width: 2,
+                          ),
+                        ),
+                        child: ClipOval(
+                          child: Blockies(
+                            seed: appState.wallet!.walletAddress,
+                            color: getWalletColor(0),
+                            bgColor: theme.primaryPurple,
+                            spotColor: theme.background,
+                            size: 8,
+                          ),
                         ),
                       ),
-                      child: Text(
-                        'Manage wallet',
+                      Text(
+                        appState.wallet!.walletName,
                         style: TextStyle(
                           color: theme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 24,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
                 Expanded(
@@ -133,7 +121,7 @@ void showWalletModal({
                         name: account.name,
                         address: shortenAddress(account.addr),
                         balance: '0.00',
-                        onTap: () => onWalletSelect?.call(index.toString()),
+                        onTap: () => onWalletSelect?.call(index),
                         isSelected: appState.selectedWallet == index,
                       );
                     }).toList(),
@@ -143,7 +131,7 @@ void showWalletModal({
                   padding: const EdgeInsets.symmetric(horizontal: 24),
                   child: InkWell(
                     onTap: onAddWallet,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(16),
                     child: Container(
                       height: 64,
                       padding: const EdgeInsets.symmetric(
