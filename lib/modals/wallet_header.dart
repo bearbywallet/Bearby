@@ -30,153 +30,142 @@ void showWalletModal({
         return Container();
       }
 
-      final double headerHeight = 150;
-      final double footerHeight = 84;
-      final double walletCardHeight = 72;
-      final double bottomPadding = MediaQuery.of(context).padding.bottom;
-      final double contentHeight = headerHeight +
-          (walletCardHeight * appState.wallet!.accounts.length) +
-          footerHeight +
-          bottomPadding;
-
-      final double screenHeight = MediaQuery.of(context).size.height;
-      final double initialChildSize =
-          (contentHeight / screenHeight).clamp(0.3, 0.85);
-
-      return DraggableScrollableSheet(
-        initialChildSize: initialChildSize,
-        minChildSize: 0.3,
-        maxChildSize: 0.70,
-        builder: (_, controller) {
-          return Container(
-            decoration: BoxDecoration(
-              color: theme.cardBackground,
-              borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(20),
+      return SingleChildScrollView(
+        child: Container(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          decoration: BoxDecoration(
+            color: theme.cardBackground,
+            borderRadius: const BorderRadius.vertical(
+              top: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              GestureDetector(
+                onTap: () => Navigator.pop(context),
+                child: Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 16),
+                  decoration: BoxDecoration(
+                    color: theme.textSecondary.withOpacity(0.5),
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
               ),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                GestureDetector(
-                  onTap: () => Navigator.pop(context),
-                  child: Container(
-                    width: 36,
-                    height: 4,
-                    margin: const EdgeInsets.symmetric(vertical: 16),
-                    decoration: BoxDecoration(
-                      color: theme.textSecondary.withOpacity(0.5),
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                GestureDetector(
-                  onTap: onManageWallet,
-                  child: Column(
-                    children: [
-                      Container(
-                        width: 50,
-                        height: 50,
-                        margin: const EdgeInsets.only(bottom: 8),
-                        decoration: BoxDecoration(
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: theme.primaryPurple.withOpacity(0.1),
-                            width: 2,
-                          ),
-                        ),
-                        child: ClipOval(
-                          child: Blockies(
-                            seed: appState.wallet!.walletAddress,
-                            color: getWalletColor(0),
-                            bgColor: theme.primaryPurple,
-                            spotColor: theme.background,
-                            size: 8,
-                          ),
-                        ),
-                      ),
-                      Text(
-                        appState.wallet!.walletName,
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 24,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Expanded(
-                  child: ListView(
-                    controller: controller,
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 24,
-                      vertical: 8,
-                    ),
-                    children:
-                        appState.wallet!.accounts.asMap().entries.map((entry) {
-                      final index = entry.key;
-                      final account = entry.value;
-                      return WalletCard(
-                        name: account.name,
-                        address: shortenAddress(account.addr),
-                        balance: '0.00',
-                        onTap: () => onWalletSelect?.call(index),
-                        isSelected: appState.selectedWallet == index,
-                      );
-                    }).toList(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  child: InkWell(
-                    onTap: onAddWallet,
-                    borderRadius: BorderRadius.circular(16),
-                    child: Container(
-                      height: 64,
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
-                      ),
+              GestureDetector(
+                onTap: onManageWallet,
+                child: Column(
+                  children: [
+                    Container(
+                      width: 50,
+                      height: 50,
+                      margin: const EdgeInsets.only(bottom: 8),
                       decoration: BoxDecoration(
-                        border: Border(
-                          top: BorderSide(
-                            color: theme.textPrimary.withOpacity(0.1),
-                            width: 1,
-                          ),
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.primaryPurple.withOpacity(0.1),
+                          width: 2,
                         ),
                       ),
-                      child: Row(
-                        children: [
-                          Container(
-                            width: 40,
-                            height: 40,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: theme.textPrimary.withOpacity(0.1),
-                                width: 1,
-                              ),
-                            ),
-                            child: Center(
-                              child: SvgPicture.asset(
-                                'assets/icons/plus.svg',
-                                width: 20,
-                                height: 20,
-                                color: theme.textPrimary,
-                              ),
+                      child: ClipOval(
+                        child: Blockies(
+                          seed: appState.wallet!.walletAddress,
+                          color: getWalletColor(0),
+                          bgColor: theme.primaryPurple,
+                          spotColor: theme.background,
+                          size: 8,
+                        ),
+                      ),
+                    ),
+                    Text(
+                      appState.wallet!.walletName,
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 24,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxHeight: MediaQuery.of(context).size.height * 0.5,
+                ),
+                child: ListView(
+                  shrinkWrap: true,
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 24,
+                    vertical: 8,
+                  ),
+                  children:
+                      appState.wallet!.accounts.asMap().entries.map((entry) {
+                    final index = entry.key;
+                    final account = entry.value;
+                    return WalletCard(
+                      name: account.name,
+                      address: shortenAddress(account.addr),
+                      balance: '0.00',
+                      onTap: () => onWalletSelect?.call(index),
+                      isSelected: appState.wallet!.selectedAccount ==
+                          BigInt.from(index),
+                    );
+                  }).toList(),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: InkWell(
+                  onTap: onAddWallet,
+                  borderRadius: BorderRadius.circular(16),
+                  child: Container(
+                    height: 64,
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      border: Border(
+                        top: BorderSide(
+                          color: theme.textPrimary.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 40,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: theme.textPrimary.withOpacity(0.1),
+                              width: 1,
                             ),
                           ),
-                        ],
-                      ),
+                          child: Center(
+                            child: SvgPicture.asset(
+                              'assets/icons/plus.svg',
+                              width: 20,
+                              height: 20,
+                              color: theme.textPrimary,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
-                SizedBox(height: MediaQuery.of(context).padding.bottom),
-              ],
-            ),
-          );
-        },
+              ),
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
+        ),
       );
     },
   );

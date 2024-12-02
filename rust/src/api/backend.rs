@@ -396,6 +396,39 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
+pub async fn add_next_bip39_account(
+    wallet_index: usize,
+    name: String,
+    passphrase: String,
+) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let mut wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+        let first_account = wallet
+            .data
+            .accounts
+            .first()
+            .ok_or("fail to get first account".to_string())?;
+        let bip49 = match first_account.pub_key {
+            PubKey::Secp256k1Sha256Zilliqa(_) => Bip49DerivationPath::Zilliqa(wallet_index),
+            PubKey::Secp256k1Keccak256Ethereum(_) => Bip49DerivationPath::Ethereum(wallet_index),
+            _ => {
+                return Err("Invalid account type".to_string());
+            }
+        };
+
+        // wallet.add_next_bip39_account(name, &bip49, &passphrase);
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_zilliqa_wallet(
     pub_key: String,
     wallet_index: usize,
