@@ -88,6 +88,21 @@ Future<FToken> fetchTokenMeta(
     RustLib.instance.api
         .crateApiBackendFetchTokenMeta(addr: addr, walletIndex: walletIndex);
 
+Future<void> addNextBip39Account(
+        {required BigInt walletIndex,
+        required String name,
+        required String passphrase,
+        required List<String> identifiers,
+        String? password,
+        String? sessionCipher}) =>
+    RustLib.instance.api.crateApiBackendAddNextBip39Account(
+        walletIndex: walletIndex,
+        name: name,
+        passphrase: passphrase,
+        identifiers: identifiers,
+        password: password,
+        sessionCipher: sessionCipher);
+
 Future<(String, String)> addLedgerZilliqaWallet(
         {required String pubKey,
         required BigInt walletIndex,

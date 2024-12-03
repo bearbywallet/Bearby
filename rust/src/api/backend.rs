@@ -400,10 +400,27 @@ pub async fn add_next_bip39_account(
     wallet_index: usize,
     name: String,
     passphrase: String,
+    identifiers: &[String],
+    password: Option<String>,
+    session_cipher: Option<String>,
 ) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let mut wallet = Arc::get_mut(&mut service.core)
-            .ok_or("Cannot get mutable reference to core")?
+        let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
+        let seed = if password.is_some() {
+            core.unlock_wallet_with_password(
+                &password.unwrap_or_default(),
+                identifiers,
+                wallet_index,
+            )
+            .map_err(|e| e.to_string())?
+        } else {
+            let session = hex::decode(session_cipher.unwrap_or_default())
+                .map_err(|_| "Invalid Session cipher")?;
+
+            core.unlock_wallet_with_session(session, identifiers, wallet_index)
+                .map_err(|e| e.to_string())?
+        };
+        let wallet = core
             .wallets
             .get_mut(wallet_index)
             .ok_or("Fail to get mutable link to wallet".to_string())?;
@@ -420,7 +437,9 @@ pub async fn add_next_bip39_account(
             }
         };
 
-        // wallet.add_next_bip39_account(name, &bip49, &passphrase);
+        wallet
+            .add_next_bip39_account(name, &bip49, &passphrase, &seed)
+            .map_err(|e| e.to_string())?;
 
         Ok(())
     } else {

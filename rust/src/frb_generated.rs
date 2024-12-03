@@ -39,7 +39,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1895511574;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 2109725165;
 
 // Section: executor
 
@@ -1415,6 +1415,55 @@ fn wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
         },
     )
 }
+fn wire__crate__api__backend__add_next_bip39_account_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "add_next_bip39_account",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_passphrase = <String>::sse_decode(&mut deserializer);
+            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_password = <Option<String>>::sse_decode(&mut deserializer);
+            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::backend::add_next_bip39_account(
+                            api_wallet_index,
+                            api_name,
+                            api_passphrase,
+                            &api_identifiers,
+                            api_password,
+                            api_session_cipher,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__backend__add_sk_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2288,6 +2337,17 @@ impl SseDecode for Option<StreamSink<String, flutter_rust_bridge::for_generated:
     }
 }
 
+impl SseDecode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<String>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for (String, String) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2339,25 +2399,31 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        31 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        38 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        39 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        40 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__backend__try_unlock_with_password_impl(
+        29 => wire__crate__api__backend__add_next_bip39_account_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        42 => wire__crate__api__backend__try_unlock_with_session_impl(
+        30 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        33 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        34 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        35 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        36 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        40 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        41 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__backend__try_unlock_with_password_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        43 => wire__crate__api__backend__try_unlock_with_session_impl(
             port,
             ptr,
             rust_vec_len,
@@ -2944,6 +3010,16 @@ impl SseEncode for Option<StreamSink<String, flutter_rust_bridge::for_generated:
             <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_encode(
                 value, serializer,
             );
+        }
+    }
+}
+
+impl SseEncode for Option<String> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <String>::sse_encode(value, serializer);
         }
     }
 }
