@@ -131,7 +131,7 @@ abstract class RustLibApi extends BaseApi {
   String crateApiBackendWalletInfoAutoAccessorGetWalletName(
       {required WalletInfo that});
 
-  int crateApiBackendWalletInfoAutoAccessorGetWalletType(
+  String crateApiBackendWalletInfoAutoAccessorGetWalletType(
       {required WalletInfo that});
 
   void crateApiBackendWalletInfoAutoAccessorSetAccounts(
@@ -156,7 +156,7 @@ abstract class RustLibApi extends BaseApi {
       {required WalletInfo that, required String walletName});
 
   void crateApiBackendWalletInfoAutoAccessorSetWalletType(
-      {required WalletInfo that, required int walletType});
+      {required WalletInfo that, required String walletType});
 
   Future<(String, String)> crateApiBackendAddBip39Wallet(
       {required String password,
@@ -762,7 +762,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  int crateApiBackendWalletInfoAutoAccessorGetWalletType(
+  String crateApiBackendWalletInfoAutoAccessorGetWalletType(
       {required WalletInfo that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
@@ -772,7 +772,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 18)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_u_8,
+        decodeSuccessData: sse_decode_String,
         decodeErrorData: null,
       ),
       constMeta: kCrateApiBackendWalletInfoAutoAccessorGetWalletTypeConstMeta,
@@ -988,13 +988,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   void crateApiBackendWalletInfoAutoAccessorSetWalletType(
-      {required WalletInfo that, required int walletType}) {
+      {required WalletInfo that, required String walletType}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
             that, serializer);
-        sse_encode_u_8(walletType, serializer);
+        sse_encode_String(walletType, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 26)!;
       },
       codec: SseCodec(
@@ -2893,7 +2893,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
         that: this,
       );
 
-  int get walletType =>
+  String get walletType =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorGetWalletType(
         that: this,
       );
@@ -2926,7 +2926,7 @@ class WalletInfoImpl extends RustOpaque implements WalletInfo {
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorSetWalletName(
           that: this, walletName: walletName);
 
-  set walletType(int walletType) =>
+  set walletType(String walletType) =>
       RustLib.instance.api.crateApiBackendWalletInfoAutoAccessorSetWalletType(
           that: this, walletType: walletType);
 }

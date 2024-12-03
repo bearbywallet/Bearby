@@ -1284,7 +1284,7 @@ fn wire__crate__api__backend__WalletInfo_auto_accessor_set_wallet_type_impl(
             let api_that = <RustOpaqueMoi<
                 flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>,
             >>::sse_decode(&mut deserializer);
-            let api_wallet_type = <u8>::sse_decode(&mut deserializer);
+            let api_wallet_type = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             transform_result_sse::<_, ()>((move || {
                 let mut api_that_guard = None;

@@ -168,7 +168,7 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   String get walletName;
 
-  int get walletType;
+  String get walletType;
 
   set accounts(List<AccountInfo> accounts);
 
@@ -184,7 +184,7 @@ abstract class WalletInfo implements RustOpaqueInterface {
 
   set walletName(String walletName);
 
-  set walletType(int walletType);
+  set walletType(String walletType);
 }
 
 class AccountInfo {
