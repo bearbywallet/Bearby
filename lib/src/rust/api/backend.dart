@@ -105,6 +105,21 @@ Future<void> addNextBip39Account(
         password: password,
         sessionCipher: sessionCipher);
 
+Future<void> addLedgerAccount(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required String name,
+        required String pubKey,
+        required List<String> identifiers,
+        String? sessionCipher}) =>
+    RustLib.instance.api.crateApiBackendAddLedgerAccount(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        name: name,
+        pubKey: pubKey,
+        identifiers: identifiers,
+        sessionCipher: sessionCipher);
+
 Future<(String, String)> addLedgerZilliqaWallet(
         {required String pubKey,
         required BigInt walletIndex,

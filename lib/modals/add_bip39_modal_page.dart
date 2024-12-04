@@ -1,5 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:ledger_flutter/ledger_flutter.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:zilliqa_ledger_flutter/zilliqa_ledger_flutter.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -107,6 +112,15 @@ class _AddNextBip39AccountContentState
 
   Future<void> _onSubmit() async {
     if (_validateForm()) {
+      String session = "";
+
+      try {
+        session = await _authGuard.getSession(
+            sessionKey: _appState.wallet!.walletAddress);
+      } catch (e) {
+        debugPrint("gettting session error: $e");
+      }
+
       try {
         setState(() {
           _loading = true;
@@ -115,20 +129,80 @@ class _AddNextBip39AccountContentState
 
         DeviceInfoService device = DeviceInfoService();
         List<String> identifiers = await device.getDeviceIdentifiers();
-        String session = await _authGuard.getSession(
-            sessionKey: _appState.wallet!.walletAddress);
 
-        await addNextBip39Account(
-          walletIndex: BigInt.from(_appState.selectedWallet),
-          accountIndex: BigInt.from(_index - 1),
-          name: _nameController.text,
-          passphrase: _passphraseController.text,
-          identifiers: identifiers,
-          password: _passwordController.text.isEmpty
-              ? null
-              : _passwordController.text,
-          sessionCipher: session.isEmpty ? null : session,
-        );
+        if (_appState.wallet!.walletType
+            .contains(WalletType.SecretPhrase.name)) {
+          await addNextBip39Account(
+            walletIndex: BigInt.from(_appState.selectedWallet),
+            accountIndex: BigInt.from(_index - 1),
+            name: _nameController.text,
+            passphrase: _passphraseController.text,
+            identifiers: identifiers,
+            password: _passwordController.text.isEmpty
+                ? null
+                : _passwordController.text,
+            sessionCipher: session.isEmpty ? null : session,
+          );
+        } else if (_appState.wallet!.walletType
+            .contains(WalletType.ledger.name)) {
+          final options = LedgerOptions();
+          Ledger ledger = Ledger(
+            options: options,
+            onPermissionRequest: (status) async {
+              Map<Permission, PermissionStatus> statuses = await [
+                Permission.location,
+                Permission.bluetoothScan,
+                Permission.bluetoothConnect,
+                Permission.bluetoothAdvertise,
+              ].request();
+
+              if (status != BleStatus.ready) {
+                setState(() => _errorMessage = 'Bluetooth is not ready');
+                return false;
+              }
+
+              if (statuses.values
+                  .where((status) => status.isDenied)
+                  .isNotEmpty) {
+                setState(
+                    () => _errorMessage = 'Required permissions were denied');
+                return false;
+              }
+
+              return true;
+            },
+          );
+          String uuid = _appState.wallet!.walletType.split(".").last;
+          LedgerDevice device = LedgerDevice(
+            id: uuid,
+            name: _appState.wallet!.walletName,
+            connectionType: ConnectionType.ble,
+          );
+
+          if (Platform.isAndroid) {
+            List<LedgerDevice> devices = await ledger.listUsbDevices();
+
+            final targetDevice = devices.firstWhere(
+              (d) => d.id == uuid,
+              orElse: () => device,
+            );
+
+            device = targetDevice;
+          }
+
+          ZilliqaLedgerApp ledgerZilliqa = ZilliqaLedgerApp(ledger);
+          ({String publicKey, String address}) key =
+              await ledgerZilliqa.getPublicAddress(device, _index - 1);
+
+          await addLedgerAccount(
+            walletIndex: BigInt.from(_appState.selectedWallet),
+            accountIndex: BigInt.from(_index - 1),
+            name: _nameController.text,
+            pubKey: key.publicKey,
+            identifiers: identifiers,
+            sessionCipher: session.isEmpty ? null : session,
+          );
+        }
         await _appState.syncData();
 
         widget.onBack();

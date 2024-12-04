@@ -449,6 +449,56 @@ pub async fn add_next_bip39_account(
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
+pub async fn add_ledger_account(
+    wallet_index: usize,
+    account_index: usize,
+    name: String,
+    pub_key: String,
+    identifiers: &[String],
+    session_cipher: Option<String>,
+) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
+        let session = hex::decode(session_cipher.unwrap_or_default())
+            .map_err(|_| "Invalid Session cipher")?;
+
+        core.unlock_wallet_with_session(session, identifiers, wallet_index)
+            .map_err(|e| e.to_string())?;
+
+        let wallet = core
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+        let first_account = wallet
+            .data
+            .accounts
+            .first()
+            .ok_or("fail to get first account".to_string())?;
+
+        let pub_key = pub_key.strip_prefix("0x").unwrap_or(&pub_key);
+        let pub_key: [u8; PUB_KEY_SIZE] = hex::decode(pub_key)
+            .unwrap_or_default()
+            .try_into()
+            .or(Err("Invalid pub key size".to_string()))?;
+        let pub_key = match first_account.pub_key {
+            PubKey::Secp256k1Sha256Zilliqa(_) => PubKey::Secp256k1Sha256Zilliqa(pub_key),
+            PubKey::Secp256k1Keccak256Ethereum(_) => PubKey::Secp256k1Keccak256Ethereum(pub_key),
+            _ => {
+                return Err("Invalid account type".to_string());
+            }
+        };
+
+        wallet
+            .add_ledger_account(name, &pub_key, account_index)
+            .map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_zilliqa_wallet(
     pub_key: String,
     wallet_index: usize,
