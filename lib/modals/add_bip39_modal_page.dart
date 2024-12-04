@@ -72,7 +72,7 @@ class _AddNextBip39AccountContentState
 
     final bool isPhr = _appState.wallet!.walletType.split(".").last == "true";
     final bool needsPassphrase =
-        WalletType.SecretPhrase.name.contains(_appState.wallet!.walletType) &&
+        _appState.wallet!.walletType.contains(WalletType.SecretPhrase.name) &&
             isPhr;
 
     if (needsPassphrase) {
@@ -84,7 +84,9 @@ class _AddNextBip39AccountContentState
     }
 
     final bool needsPassword =
-        _appState.wallet!.authType == AuthMethod.none.name;
+        _appState.wallet!.authType == AuthMethod.none.name &&
+            !_appState.wallet!.walletType.contains(WalletType.ledger.name);
+
     if (needsPassword) {
       if (_passwordController.text.isEmpty) {
         _passwordInputKey.currentState?.shake();
@@ -200,13 +202,13 @@ class _AddNextBip39AccountContentState
                         ? (value) {
                             setState(() {
                               _index = value;
-                              _nameController.text = 'Account ${value}';
+                              _nameController.text = 'Account $value';
                             });
                           }
                         : null,
                   ),
-                  if (WalletType.SecretPhrase.name
-                          .contains(_appState.wallet!.walletType) &&
+                  if (_appState.wallet!.walletType
+                          .contains(WalletType.SecretPhrase.name) &&
                       isPhr) ...[
                     SizedBox(height: adaptivePadding),
                     SmartInput(
@@ -229,7 +231,9 @@ class _AddNextBip39AccountContentState
                       onChanged: (value) => setState(() => _errorMessage = ''),
                     ),
                   ],
-                  if (_appState.wallet!.authType == AuthMethod.none.name) ...[
+                  if (_appState.wallet!.authType == AuthMethod.none.name &&
+                      !_appState.wallet!.walletType
+                          .contains(WalletType.ledger.name)) ...[
                     SizedBox(height: adaptivePadding),
                     SmartInput(
                       key: _passwordInputKey,

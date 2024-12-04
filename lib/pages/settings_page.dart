@@ -232,43 +232,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildLogoutButton(AppTheme theme) {
     return GestureDetector(
-      onTap: () async {
-        final confirmed = await showDialog<bool>(
-          context: context,
-          builder: (context) => AlertDialog(
-            backgroundColor: theme.cardBackground,
-            title: Text(
-              'Confirm Logout',
-              style: TextStyle(color: theme.textPrimary),
-            ),
-            content: Text(
-              'Are you sure you want to log out?',
-              style: TextStyle(color: theme.textSecondary),
-            ),
-            actions: [
-              TextButton(
-                onPressed: () => Navigator.pop(context, false),
-                child: Text(
-                  'Cancel',
-                  style: TextStyle(color: theme.textSecondary),
-                ),
-              ),
-              TextButton(
-                onPressed: () => Navigator.pop(context, true),
-                child: const Text(
-                  'Logout',
-                  style: TextStyle(color: Colors.red),
-                ),
-              ),
-            ],
-          ),
-        );
-
-        if (confirmed == true) {
-          Navigator.of(context)
-              .pushNamedAndRemoveUntil('/login', (route) => false);
-        }
-      },
+      onTap: () async {},
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
@@ -280,7 +244,7 @@ class _SettingsPageState extends State<SettingsPage> {
             const SizedBox(width: 16),
             const Expanded(
               child: Text(
-                'Log out',
+                'Delete Wallet',
                 style: TextStyle(
                   color: Colors.red,
                   fontSize: 16,

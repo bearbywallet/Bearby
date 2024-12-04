@@ -1,403 +1,383 @@
 import 'dart:async';
 
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/components/wallet_option.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/auth_guard.dart';
-import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/services/device.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:blockies/blockies.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
-import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+
+import '../components/load_button.dart';
+import '../components/smart_input.dart';
+import '../components/wallet_option.dart';
+import '../mixins/adaptive_size.dart';
+import '../mixins/colors.dart';
+import '../mixins/wallet_type.dart';
+import '../services/auth_guard.dart';
+import '../services/biometric_service.dart';
+import '../services/device.dart';
+import '../state/app_state.dart';
+import '../theme/theme_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  State<LoginPage> createState() => _LoginPage();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPage extends State<LoginPage> {
-  final passwordController = TextEditingController();
+class _LoginPageState extends State<LoginPage> {
+  // Controllers
+  final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
-
   final AuthService _authService = AuthService();
 
-  late AuthGuard _authGuard;
-  late AppState _appState;
+  // Services
+  late final AuthGuard _authGuard;
+  late final AppState _appState;
 
-  bool obscurePassword = true;
-  bool obscureButton = true;
-  int sellectedWallet = -1;
+  // State
+  bool _obscurePassword = true;
+  bool _obscureButton = true;
+  int _selectedWallet = -1;
 
   @override
   void initState() {
     super.initState();
+    _initializeServices();
+  }
 
+  void _initializeServices() {
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
   }
 
   @override
   void dispose() {
-    passwordController.dispose();
+    _passwordController.dispose();
     _btnController.dispose();
-
     super.dispose();
   }
 
-  void toHome() {
-    _appState.setSelectedWallet(sellectedWallet);
+  // Navigation
+  void _navigateToHome() {
+    _appState.setSelectedWallet(_selectedWallet);
+    Navigator.of(context).pushNamed('/');
+  }
 
-    Navigator.of(context).pushNamed(
-      '/',
+  void _navigateToNewWallet() {
+    Navigator.pushNamed(context, '/new_wallet_options');
+  }
+
+  // Authentication Logic
+  Future<bool> _authenticateWithSession(
+      String session, int walletIndex, List<String> identifiers) async {
+    try {
+      bool unlocked = await tryUnlockWithSession(
+        sessionCipher: session,
+        walletIndex: BigInt.from(walletIndex),
+        identifiers: identifiers,
+      );
+
+      if (unlocked) {
+        await _appState.syncData();
+        _authGuard.setEnabled(true);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Session authentication error: $e');
+    }
+    return false;
+  }
+
+  Future<bool> _authenticateWithPassword(
+      String password, int walletIndex, List<String> identifiers) async {
+    try {
+      bool unlocked = await tryUnlockWithPassword(
+        password: password,
+        walletIndex: BigInt.from(walletIndex),
+        identifiers: identifiers,
+      );
+
+      if (unlocked) {
+        await _appState.syncData();
+        _authGuard.setEnabled(true);
+        return true;
+      }
+    } catch (e) {
+      debugPrint('Password authentication error: $e');
+    }
+    return false;
+  }
+
+  Future<bool> _authenticateWithBiometrics() async {
+    try {
+      return await _authService.authenticate(
+        allowPinCode: true,
+        reason: 'Please authenticate',
+      );
+    } catch (e) {
+      debugPrint('Biometric authentication error: $e');
+      return false;
+    }
+  }
+
+  // Authentication Flow
+  Future<void> _handleAuthentication() async {
+    if (_selectedWallet == -1) return;
+
+    final wallet = _appState.wallets[_selectedWallet];
+    final device = DeviceInfoService();
+    final identifiers = await device.getDeviceIdentifiers();
+
+    _btnController.start();
+
+    try {
+      bool isAuthenticated = false;
+
+      if (wallet.walletType.contains(WalletType.ledger.name)) {
+        final session =
+            await _authGuard.getSession(sessionKey: wallet.walletAddress);
+        isAuthenticated = await _authenticateWithSession(
+            session, _selectedWallet, identifiers);
+      } else if (wallet.authType != AuthMethod.none.name) {
+        final biometricAuth = await _authenticateWithBiometrics();
+        if (biometricAuth) {
+          final session =
+              await _authGuard.getSession(sessionKey: wallet.walletAddress);
+          isAuthenticated = await _authenticateWithSession(
+              session, _selectedWallet, identifiers);
+        }
+      } else if (_passwordController.text.isNotEmpty) {
+        isAuthenticated = await _authenticateWithPassword(
+          _passwordController.text,
+          _selectedWallet,
+          identifiers,
+        );
+      } else {
+        _btnController.reset();
+        return;
+      }
+
+      if (isAuthenticated) {
+        _btnController.reset();
+        _navigateToHome();
+      } else {
+        _handleAuthenticationError();
+      }
+    } catch (e) {
+      _handleAuthenticationError();
+    }
+  }
+
+  void _handleAuthenticationError() {
+    _btnController.error();
+    if (_passwordController.text.isNotEmpty) {
+      _passwordInputKey.currentState?.shake();
+    }
+    Timer(const Duration(seconds: 1), () => _btnController.reset());
+  }
+
+  // UI Components
+  Widget _buildBackground(Size screenSize) {
+    return Positioned(
+      child: SizedBox(
+        height: screenSize.height * 0.6,
+        child: Transform.scale(
+          scale: 1.4,
+          child: SvgPicture.asset(
+            'assets/imgs/zilpay.svg',
+            fit: BoxFit.cover,
+            width: screenSize.width,
+            height: screenSize.height * 0.6,
+          ),
+        ),
+      ),
     );
   }
 
-  Future<void> walletTap(int index) async {
-    final wallet = _appState.wallets[index];
-
-    try {
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
-      String session =
-          await _authGuard.getSession(sessionKey: wallet.walletAddress);
-
-      // if Ledger device
-      if (WalletType.Ledger.name.contains(wallet.walletType) &&
-          wallet.authType == AuthMethod.none.name) {
-        _btnController.start();
-
-        bool unlocked = await tryUnlockWithSession(
-          sessionCipher: session,
-          walletIndex: BigInt.from(index),
-          identifiers: identifiers,
-        );
-
-        if (unlocked) {
-          await _appState.syncData();
-          _authGuard.setEnabled(true);
-          _btnController.reset();
-          toHome();
-        } else {
-          _btnController.error();
-
-          Timer(const Duration(seconds: 1), () {
-            _btnController.reset();
-          });
-          return;
-        }
-      }
-
-      if (wallet.authType != "none") {
-        _btnController.start();
-
-        final authenticated = await _authService.authenticate(
-          allowPinCode: true,
-          reason: 'Please authenticate',
-        );
-
-        if (!authenticated) {
-          _btnController.error();
-
-          Timer(const Duration(seconds: 1), () {
-            _btnController.reset();
-          });
-
-          return;
-        }
-
-        bool unlocked = await tryUnlockWithSession(
-          sessionCipher: session,
-          walletIndex: BigInt.from(index),
-          identifiers: identifiers,
-        );
-
-        if (unlocked) {
-          await _appState.syncData();
-          _btnController.reset();
-          _authGuard.setEnabled(true);
-          return toHome();
-        } else {
-          _btnController.error();
-
-          Timer(const Duration(seconds: 1), () {
-            _btnController.reset();
-          });
-        }
-      }
-    } catch (e) {
-      _btnController.error();
-
-      Timer(const Duration(seconds: 1), () {
-        _btnController.reset();
-      });
-    }
+  Widget _buildHeader(ThemeProvider theme) {
+    return Padding(
+      padding: EdgeInsets.all(AdaptiveSize.getAdaptivePadding(context, 16)),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          const Spacer(),
+          IconButton(
+            onPressed: _navigateToNewWallet,
+            icon: SvgPicture.asset(
+              'assets/icons/plus.svg',
+              width: 32,
+              height: 32,
+              colorFilter: ColorFilter.mode(
+                theme.currentTheme.textPrimary,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
-  Future<void> unlock() async {
-    final wallet = _appState.wallets[sellectedWallet];
+  Widget _buildWalletList(ThemeProvider theme) {
+    return Expanded(
+      child: ListView.builder(
+        physics: const BouncingScrollPhysics(),
+        padding: EdgeInsets.symmetric(
+          horizontal: AdaptiveSize.getAdaptivePadding(context, 16),
+        ),
+        itemCount: _appState.wallets.length,
+        itemBuilder: (context, index) => _buildWalletItem(index, theme),
+      ),
+    );
+  }
 
-    try {
-      DeviceInfoService device = DeviceInfoService();
-      List<String> identifiers = await device.getDeviceIdentifiers();
+  Widget _buildWalletItem(int index, ThemeProvider theme) {
+    final wallet = _appState.wallets[index];
 
-      // if Ledger device
-      if (WalletType.Ledger.name.contains(wallet.walletType) &&
-          wallet.authType == AuthMethod.none.name) {
-        String session =
-            await _authGuard.getSession(sessionKey: wallet.walletAddress);
-
-        _btnController.start();
-
-        bool unlocked = await tryUnlockWithSession(
-          sessionCipher: session,
-          walletIndex: BigInt.from(sellectedWallet),
-          identifiers: identifiers,
-        );
-
-        if (unlocked) {
-          await _appState.syncData();
-          _authGuard.setEnabled(true);
-          _btnController.reset();
-          toHome();
-        } else {
-          _btnController.error();
-
-          Timer(const Duration(seconds: 1), () {
-            _btnController.reset();
-          });
-          return;
-        }
-      }
-
-      if (passwordController.text.isNotEmpty) {
-        bool unlocked = await tryUnlockWithPassword(
-          password: passwordController.text,
-          walletIndex: BigInt.from(sellectedWallet),
-          identifiers: identifiers,
-        );
-
-        if (unlocked) {
-          await _appState.syncData();
-          _btnController.reset();
-          _authGuard.setEnabled(true);
-
-          return toHome();
-        } else {
-          _passwordInputKey.currentState?.shake();
-          _btnController.reset();
-
-          return;
-        }
-      }
-    } catch (e) {
-      if (passwordController.text.isNotEmpty) {
-        _passwordInputKey.currentState?.shake();
-      } else {
-        _btnController.reset();
-      }
-
-      Timer(const Duration(seconds: 1), () {
-        _btnController.reset();
-      });
+    if (!_obscureButton && _selectedWallet != index) {
+      return const SizedBox.shrink();
     }
 
-    await walletTap(sellectedWallet);
+    return Padding(
+      padding: EdgeInsets.only(top: index > 0 ? 4 : 0),
+      child: WalletOption(
+        title: wallet.walletName.isEmpty
+            ? "Wallet ${index + 1}"
+            : wallet.walletName,
+        address: wallet.walletAddress,
+        isSelected: _selectedWallet == index,
+        padding: const EdgeInsets.all(16),
+        onTap: () {
+          setState(() => _selectedWallet = index);
+          _handleAuthentication();
+        },
+        icons: _getWalletIcons(wallet),
+        icon: _buildWalletIcon(wallet, index, theme),
+      ),
+    );
+  }
+
+  List<String> _getWalletIcons(WalletInfo wallet) {
+    return [
+      if (wallet.walletType.contains(WalletType.ledger.name))
+        'assets/icons/ledger.svg',
+      if (wallet.walletType.contains(WalletType.SecretPhrase.name))
+        'assets/icons/document.svg',
+      if (wallet.walletType.contains(WalletType.SecretKey.name))
+        'assets/icons/bincode.svg',
+      if (wallet.authType == AuthMethod.faceId.name) 'assets/icons/face_id.svg',
+      if (wallet.authType == AuthMethod.fingerprint.name)
+        'assets/icons/fingerprint.svg',
+      if (wallet.authType == AuthMethod.biometric.name)
+        'assets/icons/biometric.svg',
+      if (wallet.authType == AuthMethod.pinCode.name) 'assets/icons/pin.svg',
+    ];
+  }
+
+  Widget _buildWalletIcon(WalletInfo wallet, int index, ThemeProvider theme) {
+    return Container(
+      padding: const EdgeInsets.all(4),
+      child: Blockies(
+        seed: wallet.walletAddress,
+        color: getWalletColor(index),
+        bgColor: theme.currentTheme.primaryPurple,
+        spotColor: theme.currentTheme.background,
+        size: 8,
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(ThemeProvider theme) {
+    final isLedgerWallet = _selectedWallet != -1 &&
+        _appState.wallets[_selectedWallet].walletType == WalletType.ledger.name;
+
+    return Padding(
+      padding: EdgeInsets.all(AdaptiveSize.getAdaptivePadding(context, 16)),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          SmartInput(
+            key: _passwordInputKey,
+            controller: _passwordController,
+            hint: "Password",
+            fontSize: 18,
+            height: 50,
+            disabled: _selectedWallet == -1 || isLedgerWallet,
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            focusedBorderColor: theme.currentTheme.primaryPurple,
+            obscureText: _obscurePassword,
+            onFocusChanged: (isFocused) =>
+                setState(() => _obscureButton = !isFocused),
+            rightIconPath: _obscurePassword
+                ? "assets/icons/close_eye.svg"
+                : "assets/icons/open_eye.svg",
+            onRightIconTap: () =>
+                setState(() => _obscurePassword = !_obscurePassword),
+          ),
+          const SizedBox(height: 8),
+          if (_obscureButton) _buildUnlockButton(theme),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildUnlockButton(ThemeProvider theme) {
+    return SizedBox(
+      width: double.infinity,
+      child: RoundedLoadingButton(
+        controller: _btnController,
+        onPressed: _handleAuthentication,
+        successIcon: SvgPicture.asset(
+          'assets/icons/ok.svg',
+          width: 24,
+          height: 24,
+          colorFilter: ColorFilter.mode(
+            theme.currentTheme.textPrimary,
+            BlendMode.srcIn,
+          ),
+        ),
+        child: Text(
+          'Unlock',
+          style: TextStyle(
+            color: theme.currentTheme.textPrimary,
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<ThemeProvider>(context);
     final screenSize = MediaQuery.of(context).size;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
-      backgroundColor: theme.background,
+      backgroundColor: theme.currentTheme.background,
       body: Stack(
         children: [
-          Positioned(
-            child: SizedBox(
-              height: screenSize.height * 0.6,
-              child: Transform.scale(
-                scale: 1.4,
-                child: SvgPicture.asset(
-                  'assets/imgs/zilpay.svg',
-                  fit: BoxFit.cover,
-                  width: screenSize.width,
-                  height: screenSize.height * 0.6,
-                ),
-              ),
-            ),
-          ),
+          _buildBackground(screenSize),
           SafeArea(
             child: Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: Column(
                   children: [
-                    Padding(
-                      padding: EdgeInsets.all(adaptivePadding),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          const Spacer(),
-                          IconButton(
-                            onPressed: () {
-                              Navigator.pushNamed(
-                                  context, '/new_wallet_options');
-                            },
-                            icon: SvgPicture.asset(
-                              'assets/icons/plus.svg',
-                              width: 32,
-                              height: 32,
-                              colorFilter: ColorFilter.mode(
-                                theme.textPrimary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
+                    _buildHeader(theme),
                     Text(
                       'Welcome back',
                       style: TextStyle(
-                        color: theme.textPrimary,
+                        color: theme.currentTheme.textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Expanded(
-                      child: ListView.builder(
-                        physics: const BouncingScrollPhysics(),
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        itemCount: _appState.wallets.length,
-                        itemBuilder: (context, index) {
-                          final wallet = _appState.wallets[index];
-
-                          if (!obscureButton && sellectedWallet != index) {
-                            return const SizedBox.shrink();
-                          }
-
-                          return Padding(
-                            padding: EdgeInsets.only(top: index > 0 ? 4 : 0),
-                            child: WalletOption(
-                              title: wallet.walletName.isEmpty
-                                  ? "Wallet ${index + 1}"
-                                  : wallet.walletName,
-                              address: wallet.walletAddress,
-                              isSelected: sellectedWallet == index,
-                              padding: const EdgeInsets.all(16),
-                              onTap: () {
-                                setState(() {
-                                  sellectedWallet = index;
-                                });
-                                walletTap(index);
-                              },
-                              icons: [
-                                if (wallet.walletType == WalletType.Ledger.name)
-                                  'assets/icons/ledger.svg',
-                                if (wallet.walletType ==
-                                    WalletType.SecretPhrase.name)
-                                  'assets/icons/document.svg',
-                                if (wallet.walletType ==
-                                    WalletType.SecretKey.name)
-                                  'assets/icons/bincode.svg',
-                                if (wallet.authType == "faceId")
-                                  'assets/icons/face_id.svg',
-                                if (wallet.authType == "fingerprint")
-                                  'assets/icons/fingerprint.svg',
-                                if (wallet.authType == "biometric")
-                                  'assets/icons/biometric.svg',
-                                if (wallet.authType == "pinCode")
-                                  'assets/icons/pin.svg',
-                              ],
-                              icon: Container(
-                                padding: const EdgeInsets.all(4),
-                                child: Blockies(
-                                  seed: wallet.walletAddress,
-                                  color: getWalletColor(index),
-                                  bgColor: theme.primaryPurple,
-                                  spotColor: theme.background,
-                                  size: 8,
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(adaptivePadding),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          SmartInput(
-                            key: _passwordInputKey,
-                            controller: passwordController,
-                            hint: "Password",
-                            fontSize: 18,
-                            height: 50,
-                            disabled: sellectedWallet == -1 ||
-                                _appState.wallets[sellectedWallet].walletType ==
-                                    WalletType.Ledger.name,
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            focusedBorderColor: theme.primaryPurple,
-                            obscureText: obscurePassword,
-                            onFocusChanged: (isFocused) {
-                              setState(() {
-                                obscureButton = !isFocused;
-                              });
-                            },
-                            rightIconPath: obscurePassword
-                                ? "assets/icons/close_eye.svg"
-                                : "assets/icons/open_eye.svg",
-                            onRightIconTap: () {
-                              setState(() {
-                                obscurePassword = !obscurePassword;
-                              });
-                            },
-                          ),
-                          const SizedBox(height: 8),
-                          if (obscureButton)
-                            SizedBox(
-                              width: double.infinity,
-                              child: RoundedLoadingButton(
-                                controller: _btnController,
-                                onPressed: unlock,
-                                successIcon: SvgPicture.asset(
-                                  'assets/icons/ok.svg',
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.textPrimary,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                child: Text(
-                                  'Unlock',
-                                  style: TextStyle(
-                                    color: theme.textPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
+                    _buildWalletList(theme),
+                    _buildLoginForm(theme),
                   ],
                 ),
               ),
