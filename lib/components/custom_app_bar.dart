@@ -68,7 +68,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   actionIconPath!,
                   width: 30,
                   height: 30,
-                  color: theme.textPrimary,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onPressed: onActionPressed,
               )

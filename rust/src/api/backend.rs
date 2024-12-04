@@ -398,6 +398,7 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_next_bip39_account(
     wallet_index: usize,
+    account_index: usize,
     name: String,
     passphrase: String,
     identifiers: &[String],

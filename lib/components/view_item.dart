@@ -59,7 +59,10 @@ class WalletListItem extends StatelessWidget {
                   'assets/icons/chevron_right.svg',
                   width: 24,
                   height: 24,
-                  color: theme.textSecondary,
+                  colorFilter: ColorFilter.mode(
+                    theme.textSecondary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),

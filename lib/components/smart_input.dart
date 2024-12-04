@@ -119,7 +119,10 @@ class SmartInputState extends State<SmartInput>
           iconPath,
           width: _iconSize,
           height: _iconSize,
-          color: color,
+          colorFilter: ColorFilter.mode(
+            color,
+            BlendMode.srcIn,
+          ),
         ),
       ),
     );

@@ -9,6 +9,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/wallet_option.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -71,7 +72,8 @@ class _LoginPage extends State<LoginPage> {
           await _authGuard.getSession(sessionKey: wallet.walletAddress);
 
       // if Ledger device
-      if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
+      if (WalletType.Ledger.name.contains(wallet.walletType) &&
+          wallet.authType == AuthMethod.none.name) {
         _btnController.start();
 
         bool unlocked = await tryUnlockWithSession(
@@ -133,7 +135,6 @@ class _LoginPage extends State<LoginPage> {
         }
       }
     } catch (e) {
-      print("unlock error $e");
       _btnController.error();
 
       Timer(const Duration(seconds: 1), () {
@@ -150,7 +151,8 @@ class _LoginPage extends State<LoginPage> {
       List<String> identifiers = await device.getDeviceIdentifiers();
 
       // if Ledger device
-      if (wallet.walletType == 0 && wallet.authType == AuthMethod.none.name) {
+      if (WalletType.Ledger.name.contains(wallet.walletType) &&
+          wallet.authType == AuthMethod.none.name) {
         String session =
             await _authGuard.getSession(sessionKey: wallet.walletAddress);
 
@@ -257,7 +259,10 @@ class _LoginPage extends State<LoginPage> {
                               'assets/icons/plus.svg',
                               width: 32,
                               height: 32,
-                              color: theme.textPrimary,
+                              colorFilter: ColorFilter.mode(
+                                theme.textPrimary,
+                                BlendMode.srcIn,
+                              ),
                             ),
                           ),
                         ],
@@ -301,11 +306,13 @@ class _LoginPage extends State<LoginPage> {
                                 walletTap(index);
                               },
                               icons: [
-                                if (wallet.walletType == 0)
+                                if (wallet.walletType == WalletType.Ledger.name)
                                   'assets/icons/ledger.svg',
-                                if (wallet.walletType == 1)
+                                if (wallet.walletType ==
+                                    WalletType.SecretPhrase.name)
                                   'assets/icons/document.svg',
-                                if (wallet.walletType == 2)
+                                if (wallet.walletType ==
+                                    WalletType.SecretKey.name)
                                   'assets/icons/bincode.svg',
                                 if (wallet.authType == "faceId")
                                   'assets/icons/face_id.svg',
@@ -344,7 +351,7 @@ class _LoginPage extends State<LoginPage> {
                             height: 50,
                             disabled: sellectedWallet == -1 ||
                                 _appState.wallets[sellectedWallet].walletType ==
-                                    0,
+                                    WalletType.Ledger.name,
                             padding: const EdgeInsets.symmetric(horizontal: 20),
                             focusedBorderColor: theme.primaryPurple,
                             obscureText: obscurePassword,
