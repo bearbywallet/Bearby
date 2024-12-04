@@ -90,6 +90,7 @@ Future<FToken> fetchTokenMeta(
 
 Future<void> addNextBip39Account(
         {required BigInt walletIndex,
+        required BigInt accountIndex,
         required String name,
         required String passphrase,
         required List<String> identifiers,
@@ -97,6 +98,7 @@ Future<void> addNextBip39Account(
         String? sessionCipher}) =>
     RustLib.instance.api.crateApiBackendAddNextBip39Account(
         walletIndex: walletIndex,
+        accountIndex: accountIndex,
         name: name,
         passphrase: passphrase,
         identifiers: identifiers,

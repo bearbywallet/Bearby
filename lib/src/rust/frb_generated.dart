@@ -179,6 +179,7 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiBackendAddNextBip39Account(
       {required BigInt walletIndex,
+      required BigInt accountIndex,
       required String name,
       required String passphrase,
       required List<String> identifiers,
@@ -1129,6 +1130,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiBackendAddNextBip39Account(
       {required BigInt walletIndex,
+      required BigInt accountIndex,
       required String name,
       required String passphrase,
       required List<String> identifiers,
@@ -1138,6 +1140,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
         sse_encode_String(name, serializer);
         sse_encode_String(passphrase, serializer);
         sse_encode_list_String(identifiers, serializer);
@@ -1153,6 +1156,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       constMeta: kCrateApiBackendAddNextBip39AccountConstMeta,
       argValues: [
         walletIndex,
+        accountIndex,
         name,
         passphrase,
         identifiers,
@@ -1168,6 +1172,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         debugName: "add_next_bip39_account",
         argNames: [
           "walletIndex",
+          "accountIndex",
           "name",
           "passphrase",
           "identifiers",

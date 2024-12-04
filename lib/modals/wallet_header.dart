@@ -6,6 +6,7 @@ import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/add_bip39_modal_page.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/theme_provider.dart';
@@ -172,7 +173,8 @@ class _WalletModalContentState extends State<_WalletModalContent> {
               final account = entry.value;
               return WalletCard(
                 name: account.name,
-                address: shortenAddress(account.addr),
+                address:
+                    shortenAddress(account.addr, leftSize: 8, rightSize: 8),
                 balance: '0.00',
                 onTap: () => widget.onWalletSelect?.call(index),
                 isSelected:
@@ -181,57 +183,58 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             }).toList(),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-          child: InkWell(
-            onTap: () {
-              _pushContent(
-                AddNextBip39AccountContent(
-                  onBack: _popContent,
-                ),
-              );
-            },
-            borderRadius: BorderRadius.circular(16),
-            child: Container(
-              height: 64,
-              padding: const EdgeInsets.symmetric(
-                horizontal: 16,
-                vertical: 12,
-              ),
-              decoration: BoxDecoration(
-                border: Border(
-                  top: BorderSide(
-                    color: theme.textPrimary.withOpacity(0.1),
-                    width: 1,
+        if (!appState.wallet!.walletType.contains(WalletType.SecretKey.name))
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+            child: InkWell(
+              onTap: () {
+                _pushContent(
+                  AddNextBip39AccountContent(
+                    onBack: _popContent,
                   ),
+                );
+              },
+              borderRadius: BorderRadius.circular(16),
+              child: Container(
+                height: 64,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 16,
+                  vertical: 12,
                 ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      border: Border.all(
-                        color: theme.textPrimary.withOpacity(0.1),
-                        width: 1,
-                      ),
-                    ),
-                    child: Center(
-                      child: SvgPicture.asset(
-                        'assets/icons/plus.svg',
-                        width: 20,
-                        height: 20,
-                        color: theme.textPrimary,
-                      ),
+                decoration: BoxDecoration(
+                  border: Border(
+                    top: BorderSide(
+                      color: theme.textPrimary.withOpacity(0.1),
+                      width: 1,
                     ),
                   ),
-                ],
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: theme.textPrimary.withOpacity(0.1),
+                          width: 1,
+                        ),
+                      ),
+                      child: Center(
+                        child: SvgPicture.asset(
+                          'assets/icons/plus.svg',
+                          width: 20,
+                          height: 20,
+                          color: theme.textPrimary,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         SizedBox(height: MediaQuery.of(context).padding.bottom),
       ],
     );

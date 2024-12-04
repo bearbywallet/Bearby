@@ -28,6 +28,9 @@ class Counter extends StatefulWidget {
   final int initialValue;
   final ValueChanged<int>? onChanged;
   final bool disabled;
+  final int minValue;
+  final int maxValue;
+  final String? errorText;
 
   const Counter({
     super.key,
@@ -38,7 +41,11 @@ class Counter extends StatefulWidget {
     this.initialValue = 0,
     this.onChanged,
     this.disabled = false,
-  });
+    this.minValue = 0,
+    this.maxValue = 999999,
+    this.errorText,
+  }) : assert(initialValue >= minValue && initialValue <= maxValue,
+            'Initial value must be between min and max values');
 
   @override
   State<Counter> createState() => _CounterState();
@@ -48,6 +55,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
   late int _count;
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -86,21 +94,31 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
   }
 
   void _increment() {
-    if (!widget.disabled) {
+    if (!widget.disabled && _count < widget.maxValue) {
       setState(() {
         _count++;
         _animate();
+        _errorMessage = null;
         widget.onChanged?.call(_count);
+      });
+    } else if (!widget.disabled && _count >= widget.maxValue) {
+      setState(() {
+        _errorMessage = 'Maximum value reached';
       });
     }
   }
 
   void _decrement() {
-    if (!widget.disabled && _count > 0) {
+    if (!widget.disabled && _count > widget.minValue) {
       setState(() {
         _count--;
         _animate();
+        _errorMessage = null;
         widget.onChanged?.call(_count);
+      });
+    } else if (!widget.disabled && _count <= widget.minValue) {
+      setState(() {
+        _errorMessage = 'Minimum value reached';
       });
     }
   }
@@ -111,6 +129,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
     if (widget.initialValue != oldWidget.initialValue) {
       setState(() {
         _count = widget.initialValue;
+        _errorMessage = null;
       });
     }
   }
@@ -121,60 +140,84 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
 
     return Opacity(
       opacity: widget.disabled ? 0.6 : 1.0,
-      child: SizedBox(
-        width: double.infinity,
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              icon: SvgPicture.string(
-                CounterIcons.minus,
-                width: widget.iconSize,
-                height: widget.iconSize,
-                colorFilter: ColorFilter.mode(
-                  _count > 0 && !widget.disabled
-                      ? widget.iconColor ?? theme.secondaryPurple
-                      : (widget.iconColor ?? theme.secondaryPurple)
-                          .withOpacity(0.3),
-                  BlendMode.srcIn,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          SizedBox(
+            width: double.infinity,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                IconButton(
+                  icon: SvgPicture.string(
+                    CounterIcons.minus,
+                    width: widget.iconSize,
+                    height: widget.iconSize,
+                    colorFilter: ColorFilter.mode(
+                      _count > widget.minValue && !widget.disabled
+                          ? widget.iconColor ?? theme.secondaryPurple
+                          : (widget.iconColor ?? theme.secondaryPurple)
+                              .withOpacity(0.3),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: widget.disabled
+                      ? null
+                      : (_count > widget.minValue ? _decrement : null),
                 ),
-              ),
-              onPressed:
-                  widget.disabled ? null : (_count > 0 ? _decrement : null),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16.0),
+                  child: AnimatedBuilder(
+                    animation: _scaleAnimation,
+                    builder: (context, child) => Transform.scale(
+                      scale: _scaleAnimation.value,
+                      child: child,
+                    ),
+                    child: Text(
+                      '$_count',
+                      style: widget.numberStyle ??
+                          TextStyle(
+                            fontSize: 14,
+                            color: theme.textSecondary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                    ),
+                  ),
+                ),
+                IconButton(
+                  icon: SvgPicture.string(
+                    CounterIcons.plus,
+                    width: widget.iconSize,
+                    height: widget.iconSize,
+                    colorFilter: ColorFilter.mode(
+                      _count < widget.maxValue && !widget.disabled
+                          ? widget.iconColor ?? theme.secondaryPurple
+                          : (widget.iconColor ?? theme.secondaryPurple)
+                              .withOpacity(0.3),
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: widget.disabled
+                      ? null
+                      : (_count < widget.maxValue ? _increment : null),
+                ),
+              ],
             ),
+          ),
+          if (_errorMessage != null || widget.errorText != null)
             Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: AnimatedBuilder(
-                animation: _scaleAnimation,
-                builder: (context, child) => Transform.scale(
-                  scale: _scaleAnimation.value,
-                  child: child,
+              padding: const EdgeInsets.only(top: 4.0),
+              child: Text(
+                _errorMessage ?? widget.errorText ?? '',
+                style: TextStyle(
+                  color: theme.danger,
+                  fontSize: 12,
+                  fontWeight: FontWeight.w400,
                 ),
-                child: Text(
-                  '$_count',
-                  style: widget.numberStyle ??
-                      TextStyle(
-                        fontSize: 14,
-                        color: theme.textSecondary,
-                        fontWeight: FontWeight.w500,
-                      ),
-                ),
+                textAlign: TextAlign.center,
               ),
             ),
-            IconButton(
-              icon: SvgPicture.string(
-                CounterIcons.plus,
-                width: widget.iconSize,
-                height: widget.iconSize,
-                colorFilter: ColorFilter.mode(
-                  widget.iconColor ?? theme.secondaryPurple,
-                  BlendMode.srcIn,
-                ),
-              ),
-              onPressed: widget.disabled ? null : _increment,
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }

@@ -118,6 +118,7 @@ class _AddNextBip39AccountContentState
 
         await addNextBip39Account(
           walletIndex: BigInt.from(_appState.selectedWallet),
+          accountIndex: BigInt.from(_index - 1),
           name: _nameController.text,
           passphrase: _passphraseController.text,
           identifiers: identifiers,
@@ -185,19 +186,21 @@ class _AddNextBip39AccountContentState
                   Counter(
                     iconSize: 32,
                     iconColor: theme.textPrimary,
+                    minValue: _appState.wallet!.accounts.length + 1,
+                    maxValue: 255,
                     animationDuration: const Duration(milliseconds: 300),
                     numberStyle: TextStyle(
                       fontSize: 32,
                       fontWeight: FontWeight.bold,
                       color: theme.textPrimary,
                     ),
-                    initialValue: 0,
+                    initialValue: _appState.wallet!.accounts.length + 1,
                     disabled: _loading,
                     onChanged: !_loading
                         ? (value) {
                             setState(() {
                               _index = value;
-                              _nameController.text = 'Account ${value + 1}';
+                              _nameController.text = 'Account ${value}';
                             });
                           }
                         : null,

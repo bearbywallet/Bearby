@@ -1438,6 +1438,7 @@ fn wire__crate__api__backend__add_next_bip39_account_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_name = <String>::sse_decode(&mut deserializer);
             let api_passphrase = <String>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
@@ -1449,6 +1450,7 @@ fn wire__crate__api__backend__add_next_bip39_account_impl(
                     (move || async move {
                         let output_ok = crate::api::backend::add_next_bip39_account(
                             api_wallet_index,
+                            api_account_index,
                             api_name,
                             api_passphrase,
                             &api_identifiers,
