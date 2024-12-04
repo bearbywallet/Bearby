@@ -431,8 +431,8 @@ pub async fn add_next_bip39_account(
             .first()
             .ok_or("fail to get first account".to_string())?;
         let bip49 = match first_account.pub_key {
-            PubKey::Secp256k1Sha256Zilliqa(_) => Bip49DerivationPath::Zilliqa(wallet_index),
-            PubKey::Secp256k1Keccak256Ethereum(_) => Bip49DerivationPath::Ethereum(wallet_index),
+            PubKey::Secp256k1Sha256Zilliqa(_) => Bip49DerivationPath::Zilliqa(account_index),
+            PubKey::Secp256k1Keccak256Ethereum(_) => Bip49DerivationPath::Ethereum(account_index),
             _ => {
                 return Err("Invalid account type".to_string());
             }
