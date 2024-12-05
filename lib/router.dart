@@ -6,6 +6,7 @@ import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
+import 'package:zilpay/pages/wallet.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -56,7 +57,8 @@ class AppRouter {
       '/gen_options',
       '/new_wallet_options',
       '/initial',
-      '/ledger_connect'
+      '/ledger_connect',
+      '/wallet'
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -146,6 +148,8 @@ class AppRouter {
         return wrapWithProviders(const HistoryPage());
       case '/browser':
         return wrapWithProviders(const BrowserPage());
+      case '/wallet':
+        return wrapWithProviders(const WalletPage());
       case '/settings':
         return wrapWithProviders(const SettingsPage());
       case '/pass_setup':
