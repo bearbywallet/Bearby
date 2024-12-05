@@ -10,6 +10,7 @@ import 'package:zilpay/components/wallet_header.dart';
 
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/theme_provider.dart';
@@ -212,7 +213,15 @@ class _HomePageState extends State<HomePage> {
                             height: 30,
                             color: theme.textSecondary,
                             onTap: () {
-                              print('tokens manage');
+                              showManageTokensModal(
+                                context: context,
+                                onAddToken: () {
+                                  debugPrint('Add new token');
+                                },
+                                onTokenToggle: (String symbol) async {
+                                  debugPrint("symbol $symbol");
+                                },
+                              );
                             },
                           ),
                         ],

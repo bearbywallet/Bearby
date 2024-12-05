@@ -17,7 +17,7 @@ void showWalletModal({
   VoidCallback? onAddWallet,
   Function(int)? onWalletSelect,
 }) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
