@@ -110,6 +110,7 @@ class _HomePageState extends State<HomePage> {
                             assetName: 'assets/icons/gear.svg',
                             width: 30,
                             height: 30,
+                            padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
                             color: theme.textSecondary,
                             onTap: () {
                               Navigator.pushNamed(context, '/settings');
@@ -203,7 +204,7 @@ class _HomePageState extends State<HomePage> {
                     ),
                     Padding(
                       padding: EdgeInsets.symmetric(
-                          horizontal: adaptivePadding, vertical: 16),
+                          horizontal: adaptivePadding, vertical: 4),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
@@ -211,6 +212,8 @@ class _HomePageState extends State<HomePage> {
                             assetName: 'assets/icons/manage.svg',
                             width: 30,
                             height: 30,
+                            padding: EdgeInsets.fromLTRB(30, adaptivePadding,
+                                adaptivePadding, adaptivePadding),
                             color: theme.textSecondary,
                             onTap: () {
                               showManageTokensModal(
@@ -253,7 +256,7 @@ class _HomePageState extends State<HomePage> {
                           return TokenCard(
                             tokenAmount: tokenAmount,
                             tokenAddr: token.addr,
-                            convertAmount: 0, // add the loading rates.
+                            convertAmount: 0,
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,

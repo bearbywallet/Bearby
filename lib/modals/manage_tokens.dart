@@ -147,6 +147,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               symbol: token.symbol,
               name: token.name,
               addr: token.addr,
+              isDefault: token.default_,
               iconUrl: viewIcon(token.addr, "Light"),
               onToggle: (value) => widget.onTokenToggle?.call(token.addr),
               isEnabled: true,
@@ -162,6 +163,7 @@ class _TokenListItem extends StatelessWidget {
   final String iconUrl;
   final Function(bool)? onToggle;
   final bool isEnabled;
+  final bool isDefault; // New property for default token
 
   const _TokenListItem({
     required this.symbol,
@@ -169,29 +171,49 @@ class _TokenListItem extends StatelessWidget {
     required this.addr,
     required this.iconUrl,
     required this.isEnabled,
+    required this.isDefault, // Make it required
     this.onToggle,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    const double iconSize = 32.0;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(20),
-            child: SvgPicture.network(
-              iconUrl,
-              width: 32,
-              height: 32,
-              placeholderBuilder: (context) => SizedBox(
-                width: 32,
-                height: 32,
-                child: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
+          Container(
+            width: iconSize,
+            height: iconSize,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(16),
+              child: SvgPicture.network(
+                iconUrl,
+                width: iconSize,
+                height: iconSize,
+                fit: BoxFit.cover,
+                placeholderBuilder: (context) => Container(
+                  width: iconSize,
+                  height: iconSize,
+                  decoration: BoxDecoration(
+                    color: theme.textSecondary.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: Center(
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.textSecondary.withOpacity(0.5),
+                      ),
+                    ),
                   ),
                 ),
               ),
@@ -200,30 +222,59 @@ class _TokenListItem extends StatelessWidget {
           const SizedBox(width: 12),
           Expanded(
             child: Column(
+              mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  symbol,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
+                Row(
+                  children: [
+                    Text(
+                      symbol,
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                        height: 1.2,
+                      ),
+                    ),
+                    if (isDefault) ...[
+                      const SizedBox(width: 8),
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 6,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: theme.textSecondary.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          'Default',
+                          style: TextStyle(
+                            color: theme.textSecondary,
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
+                const SizedBox(height: 2),
                 Text(
                   name,
                   style: TextStyle(
                     color: theme.textSecondary,
                     fontSize: 14,
+                    height: 1.2,
                   ),
                 ),
               ],
             ),
           ),
           Switch(
-            value: isEnabled,
+            value: isDefault ? true : isEnabled,
             onChanged: onToggle,
-            activeColor: Colors.green,
+            activeColor: isDefault ? theme.textSecondary : theme.success,
           ),
         ],
       ),

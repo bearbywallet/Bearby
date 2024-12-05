@@ -9,6 +9,7 @@ class HoverSvgIcon extends StatefulWidget {
   final double height;
   final VoidCallback onTap;
   final Color? color;
+  final EdgeInsets? padding;
 
   const HoverSvgIcon({
     super.key,
@@ -17,6 +18,7 @@ class HoverSvgIcon extends StatefulWidget {
     required this.height,
     required this.onTap,
     this.color,
+    this.padding = const EdgeInsets.all(8.0),
   });
 
   @override
@@ -31,20 +33,29 @@ class _HoverSvgIconState extends State<HoverSvgIcon> {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final iconColor = widget.color ?? theme.textPrimary;
 
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) => setState(() => _isPressed = false),
-      onTapCancel: () => setState(() => _isPressed = false),
-      onTap: widget.onTap,
-      child: Opacity(
-        opacity: _isPressed ? 0.5 : 1.0,
-        child: SvgPicture.asset(
-          widget.assetName,
-          width: widget.width,
-          height: widget.height,
-          colorFilter: ColorFilter.mode(
-            iconColor,
-            BlendMode.srcIn,
+    return Container(
+      constraints: BoxConstraints(
+        minWidth: widget.width + 16,
+        minHeight: widget.height + 16,
+      ),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        onTap: widget.onTap,
+        child: Padding(
+          padding: widget.padding!,
+          child: Opacity(
+            opacity: _isPressed ? 0.5 : 1.0,
+            child: SvgPicture.asset(
+              widget.assetName,
+              width: widget.width,
+              height: widget.height,
+              colorFilter: ColorFilter.mode(
+                iconColor,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
         ),
       ),
