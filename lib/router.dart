@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
@@ -58,7 +59,8 @@ class AppRouter {
       '/new_wallet_options',
       '/initial',
       '/ledger_connect',
-      '/wallet'
+      '/wallet',
+      'appearance'
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -150,6 +152,8 @@ class AppRouter {
         return wrapWithProviders(const BrowserPage());
       case '/wallet':
         return wrapWithProviders(const WalletPage());
+      case '/appearance':
+        return wrapWithProviders(const AppearanceSettingsPage());
       case '/settings':
         return wrapWithProviders(const SettingsPage());
       case '/pass_setup':
