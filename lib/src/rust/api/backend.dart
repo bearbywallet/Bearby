@@ -137,6 +137,11 @@ Future<(String, String)> addLedgerZilliqaWallet(
         biometricType: biometricType,
         identifiers: identifiers);
 
+Future<void> selectAccount(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiBackendSelectAccount(
+        walletIndex: walletIndex, accountIndex: accountIndex);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 
