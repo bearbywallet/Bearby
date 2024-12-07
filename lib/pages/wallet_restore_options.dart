@@ -43,7 +43,10 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                   height: 35,
                   color: theme.primaryPurple,
                 ),
-                onTap: () {/* Handle BIP39 restoration */},
+                onTap: () {
+                  print("dasdsadsa");
+                  Navigator.of(context).pushNamed('/restore_bip39');
+                },
               ),
               WalletListItem(
                 title: 'SLIP-0039',

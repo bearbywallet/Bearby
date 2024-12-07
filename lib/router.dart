@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/password_setup.dart';
+import 'package:zilpay/pages/restore_bip39.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
@@ -60,7 +61,8 @@ class AppRouter {
       '/initial',
       '/ledger_connect',
       '/wallet',
-      'appearance'
+      '/appearance',
+      '/restore_bip39'
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -82,6 +84,8 @@ class AppRouter {
         switch (settings.name) {
           case '/pass_setup':
             return wrapWithProviders(const PasswordSetupPage());
+          case '/restore_bip39':
+            return wrapWithProviders(const RestoreSecretPhrasePage());
           case '/cipher_setup':
             return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
@@ -126,6 +130,8 @@ class AppRouter {
             return wrapWithProviders(const SecretPhraseGeneratorPage());
           case '/verify_bip39':
             return wrapWithProviders(const SecretPhraseVerifyPage());
+          case '/restore_bip39':
+            return wrapWithProviders(const RestoreSecretPhrasePage());
           case '/restore_options':
             return wrapWithProviders(const RestoreWalletOptionsPage());
           case '/gen_options':
@@ -174,6 +180,8 @@ class AppRouter {
         return wrapWithProviders(const GenWalletOptionsPage());
       case '/new_wallet_options':
         return wrapWithProviders(const AddWalletOptionsPage());
+      case '/restore_bip39':
+        return wrapWithProviders(const RestoreSecretPhrasePage());
       case '/initial':
         return wrapWithProviders(const InitialPage());
       default:

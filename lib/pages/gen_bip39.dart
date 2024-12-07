@@ -53,15 +53,6 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text(
-                          'Generate Bip39 Wallet',
-                          style: TextStyle(
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                            color: theme.textPrimary,
-                          ),
-                        ),
-                        const SizedBox(height: 16),
                         WordCountSelector(
                           wordCounts: const [12, 15, 18, 21, 24],
                           selectedCount: _count,
