@@ -63,6 +63,7 @@ class _AddNextBip39AccountContentState
     _appState = Provider.of<AppState>(context, listen: false);
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _nameController.text = 'Account ${_appState.wallet!.accounts.length + 1}';
+    _index = _appState.wallet!.accounts.length + 1;
   }
 
   bool _validateForm() {
