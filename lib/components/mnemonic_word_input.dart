@@ -7,6 +7,8 @@ class MnemonicWordInput extends StatefulWidget {
   final String word;
   final bool isEditable;
   final Color? borderColor;
+  final Color? errorBorderColor;
+  final bool hasError;
   final double opacity;
   final Function(int, String)? onChanged;
 
@@ -18,6 +20,8 @@ class MnemonicWordInput extends StatefulWidget {
     this.opacity = 1,
     this.isEditable = false,
     this.borderColor,
+    this.errorBorderColor,
+    this.hasError = false,
   });
 
   @override
@@ -64,21 +68,34 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
       decoration: BoxDecoration(
         color: theme.cardBackground.withOpacity(widget.opacity),
         borderRadius: BorderRadius.circular(16),
-        border: widget.borderColor != null
-            ? Border.all(color: widget.borderColor!, width: 1)
-            : null,
+        border: widget.hasError
+            ? Border.all(
+                color: widget.errorBorderColor ?? theme.danger,
+                width: 1,
+              )
+            : widget.borderColor != null
+                ? Border.all(color: widget.borderColor!, width: 1)
+                : null,
       ),
       child: Row(
         children: [
           Text(
             '${widget.index}',
-            style: TextStyle(color: theme.textSecondary),
+            style: TextStyle(
+              color: widget.hasError
+                  ? (widget.errorBorderColor ?? theme.danger)
+                  : theme.textSecondary,
+            ),
           ),
           const SizedBox(width: 10),
           Expanded(
             child: TextField(
               controller: _controller,
-              style: TextStyle(color: theme.textPrimary),
+              style: TextStyle(
+                color: widget.hasError
+                    ? (widget.errorBorderColor ?? theme.danger)
+                    : theme.textPrimary,
+              ),
               enabled: widget.isEditable,
               decoration: const InputDecoration(
                 border: InputBorder.none,
