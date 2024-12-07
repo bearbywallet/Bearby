@@ -188,9 +188,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       _btnController.start();
 
       Uint64List networkIndexes = Uint64List.fromList(_codes!);
-      Uint64List accountsIndexes =
-          Uint64List.fromList([0]); // TODO: maybe make ui/ux
-
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
@@ -206,7 +203,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         session = await addBip39Wallet(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
-          indexes: accountsIndexes,
+          accouns: [
+            (BigInt.zero, "Account 0")
+          ], // TODO: add interface for change Account name
           passphrase: "", // TODO: maybe make it
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
