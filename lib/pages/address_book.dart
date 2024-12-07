@@ -14,8 +14,8 @@ class AddressBookPage extends StatefulWidget {
 
 class _AddressBookPageState extends State<AddressBookPage> {
   final List<Address> addresses = [
-    // Uncomment to show populated state
-    // Address('Wallet'),
+    // Address("test"),
+    // Address("Wallet"),
   ];
 
   @override
@@ -101,7 +101,9 @@ class _AddressBookPageState extends State<AddressBookPage> {
             child: Row(
               children: [
                 SvgPicture.asset(
-                  'assets/icons/wallet.svg',
+                  'assets/icons/book.svg',
+                  width: 24,
+                  height: 24,
                   colorFilter: ColorFilter.mode(
                     theme.textSecondary,
                     BlendMode.srcIn,
