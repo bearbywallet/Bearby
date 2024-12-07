@@ -1,6 +1,7 @@
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter/ledger_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -232,7 +233,15 @@ class _AddNextBip39AccountContentState
         CustomAppBar(
           title: '',
           onBackPressed: _loading ? () {} : widget.onBack,
-          actionIconPath: "assets/icons/plus.svg",
+          actionIcon: SvgPicture.asset(
+            'assets/icons/plus.svg',
+            width: 30,
+            height: 30,
+            colorFilter: ColorFilter.mode(
+              theme.textPrimary,
+              BlendMode.srcIn,
+            ),
+          ),
           onActionPressed: _loading ? () {} : _onSubmit,
         ),
         Flexible(

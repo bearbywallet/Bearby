@@ -7,16 +7,16 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String? title;
   final VoidCallback onBackPressed;
   final VoidCallback? onActionPressed;
-  final String? actionIconPath;
-  final String? actionText;
+  final Widget? actionIcon;
+  final Widget? actionWidget;
 
   const CustomAppBar({
     super.key,
     this.title,
     required this.onBackPressed,
     this.onActionPressed,
-    this.actionIconPath,
-    this.actionText,
+    this.actionIcon,
+    this.actionWidget,
   });
 
   @override
@@ -34,7 +34,10 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 'assets/icons/back.svg',
                 width: 24,
                 height: 24,
-                color: theme.textPrimary,
+                colorFilter: ColorFilter.mode(
+                  theme.textPrimary,
+                  BlendMode.srcIn,
+                ),
               ),
               onPressed: onBackPressed,
             ),
@@ -50,29 +53,14 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-            if (actionText != null && onActionPressed != null)
+            if (actionWidget != null && onActionPressed != null)
               TextButton(
                 onPressed: onActionPressed,
-                child: Text(
-                  actionText!,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
+                child: actionWidget!,
               )
-            else if (actionIconPath != null && onActionPressed != null)
+            else if (actionIcon != null && onActionPressed != null)
               IconButton(
-                icon: SvgPicture.asset(
-                  actionIconPath!,
-                  width: 30,
-                  height: 30,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
-                  ),
-                ),
+                icon: actionIcon!,
                 onPressed: onActionPressed,
               )
             else

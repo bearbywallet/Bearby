@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -44,7 +45,15 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                 CustomAppBar(
                   title: 'New Wallet',
                   onBackPressed: () => Navigator.pop(context),
-                  actionIconPath: 'assets/icons/reload.svg',
+                  actionIcon: SvgPicture.asset(
+                    'assets/icons/reload.svg',
+                    width: 30,
+                    height: 30,
+                    colorFilter: ColorFilter.mode(
+                      theme.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   onActionPressed: _regenerateMnemonicWords,
                 ),
                 Expanded(

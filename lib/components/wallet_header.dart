@@ -56,11 +56,7 @@ class _WalletHeaderState extends State<WalletHeader>
     showWalletModal(
       context: context,
       onManageWallet: () {
-        print("manage");
-        // Handle manage wallet
-      },
-      onAddWallet: () {
-        // Handle add wallet
+        Navigator.pushNamed(context, '/login');
       },
       onWalletSelect: (index) {
         // Handle wallet selection

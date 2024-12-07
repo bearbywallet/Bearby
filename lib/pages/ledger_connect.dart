@@ -181,7 +181,15 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                 CustomAppBar(
                   title: '',
                   onBackPressed: () => Navigator.pop(context),
-                  actionIconPath: 'assets/icons/reload.svg',
+                  actionIcon: SvgPicture.asset(
+                    'assets/icons/reload.svg',
+                    width: 30,
+                    height: 30,
+                    colorFilter: ColorFilter.mode(
+                      theme.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
                   onActionPressed: _startScanning,
                 ),
                 Padding(

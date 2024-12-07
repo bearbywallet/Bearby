@@ -14,7 +14,6 @@ import 'package:zilpay/theme/theme_provider.dart';
 void showWalletModal({
   required BuildContext context,
   VoidCallback? onManageWallet,
-  VoidCallback? onAddWallet,
   Function(int)? onWalletSelect,
 }) {
   showModalBottomSheet<void>(
@@ -28,7 +27,6 @@ void showWalletModal({
     builder: (BuildContext context) {
       return _WalletModalContent(
         onManageWallet: onManageWallet,
-        onAddWallet: onAddWallet,
         onWalletSelect: onWalletSelect,
       );
     },
@@ -37,12 +35,10 @@ void showWalletModal({
 
 class _WalletModalContent extends StatefulWidget {
   final VoidCallback? onManageWallet;
-  final VoidCallback? onAddWallet;
   final Function(int)? onWalletSelect;
 
   const _WalletModalContent({
     this.onManageWallet,
-    this.onAddWallet,
     this.onWalletSelect,
   });
 
@@ -226,7 +222,10 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                           'assets/icons/plus.svg',
                           width: 20,
                           height: 20,
-                          color: theme.textPrimary,
+                          colorFilter: ColorFilter.mode(
+                            theme.textPrimary,
+                            BlendMode.srcIn,
+                          ),
                         ),
                       ),
                     ),
