@@ -2,7 +2,6 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
@@ -152,10 +151,12 @@ class _WalletPageState extends State<WalletPage> {
             children: [
               _buildPreferenceItem(
                 theme,
-                'Notifications',
-                'assets/icons/bell.svg',
+                'Zilliqa legacy',
+                'assets/icons/scilla.svg',
                 true,
-                (value) {},
+                (value) {
+                  debugPrint("enable Zilliqa legacy mode");
+                },
               ),
               Divider(
                 height: 1,
@@ -168,6 +169,18 @@ class _WalletPageState extends State<WalletPage> {
                 false,
                 null,
                 onTap: () => Navigator.pushNamed(context, '/connections'),
+              ),
+              Divider(
+                height: 1,
+                color: theme.textSecondary.withOpacity(0.1),
+              ),
+              _buildPreferenceItem(
+                theme,
+                'Backup',
+                'assets/icons/key.svg',
+                false,
+                null,
+                onTap: () {},
               ),
             ],
           ),
@@ -222,15 +235,38 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Widget _buildRemoveWalletButton(AppTheme theme) {
-    return CustomButton(
-      text: 'Remove wallet',
-      onPressed: () {
-        // Implement wallet removal logic
-      },
-      backgroundColor: theme.danger.withOpacity(0.4),
-      textColor: theme.textPrimary.withOpacity(0.5),
-      height: 48,
-      borderRadius: 12,
+    return GestureDetector(
+      onTap: () async {},
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.red.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Row(
+          children: [
+            const SizedBox(width: 16),
+            const Expanded(
+              child: Text(
+                'Delete Wallet',
+                style: TextStyle(
+                  color: Colors.red,
+                  fontSize: 16,
+                ),
+              ),
+            ),
+            SvgPicture.asset(
+              'assets/icons/logout.svg',
+              colorFilter: const ColorFilter.mode(
+                Colors.red,
+                BlendMode.srcIn,
+              ),
+              width: 24,
+              height: 24,
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

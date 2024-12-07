@@ -1,6 +1,5 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -132,9 +131,6 @@ class _SettingsPageState extends State<SettingsPage> {
                             onTap: () => Navigator.pushNamed(context, '/about'),
                           ),
                         ]),
-                        const SizedBox(height: 24),
-                        _buildLogoutButton(theme),
-                        const SizedBox(height: 24),
                       ],
                     ),
                   ),
@@ -231,44 +227,8 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildLogoutButton(AppTheme theme) {
-    return GestureDetector(
-      onTap: () async {},
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            const SizedBox(width: 16),
-            const Expanded(
-              child: Text(
-                'Delete Wallet',
-                style: TextStyle(
-                  color: Colors.red,
-                  fontSize: 16,
-                ),
-              ),
-            ),
-            SvgPicture.asset(
-              'assets/icons/logout.svg',
-              colorFilter: const ColorFilter.mode(
-                Colors.red,
-                BlendMode.srcIn,
-              ),
-              width: 24,
-              height: 24,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Future<void> _launchURL(String url) async {
-    final Uri uri = Uri.parse(url);
+    // final Uri uri = Uri.parse(url);
     // Implement your URL launcher logic here
     // Use url_launcher package
   }
