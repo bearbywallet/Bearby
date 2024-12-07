@@ -24,37 +24,36 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  late AppState _appState;
-
   @override
   void initState() {
     super.initState();
 
-    _appState = Provider.of<AppState>(context, listen: false);
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_appState.wallet == null || _appState.account == null) {
+      final appState = Provider.of<AppState>(context, listen: false);
+
+      if (appState.wallet == null || appState.account == null) {
         Navigator.of(context).pop();
         return;
       }
 
-      _refreshData();
+      _refreshData(appState);
     });
   }
 
-  Future<void> _refreshData() async {
+  Future<void> _refreshData(AppState appState) async {
     try {
-      BigInt index = BigInt.from(_appState.selectedWallet);
+      BigInt index = BigInt.from(appState.selectedWallet);
       await syncBalances(walletIndex: index);
-      await _appState.syncData();
+      await appState.syncData();
       setState(() {});
     } catch (e) {
-      print("error sync balance: $e");
+      debugPrint("error sync balance: $e");
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
@@ -67,7 +66,9 @@ class _HomePageState extends State<HomePage> {
             physics: const AlwaysScrollableScrollPhysics(),
             slivers: [
               CupertinoSliverRefreshControl(
-                onRefresh: _refreshData,
+                onRefresh: () async {
+                  await _refreshData(appState);
+                },
                 builder: (
                   BuildContext context,
                   RefreshIndicatorMode refreshState,
@@ -96,14 +97,11 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: WalletHeader(
-                              walletName: _appState.account!.name,
-                              walletAddress: _appState.account!.addr,
+                              walletName: appState.account!.name,
+                              walletAddress: appState.account!.addr,
                               primaryPurple: theme.primaryPurple,
                               background: theme.background,
                               textPrimary: theme.textPrimary,
-                              onTap: () {
-                                print('Wallet header tapped');
-                              },
                             ),
                           ),
                           HoverSvgIcon(
@@ -233,14 +231,14 @@ class _HomePageState extends State<HomePage> {
                     Padding(
                       padding: EdgeInsets.all(adaptivePadding),
                       child: Column(
-                        children: _appState.wallet!.tokens
+                        children: appState.wallet!.tokens
                             .asMap()
                             .entries
                             .map((entry) {
                           final token = entry.value;
                           final isLast =
-                              entry.key == _appState.wallet!.tokens.length - 1;
-                          final account = _appState.account!;
+                              entry.key == appState.wallet!.tokens.length - 1;
+                          final account = appState.account!;
                           String tokenAmountValue =
                               token.balances[account.addr] ?? "0";
                           double tokenAmount = 0;

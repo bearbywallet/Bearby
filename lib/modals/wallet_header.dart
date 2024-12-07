@@ -27,7 +27,6 @@ void showWalletModal({
     builder: (BuildContext context) {
       return _WalletModalContent(
         onManageWallet: onManageWallet,
-        onWalletSelect: onWalletSelect,
       );
     },
   );
@@ -35,11 +34,9 @@ void showWalletModal({
 
 class _WalletModalContent extends StatefulWidget {
   final VoidCallback? onManageWallet;
-  final Function(int)? onWalletSelect;
 
   const _WalletModalContent({
     this.onManageWallet,
-    this.onWalletSelect,
   });
 
   @override
@@ -172,7 +169,20 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                 address:
                     shortenAddress(account.addr, leftSize: 8, rightSize: 8),
                 balance: '0.00',
-                onTap: () => widget.onWalletSelect?.call(index),
+                onTap: () async {
+                  final appState =
+                      Provider.of<AppState>(context, listen: false);
+                  BigInt walletIndex = BigInt.from(appState.selectedWallet);
+                  BigInt accountIndex = BigInt.from(index);
+
+                  try {
+                    await appState.updateSelectedAccount(
+                        walletIndex, accountIndex);
+                    _popContent();
+                  } catch (e) {
+                    debugPrint("select wallet error: $e");
+                  }
+                },
                 isSelected:
                     appState.wallet!.selectedAccount == BigInt.from(index),
               );

@@ -58,9 +58,6 @@ class _WalletHeaderState extends State<WalletHeader>
       onManageWallet: () {
         Navigator.pushNamed(context, '/login');
       },
-      onWalletSelect: (index) {
-        // Handle wallet selection
-      },
     );
   }
 

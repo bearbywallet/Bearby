@@ -61,4 +61,12 @@ class AppState extends ChangeNotifier {
   Future<void> initialize() async {
     // TODO: init theme form storage
   }
+
+  Future<void> updateSelectedAccount(
+      BigInt walletIndex, BigInt accountIndex) async {
+    await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
+    await syncData();
+
+    notifyListeners();
+  }
 }

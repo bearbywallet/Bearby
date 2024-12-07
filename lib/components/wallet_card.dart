@@ -38,73 +38,72 @@ class WalletCard extends StatelessWidget {
       child: Container(
         width: width,
         height: height,
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
-          border: isSelected
-              ? Border.all(
-                  color: theme.primaryPurple,
-                  width: 1,
-                )
-              : null,
+          color: isSelected
+              ? theme.primaryPurple.withOpacity(0.1)
+              : Colors.transparent,
         ),
-        child: Row(
-          children: [
-            Container(
-              width: avatarSize,
-              height: avatarSize,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: theme.primaryPurple.withOpacity(0.1),
-                  width: 1,
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: Row(
+            children: [
+              Container(
+                width: avatarSize,
+                height: avatarSize,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: theme.primaryPurple.withOpacity(0.1),
+                    width: 1,
+                  ),
+                ),
+                child: ClipOval(
+                  child: Blockies(
+                    seed: address,
+                    color: getWalletColor(0),
+                    bgColor: theme.primaryPurple,
+                    spotColor: theme.background,
+                    size: 8,
+                  ),
                 ),
               ),
-              child: ClipOval(
-                child: Blockies(
-                  seed: address,
-                  color: getWalletColor(0),
-                  bgColor: theme.primaryPurple,
-                  spotColor: theme.background,
-                  size: 8,
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      name,
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: fontSize ?? 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      address,
+                      style: TextStyle(
+                        color: theme.textPrimary.withOpacity(0.5),
+                        fontSize: (fontSize ?? 16) - 2,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ],
                 ),
               ),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    name,
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: fontSize ?? 16,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 2),
-                  Text(
-                    address,
-                    style: TextStyle(
-                      color: theme.textPrimary.withOpacity(0.5),
-                      fontSize: (fontSize ?? 16) - 2,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ],
+              Text(
+                balance,
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: fontSize ?? 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-            ),
-            Text(
-              balance,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: fontSize ?? 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
