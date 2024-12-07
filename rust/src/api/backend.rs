@@ -272,32 +272,33 @@ pub async fn is_service_running() -> bool {
 pub async fn add_bip39_wallet(
     password: String,
     mnemonic_str: String,
-    indexes: &[usize],
+    accouns: &[(usize, String)], // index, name
     passphrase: String,
     wallet_name: String,
     biometric_type: String,
-    networks: Vec<usize>,
+    networks: &[usize],
     identifiers: &[String],
 ) -> Result<(String, String), String> {
-    // TODO: // detect by networks. here need to think about zilliqa (scilla, evm)
-    let derive = Bip49DerivationPath::Zilliqa;
-
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        // TODO: detect by networks indexies
+        let derive_fn = Bip49DerivationPath::Zilliqa;
+        let accounts_bip39: Vec<(Bip49DerivationPath, String)> = accouns
+            .iter()
+            .map(|(i, name)| (derive_fn(*i), name.clone()))
+            .collect();
+
         let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
-            .add_bip39_wallet(
-                BackgroundBip39Params {
-                    network: networks,
-                    password: &password,
-                    mnemonic_str: &mnemonic_str,
-                    indexes,
-                    passphrase: &passphrase,
-                    wallet_name,
-                    biometric_type: biometric_type.into(),
-                    device_indicators: identifiers,
-                },
-                derive,
-            )
+            .add_bip39_wallet(BackgroundBip39Params {
+                network: networks.to_owned(),
+                password: &password,
+                mnemonic_str: &mnemonic_str,
+                accounts: accounts_bip39,
+                passphrase: &passphrase,
+                wallet_name,
+                biometric_type: biometric_type.into(),
+                device_indicators: identifiers,
+            })
             .map_err(|e| e.to_string())?;
         let cipher_session = hex::encode(session);
         let wallet = service

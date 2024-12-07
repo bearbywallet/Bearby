@@ -47,7 +47,7 @@ Future<bool> isServiceRunning() =>
 Future<(String, String)> addBip39Wallet(
         {required String password,
         required String mnemonicStr,
-        required Uint64List indexes,
+        required List<(BigInt, String)> accouns,
         required String passphrase,
         required String walletName,
         required String biometricType,
@@ -56,7 +56,7 @@ Future<(String, String)> addBip39Wallet(
     RustLib.instance.api.crateApiBackendAddBip39Wallet(
         password: password,
         mnemonicStr: mnemonicStr,
-        indexes: indexes,
+        accouns: accouns,
         passphrase: passphrase,
         walletName: walletName,
         biometricType: biometricType,

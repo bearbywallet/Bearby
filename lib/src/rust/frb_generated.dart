@@ -161,7 +161,7 @@ abstract class RustLibApi extends BaseApi {
   Future<(String, String)> crateApiBackendAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
-      required Uint64List indexes,
+      required List<(BigInt, String)> accouns,
       required String passphrase,
       required String walletName,
       required String biometricType,
@@ -1030,7 +1030,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<(String, String)> crateApiBackendAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
-      required Uint64List indexes,
+      required List<(BigInt, String)> accouns,
       required String passphrase,
       required String walletName,
       required String biometricType,
@@ -1041,7 +1041,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(password, serializer);
         sse_encode_String(mnemonicStr, serializer);
-        sse_encode_list_prim_usize_strict(indexes, serializer);
+        sse_encode_list_record_usize_string(accouns, serializer);
         sse_encode_String(passphrase, serializer);
         sse_encode_String(walletName, serializer);
         sse_encode_String(biometricType, serializer);
@@ -1058,7 +1058,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       argValues: [
         password,
         mnemonicStr,
-        indexes,
+        accouns,
         passphrase,
         walletName,
         biometricType,
@@ -1075,7 +1075,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [
           "password",
           "mnemonicStr",
-          "indexes",
+          "accouns",
           "passphrase",
           "walletName",
           "biometricType",
@@ -1988,6 +1988,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_usize_string).toList();
+  }
+
+  @protected
   RustStreamSink<String>? dco_decode_opt_StreamSink_String_Sse(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_StreamSink_String_Sse(raw);
@@ -2008,6 +2014,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     }
     return (
       dco_decode_String(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  (BigInt, String) dco_decode_record_usize_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_usize(arr[0]),
       dco_decode_String(arr[1]),
     );
   }
@@ -2359,6 +2378,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<(BigInt, String)> sse_decode_list_record_usize_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(BigInt, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_usize_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   RustStreamSink<String>? sse_decode_opt_StreamSink_String_Sse(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2386,6 +2418,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_String(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (BigInt, String) sse_decode_record_usize_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_usize(deserializer);
     var var_field1 = sse_decode_String(deserializer);
     return (var_field0, var_field1);
   }
@@ -2736,6 +2777,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_record_usize_string(
+      List<(BigInt, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_usize_string(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_StreamSink_String_Sse(
       RustStreamSink<String>? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2761,6 +2812,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       (String, String) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_usize_string(
+      (BigInt, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_usize(self.$1, serializer);
     sse_encode_String(self.$2, serializer);
   }
 

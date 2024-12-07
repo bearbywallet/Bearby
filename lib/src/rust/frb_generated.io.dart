@@ -193,6 +193,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
+  List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw);
+
+  @protected
   RustStreamSink<String>? dco_decode_opt_StreamSink_String_Sse(dynamic raw);
 
   @protected
@@ -200,6 +203,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (String, String) dco_decode_record_string_string(dynamic raw);
+
+  @protected
+  (BigInt, String) dco_decode_record_usize_string(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -361,6 +367,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<(BigInt, String)> sse_decode_list_record_usize_string(
+      SseDeserializer deserializer);
+
+  @protected
   RustStreamSink<String>? sse_decode_opt_StreamSink_String_Sse(
       SseDeserializer deserializer);
 
@@ -370,6 +380,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   (String, String) sse_decode_record_string_string(
       SseDeserializer deserializer);
+
+  @protected
+  (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -539,6 +552,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(String, String)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_usize_string(
+      List<(BigInt, String)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_StreamSink_String_Sse(
       RustStreamSink<String>? self, SseSerializer serializer);
 
@@ -548,6 +565,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_string_string(
       (String, String) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_usize_string(
+      (BigInt, String) self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
