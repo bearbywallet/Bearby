@@ -52,9 +52,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             isLast: false,
                             title: 'Language',
                             trailingSvgPath: 'assets/icons/language.svg',
-                            onTap: () {
-                              debugPrint("dasdsadsa");
-                            },
+                            onTap: () =>
+                                {Navigator.pushNamed(context, '/language')},
                           ),
                           SettingsItem(
                             title: 'Currency',

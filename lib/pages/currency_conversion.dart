@@ -41,7 +41,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
         child: Column(
           children: [
             CustomAppBar(
-              title: '',
+              title: 'Primary Currency',
               onBackPressed: () => Navigator.pop(context),
             ),
             _buildRateFetchOption(theme),

@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/currency_conversion.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
+import 'package:zilpay/pages/locale.dart';
 import 'package:zilpay/pages/notification.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/restore_bip39.dart';
@@ -67,6 +69,8 @@ class AppRouter {
       '/restore_bip39',
       '/currency',
       '/notifications',
+      '/language',
+      '/address-book'
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -166,6 +170,10 @@ class AppRouter {
         return wrapWithProviders(const AppearanceSettingsPage());
       case '/notifications':
         return wrapWithProviders(const NotificationsSettingsPage());
+      case '/address-book':
+        return wrapWithProviders(const AddressBookPage());
+      case '/language':
+        return wrapWithProviders(const LanguagePage());
       case '/settings':
         return wrapWithProviders(const SettingsPage());
       case '/currency':

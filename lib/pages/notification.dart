@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 
 import '../components/custom_app_bar.dart';
@@ -19,7 +20,6 @@ class NotificationsSettingsPage extends StatefulWidget {
 
 class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
   bool isPushNotificationsEnabled = false;
-  late final AppState _appState;
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -34,13 +34,12 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     super.dispose();
   }
 
-  void _initializeServices() {
-    _appState = Provider.of<AppState>(context, listen: false);
-  }
+  void _initializeServices() {}
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -58,9 +57,9 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildPushNotificationsSection(theme),
+                    _buildPushNotificationsSection(theme, adaptivePadding),
                     SizedBox(height: 24),
-                    _buildWalletsSection(theme),
+                    _buildWalletsSection(theme, adaptivePadding),
                     SizedBox(height: 16),
                   ],
                 ),
@@ -72,9 +71,10 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     );
   }
 
-  Widget _buildPushNotificationsSection(theme.AppTheme theme) {
+  Widget _buildPushNotificationsSection(
+      theme.AppTheme theme, double adaptivePadding) {
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16),
+      margin: EdgeInsets.symmetric(horizontal: adaptivePadding),
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.cardBackground,
@@ -119,9 +119,9 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     );
   }
 
-  Widget _buildWalletsSection(theme.AppTheme theme) {
+  Widget _buildWalletsSection(theme.AppTheme theme, double adaptivePadding) {
     return Padding(
-      padding: EdgeInsets.symmetric(horizontal: 16),
+      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -141,7 +141,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               fontSize: 16,
             ),
           ),
-          SizedBox(height: 16),
+          SizedBox(height: adaptivePadding),
           Container(
             decoration: BoxDecoration(
               color: theme.cardBackground,
