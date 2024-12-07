@@ -9,6 +9,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<String> genBip39Words({required int count}) =>
     RustLib.instance.api.crateApiMethodsGenBip39Words(count: count);
 
+Future<Uint64List> checkNotExistsBip39Words(
+        {required List<String> words, required String lang}) =>
+    RustLib.instance.api
+        .crateApiMethodsCheckNotExistsBip39Words(words: words, lang: lang);
+
 Future<KeyPair> genKeypair() =>
     RustLib.instance.api.crateApiMethodsGenKeypair();
 
