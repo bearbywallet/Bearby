@@ -233,15 +233,25 @@ class _AddNextBip39AccountContentState
         CustomAppBar(
           title: '',
           onBackPressed: _loading ? () {} : widget.onBack,
-          actionIcon: SvgPicture.asset(
-            'assets/icons/plus.svg',
-            width: 30,
-            height: 30,
-            colorFilter: ColorFilter.mode(
-              theme.textPrimary,
-              BlendMode.srcIn,
-            ),
-          ),
+          actionIcon: _loading
+              ? SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(theme.textPrimary),
+                  ),
+                )
+              : SvgPicture.asset(
+                  'assets/icons/plus.svg',
+                  width: 30,
+                  height: 30,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary,
+                    BlendMode.srcIn,
+                  ),
+                ),
           onActionPressed: _loading ? () {} : _onSubmit,
         ),
         Flexible(
