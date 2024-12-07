@@ -30,33 +30,27 @@ class MnemonicWordInput extends StatefulWidget {
 
 class _MnemonicWordInputState extends State<MnemonicWordInput> {
   late TextEditingController _controller;
+  bool _shouldUpdateText = true;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.word);
-    _controller.addListener(_onTextChanged);
   }
 
   @override
   void didUpdateWidget(MnemonicWordInput oldWidget) {
     super.didUpdateWidget(oldWidget);
-    if (widget.word != oldWidget.word) {
+    if (_shouldUpdateText && widget.word != _controller.text) {
       _controller.text = widget.word;
     }
+    _shouldUpdateText = true;
   }
 
   @override
   void dispose() {
-    _controller.removeListener(_onTextChanged);
     _controller.dispose();
     super.dispose();
-  }
-
-  void _onTextChanged() {
-    if (widget.onChanged != null) {
-      widget.onChanged!(widget.index, _controller.text);
-    }
   }
 
   @override
@@ -102,6 +96,12 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
                 isDense: true,
                 contentPadding: EdgeInsets.zero,
               ),
+              onChanged: (value) {
+                _shouldUpdateText = false;
+                if (widget.onChanged != null) {
+                  widget.onChanged!(widget.index, value);
+                }
+              },
             ),
           ),
         ],

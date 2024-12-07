@@ -37,7 +37,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
 
       final List<int> errorIndexes = (await checkNotExistsBip39Words(
         words: nonEmptyWords,
-        lang: 'english', // TODO: add lang chose
+        lang: 'english',
       ))
           .map((e) => e.toInt())
           .toList();
@@ -54,49 +54,38 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
         }
       }
 
-      setState(() {
-        _wordsErrorIndexes = adjustedIndexes;
-        _validateForm();
-      });
+      if (mounted) {
+        setState(() {
+          _wordsErrorIndexes = adjustedIndexes;
+          _validateForm();
+        });
+      }
     } catch (e) {
       debugPrint('Error checking words: $e');
     }
   }
 
-  void _handleWordChange(int index, String word) async {
-    // Remove only the current index from errors if it exists
-    setState(() {
-      if (_wordsErrorIndexes.contains(index - 1)) {
-        _wordsErrorIndexes.remove(index - 1);
-      }
-    });
+  void _handleWordChange(int index, String word) {
+    final trimmedWord = word.trim().toLowerCase();
+    final currentIndex = index - 1;
 
     if (word.contains(' ')) {
-      _handlePhrasePaste(word, index - 1);
+      _handlePhrasePaste(word, currentIndex);
       return;
     }
 
-    setState(() {
-      final trimmedWord = word.trim().toLowerCase();
-      _words[index - 1] = trimmedWord;
-      _validateForm();
-    });
-
-    if (word.trim().isNotEmpty) {
-      await _handleCheckWords();
+    _words[currentIndex] = trimmedWord;
+    if (_wordsErrorIndexes.contains(currentIndex)) {
+      _wordsErrorIndexes.remove(currentIndex);
     }
+    _validateForm();
 
-    // Check if all words are filled to validate the entire phrase
-    if (_words.every((word) => word.isNotEmpty)) {
-      await _handleCheckWords();
+    if (trimmedWord.isNotEmpty) {
+      Future.microtask(() => _handleCheckWords());
     }
   }
 
-  void _handlePhrasePaste(String phrase, int startIndex) async {
-    setState(() {
-      _wordsErrorIndexes = [];
-    });
-
+  void _handlePhrasePaste(String phrase, int startIndex) {
     final words = phrase.trim().split(RegExp(r'\s+'));
 
     int targetCount = _count;
@@ -111,39 +100,42 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
       _handleCountChanged(targetCount, autoAdjust: true);
     }
 
-    setState(() {
-      for (var i = 0; i < words.length && (startIndex + i) < targetCount; i++) {
-        if (words[i].isNotEmpty) {
-          _words[startIndex + i] = words[i].toLowerCase();
-        }
+    for (var i = 0; i < words.length && (startIndex + i) < targetCount; i++) {
+      if (words[i].isNotEmpty) {
+        _words[startIndex + i] = words[i].toLowerCase();
       }
-      _validateForm();
-    });
+    }
+
+    _validateForm();
 
     if (words.isNotEmpty) {
-      await _handleCheckWords();
+      Future.microtask(() => _handleCheckWords());
     }
   }
 
   void _validateForm() {
-    setState(() {
-      _isFormValid =
-          _words.every((word) => word.isNotEmpty) && _wordsErrorIndexes.isEmpty;
-    });
+    final isValid =
+        _words.every((word) => word.isNotEmpty) && _wordsErrorIndexes.isEmpty;
+    if (isValid != _isFormValid) {
+      setState(() {
+        _isFormValid = isValid;
+      });
+    }
   }
 
   void _handleCountChanged(int newCount, {bool autoAdjust = false}) {
-    setState(() {
-      _count = newCount;
-      _wordsErrorIndexes = [];
-
-      final newWords = List<String>.filled(newCount, '');
-      for (var i = 0; i < math.min(_words.length, newCount); i++) {
-        newWords[i] = _words[i];
-      }
-      _words = newWords;
-      _validateForm();
-    });
+    if (mounted) {
+      setState(() {
+        _count = newCount;
+        final newWords = List<String>.filled(newCount, '');
+        for (var i = 0; i < math.min(_words.length, newCount); i++) {
+          newWords[i] = _words[i];
+        }
+        _words = newWords;
+        _wordsErrorIndexes = [];
+        _validateForm();
+      });
+    }
   }
 
   @override
@@ -184,6 +176,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 8.0),
                                 child: MnemonicWordInput(
+                                  key: ValueKey('word_$index'),
                                   index: index + 1,
                                   word: _words[index],
                                   isEditable: true,
@@ -201,7 +194,10 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                           padding: const EdgeInsets.only(bottom: 16),
                           child: CustomButton(
                             text: 'Restore',
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.of(context).pushNamed('/net_setup',
+                                  arguments: {'bip39': _words});
+                            },
                             backgroundColor: theme.primaryPurple,
                             borderRadius: 30.0,
                             height: 56.0,
