@@ -19,6 +19,17 @@ class _SecurityPageState extends State<SecurityPage> {
   bool isRateFetcherEnabled = true;
   bool isGasStationEnabled = true;
   bool isNodeRankingEnabled = true;
+  bool isENSEnabled = true;
+  bool isIPFSEnabled = true;
+
+  final TextEditingController _ipfsController =
+      TextEditingController(text: 'dweb.link');
+
+  @override
+  void dispose() {
+    _ipfsController.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,12 +143,34 @@ class _SecurityPageState extends State<SecurityPage> {
             children: [
               _buildPreferenceItem(
                 theme,
-                'Enable rate fetcher',
+                'Show balance and token price checker',
                 'assets/icons/graph.svg',
                 'ZilPay wallet makes requests to fetch current rates of currency',
                 true,
                 isRateFetcherEnabled,
                 (value) => setState(() => isRateFetcherEnabled = value),
+              ),
+              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
+              _buildPreferenceItem(
+                theme,
+                'Show ENS domains in address bar',
+                'assets/icons/graph.svg',
+                'Keep in mind that using this feature exposes your IP address to IPFS third-party services.',
+                true,
+                isENSEnabled,
+                (value) => setState(() => isRateFetcherEnabled = value),
+              ),
+              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
+              _buildPreferenceItem(
+                theme,
+                'IPFS gateway',
+                'assets/icons/server.svg',
+                'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
+                true,
+                isIPFSEnabled,
+                (value) => setState(() => isIPFSEnabled = value),
+                showInput: true,
+                controller: _ipfsController,
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
@@ -175,6 +208,9 @@ class _SecurityPageState extends State<SecurityPage> {
     bool value,
     Function(bool)? onChanged, {
     VoidCallback? onTap,
+    bool showInput = false,
+    TextEditingController? controller,
+    String? hintText,
   }) {
     return GestureDetector(
       onTap: onTap,
@@ -221,6 +257,40 @@ class _SecurityPageState extends State<SecurityPage> {
                   style: TextStyle(
                     color: theme.textSecondary,
                     fontSize: 14,
+                  ),
+                ),
+              ),
+            ],
+            if (showInput) ...[
+              const SizedBox(height: 12),
+              Padding(
+                padding: const EdgeInsets.only(left: 40),
+                child: TextField(
+                  controller: controller,
+                  readOnly: !value,
+                  style: TextStyle(
+                    color: value
+                        ? theme.textPrimary
+                        : theme.textSecondary.withOpacity(0.5),
+                    fontSize: 14,
+                  ),
+                  decoration: InputDecoration(
+                    contentPadding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: theme.textSecondary.withOpacity(0.2),
+                      ),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(8),
+                      borderSide: BorderSide(
+                        color: theme.primaryPurple,
+                      ),
+                    ),
                   ),
                 ),
               ),
