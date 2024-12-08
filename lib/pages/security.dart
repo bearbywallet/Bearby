@@ -52,9 +52,9 @@ class _SecurityPageState extends State<SecurityPage> {
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        _buildSecuritySection(theme),
-                        const SizedBox(height: 32),
                         _buildNetworkSection(theme),
+                        const SizedBox(height: 32),
+                        _buildSecuritySection(theme),
                         const SizedBox(height: 32),
                         _buildEncryptionSection(theme),
                         const SizedBox(height: 32),
@@ -74,16 +74,6 @@ class _SecurityPageState extends State<SecurityPage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16),
-          child: Text(
-            'Security preferences',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
-            ),
-          ),
-        ),
         Container(
           decoration: BoxDecoration(
             color: theme.cardBackground,
@@ -91,16 +81,6 @@ class _SecurityPageState extends State<SecurityPage> {
           ),
           child: Column(
             children: [
-              _buildPreferenceItem(
-                theme,
-                'Use Face ID',
-                'assets/icons/face_id.svg',
-                'The ZilPay wallet uses your biometric to unlock and sign transactions',
-                true,
-                isFaceIdEnabled,
-                (value) => setState(() => isFaceIdEnabled = value),
-              ),
-              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
                 theme,
                 'Change wallet password',
@@ -144,7 +124,7 @@ class _SecurityPageState extends State<SecurityPage> {
               _buildPreferenceItem(
                 theme,
                 'Show balance and token price checker',
-                'assets/icons/graph.svg',
+                'assets/icons/currency.svg',
                 'ZilPay wallet makes requests to fetch current rates of currency',
                 true,
                 isRateFetcherEnabled,
@@ -164,7 +144,7 @@ class _SecurityPageState extends State<SecurityPage> {
               _buildPreferenceItem(
                 theme,
                 'IPFS gateway',
-                'assets/icons/server.svg',
+                'assets/icons/ipfs.svg',
                 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
                 true,
                 isIPFSEnabled,
