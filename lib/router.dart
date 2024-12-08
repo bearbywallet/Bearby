@@ -8,6 +8,7 @@ import 'package:zilpay/pages/locale.dart';
 import 'package:zilpay/pages/notification.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/restore_bip39.dart';
+import 'package:zilpay/pages/security.dart';
 import 'package:zilpay/pages/setup_cipher.dart';
 import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
@@ -70,7 +71,8 @@ class AppRouter {
       '/currency',
       '/notifications',
       '/language',
-      '/address-book'
+      '/address-book',
+      '/security'
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -174,6 +176,8 @@ class AppRouter {
         return wrapWithProviders(const AddressBookPage());
       case '/language':
         return wrapWithProviders(const LanguagePage());
+      case '/security':
+        return wrapWithProviders(const SecurityPage());
       case '/settings':
         return wrapWithProviders(const SettingsPage());
       case '/currency':

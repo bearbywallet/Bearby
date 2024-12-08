@@ -11,6 +11,7 @@ abstract class AppTheme {
   Color get buttonText;
   Color get danger;
   Color get success;
+  Color get warning;
 
   Color get gradientStart;
   Color get gradientMiddle;
@@ -38,6 +39,8 @@ class DarkTheme implements AppTheme {
   Color get danger => const Color(0xFFE94560);
   @override
   Color get success => const Color(0xFF4CAF50);
+  @override
+  Color get warning => const Color(0xFFFF9800);
 
   @override
   Color get gradientStart => const Color(0xFF4A0E4E);
@@ -68,6 +71,8 @@ class LightTheme implements AppTheme {
   Color get danger => const Color(0xFFD32F2F);
   @override
   Color get success => const Color(0xFF2E7D32);
+  @override
+  Color get warning => const Color(0xFFFB8C00);
 
   @override
   Color get gradientStart => const Color(0xFFE6E6FA);

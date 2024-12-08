@@ -151,6 +151,19 @@ class _WalletPageState extends State<WalletPage> {
             children: [
               _buildPreferenceItem(
                 theme,
+                'Use Face ID',
+                'assets/icons/face_id.svg',
+                true,
+                (value) {
+                  debugPrint("enable face id $value");
+                },
+              ),
+              Divider(
+                height: 1,
+                color: theme.textSecondary.withOpacity(0.1),
+              ),
+              _buildPreferenceItem(
+                theme,
                 'Zilliqa legacy',
                 'assets/icons/scilla.svg',
                 true,
