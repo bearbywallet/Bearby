@@ -6,7 +6,9 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/manage_connections.dart';
+import 'package:zilpay/modals/secret_recovery_modal.dart';
 import 'package:zilpay/state/app_state.dart' as app_state;
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -64,6 +66,8 @@ class _WalletPageState extends State<WalletPage> {
 
   List<WalletPreferenceItem> _getPreferenceItems(
       BuildContext context, AppTheme theme) {
+    final appState = Provider.of<app_state.AppState>(context);
+
     return [
       WalletPreferenceItem(
         title: 'Use Face ID',
@@ -90,7 +94,11 @@ class _WalletPageState extends State<WalletPage> {
       WalletPreferenceItem(
         title: 'Backup',
         iconPath: 'assets/icons/key.svg',
-        onTap: () {},
+        onTap: () {
+          if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
+            _handleBackup(theme);
+          }
+        },
       ),
     ];
   }
@@ -317,6 +325,17 @@ class _WalletPageState extends State<WalletPage> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  void _handleBackup(AppTheme theme) {
+    showModalBottomSheet<void>(
+      context: context,
+      backgroundColor: theme.cardBackground,
+      isScrollControlled: true,
+      builder: (context) => SecretRecoveryModal(
+        theme: theme,
       ),
     );
   }
