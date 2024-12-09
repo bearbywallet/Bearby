@@ -6,9 +6,28 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/state/app_state.dart' as app_state;
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
+
+class WalletPreferenceItem {
+  final String title;
+  final String iconPath;
+  final bool hasSwitch;
+  final bool switchValue;
+  final Function(bool)? onChanged;
+  final VoidCallback? onTap;
+
+  WalletPreferenceItem({
+    required this.title,
+    required this.iconPath,
+    this.hasSwitch = false,
+    this.switchValue = false,
+    this.onChanged,
+    this.onTap,
+  });
+}
 
 class WalletPage extends StatefulWidget {
   const WalletPage({super.key});
@@ -19,11 +38,14 @@ class WalletPage extends StatefulWidget {
 
 class _WalletPageState extends State<WalletPage> {
   final TextEditingController _walletNameController = TextEditingController();
+  static const double _avatarSize = 80.0;
+  static const double _borderRadius = 12.0;
+  static const double _iconSize = 24.0;
+  static const double _fontSize = 16.0;
 
   @override
   void initState() {
     super.initState();
-
     final appState = Provider.of<app_state.AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
   }
@@ -32,6 +54,45 @@ class _WalletPageState extends State<WalletPage> {
   void dispose() {
     _walletNameController.dispose();
     super.dispose();
+  }
+
+  void _handleDappDisconnect(String url) {
+    // final appState = Provider.of<app_state.AppState>(context, listen: false);
+    // Implement disconnect logic here
+    debugPrint('Disconnecting DApp: $url');
+  }
+
+  List<WalletPreferenceItem> _getPreferenceItems(
+      BuildContext context, AppTheme theme) {
+    return [
+      WalletPreferenceItem(
+        title: 'Use Face ID',
+        iconPath: 'assets/icons/face_id.svg',
+        hasSwitch: true,
+        switchValue: true,
+        onChanged: (value) => debugPrint("enable face id $value"),
+      ),
+      WalletPreferenceItem(
+        title: 'Zilliqa legacy',
+        iconPath: 'assets/icons/scilla.svg',
+        hasSwitch: true,
+        switchValue: true,
+        onChanged: (value) => debugPrint("enable Zilliqa legacy mode"),
+      ),
+      WalletPreferenceItem(
+        title: 'Manage connections',
+        iconPath: 'assets/icons/globe.svg',
+        onTap: () => showConnectedDappsModal(
+          context: context,
+          onDappDisconnect: _handleDappDisconnect,
+        ),
+      ),
+      WalletPreferenceItem(
+        title: 'Backup',
+        iconPath: 'assets/icons/key.svg',
+        onTap: () {},
+      ),
+    ];
   }
 
   @override
@@ -58,18 +119,7 @@ class _WalletPageState extends State<WalletPage> {
                       delegate: SliverChildListDelegate([
                         Center(child: _buildWalletHeader(theme, appState)),
                         const SizedBox(height: 16),
-                        SmartInput(
-                          controller: _walletNameController,
-                          hint: 'Wallet name',
-                          onChanged: (value) {
-                            // Implement wallet name change logic
-                          },
-                          height: 50,
-                          rightIconPath: "assets/icons/edit.svg",
-                          borderColor: theme.cardBackground,
-                          focusedBorderColor: theme.primaryPurple,
-                          fontSize: 16,
-                        ),
+                        _buildWalletNameInput(theme),
                         const SizedBox(height: 32),
                         _buildPreferencesSection(theme),
                       ]),
@@ -104,17 +154,17 @@ class _WalletPageState extends State<WalletPage> {
 
   Widget _buildWalletHeader(AppTheme theme, app_state.AppState appState) {
     return SizedBox(
-      width: 80,
-      height: 80,
+      width: _avatarSize,
+      height: _avatarSize,
       child: Container(
         decoration: BoxDecoration(
           color: theme.background,
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(_avatarSize / 2),
         ),
         child: ClipRRect(
-          borderRadius: BorderRadius.circular(40),
+          borderRadius: BorderRadius.circular(_avatarSize / 2),
           child: Transform.scale(
-            scale: 1.0, // Adjust this value if needed to fine-tune the size
+            scale: 1.0,
             child: Blockies(
               seed: appState.account!.addr,
               color: getWalletColor(0),
@@ -128,6 +178,21 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
+  Widget _buildWalletNameInput(AppTheme theme) {
+    return SmartInput(
+      controller: _walletNameController,
+      hint: 'Wallet name',
+      onChanged: (value) {
+        // Implement wallet name change logic
+      },
+      height: 50,
+      rightIconPath: "assets/icons/edit.svg",
+      borderColor: theme.cardBackground,
+      focusedBorderColor: theme.primaryPurple,
+      fontSize: _fontSize,
+    );
+  }
+
   Widget _buildPreferencesSection(AppTheme theme) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,88 +203,53 @@ class _WalletPageState extends State<WalletPage> {
             'Wallet preferences',
             style: TextStyle(
               color: theme.textSecondary,
-              fontSize: 16,
+              fontSize: _fontSize,
             ),
           ),
         ),
         Container(
           decoration: BoxDecoration(
             color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(_borderRadius),
           ),
           child: Column(
-            children: [
-              _buildPreferenceItem(
-                theme,
-                'Use Face ID',
-                'assets/icons/face_id.svg',
-                true,
-                (value) {
-                  debugPrint("enable face id $value");
-                },
-              ),
-              Divider(
-                height: 1,
-                color: theme.textSecondary.withOpacity(0.1),
-              ),
-              _buildPreferenceItem(
-                theme,
-                'Zilliqa legacy',
-                'assets/icons/scilla.svg',
-                true,
-                (value) {
-                  debugPrint("enable Zilliqa legacy mode");
-                },
-              ),
-              Divider(
-                height: 1,
-                color: theme.textSecondary.withOpacity(0.1),
-              ),
-              _buildPreferenceItem(
-                theme,
-                'Manage connections',
-                'assets/icons/globe.svg',
-                false,
-                null,
-                onTap: () => Navigator.pushNamed(context, '/connections'),
-              ),
-              Divider(
-                height: 1,
-                color: theme.textSecondary.withOpacity(0.1),
-              ),
-              _buildPreferenceItem(
-                theme,
-                'Backup',
-                'assets/icons/key.svg',
-                false,
-                null,
-                onTap: () {},
-              ),
-            ],
+            children: _buildPreferenceItems(theme),
           ),
         ),
       ],
     );
   }
 
-  Widget _buildPreferenceItem(
-    AppTheme theme,
-    String title,
-    String iconPath,
-    bool hasSwitch,
-    Function(bool)? onChanged, {
-    VoidCallback? onTap,
-  }) {
+  List<Widget> _buildPreferenceItems(AppTheme theme) {
+    final items = _getPreferenceItems(context, theme);
+    final List<Widget> widgets = [];
+
+    for (var i = 0; i < items.length; i++) {
+      widgets.add(_buildPreferenceItem(theme, items[i]));
+      if (i < items.length - 1) {
+        widgets.add(Divider(
+          height: 1,
+          color: theme.textSecondary.withOpacity(0.1),
+        ));
+      }
+    }
+
+    return widgets;
+  }
+
+  Widget _buildPreferenceItem(AppTheme theme, WalletPreferenceItem item) {
+    final appState = Provider.of<app_state.AppState>(context);
+
     return GestureDetector(
-      onTap: onTap,
+      onTap: item.onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Row(
           children: [
             SvgPicture.asset(
-              iconPath,
-              width: 24,
-              height: 24,
+              item.iconPath,
+              width: _iconSize,
+              height: _iconSize,
               colorFilter: ColorFilter.mode(
                 theme.textPrimary,
                 BlendMode.srcIn,
@@ -228,19 +258,27 @@ class _WalletPageState extends State<WalletPage> {
             const SizedBox(width: 16),
             Expanded(
               child: Text(
-                title,
+                item.title,
                 style: TextStyle(
                   color: theme.textPrimary,
-                  fontSize: 16,
+                  fontSize: _fontSize,
                 ),
               ),
             ),
-            if (hasSwitch)
+            if (item.hasSwitch)
               Switch(
-                value: true,
-                onChanged: onChanged,
+                value: item.switchValue,
+                onChanged: item.onChanged,
                 activeColor: theme.primaryPurple,
               )
+            else if (item.title == 'Manage connections')
+              Text(
+                '${appState.connectedDapps.length}',
+                style: TextStyle(
+                  color: theme.textSecondary,
+                  fontSize: _fontSize,
+                ),
+              ),
           ],
         ),
       ),
@@ -254,7 +292,7 @@ class _WalletPageState extends State<WalletPage> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.red.withOpacity(0.1),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(_borderRadius),
         ),
         child: Row(
           children: [
@@ -264,7 +302,7 @@ class _WalletPageState extends State<WalletPage> {
                 'Delete Wallet',
                 style: TextStyle(
                   color: Colors.red,
-                  fontSize: 16,
+                  fontSize: _fontSize,
                 ),
               ),
             ),
@@ -274,8 +312,8 @@ class _WalletPageState extends State<WalletPage> {
                 Colors.red,
                 BlendMode.srcIn,
               ),
-              width: 24,
-              height: 24,
+              width: _iconSize,
+              height: _iconSize,
             ),
           ],
         ),
