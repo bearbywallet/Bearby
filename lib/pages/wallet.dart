@@ -91,15 +91,16 @@ class _WalletPageState extends State<WalletPage> {
           onDappDisconnect: _handleDappDisconnect,
         ),
       ),
-      WalletPreferenceItem(
-        title: 'Backup',
-        iconPath: 'assets/icons/key.svg',
-        onTap: () {
-          if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
-            _handleBackup(theme);
-          }
-        },
-      ),
+      if (!appState.wallet!.walletType.contains(WalletType.ledger.name))
+        WalletPreferenceItem(
+          title: 'Backup',
+          iconPath: 'assets/icons/key.svg',
+          onTap: () {
+            if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
+              _handleBackup(theme);
+            }
+          },
+        ),
     ];
   }
 
