@@ -93,8 +93,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Navigator.pushNamed(context, '/networks'),
                           ),
                           SettingsItem(
-                            isFirst: true,
-                            isLast: false,
+                            isFirst: false,
+                            isLast: true,
                             title: 'Language',
                             trailingSvgPath: 'assets/icons/language.svg',
                             onTap: () =>

@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
+import 'package:zilpay/modals/password_change.dart';
+import 'package:zilpay/state/app_state.dart';
 
 import '../components/custom_app_bar.dart';
 import '../theme/app_theme.dart' as theme;
@@ -35,6 +38,7 @@ class _SecurityPageState extends State<SecurityPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final appState = Provider.of<AppState>(context);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -54,8 +58,11 @@ class _SecurityPageState extends State<SecurityPage> {
                       delegate: SliverChildListDelegate([
                         _buildNetworkSection(theme),
                         const SizedBox(height: 32),
-                        _buildSecuritySection(theme),
-                        const SizedBox(height: 32),
+                        if (!appState.wallet!.walletType
+                            .contains(WalletType.ledger.name)) ...[
+                          _buildSecuritySection(theme),
+                          const SizedBox(height: 32)
+                        ],
                         _buildEncryptionSection(theme),
                         const SizedBox(height: 32),
                       ]),
@@ -76,8 +83,8 @@ class _SecurityPageState extends State<SecurityPage> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(12),
+            color: theme.cardBackground.withOpacity(0.7),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
@@ -90,7 +97,12 @@ class _SecurityPageState extends State<SecurityPage> {
                 false,
                 null,
                 onTap: () {
-                  debugPrint("change password");
+                  showModalBottomSheet(
+                    context: context,
+                    backgroundColor: theme.cardBackground,
+                    isScrollControlled: true,
+                    builder: (context) => ChangePasswordModal(theme: theme),
+                  );
                 },
               ),
             ],
@@ -117,7 +129,7 @@ class _SecurityPageState extends State<SecurityPage> {
         Container(
           decoration: BoxDecoration(
             color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
             children: [
