@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../theme/app_theme.dart';
-import '../components/custom_app_bar.dart';
 
 class NodeData {
   final String name;
@@ -48,14 +47,28 @@ class _NodeSelectionModalState extends State<NodeSelectionModal> {
         ? widget.selectedMainnetNode
         : widget.selectedTestnetNode;
 
-    return Scaffold(
-      backgroundColor: widget.theme.cardBackground,
-      body: SafeArea(
+    return Container(
+      decoration: BoxDecoration(
+        color: widget.theme.cardBackground,
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(16),
+          topRight: Radius.circular(16),
+        ),
+      ),
+      child: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: 'Select Node',
-              onBackPressed: () => Navigator.pop(context),
+            // Close indicator
+            Center(
+              child: Container(
+                width: 32,
+                height: 4,
+                margin: const EdgeInsets.only(top: 8, bottom: 16),
+                decoration: BoxDecoration(
+                  color: widget.theme.textSecondary.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
             ),
             Expanded(
               child: ListView.builder(
