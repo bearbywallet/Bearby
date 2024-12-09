@@ -5,6 +5,7 @@ import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/state/app_state.dart' as app_state;
 import '../theme/app_theme.dart';
 import '../theme/theme_provider.dart';
@@ -19,6 +20,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
+    final SocialMediaService socialMediaService = SocialMediaService();
     final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final appState = Provider.of<app_state.AppState>(context);
@@ -47,14 +49,6 @@ class _SettingsPageState extends State<SettingsPage> {
                         _buildWalletSection(theme, appState),
                         const SizedBox(height: 24),
                         _buildSettingsGroup(theme, [
-                          SettingsItem(
-                            isFirst: true,
-                            isLast: false,
-                            title: 'Language',
-                            trailingSvgPath: 'assets/icons/language.svg',
-                            onTap: () =>
-                                {Navigator.pushNamed(context, '/language')},
-                          ),
                           SettingsItem(
                             title: 'Currency',
                             trailingSvgPath: 'assets/icons/currency.svg',
@@ -99,12 +93,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                 Navigator.pushNamed(context, '/networks'),
                           ),
                           SettingsItem(
-                            isFirst: false,
-                            isLast: true,
-                            title: 'Alerts',
-                            trailingSvgPath: 'assets/icons/warning.svg',
+                            isFirst: true,
+                            isLast: false,
+                            title: 'Language',
+                            trailingSvgPath: 'assets/icons/language.svg',
                             onTap: () =>
-                                Navigator.pushNamed(context, '/alerts'),
+                                {Navigator.pushNamed(context, '/language')},
                           ),
                         ]),
                         const SizedBox(height: 24),
@@ -114,13 +108,14 @@ class _SettingsPageState extends State<SettingsPage> {
                             isLast: false,
                             title: 'Telegram',
                             trailingSvgPath: 'assets/icons/telegram.svg',
-                            onTap: () => _launchURL('https://t.me/zilpaychat'),
+                            onTap: () => socialMediaService.openTelegram(
+                                username: 'zilpaychat'),
                           ),
                           SettingsItem(
                             title: 'Twitter',
                             trailingSvgPath: 'assets/icons/x.svg',
                             onTap: () =>
-                                _launchURL('https://twitter.com/zilpay'),
+                                socialMediaService.openX(username: 'pay_zil'),
                           ),
                           SettingsItem(
                             isFirst: false,
@@ -224,11 +219,5 @@ class _SettingsPageState extends State<SettingsPage> {
         }),
       ),
     );
-  }
-
-  Future<void> _launchURL(String url) async {
-    // final Uri uri = Uri.parse(url);
-    // Implement your URL launcher logic here
-    // Use url_launcher package
   }
 }

@@ -24,6 +24,8 @@ PODS:
   - rust_lib_zilpay (0.0.1):
     - Flutter
   - SwiftProtobuf (1.28.2)
+  - url_launcher_ios (0.0.1):
+    - Flutter
 
 DEPENDENCIES:
   - device_info_plus (from `.symlinks/plugins/device_info_plus/ios`)
@@ -36,6 +38,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/ios`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
+  - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
   trunk:
@@ -63,6 +66,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/reactive_ble_mobile/ios"
   rust_lib_zilpay:
     :path: ".symlinks/plugins/rust_lib_zilpay/ios"
+  url_launcher_ios:
+    :path: ".symlinks/plugins/url_launcher_ios/ios"
 
 SPEC CHECKSUMS:
   device_info_plus: bf2e3232933866d73fe290f2942f2156cdd10342
@@ -77,6 +82,7 @@ SPEC CHECKSUMS:
   reactive_ble_mobile: 9ce6723d37ccf701dbffd202d487f23f5de03b4c
   rust_lib_zilpay: 7add2511a40c5dee3bc95b49aa7b04a921d5776f
   SwiftProtobuf: 4dbaffec76a39a8dc5da23b40af1a5dc01a4c02d
+  url_launcher_ios: 5334b05cef931de560670eeae103fd3e431ac3fe
 
 PODFILE CHECKSUM: ba5b524018eec9c9d4a66b6e4e4fcc756af72bf7
 
