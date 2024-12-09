@@ -1,19 +1,48 @@
 import 'package:flutter/material.dart';
 import './app_theme.dart';
 
-class ThemeProvider extends ChangeNotifier {
-  // AppTheme _currentTheme = LightTheme();
-  AppTheme _currentTheme = DarkTheme();
+enum ThemeState { system, dark, light }
 
-  AppTheme get currentTheme => _currentTheme;
+class ThemeProvider extends ChangeNotifier with WidgetsBindingObserver {
+  ThemeState _state = ThemeState.system;
+  Brightness _systemBrightness =
+      WidgetsBinding.instance.window.platformBrightness;
 
-  void setTheme(AppTheme theme) {
-    _currentTheme = theme;
+  ThemeProvider() {
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangePlatformBrightness() {
+    _systemBrightness = WidgetsBinding.instance.window.platformBrightness;
     notifyListeners();
   }
 
-  void toggleTheme() {
-    _currentTheme = _currentTheme is DarkTheme ? LightTheme() : DarkTheme();
+  ThemeState get state {
+    return _state;
+  }
+
+  AppTheme get currentTheme {
+    switch (_state) {
+      case ThemeState.system:
+        return _systemBrightness == Brightness.dark
+            ? DarkTheme()
+            : LightTheme();
+      case ThemeState.dark:
+        return DarkTheme();
+      case ThemeState.light:
+        return LightTheme();
+    }
+  }
+
+  void setTheme(ThemeState theme) {
+    _state = theme;
     notifyListeners();
   }
 }

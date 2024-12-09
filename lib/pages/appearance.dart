@@ -38,6 +38,52 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      setState(() {
+        selectedThemeIndex = _getThemeIndex(themeProvider.state);
+      });
+    });
+  }
+
+  // Convert ThemeState to index
+  int _getThemeIndex(ThemeState state) {
+    switch (state) {
+      case ThemeState.system:
+        return 0;
+      case ThemeState.light:
+        return 1;
+      case ThemeState.dark:
+        return 2;
+    }
+  }
+
+  // Convert index to ThemeState
+  ThemeState _getThemeState(int index) {
+    switch (index) {
+      case 0:
+        return ThemeState.system;
+      case 1:
+        return ThemeState.light;
+      case 2:
+        return ThemeState.dark;
+      default:
+        return ThemeState.system;
+    }
+  }
+
+  // Handle theme selection
+  void _handleThemeSelection(int index) {
+    setState(() {
+      selectedThemeIndex = index;
+      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      themeProvider.setTheme(_getThemeState(index));
+    });
+  }
+
+  @override
   void reassemble() {
     super.reassemble();
     setState(() {
@@ -106,8 +152,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                   ],
                                 ),
                                 isSelected: selectedThemeIndex == index,
-                                onSelect: () =>
-                                    setState(() => selectedThemeIndex = index),
+                                onSelect: () => _handleThemeSelection(index),
                               ),
                             ),
                             unselectedOpacity: 0.5,

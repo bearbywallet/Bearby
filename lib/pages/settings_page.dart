@@ -171,14 +171,14 @@ class _SettingsPageState extends State<SettingsPage> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Main wallet',
+                  appState.wallet!.walletName,
                   style: TextStyle(
                     color: theme.textSecondary,
                     fontSize: 14,
                   ),
                 ),
                 Text(
-                  'Ethereum (ETH)',
+                  'Ethereum (ETH)', // TODO: add Netowrk name!
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,
