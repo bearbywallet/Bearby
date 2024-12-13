@@ -97,7 +97,10 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               ),
               Switch(
                 value: state.state.notificationsGlobalEnabled,
-                onChanged: (value) async {},
+                onChanged: (value) async {
+                  await setGlobalNotifications(globalEnabled: value);
+                  await state.syncData();
+                },
                 activeColor: theme.primaryPurple,
                 activeTrackColor: theme.primaryPurple.withOpacity(0.5),
               ),
@@ -161,9 +164,6 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                         appState.wallets[index],
                         index,
                         isLastItem: index == appState.wallets.length - 1,
-                        onChanged: (value) {
-                          // Handle the notification toggle
-                        },
                       ),
                     ),
                   ),
@@ -180,12 +180,11 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     AppState state,
     WalletInfo wallet,
     int index, {
-    required ValueChanged<bool> onChanged,
     bool isLastItem = false,
   }) {
     final theme = state.currentTheme;
     final BackgroundNotificationState? walletNotify =
-        state.state.notificationsWalletStates[index];
+        state.state.notificationsWalletStates[BigInt.from(index)];
 
     return Container(
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -230,7 +229,16 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
           ),
           Switch(
             value: walletNotify != null ? walletNotify.transactions : false,
-            onChanged: onChanged,
+            onChanged: (value) async {
+              await setWalletNotifications(
+                walletIndex: BigInt.from(index),
+                transactions: value,
+                price: false, // TODO: makeyb set in future
+                security: false,
+                balance: false,
+              );
+              await state.syncData();
+            },
             activeColor: theme.primaryPurple,
             activeTrackColor: theme.primaryPurple.withOpacity(0.5),
           ),
