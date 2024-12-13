@@ -98,11 +98,19 @@ pub struct WalletInfo {
     pub wallet_type: String,
     pub wallet_name: String,
     pub auth_type: String,
-    pub settings: WalletSettings,
     pub wallet_address: String,
     pub accounts: Vec<AccountInfo>,
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
+    // settings
+    pub cipher_orders: Vec<String>,
+    pub currency_convert: Option<String>,
+    pub ipfs_node: Option<String>,
+    pub ens_enabled: bool,
+    pub gas_control_enabled: bool,
+    pub node_ranking_enabled: bool,
+    pub max_connections: u8,
+    pub request_timeout_secs: u32,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -116,11 +124,24 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
-                settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.iter().map(|v| v.into()).collect(),
+                cipher_orders: w
+                    .data
+                    .settings
+                    .cipher_orders
+                    .iter()
+                    .map(|v| v.to_string())
+                    .collect(),
+                currency_convert: w.data.settings.features.currency_convert.clone(),
+                ipfs_node: w.data.settings.features.ipfs_node.clone(),
+                ens_enabled: w.data.settings.features.ens_enabled,
+                gas_control_enabled: w.data.settings.network.gas_control_enabled,
+                node_ranking_enabled: w.data.settings.network.node_ranking_enabled,
+                max_connections: w.data.settings.network.max_connections,
+                request_timeout_secs: w.data.settings.network.request_timeout_secs,
             })
             .collect();
 
@@ -180,11 +201,24 @@ pub async fn get_data() -> Result<BackgroundState, String> {
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
-                settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.iter().map(|v| v.into()).collect(),
+                cipher_orders: w
+                    .data
+                    .settings
+                    .cipher_orders
+                    .iter()
+                    .map(|v| v.to_string())
+                    .collect(),
+                currency_convert: w.data.settings.features.currency_convert.clone(),
+                ipfs_node: w.data.settings.features.ipfs_node.clone(),
+                ens_enabled: w.data.settings.features.ens_enabled,
+                gas_control_enabled: w.data.settings.network.gas_control_enabled,
+                node_ranking_enabled: w.data.settings.network.node_ranking_enabled,
+                max_connections: w.data.settings.network.max_connections,
+                request_timeout_secs: w.data.settings.network.request_timeout_secs,
             })
             .collect();
         let state = BackgroundState {
@@ -270,11 +304,24 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
-                settings: w.data.settings.clone(),
                 wallet_address: w.data.wallet_address.clone(),
                 accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
                 selected_account: w.data.selected_account,
                 tokens: w.ftokens.iter().map(|v| v.into()).collect(),
+                cipher_orders: w
+                    .data
+                    .settings
+                    .cipher_orders
+                    .iter()
+                    .map(|v| v.to_string())
+                    .collect(),
+                currency_convert: w.data.settings.features.currency_convert.clone(),
+                ipfs_node: w.data.settings.features.ipfs_node.clone(),
+                ens_enabled: w.data.settings.features.ens_enabled,
+                gas_control_enabled: w.data.settings.network.gas_control_enabled,
+                node_ranking_enabled: w.data.settings.network.node_ranking_enabled,
+                max_connections: w.data.settings.network.max_connections,
+                request_timeout_secs: w.data.settings.network.request_timeout_secs,
             })
             .collect();
         let state = BackgroundState {
