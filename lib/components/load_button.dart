@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 enum ButtonState { idle, loading, success, error }
 
@@ -75,7 +75,7 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {

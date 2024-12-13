@@ -7,7 +7,7 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
   const SecretPhraseGeneratorPage({
@@ -22,7 +22,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
   List<String> _mnemonicWords = [];
   var _count = 12;
   bool _hasBackupWords = false;
-  final String _selectedLanguage = 'English';
+  // final String _selectedLanguage = 'English';
 
   @override
   void initState() {
@@ -33,7 +33,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
   @override
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       body: SafeArea(

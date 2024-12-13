@@ -6,7 +6,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
   const SecretKeyGeneratorPage({
@@ -38,7 +38,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
   @override
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       body: SafeArea(

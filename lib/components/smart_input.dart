@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../theme/theme_provider.dart';
 import 'dart:math' show pi, sin;
+
+import 'package:zilpay/state/app_state.dart';
 
 class SmartInput extends StatefulWidget {
   final TextEditingController? controller;
@@ -130,7 +131,7 @@ class SmartInputState extends State<SmartInput>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     final defaultBorderColor = theme.textSecondary.withOpacity(0.3);
     final defaultFocusedBorderColor = theme.primaryPurple;

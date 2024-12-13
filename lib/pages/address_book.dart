@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
-import '../theme/theme_provider.dart';
 import '../components/custom_app_bar.dart';
 
 class AddressBookPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       backgroundColor: theme.background,

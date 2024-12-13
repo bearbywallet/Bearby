@@ -4,8 +4,8 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
-import '../theme/theme_provider.dart';
 import 'package:http/http.dart' as http;
+import 'package:zilpay/state/app_state.dart';
 
 // TODO: make a cache image loading! remove http
 class TokenCard extends StatefulWidget {
@@ -68,7 +68,7 @@ class _TokenCardState extends State<TokenCard> {
     }
   }
 
-  Widget _buildIcon(ThemeProvider themeProvider) {
+  Widget _buildIcon(AppState themeProvider) {
     if (isLoading) {
       return SizedBox(
         width: 25,
@@ -154,7 +154,7 @@ class _TokenCardState extends State<TokenCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Column(
@@ -240,7 +240,7 @@ class _TokenCardState extends State<TokenCard> {
                         shape: BoxShape.circle,
                       ),
                       child: ClipOval(
-                        child: _buildIcon(Provider.of<ThemeProvider>(context)),
+                        child: _buildIcon(Provider.of<AppState>(context)),
                       ),
                     ),
                   ],

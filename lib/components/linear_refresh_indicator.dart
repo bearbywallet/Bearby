@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class LinearRefreshIndicator extends StatefulWidget {
   final double pulledExtent;
@@ -66,7 +66,7 @@ class _LinearRefreshIndicatorState extends State<LinearRefreshIndicator>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final double progress =
         (widget.pulledExtent / widget.refreshTriggerPullDistance)
             .clamp(0.0, 1.0);

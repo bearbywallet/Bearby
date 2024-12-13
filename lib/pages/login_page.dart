@@ -16,7 +16,6 @@ import '../services/auth_guard.dart';
 import '../services/biometric_service.dart';
 import '../services/device.dart';
 import '../state/app_state.dart';
-import '../theme/theme_provider.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -196,7 +195,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildHeader(ThemeProvider theme) {
+  Widget _buildHeader(AppState theme) {
     return Padding(
       padding: EdgeInsets.all(AdaptiveSize.getAdaptivePadding(context, 16)),
       child: Row(
@@ -220,7 +219,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildWalletList(ThemeProvider theme) {
+  Widget _buildWalletList(AppState theme) {
     return Expanded(
       child: ListView.builder(
         physics: const BouncingScrollPhysics(),
@@ -233,7 +232,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildWalletItem(int index, ThemeProvider theme) {
+  Widget _buildWalletItem(int index, AppState theme) {
     final wallet = _appState.wallets[index];
 
     if (!_obscureButton && _selectedWallet != index) {
@@ -276,7 +275,7 @@ class _LoginPageState extends State<LoginPage> {
     ];
   }
 
-  Widget _buildWalletIcon(WalletInfo wallet, int index, ThemeProvider theme) {
+  Widget _buildWalletIcon(WalletInfo wallet, int index, AppState theme) {
     return Container(
       padding: const EdgeInsets.all(4),
       child: Blockies(
@@ -289,7 +288,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildLoginForm(ThemeProvider theme) {
+  Widget _buildLoginForm(AppState theme) {
     final isLedgerWallet = _selectedWallet != -1 &&
         _appState.wallets[_selectedWallet].walletType == WalletType.ledger.name;
 
@@ -323,7 +322,7 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildUnlockButton(ThemeProvider theme) {
+  Widget _buildUnlockButton(AppState theme) {
     return SizedBox(
       width: double.infinity,
       child: RoundedLoadingButton(
@@ -352,7 +351,7 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context);
+    final theme = Provider.of<AppState>(context);
     final screenSize = MediaQuery.of(context).size;
 
     return Scaffold(

@@ -14,7 +14,6 @@ import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
-import '../theme/theme_provider.dart';
 
 class PasswordSetupPage extends StatefulWidget {
   const PasswordSetupPage({super.key});
@@ -26,7 +25,7 @@ class PasswordSetupPage extends StatefulWidget {
 class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<String>? _bip39List;
   List<int>? _codes;
-  int? _cipher;
+  // int? _cipher;
   KeyPair? _keys;
 
   final AuthService _authService = AuthService();
@@ -70,7 +69,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       setState(() {
         _bip39List = bip39;
         _codes = codes;
-        _cipher = cipher;
+        // _cipher = cipher;
         _keys = keys;
       });
     }
@@ -252,7 +251,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final screenWidth = MediaQuery.of(context).size.width;
     const inputHeight = 50.0;

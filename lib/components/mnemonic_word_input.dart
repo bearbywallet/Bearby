@@ -1,6 +1,6 @@
 import 'package:provider/provider.dart';
 import 'package:flutter/material.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class MnemonicWordInput extends StatefulWidget {
   final int index;
@@ -55,7 +55,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),

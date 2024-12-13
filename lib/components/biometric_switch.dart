@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class BiometricSwitch extends StatelessWidget {
   final AuthMethod biometricType;
@@ -56,7 +56,7 @@ class BiometricSwitch extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 4),

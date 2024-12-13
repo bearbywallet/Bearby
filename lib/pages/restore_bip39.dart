@@ -7,7 +7,7 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class RestoreSecretPhrasePage extends StatefulWidget {
   const RestoreSecretPhrasePage({super.key});
@@ -141,7 +141,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
   @override
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       body: SafeArea(

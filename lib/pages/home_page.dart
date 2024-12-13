@@ -13,7 +13,6 @@ import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../theme/theme_provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
 class HomePage extends StatefulWidget {
@@ -54,7 +53,7 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
 
@@ -259,7 +258,8 @@ class _HomePageState extends State<HomePage> {
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,
                             iconUrl: viewIcon(token.addr, "Light"),
-                            onTap: () => {print("tap token ${token.name}")},
+                            onTap: () =>
+                                {debugPrint("tap token ${token.name}")},
                           );
                         }).toList(),
                       ),

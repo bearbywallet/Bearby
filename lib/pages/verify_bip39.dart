@@ -4,7 +4,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 List<int> getRandomNumbers(int min, int max, int count) {
   final random = Random();
@@ -57,7 +57,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       body: SafeArea(

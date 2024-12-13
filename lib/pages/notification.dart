@@ -8,7 +8,6 @@ import '../components/custom_app_bar.dart';
 import '../mixins/colors.dart';
 import '../state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
-import '../theme/theme_provider.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   const NotificationsSettingsPage({super.key});
@@ -38,7 +37,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(

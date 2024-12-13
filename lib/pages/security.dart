@@ -8,7 +8,6 @@ import 'package:zilpay/state/app_state.dart';
 
 import '../components/custom_app_bar.dart';
 import '../theme/app_theme.dart' as theme;
-import '../theme/theme_provider.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -36,9 +35,9 @@ class _SecurityPageState extends State<SecurityPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -202,7 +201,6 @@ class _SecurityPageState extends State<SecurityPage> {
     VoidCallback? onTap,
     bool showInput = false,
     TextEditingController? controller,
-    String? hintText,
   }) {
     return GestureDetector(
       onTap: onTap,

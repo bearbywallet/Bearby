@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/icon.dart';
-import 'package:zilpay/theme/theme_provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
 
@@ -60,7 +59,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
     final tokens = appState.wallet?.tokens ?? [];
 
@@ -177,7 +176,7 @@ class _TokenListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     const double iconSize = 32.0;
 
     return Container(

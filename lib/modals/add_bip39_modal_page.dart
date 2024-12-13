@@ -16,7 +16,6 @@ import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/smart_input.dart';
-import '../../theme/theme_provider.dart';
 
 class AddNextBip39AccountContent extends StatefulWidget {
   final VoidCallback onBack;
@@ -220,7 +219,7 @@ class _AddNextBip39AccountContentState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final bottomInset = MediaQuery.of(context).viewInsets.bottom;
     const inputHeight = 50.0;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);

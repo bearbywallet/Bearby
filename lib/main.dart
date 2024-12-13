@@ -28,6 +28,6 @@ Future<void> main() async {
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));
   } catch (e) {
-    print("try start, Error: $e");
+    debugPrint("try start, Error: $e");
   }
 }

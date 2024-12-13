@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
 class AddWalletOptionsPage extends StatelessWidget {
@@ -9,7 +9,7 @@ class AddWalletOptionsPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -21,7 +21,10 @@ class AddWalletOptionsPage extends StatelessWidget {
             'assets/icons/back.svg',
             width: 24,
             height: 24,
-            color: theme.secondaryPurple,
+            colorFilter: ColorFilter.mode(
+              theme.secondaryPurple,
+              BlendMode.srcIn,
+            ),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
@@ -40,7 +43,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                   'assets/icons/add.svg',
                   width: 35,
                   height: 35,
-                  color: theme.primaryPurple,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(context).pushNamed('/gen_options');
@@ -53,7 +59,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                   'assets/icons/import.svg',
                   width: 35,
                   height: 35,
-                  color: theme.primaryPurple,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(context).pushNamed('/restore_options');
@@ -66,7 +75,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                   'assets/icons/ledger.svg',
                   width: 25,
                   height: 25,
-                  color: theme.primaryPurple,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onTap: () {
                   Navigator.of(context).pushNamed('/ledger_connect');
@@ -88,7 +100,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                   'assets/icons/looking.svg',
                   width: 35,
                   height: 35,
-                  color: theme.primaryPurple,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
                 ),
                 onTap: () {/* Handle watch account */},
               ),

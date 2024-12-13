@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CustomDropdown extends StatefulWidget {
   final List<dynamic> items;
@@ -44,7 +44,7 @@ class _CustomDropdownState extends State<CustomDropdown>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return GestureDetector(
       onTap: _toggleDropdown,
@@ -96,7 +96,8 @@ class _CustomDropdownState extends State<CustomDropdown>
 
     return OverlayEntry(
       builder: (context) {
-        final theme = Provider.of<ThemeProvider>(context).currentTheme;
+        final theme = Provider.of<AppState>(context).currentTheme;
+
         return GestureDetector(
           onTap: () => _toggleDropdown(),
           behavior: HitTestBehavior.translucent,

@@ -3,7 +3,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class HexKeyDisplay extends StatefulWidget {
   final String hexKey;
@@ -127,7 +127,7 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
 
     final chunks = _formatHexKey(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     final chunkSize = _getChunkSize(context);
     final containerWidth = (45.0 * chunkSize) + adaptivePadding * 2;

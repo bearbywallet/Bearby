@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/theme/theme_provider.dart';
 
 class LedgerItem extends StatefulWidget {
   final Widget icon;
@@ -73,7 +73,7 @@ class _LedgerItemState extends State<LedgerItem>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return GestureDetector(
       onTapDown: _handleTapDown,

@@ -9,7 +9,6 @@ import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/add_bip39_modal_page.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/theme_provider.dart';
 
 void showWalletModal({
   required BuildContext context,
@@ -64,8 +63,8 @@ class _WalletModalContentState extends State<_WalletModalContent> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
 
     if (appState.wallet == null) {
       return Container();
@@ -96,8 +95,8 @@ class _WalletModalContentState extends State<_WalletModalContent> {
   }
 
   Widget _buildMainContent(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Column(

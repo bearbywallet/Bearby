@@ -1,5 +1,8 @@
+import 'dart:ui';
+
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 class Connection {
   final String name;
@@ -23,11 +26,17 @@ class Connection {
   });
 }
 
-class AppState extends ChangeNotifier {
-  BackgroundState _state;
+class AppState extends ChangeNotifier with WidgetsBindingObserver {
+  late BackgroundState _state;
   int _selectedWallet = 0;
 
-  AppState({required BackgroundState state}) : _state = state;
+  final Brightness _systemBrightness =
+      PlatformDispatcher.instance.platformBrightness;
+
+  AppState({required BackgroundState state}) {
+    WidgetsBinding.instance.addObserver(this);
+    _state = state;
+  }
 
   void setSelectedWallet(int index) {
     _selectedWallet = index;
@@ -36,6 +45,27 @@ class AppState extends ChangeNotifier {
 
   List<WalletInfo> get wallets {
     return _state.wallets;
+  }
+
+  BackgroundState get state {
+    return _state;
+  }
+
+  AppTheme get currentTheme {
+    switch (_state.appearances) {
+      case 0:
+        return _systemBrightness == Brightness.dark
+            ? DarkTheme()
+            : LightTheme();
+      case 1:
+        return DarkTheme();
+      case 2:
+        return LightTheme();
+      default:
+        return _systemBrightness == Brightness.dark
+            ? DarkTheme()
+            : LightTheme();
+    }
   }
 
   List<Connection> get connectedDapps {
@@ -81,6 +111,7 @@ class AppState extends ChangeNotifier {
 
   Future<void> syncData() async {
     _state = await getData();
+
     notifyListeners();
   }
 
@@ -93,6 +124,12 @@ class AppState extends ChangeNotifier {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
     await syncData();
 
+    notifyListeners();
+  }
+
+  Future<void> setAppearancesCode(int code) async {
+    await setTheme(appearancesCode: code);
+    _state = await getData();
     notifyListeners();
   }
 }

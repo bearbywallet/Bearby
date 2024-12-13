@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class WordCountSelector extends StatelessWidget {
   final List<int> wordCounts;
@@ -16,7 +16,7 @@ class WordCountSelector extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),

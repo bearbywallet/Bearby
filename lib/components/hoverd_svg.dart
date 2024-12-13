@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class HoverSvgIcon extends StatefulWidget {
   final String assetName;
@@ -22,15 +22,15 @@ class HoverSvgIcon extends StatefulWidget {
   });
 
   @override
-  _HoverSvgIconState createState() => _HoverSvgIconState();
+  State<HoverSvgIcon> createState() => HoverSvgIconState();
 }
 
-class _HoverSvgIconState extends State<HoverSvgIcon> {
+class HoverSvgIconState extends State<HoverSvgIcon> {
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final iconColor = widget.color ?? theme.textPrimary;
 
     return Container(

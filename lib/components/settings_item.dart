@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class SettingsItem extends StatefulWidget {
   final String title;
@@ -45,7 +45,7 @@ class _SettingsItemState extends State<SettingsItem> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final borderRadius = _getBorderRadius();
 
     return GestureDetector(

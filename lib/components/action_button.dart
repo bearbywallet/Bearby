@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CustomActionButton extends StatefulWidget {
   final String label;
@@ -16,15 +16,15 @@ class CustomActionButton extends StatefulWidget {
   });
 
   @override
-  _CustomActionButtonState createState() => _CustomActionButtonState();
+  State<CustomActionButton> createState() => CustomActionButtonState();
 }
 
-class _CustomActionButtonState extends State<CustomActionButton> {
+class CustomActionButtonState extends State<CustomActionButton> {
   bool _isPressed = false;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return GestureDetector(
       onTapDown: (_) => setState(() => _isPressed = true),
@@ -56,7 +56,10 @@ class _CustomActionButtonState extends State<CustomActionButton> {
                 widget.iconPath,
                 width: 24,
                 height: 24,
-                color: theme.primaryPurple,
+                colorFilter: ColorFilter.mode(
+                  theme.primaryPurple,
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(height: 6),
               Text(

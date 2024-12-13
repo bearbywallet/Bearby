@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:blockies/blockies.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/colors.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class WalletCard extends StatelessWidget {
   final String name;
@@ -30,7 +30,7 @@ class WalletCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return InkWell(
       onTap: onTap,

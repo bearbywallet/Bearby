@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'router.dart';
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
-import './theme/theme_provider.dart';
 
 class ZilPayApp extends StatelessWidget {
   final AuthGuard authGuard;
@@ -17,13 +16,12 @@ class ZilPayApp extends StatelessWidget {
       providers: [
         ChangeNotifierProvider.value(value: authGuard),
         ChangeNotifierProvider.value(value: appState),
-        ChangeNotifierProvider(create: (_) => ThemeProvider()),
       ],
       child: Builder(
         builder: (context) {
-          return Consumer<ThemeProvider>(
-            builder: (context, themeProvider, _) {
-              final currentTheme = themeProvider.currentTheme;
+          return Consumer<AppState>(
+            builder: (context, appState, _) {
+              final currentTheme = appState.currentTheme;
 
               return MaterialApp(
                 title: 'ZilPay Wallet',

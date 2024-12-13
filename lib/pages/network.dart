@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/network_options.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 import '../components/custom_app_bar.dart';
 import '../mixins/adaptive_size.dart';
 
@@ -41,7 +41,7 @@ class _NetworkPageState extends State<NetworkPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(

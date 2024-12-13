@@ -3,7 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/addr.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CopyAddressButton extends StatefulWidget {
   final String address;
@@ -65,7 +65,7 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,

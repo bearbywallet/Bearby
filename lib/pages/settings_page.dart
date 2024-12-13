@@ -8,7 +8,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/state/app_state.dart' as app_state;
 import '../theme/app_theme.dart';
-import '../theme/theme_provider.dart';
 
 class SettingsPage extends StatefulWidget {
   const SettingsPage({super.key});
@@ -20,10 +19,10 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final SocialMediaService socialMediaService = SocialMediaService();
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final appState = Provider.of<app_state.AppState>(context);
+    final SocialMediaService socialMediaService = SocialMediaService();
+    final theme = appState.currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       backgroundColor: theme.background,

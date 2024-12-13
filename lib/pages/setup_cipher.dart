@@ -6,7 +6,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CipherSettingsPage extends StatefulWidget {
   const CipherSettingsPage({
@@ -82,7 +82,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(

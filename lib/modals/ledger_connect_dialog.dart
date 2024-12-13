@@ -5,8 +5,8 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/services/biometric_service.dart';
-import '../theme/theme_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class LedgerConnectDialog extends StatefulWidget {
   final String? walletName;
@@ -80,7 +80,7 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final viewInsets = MediaQuery.of(context).viewInsets;
     final screenHeight = MediaQuery.of(context).size.height;
     final maxHeight = screenHeight - (screenHeight * 0.1);

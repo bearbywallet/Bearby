@@ -16,7 +16,6 @@ import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../theme/theme_provider.dart';
 
 class LedgerConnectPage extends StatefulWidget {
   const LedgerConnectPage({super.key});
@@ -169,7 +168,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   @override
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
       body: SafeArea(
@@ -264,7 +263,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                 icon,
                                 width: 30,
                                 height: 30,
-                                color: theme.textPrimary,
+                                colorFilter: ColorFilter.mode(
+                                  theme.textPrimary,
+                                  BlendMode.srcIn,
+                                ),
                               ),
                               title: device.name,
                               id: device.id,
@@ -336,9 +338,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           _appState.setSelectedWallet(_appState.wallets.length - 1);
           await _authGuard.setSession(session.$2, session.$1);
 
-          Navigator.of(context).pushNamed(
-            '/',
-          );
+          final navContext = context;
+
+          if (mounted) {
+            Navigator.of(navContext).pushNamed(
+              '/',
+            );
+          }
         },
       ),
     );

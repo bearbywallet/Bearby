@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CounterIcons {
   static const String minus = '''
@@ -136,7 +136,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return Opacity(
       opacity: widget.disabled ? 0.6 : 1.0,

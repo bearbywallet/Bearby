@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import '../theme/theme_provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class AppearanceSettingsPage extends StatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -24,16 +24,16 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
           "Default to your device's appearance. Your wallet theme will automatically adjust based on your system settings.",
     },
     {
-      'title': 'Light mode',
-      'subtitle': 'Always light',
-      'description':
-          'Keep the light theme enabled at all times, regardless of your device settings.',
-    },
-    {
       'title': 'Dark Mode',
       'subtitle': 'Always dark',
       'description':
           'Keep the dark theme enabled at all times, regardless of your device settings.',
+    },
+    {
+      'title': 'Light mode',
+      'subtitle': 'Always light',
+      'description':
+          'Keep the light theme enabled at all times, regardless of your device settings.',
     },
   ];
 
@@ -41,45 +41,21 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
+      final themeProvider = Provider.of<AppState>(context, listen: false);
+
       setState(() {
-        selectedThemeIndex = _getThemeIndex(themeProvider.state);
+        selectedThemeIndex = themeProvider.state.appearances;
       });
     });
   }
 
-  // Convert ThemeState to index
-  int _getThemeIndex(ThemeState state) {
-    switch (state) {
-      case ThemeState.system:
-        return 0;
-      case ThemeState.light:
-        return 1;
-      case ThemeState.dark:
-        return 2;
-    }
-  }
-
-  // Convert index to ThemeState
-  ThemeState _getThemeState(int index) {
-    switch (index) {
-      case 0:
-        return ThemeState.system;
-      case 1:
-        return ThemeState.light;
-      case 2:
-        return ThemeState.dark;
-      default:
-        return ThemeState.system;
-    }
-  }
-
   // Handle theme selection
-  void _handleThemeSelection(int index) {
+  Future<void> _handleThemeSelection(int index) async {
+    final stateProvider = Provider.of<AppState>(context, listen: false);
+    await stateProvider.setAppearancesCode(index);
+
     setState(() {
       selectedThemeIndex = index;
-      final themeProvider = Provider.of<ThemeProvider>(context, listen: false);
-      themeProvider.setTheme(_getThemeState(index));
     });
   }
 
@@ -93,7 +69,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(

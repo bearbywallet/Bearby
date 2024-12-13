@@ -9,7 +9,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
 // These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `initialize`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `initialize`
 
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
@@ -148,17 +148,6 @@ Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<BackgroundState>>
-abstract class BackgroundState implements RustOpaqueInterface {
-  CommonSettings get settings;
-
-  List<WalletInfo> get wallets;
-
-  set settings(CommonSettings settings);
-
-  set wallets(List<WalletInfo> wallets);
-}
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
 abstract class FToken implements RustOpaqueInterface {}
 
@@ -231,6 +220,72 @@ class AccountInfo {
           runtimeType == other.runtimeType &&
           addr == other.addr &&
           name == other.name;
+}
+
+class BackgroundNotificationState {
+  final bool transactions;
+  final bool price;
+  final bool security;
+  final bool balance;
+
+  const BackgroundNotificationState({
+    required this.transactions,
+    required this.price,
+    required this.security,
+    required this.balance,
+  });
+
+  @override
+  int get hashCode =>
+      transactions.hashCode ^
+      price.hashCode ^
+      security.hashCode ^
+      balance.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BackgroundNotificationState &&
+          runtimeType == other.runtimeType &&
+          transactions == other.transactions &&
+          price == other.price &&
+          security == other.security &&
+          balance == other.balance;
+}
+
+class BackgroundState {
+  final List<WalletInfo> wallets;
+  final Map<BigInt, BackgroundNotificationState> notificationsWalletStates;
+  final bool notificationsGlobalEnabled;
+  final String locale;
+  final int appearances;
+
+  const BackgroundState({
+    required this.wallets,
+    required this.notificationsWalletStates,
+    required this.notificationsGlobalEnabled,
+    required this.locale,
+    required this.appearances,
+  });
+
+  @override
+  int get hashCode =>
+      wallets.hashCode ^
+      notificationsWalletStates.hashCode ^
+      notificationsGlobalEnabled.hashCode ^
+      locale.hashCode ^
+      appearances.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is BackgroundState &&
+          runtimeType == other.runtimeType &&
+          wallets == other.wallets &&
+          notificationsWalletStates == other.notificationsWalletStates &&
+          notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
+          locale == other.locale &&
+          appearances == other.appearances;
 }
 
 class FTokenInfo {

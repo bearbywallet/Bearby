@@ -3,6 +3,7 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use zilpay::settings::notifications::NotificationState;
 
 pub use zilpay::background::BackgroundSKParams;
 pub use zilpay::background::{Background, BackgroundBip39Params};
@@ -130,9 +131,42 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
 }
 
 #[derive(Debug)]
+pub struct BackgroundNotificationState {
+    pub transactions: bool,
+    pub price: bool,
+    pub security: bool,
+    pub balance: bool,
+}
+
+impl From<&NotificationState> for BackgroundNotificationState {
+    fn from(notify: &NotificationState) -> Self {
+        BackgroundNotificationState {
+            transactions: notify.transactions,
+            price: notify.price,
+            security: notify.security,
+            balance: notify.balance,
+        }
+    }
+}
+
+impl From<NotificationState> for BackgroundNotificationState {
+    fn from(state: NotificationState) -> Self {
+        BackgroundNotificationState {
+            transactions: state.transactions,
+            price: state.price,
+            security: state.security,
+            balance: state.balance,
+        }
+    }
+}
+
+#[derive(Debug)]
 pub struct BackgroundState {
     pub wallets: Vec<WalletInfo>,
-    pub settings: CommonSettings,
+    pub notifications_wallet_states: HashMap<usize, BackgroundNotificationState>,
+    pub notifications_global_enabled: bool,
+    pub locale: String,
+    pub appearances: u8,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -155,7 +189,27 @@ pub async fn get_data() -> Result<BackgroundState, String> {
             .collect();
         let state = BackgroundState {
             wallets,
-            settings: service.core.settings.clone(),
+            notifications_wallet_states: service
+                .core
+                .settings
+                .notifications
+                .wallet_states
+                .iter()
+                .map(|(k, v)| {
+                    (
+                        *k,
+                        BackgroundNotificationState {
+                            transactions: v.transactions,
+                            price: v.price,
+                            security: v.security,
+                            balance: v.balance,
+                        },
+                    )
+                })
+                .collect(),
+            notifications_global_enabled: service.core.settings.notifications.global_enabled,
+            locale: service.core.settings.locale.to_string(),
+            appearances: service.core.settings.theme.appearances.code(),
         };
 
         return Ok(state);
@@ -225,7 +279,28 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
             .collect();
         let state = BackgroundState {
             wallets,
-            settings: bg.core.settings.clone(),
+            notifications_wallet_states: bg
+                .core
+                .settings
+                .notifications
+                .wallet_states
+                .iter()
+                .map(|(k, v)| {
+                    (
+                        *k,
+                        BackgroundNotificationState {
+                            transactions: v.transactions,
+                            price: v.price,
+                            security: v.security,
+                            balance: v.balance,
+                        },
+                    )
+                })
+                .collect(),
+
+            notifications_global_enabled: bg.core.settings.notifications.global_enabled,
+            locale: bg.core.settings.locale.to_string(),
+            appearances: bg.core.settings.theme.appearances.code(),
         };
 
         *service = Some(bg);

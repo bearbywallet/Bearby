@@ -9,9 +9,8 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
-import 'package:zilpay/state/app_state.dart' as app_state;
+import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
-import '../theme/theme_provider.dart';
 
 class WalletPreferenceItem {
   final String title;
@@ -48,7 +47,7 @@ class _WalletPageState extends State<WalletPage> {
   @override
   void initState() {
     super.initState();
-    final appState = Provider.of<app_state.AppState>(context, listen: false);
+    final appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
   }
 
@@ -66,7 +65,7 @@ class _WalletPageState extends State<WalletPage> {
 
   List<WalletPreferenceItem> _getPreferenceItems(
       BuildContext context, AppTheme theme) {
-    final appState = Provider.of<app_state.AppState>(context);
+    final appState = Provider.of<AppState>(context);
 
     return [
       WalletPreferenceItem(
@@ -106,9 +105,9 @@ class _WalletPageState extends State<WalletPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<ThemeProvider>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final appState = Provider.of<app_state.AppState>(context);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -161,7 +160,7 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget _buildWalletHeader(AppTheme theme, app_state.AppState appState) {
+  Widget _buildWalletHeader(AppTheme theme, AppState appState) {
     return SizedBox(
       width: _avatarSize,
       height: _avatarSize,
@@ -247,7 +246,7 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Widget _buildPreferenceItem(AppTheme theme, WalletPreferenceItem item) {
-    final appState = Provider.of<app_state.AppState>(context);
+    final appState = Provider.of<AppState>(context);
 
     return GestureDetector(
       onTap: item.onTap,
