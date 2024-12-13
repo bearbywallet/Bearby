@@ -710,7 +710,7 @@ pub async fn set_wallet_notifications(
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
 
-        core.settings.notifications.wallet_states.insert(
+        core.set_wallet_notifications(
             wallet_index,
             NotificationState {
                 transactions,
@@ -718,8 +718,8 @@ pub async fn set_wallet_notifications(
                 security,
                 balance,
             },
-        );
-        // TODO: save to storage;
+        )
+        .map_err(|e| e.to_string())?;
 
         Ok(())
     } else {
@@ -732,8 +732,8 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
 
-        core.settings.notifications.global_enabled = global_enabled;
-        // TODO: save to storage;
+        core.set_global_notifications(global_enabled)
+            .map_err(|e| e.to_string())?;
 
         Ok(())
     } else {
