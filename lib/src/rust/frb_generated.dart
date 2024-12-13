@@ -70,7 +70,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.6.0';
 
   @override
-  int get rustContentHash => 1397754144;
+  int get rustContentHash => 1982109650;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -93,22 +93,24 @@ abstract class RustLibApi extends BaseApi {
   void crateApiBackendBackgroundStateAutoAccessorSetWallets(
       {required BackgroundState that, required List<WalletInfo> wallets});
 
-  ArcBackground crateApiBackendSerivceAutoAccessorGetCore(
-      {required Serivce that});
+  ArcBackground crateApiBackendSerivceBackgroundAutoAccessorGetCore(
+      {required SerivceBackground that});
 
-  RustStreamSink<String>? crateApiBackendSerivceAutoAccessorGetMessageSink(
-      {required Serivce that});
+  RustStreamSink<String>?
+      crateApiBackendSerivceBackgroundAutoAccessorGetMessageSink(
+          {required SerivceBackground that});
 
-  bool crateApiBackendSerivceAutoAccessorGetRunning({required Serivce that});
+  bool crateApiBackendSerivceBackgroundAutoAccessorGetRunning(
+      {required SerivceBackground that});
 
-  void crateApiBackendSerivceAutoAccessorSetCore(
-      {required Serivce that, required ArcBackground core});
+  void crateApiBackendSerivceBackgroundAutoAccessorSetCore(
+      {required SerivceBackground that, required ArcBackground core});
 
-  void crateApiBackendSerivceAutoAccessorSetMessageSink(
-      {required Serivce that, RustStreamSink<String>? messageSink});
+  void crateApiBackendSerivceBackgroundAutoAccessorSetMessageSink(
+      {required SerivceBackground that, RustStreamSink<String>? messageSink});
 
-  void crateApiBackendSerivceAutoAccessorSetRunning(
-      {required Serivce that, required bool running});
+  void crateApiBackendSerivceBackgroundAutoAccessorSetRunning(
+      {required SerivceBackground that, required bool running});
 
   List<AccountInfo> crateApiBackendWalletInfoAutoAccessorGetAccounts(
       {required WalletInfo that});
@@ -224,6 +226,8 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiBackendSelectAccount(
       {required BigInt walletIndex, required BigInt accountIndex});
 
+  Future<void> crateApiBackendSetTheme({required int appearancesCode});
+
   Future<BackgroundState> crateApiBackendStartService({required String path});
 
   Stream<String> crateApiBackendStartWorker();
@@ -275,11 +279,14 @@ abstract class RustLibApi extends BaseApi {
 
   CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_FTokenPtr;
 
-  RustArcIncrementStrongCountFnType get rust_arc_increment_strong_count_Serivce;
+  RustArcIncrementStrongCountFnType
+      get rust_arc_increment_strong_count_SerivceBackground;
 
-  RustArcDecrementStrongCountFnType get rust_arc_decrement_strong_count_Serivce;
+  RustArcDecrementStrongCountFnType
+      get rust_arc_decrement_strong_count_SerivceBackground;
 
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_SerivcePtr;
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_SerivceBackgroundPtr;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_WalletInfo;
@@ -424,12 +431,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           );
 
   @override
-  ArcBackground crateApiBackendSerivceAutoAccessorGetCore(
-      {required Serivce that}) {
+  ArcBackground crateApiBackendSerivceBackgroundAutoAccessorGetCore(
+      {required SerivceBackground that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 5)!;
       },
@@ -438,25 +445,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorGetCoreConstMeta,
+      constMeta: kCrateApiBackendSerivceBackgroundAutoAccessorGetCoreConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSerivceAutoAccessorGetCoreConstMeta =>
-      const TaskConstMeta(
-        debugName: "Serivce_auto_accessor_get_core",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kCrateApiBackendSerivceBackgroundAutoAccessorGetCoreConstMeta =>
+          const TaskConstMeta(
+            debugName: "SerivceBackground_auto_accessor_get_core",
+            argNames: ["that"],
+          );
 
   @override
-  RustStreamSink<String>? crateApiBackendSerivceAutoAccessorGetMessageSink(
-      {required Serivce that}) {
+  RustStreamSink<String>?
+      crateApiBackendSerivceBackgroundAutoAccessorGetMessageSink(
+          {required SerivceBackground that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 6)!;
       },
@@ -464,25 +473,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_opt_StreamSink_String_Sse,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorGetMessageSinkConstMeta,
+      constMeta:
+          kCrateApiBackendSerivceBackgroundAutoAccessorGetMessageSinkConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiBackendSerivceAutoAccessorGetMessageSinkConstMeta =>
+      get kCrateApiBackendSerivceBackgroundAutoAccessorGetMessageSinkConstMeta =>
           const TaskConstMeta(
-            debugName: "Serivce_auto_accessor_get_message_sink",
+            debugName: "SerivceBackground_auto_accessor_get_message_sink",
             argNames: ["that"],
           );
 
   @override
-  bool crateApiBackendSerivceAutoAccessorGetRunning({required Serivce that}) {
+  bool crateApiBackendSerivceBackgroundAutoAccessorGetRunning(
+      {required SerivceBackground that}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 7)!;
       },
@@ -490,25 +501,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_bool,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorGetRunningConstMeta,
+      constMeta:
+          kCrateApiBackendSerivceBackgroundAutoAccessorGetRunningConstMeta,
       argValues: [that],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSerivceAutoAccessorGetRunningConstMeta =>
-      const TaskConstMeta(
-        debugName: "Serivce_auto_accessor_get_running",
-        argNames: ["that"],
-      );
+  TaskConstMeta
+      get kCrateApiBackendSerivceBackgroundAutoAccessorGetRunningConstMeta =>
+          const TaskConstMeta(
+            debugName: "SerivceBackground_auto_accessor_get_running",
+            argNames: ["that"],
+          );
 
   @override
-  void crateApiBackendSerivceAutoAccessorSetCore(
-      {required Serivce that, required ArcBackground core}) {
+  void crateApiBackendSerivceBackgroundAutoAccessorSetCore(
+      {required SerivceBackground that, required ArcBackground core}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
             core, serializer);
@@ -518,25 +531,26 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorSetCoreConstMeta,
+      constMeta: kCrateApiBackendSerivceBackgroundAutoAccessorSetCoreConstMeta,
       argValues: [that, core],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSerivceAutoAccessorSetCoreConstMeta =>
-      const TaskConstMeta(
-        debugName: "Serivce_auto_accessor_set_core",
-        argNames: ["that", "core"],
-      );
+  TaskConstMeta
+      get kCrateApiBackendSerivceBackgroundAutoAccessorSetCoreConstMeta =>
+          const TaskConstMeta(
+            debugName: "SerivceBackground_auto_accessor_set_core",
+            argNames: ["that", "core"],
+          );
 
   @override
-  void crateApiBackendSerivceAutoAccessorSetMessageSink(
-      {required Serivce that, RustStreamSink<String>? messageSink}) {
+  void crateApiBackendSerivceBackgroundAutoAccessorSetMessageSink(
+      {required SerivceBackground that, RustStreamSink<String>? messageSink}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         sse_encode_opt_StreamSink_String_Sse(messageSink, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 9)!;
@@ -545,26 +559,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorSetMessageSinkConstMeta,
+      constMeta:
+          kCrateApiBackendSerivceBackgroundAutoAccessorSetMessageSinkConstMeta,
       argValues: [that, messageSink],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta
-      get kCrateApiBackendSerivceAutoAccessorSetMessageSinkConstMeta =>
+      get kCrateApiBackendSerivceBackgroundAutoAccessorSetMessageSinkConstMeta =>
           const TaskConstMeta(
-            debugName: "Serivce_auto_accessor_set_message_sink",
+            debugName: "SerivceBackground_auto_accessor_set_message_sink",
             argNames: ["that", "messageSink"],
           );
 
   @override
-  void crateApiBackendSerivceAutoAccessorSetRunning(
-      {required Serivce that, required bool running}) {
+  void crateApiBackendSerivceBackgroundAutoAccessorSetRunning(
+      {required SerivceBackground that, required bool running}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+        sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
             that, serializer);
         sse_encode_bool(running, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 10)!;
@@ -573,17 +588,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: null,
       ),
-      constMeta: kCrateApiBackendSerivceAutoAccessorSetRunningConstMeta,
+      constMeta:
+          kCrateApiBackendSerivceBackgroundAutoAccessorSetRunningConstMeta,
       argValues: [that, running],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSerivceAutoAccessorSetRunningConstMeta =>
-      const TaskConstMeta(
-        debugName: "Serivce_auto_accessor_set_running",
-        argNames: ["that", "running"],
-      );
+  TaskConstMeta
+      get kCrateApiBackendSerivceBackgroundAutoAccessorSetRunningConstMeta =>
+          const TaskConstMeta(
+            debugName: "SerivceBackground_auto_accessor_set_running",
+            argNames: ["that", "running"],
+          );
 
   @override
   List<AccountInfo> crateApiBackendWalletInfoAutoAccessorGetAccounts(
@@ -1524,13 +1541,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiBackendSetTheme({required int appearancesCode}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_u_8(appearancesCode, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 41, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiBackendSetThemeConstMeta,
+      argValues: [appearancesCode],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiBackendSetThemeConstMeta => const TaskConstMeta(
+        debugName: "set_theme",
+        argNames: ["appearancesCode"],
+      );
+
+  @override
   Future<BackgroundState> crateApiBackendStartService({required String path}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(path, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 41, port: port_);
+            funcId: 42, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData:
@@ -1557,7 +1598,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_StreamSink_String_Sse(sink, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 42, port: port_);
+            funcId: 43, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1581,7 +1622,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 43, port: port_);
+            funcId: 44, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1605,7 +1646,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 44, port: port_);
+            funcId: 45, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1635,7 +1676,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 45, port: port_);
+            funcId: 46, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -1665,7 +1706,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_list_String(identifiers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 46, port: port_);
+            funcId: 47, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -1716,12 +1757,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken;
 
   RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_Serivce => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce;
+      get rust_arc_increment_strong_count_SerivceBackground => wire
+          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground;
 
   RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_Serivce => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce;
+      get rust_arc_decrement_strong_count_SerivceBackground => wire
+          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground;
 
   RustArcIncrementStrongCountFnType
       get rust_arc_increment_strong_count_WalletInfo => wire
@@ -1778,11 +1819,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SerivceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return SerivceBackgroundImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1810,11 +1851,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      dco_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SerivceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return SerivceBackgroundImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1834,11 +1875,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      dco_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SerivceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return SerivceBackgroundImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1889,11 +1930,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
-    return SerivceImpl.frbInternalDcoDecode(raw as List<dynamic>);
+    return SerivceBackgroundImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -2123,11 +2164,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SerivceImpl.frbInternalSseDecode(
+    return SerivceBackgroundImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -2159,11 +2200,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      sse_decode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SerivceImpl.frbInternalSseDecode(
+    return SerivceBackgroundImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -2186,11 +2227,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      sse_decode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SerivceImpl.frbInternalSseDecode(
+    return SerivceBackgroundImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -2248,11 +2289,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Serivce
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
+  SerivceBackground
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
           SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    return SerivceImpl.frbInternalSseDecode(
+    return SerivceBackgroundImpl.frbInternalSseDecode(
         sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
@@ -2532,11 +2573,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
-          Serivce self, SseSerializer serializer) {
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
+          SerivceBackground self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as SerivceImpl).frbInternalSseEncode(move: true), serializer);
+        (self as SerivceBackgroundImpl).frbInternalSseEncode(move: true),
+        serializer);
   }
 
   @protected
@@ -2570,11 +2612,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
-          Serivce self, SseSerializer serializer) {
+      sse_encode_Auto_RefMut_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
+          SerivceBackground self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as SerivceImpl).frbInternalSseEncode(move: false), serializer);
+        (self as SerivceBackgroundImpl).frbInternalSseEncode(move: false),
+        serializer);
   }
 
   @protected
@@ -2598,11 +2641,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
-          Serivce self, SseSerializer serializer) {
+      sse_encode_Auto_Ref_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
+          SerivceBackground self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as SerivceImpl).frbInternalSseEncode(move: false), serializer);
+        (self as SerivceBackgroundImpl).frbInternalSseEncode(move: false),
+        serializer);
   }
 
   @protected
@@ -2663,11 +2707,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @protected
   void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivce(
-          Serivce self, SseSerializer serializer) {
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
+          SerivceBackground self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(
-        (self as SerivceImpl).frbInternalSseEncode(move: null), serializer);
+        (self as SerivceBackgroundImpl).frbInternalSseEncode(move: null),
+        serializer);
   }
 
   @protected
@@ -2976,48 +3021,50 @@ class FTokenImpl extends RustOpaque implements FToken {
 }
 
 @sealed
-class SerivceImpl extends RustOpaque implements Serivce {
+class SerivceBackgroundImpl extends RustOpaque implements SerivceBackground {
   // Not to be used by end users
-  SerivceImpl.frbInternalDcoDecode(List<dynamic> wire)
+  SerivceBackgroundImpl.frbInternalDcoDecode(List<dynamic> wire)
       : super.frbInternalDcoDecode(wire, _kStaticData);
 
   // Not to be used by end users
-  SerivceImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
+  SerivceBackgroundImpl.frbInternalSseDecode(
+      BigInt ptr, int externalSizeOnNative)
       : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
 
   static final _kStaticData = RustArcStaticData(
     rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_Serivce,
+        RustLib.instance.api.rust_arc_increment_strong_count_SerivceBackground,
     rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_Serivce,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_SerivcePtr,
+        RustLib.instance.api.rust_arc_decrement_strong_count_SerivceBackground,
+    rustArcDecrementStrongCountPtr: RustLib
+        .instance.api.rust_arc_decrement_strong_count_SerivceBackgroundPtr,
   );
 
   ArcBackground get core =>
-      RustLib.instance.api.crateApiBackendSerivceAutoAccessorGetCore(
+      RustLib.instance.api.crateApiBackendSerivceBackgroundAutoAccessorGetCore(
         that: this,
       );
 
-  RustStreamSink<String>? get messageSink =>
-      RustLib.instance.api.crateApiBackendSerivceAutoAccessorGetMessageSink(
+  RustStreamSink<String>? get messageSink => RustLib.instance.api
+          .crateApiBackendSerivceBackgroundAutoAccessorGetMessageSink(
         that: this,
       );
 
-  bool get running =>
-      RustLib.instance.api.crateApiBackendSerivceAutoAccessorGetRunning(
+  bool get running => RustLib.instance.api
+          .crateApiBackendSerivceBackgroundAutoAccessorGetRunning(
         that: this,
       );
 
-  set core(ArcBackground core) => RustLib.instance.api
-      .crateApiBackendSerivceAutoAccessorSetCore(that: this, core: core);
+  set core(ArcBackground core) =>
+      RustLib.instance.api.crateApiBackendSerivceBackgroundAutoAccessorSetCore(
+          that: this, core: core);
 
-  set messageSink(RustStreamSink<String>? messageSink) =>
-      RustLib.instance.api.crateApiBackendSerivceAutoAccessorSetMessageSink(
+  set messageSink(RustStreamSink<String>? messageSink) => RustLib.instance.api
+      .crateApiBackendSerivceBackgroundAutoAccessorSetMessageSink(
           that: this, messageSink: messageSink);
 
-  set running(bool running) =>
-      RustLib.instance.api.crateApiBackendSerivceAutoAccessorSetRunning(
+  set running(bool running) => RustLib.instance.api
+      .crateApiBackendSerivceBackgroundAutoAccessorSetRunning(
           that: this, running: running);
 }
 

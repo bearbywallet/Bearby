@@ -142,6 +142,9 @@ Future<void> selectAccount(
     RustLib.instance.api.crateApiBackendSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
+    .crateApiBackendSetTheme(appearancesCode: appearancesCode);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 
@@ -159,8 +162,8 @@ abstract class BackgroundState implements RustOpaqueInterface {
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
 abstract class FToken implements RustOpaqueInterface {}
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Serivce>>
-abstract class Serivce implements RustOpaqueInterface {
+// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>
+abstract class SerivceBackground implements RustOpaqueInterface {
   ArcBackground get core;
 
   RustStreamSink<String>? get messageSink;
