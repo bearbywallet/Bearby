@@ -653,18 +653,16 @@ pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn set_notifications(
+pub async fn set_wallet_notifications(
     wallet_index: usize,
     transactions: bool,
     price: bool,
     security: bool,
     balance: bool,
-    global_enabled: bool,
 ) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
 
-        core.settings.notifications.global_enabled = global_enabled;
         core.settings.notifications.wallet_states.insert(
             wallet_index,
             NotificationState {
@@ -674,6 +672,19 @@ pub async fn set_notifications(
                 balance,
             },
         );
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
+
+        core.settings.notifications.global_enabled = global_enabled;
 
         Ok(())
     } else {
