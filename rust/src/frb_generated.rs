@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -497148729;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1332162399;
 
 // Section: executor
 
@@ -953,6 +953,45 @@ fn wire__crate__api__backend__set_global_notifications_impl(
         },
     )
 }
+fn wire__crate__api__backend__set_rate_fetcher_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "set_rate_fetcher",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_currency = <Option<String>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::backend::set_rate_fetcher(api_wallet_index, api_currency)
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__backend__set_theme_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1757,24 +1796,25 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__backend__set_wallet_notifications_impl(
+        22 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__backend__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        24 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__api__backend__try_unlock_with_password_impl(
+        25 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        29 => wire__crate__api__backend__try_unlock_with_password_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__backend__try_unlock_with_session_impl(
+        30 => wire__crate__api__backend__try_unlock_with_session_impl(
             port,
             ptr,
             rust_vec_len,

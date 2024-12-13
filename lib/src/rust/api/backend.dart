@@ -161,6 +161,10 @@ Future<void> setGlobalNotifications({required bool globalEnabled}) =>
     RustLib.instance.api
         .crateApiBackendSetGlobalNotifications(globalEnabled: globalEnabled);
 
+Future<void> setRateFetcher({required BigInt walletIndex, String? currency}) =>
+    RustLib.instance.api.crateApiBackendSetRateFetcher(
+        walletIndex: walletIndex, currency: currency);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 

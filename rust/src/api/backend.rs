@@ -719,6 +719,7 @@ pub async fn set_wallet_notifications(
                 balance,
             },
         );
+        // TODO: save to storage;
 
         Ok(())
     } else {
@@ -732,6 +733,25 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
         let core = Arc::get_mut(&mut service.core).ok_or("Cannot get mutable reference to core")?;
 
         core.settings.notifications.global_enabled = global_enabled;
+        // TODO: save to storage;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.features.currency_convert = currency;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
 
         Ok(())
     } else {

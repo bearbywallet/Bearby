@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
@@ -29,11 +30,26 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
   ];
 
   String selectedCurrency = 'RUB';
-  bool isRateFetchEnabled = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = Provider.of<AppState>(context, listen: false);
+      if (state.wallet?.currencyConvert != null) {
+        setState(() {
+          selectedCurrency = state.wallet!.currencyConvert!;
+        });
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final state = Provider.of<AppState>(context);
+    final theme = state.currentTheme;
+    final bool isRateFetchEnabled = state.wallet!.currencyConvert != null;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -44,7 +60,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
               title: 'Primary Currency',
               onBackPressed: () => Navigator.pop(context),
             ),
-            _buildRateFetchOption(theme),
+            _buildRateFetchOption(state),
             Expanded(
               child: Opacity(
                 opacity: isRateFetchEnabled ? 1.0 : 0.5,
@@ -62,10 +78,17 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                           theme,
                           currency,
                           isSelected,
-                          onTap: () {
+                          onTap: () async {
                             setState(() {
                               selectedCurrency = currency.code;
                             });
+
+                            await setRateFetcher(
+                              walletIndex: BigInt.from(state.selectedWallet),
+                              currency: selectedCurrency,
+                            );
+
+                            await state.syncData();
                           },
                         );
                       },
@@ -80,7 +103,9 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     );
   }
 
-  Widget _buildRateFetchOption(AppTheme theme) {
+  Widget _buildRateFetchOption(AppState state) {
+    final theme = state.currentTheme;
+
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       padding: EdgeInsets.all(16),
@@ -103,11 +128,14 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                 ),
               ),
               Switch(
-                value: isRateFetchEnabled,
-                onChanged: (value) {
-                  setState(() {
-                    isRateFetchEnabled = value;
-                  });
+                value: state.wallet!.currencyConvert != null,
+                onChanged: (value) async {
+                  await setRateFetcher(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    currency: value ? selectedCurrency : null,
+                  );
+
+                  await state.syncData();
                 },
                 activeColor: theme.primaryPurple,
                 activeTrackColor: theme.primaryPurple.withOpacity(0.5),
