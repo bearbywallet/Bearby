@@ -7,7 +7,6 @@ import 'package:zilpay/modals/password_change.dart';
 import 'package:zilpay/state/app_state.dart';
 
 import '../components/custom_app_bar.dart';
-import '../theme/app_theme.dart' as theme;
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -17,20 +16,25 @@ class SecurityPage extends StatefulWidget {
 }
 
 class _SecurityPageState extends State<SecurityPage> {
-  bool isFaceIdEnabled = false;
-  bool isRateFetcherEnabled = true;
-  bool isGasStationEnabled = true;
-  bool isNodeRankingEnabled = true;
-  bool isENSEnabled = true;
-  bool isIPFSEnabled = true;
-
-  final TextEditingController _ipfsController =
-      TextEditingController(text: 'dweb.link');
+  final TextEditingController _ipfsController = TextEditingController(text: '');
 
   @override
   void dispose() {
     _ipfsController.dispose();
     super.dispose();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final state = Provider.of<AppState>(context, listen: false);
+
+      if (state.wallet != null && state.wallet!.ipfsNode != null) {
+        _ipfsController.text = state.wallet!.ipfsNode!;
+      }
+    });
   }
 
   @override
@@ -55,14 +59,14 @@ class _SecurityPageState extends State<SecurityPage> {
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     sliver: SliverList(
                       delegate: SliverChildListDelegate([
-                        _buildNetworkSection(theme),
+                        _buildNetworkSection(appState),
                         const SizedBox(height: 32),
                         if (!appState.wallet!.walletType
                             .contains(WalletType.ledger.name)) ...[
-                          _buildSecuritySection(theme),
+                          _buildSecuritySection(appState),
                           const SizedBox(height: 32)
                         ],
-                        _buildEncryptionSection(theme),
+                        _buildEncryptionSection(appState),
                         const SizedBox(height: 32),
                       ]),
                     ),
@@ -76,7 +80,9 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  Widget _buildSecuritySection(theme.AppTheme theme) {
+  Widget _buildSecuritySection(AppState state) {
+    final theme = state.currentTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -88,7 +94,7 @@ class _SecurityPageState extends State<SecurityPage> {
           child: Column(
             children: [
               _buildPreferenceItem(
-                theme,
+                state,
                 'Change wallet password',
                 'assets/icons/key.svg',
                 'Secure your wallet with a strong password',
@@ -111,7 +117,9 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  Widget _buildNetworkSection(theme.AppTheme theme) {
+  Widget _buildNetworkSection(AppState state) {
+    final theme = state.currentTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -133,55 +141,65 @@ class _SecurityPageState extends State<SecurityPage> {
           child: Column(
             children: [
               _buildPreferenceItem(
-                theme,
+                state,
                 'Show balance and token price checker',
                 'assets/icons/currency.svg',
                 'ZilPay wallet makes requests to fetch current rates of currency',
                 true,
-                isRateFetcherEnabled,
-                (value) => setState(() => isRateFetcherEnabled = value),
+                state.wallet!.currencyConvert != null,
+                (value) {
+                  debugPrint("change convert $value");
+                },
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
-                theme,
+                state,
                 'Show ENS domains in address bar',
                 'assets/icons/graph.svg',
                 'Keep in mind that using this feature exposes your IP address to IPFS third-party services.',
                 true,
-                isENSEnabled,
-                (value) => setState(() => isRateFetcherEnabled = value),
+                state.wallet!.ensEnabled,
+                (value) {
+                  debugPrint("change ENS $value");
+                },
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
-                theme,
+                state,
                 'IPFS gateway',
                 'assets/icons/ipfs.svg',
                 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
                 true,
-                isIPFSEnabled,
-                (value) => setState(() => isIPFSEnabled = value),
+                state.wallet!.ipfsNode != null,
+                (value) {
+                  debugPrint("change ENS $value");
+                },
                 showInput: true,
                 controller: _ipfsController,
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
-                theme,
+                state,
                 'Gas station',
                 'assets/icons/gas.svg',
                 'Use ZilPay server for optimize your gas usage',
                 true,
-                isGasStationEnabled,
-                (value) => setState(() => isGasStationEnabled = value),
+                state.wallet!.gasControlEnabled,
+                (value) {
+                  debugPrint("gas  $value");
+                },
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
-                theme,
+                state,
                 'Node ranking',
                 'assets/icons/server.svg',
                 'Make requests to ZilPay server for fetch best node',
                 true,
-                isNodeRankingEnabled,
-                (value) => setState(() => isNodeRankingEnabled = value),
+                state.wallet!.nodeRankingEnabled,
+                (value) {
+                  debugPrint("node rang $value");
+                },
               ),
             ],
           ),
@@ -191,7 +209,7 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   Widget _buildPreferenceItem(
-    theme.AppTheme theme,
+    AppState state,
     String title,
     String iconPath,
     String description,
@@ -202,6 +220,8 @@ class _SecurityPageState extends State<SecurityPage> {
     bool showInput = false,
     TextEditingController? controller,
   }) {
+    final theme = state.currentTheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -291,7 +311,8 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  Widget _buildEncryptionSection(theme.AppTheme theme) {
+  Widget _buildEncryptionSection(AppState state) {
+    final theme = state.currentTheme;
     final algorithms = [
       {
         'name': 'AES256',
@@ -350,7 +371,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   SizedBox(
                     width: MediaQuery.of(context).size.width * 0.7,
                     child: _buildEncryptionCard(
-                      theme,
+                      state,
                       algorithms[i],
                     ),
                   ),
@@ -364,9 +385,11 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   Widget _buildEncryptionCard(
-    theme.AppTheme theme,
+    AppState state,
     Map<String, dynamic> algorithm,
   ) {
+    final theme = state.currentTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -408,14 +431,14 @@ class _SecurityPageState extends State<SecurityPage> {
           ),
           const SizedBox(height: 16),
           _buildProgressBar(
-            theme,
+            state,
             'Protection',
             algorithm['protection'],
             theme.primaryPurple,
           ),
           const SizedBox(height: 12),
           _buildProgressBar(
-            theme,
+            state,
             'CPU Load',
             algorithm['cpuLoad'],
             theme.warning,
@@ -426,11 +449,13 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   Widget _buildProgressBar(
-    theme.AppTheme theme,
+    AppState state,
     String label,
     double value,
     Color color,
   ) {
+    final theme = state.currentTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
