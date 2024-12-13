@@ -3,16 +3,17 @@ use lazy_static::lazy_static;
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use zilpay::proto::address::Address;
 
 pub use zilpay::background::BackgroundSKParams;
 pub use zilpay::background::{Background, BackgroundBip39Params};
 pub use zilpay::config::key::PUB_KEY_SIZE;
 pub use zilpay::config::key::SECRET_KEY_SIZE;
 pub use zilpay::crypto::bip49::Bip49DerivationPath;
+pub use zilpay::proto::address::Address;
 pub use zilpay::proto::pubkey::PubKey;
 pub use zilpay::proto::secret_key::SecretKey;
 pub use zilpay::settings::common_settings::CommonSettings;
+pub use zilpay::settings::theme::{Appearances, Theme};
 pub use zilpay::settings::wallet_settings::WalletSettings;
 pub use zilpay::wallet::account::Account;
 pub use zilpay::wallet::ft::FToken;
@@ -21,17 +22,17 @@ pub use zilpay::wallet::wallet_data::WalletData;
 pub use zilpay::wallet::wallet_types::WalletTypes;
 pub use zilpay::wallet::LedgerParams;
 
-pub struct Serivce {
+pub struct SerivceBackground {
     pub running: bool,
     pub message_sink: Option<StreamSink<String>>,
     pub core: Arc<Background>,
 }
 
 lazy_static! {
-    static ref BACKGROUND_SERVICE: RwLock<Option<Serivce>> = RwLock::new(None);
+    static ref BACKGROUND_SERVICE: RwLock<Option<SerivceBackground>> = RwLock::new(None);
 }
 
-impl Serivce {
+impl SerivceBackground {
     fn from_path(path: &str) -> Result<Self, String> {
         let core = Background::from_storage_path(path).map_err(|e| e.to_string())?;
 
@@ -111,7 +112,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
-                auth_type: w.data.biometric_type.into(),
+                auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
                 settings: w.data.settings.clone(),
@@ -142,7 +143,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
-                auth_type: w.data.biometric_type.into(),
+                auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
                 settings: w.data.settings.clone(),
@@ -206,13 +207,13 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
     let mut service = BACKGROUND_SERVICE.write().await;
 
     if service.is_none() {
-        let bg = Serivce::from_path(path)?;
+        let bg = SerivceBackground::from_path(path)?;
         let wallets: Vec<WalletInfo> = bg
             .core
             .wallets
             .iter()
             .map(|w| WalletInfo {
-                auth_type: w.data.biometric_type.into(),
+                auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
                 settings: w.data.settings.clone(),
@@ -290,10 +291,10 @@ pub async fn add_bip39_wallet(
         let session = Arc::get_mut(&mut service.core)
             .ok_or("Cannot get mutable reference to core")?
             .add_bip39_wallet(BackgroundBip39Params {
-                network: networks.to_owned(),
+                network: networks,
                 password: &password,
                 mnemonic_str: &mnemonic_str,
-                accounts: accounts_bip39,
+                accounts: &accounts_bip39,
                 passphrase: &passphrase,
                 wallet_name,
                 biometric_type: biometric_type.into(),
@@ -550,6 +551,24 @@ pub async fn select_account(wallet_index: usize, account_index: usize) -> Result
             .get_mut(wallet_index)
             .ok_or("Fail to get mutable link to wallet".to_string())?
             .select_account(account_index)
+            .map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let new_theme = Theme {
+            appearances: Appearances::from_code(appearances_code).map_err(|e| e.to_string())?,
+        };
+
+        Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .set_theme(new_theme)
             .map_err(|e| e.to_string())?;
 
         Ok(())
