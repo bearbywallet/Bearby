@@ -145,6 +145,21 @@ Future<void> selectAccount(
 Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
     .crateApiBackendSetTheme(appearancesCode: appearancesCode);
 
+Future<void> setNotifications(
+        {required BigInt walletIndex,
+        required bool transactions,
+        required bool price,
+        required bool security,
+        required bool balance,
+        required bool globalEnabled}) =>
+    RustLib.instance.api.crateApiBackendSetNotifications(
+        walletIndex: walletIndex,
+        transactions: transactions,
+        price: price,
+        security: security,
+        balance: balance,
+        globalEnabled: globalEnabled);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 
