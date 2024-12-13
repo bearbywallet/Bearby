@@ -165,6 +165,35 @@ Future<void> setRateFetcher({required BigInt walletIndex, String? currency}) =>
     RustLib.instance.api.crateApiBackendSetRateFetcher(
         walletIndex: walletIndex, currency: currency);
 
+Future<void> setWalletEns(
+        {required BigInt walletIndex, required bool ensEnabled}) =>
+    RustLib.instance.api.crateApiBackendSetWalletEns(
+        walletIndex: walletIndex, ensEnabled: ensEnabled);
+
+Future<void> setWalletIpfsNode({required BigInt walletIndex, String? node}) =>
+    RustLib.instance.api
+        .crateApiBackendSetWalletIpfsNode(walletIndex: walletIndex, node: node);
+
+Future<void> setWalletGasContol(
+        {required BigInt walletIndex, required bool enabled}) =>
+    RustLib.instance.api.crateApiBackendSetWalletGasContol(
+        walletIndex: walletIndex, enabled: enabled);
+
+Future<void> setWalletNodeRanking(
+        {required BigInt walletIndex, required bool enabled}) =>
+    RustLib.instance.api.crateApiBackendSetWalletNodeRanking(
+        walletIndex: walletIndex, enabled: enabled);
+
+Future<void> setWalletMaxConnections(
+        {required BigInt walletIndex, required int maxConnections}) =>
+    RustLib.instance.api.crateApiBackendSetWalletMaxConnections(
+        walletIndex: walletIndex, maxConnections: maxConnections);
+
+Future<void> setWalletRequestTimeout(
+        {required BigInt walletIndex, required int requestTimeoutSecs}) =>
+    RustLib.instance.api.crateApiBackendSetWalletRequestTimeout(
+        walletIndex: walletIndex, requestTimeoutSecs: requestTimeoutSecs);
+
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
 abstract class ArcBackground implements RustOpaqueInterface {}
 

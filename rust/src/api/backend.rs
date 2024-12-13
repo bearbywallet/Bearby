@@ -758,3 +758,119 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> 
         Err("Service is not running".to_string())
     }
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.features.ens_enabled = ens_enabled;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        // TODO: add node validation
+
+        wallet.data.settings.features.ipfs_node = node;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_gas_contol(wallet_index: usize, enabled: bool) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.network.gas_control_enabled = enabled;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.network.node_ranking_enabled = enabled;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_max_connections(
+    wallet_index: usize,
+    max_connections: u8,
+) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.network.max_connections = max_connections;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn set_wallet_request_timeout(
+    wallet_index: usize,
+    request_timeout_secs: u32,
+) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let wallet = Arc::get_mut(&mut service.core)
+            .ok_or("Cannot get mutable reference to core")?
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or("Fail to get mutable link to wallet".to_string())?;
+
+        wallet.data.settings.network.request_timeout_secs = request_timeout_secs;
+        wallet.save_to_storage().map_err(|e| e.to_string())?;
+
+        Ok(())
+    } else {
+        Err("Service is not running".to_string())
+    }
+}

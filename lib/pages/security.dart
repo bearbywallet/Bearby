@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/password_change.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 
 import '../components/custom_app_bar.dart';
@@ -102,7 +103,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 false,
                 null,
                 onTap: () {
-                  showModalBottomSheet(
+                  showModalBottomSheet<void>(
                     context: context,
                     backgroundColor: theme.cardBackground,
                     isScrollControlled: true,
@@ -140,17 +141,6 @@ class _SecurityPageState extends State<SecurityPage> {
           ),
           child: Column(
             children: [
-              _buildPreferenceItem(
-                state,
-                'Show balance and token price checker',
-                'assets/icons/currency.svg',
-                'ZilPay wallet makes requests to fetch current rates of currency',
-                true,
-                state.wallet!.currencyConvert != null,
-                (value) {
-                  debugPrint("change convert $value");
-                },
-              ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
                 state,
@@ -159,8 +149,12 @@ class _SecurityPageState extends State<SecurityPage> {
                 'Keep in mind that using this feature exposes your IP address to IPFS third-party services.',
                 true,
                 state.wallet!.ensEnabled,
-                (value) {
-                  debugPrint("change ENS $value");
+                (value) async {
+                  await setWalletEns(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    ensEnabled: value,
+                  );
+                  await state.syncData();
                 },
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
@@ -171,8 +165,12 @@ class _SecurityPageState extends State<SecurityPage> {
                 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
                 true,
                 state.wallet!.ipfsNode != null,
-                (value) {
-                  debugPrint("change ENS $value");
+                (value) async {
+                  await setWalletIpfsNode(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    node: value ? _ipfsController.text : null,
+                  );
+                  await state.syncData();
                 },
                 showInput: true,
                 controller: _ipfsController,
@@ -185,8 +183,12 @@ class _SecurityPageState extends State<SecurityPage> {
                 'Use ZilPay server for optimize your gas usage',
                 true,
                 state.wallet!.gasControlEnabled,
-                (value) {
-                  debugPrint("gas  $value");
+                (value) async {
+                  await setWalletGasContol(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    enabled: value,
+                  );
+                  await state.syncData();
                 },
               ),
               Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
@@ -197,8 +199,12 @@ class _SecurityPageState extends State<SecurityPage> {
                 'Make requests to ZilPay server for fetch best node',
                 true,
                 state.wallet!.nodeRankingEnabled,
-                (value) {
-                  debugPrint("node rang $value");
+                (value) async {
+                  await setWalletNodeRanking(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    enabled: value,
+                  );
+                  await state.syncData();
                 },
               ),
             ],
@@ -313,26 +319,7 @@ class _SecurityPageState extends State<SecurityPage> {
 
   Widget _buildEncryptionSection(AppState state) {
     final theme = state.currentTheme;
-    final algorithms = [
-      {
-        'name': 'AES256',
-        'protection': 0.60,
-        'cpuLoad': 0.3,
-        'icon': 'assets/icons/lock.svg',
-      },
-      {
-        'name': 'NTRUPrime',
-        'protection': 0.92,
-        'cpuLoad': 0.9,
-        'icon': 'assets/icons/atom.svg',
-      },
-      {
-        'name': 'Cyber',
-        'protection': 0.70,
-        'cpuLoad': 0.5,
-        'icon': 'assets/icons/atom.svg',
-      },
-    ];
+    final algorithms = generateAlgorithms(state.wallet!.cipherOrders);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -386,7 +373,7 @@ class _SecurityPageState extends State<SecurityPage> {
 
   Widget _buildEncryptionCard(
     AppState state,
-    Map<String, dynamic> algorithm,
+    Algorithm algorithm,
   ) {
     final theme = state.currentTheme;
 
@@ -408,7 +395,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: SvgPicture.asset(
-                  algorithm['icon'],
+                  algorithm.icon,
                   width: 24,
                   height: 24,
                   colorFilter: ColorFilter.mode(
@@ -419,7 +406,7 @@ class _SecurityPageState extends State<SecurityPage> {
               ),
               const SizedBox(width: 12),
               Text(
-                algorithm['name'],
+                algorithm.name,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 16,
@@ -433,14 +420,14 @@ class _SecurityPageState extends State<SecurityPage> {
           _buildProgressBar(
             state,
             'Protection',
-            algorithm['protection'],
+            algorithm.protection,
             theme.primaryPurple,
           ),
           const SizedBox(height: 12),
           _buildProgressBar(
             state,
             'CPU Load',
-            algorithm['cpuLoad'],
+            algorithm.cpuLoad,
             theme.warning,
           ),
         ],
@@ -498,4 +485,51 @@ class _SecurityPageState extends State<SecurityPage> {
       ],
     );
   }
+
+  List<Algorithm> generateAlgorithms(List<String> algorithms) {
+    final Map<String, Algorithm> algorithmData = {
+      'AES': const Algorithm(
+        name: 'AES256',
+        protection: 0.60,
+        cpuLoad: 0.3,
+        icon: 'assets/icons/lock.svg',
+      ),
+      'NTRU': const Algorithm(
+        name: 'NTRUPrime',
+        protection: 0.92,
+        cpuLoad: 0.9,
+        icon: 'assets/icons/atom.svg',
+      ),
+      'Cyber': const Algorithm(
+        name: 'Cyber',
+        protection: 0.70,
+        cpuLoad: 0.5,
+        icon: 'assets/icons/atom.svg',
+      ),
+    };
+
+    return algorithms.map((algo) {
+      return algorithmData[algo] ??
+          Algorithm(
+            name: algo,
+            protection: 0.0,
+            cpuLoad: 0.0,
+            icon: 'assets/icons/lock.svg',
+          );
+    }).toList();
+  }
+}
+
+class Algorithm {
+  final String name;
+  final double protection;
+  final double cpuLoad;
+  final String icon;
+
+  const Algorithm({
+    required this.name,
+    required this.protection,
+    required this.cpuLoad,
+    required this.icon,
+  });
 }
