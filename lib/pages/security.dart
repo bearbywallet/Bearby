@@ -34,6 +34,8 @@ class _SecurityPageState extends State<SecurityPage> {
 
       if (state.wallet != null && state.wallet!.ipfsNode != null) {
         _ipfsController.text = state.wallet!.ipfsNode!;
+      } else {
+        _ipfsController.text = "dweb.link";
       }
     });
   }
@@ -486,21 +488,21 @@ class _SecurityPageState extends State<SecurityPage> {
     );
   }
 
-  List<Algorithm> generateAlgorithms(List<String> algorithms) {
-    final Map<String, Algorithm> algorithmData = {
-      'AES': const Algorithm(
+  List<Algorithm> generateAlgorithms(List<int> algorithms) {
+    final Map<int, Algorithm> algorithmData = {
+      0: const Algorithm(
         name: 'AES256',
         protection: 0.60,
         cpuLoad: 0.3,
         icon: 'assets/icons/lock.svg',
       ),
-      'NTRU': const Algorithm(
+      1: const Algorithm(
         name: 'NTRUPrime',
         protection: 0.92,
         cpuLoad: 0.9,
         icon: 'assets/icons/atom.svg',
       ),
-      'Cyber': const Algorithm(
+      2: const Algorithm(
         name: 'Cyber',
         protection: 0.70,
         cpuLoad: 0.5,
@@ -511,7 +513,7 @@ class _SecurityPageState extends State<SecurityPage> {
     return algorithms.map((algo) {
       return algorithmData[algo] ??
           Algorithm(
-            name: algo,
+            name: 'Unknown',
             protection: 0.0,
             cpuLoad: 0.0,
             icon: 'assets/icons/lock.svg',

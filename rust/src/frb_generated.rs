@@ -1959,7 +1959,7 @@ impl SseDecode for crate::api::backend::WalletInfo {
         let mut var_accounts = <Vec<crate::api::backend::AccountInfo>>::sse_decode(deserializer);
         let mut var_selectedAccount = <usize>::sse_decode(deserializer);
         let mut var_tokens = <Vec<crate::api::backend::FTokenInfo>>::sse_decode(deserializer);
-        let mut var_cipherOrders = <Vec<String>>::sse_decode(deserializer);
+        let mut var_cipherOrders = <Vec<u8>>::sse_decode(deserializer);
         let mut var_currencyConvert = <Option<String>>::sse_decode(deserializer);
         let mut var_ipfsNode = <Option<String>>::sse_decode(deserializer);
         let mut var_ensEnabled = <bool>::sse_decode(deserializer);
@@ -2655,7 +2655,7 @@ impl SseEncode for crate::api::backend::WalletInfo {
         <Vec<crate::api::backend::AccountInfo>>::sse_encode(self.accounts, serializer);
         <usize>::sse_encode(self.selected_account, serializer);
         <Vec<crate::api::backend::FTokenInfo>>::sse_encode(self.tokens, serializer);
-        <Vec<String>>::sse_encode(self.cipher_orders, serializer);
+        <Vec<u8>>::sse_encode(self.cipher_orders, serializer);
         <Option<String>>::sse_encode(self.currency_convert, serializer);
         <Option<String>>::sse_encode(self.ipfs_node, serializer);
         <bool>::sse_encode(self.ens_enabled, serializer);

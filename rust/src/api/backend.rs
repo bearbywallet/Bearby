@@ -103,7 +103,7 @@ pub struct WalletInfo {
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
     // settings
-    pub cipher_orders: Vec<String>,
+    pub cipher_orders: Vec<u8>,
     pub currency_convert: Option<String>,
     pub ipfs_node: Option<String>,
     pub ens_enabled: bool,
@@ -133,7 +133,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
                     .settings
                     .cipher_orders
                     .iter()
-                    .map(|v| v.to_string())
+                    .map(|v| v.code())
                     .collect(),
                 currency_convert: w.data.settings.features.currency_convert.clone(),
                 ipfs_node: w.data.settings.features.ipfs_node.clone(),
@@ -210,7 +210,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
                     .settings
                     .cipher_orders
                     .iter()
-                    .map(|v| v.to_string())
+                    .map(|v| v.code())
                     .collect(),
                 currency_convert: w.data.settings.features.currency_convert.clone(),
                 ipfs_node: w.data.settings.features.ipfs_node.clone(),
@@ -313,7 +313,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
                     .settings
                     .cipher_orders
                     .iter()
-                    .map(|v| v.to_string())
+                    .map(|v| v.code())
                     .collect(),
                 currency_convert: w.data.settings.features.currency_convert.clone(),
                 ipfs_node: w.data.settings.features.ipfs_node.clone(),

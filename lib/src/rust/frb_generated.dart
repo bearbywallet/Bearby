@@ -1697,7 +1697,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       accounts: dco_decode_list_account_info(arr[4]),
       selectedAccount: dco_decode_usize(arr[5]),
       tokens: dco_decode_list_f_token_info(arr[6]),
-      cipherOrders: dco_decode_list_String(arr[7]),
+      cipherOrders: dco_decode_list_prim_u_8_strict(arr[7]),
       currencyConvert: dco_decode_opt_String(arr[8]),
       ipfsNode: dco_decode_opt_String(arr[9]),
       ensEnabled: dco_decode_bool(arr[10]),
@@ -2078,7 +2078,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_accounts = sse_decode_list_account_info(deserializer);
     var var_selectedAccount = sse_decode_usize(deserializer);
     var var_tokens = sse_decode_list_f_token_info(deserializer);
-    var var_cipherOrders = sse_decode_list_String(deserializer);
+    var var_cipherOrders = sse_decode_list_prim_u_8_strict(deserializer);
     var var_currencyConvert = sse_decode_opt_String(deserializer);
     var var_ipfsNode = sse_decode_opt_String(deserializer);
     var var_ensEnabled = sse_decode_bool(deserializer);
@@ -2447,7 +2447,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_account_info(self.accounts, serializer);
     sse_encode_usize(self.selectedAccount, serializer);
     sse_encode_list_f_token_info(self.tokens, serializer);
-    sse_encode_list_String(self.cipherOrders, serializer);
+    sse_encode_list_prim_u_8_strict(self.cipherOrders, serializer);
     sse_encode_opt_String(self.currencyConvert, serializer);
     sse_encode_opt_String(self.ipfsNode, serializer);
     sse_encode_bool(self.ensEnabled, serializer);

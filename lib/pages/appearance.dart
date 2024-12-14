@@ -40,6 +40,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   @override
   void initState() {
     super.initState();
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final themeProvider = Provider.of<AppState>(context, listen: false);
 

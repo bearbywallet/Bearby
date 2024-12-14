@@ -349,7 +349,7 @@ class WalletInfo {
   final List<AccountInfo> accounts;
   final BigInt selectedAccount;
   final List<FTokenInfo> tokens;
-  final List<String> cipherOrders;
+  final Uint8List cipherOrders;
   final String? currencyConvert;
   final String? ipfsNode;
   final bool ensEnabled;
