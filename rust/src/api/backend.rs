@@ -72,6 +72,7 @@ pub struct FTokenInfo {
     pub addr: String,
     pub balances: HashMap<String, String>,
     pub default: bool,
+    pub net_id: usize,
 }
 
 impl From<&FToken> for FTokenInfo {
@@ -89,6 +90,7 @@ impl From<&FToken> for FTokenInfo {
             symbol: ft.symbol.clone(),
             decimals: ft.decimals,
             default: ft.default,
+            net_id: ft.net_id,
         }
     }
 }
@@ -102,6 +104,7 @@ pub struct WalletInfo {
     pub accounts: Vec<AccountInfo>,
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
+    pub networks: Vec<usize>,
     // settings
     pub cipher_orders: Vec<u8>,
     pub currency_convert: Option<String>,
@@ -121,6 +124,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
+                networks: w.data.network,
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
@@ -198,6 +202,7 @@ pub async fn get_data() -> Result<BackgroundState, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
+                networks: w.data.network,
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
@@ -301,6 +306,7 @@ pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
             .wallets
             .iter()
             .map(|w| WalletInfo {
+                networks: w.data.network,
                 auth_type: w.data.biometric_type.clone().into(),
                 wallet_name: w.data.wallet_name.clone(),
                 wallet_type: w.data.wallet_type.to_str(),
