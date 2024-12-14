@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -109096813;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -865646152;
 
 // Section: executor
 
@@ -46,299 +46,6 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_get_core_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_get_core",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.core.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_get_message_sink_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_get_message_sink",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.message_sink.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_get_running_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_get_running",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, false,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref()),
-                        _ => unreachable!(),
-                    }
-                }
-                let api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok(api_that_guard.running.clone())?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_set_core_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_set_core",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            let api_core = <Arc<Background>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.core = api_core;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_set_message_sink_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_set_message_sink",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            let api_message_sink = <Option<
-                StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>,
-            >>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.message_sink = api_message_sink;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
-fn wire__crate__api__backend__SerivceBackground_auto_accessor_set_running_impl(
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_sync::<flutter_rust_bridge::for_generated::SseCodec, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "SerivceBackground_auto_accessor_set_running",
-            port: None,
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Sync,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_that = <RustOpaqueMoi<
-                flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
-            >>::sse_decode(&mut deserializer);
-            let api_running = <bool>::sse_decode(&mut deserializer);
-            deserializer.end();
-            transform_result_sse::<_, ()>((move || {
-                let mut api_that_guard = None;
-                let decode_indices_ =
-                    flutter_rust_bridge::for_generated::lockable_compute_decode_order(vec![
-                        flutter_rust_bridge::for_generated::LockableOrderInfo::new(
-                            &api_that, 0, true,
-                        ),
-                    ]);
-                for i in decode_indices_ {
-                    match i {
-                        0 => api_that_guard = Some(api_that.lockable_decode_sync_ref_mut()),
-                        _ => unreachable!(),
-                    }
-                }
-                let mut api_that_guard = api_that_guard.unwrap();
-                let output_ok = Result::<_, ()>::Ok({
-                    {
-                        api_that_guard.running = api_running;
-                    };
-                })?;
-                Ok(output_ok)
-            })())
-        },
-    )
-}
 fn wire__crate__api__backend__add_bip39_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -363,7 +70,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_password = <String>::sse_decode(&mut deserializer);
             let api_mnemonic_str = <String>::sse_decode(&mut deserializer);
-            let api_accouns = <Vec<(usize, String)>>::sse_decode(&mut deserializer);
+            let api_accounts = <Vec<(usize, String)>>::sse_decode(&mut deserializer);
             let api_passphrase = <String>::sse_decode(&mut deserializer);
             let api_wallet_name = <String>::sse_decode(&mut deserializer);
             let api_biometric_type = <String>::sse_decode(&mut deserializer);
@@ -376,7 +83,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
                         let output_ok = crate::api::backend::add_bip39_wallet(
                             api_password,
                             api_mnemonic_str,
-                            &api_accouns,
+                            &api_accounts,
                             api_passphrase,
                             api_wallet_name,
                             api_biometric_type,
@@ -392,7 +99,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
         },
     )
 }
-fn wire__crate__api__backend__add_ledger_account_impl(
+fn wire__crate__api__backend__add_ledger_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -400,56 +107,7 @@ fn wire__crate__api__backend__add_ledger_account_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "add_ledger_account",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_name = <String>::sse_decode(&mut deserializer);
-            let api_pub_key = <String>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::backend::add_ledger_account(
-                            api_wallet_index,
-                            api_account_index,
-                            api_name,
-                            api_pub_key,
-                            &api_identifiers,
-                            api_session_cipher,
-                        )
-                        .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "add_ledger_zilliqa_wallet",
+            debug_name: "add_ledger_wallet",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -474,7 +132,7 @@ fn wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_ledger_zilliqa_wallet(
+                        let output_ok = crate::api::backend::add_ledger_wallet(
                             api_pub_key,
                             api_wallet_index,
                             api_wallet_name,
@@ -1068,7 +726,7 @@ fn wire__crate__api__backend__set_wallet_ens_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_gas_contol_impl(
+fn wire__crate__api__backend__set_wallet_gas_control_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1076,7 +734,7 @@ fn wire__crate__api__backend__set_wallet_gas_contol_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "set_wallet_gas_contol",
+            debug_name: "set_wallet_gas_control",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -1096,7 +754,7 @@ fn wire__crate__api__backend__set_wallet_gas_contol_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_gas_contol(
+                        let output_ok = crate::api::backend::set_wallet_gas_control(
                             api_wallet_index,
                             api_enabled,
                         )
@@ -1140,47 +798,6 @@ fn wire__crate__api__backend__set_wallet_ipfs_node_impl(
                         let output_ok =
                             crate::api::backend::set_wallet_ipfs_node(api_wallet_index, api_node)
                                 .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__backend__set_wallet_max_connections_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "set_wallet_max_connections",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_max_connections = <u8>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_max_connections(
-                            api_wallet_index,
-                            api_max_connections,
-                        )
-                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1277,47 +894,6 @@ fn wire__crate__api__backend__set_wallet_notifications_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_request_timeout_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "set_wallet_request_timeout",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_request_timeout_secs = <u32>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_request_timeout(
-                            api_wallet_index,
-                            api_request_timeout_secs,
-                        )
-                        .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
 fn wire__crate__api__backend__start_service_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -1376,7 +952,7 @@ fn wire__crate__api__backend__start_worker_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api__sink =
+            let api_sink =
                 <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
                     &mut deserializer,
                 );
@@ -1384,7 +960,7 @@ fn wire__crate__api__backend__start_worker_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::start_worker(api__sink).await?;
+                        let output_ok = crate::api::backend::start_worker(api_sink).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1555,13 +1131,7 @@ fn wire__crate__api__backend__try_unlock_with_session_impl(
 // Section: related_funcs
 
 flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc<Background>>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
     flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>
-);
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>
 );
 
 // Section: dart2rust
@@ -1574,31 +1144,11 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
-impl SseDecode for Arc<Background> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc<Background>>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
 impl SseDecode for FToken {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <RustOpaqueMoi<
             flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
-    }
-}
-
-impl SseDecode for SerivceBackground {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>,
         >>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
@@ -1613,39 +1163,19 @@ impl SseDecode for std::collections::HashMap<String, String> {
 }
 
 impl SseDecode
-    for std::collections::HashMap<usize, crate::api::backend::BackgroundNotificationState>
+    for std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner =
-            <Vec<(usize, crate::api::backend::BackgroundNotificationState)>>::sse_decode(
-                deserializer,
-            );
+        let mut inner = <Vec<(
+            usize,
+            crate::models::notification::BackgroundNotificationState,
+        )>>::sse_decode(deserializer);
         return inner.into_iter().collect();
     }
 }
 
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc<Background>>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
 impl SseDecode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>
-{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <usize>::sse_decode(deserializer);
@@ -1669,26 +1199,26 @@ impl SseDecode for String {
     }
 }
 
-impl SseDecode for crate::api::backend::AccountInfo {
+impl SseDecode for crate::api::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_addr = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
-        return crate::api::backend::AccountInfo {
+        return crate::api::account::AccountInfo {
             addr: var_addr,
             name: var_name,
         };
     }
 }
 
-impl SseDecode for crate::api::backend::BackgroundNotificationState {
+impl SseDecode for crate::models::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_transactions = <bool>::sse_decode(deserializer);
         let mut var_price = <bool>::sse_decode(deserializer);
         let mut var_security = <bool>::sse_decode(deserializer);
         let mut var_balance = <bool>::sse_decode(deserializer);
-        return crate::api::backend::BackgroundNotificationState {
+        return crate::models::notification::BackgroundNotificationState {
             transactions: var_transactions,
             price: var_price,
             security: var_security,
@@ -1697,18 +1227,18 @@ impl SseDecode for crate::api::backend::BackgroundNotificationState {
     }
 }
 
-impl SseDecode for crate::api::backend::BackgroundState {
+impl SseDecode for crate::models::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_wallets = <Vec<crate::api::backend::WalletInfo>>::sse_decode(deserializer);
+        let mut var_wallets = <Vec<crate::models::wallet::WalletInfo>>::sse_decode(deserializer);
         let mut var_notificationsWalletStates = <std::collections::HashMap<
             usize,
-            crate::api::backend::BackgroundNotificationState,
+            crate::models::notification::BackgroundNotificationState,
         >>::sse_decode(deserializer);
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
         let mut var_locale = <String>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
-        return crate::api::backend::BackgroundState {
+        return crate::models::background::BackgroundState {
             wallets: var_wallets,
             notifications_wallet_states: var_notificationsWalletStates,
             notifications_global_enabled: var_notificationsGlobalEnabled,
@@ -1725,7 +1255,7 @@ impl SseDecode for bool {
     }
 }
 
-impl SseDecode for crate::api::backend::FTokenInfo {
+impl SseDecode for crate::models::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <String>::sse_decode(deserializer);
@@ -1735,13 +1265,15 @@ impl SseDecode for crate::api::backend::FTokenInfo {
         let mut var_balances =
             <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         let mut var_default_ = <bool>::sse_decode(deserializer);
-        return crate::api::backend::FTokenInfo {
+        let mut var_netId = <usize>::sse_decode(deserializer);
+        return crate::models::ftoken::FTokenInfo {
             name: var_name,
             symbol: var_symbol,
             decimals: var_decimals,
             addr: var_addr,
             balances: var_balances,
             default: var_default_,
+            net_id: var_netId,
         };
     }
 }
@@ -1770,25 +1302,27 @@ impl SseDecode for Vec<String> {
     }
 }
 
-impl SseDecode for Vec<crate::api::backend::AccountInfo> {
+impl SseDecode for Vec<crate::api::account::AccountInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::backend::AccountInfo>::sse_decode(deserializer));
+            ans_.push(<crate::api::account::AccountInfo>::sse_decode(deserializer));
         }
         return ans_;
     }
 }
 
-impl SseDecode for Vec<crate::api::backend::FTokenInfo> {
+impl SseDecode for Vec<crate::models::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::backend::FTokenInfo>::sse_decode(deserializer));
+            ans_.push(<crate::models::ftoken::FTokenInfo>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -1830,17 +1364,21 @@ impl SseDecode for Vec<(String, String)> {
     }
 }
 
-impl SseDecode for Vec<(usize, crate::api::backend::BackgroundNotificationState)> {
+impl SseDecode
+    for Vec<(
+        usize,
+        crate::models::notification::BackgroundNotificationState,
+    )>
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(
-                <(usize, crate::api::backend::BackgroundNotificationState)>::sse_decode(
-                    deserializer,
-                ),
-            );
+            ans_.push(<(
+                usize,
+                crate::models::notification::BackgroundNotificationState,
+            )>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1858,29 +1396,17 @@ impl SseDecode for Vec<(usize, String)> {
     }
 }
 
-impl SseDecode for Vec<crate::api::backend::WalletInfo> {
+impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::api::backend::WalletInfo>::sse_decode(deserializer));
+            ans_.push(<crate::models::wallet::WalletInfo>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
-    }
-}
-
-impl SseDecode for Option<StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<StreamSink<
-                String,
-                flutter_rust_bridge::for_generated::SseCodec,
-            >>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
     }
 }
 
@@ -1904,12 +1430,17 @@ impl SseDecode for (String, String) {
     }
 }
 
-impl SseDecode for (usize, crate::api::backend::BackgroundNotificationState) {
+impl SseDecode
+    for (
+        usize,
+        crate::models::notification::BackgroundNotificationState,
+    )
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_field0 = <usize>::sse_decode(deserializer);
         let mut var_field1 =
-            <crate::api::backend::BackgroundNotificationState>::sse_decode(deserializer);
+            <crate::models::notification::BackgroundNotificationState>::sse_decode(deserializer);
         return (var_field0, var_field1);
     }
 }
@@ -1949,16 +1480,17 @@ impl SseDecode for usize {
     }
 }
 
-impl SseDecode for crate::api::backend::WalletInfo {
+impl SseDecode for crate::models::wallet::WalletInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_walletType = <String>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_authType = <String>::sse_decode(deserializer);
         let mut var_walletAddress = <String>::sse_decode(deserializer);
-        let mut var_accounts = <Vec<crate::api::backend::AccountInfo>>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<crate::api::account::AccountInfo>>::sse_decode(deserializer);
         let mut var_selectedAccount = <usize>::sse_decode(deserializer);
-        let mut var_tokens = <Vec<crate::api::backend::FTokenInfo>>::sse_decode(deserializer);
+        let mut var_tokens = <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
+        let mut var_networks = <Vec<usize>>::sse_decode(deserializer);
         let mut var_cipherOrders = <Vec<u8>>::sse_decode(deserializer);
         let mut var_currencyConvert = <Option<String>>::sse_decode(deserializer);
         let mut var_ipfsNode = <Option<String>>::sse_decode(deserializer);
@@ -1967,7 +1499,7 @@ impl SseDecode for crate::api::backend::WalletInfo {
         let mut var_nodeRankingEnabled = <bool>::sse_decode(deserializer);
         let mut var_maxConnections = <u8>::sse_decode(deserializer);
         let mut var_requestTimeoutSecs = <u32>::sse_decode(deserializer);
-        return crate::api::backend::WalletInfo {
+        return crate::models::wallet::WalletInfo {
             wallet_type: var_walletType,
             wallet_name: var_walletName,
             auth_type: var_authType,
@@ -1975,6 +1507,7 @@ impl SseDecode for crate::api::backend::WalletInfo {
             accounts: var_accounts,
             selected_account: var_selectedAccount,
             tokens: var_tokens,
+            networks: var_networks,
             cipher_orders: var_cipherOrders,
             currency_convert: var_currencyConvert,
             ipfs_node: var_ipfsNode,
@@ -2003,85 +1536,70 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        7 => wire__crate__api__backend__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__backend__add_ledger_account_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__backend__add_ledger_zilliqa_wallet_impl(
+        1 => wire__crate__api__backend__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__backend__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__backend__add_next_bip39_account_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__backend__add_next_bip39_account_impl(
+        4 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
+        5 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
+        6 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__backend__select_account_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__backend__set_global_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__api__backend__select_account_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__api__backend__set_global_notifications_impl(
+        15 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__backend__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__backend__set_wallet_gas_control_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__backend__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        25 => {
-            wire__crate__api__backend__set_wallet_gas_contol_impl(port, ptr, rust_vec_len, data_len)
-        }
-        26 => {
+        19 => {
             wire__crate__api__backend__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
-        27 => wire__crate__api__backend__set_wallet_max_connections_impl(
+        20 => wire__crate__api__backend__set_wallet_node_ranking_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        28 => wire__crate__api__backend__set_wallet_node_ranking_impl(
+        21 => wire__crate__api__backend__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        29 => wire__crate__api__backend__set_wallet_notifications_impl(
+        22 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__backend__try_unlock_with_password_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        30 => wire__crate__api__backend__set_wallet_request_timeout_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        31 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        32 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        33 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        34 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__backend__try_unlock_with_password_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        36 => wire__crate__api__backend__try_unlock_with_session_impl(
+        27 => wire__crate__api__backend__try_unlock_with_session_impl(
             port,
             ptr,
             rust_vec_len,
@@ -2099,56 +1617,11 @@ fn pde_ffi_dispatcher_sync_impl(
 ) -> flutter_rust_bridge::for_generated::WireSyncRust2DartSse {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__backend__SerivceBackground_auto_accessor_get_core_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        2 => wire__crate__api__backend__SerivceBackground_auto_accessor_get_message_sink_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        3 => wire__crate__api__backend__SerivceBackground_auto_accessor_get_running_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        4 => wire__crate__api__backend__SerivceBackground_auto_accessor_set_core_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        5 => wire__crate__api__backend__SerivceBackground_auto_accessor_set_message_sink_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        6 => wire__crate__api__backend__SerivceBackground_auto_accessor_set_running_impl(
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
         _ => unreachable!(),
     }
 }
 
 // Section: rust2dart
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<Arc<Background>> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<Arc<Background>> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<Arc<Background>>> for Arc<Background> {
-    fn into_into_dart(self) -> FrbWrapper<Arc<Background>> {
-        self.into()
-    }
-}
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for FrbWrapper<FToken> {
@@ -2166,22 +1639,7 @@ impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<FToken>> for FToken {
 }
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<SerivceBackground> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<SerivceBackground> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<SerivceBackground>> for SerivceBackground {
-    fn into_into_dart(self) -> FrbWrapper<SerivceBackground> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::backend::AccountInfo {
+impl flutter_rust_bridge::IntoDart for crate::api::account::AccountInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.addr.into_into_dart().into_dart(),
@@ -2191,18 +1649,18 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::AccountInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::backend::AccountInfo
+    for crate::api::account::AccountInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::AccountInfo>
-    for crate::api::backend::AccountInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::api::account::AccountInfo>
+    for crate::api::account::AccountInfo
 {
-    fn into_into_dart(self) -> crate::api::backend::AccountInfo {
+    fn into_into_dart(self) -> crate::api::account::AccountInfo {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::backend::BackgroundNotificationState {
+impl flutter_rust_bridge::IntoDart for crate::models::notification::BackgroundNotificationState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.transactions.into_into_dart().into_dart(),
@@ -2214,18 +1672,18 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::BackgroundNotificati
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::backend::BackgroundNotificationState
+    for crate::models::notification::BackgroundNotificationState
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::BackgroundNotificationState>
-    for crate::api::backend::BackgroundNotificationState
+impl flutter_rust_bridge::IntoIntoDart<crate::models::notification::BackgroundNotificationState>
+    for crate::models::notification::BackgroundNotificationState
 {
-    fn into_into_dart(self) -> crate::api::backend::BackgroundNotificationState {
+    fn into_into_dart(self) -> crate::models::notification::BackgroundNotificationState {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::backend::BackgroundState {
+impl flutter_rust_bridge::IntoDart for crate::models::background::BackgroundState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.wallets.into_into_dart().into_dart(),
@@ -2242,18 +1700,18 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::BackgroundState {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::backend::BackgroundState
+    for crate::models::background::BackgroundState
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::BackgroundState>
-    for crate::api::backend::BackgroundState
+impl flutter_rust_bridge::IntoIntoDart<crate::models::background::BackgroundState>
+    for crate::models::background::BackgroundState
 {
-    fn into_into_dart(self) -> crate::api::backend::BackgroundState {
+    fn into_into_dart(self) -> crate::models::background::BackgroundState {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::backend::FTokenInfo {
+impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.name.into_into_dart().into_dart(),
@@ -2262,18 +1720,19 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::FTokenInfo {
             self.addr.into_into_dart().into_dart(),
             self.balances.into_into_dart().into_dart(),
             self.default.into_into_dart().into_dart(),
+            self.net_id.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::backend::FTokenInfo
+    for crate::models::ftoken::FTokenInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::FTokenInfo>
-    for crate::api::backend::FTokenInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::models::ftoken::FTokenInfo>
+    for crate::models::ftoken::FTokenInfo
 {
-    fn into_into_dart(self) -> crate::api::backend::FTokenInfo {
+    fn into_into_dart(self) -> crate::models::ftoken::FTokenInfo {
         self
     }
 }
@@ -2296,7 +1755,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::methods::KeyPair>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::api::backend::WalletInfo {
+impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.wallet_type.into_into_dart().into_dart(),
@@ -2306,6 +1765,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::WalletInfo {
             self.accounts.into_into_dart().into_dart(),
             self.selected_account.into_into_dart().into_dart(),
             self.tokens.into_into_dart().into_dart(),
+            self.networks.into_into_dart().into_dart(),
             self.cipher_orders.into_into_dart().into_dart(),
             self.currency_convert.into_into_dart().into_dart(),
             self.ipfs_node.into_into_dart().into_dart(),
@@ -2319,13 +1779,13 @@ impl flutter_rust_bridge::IntoDart for crate::api::backend::WalletInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::api::backend::WalletInfo
+    for crate::models::wallet::WalletInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::WalletInfo>
-    for crate::api::backend::WalletInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::models::wallet::WalletInfo>
+    for crate::models::wallet::WalletInfo
 {
-    fn into_into_dart(self) -> crate::api::backend::WalletInfo {
+    fn into_into_dart(self) -> crate::models::wallet::WalletInfo {
         self
     }
 }
@@ -2337,24 +1797,10 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
-impl SseEncode for Arc<Background> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
 impl SseEncode for FToken {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
-impl SseEncode for SerivceBackground {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
     }
 }
 
@@ -2366,40 +1812,18 @@ impl SseEncode for std::collections::HashMap<String, String> {
 }
 
 impl SseEncode
-    for std::collections::HashMap<usize, crate::api::backend::BackgroundNotificationState>
+    for std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<(usize, crate::api::backend::BackgroundNotificationState)>>::sse_encode(
-            self.into_iter().collect(),
-            serializer,
-        );
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc<Background>>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
+        <Vec<(
+            usize,
+            crate::models::notification::BackgroundNotificationState,
+        )>>::sse_encode(self.into_iter().collect(), serializer);
     }
 }
 
 impl SseEncode for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>
-{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         let (ptr, size) = self.sse_encode_raw();
@@ -2422,7 +1846,7 @@ impl SseEncode for String {
     }
 }
 
-impl SseEncode for crate::api::backend::AccountInfo {
+impl SseEncode for crate::api::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.addr, serializer);
@@ -2430,7 +1854,7 @@ impl SseEncode for crate::api::backend::AccountInfo {
     }
 }
 
-impl SseEncode for crate::api::backend::BackgroundNotificationState {
+impl SseEncode for crate::models::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.transactions, serializer);
@@ -2440,11 +1864,11 @@ impl SseEncode for crate::api::backend::BackgroundNotificationState {
     }
 }
 
-impl SseEncode for crate::api::backend::BackgroundState {
+impl SseEncode for crate::models::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::api::backend::WalletInfo>>::sse_encode(self.wallets, serializer);
-        <std::collections::HashMap<usize, crate::api::backend::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
+        <Vec<crate::models::wallet::WalletInfo>>::sse_encode(self.wallets, serializer);
+        <std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
@@ -2458,7 +1882,7 @@ impl SseEncode for bool {
     }
 }
 
-impl SseEncode for crate::api::backend::FTokenInfo {
+impl SseEncode for crate::models::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.name, serializer);
@@ -2467,6 +1891,7 @@ impl SseEncode for crate::api::backend::FTokenInfo {
         <String>::sse_encode(self.addr, serializer);
         <std::collections::HashMap<String, String>>::sse_encode(self.balances, serializer);
         <bool>::sse_encode(self.default, serializer);
+        <usize>::sse_encode(self.net_id, serializer);
     }
 }
 
@@ -2488,22 +1913,22 @@ impl SseEncode for Vec<String> {
     }
 }
 
-impl SseEncode for Vec<crate::api::backend::AccountInfo> {
+impl SseEncode for Vec<crate::api::account::AccountInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::backend::AccountInfo>::sse_encode(item, serializer);
+            <crate::api::account::AccountInfo>::sse_encode(item, serializer);
         }
     }
 }
 
-impl SseEncode for Vec<crate::api::backend::FTokenInfo> {
+impl SseEncode for Vec<crate::models::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::backend::FTokenInfo>::sse_encode(item, serializer);
+            <crate::models::ftoken::FTokenInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2538,14 +1963,20 @@ impl SseEncode for Vec<(String, String)> {
     }
 }
 
-impl SseEncode for Vec<(usize, crate::api::backend::BackgroundNotificationState)> {
+impl SseEncode
+    for Vec<(
+        usize,
+        crate::models::notification::BackgroundNotificationState,
+    )>
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <(usize, crate::api::backend::BackgroundNotificationState)>::sse_encode(
-                item, serializer,
-            );
+            <(
+                usize,
+                crate::models::notification::BackgroundNotificationState,
+            )>::sse_encode(item, serializer);
         }
     }
 }
@@ -2560,24 +1991,12 @@ impl SseEncode for Vec<(usize, String)> {
     }
 }
 
-impl SseEncode for Vec<crate::api::backend::WalletInfo> {
+impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::api::backend::WalletInfo>::sse_encode(item, serializer);
-        }
-    }
-}
-
-impl SseEncode for Option<StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_encode(
-                value, serializer,
-            );
+            <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2600,11 +2019,16 @@ impl SseEncode for (String, String) {
     }
 }
 
-impl SseEncode for (usize, crate::api::backend::BackgroundNotificationState) {
+impl SseEncode
+    for (
+        usize,
+        crate::models::notification::BackgroundNotificationState,
+    )
+{
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.0, serializer);
-        <crate::api::backend::BackgroundNotificationState>::sse_encode(self.1, serializer);
+        <crate::models::notification::BackgroundNotificationState>::sse_encode(self.1, serializer);
     }
 }
 
@@ -2645,16 +2069,17 @@ impl SseEncode for usize {
     }
 }
 
-impl SseEncode for crate::api::backend::WalletInfo {
+impl SseEncode for crate::models::wallet::WalletInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.wallet_type, serializer);
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.auth_type, serializer);
         <String>::sse_encode(self.wallet_address, serializer);
-        <Vec<crate::api::backend::AccountInfo>>::sse_encode(self.accounts, serializer);
+        <Vec<crate::api::account::AccountInfo>>::sse_encode(self.accounts, serializer);
         <usize>::sse_encode(self.selected_account, serializer);
-        <Vec<crate::api::backend::FTokenInfo>>::sse_encode(self.tokens, serializer);
+        <Vec<crate::models::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
+        <Vec<usize>>::sse_encode(self.networks, serializer);
         <Vec<u8>>::sse_encode(self.cipher_orders, serializer);
         <Option<String>>::sse_encode(self.currency_convert, serializer);
         <Option<String>>::sse_encode(self.ipfs_node, serializer);
@@ -2693,20 +2118,6 @@ mod io {
     flutter_rust_bridge::frb_generated_boilerplate_io!();
 
     #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>::increment_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>::decrement_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
     pub extern "C" fn frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
         ptr: *const std::ffi::c_void,
     ) {
@@ -2718,20 +2129,6 @@ mod io {
         ptr: *const std::ffi::c_void,
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>::decrement_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>::increment_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>::decrement_strong_count(ptr as _);
     }
 }
 #[cfg(not(target_family = "wasm"))]
@@ -2760,20 +2157,6 @@ mod web {
     flutter_rust_bridge::frb_generated_boilerplate_web!();
 
     #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerArcBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
     pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken(
         ptr: *const std::ffi::c_void,
     ) {
@@ -2785,20 +2168,6 @@ mod web {
         ptr: *const std::ffi::c_void,
     ) {
         MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>::decrement_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerSerivceBackground(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>::decrement_strong_count(ptr as _);
     }
 }
 #[cfg(target_family = "wasm")]

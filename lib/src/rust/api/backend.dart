@@ -4,11 +4,23 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/background.dart';
+import '../models/ftoken.dart';
+import '../models/notification.dart';
+import '../models/wallet.dart';
+import 'account.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// These functions are ignored because they are not marked as `pub`: `from_path`, `stop`
-// These types are ignored because they are not used by any `pub` functions: `BACKGROUND_SERVICE`
-// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `clone`, `clone`, `clone`, `deref`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `from`, `from`, `from`, `from`, `initialize`
+Future<BackgroundState> startService({required String path}) =>
+    RustLib.instance.api.crateApiBackendStartService(path: path);
+
+Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
+
+Future<bool> isServiceRunning() =>
+    RustLib.instance.api.crateApiBackendIsServiceRunning();
+
+Stream<String> startWorker() =>
+    RustLib.instance.api.crateApiBackendStartWorker();
 
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiBackendGetWallets();
@@ -32,21 +44,10 @@ Future<bool> tryUnlockWithSession(
         walletIndex: walletIndex,
         identifiers: identifiers);
 
-Future<BackgroundState> startService({required String path}) =>
-    RustLib.instance.api.crateApiBackendStartService(path: path);
-
-Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
-
-Stream<String> startWorker() =>
-    RustLib.instance.api.crateApiBackendStartWorker();
-
-Future<bool> isServiceRunning() =>
-    RustLib.instance.api.crateApiBackendIsServiceRunning();
-
 Future<(String, String)> addBip39Wallet(
         {required String password,
         required String mnemonicStr,
-        required List<(BigInt, String)> accouns,
+        required List<(BigInt, String)> accounts,
         required String passphrase,
         required String walletName,
         required String biometricType,
@@ -55,7 +56,7 @@ Future<(String, String)> addBip39Wallet(
     RustLib.instance.api.crateApiBackendAddBip39Wallet(
         password: password,
         mnemonicStr: mnemonicStr,
-        accouns: accouns,
+        accounts: accounts,
         passphrase: passphrase,
         walletName: walletName,
         biometricType: biometricType,
@@ -79,13 +80,22 @@ Future<(String, String)> addSkWallet(
         identifiers: identifiers,
         networks: networks);
 
-Future<void> syncBalances({required BigInt walletIndex}) =>
-    RustLib.instance.api.crateApiBackendSyncBalances(walletIndex: walletIndex);
-
-Future<FToken> fetchTokenMeta(
-        {required String addr, required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiBackendFetchTokenMeta(addr: addr, walletIndex: walletIndex);
+Future<(String, String)> addLedgerWallet(
+        {required String pubKey,
+        required BigInt walletIndex,
+        required String walletName,
+        required String ledgerId,
+        required String accountName,
+        required String biometricType,
+        required List<String> identifiers}) =>
+    RustLib.instance.api.crateApiBackendAddLedgerWallet(
+        pubKey: pubKey,
+        walletIndex: walletIndex,
+        walletName: walletName,
+        ledgerId: ledgerId,
+        accountName: accountName,
+        biometricType: biometricType,
+        identifiers: identifiers);
 
 Future<void> addNextBip39Account(
         {required BigInt walletIndex,
@@ -104,42 +114,18 @@ Future<void> addNextBip39Account(
         password: password,
         sessionCipher: sessionCipher);
 
-Future<void> addLedgerAccount(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required String name,
-        required String pubKey,
-        required List<String> identifiers,
-        String? sessionCipher}) =>
-    RustLib.instance.api.crateApiBackendAddLedgerAccount(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        name: name,
-        pubKey: pubKey,
-        identifiers: identifiers,
-        sessionCipher: sessionCipher);
-
-Future<(String, String)> addLedgerZilliqaWallet(
-        {required String pubKey,
-        required BigInt walletIndex,
-        required String walletName,
-        required String ledgerId,
-        required String accountName,
-        required String biometricType,
-        required List<String> identifiers}) =>
-    RustLib.instance.api.crateApiBackendAddLedgerZilliqaWallet(
-        pubKey: pubKey,
-        walletIndex: walletIndex,
-        walletName: walletName,
-        ledgerId: ledgerId,
-        accountName: accountName,
-        biometricType: biometricType,
-        identifiers: identifiers);
-
 Future<void> selectAccount(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiBackendSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+Future<void> syncBalances({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiBackendSyncBalances(walletIndex: walletIndex);
+
+Future<FToken> fetchTokenMeta(
+        {required String addr, required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiBackendFetchTokenMeta(addr: addr, walletIndex: walletIndex);
 
 Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
     .crateApiBackendSetTheme(appearancesCode: appearancesCode);
@@ -174,9 +160,9 @@ Future<void> setWalletIpfsNode({required BigInt walletIndex, String? node}) =>
     RustLib.instance.api
         .crateApiBackendSetWalletIpfsNode(walletIndex: walletIndex, node: node);
 
-Future<void> setWalletGasContol(
+Future<void> setWalletGasControl(
         {required BigInt walletIndex, required bool enabled}) =>
-    RustLib.instance.api.crateApiBackendSetWalletGasContol(
+    RustLib.instance.api.crateApiBackendSetWalletGasControl(
         walletIndex: walletIndex, enabled: enabled);
 
 Future<void> setWalletNodeRanking(
@@ -184,234 +170,5 @@ Future<void> setWalletNodeRanking(
     RustLib.instance.api.crateApiBackendSetWalletNodeRanking(
         walletIndex: walletIndex, enabled: enabled);
 
-Future<void> setWalletMaxConnections(
-        {required BigInt walletIndex, required int maxConnections}) =>
-    RustLib.instance.api.crateApiBackendSetWalletMaxConnections(
-        walletIndex: walletIndex, maxConnections: maxConnections);
-
-Future<void> setWalletRequestTimeout(
-        {required BigInt walletIndex, required int requestTimeoutSecs}) =>
-    RustLib.instance.api.crateApiBackendSetWalletRequestTimeout(
-        walletIndex: walletIndex, requestTimeoutSecs: requestTimeoutSecs);
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<Arc < Background >>>
-abstract class ArcBackground implements RustOpaqueInterface {}
-
 // Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
 abstract class FToken implements RustOpaqueInterface {}
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<SerivceBackground>>
-abstract class SerivceBackground implements RustOpaqueInterface {
-  ArcBackground get core;
-
-  RustStreamSink<String>? get messageSink;
-
-  bool get running;
-
-  set core(ArcBackground core);
-
-  set messageSink(RustStreamSink<String>? messageSink);
-
-  set running(bool running);
-}
-
-class AccountInfo {
-  final String addr;
-  final String name;
-
-  const AccountInfo({
-    required this.addr,
-    required this.name,
-  });
-
-  @override
-  int get hashCode => addr.hashCode ^ name.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is AccountInfo &&
-          runtimeType == other.runtimeType &&
-          addr == other.addr &&
-          name == other.name;
-}
-
-class BackgroundNotificationState {
-  final bool transactions;
-  final bool price;
-  final bool security;
-  final bool balance;
-
-  const BackgroundNotificationState({
-    required this.transactions,
-    required this.price,
-    required this.security,
-    required this.balance,
-  });
-
-  @override
-  int get hashCode =>
-      transactions.hashCode ^
-      price.hashCode ^
-      security.hashCode ^
-      balance.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BackgroundNotificationState &&
-          runtimeType == other.runtimeType &&
-          transactions == other.transactions &&
-          price == other.price &&
-          security == other.security &&
-          balance == other.balance;
-}
-
-class BackgroundState {
-  final List<WalletInfo> wallets;
-  final Map<BigInt, BackgroundNotificationState> notificationsWalletStates;
-  final bool notificationsGlobalEnabled;
-  final String locale;
-  final int appearances;
-
-  const BackgroundState({
-    required this.wallets,
-    required this.notificationsWalletStates,
-    required this.notificationsGlobalEnabled,
-    required this.locale,
-    required this.appearances,
-  });
-
-  @override
-  int get hashCode =>
-      wallets.hashCode ^
-      notificationsWalletStates.hashCode ^
-      notificationsGlobalEnabled.hashCode ^
-      locale.hashCode ^
-      appearances.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is BackgroundState &&
-          runtimeType == other.runtimeType &&
-          wallets == other.wallets &&
-          notificationsWalletStates == other.notificationsWalletStates &&
-          notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
-          locale == other.locale &&
-          appearances == other.appearances;
-}
-
-class FTokenInfo {
-  final String name;
-  final String symbol;
-  final int decimals;
-  final String addr;
-  final Map<String, String> balances;
-  final bool default_;
-
-  const FTokenInfo({
-    required this.name,
-    required this.symbol,
-    required this.decimals,
-    required this.addr,
-    required this.balances,
-    required this.default_,
-  });
-
-  @override
-  int get hashCode =>
-      name.hashCode ^
-      symbol.hashCode ^
-      decimals.hashCode ^
-      addr.hashCode ^
-      balances.hashCode ^
-      default_.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is FTokenInfo &&
-          runtimeType == other.runtimeType &&
-          name == other.name &&
-          symbol == other.symbol &&
-          decimals == other.decimals &&
-          addr == other.addr &&
-          balances == other.balances &&
-          default_ == other.default_;
-}
-
-class WalletInfo {
-  final String walletType;
-  final String walletName;
-  final String authType;
-  final String walletAddress;
-  final List<AccountInfo> accounts;
-  final BigInt selectedAccount;
-  final List<FTokenInfo> tokens;
-  final Uint8List cipherOrders;
-  final String? currencyConvert;
-  final String? ipfsNode;
-  final bool ensEnabled;
-  final bool gasControlEnabled;
-  final bool nodeRankingEnabled;
-  final int maxConnections;
-  final int requestTimeoutSecs;
-
-  const WalletInfo({
-    required this.walletType,
-    required this.walletName,
-    required this.authType,
-    required this.walletAddress,
-    required this.accounts,
-    required this.selectedAccount,
-    required this.tokens,
-    required this.cipherOrders,
-    this.currencyConvert,
-    this.ipfsNode,
-    required this.ensEnabled,
-    required this.gasControlEnabled,
-    required this.nodeRankingEnabled,
-    required this.maxConnections,
-    required this.requestTimeoutSecs,
-  });
-
-  @override
-  int get hashCode =>
-      walletType.hashCode ^
-      walletName.hashCode ^
-      authType.hashCode ^
-      walletAddress.hashCode ^
-      accounts.hashCode ^
-      selectedAccount.hashCode ^
-      tokens.hashCode ^
-      cipherOrders.hashCode ^
-      currencyConvert.hashCode ^
-      ipfsNode.hashCode ^
-      ensEnabled.hashCode ^
-      gasControlEnabled.hashCode ^
-      nodeRankingEnabled.hashCode ^
-      maxConnections.hashCode ^
-      requestTimeoutSecs.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is WalletInfo &&
-          runtimeType == other.runtimeType &&
-          walletType == other.walletType &&
-          walletName == other.walletName &&
-          authType == other.authType &&
-          walletAddress == other.walletAddress &&
-          accounts == other.accounts &&
-          selectedAccount == other.selectedAccount &&
-          tokens == other.tokens &&
-          cipherOrders == other.cipherOrders &&
-          currencyConvert == other.currencyConvert &&
-          ipfsNode == other.ipfsNode &&
-          ensEnabled == other.ensEnabled &&
-          gasControlEnabled == other.gasControlEnabled &&
-          nodeRankingEnabled == other.nodeRankingEnabled &&
-          maxConnections == other.maxConnections &&
-          requestTimeoutSecs == other.requestTimeoutSecs;
-}
