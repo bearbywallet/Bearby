@@ -1163,14 +1163,14 @@ impl SseDecode for std::collections::HashMap<String, String> {
 }
 
 impl SseDecode
-    for std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>
+    for std::collections::HashMap<usize, crate::api::notification::BackgroundNotificationState>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <Vec<(
-            usize,
-            crate::models::notification::BackgroundNotificationState,
-        )>>::sse_decode(deserializer);
+        let mut inner =
+            <Vec<(usize, crate::api::notification::BackgroundNotificationState)>>::sse_decode(
+                deserializer,
+            );
         return inner.into_iter().collect();
     }
 }
@@ -1211,14 +1211,14 @@ impl SseDecode for crate::api::account::AccountInfo {
     }
 }
 
-impl SseDecode for crate::models::notification::BackgroundNotificationState {
+impl SseDecode for crate::api::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_transactions = <bool>::sse_decode(deserializer);
         let mut var_price = <bool>::sse_decode(deserializer);
         let mut var_security = <bool>::sse_decode(deserializer);
         let mut var_balance = <bool>::sse_decode(deserializer);
-        return crate::models::notification::BackgroundNotificationState {
+        return crate::api::notification::BackgroundNotificationState {
             transactions: var_transactions,
             price: var_price,
             security: var_security,
@@ -1227,18 +1227,18 @@ impl SseDecode for crate::models::notification::BackgroundNotificationState {
     }
 }
 
-impl SseDecode for crate::models::background::BackgroundState {
+impl SseDecode for crate::api::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_wallets = <Vec<crate::models::wallet::WalletInfo>>::sse_decode(deserializer);
+        let mut var_wallets = <Vec<crate::api::wallet::WalletInfo>>::sse_decode(deserializer);
         let mut var_notificationsWalletStates = <std::collections::HashMap<
             usize,
-            crate::models::notification::BackgroundNotificationState,
+            crate::api::notification::BackgroundNotificationState,
         >>::sse_decode(deserializer);
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
         let mut var_locale = <String>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
-        return crate::models::background::BackgroundState {
+        return crate::api::background::BackgroundState {
             wallets: var_wallets,
             notifications_wallet_states: var_notificationsWalletStates,
             notifications_global_enabled: var_notificationsGlobalEnabled,
@@ -1255,7 +1255,7 @@ impl SseDecode for bool {
     }
 }
 
-impl SseDecode for crate::models::ftoken::FTokenInfo {
+impl SseDecode for crate::api::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <String>::sse_decode(deserializer);
@@ -1266,7 +1266,7 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
             <std::collections::HashMap<String, String>>::sse_decode(deserializer);
         let mut var_default_ = <bool>::sse_decode(deserializer);
         let mut var_netId = <usize>::sse_decode(deserializer);
-        return crate::models::ftoken::FTokenInfo {
+        return crate::api::ftoken::FTokenInfo {
             name: var_name,
             symbol: var_symbol,
             decimals: var_decimals,
@@ -1314,15 +1314,13 @@ impl SseDecode for Vec<crate::api::account::AccountInfo> {
     }
 }
 
-impl SseDecode for Vec<crate::models::ftoken::FTokenInfo> {
+impl SseDecode for Vec<crate::api::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::models::ftoken::FTokenInfo>::sse_decode(
-                deserializer,
-            ));
+            ans_.push(<crate::api::ftoken::FTokenInfo>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1364,12 +1362,7 @@ impl SseDecode for Vec<(String, String)> {
     }
 }
 
-impl SseDecode
-    for Vec<(
-        usize,
-        crate::models::notification::BackgroundNotificationState,
-    )>
-{
+impl SseDecode for Vec<(usize, crate::api::notification::BackgroundNotificationState)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
@@ -1377,7 +1370,7 @@ impl SseDecode
         for idx_ in 0..len_ {
             ans_.push(<(
                 usize,
-                crate::models::notification::BackgroundNotificationState,
+                crate::api::notification::BackgroundNotificationState,
             )>::sse_decode(deserializer));
         }
         return ans_;
@@ -1396,15 +1389,13 @@ impl SseDecode for Vec<(usize, String)> {
     }
 }
 
-impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
+impl SseDecode for Vec<crate::api::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
-            ans_.push(<crate::models::wallet::WalletInfo>::sse_decode(
-                deserializer,
-            ));
+            ans_.push(<crate::api::wallet::WalletInfo>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -1430,17 +1421,12 @@ impl SseDecode for (String, String) {
     }
 }
 
-impl SseDecode
-    for (
-        usize,
-        crate::models::notification::BackgroundNotificationState,
-    )
-{
+impl SseDecode for (usize, crate::api::notification::BackgroundNotificationState) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_field0 = <usize>::sse_decode(deserializer);
         let mut var_field1 =
-            <crate::models::notification::BackgroundNotificationState>::sse_decode(deserializer);
+            <crate::api::notification::BackgroundNotificationState>::sse_decode(deserializer);
         return (var_field0, var_field1);
     }
 }
@@ -1480,7 +1466,7 @@ impl SseDecode for usize {
     }
 }
 
-impl SseDecode for crate::models::wallet::WalletInfo {
+impl SseDecode for crate::api::wallet::WalletInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_walletType = <String>::sse_decode(deserializer);
@@ -1489,7 +1475,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
         let mut var_walletAddress = <String>::sse_decode(deserializer);
         let mut var_accounts = <Vec<crate::api::account::AccountInfo>>::sse_decode(deserializer);
         let mut var_selectedAccount = <usize>::sse_decode(deserializer);
-        let mut var_tokens = <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
+        let mut var_tokens = <Vec<crate::api::ftoken::FTokenInfo>>::sse_decode(deserializer);
         let mut var_networks = <Vec<usize>>::sse_decode(deserializer);
         let mut var_cipherOrders = <Vec<u8>>::sse_decode(deserializer);
         let mut var_currencyConvert = <Option<String>>::sse_decode(deserializer);
@@ -1499,7 +1485,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
         let mut var_nodeRankingEnabled = <bool>::sse_decode(deserializer);
         let mut var_maxConnections = <u8>::sse_decode(deserializer);
         let mut var_requestTimeoutSecs = <u32>::sse_decode(deserializer);
-        return crate::models::wallet::WalletInfo {
+        return crate::api::wallet::WalletInfo {
             wallet_type: var_walletType,
             wallet_name: var_walletName,
             auth_type: var_authType,
@@ -1660,7 +1646,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::account::AccountInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::notification::BackgroundNotificationState {
+impl flutter_rust_bridge::IntoDart for crate::api::notification::BackgroundNotificationState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.transactions.into_into_dart().into_dart(),
@@ -1672,18 +1658,18 @@ impl flutter_rust_bridge::IntoDart for crate::models::notification::BackgroundNo
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::notification::BackgroundNotificationState
+    for crate::api::notification::BackgroundNotificationState
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::notification::BackgroundNotificationState>
-    for crate::models::notification::BackgroundNotificationState
+impl flutter_rust_bridge::IntoIntoDart<crate::api::notification::BackgroundNotificationState>
+    for crate::api::notification::BackgroundNotificationState
 {
-    fn into_into_dart(self) -> crate::models::notification::BackgroundNotificationState {
+    fn into_into_dart(self) -> crate::api::notification::BackgroundNotificationState {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::background::BackgroundState {
+impl flutter_rust_bridge::IntoDart for crate::api::background::BackgroundState {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.wallets.into_into_dart().into_dart(),
@@ -1700,18 +1686,18 @@ impl flutter_rust_bridge::IntoDart for crate::models::background::BackgroundStat
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::background::BackgroundState
+    for crate::api::background::BackgroundState
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::background::BackgroundState>
-    for crate::models::background::BackgroundState
+impl flutter_rust_bridge::IntoIntoDart<crate::api::background::BackgroundState>
+    for crate::api::background::BackgroundState
 {
-    fn into_into_dart(self) -> crate::models::background::BackgroundState {
+    fn into_into_dart(self) -> crate::api::background::BackgroundState {
         self
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
+impl flutter_rust_bridge::IntoDart for crate::api::ftoken::FTokenInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.name.into_into_dart().into_dart(),
@@ -1726,13 +1712,13 @@ impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::ftoken::FTokenInfo
+    for crate::api::ftoken::FTokenInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::ftoken::FTokenInfo>
-    for crate::models::ftoken::FTokenInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::api::ftoken::FTokenInfo>
+    for crate::api::ftoken::FTokenInfo
 {
-    fn into_into_dart(self) -> crate::models::ftoken::FTokenInfo {
+    fn into_into_dart(self) -> crate::api::ftoken::FTokenInfo {
         self
     }
 }
@@ -1755,7 +1741,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::methods::KeyPair>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
+impl flutter_rust_bridge::IntoDart for crate::api::wallet::WalletInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.wallet_type.into_into_dart().into_dart(),
@@ -1779,13 +1765,13 @@ impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
     }
 }
 impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
-    for crate::models::wallet::WalletInfo
+    for crate::api::wallet::WalletInfo
 {
 }
-impl flutter_rust_bridge::IntoIntoDart<crate::models::wallet::WalletInfo>
-    for crate::models::wallet::WalletInfo
+impl flutter_rust_bridge::IntoIntoDart<crate::api::wallet::WalletInfo>
+    for crate::api::wallet::WalletInfo
 {
-    fn into_into_dart(self) -> crate::models::wallet::WalletInfo {
+    fn into_into_dart(self) -> crate::api::wallet::WalletInfo {
         self
     }
 }
@@ -1812,14 +1798,14 @@ impl SseEncode for std::collections::HashMap<String, String> {
 }
 
 impl SseEncode
-    for std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>
+    for std::collections::HashMap<usize, crate::api::notification::BackgroundNotificationState>
 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<(
-            usize,
-            crate::models::notification::BackgroundNotificationState,
-        )>>::sse_encode(self.into_iter().collect(), serializer);
+        <Vec<(usize, crate::api::notification::BackgroundNotificationState)>>::sse_encode(
+            self.into_iter().collect(),
+            serializer,
+        );
     }
 }
 
@@ -1854,7 +1840,7 @@ impl SseEncode for crate::api::account::AccountInfo {
     }
 }
 
-impl SseEncode for crate::models::notification::BackgroundNotificationState {
+impl SseEncode for crate::api::notification::BackgroundNotificationState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.transactions, serializer);
@@ -1864,11 +1850,11 @@ impl SseEncode for crate::models::notification::BackgroundNotificationState {
     }
 }
 
-impl SseEncode for crate::models::background::BackgroundState {
+impl SseEncode for crate::api::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<crate::models::wallet::WalletInfo>>::sse_encode(self.wallets, serializer);
-        <std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
+        <Vec<crate::api::wallet::WalletInfo>>::sse_encode(self.wallets, serializer);
+        <std::collections::HashMap<usize, crate::api::notification::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
@@ -1882,7 +1868,7 @@ impl SseEncode for bool {
     }
 }
 
-impl SseEncode for crate::models::ftoken::FTokenInfo {
+impl SseEncode for crate::api::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.name, serializer);
@@ -1923,12 +1909,12 @@ impl SseEncode for Vec<crate::api::account::AccountInfo> {
     }
 }
 
-impl SseEncode for Vec<crate::models::ftoken::FTokenInfo> {
+impl SseEncode for Vec<crate::api::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::models::ftoken::FTokenInfo>::sse_encode(item, serializer);
+            <crate::api::ftoken::FTokenInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -1963,20 +1949,14 @@ impl SseEncode for Vec<(String, String)> {
     }
 }
 
-impl SseEncode
-    for Vec<(
-        usize,
-        crate::models::notification::BackgroundNotificationState,
-    )>
-{
+impl SseEncode for Vec<(usize, crate::api::notification::BackgroundNotificationState)> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <(
-                usize,
-                crate::models::notification::BackgroundNotificationState,
-            )>::sse_encode(item, serializer);
+            <(usize, crate::api::notification::BackgroundNotificationState)>::sse_encode(
+                item, serializer,
+            );
         }
     }
 }
@@ -1991,12 +1971,12 @@ impl SseEncode for Vec<(usize, String)> {
     }
 }
 
-impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
+impl SseEncode for Vec<crate::api::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
-            <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
+            <crate::api::wallet::WalletInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2019,16 +1999,11 @@ impl SseEncode for (String, String) {
     }
 }
 
-impl SseEncode
-    for (
-        usize,
-        crate::models::notification::BackgroundNotificationState,
-    )
-{
+impl SseEncode for (usize, crate::api::notification::BackgroundNotificationState) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.0, serializer);
-        <crate::models::notification::BackgroundNotificationState>::sse_encode(self.1, serializer);
+        <crate::api::notification::BackgroundNotificationState>::sse_encode(self.1, serializer);
     }
 }
 
@@ -2069,7 +2044,7 @@ impl SseEncode for usize {
     }
 }
 
-impl SseEncode for crate::models::wallet::WalletInfo {
+impl SseEncode for crate::api::wallet::WalletInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.wallet_type, serializer);
@@ -2078,7 +2053,7 @@ impl SseEncode for crate::models::wallet::WalletInfo {
         <String>::sse_encode(self.wallet_address, serializer);
         <Vec<crate::api::account::AccountInfo>>::sse_encode(self.accounts, serializer);
         <usize>::sse_encode(self.selected_account, serializer);
-        <Vec<crate::models::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
+        <Vec<crate::api::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
         <Vec<usize>>::sse_encode(self.networks, serializer);
         <Vec<u8>>::sse_encode(self.cipher_orders, serializer);
         <Option<String>>::sse_encode(self.currency_convert, serializer);

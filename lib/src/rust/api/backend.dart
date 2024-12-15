@@ -4,12 +4,12 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
-import '../models/background.dart';
-import '../models/ftoken.dart';
-import '../models/notification.dart';
-import '../models/wallet.dart';
 import 'account.dart';
+import 'background.dart';
+import 'ftoken.dart';
+import 'notification.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'wallet.dart';
 
 Future<BackgroundState> startService({required String path}) =>
     RustLib.instance.api.crateApiBackendStartService(path: path);

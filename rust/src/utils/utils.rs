@@ -1,28 +1,59 @@
 use std::sync::Arc;
-use zilpay::wallet::Wallet;
+use zilpay::{background::Background, wallet::Wallet};
 
 use crate::{
-    models::{background::BackgroundState, wallet::WalletInfo},
-    service::service::{ServiceBackground, BACKGROUND_SERVICE},
+    api::{background::BackgroundState, wallet::WalletInfo},
+    service::service::BACKGROUND_SERVICE,
 };
 
+#[derive(Debug)]
 pub enum ServiceError {
-    CoreAccess,
-    Custom(String),
-    MutexLock,
     NotRunning,
+    MutexLock,
+    CoreAccess,
     WalletAccess(usize),
+    Custom(String),
+}
+
+impl std::fmt::Display for ServiceError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            ServiceError::NotRunning => write!(f, "Service is not running"),
+            ServiceError::MutexLock => write!(f, "Failed to acquire lock"),
+            ServiceError::CoreAccess => write!(f, "Cannot get mutable reference to core"),
+            ServiceError::WalletAccess(idx) => {
+                write!(f, "Failed to access wallet at index {}", idx)
+            }
+            ServiceError::Custom(msg) => write!(f, "{}", msg),
+        }
+    }
 }
 
 impl From<ServiceError> for String {
-    fn from(err: ServiceError) -> Self {
-        match err {
-            ServiceError::NotRunning => "Service is not running".to_string(),
-            ServiceError::MutexLock => "Failed to acquire lock".to_string(),
-            ServiceError::CoreAccess => "Cannot get mutable reference to core".to_string(),
-            ServiceError::WalletAccess(idx) => format!("Failed to access wallet at index {}", idx),
-            ServiceError::Custom(msg) => msg,
-        }
+    fn from(err: ServiceError) -> String {
+        err.to_string()
+    }
+}
+
+impl std::error::Error for ServiceError {}
+
+pub trait IntoServiceError<T> {
+    fn service_err(self) -> Result<T, ServiceError>;
+}
+
+impl<T> IntoServiceError<T> for Result<T, ServiceError> {
+    fn service_err(self) -> Result<T, ServiceError> {
+        self
+    }
+}
+
+pub trait ResultExt<T> {
+    fn into_service_error(self) -> Result<T, ServiceError>;
+}
+
+impl<T, E: ToString> ResultExt<T> for Result<T, E> {
+    fn into_service_error(self) -> Result<T, ServiceError> {
+        self.map_err(|e| ServiceError::Custom(e.to_string()))
     }
 }
 
@@ -54,20 +85,17 @@ pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
-    hex::decode(session_cipher.unwrap_or_default())
-        .map_err(|_| ServiceError::Custom("Invalid Session cipher".to_string()))
+    hex::decode(session_cipher.unwrap_or_default()).into_service_error()
 }
 
-pub fn get_background_state(service: &ServiceBackground) -> Result<BackgroundState, ServiceError> {
-    let wallets = service
-        .core
+pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
+    let wallets: Vec<WalletInfo> = service
         .wallets
         .iter()
         .map(wallet_info_from_wallet)
         .collect();
 
     let notifications_wallet_states = service
-        .core
         .settings
         .notifications
         .wallet_states
@@ -78,9 +106,9 @@ pub fn get_background_state(service: &ServiceBackground) -> Result<BackgroundSta
     Ok(BackgroundState {
         wallets,
         notifications_wallet_states,
-        notifications_global_enabled: service.core.settings.notifications.global_enabled,
-        locale: service.core.settings.locale.to_string(),
-        appearances: service.core.settings.theme.appearances.code(),
+        notifications_global_enabled: service.settings.notifications.global_enabled,
+        locale: service.settings.locale.to_string(),
+        appearances: service.settings.theme.appearances.code(),
     })
 }
 
@@ -123,14 +151,4 @@ where
         .ok_or(ServiceError::WalletAccess(wallet_index))?;
 
     f(wallet)
-}
-
-pub trait IntoServiceError<T> {
-    fn service_err(self) -> Result<T, ServiceError>;
-}
-
-impl<T, E: ToString> IntoServiceError<T> for Result<T, E> {
-    fn service_err(self) -> Result<T, ServiceError> {
-        self.map_err(|e| ServiceError::Custom(e.to_string()))
-    }
 }
