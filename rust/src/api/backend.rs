@@ -14,6 +14,7 @@ pub use zilpay::{
 
 use crate::{
     frb_generated::StreamSink,
+    models::{background::BackgroundState, wallet::WalletInfo},
     service::service::{ServiceBackground, BACKGROUND_SERVICE},
     utils::{
         errors::ServiceError,
@@ -24,8 +25,6 @@ use crate::{
         },
     },
 };
-
-use super::{background::BackgroundState, wallet::WalletInfo};
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn start_service(path: &str) -> Result<BackgroundState, String> {

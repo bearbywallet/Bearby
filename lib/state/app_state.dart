@@ -1,7 +1,6 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 class Connection {

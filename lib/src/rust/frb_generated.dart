@@ -3,18 +3,18 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
-import 'api/account.dart';
 import 'api/backend.dart';
-import 'api/background.dart';
-import 'api/ftoken.dart';
 import 'api/methods.dart';
-import 'api/notification.dart';
-import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
 import 'frb_generated.io.dart'
     if (dart.library.js_interop) 'frb_generated.web.dart';
+import 'models/account.dart';
+import 'models/background.dart';
+import 'models/ftoken.dart';
+import 'models/notification.dart';
+import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 /// Main entrypoint of the Rust API

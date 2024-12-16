@@ -6,7 +6,7 @@ use zilpay::{
 };
 
 use crate::{
-    api::{background::BackgroundState, wallet::WalletInfo},
+    models::{background::BackgroundState, wallet::WalletInfo},
     service::service::BACKGROUND_SERVICE,
 };
 
