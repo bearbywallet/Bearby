@@ -166,6 +166,7 @@ class _LoginPageState extends State<LoginPage> {
         _handleAuthenticationError();
       }
     } catch (e) {
+      debugPrint("unlock $e");
       _handleAuthenticationError();
     }
   }

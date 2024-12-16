@@ -102,29 +102,29 @@ pub async fn with_service_mut<F, T>(f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut zilpay::background::Background) -> Result<T, ServiceError>,
 {
-    let guard = BACKGROUND_SERVICE.write().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
 
-    let mut core_arc = service.core.clone();
-    let core = Arc::get_mut(&mut core_arc).ok_or(ServiceError::CoreAccess)?;
-
-    f(core)
+        f(core)
+    } else {
+        Err(ServiceError::NotRunning)
+    }
 }
 
 pub async fn with_wallet_mut<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
 where
     F: FnOnce(&mut Wallet) -> Result<T, ServiceError>,
 {
-    let guard = BACKGROUND_SERVICE.write().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
 
-    let mut core_arc = service.core.clone();
-    let core = Arc::get_mut(&mut core_arc).ok_or(ServiceError::CoreAccess)?;
+        let wallet = core
+            .wallets
+            .get_mut(wallet_index)
+            .ok_or(ServiceError::WalletAccess(wallet_index))?;
 
-    let wallet = core
-        .wallets
-        .get_mut(wallet_index)
-        .ok_or(ServiceError::WalletAccess(wallet_index))?;
-
-    f(wallet)
+        f(wallet)
+    } else {
+        Err(ServiceError::NotRunning)
+    }
 }
