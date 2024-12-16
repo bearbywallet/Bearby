@@ -1,61 +1,16 @@
 use std::sync::Arc;
-use zilpay::{background::Background, wallet::Wallet};
+use zilpay::{
+    background::Background,
+    config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
+    wallet::Wallet,
+};
 
 use crate::{
     api::{background::BackgroundState, wallet::WalletInfo},
     service::service::BACKGROUND_SERVICE,
 };
 
-#[derive(Debug)]
-pub enum ServiceError {
-    NotRunning,
-    MutexLock,
-    CoreAccess,
-    WalletAccess(usize),
-    Custom(String),
-}
-
-impl std::fmt::Display for ServiceError {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match self {
-            ServiceError::NotRunning => write!(f, "Service is not running"),
-            ServiceError::MutexLock => write!(f, "Failed to acquire lock"),
-            ServiceError::CoreAccess => write!(f, "Cannot get mutable reference to core"),
-            ServiceError::WalletAccess(idx) => {
-                write!(f, "Failed to access wallet at index {}", idx)
-            }
-            ServiceError::Custom(msg) => write!(f, "{}", msg),
-        }
-    }
-}
-
-impl From<ServiceError> for String {
-    fn from(err: ServiceError) -> String {
-        err.to_string()
-    }
-}
-
-impl std::error::Error for ServiceError {}
-
-pub trait IntoServiceError<T> {
-    fn service_err(self) -> Result<T, ServiceError>;
-}
-
-impl<T> IntoServiceError<T> for Result<T, ServiceError> {
-    fn service_err(self) -> Result<T, ServiceError> {
-        self
-    }
-}
-
-pub trait ResultExt<T> {
-    fn into_service_error(self) -> Result<T, ServiceError>;
-}
-
-impl<T, E: ToString> ResultExt<T> for Result<T, E> {
-    fn into_service_error(self) -> Result<T, ServiceError> {
-        self.map_err(|e| ServiceError::Custom(e.to_string()))
-    }
-}
+use super::errors::ServiceError;
 
 pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
     WalletInfo {
@@ -85,7 +40,25 @@ pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
-    hex::decode(session_cipher.unwrap_or_default()).into_service_error()
+    hex::decode(session_cipher.unwrap_or_default()).map_err(|_| ServiceError::DecodeSession)
+}
+
+pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError> {
+    let sk = sk.strip_prefix("0x").unwrap_or(sk);
+    hex::decode(sk)
+        .map_err(|_| ServiceError::DecodeSecretKey)?
+        .try_into()
+        .map_err(|_| ServiceError::InvalidSecretKeyLength)
+}
+
+pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceError> {
+    let pub_key = pub_key.strip_prefix("0x").unwrap_or(pub_key);
+    let pub_key_bytes: [u8; PUB_KEY_SIZE] = hex::decode(pub_key)
+        .map_err(|_| ServiceError::DecodePublicKey)?
+        .try_into()
+        .map_err(|_| ServiceError::InvalidPublicKeyLength)?;
+
+    Ok(pub_key_bytes)
 }
 
 pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
@@ -110,6 +83,10 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
         locale: service.settings.locale.to_string(),
         appearances: service.settings.theme.appearances.code(),
     })
+}
+
+pub fn get_last_wallet(service: &Background) -> Result<&Wallet, ServiceError> {
+    service.wallets.last().ok_or(ServiceError::FailToSaveWallet)
 }
 
 pub async fn with_service<F, T>(f: F) -> Result<T, ServiceError>

@@ -3147,6 +3147,7 @@ dependencies = [
  "hex",
  "lazy_static",
  "once_cell",
+ "thiserror 1.0.63",
  "tokio",
  "zilpay_core",
 ]

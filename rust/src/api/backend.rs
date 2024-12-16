@@ -1,5 +1,5 @@
 pub use zilpay::{
-    background::{BackgroundBip39Params, BackgroundSKParams},
+    background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
     crypto::bip49::Bip49DerivationPath,
     proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
@@ -13,9 +13,13 @@ pub use zilpay::{
 use crate::{
     frb_generated::StreamSink,
     service::service::{ServiceBackground, BACKGROUND_SERVICE},
-    utils::utils::{
-        decode_session, get_background_state, wallet_info_from_wallet, with_service,
-        with_service_mut, with_wallet_mut, IntoServiceError, ResultExt, ServiceError,
+    utils::{
+        errors::ServiceError,
+        utils::{
+            decode_public_key, decode_secret_key, decode_session, get_background_state,
+            get_last_wallet, wallet_info_from_wallet, with_service, with_service_mut,
+            with_wallet_mut,
+        },
     },
 };
 
@@ -80,7 +84,8 @@ pub async fn try_unlock_with_password(
 ) -> Result<bool, String> {
     with_service_mut(|core| {
         core.unlock_wallet_with_password(&password, identifiers, wallet_index)
-            .into_service_error()?;
+            .map_err(ServiceError::BackgroundError)?;
+
         Ok(true)
     })
     .await
@@ -96,7 +101,8 @@ pub async fn try_unlock_with_session(
     let session = decode_session(Some(session_cipher))?;
     with_service_mut(|core| {
         core.unlock_wallet_with_session(session, identifiers, wallet_index)
-            .into_service_error()?;
+            .map_err(ServiceError::BackgroundError)?;
+
         Ok(true)
     })
     .await
@@ -119,7 +125,6 @@ pub async fn add_bip39_wallet(
             .iter()
             .map(|(i, name)| (Bip49DerivationPath::Zilliqa(*i), name.clone()))
             .collect::<Vec<_>>();
-
         let session = core
             .add_bip39_wallet(BackgroundBip39Params {
                 network: networks,
@@ -131,12 +136,8 @@ pub async fn add_bip39_wallet(
                 biometric_type: biometric_type.into(),
                 device_indicators: identifiers,
             })
-            .into_service_error()?;
-
-        let wallet = core
-            .wallets
-            .last()
-            .ok_or(ServiceError::Custom("Failed to save wallet".into()))?;
+            .map_err(ServiceError::BackgroundError)?;
+        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
         Ok((hex::encode(session), wallet.data.wallet_address.clone()))
     })
@@ -156,10 +157,7 @@ pub async fn add_sk_wallet(
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let sk = sk.strip_prefix("0x").unwrap_or(&sk);
-        let secret_key: [u8; SECRET_KEY_SIZE] = hex::decode(sk)
-            .map_err(|_| ServiceError::Custom("Failed to decode key".into()))?
-            .try_into()
-            .map_err(|_| ServiceError::Custom("Invalid Secret key length".into()))?;
+        let secret_key = decode_secret_key(&sk)?;
 
         let secret_key = SecretKey::Secp256k1Sha256Zilliqa(secret_key);
         let session = core
@@ -172,12 +170,9 @@ pub async fn add_sk_wallet(
                 password: &password,
                 device_indicators: identifiers,
             })
-            .into_service_error()?;
+            .map_err(ServiceError::BackgroundError)?;
 
-        let wallet = core
-            .wallets
-            .last()
-            .ok_or(ServiceError::Custom("Failed to save wallet".into()))?;
+        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
         Ok((hex::encode(session), wallet.data.wallet_address.clone()))
     })
@@ -196,11 +191,7 @@ pub async fn add_ledger_wallet(
     identifiers: &[String],
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        let pub_key_bytes: [u8; PUB_KEY_SIZE] = hex::decode(pub_key)
-            .into_service_error()?
-            .try_into()
-            .map_err(|_| ServiceError::Custom("Invalid public key".into()))?;
-
+        let pub_key_bytes = decode_public_key(&pub_key)?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
         let params = LedgerParams {
             networks: vec![0],
@@ -214,11 +205,8 @@ pub async fn add_ledger_wallet(
 
         let session = core
             .add_ledger_wallet(params, identifiers)
-            .into_service_error()?;
-        let wallet = core
-            .wallets
-            .last()
-            .ok_or(ServiceError::Custom("Failed to save wallet".into()))?;
+            .map_err(ServiceError::BackgroundError)?;
+        let wallet = get_last_wallet(core)?;
 
         Ok((hex::encode(session), wallet.data.wallet_address.clone()))
     })
@@ -240,10 +228,10 @@ pub async fn add_next_bip39_account(
         let seed = if let Some(pass) = password {
             core.unlock_wallet_with_password(&pass, identifiers, wallet_index)
         } else {
-            let session = decode_session(session_cipher).service_err()?;
+            let session = decode_session(session_cipher)?;
             core.unlock_wallet_with_session(session, identifiers, wallet_index)
         }
-        .into_service_error()?;
+        .map_err(ServiceError::BackgroundError)?;
 
         let wallet = core
             .wallets
@@ -254,17 +242,17 @@ pub async fn add_next_bip39_account(
             .data
             .accounts
             .first()
-            .ok_or(ServiceError::Custom("Failed to get first account".into()))?;
+            .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
 
         let bip49 = match first_account.pub_key {
             PubKey::Secp256k1Sha256Zilliqa(_) => Bip49DerivationPath::Zilliqa(account_index),
             PubKey::Secp256k1Keccak256Ethereum(_) => Bip49DerivationPath::Ethereum(account_index),
-            _ => return Err(ServiceError::Custom("Invalid account type".into())),
+            _ => return Err(ServiceError::AccountTypeNotValid),
         };
 
         wallet
             .add_next_bip39_account(name, &bip49, &passphrase, &seed)
-            .into_service_error()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
     })
     .await
     .map_err(Into::into)
@@ -273,22 +261,21 @@ pub async fn add_next_bip39_account(
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
-        wallet.select_account(account_index).into_service_error()
+        wallet
+            .select_account(account_index)
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
     })
     .await
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
+// #[flutter_rust_bridge::frb(dart_async)]
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
-    let result = with_service_mut(|core| async move {
-        core.sync_ftokens_balances(wallet_index)
-            .await
-            .into_service_error()
-    })
-    .await;
+    let res = with_service_mut(move |core| core.sync_ftokens_balances(wallet_index))
+        .await?
+        .map_err(Into::into);
 
-    result
+    res
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -297,23 +284,25 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
         let address = Address::from_zil_base16(&addr)
             .or_else(|_| Address::from_zil_bech32(&addr))
             .or_else(|_| Address::from_eth_address(&addr))
-            .into_service_error()?;
+            .map_err(ServiceError::AddressError)?;
 
         core.get_ftoken_meta(wallet_index, address)
             .await
-            .into_service_error()
+            .map_err(ServiceError::BackgroundError)
     })
     .await
-    .map_err(Into::into)
+    .map_err(Into::into)?
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
     with_service_mut(|core| {
         let new_theme = Theme {
-            appearances: Appearances::from_code(appearances_code).into_service_error()?,
+            appearances: Appearances::from_code(appearances_code)
+                .map_err(ServiceError::SettingsError)?,
         };
-        core.set_theme(new_theme).into_service_error()
+        core.set_theme(new_theme)
+            .map_err(ServiceError::BackgroundError)
     })
     .await
     .map_err(Into::into)
@@ -337,7 +326,7 @@ pub async fn set_wallet_notifications(
                 balance,
             },
         )
-        .into_service_error()
+        .map_err(ServiceError::BackgroundError)
     })
     .await
     .map_err(Into::into)
@@ -347,7 +336,7 @@ pub async fn set_wallet_notifications(
 pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String> {
     with_service_mut(|core| {
         core.set_global_notifications(global_enabled)
-            .into_service_error()
+            .map_err(ServiceError::BackgroundError)
     })
     .await
     .map_err(Into::into)
@@ -357,7 +346,9 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
 pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         wallet.data.settings.features.currency_convert = currency;
-        wallet.save_to_storage().into_service_error()
+        wallet
+            .save_to_storage()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)
@@ -367,7 +358,9 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> 
 pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         wallet.data.settings.features.ens_enabled = ens_enabled;
-        wallet.save_to_storage().into_service_error()
+        wallet
+            .save_to_storage()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)
@@ -377,7 +370,9 @@ pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<()
 pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         wallet.data.settings.features.ipfs_node = node;
-        wallet.save_to_storage().into_service_error()
+        wallet
+            .save_to_storage()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)
@@ -387,7 +382,9 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
 pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         wallet.data.settings.network.gas_control_enabled = enabled;
-        wallet.save_to_storage().into_service_error()
+        wallet
+            .save_to_storage()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)
@@ -397,7 +394,9 @@ pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Resul
 pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         wallet.data.settings.network.node_ranking_enabled = enabled;
-        wallet.save_to_storage().into_service_error()
+        wallet
+            .save_to_storage()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)

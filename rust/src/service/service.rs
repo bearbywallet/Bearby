@@ -1,4 +1,4 @@
-use crate::frb_generated::StreamSink;
+use crate::{frb_generated::StreamSink, utils::errors::ServiceError};
 use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
@@ -15,8 +15,8 @@ lazy_static! {
 }
 
 impl ServiceBackground {
-    pub fn from_path(path: &str) -> Result<Self, String> {
-        let core = Background::from_storage_path(path).map_err(|e| e.to_string())?;
+    pub fn from_path(path: &str) -> Result<Self, ServiceError> {
+        let core = Background::from_storage_path(path).map_err(ServiceError::BackgroundError)?;
 
         Ok(Self {
             core: Arc::new(core),
@@ -32,11 +32,11 @@ impl ServiceBackground {
     pub fn get_wallet_mut(
         &mut self,
         wallet_index: usize,
-    ) -> Result<&mut zilpay::wallet::Wallet, String> {
+    ) -> Result<&mut zilpay::wallet::Wallet, ServiceError> {
         Arc::get_mut(&mut self.core)
-            .ok_or("Cannot get mutable reference to core")?
+            .ok_or(ServiceError::CoreAccess)?
             .wallets
             .get_mut(wallet_index)
-            .ok_or("Fail to get mutable link to wallet".to_string())
+            .ok_or(ServiceError::WalletAccess(wallet_index))
     }
 }
