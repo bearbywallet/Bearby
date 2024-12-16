@@ -952,7 +952,7 @@ fn wire__crate__api__backend__start_worker_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_sink =
+            let api__sink =
                 <StreamSink<String, flutter_rust_bridge::for_generated::SseCodec>>::sse_decode(
                     &mut deserializer,
                 );
@@ -960,7 +960,7 @@ fn wire__crate__api__backend__start_worker_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::start_worker(api_sink).await?;
+                        let output_ok = crate::api::backend::start_worker(api__sink).await?;
                         Ok(output_ok)
                     })()
                     .await,

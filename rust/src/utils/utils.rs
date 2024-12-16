@@ -105,7 +105,6 @@ where
     let guard = BACKGROUND_SERVICE.write().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-    // Since we need a mutable reference, we need to clone the Arc and try to get exclusive access
     let mut core_arc = service.core.clone();
     let core = Arc::get_mut(&mut core_arc).ok_or(ServiceError::CoreAccess)?;
 

@@ -1,3 +1,5 @@
+use std::sync::Arc;
+
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
@@ -252,7 +254,7 @@ pub async fn add_next_bip39_account(
 
         wallet
             .add_next_bip39_account(name, &bip49, &passphrase, &seed)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
     .map_err(Into::into)
@@ -263,35 +265,46 @@ pub async fn select_account(wallet_index: usize, account_index: usize) -> Result
     with_wallet_mut(wallet_index, |wallet| {
         wallet
             .select_account(account_index)
-            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))
     })
     .await
     .map_err(Into::into)
 }
 
-// #[flutter_rust_bridge::frb(dart_async)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
-    let res = with_service_mut(move |core| core.sync_ftokens_balances(wallet_index))
-        .await?
-        .map_err(Into::into);
+    let guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-    res
+    let mut core_arc = service.core.clone();
+    let core = Arc::get_mut(&mut core_arc).ok_or(ServiceError::CoreAccess)?;
+
+    core.sync_ftokens_balances(wallet_index)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
-    with_service(|core| async move {
-        let address = Address::from_zil_base16(&addr)
-            .or_else(|_| Address::from_zil_bech32(&addr))
-            .or_else(|_| Address::from_eth_address(&addr))
-            .map_err(ServiceError::AddressError)?;
+    let guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-        core.get_ftoken_meta(wallet_index, address)
-            .await
-            .map_err(ServiceError::BackgroundError)
-    })
-    .await
-    .map_err(Into::into)?
+    let mut core_arc = service.core.clone();
+    let core = Arc::get_mut(&mut core_arc).ok_or(ServiceError::CoreAccess)?;
+
+    let address = Address::from_zil_base16(&addr)
+        .or_else(|_| Address::from_zil_bech32(&addr))
+        .or_else(|_| Address::from_eth_address(&addr))
+        .map_err(ServiceError::AddressError)?;
+
+    let token_meta = core
+        .get_ftoken_meta(wallet_index, address)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(token_meta)
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
