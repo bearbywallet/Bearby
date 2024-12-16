@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -865646152;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -906974005;
 
 // Section: executor
 
@@ -89,6 +89,55 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
                             api_biometric_type,
                             &api_networks,
                             &api_identifiers,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__backend__add_ledger_account_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "add_ledger_account",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
+            let api_name = <String>::sse_decode(&mut deserializer);
+            let api_pub_key = <String>::sse_decode(&mut deserializer);
+            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::backend::add_ledger_account(
+                            api_wallet_index,
+                            api_account_index,
+                            api_name,
+                            api_pub_key,
+                            &api_identifiers,
+                            api_session_cipher,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1539,69 +1588,70 @@ fn pde_ffi_dispatcher_primary_impl(
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
         1 => wire__crate__api__backend__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__backend__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__backend__add_next_bip39_account_impl(
+        2 => wire__crate__api__backend__add_ledger_account_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__backend__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
+        4 => wire__crate__api__backend__add_next_bip39_account_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        4 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
-        5 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
+        5 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
+        6 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        6 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        7 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        8 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        9 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        10 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__backend__select_account_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__backend__set_global_notifications_impl(
+        7 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        8 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        9 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        10 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        12 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__backend__select_account_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__backend__set_global_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        15 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
-        16 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__backend__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__backend__set_wallet_gas_control_impl(
+        16 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__backend__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__backend__set_wallet_gas_control_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        19 => {
+        20 => {
             wire__crate__api__backend__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
-        20 => wire__crate__api__backend__set_wallet_node_ranking_impl(
+        21 => wire__crate__api__backend__set_wallet_node_ranking_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        21 => wire__crate__api__backend__set_wallet_notifications_impl(
+        22 => wire__crate__api__backend__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__backend__try_unlock_with_password_impl(
+        23 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__backend__try_unlock_with_password_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => wire__crate__api__backend__try_unlock_with_session_impl(
+        28 => wire__crate__api__backend__try_unlock_with_session_impl(
             port,
             ptr,
             rust_vec_len,

@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/models/notification.dart';
+import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 import '../components/custom_app_bar.dart';

@@ -323,7 +323,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           DeviceInfoService device = DeviceInfoService();
           List<String> identifiers = await device.getDeviceIdentifiers();
 
-          (String, String) session = await addLedgerZilliqaWallet(
+          (String, String) session = await addLedgerWallet(
             pubKey: key.publicKey,
             walletIndex: BigInt.from(index),
             walletName: name,

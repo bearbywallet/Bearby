@@ -202,7 +202,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         session = await addBip39Wallet(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
-          accouns: [
+          accounts: [
             (BigInt.zero, "Account 0")
           ], // TODO: add interface for change Account name
           passphrase: "", // TODO: maybe make it

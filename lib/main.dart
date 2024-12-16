@@ -1,6 +1,7 @@
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/models/background.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';

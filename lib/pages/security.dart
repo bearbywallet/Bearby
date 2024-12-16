@@ -186,7 +186,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 true,
                 state.wallet!.gasControlEnabled,
                 (value) async {
-                  await setWalletGasContol(
+                  await setWalletGasControl(
                     walletIndex: BigInt.from(state.selectedWallet),
                     enabled: value,
                   );
