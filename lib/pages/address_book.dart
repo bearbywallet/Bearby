@@ -24,58 +24,71 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
-      body: Column(
-        children: [
-          CustomAppBar(
-            title: 'Address Book',
-            onBackPressed: () => Navigator.pop(context),
-            actionWidget: SvgPicture.asset(
-              'assets/icons/plus.svg',
-              width: 24,
-              height: 24,
-              colorFilter: ColorFilter.mode(
-                theme.textPrimary,
-                BlendMode.srcIn,
-              ),
+      body: SafeArea(
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomAppBar(
+                    title: 'Address Book',
+                    onBackPressed: () => Navigator.pop(context),
+                    actionWidget: SvgPicture.asset(
+                      'assets/icons/plus.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.textPrimary,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onActionPressed: () {
+                      // Handle add address
+                    },
+                  ),
+                ),
+                Expanded(
+                  child: addresses.isEmpty
+                      ? _buildEmptyState(theme)
+                      : _buildAddressList(theme),
+                ),
+              ],
             ),
-            onActionPressed: () {
-              // Handle add address
-            },
           ),
-          Expanded(
-            child: addresses.isEmpty
-                ? _buildEmptyState(theme)
-                : _buildAddressList(theme),
-          ),
-        ],
+        ),
       ),
     );
   }
 
   Widget _buildEmptyState(AppTheme theme) {
     return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/book.svg',
-            width: 120,
-            height: 120,
-            colorFilter: ColorFilter.mode(
-              theme.textSecondary.withOpacity(0.4),
-              BlendMode.srcIn,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            SvgPicture.asset(
+              'assets/icons/book.svg',
+              width: 120,
+              height: 120,
+              colorFilter: ColorFilter.mode(
+                theme.textSecondary.withOpacity(0.4),
+                BlendMode.srcIn,
+              ),
             ),
-          ),
-          SizedBox(height: 16),
-          Text(
-            'Your contacts and their wallet address will\nappear here.',
-            textAlign: TextAlign.center,
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
+            const SizedBox(height: 16),
+            Text(
+              'Your contacts and their wallet address will\nappear here.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 16,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -84,6 +97,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
     return ListView.builder(
       itemCount: addresses.length,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      physics: const BouncingScrollPhysics(),
       itemBuilder: (context, index) {
         final address = addresses[index];
         return GestureDetector(

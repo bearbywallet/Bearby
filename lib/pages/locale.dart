@@ -42,35 +42,44 @@ class _LanguagePageState extends State<LanguagePage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Language',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: ListView.builder(
-                itemCount: languages.length,
-                itemBuilder: (context, index) {
-                  final language = languages[index];
-                  final isSelected = language.code == selectedLanguage;
-                  final isLastItem = index == languages.length - 1;
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomAppBar(
+                    title: 'Language',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                Expanded(
+                  child: ListView.builder(
+                    physics: const BouncingScrollPhysics(),
+                    itemCount: languages.length,
+                    itemBuilder: (context, index) {
+                      final language = languages[index];
+                      final isSelected = language.code == selectedLanguage;
+                      final isLastItem = index == languages.length - 1;
 
-                  return _buildLanguageItem(
-                    theme,
-                    language,
-                    isSelected,
-                    isLastItem,
-                    onTap: () {
-                      setState(() {
-                        selectedLanguage = language.code;
-                      });
+                      return _buildLanguageItem(
+                        theme,
+                        language,
+                        isSelected,
+                        isLastItem,
+                        onTap: () {
+                          setState(() {
+                            selectedLanguage = language.code;
+                          });
+                        },
+                      );
                     },
-                  );
-                },
-              ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

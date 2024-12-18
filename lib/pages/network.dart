@@ -47,38 +47,48 @@ class _NetworkPageState extends State<NetworkPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Network',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        NetworkOptions(
-                          theme: theme,
-                          selectedNetwork: selectedNetwork,
-                          selectedMainnetNode: selectedMainnetNode,
-                          selectedTestnetNode: selectedTestnetNode,
-                          customUrl: customUrl,
-                          customChainId: customChainId,
-                          onNetworkSelected: updateSelectedNetwork,
-                          onMainnetNodeSelected: updateMainnetNode,
-                          onTestnetNodeSelected: updateTestnetNode,
-                          onCustomNetworkSaved: updateCustomNetwork,
-                        ),
-                      ]),
-                    ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: 'Network',
+                    onBackPressed: () => Navigator.pop(context),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            NetworkOptions(
+                              theme: theme,
+                              selectedNetwork: selectedNetwork,
+                              selectedMainnetNode: selectedMainnetNode,
+                              selectedTestnetNode: selectedTestnetNode,
+                              customUrl: customUrl,
+                              customChainId: customChainId,
+                              onNetworkSelected: updateSelectedNetwork,
+                              onMainnetNodeSelected: updateMainnetNode,
+                              onTestnetNodeSelected: updateTestnetNode,
+                              onCustomNetworkSaved: updateCustomNetwork,
+                            ),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );

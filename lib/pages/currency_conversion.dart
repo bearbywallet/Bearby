@@ -54,50 +54,61 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Primary Currency',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            _buildRateFetchOption(state),
-            Expanded(
-              child: Opacity(
-                opacity: isRateFetchEnabled ? 1.0 : 0.5,
-                child: Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
-                  child: AbsorbPointer(
-                    absorbing: !isRateFetchEnabled,
-                    child: ListView.builder(
-                      itemCount: currencies.length,
-                      itemBuilder: (context, index) {
-                        final currency = currencies[index];
-                        final isSelected = currency.code == selectedCurrency;
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomAppBar(
+                    title: 'Primary Currency',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                _buildRateFetchOption(state),
+                Expanded(
+                  child: Opacity(
+                    opacity: isRateFetchEnabled ? 1.0 : 0.5,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16),
+                      child: AbsorbPointer(
+                        absorbing: !isRateFetchEnabled,
+                        child: ListView.builder(
+                          physics: const BouncingScrollPhysics(),
+                          itemCount: currencies.length,
+                          itemBuilder: (context, index) {
+                            final currency = currencies[index];
+                            final isSelected =
+                                currency.code == selectedCurrency;
 
-                        return _buildCurrencyItem(
-                          theme,
-                          currency,
-                          isSelected,
-                          onTap: () async {
-                            setState(() {
-                              selectedCurrency = currency.code;
-                            });
+                            return _buildCurrencyItem(
+                              theme,
+                              currency,
+                              isSelected,
+                              onTap: () async {
+                                setState(() {
+                                  selectedCurrency = currency.code;
+                                });
 
-                            await setRateFetcher(
-                              walletIndex: BigInt.from(state.selectedWallet),
-                              currency: selectedCurrency,
+                                await setRateFetcher(
+                                  walletIndex:
+                                      BigInt.from(state.selectedWallet),
+                                  currency: selectedCurrency,
+                                );
+
+                                await state.syncData();
+                              },
                             );
-
-                            await state.syncData();
                           },
-                        );
-                      },
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -107,8 +118,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     final theme = state.currentTheme;
 
     return Container(
-      margin: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: EdgeInsets.all(16),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: BorderRadius.circular(12),
@@ -142,7 +153,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
               ),
             ],
           ),
-          SizedBox(height: 8),
+          const SizedBox(height: 8),
           Text(
             'The wallet will fetch rates and makes request to ZilPay server',
             style: TextStyle(

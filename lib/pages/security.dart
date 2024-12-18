@@ -49,35 +49,45 @@ class _SecurityPageState extends State<SecurityPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Security',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        _buildNetworkSection(appState),
-                        const SizedBox(height: 32),
-                        if (!appState.wallet!.walletType
-                            .contains(WalletType.ledger.name)) ...[
-                          _buildSecuritySection(appState),
-                          const SizedBox(height: 32)
-                        ],
-                        _buildEncryptionSection(appState),
-                        const SizedBox(height: 32),
-                      ]),
-                    ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: 'Security',
+                    onBackPressed: () => Navigator.pop(context),
                   ),
-                ],
-              ),
+                ),
+                Expanded(
+                  child: CustomScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    slivers: [
+                      SliverPadding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        sliver: SliverList(
+                          delegate: SliverChildListDelegate([
+                            _buildNetworkSection(appState),
+                            const SizedBox(height: 32),
+                            if (!appState.wallet!.walletType
+                                .contains(WalletType.ledger.name)) ...[
+                              _buildSecuritySection(appState),
+                              const SizedBox(height: 32)
+                            ],
+                            _buildEncryptionSection(appState),
+                            const SizedBox(height: 32),
+                          ]),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -358,7 +368,7 @@ class _SecurityPageState extends State<SecurityPage> {
                       ),
                     ),
                   SizedBox(
-                    width: MediaQuery.of(context).size.width * 0.7,
+                    width: 300,
                     child: _buildEncryptionCard(
                       state,
                       algorithms[i],
@@ -378,8 +388,12 @@ class _SecurityPageState extends State<SecurityPage> {
     Algorithm algorithm,
   ) {
     final theme = state.currentTheme;
+    final cardWidth = MediaQuery.of(context).size.width > 480
+        ? 320.0
+        : MediaQuery.of(context).size.width * 0.7;
 
     return Container(
+      width: cardWidth,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.cardBackground,

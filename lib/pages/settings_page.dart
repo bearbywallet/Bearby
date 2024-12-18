@@ -27,110 +27,121 @@ class _SettingsPageState extends State<SettingsPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Settings',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: ScrollConfiguration(
-                behavior: const ScrollBehavior().copyWith(
-                  physics: const BouncingScrollPhysics(),
-                  overscroll: true,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: 'Settings',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
-                child: SingleChildScrollView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    child: Column(
-                      children: [
-                        _buildWalletSection(theme, appState),
-                        const SizedBox(height: 24),
-                        _buildSettingsGroup(theme, [
-                          SettingsItem(
-                            title: 'Currency',
-                            trailingSvgPath: 'assets/icons/currency.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/currency'),
-                          ),
-                          SettingsItem(
-                            title: 'Appearance',
-                            trailingSvgPath: 'assets/icons/appearance.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/appearance'),
-                          ),
-                          SettingsItem(
-                            title: 'Notifications',
-                            trailingSvgPath: 'assets/icons/bell.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/notifications'),
-                          ),
-                          SettingsItem(
-                            isFirst: false,
-                            isLast: true,
-                            title: 'Address book',
-                            trailingSvgPath: 'assets/icons/book.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/address-book'),
-                          ),
-                        ]),
-                        const SizedBox(height: 24),
-                        _buildSettingsGroup(theme, [
-                          SettingsItem(
-                            isFirst: true,
-                            isLast: false,
-                            title: 'Security & privacy',
-                            trailingSvgPath: 'assets/icons/shield.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/security'),
-                          ),
-                          SettingsItem(
-                            title: 'Networks',
-                            trailingSvgPath: 'assets/icons/globe.svg',
-                            onTap: () =>
-                                Navigator.pushNamed(context, '/networks'),
-                          ),
-                          SettingsItem(
-                            isFirst: false,
-                            isLast: true,
-                            title: 'Language',
-                            trailingSvgPath: 'assets/icons/language.svg',
-                            onTap: () =>
-                                {Navigator.pushNamed(context, '/language')},
-                          ),
-                        ]),
-                        const SizedBox(height: 24),
-                        _buildSettingsGroup(theme, [
-                          SettingsItem(
-                            isFirst: true,
-                            isLast: false,
-                            title: 'Telegram',
-                            trailingSvgPath: 'assets/icons/telegram.svg',
-                            onTap: () => socialMediaService.openTelegram(
-                                username: 'zilpaychat'),
-                          ),
-                          SettingsItem(
-                            title: 'Twitter',
-                            trailingSvgPath: 'assets/icons/x.svg',
-                            onTap: () =>
-                                socialMediaService.openX(username: 'pay_zil'),
-                          ),
-                          SettingsItem(
-                            isFirst: false,
-                            isLast: true,
-                            title: 'About',
-                            trailingSvgPath: 'assets/icons/info.svg',
-                            onTap: () => Navigator.pushNamed(context, '/about'),
-                          ),
-                        ]),
-                      ],
+                Expanded(
+                  child: ScrollConfiguration(
+                    behavior: const ScrollBehavior().copyWith(
+                      physics: const BouncingScrollPhysics(),
+                      overscroll: true,
+                    ),
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: Column(
+                          children: [
+                            _buildWalletSection(theme, appState),
+                            const SizedBox(height: 24),
+                            _buildSettingsGroup(theme, [
+                              SettingsItem(
+                                title: 'Currency',
+                                trailingSvgPath: 'assets/icons/currency.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/currency'),
+                              ),
+                              SettingsItem(
+                                title: 'Appearance',
+                                trailingSvgPath: 'assets/icons/appearance.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/appearance'),
+                              ),
+                              SettingsItem(
+                                title: 'Notifications',
+                                trailingSvgPath: 'assets/icons/bell.svg',
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/notifications'),
+                              ),
+                              SettingsItem(
+                                isFirst: false,
+                                isLast: true,
+                                title: 'Address book',
+                                trailingSvgPath: 'assets/icons/book.svg',
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/address-book'),
+                              ),
+                            ]),
+                            const SizedBox(height: 24),
+                            _buildSettingsGroup(theme, [
+                              SettingsItem(
+                                isFirst: true,
+                                isLast: false,
+                                title: 'Security & privacy',
+                                trailingSvgPath: 'assets/icons/shield.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/security'),
+                              ),
+                              SettingsItem(
+                                title: 'Networks',
+                                trailingSvgPath: 'assets/icons/globe.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/networks'),
+                              ),
+                              SettingsItem(
+                                isFirst: false,
+                                isLast: true,
+                                title: 'Language',
+                                trailingSvgPath: 'assets/icons/language.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/language'),
+                              ),
+                            ]),
+                            const SizedBox(height: 24),
+                            _buildSettingsGroup(theme, [
+                              SettingsItem(
+                                isFirst: true,
+                                isLast: false,
+                                title: 'Telegram',
+                                trailingSvgPath: 'assets/icons/telegram.svg',
+                                onTap: () => socialMediaService.openTelegram(
+                                    username: 'zilpaychat'),
+                              ),
+                              SettingsItem(
+                                title: 'Twitter',
+                                trailingSvgPath: 'assets/icons/x.svg',
+                                onTap: () => socialMediaService.openX(
+                                    username: 'pay_zil'),
+                              ),
+                              SettingsItem(
+                                isFirst: false,
+                                isLast: true,
+                                title: 'About',
+                                trailingSvgPath: 'assets/icons/info.svg',
+                                onTap: () =>
+                                    Navigator.pushNamed(context, '/about'),
+                              ),
+                            ]),
+                            SizedBox(height: adaptivePadding),
+                          ],
+                        ),
+                      ),
                     ),
                   ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -177,7 +188,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 Text(
-                  'Ethereum (ETH)', // TODO: add Netowrk name!
+                  'Ethereum (ETH)', // TODO: add Network name!
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,
