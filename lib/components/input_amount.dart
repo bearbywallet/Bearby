@@ -1,144 +1,148 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zilpay/state/app_state.dart';
 
-class InputAmount extends StatefulWidget {
-  final TextEditingController? controller;
-  final String? tokenLabel;
-  final String? tokenIconPath;
-  final String? equivalentValue;
-  final VoidCallback? onMaxPressed;
-  final ValueChanged<String>? onChanged;
-  final bool disabled;
+class TokenAmountCard extends StatelessWidget {
+  final String amount;
+  final String dollarAmount;
+  final String tokenSymbol;
+  final String balanceAmount;
+  final bool showMax;
+  final VoidCallback? onMaxTap;
 
-  const InputAmount({
+  const TokenAmountCard({
     super.key,
-    this.controller,
-    this.tokenLabel = 'ETH',
-    this.tokenIconPath,
-    this.equivalentValue = '\$0.00',
-    this.onMaxPressed,
-    this.onChanged,
-    this.disabled = false,
+    this.amount = "1",
+    this.dollarAmount = "\$3,667.88",
+    this.tokenSymbol = "ETH",
+    this.balanceAmount = "0",
+    this.showMax = true,
+    this.onMaxTap,
   });
 
   @override
-  State<InputAmount> createState() => _InputAmountState();
-}
-
-class _InputAmountState extends State<InputAmount> {
-  final FocusNode _focusNode = FocusNode();
-  bool _isFocused = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(_handleFocusChange);
-  }
-
-  void _handleFocusChange() {
-    setState(() {
-      _isFocused = _focusNode.hasFocus;
-    });
-  }
-
-  @override
-  void dispose() {
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
-
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
-      height: 56,
+      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: widget.disabled
-            ? theme.cardColor.withOpacity(0.5)
-            : theme.cardColor,
-        borderRadius: BorderRadius.circular(12),
+        color: Colors.transparent,
         border: Border.all(
-          color: _isFocused ? theme.primaryColor : theme.dividerColor,
-          width: 1.0,
+          color: Colors.white.withOpacity(0.2),
+          width: 1.5,
         ),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          // Token Icon
-          if (widget.tokenIconPath != null)
-            Image.asset(
-              widget.tokenIconPath!,
-              width: 24,
-              height: 24,
-            ),
-          const SizedBox(width: 8),
-
-          // Token Label
-          Text(
-            widget.tokenLabel ?? '',
-            style: theme.textTheme.bodyText1,
-          ),
-          const SizedBox(width: 16),
-
-          // Amount Input Field
-          Expanded(
-            child: TextFormField(
-              controller: widget.controller,
-              focusNode: _focusNode,
-              keyboardType: TextInputType.number,
-              enabled: !widget.disabled,
-              onChanged: widget.onChanged,
-              style: TextStyle(
-                color: widget.disabled
-                    ? theme.hintColor
-                    : theme.textTheme.bodyText1?.color,
-                fontSize: 16,
-              ),
-              decoration: InputDecoration(
-                border: InputBorder.none,
-                hintText: '0',
-                hintStyle: TextStyle(
-                  color: widget.disabled
-                      ? theme.hintColor
-                      : theme.textTheme.bodyText2?.color,
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                amount,
+                style: const TextStyle(
+                  color: Colors.white,
+                  fontSize: 42,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
-            ),
+              Text(
+                dollarAmount,
+                style: TextStyle(
+                  color: Colors.white.withOpacity(0.7),
+                  fontSize: 28,
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            ],
           ),
-
-          // Max Button
-          if (widget.onMaxPressed != null)
-            GestureDetector(
-              onTap: widget.disabled ? null : widget.onMaxPressed,
-              child: Container(
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Container(
                 padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                 decoration: BoxDecoration(
-                  color: widget.disabled
-                      ? theme.primaryColor.withOpacity(0.3)
-                      : theme.primaryColor,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Text(
-                  'Max',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 14,
+                  border: Border.all(
+                    color: Colors.white.withOpacity(0.2),
+                    width: 1.5,
                   ),
+                  // color: Colors.black.withOpacity(0.3),
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                child: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Container(
+                      width: 24,
+                      height: 24,
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Colors.white.withOpacity(0.2),
+                          width: 1.5,
+                        ),
+                        borderRadius: BorderRadius.circular(24),
+                      ),
+                      child: const Icon(
+                        Icons.currency_exchange,
+                        size: 16,
+                        color: Colors.white,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Text(
+                      tokenSymbol,
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ],
                 ),
               ),
-            ),
-          const SizedBox(width: 8),
-
-          // Equivalent Value
-          Text(
-            widget.equivalentValue ?? '\$0.00',
-            style: theme.textTheme.caption?.copyWith(
-              color: theme.hintColor,
-            ),
+              const SizedBox(height: 8),
+              Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(
+                    Icons.warning_amber_rounded,
+                    size: 16,
+                    color: Colors.amber.withOpacity(0.7),
+                  ),
+                  const SizedBox(width: 4),
+                  Text(
+                    "$balanceAmount $tokenSymbol",
+                    style: TextStyle(
+                      color: Colors.white.withOpacity(0.7),
+                      fontSize: 14,
+                    ),
+                  ),
+                  if (showMax) ...[
+                    const SizedBox(width: 8),
+                    GestureDetector(
+                      onTap: onMaxTap,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 4,
+                        ),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(6),
+                        ),
+                        child: Text(
+                          'Max',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 12,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
+              ),
+            ],
           ),
         ],
       ),
