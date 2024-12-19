@@ -6,6 +6,7 @@ class TileButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Color backgroundColor;
   final Color textColor;
+  final bool disabled;
 
   const TileButton({
     super.key,
@@ -14,6 +15,7 @@ class TileButton extends StatefulWidget {
     this.title,
     this.backgroundColor = const Color(0xFF2C2C2E),
     this.textColor = const Color(0xFF9D4BFF),
+    this.disabled = false,
   });
 
   @override
@@ -59,22 +61,30 @@ class _TileButtonState extends State<TileButton>
   }
 
   void _handleTapDown(TapDownDetails details) {
-    _controller.forward();
+    if (!widget.disabled) {
+      _controller.forward();
+    }
   }
 
   void _handleTapUp(TapUpDetails details) {
-    _controller.reverse();
-    widget.onPressed();
+    if (!widget.disabled) {
+      _controller.reverse();
+      widget.onPressed();
+    }
   }
 
   void _handleTapCancel() {
-    _controller.reverse();
+    if (!widget.disabled) {
+      _controller.reverse();
+    }
   }
 
   void _handleHoverChanged(bool isHovered) {
-    setState(() {
-      _isHovered = isHovered;
-    });
+    if (!widget.disabled) {
+      setState(() {
+        _isHovered = isHovered;
+      });
+    }
   }
 
   @override
@@ -87,7 +97,11 @@ class _TileButtonState extends State<TileButton>
     return MouseRegion(
       onEnter: (_) => _handleHoverChanged(true),
       onExit: (_) => _handleHoverChanged(false),
+      cursor: widget.disabled
+          ? SystemMouseCursors.forbidden
+          : SystemMouseCursors.click,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque, // Makes entire area clickable
         onTapDown: _handleTapDown,
         onTapUp: _handleTapUp,
         onTapCancel: _handleTapCancel,
@@ -97,15 +111,17 @@ class _TileButtonState extends State<TileButton>
             return Transform.scale(
               scale: _scaleAnimation.value,
               child: Opacity(
-                opacity: _opacityAnimation.value,
+                opacity: widget.disabled ? 0.5 : _opacityAnimation.value,
                 child: Container(
                   width: containerSize,
                   height: containerSize,
+                  padding:
+                      EdgeInsets.zero, // Ensures no padding affects click area
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.circular(borderRadius),
                     boxShadow: [
-                      if (_isHovered)
+                      if (_isHovered && !widget.disabled)
                         BoxShadow(
                           color: widget.textColor.withOpacity(0.1),
                           blurRadius: 8,
@@ -113,26 +129,29 @@ class _TileButtonState extends State<TileButton>
                         ),
                     ],
                   ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      SizedBox(
-                        width: iconSize,
-                        height: iconSize,
-                        child: widget.icon,
-                      ),
-                      if (hasTitle) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          widget.title!,
-                          style: TextStyle(
-                            color: widget.textColor,
-                            fontSize: 11,
-                            fontWeight: FontWeight.w500,
-                          ),
+                  child: Center(
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        SizedBox(
+                          width: iconSize,
+                          height: iconSize,
+                          child: widget.icon,
                         ),
+                        if (hasTitle) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            widget.title!,
+                            style: TextStyle(
+                              color: widget.textColor,
+                              fontSize: 11,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
+                    ),
                   ),
                 ),
               ),
