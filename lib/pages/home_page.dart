@@ -132,7 +132,9 @@ class _HomePageState extends State<HomePage> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/send');
+                            },
                             backgroundColor: theme.cardBackground,
                             textColor: theme.primaryPurple,
                           ),

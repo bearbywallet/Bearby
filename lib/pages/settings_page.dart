@@ -6,7 +6,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/services/social_media.dart';
-import 'package:zilpay/state/app_state.dart' as app_state;
+import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -19,7 +19,7 @@ class SettingsPage extends StatefulWidget {
 class _SettingsPageState extends State<SettingsPage> {
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<app_state.AppState>(context);
+    final appState = Provider.of<AppState>(context);
     final SocialMediaService socialMediaService = SocialMediaService();
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
@@ -147,7 +147,7 @@ class _SettingsPageState extends State<SettingsPage> {
     );
   }
 
-  Widget _buildWalletSection(AppTheme theme, app_state.AppState appState) {
+  Widget _buildWalletSection(AppTheme theme, AppState appState) {
     return GestureDetector(
       onTap: () => Navigator.pushNamed(context, '/wallet'),
       child: Container(
