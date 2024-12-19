@@ -19,35 +19,51 @@ class NumberKeyboard extends StatelessWidget {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     Widget buildKey(String value, {bool isIcon = false}) {
-      return GestureDetector(
-        onTap: () {
-          if (value == '←') {
-            onBackspace();
-          } else if (value == '.') {
-            onDotPress?.call();
-          } else {
-            onKeyPressed(value);
+      return StatefulBuilder(
+        builder: (context, setState) {
+          double scale = 1.0;
+
+          void handleTap() {
+            setState(() => scale = 1.2);
+            Future.delayed(const Duration(milliseconds: 100), () {
+              setState(() => scale = 1.0);
+              if (value == '←') {
+                onBackspace();
+              } else if (value == '.') {
+                onDotPress?.call();
+              } else {
+                onKeyPressed(value);
+              }
+            });
           }
+
+          return GestureDetector(
+            onTap: handleTap,
+            child: AnimatedScale(
+              scale: scale,
+              duration: const Duration(milliseconds: 100),
+              child: Container(
+                width: 80,
+                height: 40,
+                alignment: Alignment.center,
+                child: isIcon
+                    ? Icon(
+                        Icons.arrow_back,
+                        color: theme.textPrimary,
+                        size: 24,
+                      )
+                    : Text(
+                        value,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 32,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+              ),
+            ),
+          );
         },
-        child: Container(
-          width: 80,
-          height: 40,
-          alignment: Alignment.center,
-          child: isIcon
-              ? Icon(
-                  Icons.arrow_back,
-                  color: theme.textPrimary,
-                  size: 24,
-                )
-              : Text(
-                  value,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 32,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-        ),
       );
     }
 

@@ -58,7 +58,9 @@ class SendTokenPage extends StatelessWidget {
                               onTap: () {},
                             ),
                             NumberKeyboard(
-                              onKeyPressed: (value) {},
+                              onKeyPressed: (value) {
+                                debugPrint("value $value");
+                              },
                               onBackspace: () {},
                             ),
                             const SizedBox(
