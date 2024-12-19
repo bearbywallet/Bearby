@@ -153,7 +153,6 @@ class _SecurityPageState extends State<SecurityPage> {
           ),
           child: Column(
             children: [
-              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
               _buildPreferenceItem(
                 state,
                 'Show ENS domains in address bar',
@@ -368,7 +367,7 @@ class _SecurityPageState extends State<SecurityPage> {
                       ),
                     ),
                   SizedBox(
-                    width: 300,
+                    width: 250,
                     child: _buildEncryptionCard(
                       state,
                       algorithms[i],
