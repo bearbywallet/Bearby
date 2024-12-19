@@ -5,6 +5,7 @@
 
 import 'api/auth.dart';
 import 'api/backend.dart';
+import 'api/book.dart';
 import 'api/ledger.dart';
 import 'api/methods.dart';
 import 'api/settings.dart';
@@ -16,6 +17,7 @@ import 'dart:ffi' as ffi;
 import 'frb_generated.dart';
 import 'models/account.dart';
 import 'models/background.dart';
+import 'models/book.dart';
 import 'models/ftoken.dart';
 import 'models/notification.dart';
 import 'models/wallet.dart';
@@ -41,7 +43,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           dynamic raw);
 
   @protected
-  Map<String, String> dco_decode_Map_String_String(dynamic raw);
+  Map<BigInt, String> dco_decode_Map_usize_String(dynamic raw);
 
   @protected
   Map<BigInt, BackgroundNotificationState>
@@ -60,6 +62,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AccountInfo dco_decode_account_info(dynamic raw);
+
+  @protected
+  AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw);
 
   @protected
   BackgroundNotificationState dco_decode_background_notification_state(
@@ -84,6 +89,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AccountInfo> dco_decode_list_account_info(dynamic raw);
 
   @protected
+  List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(
+      dynamic raw);
+
+  @protected
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
 
   @protected
@@ -91,9 +100,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
-
-  @protected
-  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
 
   @protected
   List<(BigInt, BackgroundNotificationState)>
@@ -142,8 +148,7 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           SseDeserializer deserializer);
 
   @protected
-  Map<String, String> sse_decode_Map_String_String(
-      SseDeserializer deserializer);
+  Map<BigInt, String> sse_decode_Map_usize_String(SseDeserializer deserializer);
 
   @protected
   Map<BigInt, BackgroundNotificationState>
@@ -164,6 +169,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   AccountInfo sse_decode_account_info(SseDeserializer deserializer);
+
+  @protected
+  AddressBookEntryInfo sse_decode_address_book_entry_info(
+      SseDeserializer deserializer);
 
   @protected
   BackgroundNotificationState sse_decode_background_notification_state(
@@ -188,6 +197,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<AccountInfo> sse_decode_list_account_info(SseDeserializer deserializer);
 
   @protected
+  List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
 
   @protected
@@ -195,10 +208,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
-
-  @protected
-  List<(String, String)> sse_decode_list_record_string_string(
-      SseDeserializer deserializer);
 
   @protected
   List<(BigInt, BackgroundNotificationState)>
@@ -255,8 +264,8 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
           FToken self, SseSerializer serializer);
 
   @protected
-  void sse_encode_Map_String_String(
-      Map<String, String> self, SseSerializer serializer);
+  void sse_encode_Map_usize_String(
+      Map<BigInt, String> self, SseSerializer serializer);
 
   @protected
   void sse_encode_Map_usize_background_notification_state(
@@ -276,6 +285,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_account_info(AccountInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_address_book_entry_info(
+      AddressBookEntryInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_background_notification_state(
@@ -302,6 +315,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<AccountInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_address_book_entry_info(
+      List<AddressBookEntryInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_f_token_info(
       List<FTokenInfo> self, SseSerializer serializer);
 
@@ -312,10 +329,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_prim_usize_strict(
       Uint64List self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_record_string_string(
-      List<(String, String)> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_record_usize_background_notification_state(

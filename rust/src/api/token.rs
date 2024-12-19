@@ -1,4 +1,7 @@
-use crate::{service::service::BACKGROUND_SERVICE, utils::errors::ServiceError};
+use crate::{
+    service::service::BACKGROUND_SERVICE,
+    utils::{errors::ServiceError, utils::parse_address},
+};
 use std::sync::Arc;
 pub use zilpay::{proto::address::Address, wallet::ft::FToken};
 
@@ -21,11 +24,7 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-
-        let address = Address::from_zil_base16(&addr)
-            .or_else(|_| Address::from_zil_bech32(&addr))
-            .or_else(|_| Address::from_eth_address(&addr))
-            .map_err(ServiceError::AddressError)?;
+        let address = parse_address(addr)?;
 
         let token_meta = core
             .get_ftoken_meta(wallet_index, address)

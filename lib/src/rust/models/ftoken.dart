@@ -11,7 +11,7 @@ class FTokenInfo {
   final String symbol;
   final int decimals;
   final String addr;
-  final Map<String, String> balances;
+  final Map<BigInt, String> balances;
   final bool default_;
   final BigInt netId;
 

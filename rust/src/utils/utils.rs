@@ -2,6 +2,7 @@ use std::sync::Arc;
 use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
+    proto::address::Address,
     wallet::Wallet,
 };
 
@@ -11,6 +12,13 @@ use crate::{
 };
 
 use super::errors::ServiceError;
+
+pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
+    Address::from_zil_base16(&addr)
+        .or_else(|_| Address::from_zil_bech32(&addr))
+        .or_else(|_| Address::from_eth_address(&addr))
+        .map_err(ServiceError::AddressError)
+}
 
 pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
     WalletInfo {

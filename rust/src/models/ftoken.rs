@@ -8,7 +8,7 @@ pub struct FTokenInfo {
     pub symbol: String,
     pub decimals: u8,
     pub addr: String,
-    pub balances: HashMap<String, String>,
+    pub balances: HashMap<usize, String>,
     pub default: bool,
     pub net_id: usize,
 }
@@ -18,7 +18,7 @@ impl From<&FToken> for FTokenInfo {
         let balances = ft
             .balances
             .iter()
-            .map(|(addr, balance)| (addr.auto_format(), balance.to_string()))
+            .map(|(account_index, balance)| (*account_index, balance.to_string()))
             .collect();
 
         FTokenInfo {
