@@ -2,10 +2,12 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
+import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -32,9 +34,9 @@ class Connection {
 }
 
 class AppState extends ChangeNotifier with WidgetsBindingObserver {
+  List<AddressBookEntryInfo> _book = [];
   late BackgroundState _state;
   int _selectedWallet = 0;
-
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
 
@@ -50,6 +52,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   List<WalletInfo> get wallets {
     return _state.wallets;
+  }
+
+  List<AddressBookEntryInfo> get book {
+    return _book;
   }
 
   BackgroundState get state {
@@ -116,6 +122,12 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> syncData() async {
     _state = await getData();
+    await syncBook();
+    notifyListeners();
+  }
+
+  Future<void> syncBook() async {
+    _book = await getAddressBookList();
 
     notifyListeners();
   }

@@ -1,6 +1,8 @@
+import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/modals/add_contect.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
@@ -13,14 +15,10 @@ class AddressBookPage extends StatefulWidget {
 }
 
 class _AddressBookPageState extends State<AddressBookPage> {
-  final List<Address> addresses = [
-    // Address("test"),
-    // Address("Wallet"),
-  ];
-
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final state = Provider.of<AppState>(context);
+    final theme = state.currentTheme;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -45,14 +43,26 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       ),
                     ),
                     onActionPressed: () {
-                      // Handle add address
+                      showModalBottomSheet(
+                        context: context,
+                        isScrollControlled: true,
+                        backgroundColor: theme.cardBackground,
+                        shape: const RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(16)),
+                        ),
+                        builder: (context) => AddAddressModal(
+                          theme: theme,
+                          state: state,
+                        ),
+                      );
                     },
                   ),
                 ),
                 Expanded(
-                  child: addresses.isEmpty
+                  child: state.book.isEmpty
                       ? _buildEmptyState(theme)
-                      : _buildAddressList(theme),
+                      : _buildAddressList(state),
                 ),
               ],
             ),
@@ -93,52 +103,83 @@ class _AddressBookPageState extends State<AddressBookPage> {
     );
   }
 
-  Widget _buildAddressList(AppTheme theme) {
+  Widget _buildAddressList(AppState state) {
+    final theme = state.currentTheme;
+
     return ListView.builder(
-      itemCount: addresses.length,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      itemCount: state.book.length,
+      padding: const EdgeInsets.symmetric(horizontal: 16),
       physics: const BouncingScrollPhysics(),
       itemBuilder: (context, index) {
-        final address = addresses[index];
+        final address = state.book[index];
+        final isLastItem = index == state.book.length - 1;
+
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
             // Handle address selection
           },
           child: Container(
-            padding: const EdgeInsets.all(16),
-            margin: const EdgeInsets.only(bottom: 8),
+            height: 72,
             decoration: BoxDecoration(
-              color: theme.cardBackground,
-              borderRadius: BorderRadius.circular(12),
+              border: !isLastItem
+                  ? Border(
+                      bottom: BorderSide(
+                        color: theme.textSecondary.withOpacity(0.1),
+                        width: 1,
+                      ),
+                    )
+                  : null,
             ),
             child: Row(
               children: [
-                SvgPicture.asset(
-                  'assets/icons/book.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(16),
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: Blockies(
+                      seed: address.addr.toLowerCase(),
+                      size: 8,
+                      color: theme.primaryPurple,
+                      spotColor: theme.textSecondary,
+                    ),
                   ),
                 ),
                 const SizedBox(width: 12),
                 Expanded(
-                  child: Text(
-                    address.name,
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                    ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        address.name,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        "Netowrk ${address.net}",
+                        style: TextStyle(
+                          color: theme.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ],
                   ),
                 ),
-                SvgPicture.asset(
-                  'assets/icons/chevron-right.svg',
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
+                SizedBox(
+                  width: 24,
+                  height: 24,
+                  child: SvgPicture.asset(
+                    'assets/icons/chevron_right.svg',
+                    colorFilter: ColorFilter.mode(
+                      theme.textSecondary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ],
@@ -148,10 +189,4 @@ class _AddressBookPageState extends State<AddressBookPage> {
       },
     );
   }
-}
-
-class Address {
-  final String name;
-
-  Address(this.name);
 }
