@@ -25,7 +25,7 @@
 
 // Section: imports
 
-use crate::api::backend::*;
+use crate::api::token::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -38,7 +38,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -906974005;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -198809930;
 
 // Section: executor
 
@@ -46,7 +46,7 @@ flutter_rust_bridge::frb_generated_default_handler!();
 
 // Section: wire_funcs
 
-fn wire__crate__api__backend__add_bip39_wallet_impl(
+fn wire__crate__api__wallet__add_bip39_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -80,7 +80,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_bip39_wallet(
+                        let output_ok = crate::api::wallet::add_bip39_wallet(
                             api_password,
                             api_mnemonic_str,
                             &api_accounts,
@@ -99,7 +99,7 @@ fn wire__crate__api__backend__add_bip39_wallet_impl(
         },
     )
 }
-fn wire__crate__api__backend__add_ledger_account_impl(
+fn wire__crate__api__ledger__add_ledger_account_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -131,7 +131,7 @@ fn wire__crate__api__backend__add_ledger_account_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_ledger_account(
+                        let output_ok = crate::api::ledger::add_ledger_account(
                             api_wallet_index,
                             api_account_index,
                             api_name,
@@ -148,7 +148,7 @@ fn wire__crate__api__backend__add_ledger_account_impl(
         },
     )
 }
-fn wire__crate__api__backend__add_ledger_wallet_impl(
+fn wire__crate__api__ledger__add_ledger_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -181,7 +181,7 @@ fn wire__crate__api__backend__add_ledger_wallet_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_ledger_wallet(
+                        let output_ok = crate::api::ledger::add_ledger_wallet(
                             api_pub_key,
                             api_wallet_index,
                             api_wallet_name,
@@ -199,7 +199,7 @@ fn wire__crate__api__backend__add_ledger_wallet_impl(
         },
     )
 }
-fn wire__crate__api__backend__add_next_bip39_account_impl(
+fn wire__crate__api__wallet__add_next_bip39_account_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -232,7 +232,7 @@ fn wire__crate__api__backend__add_next_bip39_account_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_next_bip39_account(
+                        let output_ok = crate::api::wallet::add_next_bip39_account(
                             api_wallet_index,
                             api_account_index,
                             api_name,
@@ -250,7 +250,7 @@ fn wire__crate__api__backend__add_next_bip39_account_impl(
         },
     )
 }
-fn wire__crate__api__backend__add_sk_wallet_impl(
+fn wire__crate__api__wallet__add_sk_wallet_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -283,7 +283,7 @@ fn wire__crate__api__backend__add_sk_wallet_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::add_sk_wallet(
+                        let output_ok = crate::api::wallet::add_sk_wallet(
                             api_sk,
                             api_password,
                             api_account_name,
@@ -337,7 +337,7 @@ fn wire__crate__api__methods__check_not_exists_bip39_words_impl(
         },
     )
 }
-fn wire__crate__api__backend__fetch_token_meta_impl(
+fn wire__crate__api__token__fetch_token_meta_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -366,8 +366,7 @@ fn wire__crate__api__backend__fetch_token_meta_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::fetch_token_meta(api_addr, api_wallet_index)
-                                .await?;
+                            crate::api::token::fetch_token_meta(api_addr, api_wallet_index).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -476,7 +475,7 @@ fn wire__crate__api__backend__get_data_impl(
         },
     )
 }
-fn wire__crate__api__backend__get_wallets_impl(
+fn wire__crate__api__wallet__get_wallets_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -502,7 +501,7 @@ fn wire__crate__api__backend__get_wallets_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::get_wallets().await?;
+                        let output_ok = crate::api::wallet::get_wallets().await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -581,7 +580,7 @@ fn wire__crate__api__backend__is_service_running_impl(
         },
     )
 }
-fn wire__crate__api__backend__select_account_impl(
+fn wire__crate__api__wallet__select_account_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -609,11 +608,9 @@ fn wire__crate__api__backend__select_account_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::select_account(
-                            api_wallet_index,
-                            api_account_index,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::wallet::select_account(api_wallet_index, api_account_index)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -622,7 +619,7 @@ fn wire__crate__api__backend__select_account_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_global_notifications_impl(
+fn wire__crate__api__settings__set_global_notifications_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -650,7 +647,7 @@ fn wire__crate__api__backend__set_global_notifications_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::set_global_notifications(api_global_enabled)
+                            crate::api::settings::set_global_notifications(api_global_enabled)
                                 .await?;
                         Ok(output_ok)
                     })()
@@ -660,7 +657,7 @@ fn wire__crate__api__backend__set_global_notifications_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_rate_fetcher_impl(
+fn wire__crate__api__settings__set_rate_fetcher_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -689,7 +686,7 @@ fn wire__crate__api__backend__set_rate_fetcher_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::set_rate_fetcher(api_wallet_index, api_currency)
+                            crate::api::settings::set_rate_fetcher(api_wallet_index, api_currency)
                                 .await?;
                         Ok(output_ok)
                     })()
@@ -699,7 +696,7 @@ fn wire__crate__api__backend__set_rate_fetcher_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_theme_impl(
+fn wire__crate__api__settings__set_theme_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -727,7 +724,7 @@ fn wire__crate__api__backend__set_theme_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::set_theme(api_appearances_code).await?;
+                            crate::api::settings::set_theme(api_appearances_code).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -736,7 +733,7 @@ fn wire__crate__api__backend__set_theme_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_ens_impl(
+fn wire__crate__api__settings__set_wallet_ens_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -765,7 +762,7 @@ fn wire__crate__api__backend__set_wallet_ens_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::set_wallet_ens(api_wallet_index, api_ens_enabled)
+                            crate::api::settings::set_wallet_ens(api_wallet_index, api_ens_enabled)
                                 .await?;
                         Ok(output_ok)
                     })()
@@ -775,7 +772,7 @@ fn wire__crate__api__backend__set_wallet_ens_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_gas_control_impl(
+fn wire__crate__api__settings__set_wallet_gas_control_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -803,7 +800,7 @@ fn wire__crate__api__backend__set_wallet_gas_control_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_gas_control(
+                        let output_ok = crate::api::settings::set_wallet_gas_control(
                             api_wallet_index,
                             api_enabled,
                         )
@@ -816,7 +813,7 @@ fn wire__crate__api__backend__set_wallet_gas_control_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_ipfs_node_impl(
+fn wire__crate__api__settings__set_wallet_ipfs_node_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -845,7 +842,7 @@ fn wire__crate__api__backend__set_wallet_ipfs_node_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::backend::set_wallet_ipfs_node(api_wallet_index, api_node)
+                            crate::api::settings::set_wallet_ipfs_node(api_wallet_index, api_node)
                                 .await?;
                         Ok(output_ok)
                     })()
@@ -855,7 +852,7 @@ fn wire__crate__api__backend__set_wallet_ipfs_node_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_node_ranking_impl(
+fn wire__crate__api__settings__set_wallet_node_ranking_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -883,7 +880,7 @@ fn wire__crate__api__backend__set_wallet_node_ranking_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_node_ranking(
+                        let output_ok = crate::api::settings::set_wallet_node_ranking(
                             api_wallet_index,
                             api_enabled,
                         )
@@ -896,7 +893,7 @@ fn wire__crate__api__backend__set_wallet_node_ranking_impl(
         },
     )
 }
-fn wire__crate__api__backend__set_wallet_notifications_impl(
+fn wire__crate__api__settings__set_wallet_notifications_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -927,7 +924,7 @@ fn wire__crate__api__backend__set_wallet_notifications_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::set_wallet_notifications(
+                        let output_ok = crate::api::settings::set_wallet_notifications(
                             api_wallet_index,
                             api_transactions,
                             api_price,
@@ -1053,7 +1050,7 @@ fn wire__crate__api__backend__stop_service_impl(
         },
     )
 }
-fn wire__crate__api__backend__sync_balances_impl(
+fn wire__crate__api__token__sync_balances_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1080,8 +1077,7 @@ fn wire__crate__api__backend__sync_balances_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::backend::sync_balances(api_wallet_index).await?;
+                        let output_ok = crate::api::token::sync_balances(api_wallet_index).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1090,7 +1086,7 @@ fn wire__crate__api__backend__sync_balances_impl(
         },
     )
 }
-fn wire__crate__api__backend__try_unlock_with_password_impl(
+fn wire__crate__api__auth__try_unlock_with_password_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1119,7 +1115,7 @@ fn wire__crate__api__backend__try_unlock_with_password_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::try_unlock_with_password(
+                        let output_ok = crate::api::auth::try_unlock_with_password(
                             api_password,
                             api_wallet_index,
                             &api_identifiers,
@@ -1133,7 +1129,7 @@ fn wire__crate__api__backend__try_unlock_with_password_impl(
         },
     )
 }
-fn wire__crate__api__backend__try_unlock_with_session_impl(
+fn wire__crate__api__auth__try_unlock_with_session_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -1162,7 +1158,7 @@ fn wire__crate__api__backend__try_unlock_with_session_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::backend::try_unlock_with_session(
+                        let output_ok = crate::api::auth::try_unlock_with_session(
                             api_session_cipher,
                             api_wallet_index,
                             &api_identifiers,
@@ -1587,55 +1583,52 @@ fn pde_ffi_dispatcher_primary_impl(
 ) {
     // Codec=Pde (Serialization + dispatch), see doc to use other codecs
     match func_id {
-        1 => wire__crate__api__backend__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
-        2 => wire__crate__api__backend__add_ledger_account_impl(port, ptr, rust_vec_len, data_len),
-        3 => wire__crate__api__backend__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
-        4 => wire__crate__api__backend__add_next_bip39_account_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        5 => wire__crate__api__backend__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
+        1 => wire__crate__api__wallet__add_bip39_wallet_impl(port, ptr, rust_vec_len, data_len),
+        2 => wire__crate__api__ledger__add_ledger_account_impl(port, ptr, rust_vec_len, data_len),
+        3 => wire__crate__api__ledger__add_ledger_wallet_impl(port, ptr, rust_vec_len, data_len),
+        4 => {
+            wire__crate__api__wallet__add_next_bip39_account_impl(port, ptr, rust_vec_len, data_len)
+        }
+        5 => wire__crate__api__wallet__add_sk_wallet_impl(port, ptr, rust_vec_len, data_len),
         6 => wire__crate__api__methods__check_not_exists_bip39_words_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        7 => wire__crate__api__backend__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        7 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
         8 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
         9 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
         10 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        11 => wire__crate__api__backend__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        11 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
         12 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
         13 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__backend__select_account_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__backend__set_global_notifications_impl(
+        14 => wire__crate__api__wallet__select_account_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__settings__set_global_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__backend__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__backend__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__backend__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__backend__set_wallet_gas_control_impl(
+        16 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        17 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__settings__set_wallet_gas_control_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
         20 => {
-            wire__crate__api__backend__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
+            wire__crate__api__settings__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
-        21 => wire__crate__api__backend__set_wallet_node_ranking_impl(
+        21 => wire__crate__api__settings__set_wallet_node_ranking_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        22 => wire__crate__api__backend__set_wallet_notifications_impl(
+        22 => wire__crate__api__settings__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
@@ -1644,19 +1637,13 @@ fn pde_ffi_dispatcher_primary_impl(
         23 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
         24 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
         25 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__backend__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        27 => wire__crate__api__backend__try_unlock_with_password_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
-        28 => wire__crate__api__backend__try_unlock_with_session_impl(
-            port,
-            ptr,
-            rust_vec_len,
-            data_len,
-        ),
+        26 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        27 => {
+            wire__crate__api__auth__try_unlock_with_password_impl(port, ptr, rust_vec_len, data_len)
+        }
+        28 => {
+            wire__crate__api__auth__try_unlock_with_session_impl(port, ptr, rust_vec_len, data_len)
+        }
         _ => unreachable!(),
     }
 }
@@ -2158,7 +2145,7 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::api::backend::*;
+    use crate::api::token::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -2195,7 +2182,7 @@ mod web {
     // Section: imports
 
     use super::*;
-    use crate::api::backend::*;
+    use crate::api::token::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };

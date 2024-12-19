@@ -6,8 +6,13 @@
 // Static analysis wrongly picks the IO variant, thus ignore this
 // ignore_for_file: argument_type_not_assignable
 
+import 'api/auth.dart';
 import 'api/backend.dart';
+import 'api/ledger.dart';
 import 'api/methods.dart';
+import 'api/settings.dart';
+import 'api/token.dart';
+import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';

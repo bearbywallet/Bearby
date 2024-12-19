@@ -3,8 +3,13 @@
 
 // ignore_for_file: unused_import, unused_element, unnecessary_import, duplicate_ignore, invalid_use_of_internal_member, annotate_overrides, non_constant_identifier_names, curly_braces_in_flow_control_structures, prefer_const_literals_to_create_immutables, unused_field
 
+import 'api/auth.dart';
 import 'api/backend.dart';
+import 'api/ledger.dart';
 import 'api/methods.dart';
+import 'api/settings.dart';
+import 'api/token.dart';
+import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
 import 'frb_generated.dart';
@@ -74,7 +79,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.6.0';
 
   @override
-  int get rustContentHash => -906974005;
+  int get rustContentHash => -198809930;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -85,7 +90,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 }
 
 abstract class RustLibApi extends BaseApi {
-  Future<(String, String)> crateApiBackendAddBip39Wallet(
+  Future<(String, String)> crateApiWalletAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
       required List<(BigInt, String)> accounts,
@@ -95,7 +100,7 @@ abstract class RustLibApi extends BaseApi {
       required Uint64List networks,
       required List<String> identifiers});
 
-  Future<void> crateApiBackendAddLedgerAccount(
+  Future<void> crateApiLedgerAddLedgerAccount(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required String name,
@@ -103,7 +108,7 @@ abstract class RustLibApi extends BaseApi {
       required List<String> identifiers,
       String? sessionCipher});
 
-  Future<(String, String)> crateApiBackendAddLedgerWallet(
+  Future<(String, String)> crateApiLedgerAddLedgerWallet(
       {required String pubKey,
       required BigInt walletIndex,
       required String walletName,
@@ -112,7 +117,7 @@ abstract class RustLibApi extends BaseApi {
       required String biometricType,
       required List<String> identifiers});
 
-  Future<void> crateApiBackendAddNextBip39Account(
+  Future<void> crateApiWalletAddNextBip39Account(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required String name,
@@ -121,7 +126,7 @@ abstract class RustLibApi extends BaseApi {
       String? password,
       String? sessionCipher});
 
-  Future<(String, String)> crateApiBackendAddSkWallet(
+  Future<(String, String)> crateApiWalletAddSkWallet(
       {required String sk,
       required String password,
       required String accountName,
@@ -133,7 +138,7 @@ abstract class RustLibApi extends BaseApi {
   Future<Uint64List> crateApiMethodsCheckNotExistsBip39Words(
       {required List<String> words, required String lang});
 
-  Future<FToken> crateApiBackendFetchTokenMeta(
+  Future<FToken> crateApiTokenFetchTokenMeta(
       {required String addr, required BigInt walletIndex});
 
   Future<String> crateApiMethodsGenBip39Words({required int count});
@@ -142,36 +147,36 @@ abstract class RustLibApi extends BaseApi {
 
   Future<BackgroundState> crateApiBackendGetData();
 
-  Future<List<WalletInfo>> crateApiBackendGetWallets();
+  Future<List<WalletInfo>> crateApiWalletGetWallets();
 
   Future<void> crateApiMethodsInitApp();
 
   Future<bool> crateApiBackendIsServiceRunning();
 
-  Future<void> crateApiBackendSelectAccount(
+  Future<void> crateApiWalletSelectAccount(
       {required BigInt walletIndex, required BigInt accountIndex});
 
-  Future<void> crateApiBackendSetGlobalNotifications(
+  Future<void> crateApiSettingsSetGlobalNotifications(
       {required bool globalEnabled});
 
-  Future<void> crateApiBackendSetRateFetcher(
+  Future<void> crateApiSettingsSetRateFetcher(
       {required BigInt walletIndex, String? currency});
 
-  Future<void> crateApiBackendSetTheme({required int appearancesCode});
+  Future<void> crateApiSettingsSetTheme({required int appearancesCode});
 
-  Future<void> crateApiBackendSetWalletEns(
+  Future<void> crateApiSettingsSetWalletEns(
       {required BigInt walletIndex, required bool ensEnabled});
 
-  Future<void> crateApiBackendSetWalletGasControl(
+  Future<void> crateApiSettingsSetWalletGasControl(
       {required BigInt walletIndex, required bool enabled});
 
-  Future<void> crateApiBackendSetWalletIpfsNode(
+  Future<void> crateApiSettingsSetWalletIpfsNode(
       {required BigInt walletIndex, String? node});
 
-  Future<void> crateApiBackendSetWalletNodeRanking(
+  Future<void> crateApiSettingsSetWalletNodeRanking(
       {required BigInt walletIndex, required bool enabled});
 
-  Future<void> crateApiBackendSetWalletNotifications(
+  Future<void> crateApiSettingsSetWalletNotifications(
       {required BigInt walletIndex,
       required bool transactions,
       required bool price,
@@ -184,14 +189,14 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiBackendStopService();
 
-  Future<void> crateApiBackendSyncBalances({required BigInt walletIndex});
+  Future<void> crateApiTokenSyncBalances({required BigInt walletIndex});
 
-  Future<bool> crateApiBackendTryUnlockWithPassword(
+  Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
       required List<String> identifiers});
 
-  Future<bool> crateApiBackendTryUnlockWithSession(
+  Future<bool> crateApiAuthTryUnlockWithSession(
       {required String sessionCipher,
       required BigInt walletIndex,
       required List<String> identifiers});
@@ -212,7 +217,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   });
 
   @override
-  Future<(String, String)> crateApiBackendAddBip39Wallet(
+  Future<(String, String)> crateApiWalletAddBip39Wallet(
       {required String password,
       required String mnemonicStr,
       required List<(BigInt, String)> accounts,
@@ -239,7 +244,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_record_string_string,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendAddBip39WalletConstMeta,
+      constMeta: kCrateApiWalletAddBip39WalletConstMeta,
       argValues: [
         password,
         mnemonicStr,
@@ -254,7 +259,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendAddBip39WalletConstMeta =>
+  TaskConstMeta get kCrateApiWalletAddBip39WalletConstMeta =>
       const TaskConstMeta(
         debugName: "add_bip39_wallet",
         argNames: [
@@ -270,7 +275,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiBackendAddLedgerAccount(
+  Future<void> crateApiLedgerAddLedgerAccount(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required String name,
@@ -293,7 +298,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendAddLedgerAccountConstMeta,
+      constMeta: kCrateApiLedgerAddLedgerAccountConstMeta,
       argValues: [
         walletIndex,
         accountIndex,
@@ -306,7 +311,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendAddLedgerAccountConstMeta =>
+  TaskConstMeta get kCrateApiLedgerAddLedgerAccountConstMeta =>
       const TaskConstMeta(
         debugName: "add_ledger_account",
         argNames: [
@@ -320,7 +325,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<(String, String)> crateApiBackendAddLedgerWallet(
+  Future<(String, String)> crateApiLedgerAddLedgerWallet(
       {required String pubKey,
       required BigInt walletIndex,
       required String walletName,
@@ -345,7 +350,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_record_string_string,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendAddLedgerWalletConstMeta,
+      constMeta: kCrateApiLedgerAddLedgerWalletConstMeta,
       argValues: [
         pubKey,
         walletIndex,
@@ -359,7 +364,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendAddLedgerWalletConstMeta =>
+  TaskConstMeta get kCrateApiLedgerAddLedgerWalletConstMeta =>
       const TaskConstMeta(
         debugName: "add_ledger_wallet",
         argNames: [
@@ -374,7 +379,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiBackendAddNextBip39Account(
+  Future<void> crateApiWalletAddNextBip39Account(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required String name,
@@ -399,7 +404,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendAddNextBip39AccountConstMeta,
+      constMeta: kCrateApiWalletAddNextBip39AccountConstMeta,
       argValues: [
         walletIndex,
         accountIndex,
@@ -413,7 +418,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendAddNextBip39AccountConstMeta =>
+  TaskConstMeta get kCrateApiWalletAddNextBip39AccountConstMeta =>
       const TaskConstMeta(
         debugName: "add_next_bip39_account",
         argNames: [
@@ -428,7 +433,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<(String, String)> crateApiBackendAddSkWallet(
+  Future<(String, String)> crateApiWalletAddSkWallet(
       {required String sk,
       required String password,
       required String accountName,
@@ -453,7 +458,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_record_string_string,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendAddSkWalletConstMeta,
+      constMeta: kCrateApiWalletAddSkWalletConstMeta,
       argValues: [
         sk,
         password,
@@ -467,7 +472,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendAddSkWalletConstMeta => const TaskConstMeta(
+  TaskConstMeta get kCrateApiWalletAddSkWalletConstMeta => const TaskConstMeta(
         debugName: "add_sk_wallet",
         argNames: [
           "sk",
@@ -508,7 +513,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<FToken> crateApiBackendFetchTokenMeta(
+  Future<FToken> crateApiTokenFetchTokenMeta(
       {required String addr, required BigInt walletIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -523,13 +528,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerFToken,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendFetchTokenMetaConstMeta,
+      constMeta: kCrateApiTokenFetchTokenMetaConstMeta,
       argValues: [addr, walletIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendFetchTokenMetaConstMeta =>
+  TaskConstMeta get kCrateApiTokenFetchTokenMetaConstMeta =>
       const TaskConstMeta(
         debugName: "fetch_token_meta",
         argNames: ["addr", "walletIndex"],
@@ -607,7 +612,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<List<WalletInfo>> crateApiBackendGetWallets() {
+  Future<List<WalletInfo>> crateApiWalletGetWallets() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -618,13 +623,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_list_wallet_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendGetWalletsConstMeta,
+      constMeta: kCrateApiWalletGetWalletsConstMeta,
       argValues: [],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendGetWalletsConstMeta => const TaskConstMeta(
+  TaskConstMeta get kCrateApiWalletGetWalletsConstMeta => const TaskConstMeta(
         debugName: "get_wallets",
         argNames: [],
       );
@@ -677,7 +682,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiBackendSelectAccount(
+  Future<void> crateApiWalletSelectAccount(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -691,20 +696,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSelectAccountConstMeta,
+      constMeta: kCrateApiWalletSelectAccountConstMeta,
       argValues: [walletIndex, accountIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSelectAccountConstMeta =>
+  TaskConstMeta get kCrateApiWalletSelectAccountConstMeta =>
       const TaskConstMeta(
         debugName: "select_account",
         argNames: ["walletIndex", "accountIndex"],
       );
 
   @override
-  Future<void> crateApiBackendSetGlobalNotifications(
+  Future<void> crateApiSettingsSetGlobalNotifications(
       {required bool globalEnabled}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -717,20 +722,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetGlobalNotificationsConstMeta,
+      constMeta: kCrateApiSettingsSetGlobalNotificationsConstMeta,
       argValues: [globalEnabled],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetGlobalNotificationsConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetGlobalNotificationsConstMeta =>
       const TaskConstMeta(
         debugName: "set_global_notifications",
         argNames: ["globalEnabled"],
       );
 
   @override
-  Future<void> crateApiBackendSetRateFetcher(
+  Future<void> crateApiSettingsSetRateFetcher(
       {required BigInt walletIndex, String? currency}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -744,20 +749,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetRateFetcherConstMeta,
+      constMeta: kCrateApiSettingsSetRateFetcherConstMeta,
       argValues: [walletIndex, currency],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetRateFetcherConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetRateFetcherConstMeta =>
       const TaskConstMeta(
         debugName: "set_rate_fetcher",
         argNames: ["walletIndex", "currency"],
       );
 
   @override
-  Future<void> crateApiBackendSetTheme({required int appearancesCode}) {
+  Future<void> crateApiSettingsSetTheme({required int appearancesCode}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -769,19 +774,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetThemeConstMeta,
+      constMeta: kCrateApiSettingsSetThemeConstMeta,
       argValues: [appearancesCode],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetThemeConstMeta => const TaskConstMeta(
+  TaskConstMeta get kCrateApiSettingsSetThemeConstMeta => const TaskConstMeta(
         debugName: "set_theme",
         argNames: ["appearancesCode"],
       );
 
   @override
-  Future<void> crateApiBackendSetWalletEns(
+  Future<void> crateApiSettingsSetWalletEns(
       {required BigInt walletIndex, required bool ensEnabled}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -795,20 +800,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetWalletEnsConstMeta,
+      constMeta: kCrateApiSettingsSetWalletEnsConstMeta,
       argValues: [walletIndex, ensEnabled],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetWalletEnsConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetWalletEnsConstMeta =>
       const TaskConstMeta(
         debugName: "set_wallet_ens",
         argNames: ["walletIndex", "ensEnabled"],
       );
 
   @override
-  Future<void> crateApiBackendSetWalletGasControl(
+  Future<void> crateApiSettingsSetWalletGasControl(
       {required BigInt walletIndex, required bool enabled}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -822,20 +827,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetWalletGasControlConstMeta,
+      constMeta: kCrateApiSettingsSetWalletGasControlConstMeta,
       argValues: [walletIndex, enabled],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetWalletGasControlConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetWalletGasControlConstMeta =>
       const TaskConstMeta(
         debugName: "set_wallet_gas_control",
         argNames: ["walletIndex", "enabled"],
       );
 
   @override
-  Future<void> crateApiBackendSetWalletIpfsNode(
+  Future<void> crateApiSettingsSetWalletIpfsNode(
       {required BigInt walletIndex, String? node}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -849,20 +854,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetWalletIpfsNodeConstMeta,
+      constMeta: kCrateApiSettingsSetWalletIpfsNodeConstMeta,
       argValues: [walletIndex, node],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetWalletIpfsNodeConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetWalletIpfsNodeConstMeta =>
       const TaskConstMeta(
         debugName: "set_wallet_ipfs_node",
         argNames: ["walletIndex", "node"],
       );
 
   @override
-  Future<void> crateApiBackendSetWalletNodeRanking(
+  Future<void> crateApiSettingsSetWalletNodeRanking(
       {required BigInt walletIndex, required bool enabled}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -876,20 +881,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetWalletNodeRankingConstMeta,
+      constMeta: kCrateApiSettingsSetWalletNodeRankingConstMeta,
       argValues: [walletIndex, enabled],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetWalletNodeRankingConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetWalletNodeRankingConstMeta =>
       const TaskConstMeta(
         debugName: "set_wallet_node_ranking",
         argNames: ["walletIndex", "enabled"],
       );
 
   @override
-  Future<void> crateApiBackendSetWalletNotifications(
+  Future<void> crateApiSettingsSetWalletNotifications(
       {required BigInt walletIndex,
       required bool transactions,
       required bool price,
@@ -910,13 +915,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSetWalletNotificationsConstMeta,
+      constMeta: kCrateApiSettingsSetWalletNotificationsConstMeta,
       argValues: [walletIndex, transactions, price, security, balance],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSetWalletNotificationsConstMeta =>
+  TaskConstMeta get kCrateApiSettingsSetWalletNotificationsConstMeta =>
       const TaskConstMeta(
         debugName: "set_wallet_notifications",
         argNames: [
@@ -1003,7 +1008,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiBackendSyncBalances({required BigInt walletIndex}) {
+  Future<void> crateApiTokenSyncBalances({required BigInt walletIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1015,20 +1020,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_unit,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendSyncBalancesConstMeta,
+      constMeta: kCrateApiTokenSyncBalancesConstMeta,
       argValues: [walletIndex],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendSyncBalancesConstMeta =>
-      const TaskConstMeta(
+  TaskConstMeta get kCrateApiTokenSyncBalancesConstMeta => const TaskConstMeta(
         debugName: "sync_balances",
         argNames: ["walletIndex"],
       );
 
   @override
-  Future<bool> crateApiBackendTryUnlockWithPassword(
+  Future<bool> crateApiAuthTryUnlockWithPassword(
       {required String password,
       required BigInt walletIndex,
       required List<String> identifiers}) {
@@ -1045,20 +1049,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_bool,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendTryUnlockWithPasswordConstMeta,
+      constMeta: kCrateApiAuthTryUnlockWithPasswordConstMeta,
       argValues: [password, walletIndex, identifiers],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendTryUnlockWithPasswordConstMeta =>
+  TaskConstMeta get kCrateApiAuthTryUnlockWithPasswordConstMeta =>
       const TaskConstMeta(
         debugName: "try_unlock_with_password",
         argNames: ["password", "walletIndex", "identifiers"],
       );
 
   @override
-  Future<bool> crateApiBackendTryUnlockWithSession(
+  Future<bool> crateApiAuthTryUnlockWithSession(
       {required String sessionCipher,
       required BigInt walletIndex,
       required List<String> identifiers}) {
@@ -1075,13 +1079,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_bool,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiBackendTryUnlockWithSessionConstMeta,
+      constMeta: kCrateApiAuthTryUnlockWithSessionConstMeta,
       argValues: [sessionCipher, walletIndex, identifiers],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiBackendTryUnlockWithSessionConstMeta =>
+  TaskConstMeta get kCrateApiAuthTryUnlockWithSessionConstMeta =>
       const TaskConstMeta(
         debugName: "try_unlock_with_session",
         argNames: ["sessionCipher", "walletIndex", "identifiers"],
