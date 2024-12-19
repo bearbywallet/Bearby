@@ -6,6 +6,7 @@
 import 'api/auth.dart';
 import 'api/backend.dart';
 import 'api/book.dart';
+import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/methods.dart';
 import 'api/settings.dart';
@@ -18,6 +19,7 @@ import 'frb_generated.dart';
 import 'models/account.dart';
 import 'models/background.dart';
 import 'models/book.dart';
+import 'models/connection.dart';
 import 'models/ftoken.dart';
 import 'models/notification.dart';
 import 'models/wallet.dart';
@@ -77,6 +79,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
+
+  @protected
+  ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
+
+  @protected
+  ColorsInfo dco_decode_colors_info(dynamic raw);
+
+  @protected
+  ConnectionInfo dco_decode_connection_info(dynamic raw);
+
+  @protected
   FTokenInfo dco_decode_f_token_info(dynamic raw);
 
   @protected
@@ -91,6 +105,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<AddressBookEntryInfo> dco_decode_list_address_book_entry_info(
       dynamic raw);
+
+  @protected
+  List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw);
 
   @protected
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
@@ -115,6 +132,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? dco_decode_opt_String(dynamic raw);
 
   @protected
+  ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw);
+
+  @protected
   (String, String) dco_decode_record_string_string(dynamic raw);
 
   @protected
@@ -126,6 +146,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int dco_decode_u_32(dynamic raw);
+
+  @protected
+  BigInt dco_decode_u_64(dynamic raw);
 
   @protected
   int dco_decode_u_8(dynamic raw);
@@ -185,6 +208,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
+
+  @protected
+  ConnectionInfo sse_decode_box_autoadd_connection_info(
+      SseDeserializer deserializer);
+
+  @protected
+  ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
+
+  @protected
+  ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer);
+
+  @protected
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
   @protected
@@ -198,6 +234,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<AddressBookEntryInfo> sse_decode_list_address_book_entry_info(
+      SseDeserializer deserializer);
+
+  @protected
+  List<ConnectionInfo> sse_decode_list_connection_info(
       SseDeserializer deserializer);
 
   @protected
@@ -225,6 +265,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   String? sse_decode_opt_String(SseDeserializer deserializer);
 
   @protected
+  ColorsInfo? sse_decode_opt_box_autoadd_colors_info(
+      SseDeserializer deserializer);
+
+  @protected
   (String, String) sse_decode_record_string_string(
       SseDeserializer deserializer);
 
@@ -238,6 +282,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   int sse_decode_u_32(SseDeserializer deserializer);
+
+  @protected
+  BigInt sse_decode_u_64(SseDeserializer deserializer);
 
   @protected
   int sse_decode_u_8(SseDeserializer deserializer);
@@ -302,6 +349,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_colors_info(
+      ColorsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_connection_info(
+      ConnectionInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_connection_info(
+      ConnectionInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
   @protected
@@ -317,6 +379,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_address_book_entry_info(
       List<AddressBookEntryInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_connection_info(
+      List<ConnectionInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_f_token_info(
@@ -347,6 +413,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_String(String? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_colors_info(
+      ColorsInfo? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_record_string_string(
       (String, String) self, SseSerializer serializer);
 
@@ -360,6 +430,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_u_32(int self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_u_64(BigInt self, SseSerializer serializer);
 
   @protected
   void sse_encode_u_8(int self, SseSerializer serializer);
