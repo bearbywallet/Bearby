@@ -11,8 +11,8 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 
 class PasswordSetupPage extends StatefulWidget {

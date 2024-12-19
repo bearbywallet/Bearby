@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/password_change.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 
 import '../components/custom_app_bar.dart';

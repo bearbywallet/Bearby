@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:blockies/blockies.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 
 import '../components/load_button.dart';

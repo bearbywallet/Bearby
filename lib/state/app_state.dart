@@ -2,6 +2,8 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/settings.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';

@@ -11,7 +11,7 @@ import 'package:zilpay/components/wallet_header.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/modals/manage_tokens.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 
