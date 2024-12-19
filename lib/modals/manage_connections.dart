@@ -57,7 +57,7 @@ class _ConnectedDappsModalContentState
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
-    final connectedDapps = appState.connectedDapps;
+    final connectedDapps = appState.connections;
 
     // Calculate container height based on content
     final double headerHeight = 84.0;
@@ -132,10 +132,10 @@ class _ConnectedDappsModalContentState
       return [];
     }
 
-    final filteredDapps = appState.connectedDapps
+    final filteredDapps = appState.connections
         .where((dapp) =>
-            dapp.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            dapp.url.toLowerCase().contains(_searchQuery.toLowerCase()))
+            dapp.domain.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            dapp.title.toLowerCase().contains(_searchQuery.toLowerCase()))
         .toList();
 
     final List<Widget> items = [];
@@ -143,11 +143,11 @@ class _ConnectedDappsModalContentState
       final dapp = filteredDapps[i];
       items.add(
         _DappListItem(
-          name: dapp.name,
-          url: dapp.url,
-          iconUrl: dapp.iconUrl,
-          lastConnected: dapp.lastConnected,
-          onDisconnect: () => widget.onDappDisconnect?.call(dapp.url),
+          name: dapp.title,
+          url: dapp.domain,
+          iconUrl: dapp.favicon ?? "",
+          lastConnected: fromLargeBigInt(dapp.lastConnected),
+          onDisconnect: () => widget.onDappDisconnect?.call(dapp.domain),
         ),
       );
 
@@ -163,6 +163,10 @@ class _ConnectedDappsModalContentState
     }
 
     return items;
+  }
+
+  DateTime fromLargeBigInt(BigInt timestamp) {
+    return DateTime.fromMillisecondsSinceEpoch(int.parse(timestamp.toString()));
   }
 }
 

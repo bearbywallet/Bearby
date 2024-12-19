@@ -83,13 +83,16 @@ class _WalletPageState extends State<WalletPage> {
         onChanged: (value) => debugPrint("enable Zilliqa legacy mode"),
       ),
       WalletPreferenceItem(
-        title: 'Manage connections',
-        iconPath: 'assets/icons/globe.svg',
-        onTap: () => showConnectedDappsModal(
-          context: context,
-          onDappDisconnect: _handleDappDisconnect,
-        ),
-      ),
+          title: 'Manage connections',
+          iconPath: 'assets/icons/globe.svg',
+          onTap: () {
+            if (appState.connections.length > 0) {
+              showConnectedDappsModal(
+                context: context,
+                onDappDisconnect: _handleDappDisconnect,
+              );
+            }
+          }),
       if (!appState.wallet!.walletType.contains(WalletType.ledger.name))
         WalletPreferenceItem(
           title: 'Backup',
@@ -281,7 +284,7 @@ class _WalletPageState extends State<WalletPage> {
               )
             else if (item.title == 'Manage connections')
               Text(
-                '${appState.connectedDapps.length}',
+                '${appState.connections.length}',
                 style: TextStyle(
                   color: theme.textSecondary,
                   fontSize: _fontSize,
