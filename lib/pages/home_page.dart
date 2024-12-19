@@ -237,9 +237,9 @@ class _HomePageState extends State<HomePage> {
                           final token = entry.value;
                           final isLast =
                               entry.key == appState.wallet!.tokens.length - 1;
-                          final account = appState.account!;
-                          String tokenAmountValue =
-                              token.balances[account.addr] ?? "0";
+                          String tokenAmountValue = token
+                                  .balances[appState.wallet!.selectedAccount] ??
+                              "0";
                           double tokenAmount = 0;
 
                           try {
