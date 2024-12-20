@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -54,13 +55,23 @@ class SendTokenPage extends StatelessWidget {
                               tokenIndex: 0,
                               onMaxTap: () {},
                             ),
-                            const SizedBox(
-                              height: 8,
+                            SvgPicture.asset(
+                              "assets/icons/down_arrow.svg",
+                              width: 20,
+                              height: 20,
+                              colorFilter: ColorFilter.mode(
+                                theme.textSecondary.withOpacity(0.2),
+                                BlendMode.srcIn,
+                              ),
                             ),
                             WalletSelectionCard(
-                              walletName: "test",
-                              transferCount: 232,
-                              onTap: () {},
+                              walletName: 'My Wallet',
+                              transferCount: 5,
+                              address: '0x123...',
+                              onTap: () {
+                                debugPrint("clicked");
+                                // Your tap handler
+                              },
                             ),
                             NumberKeyboard(
                               onKeyPressed: (value) {

@@ -34,7 +34,7 @@ class TokenAmountCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(
-          color: Colors.white.withOpacity(0.2),
+          color: theme.textSecondary.withOpacity(0.2),
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(24),
