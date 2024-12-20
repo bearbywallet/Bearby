@@ -2,12 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class TokenAmountCard extends StatelessWidget {
+class TokenAmountCard extends StatefulWidget {
   final String amount;
   final String convertAmount;
-  final int tokenIndex;
+  final int initialTokenIndex;
   final bool showMax;
   final VoidCallback? onMaxTap;
 
@@ -15,16 +17,29 @@ class TokenAmountCard extends StatelessWidget {
     super.key,
     this.amount = "1",
     this.convertAmount = "3,667.88",
-    this.tokenIndex = 0,
+    this.initialTokenIndex = 0,
     this.showMax = true,
     this.onMaxTap,
   });
 
   @override
+  State<TokenAmountCard> createState() => _TokenAmountCardState();
+}
+
+class _TokenAmountCardState extends State<TokenAmountCard> {
+  late int _tokenIndex;
+
+  @override
+  void initState() {
+    super.initState();
+    _tokenIndex = widget.initialTokenIndex;
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens[tokenIndex];
+    final token = appState.wallet!.tokens[_tokenIndex];
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustBalanceToDouble(bigBalance, token.decimals);
@@ -46,7 +61,7 @@ class TokenAmountCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                amount,
+                widget.amount,
                 style: const TextStyle(
                   color: Colors.white,
                   fontSize: 42,
@@ -54,7 +69,7 @@ class TokenAmountCard extends StatelessWidget {
                 ),
               ),
               Text(
-                convertAmount,
+                widget.convertAmount,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.7),
                   fontSize: 28,
@@ -66,45 +81,76 @@ class TokenAmountCard extends StatelessWidget {
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: Colors.white.withOpacity(0.2),
-                    width: 1.5,
+              GestureDetector(
+                onTap: () {
+                  showTokenSelectModal(
+                    context: context,
+                    onTokenSelected: (int tokenIndex) {
+                      setState(() {
+                        _tokenIndex = tokenIndex;
+                      });
+                    },
+                  );
+                },
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: Colors.white.withOpacity(0.2),
+                      width: 1.5,
+                    ),
+                    borderRadius: BorderRadius.circular(16),
                   ),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        border: Border.all(
-                          color: Colors.white.withOpacity(0.2),
-                          width: 1.5,
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        width: 24,
+                        height: 24,
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: Colors.white.withOpacity(0.2),
+                            width: 1.5,
+                          ),
+                          borderRadius: BorderRadius.circular(24),
                         ),
-                        borderRadius: BorderRadius.circular(24),
+                        child: SvgPicture.network(
+                          viewIcon(token.addr, "Dark"),
+                          width: 30,
+                          height: 30,
+                          fit: BoxFit.cover,
+                          placeholderBuilder: (context) => Container(
+                            width: 30,
+                            height: 30,
+                            decoration: BoxDecoration(
+                              color: theme.textSecondary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(30 / 2),
+                            ),
+                            child: Center(
+                              child: SizedBox(
+                                width: 30 / 2,
+                                height: 30 / 2,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: theme.textSecondary.withOpacity(0.5),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
-                      child: const Icon(
-                        Icons.currency_exchange,
-                        size: 16,
-                        color: Colors.white,
+                      const SizedBox(width: 8),
+                      Text(
+                        token.symbol,
+                        style: const TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      token.symbol,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
               const SizedBox(height: 8),
@@ -128,10 +174,10 @@ class TokenAmountCard extends StatelessWidget {
                       fontSize: 14,
                     ),
                   ),
-                  if (showMax) ...[
+                  if (widget.showMax) ...[
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: onMaxTap,
+                      onTap: widget.onMaxTap,
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,

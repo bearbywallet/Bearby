@@ -11,7 +11,7 @@ void showManageTokensModal({
   VoidCallback? onAddToken,
   Function(String)? onTokenToggle,
 }) {
-  showModalBottomSheet(
+  showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -100,8 +100,6 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Search Bar
           Padding(
             padding: const EdgeInsets.all(16),
             child: SmartInput(
