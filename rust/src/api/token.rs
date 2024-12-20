@@ -21,6 +21,46 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
+pub async fn update_rates() -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
+
+        core.update_rates()
+            .await
+            .map_err(ServiceError::BackgroundError)?;
+
+        Ok(())
+    } else {
+        Err(ServiceError::NotRunning.to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn get_rates() -> Result<String, String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
+        let value = core.get_rates();
+
+        Ok(value.to_string())
+    } else {
+        Err(ServiceError::NotRunning.to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn update_token_list(net: usize) -> Result<(), String> {
+    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
+        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
+
+        // TODO: add fetch tokens from ZilPay server.
+
+        Ok(())
+    } else {
+        Err(ServiceError::NotRunning.to_string())
+    }
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
