@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:zilpay/state/app_state.dart';
@@ -142,16 +143,6 @@ class _TokenCardState extends State<TokenCard> {
     );
   }
 
-  String formatAmount(double amount) {
-    if (amount >= 1e9) {
-      return '${(amount / 1e9).toStringAsFixed(2)}B';
-    } else if (amount >= 1e6) {
-      return '${(amount / 1e6).toStringAsFixed(2)}M';
-    } else {
-      return amount.toStringAsFixed(2);
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -211,7 +202,7 @@ class _TokenCardState extends State<TokenCard> {
                           Row(
                             children: [
                               Text(
-                                formatAmount(widget.tokenAmount),
+                                formatAmount(BigInt.from(widget.tokenAmount)),
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -221,7 +212,7 @@ class _TokenCardState extends State<TokenCard> {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                '${widget.currencySymbol}${formatAmount(widget.convertAmount)}',
+                                '${widget.currencySymbol}${formatAmount(BigInt.from(widget.convertAmount))}',
                                 style: TextStyle(
                                   color: theme.textSecondary.withOpacity(0.7),
                                   fontSize: 14,

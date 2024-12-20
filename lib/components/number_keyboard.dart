@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class NumberKeyboard extends StatefulWidget {
-  final Function(String) onKeyPressed;
+  final Function(int) onKeyPressed;
   final VoidCallback onBackspace;
   final VoidCallback? onDotPress;
 
@@ -58,7 +59,7 @@ class NumberKeyboardState extends State<NumberKeyboard>
       } else if (value == '.') {
         widget.onDotPress?.call();
       } else {
-        widget.onKeyPressed(value);
+        widget.onKeyPressed(int.parse(value));
       }
     }
 
@@ -70,6 +71,7 @@ class NumberKeyboardState extends State<NumberKeyboard>
       onTapUp: (_) {
         _controller.reverse();
         setState(() => activeKey = null);
+        handleTap();
       },
       onTapCancel: () {
         _controller.reverse();
@@ -80,13 +82,17 @@ class NumberKeyboardState extends State<NumberKeyboard>
         scale: isActive ? _scaleAnimation : const AlwaysStoppedAnimation(1.0),
         child: Container(
           width: 80,
-          height: 40,
+          height: 50,
           alignment: Alignment.center,
           child: isIcon
-              ? Icon(
-                  Icons.arrow_back,
-                  color: theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
-                  size: 24,
+              ? SvgPicture.asset(
+                  "assets/icons/backspace.svg",
+                  width: 30,
+                  height: 30,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
+                    BlendMode.srcIn,
+                  ),
                 )
               : Text(
                   value,

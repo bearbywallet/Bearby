@@ -48,7 +48,12 @@ class SendTokenPage extends StatelessWidget {
                             const SizedBox(
                               height: 16,
                             ),
-                            TokenAmountCard(),
+                            TokenAmountCard(
+                              amount: "0",
+                              convertAmount: "0",
+                              tokenIndex: 0,
+                              onMaxTap: () {},
+                            ),
                             const SizedBox(
                               height: 8,
                             ),
@@ -61,7 +66,12 @@ class SendTokenPage extends StatelessWidget {
                               onKeyPressed: (value) {
                                 debugPrint("value $value");
                               },
-                              onBackspace: () {},
+                              onBackspace: () {
+                                debugPrint("remove");
+                              },
+                              onDotPress: () {
+                                debugPrint(".");
+                              },
                             ),
                             const SizedBox(
                               height: 8,

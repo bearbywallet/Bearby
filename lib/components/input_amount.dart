@@ -1,25 +1,34 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class TokenAmountCard extends StatelessWidget {
   final String amount;
-  final String dollarAmount;
-  final String tokenSymbol;
-  final String balanceAmount;
+  final String convertAmount;
+  final int tokenIndex;
   final bool showMax;
   final VoidCallback? onMaxTap;
 
   const TokenAmountCard({
     super.key,
     this.amount = "1",
-    this.dollarAmount = "\$3,667.88",
-    this.tokenSymbol = "ETH",
-    this.balanceAmount = "0",
+    this.convertAmount = "3,667.88",
+    this.tokenIndex = 0,
     this.showMax = true,
     this.onMaxTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    final token = appState.wallet!.tokens[tokenIndex];
+    final bigBalance =
+        BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
+    final balance = adjustBalanceToDouble(bigBalance, token.decimals);
+
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -45,7 +54,7 @@ class TokenAmountCard extends StatelessWidget {
                 ),
               ),
               Text(
-                dollarAmount,
+                convertAmount,
                 style: TextStyle(
                   color: Colors.white.withOpacity(0.7),
                   fontSize: 28,
@@ -65,7 +74,6 @@ class TokenAmountCard extends StatelessWidget {
                     color: Colors.white.withOpacity(0.2),
                     width: 1.5,
                   ),
-                  // color: Colors.black.withOpacity(0.3),
                   borderRadius: BorderRadius.circular(16),
                 ),
                 child: Row(
@@ -89,7 +97,7 @@ class TokenAmountCard extends StatelessWidget {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      tokenSymbol,
+                      token.symbol,
                       style: const TextStyle(
                         color: Colors.white,
                         fontSize: 16,
@@ -103,14 +111,18 @@ class TokenAmountCard extends StatelessWidget {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  Icon(
-                    Icons.warning_amber_rounded,
-                    size: 16,
-                    color: Colors.amber.withOpacity(0.7),
+                  SvgPicture.asset(
+                    "assets/icons/warning.svg",
+                    width: 15,
+                    height: 15,
+                    colorFilter: ColorFilter.mode(
+                      theme.warning.withOpacity(0.7),
+                      BlendMode.srcIn,
+                    ),
                   ),
                   const SizedBox(width: 4),
                   Text(
-                    "$balanceAmount $tokenSymbol",
+                    balance.toString(),
                     style: TextStyle(
                       color: Colors.white.withOpacity(0.7),
                       fontSize: 14,
