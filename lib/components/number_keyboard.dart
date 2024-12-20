@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class NumberKeyboard extends StatelessWidget {
+class NumberKeyboard extends StatefulWidget {
   final Function(String) onKeyPressed;
   final VoidCallback onBackspace;
   final VoidCallback? onDotPress;
@@ -15,58 +15,94 @@ class NumberKeyboard extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
+  NumberKeyboardState createState() => NumberKeyboardState();
+}
+
+class NumberKeyboardState extends State<NumberKeyboard>
+    with SingleTickerProviderStateMixin {
+  String? activeKey;
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(begin: 1.0, end: 1.1).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeOut),
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  Widget _buildKey(BuildContext context, String value, {bool isIcon = false}) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final isActive = activeKey == value;
 
-    Widget buildKey(String value, {bool isIcon = false}) {
-      return StatefulBuilder(
-        builder: (context, setState) {
-          double scale = 1.0;
+    void handleTap() {
+      setState(() => activeKey = value);
+      _controller.forward().then((_) => _controller.reverse());
+      Future.delayed(const Duration(milliseconds: 200), () {
+        setState(() => activeKey = null);
+      });
 
-          void handleTap() {
-            setState(() => scale = 1.2);
-            Future.delayed(const Duration(milliseconds: 100), () {
-              setState(() => scale = 1.0);
-              if (value == '←') {
-                onBackspace();
-              } else if (value == '.') {
-                onDotPress?.call();
-              } else {
-                onKeyPressed(value);
-              }
-            });
-          }
-
-          return GestureDetector(
-            onTap: handleTap,
-            child: AnimatedScale(
-              scale: scale,
-              duration: const Duration(milliseconds: 100),
-              child: Container(
-                width: 80,
-                height: 40,
-                alignment: Alignment.center,
-                child: isIcon
-                    ? Icon(
-                        Icons.arrow_back,
-                        color: theme.textPrimary,
-                        size: 24,
-                      )
-                    : Text(
-                        value,
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 32,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-              ),
-            ),
-          );
-        },
-      );
+      if (value == '←') {
+        widget.onBackspace();
+      } else if (value == '.') {
+        widget.onDotPress?.call();
+      } else {
+        widget.onKeyPressed(value);
+      }
     }
 
+    return GestureDetector(
+      onTapDown: (_) {
+        setState(() => activeKey = value);
+        _controller.forward();
+      },
+      onTapUp: (_) {
+        _controller.reverse();
+        setState(() => activeKey = null);
+      },
+      onTapCancel: () {
+        _controller.reverse();
+        setState(() => activeKey = null);
+      },
+      behavior: HitTestBehavior.opaque,
+      child: ScaleTransition(
+        scale: isActive ? _scaleAnimation : const AlwaysStoppedAnimation(1.0),
+        child: Container(
+          width: 80,
+          height: 40,
+          alignment: Alignment.center,
+          child: isIcon
+              ? Icon(
+                  Icons.arrow_back,
+                  color: theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
+                  size: 24,
+                )
+              : Text(
+                  value,
+                  style: TextStyle(
+                    color: theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
+                    fontSize: 32,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 20),
       child: Column(
@@ -74,25 +110,28 @@ class NumberKeyboard extends StatelessWidget {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: ['1', '2', '3'].map((e) => buildKey(e)).toList(),
+            children:
+                ['1', '2', '3'].map((e) => _buildKey(context, e)).toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: ['4', '5', '6'].map((e) => buildKey(e)).toList(),
+            children:
+                ['4', '5', '6'].map((e) => _buildKey(context, e)).toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: ['7', '8', '9'].map((e) => buildKey(e)).toList(),
+            children:
+                ['7', '8', '9'].map((e) => _buildKey(context, e)).toList(),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 6),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              buildKey('.'),
-              buildKey('0'),
-              buildKey('←', isIcon: true),
+              _buildKey(context, '.'),
+              _buildKey(context, '0'),
+              _buildKey(context, '←', isIcon: true),
             ],
           ),
         ],
