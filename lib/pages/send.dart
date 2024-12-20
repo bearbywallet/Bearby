@@ -7,6 +7,7 @@ import 'package:zilpay/components/input_amount.dart';
 import 'package:zilpay/components/number_keyboard.dart';
 import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SendTokenPage extends StatefulWidget {
@@ -17,9 +18,50 @@ class SendTokenPage extends StatefulWidget {
 }
 
 class _SendTokenPageState extends State<SendTokenPage> {
+  int tokenIndex = 0;
   String amount = "0";
   String convertAmount = "0";
   bool hasDecimalPoint = false;
+  String? address;
+  String? walletName;
+
+  late final AppState _appState;
+
+  @override
+  void initState() {
+    super.initState();
+    _appState = Provider.of<AppState>(context, listen: false);
+  }
+
+  bool get isValidAmount {
+    if (amount.endsWith('.')) {
+      return false;
+    }
+
+    try {
+      final numAmount = double.parse(amount);
+      final token = _appState.wallet!.tokens[tokenIndex];
+      final bigBalance = BigInt.parse(
+          token.balances[_appState.wallet!.selectedAccount] ?? '0');
+      final balance = adjustBalanceToDouble(bigBalance, token.decimals);
+
+      return numAmount > 0 && numAmount <= balance;
+    } catch (e) {
+      debugPrint("amoutn is not valid $e");
+      return false;
+    }
+  }
+
+  bool get isValidAddress {
+    if (address == null || address!.isEmpty) {
+      return false;
+    }
+
+    return true;
+  }
+
+  // Combined validation for submit button
+  bool get isFormValid => isValidAmount && isValidAddress;
 
   void updateAmount(String value) {
     setState(() {
@@ -28,8 +70,13 @@ class _SendTokenPageState extends State<SendTokenPage> {
       } else {
         amount += value;
       }
-      // Here you can add logic to calculate convertAmount based on exchange rates
-      convertAmount = amount; // Placeholder conversion
+    });
+  }
+
+  void updateAddress(String value, String name) {
+    setState(() {
+      address = value;
+      walletName = name;
     });
   }
 
@@ -42,11 +89,9 @@ class _SendTokenPageState extends State<SendTokenPage> {
         });
       }
     } else {
-      // Prevent more than 8 digits before decimal point
       int decimalIndex = amount.indexOf('.');
       int wholeNumberLength = decimalIndex == -1 ? amount.length : decimalIndex;
 
-      // Prevent more than 2 digits after decimal point
       if (decimalIndex != -1 && amount.length - decimalIndex > 2) {
         return;
       }
@@ -68,8 +113,14 @@ class _SendTokenPageState extends State<SendTokenPage> {
         amount = "0";
         hasDecimalPoint = false;
       }
-      convertAmount = amount; // Update conversion
     });
+  }
+
+  void handleSubmit() {
+    if (isFormValid) {
+      // Implement your submit logic here
+      print('Submitting with amount: $amount and address: $address');
+    }
   }
 
   @override
@@ -110,9 +161,17 @@ class _SendTokenPageState extends State<SendTokenPage> {
                             TokenAmountCard(
                               amount: amount,
                               convertAmount: convertAmount,
-                              initialTokenIndex: 0,
-                              onMaxTap: () {
-                                // Implement max amount logic here
+                              tokenIndex: tokenIndex,
+                              onMaxTap: (String value) {
+                                setState(() {
+                                  amount = value;
+                                });
+                              },
+                              onTokenSelected: (int value) {
+                                setState(() {
+                                  tokenIndex = value;
+                                  amount = '0';
+                                });
                               },
                             ),
                             SvgPicture.asset(
@@ -124,7 +183,11 @@ class _SendTokenPageState extends State<SendTokenPage> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            WalletSelectionCard(),
+                            WalletSelectionCard(
+                              address: address,
+                              walletName: walletName,
+                              onChange: updateAddress,
+                            ),
                             NumberKeyboard(
                               onKeyPressed: (value) {
                                 handleKeyPress(value.toString());
@@ -132,12 +195,10 @@ class _SendTokenPageState extends State<SendTokenPage> {
                               onBackspace: handleBackspace,
                               onDotPress: () => handleKeyPress("."),
                             ),
-                            const SizedBox(height: 8),
                             CustomButton(
-                              text: "submit",
-                              onPressed: () {
-                                // Implement submit logic
-                              },
+                              text: "Submit",
+                              onPressed: handleSubmit,
+                              disabled: !isFormValid,
                             ),
                           ],
                         ),

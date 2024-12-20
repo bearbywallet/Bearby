@@ -9,17 +9,19 @@ import 'package:zilpay/state/app_state.dart';
 class TokenAmountCard extends StatefulWidget {
   final String amount;
   final String convertAmount;
-  final int initialTokenIndex;
+  final int tokenIndex;
   final bool showMax;
-  final VoidCallback? onMaxTap;
+  final Function(String) onMaxTap;
+  final Function(int) onTokenSelected;
 
   const TokenAmountCard({
     super.key,
     this.amount = "1",
     this.convertAmount = "3,667.88",
-    this.initialTokenIndex = 0,
+    this.tokenIndex = 0,
     this.showMax = true,
-    this.onMaxTap,
+    required this.onMaxTap,
+    required this.onTokenSelected,
   });
 
   @override
@@ -27,19 +29,16 @@ class TokenAmountCard extends StatefulWidget {
 }
 
 class _TokenAmountCardState extends State<TokenAmountCard> {
-  late int _tokenIndex;
-
   @override
   void initState() {
     super.initState();
-    _tokenIndex = widget.initialTokenIndex;
   }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens[_tokenIndex];
+    final token = appState.wallet!.tokens[widget.tokenIndex];
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustBalanceToDouble(bigBalance, token.decimals);
@@ -85,11 +84,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                 onTap: () {
                   showTokenSelectModal(
                     context: context,
-                    onTokenSelected: (int tokenIndex) {
-                      setState(() {
-                        _tokenIndex = tokenIndex;
-                      });
-                    },
+                    onTokenSelected: widget.onTokenSelected,
                   );
                 },
                 child: Container(
@@ -157,15 +152,16 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  SvgPicture.asset(
-                    "assets/icons/warning.svg",
-                    width: 15,
-                    height: 15,
-                    colorFilter: ColorFilter.mode(
-                      theme.warning.withOpacity(0.7),
-                      BlendMode.srcIn,
+                  if (_getAmount() > balance)
+                    SvgPicture.asset(
+                      "assets/icons/warning.svg",
+                      width: 15,
+                      height: 15,
+                      colorFilter: ColorFilter.mode(
+                        theme.warning.withOpacity(0.7),
+                        BlendMode.srcIn,
+                      ),
                     ),
-                  ),
                   const SizedBox(width: 4),
                   Text(
                     balance.toString(),
@@ -177,7 +173,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                   if (widget.showMax) ...[
                     const SizedBox(width: 8),
                     GestureDetector(
-                      onTap: widget.onMaxTap,
+                      onTap: () => widget.onMaxTap(balance.toString()),
                       child: Container(
                         padding: const EdgeInsets.symmetric(
                           horizontal: 8,
@@ -205,5 +201,13 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         ],
       ),
     );
+  }
+
+  double _getAmount() {
+    try {
+      return double.parse(widget.amount);
+    } catch (e) {
+      return 0;
+    }
   }
 }

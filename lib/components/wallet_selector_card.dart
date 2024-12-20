@@ -6,13 +6,15 @@ import 'package:zilpay/modals/select_address.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class WalletSelectionCard extends StatefulWidget {
-  final String? initedWalletName;
-  final String? initedAddress;
+  final String? walletName;
+  final String? address;
+  final Function(String, String) onChange;
 
   const WalletSelectionCard({
     super.key,
-    this.initedWalletName,
-    this.initedAddress,
+    this.walletName,
+    this.address,
+    required this.onChange,
   });
 
   @override
@@ -20,25 +22,13 @@ class WalletSelectionCard extends StatefulWidget {
 }
 
 class _WalletSelectionCardState extends State<WalletSelectionCard> {
-  late String _name;
-  late String _address;
   bool isPressed = false;
 
   @override
   void initState() {
     super.initState();
 
-    if (widget.initedWalletName != null) {
-      _name = widget.initedWalletName!;
-    } else {
-      _name = "";
-    }
-
-    if (widget.initedAddress != null) {
-      _address = widget.initedAddress!;
-    } else {
-      _address = "";
-
+    if (widget.address == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _showAccountsModal();
       });
@@ -83,7 +73,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                 ),
                 child: ClipOval(
                   child: Blockies(
-                    seed: _address,
+                    seed: widget.address ?? "",
                     color: getWalletColor(0),
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
@@ -97,7 +87,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      _name,
+                      widget.walletName ?? "",
                       style: TextStyle(
                         color: theme.textPrimary,
                         fontSize: 18,
@@ -106,10 +96,10 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      _address,
+                      widget.address ?? "",
                       style: TextStyle(
                         color: theme.textSecondary,
-                        fontSize: 14,
+                        fontSize: 12,
                       ),
                     ),
                   ],
@@ -125,12 +115,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
   void _showAccountsModal() {
     showAddressSelectModal(
       context: context,
-      onAddressSelected: (String address, String name) {
-        setState(() {
-          _name = name;
-          _address = address;
-        });
-      },
+      onAddressSelected: widget.onChange,
     );
   }
 }
