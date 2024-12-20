@@ -4,6 +4,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/token_select_item.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
 
@@ -141,7 +142,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     );
   }
 
-  List<dynamic> _getFilteredTokens(AppState appState) {
+  List<FTokenInfo> _getFilteredTokens(AppState appState) {
     if (appState.wallet == null) {
       return [];
     }

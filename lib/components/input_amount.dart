@@ -52,7 +52,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           color: theme.textSecondary.withOpacity(0.2),
           width: 1.5,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,

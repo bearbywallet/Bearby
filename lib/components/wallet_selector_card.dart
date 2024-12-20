@@ -2,20 +2,17 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/modals/select_address.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class WalletSelectionCard extends StatefulWidget {
-  final String walletName;
-  final int transferCount;
-  final VoidCallback onTap;
-  final String address;
+  final String? initedWalletName;
+  final String? initedAddress;
 
   const WalletSelectionCard({
     super.key,
-    required this.walletName,
-    required this.transferCount,
-    required this.onTap,
-    required this.address,
+    this.initedWalletName,
+    this.initedAddress,
   });
 
   @override
@@ -23,32 +20,54 @@ class WalletSelectionCard extends StatefulWidget {
 }
 
 class _WalletSelectionCardState extends State<WalletSelectionCard> {
-  bool isHovered = false;
+  late String _name;
+  late String _address;
   bool isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.initedWalletName != null) {
+      _name = widget.initedWalletName!;
+    } else {
+      _name = "";
+    }
+
+    if (widget.initedAddress != null) {
+      _address = widget.initedAddress!;
+    } else {
+      _address = "";
+
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _showAccountsModal();
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     return MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
+      onEnter: (_) => setState(() => isPressed = true),
+      onExit: (_) => setState(() => isPressed = false),
       child: GestureDetector(
         onTapDown: (_) => setState(() => isPressed = true),
         onTapUp: (_) => setState(() => isPressed = false),
         onTapCancel: () => setState(() => isPressed = false),
-        onTap: widget.onTap,
+        onTap: _showAccountsModal,
         child: Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: Colors.transparent,
+            color: isPressed
+                ? theme.cardBackground.withOpacity(0.6)
+                : Colors.transparent,
             border: Border.all(
-              color: theme.textSecondary.withOpacity(
-                isPressed ? 0.8 : (isHovered ? 0.4 : 0.2),
-              ),
+              color: theme.textSecondary.withOpacity(0.2),
               width: 1.5,
             ),
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(16),
           ),
           child: Row(
             children: [
@@ -64,7 +83,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                 ),
                 child: ClipOval(
                   child: Blockies(
-                    seed: widget.address,
+                    seed: _address,
                     color: getWalletColor(0),
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
@@ -78,7 +97,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      widget.walletName,
+                      _name,
                       style: TextStyle(
                         color: theme.textPrimary,
                         fontSize: 18,
@@ -87,7 +106,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${widget.transferCount} previous transfers',
+                      _address,
                       style: TextStyle(
                         color: theme.textSecondary,
                         fontSize: 14,
@@ -100,6 +119,18 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showAccountsModal() {
+    showAddressSelectModal(
+      context: context,
+      onAddressSelected: (String address, String name) {
+        setState(() {
+          _name = name;
+          _address = address;
+        });
+      },
     );
   }
 }

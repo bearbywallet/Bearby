@@ -124,14 +124,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            WalletSelectionCard(
-                              walletName: 'My Wallet',
-                              transferCount: 5,
-                              address: '0x123...',
-                              onTap: () {
-                                debugPrint("clicked");
-                              },
-                            ),
+                            WalletSelectionCard(),
                             NumberKeyboard(
                               onKeyPressed: (value) {
                                 handleKeyPress(value.toString());
