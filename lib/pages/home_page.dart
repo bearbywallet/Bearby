@@ -43,6 +43,7 @@ class _HomePageState extends State<HomePage> {
     try {
       BigInt index = BigInt.from(appState.selectedWallet);
       await syncBalances(walletIndex: index);
+      await appState.updateTokensRates();
       await appState.syncData();
       setState(() {});
     } catch (e) {

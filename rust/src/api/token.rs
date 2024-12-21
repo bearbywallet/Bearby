@@ -22,8 +22,8 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn update_rates() -> Result<(), String> {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
+    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
+        let core = Arc::clone(&service.core);
 
         core.update_rates()
             .await

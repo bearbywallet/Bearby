@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
@@ -5,6 +6,7 @@ import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
@@ -16,6 +18,7 @@ import 'package:zilpay/theme/app_theme.dart';
 class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<AddressBookEntryInfo> _book = [];
   List<ConnectionInfo> _connections = [];
+  Map<String, double> _rates = {};
 
   late BackgroundState _state;
   int _selectedWallet = 0;
@@ -42,6 +45,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   List<AddressBookEntryInfo> get book {
     return _book;
+  }
+
+  Map<String, double> get rates {
+    return _rates;
   }
 
   BackgroundState get state {
@@ -87,6 +94,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
+    await syncTokenRates();
     notifyListeners();
   }
 
@@ -94,6 +102,38 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _book = await getAddressBookList();
 
     notifyListeners();
+  }
+
+  Future<void> syncTokenRates() async {
+    if (wallet?.currencyConvert?.isEmpty ?? true) {
+      return;
+    }
+
+    try {
+      String value = await getRates();
+
+      Map<String, dynamic> rawJson = jsonDecode(value);
+      Map<String, double> jsonValue = rawJson
+          .map((key, value) => MapEntry(key, double.parse(value.toString())));
+      _rates = jsonValue;
+
+      notifyListeners();
+    } catch (e) {
+      debugPrint("error get rates $e");
+    }
+  }
+
+  Future<void> updateTokensRates() async {
+    if (wallet?.currencyConvert?.isEmpty ?? true) {
+      return;
+    }
+
+    try {
+      await updateRates();
+      notifyListeners();
+    } catch (e) {
+      debugPrint("error fetch rates $e");
+    }
   }
 
   Future<void> syncConnections() async {

@@ -14,22 +14,9 @@ class CurrencyConversionPage extends StatefulWidget {
 }
 
 class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
-  final List<Currency> currencies = [
-    Currency('RUB', 'Russian Ruble'),
-    Currency('EUR', 'Euro'),
-    Currency('IDR', 'Indonesian Rupiah'),
-    Currency('USD', 'United States Dollar'),
-    Currency('UAH', 'Ukrainian hryvnia'),
-    Currency('UZS', 'Uzbekistani sum'),
-    Currency('INR', 'Indian Rupee'),
-    Currency('GBP', 'Great Britain Pound'),
-    Currency('AED', 'United Arab Emirates Dirham'),
-    Currency('CNY', 'China Yuan'),
-    Currency('BYN', 'Belarusian Ruble'),
-    Currency('BRL', 'Brazilian Real'),
-  ];
+  late List<Currency> currencies = [];
 
-  String selectedCurrency = 'RUB';
+  String selectedCurrency = 'btc';
 
   @override
   void initState() {
@@ -37,6 +24,13 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = Provider.of<AppState>(context, listen: false);
+
+      setState(() {
+        currencies =
+            state.rates.keys.map((code) => Currency(code, '')).toList();
+        ;
+      });
+
       if (state.wallet?.currencyConvert != null) {
         setState(() {
           selectedCurrency = state.wallet!.currencyConvert!;
@@ -79,8 +73,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                           itemCount: currencies.length,
                           itemBuilder: (context, index) {
                             final currency = currencies[index];
-                            final isSelected =
-                                currency.code == selectedCurrency;
+                            final isSelected = currency.code.toLowerCase() ==
+                                selectedCurrency.toLowerCase();
 
                             return _buildCurrencyItem(
                               theme,
@@ -141,10 +135,17 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
               Switch(
                 value: state.wallet!.currencyConvert != null,
                 onChanged: (value) async {
-                  await setRateFetcher(
-                    walletIndex: BigInt.from(state.selectedWallet),
-                    currency: value ? selectedCurrency : null,
-                  );
+                  if (value) {
+                    await setRateFetcher(
+                      walletIndex: BigInt.from(state.selectedWallet),
+                      currency: selectedCurrency,
+                    );
+                  } else {
+                    await setRateFetcher(
+                      walletIndex: BigInt.from(state.selectedWallet),
+                      currency: value ? selectedCurrency : null,
+                    );
+                  }
 
                   await state.syncData();
                 },
@@ -189,7 +190,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
             SizedBox(
               width: 60,
               child: Text(
-                currency.code,
+                currency.code.toUpperCase(),
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 16,
