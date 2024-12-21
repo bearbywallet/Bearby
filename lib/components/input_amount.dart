@@ -41,7 +41,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final token = appState.wallet!.tokens[widget.tokenIndex];
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
-    final balance = adjustBalanceToDouble(bigBalance, token.decimals);
+    final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
     return Container(
       padding: const EdgeInsets.all(20),

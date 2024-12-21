@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/cupertino.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -246,20 +244,13 @@ class _HomePageState extends State<HomePage> {
                           String tokenAmountValue = token
                                   .balances[appState.wallet!.selectedAccount] ??
                               "0";
-                          double tokenAmount = 0;
-
-                          try {
-                            tokenAmount = double.parse(tokenAmountValue);
-                            double divisor = pow(10, token.decimals).toDouble();
-                            tokenAmount = tokenAmount / divisor;
-                          } catch (e) {
-                            ///
-                          }
 
                           return TokenCard(
-                            tokenAmount: tokenAmount,
+                            currencySymbol:
+                                appState.wallet!.currencyConvert ?? "",
+                            tokenAmount: tokenAmountValue,
                             tokenAddr: token.addr,
-                            convertAmount: 0,
+                            tokenDecimals: token.decimals,
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,

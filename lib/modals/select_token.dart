@@ -161,7 +161,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     final tokenIndex = tokens.indexOf(token);
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
-    final balance = adjustBalanceToDouble(bigBalance, token.decimals);
+    final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
     return TokenSelectItem(
       symbol: token.symbol,

@@ -43,7 +43,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
       final token = _appState.wallet!.tokens[tokenIndex];
       final bigBalance = BigInt.parse(
           token.balances[_appState.wallet!.selectedAccount] ?? '0');
-      final balance = adjustBalanceToDouble(bigBalance, token.decimals);
+      final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
       return numAmount > 0 && numAmount <= balance;
     } catch (e) {

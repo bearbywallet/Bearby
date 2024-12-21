@@ -10,8 +10,8 @@ import 'package:zilpay/state/app_state.dart';
 
 // TODO: make a cache image loading! remove http
 class TokenCard extends StatefulWidget {
-  final double tokenAmount;
-  final double convertAmount;
+  final String tokenAmount;
+  final int tokenDecimals;
   final String tokenName;
   final String tokenSymbol;
   final String tokenAddr;
@@ -23,12 +23,12 @@ class TokenCard extends StatefulWidget {
   const TokenCard({
     super.key,
     required this.tokenAmount,
-    required this.convertAmount,
+    required this.tokenDecimals,
     required this.tokenName,
     required this.tokenSymbol,
     required this.tokenAddr,
     required this.iconUrl,
-    this.currencySymbol = '\$',
+    required this.currencySymbol,
     this.showDivider = true,
     this.onTap,
   });
@@ -145,8 +145,12 @@ class _TokenCardState extends State<TokenCard> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final state = Provider.of<AppState>(context);
+    final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final double tokenAmount = _getAmount();
+    final convertedAmount = getConvertedAmount(state, tokenAmount);
+    final String amount = formatCompactNumber(tokenAmount);
 
     return Column(
       children: [
@@ -202,7 +206,7 @@ class _TokenCardState extends State<TokenCard> {
                           Row(
                             children: [
                               Text(
-                                formatAmount(BigInt.from(widget.tokenAmount)),
+                                amount,
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontSize: 20,
@@ -212,7 +216,7 @@ class _TokenCardState extends State<TokenCard> {
                               ),
                               const SizedBox(width: 2),
                               Text(
-                                '${widget.currencySymbol}${formatAmount(BigInt.from(widget.convertAmount))}',
+                                '$convertedAmount${widget.currencySymbol}',
                                 style: TextStyle(
                                   color: theme.textSecondary.withOpacity(0.7),
                                   fontSize: 14,
@@ -247,5 +251,16 @@ class _TokenCardState extends State<TokenCard> {
           ),
       ],
     );
+  }
+
+  double _getAmount() {
+    try {
+      BigInt value = BigInt.parse(widget.tokenAmount);
+
+      return adjustAmountToDouble(value, widget.tokenDecimals);
+    } catch (e) {
+      debugPrint("fail parse amount $e");
+      return 0;
+    }
   }
 }
