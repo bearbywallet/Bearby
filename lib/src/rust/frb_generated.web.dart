@@ -12,6 +12,7 @@ import 'api/book.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/methods.dart';
+import 'api/network.dart';
 import 'api/settings.dart';
 import 'api/token.dart';
 import 'api/wallet.dart';
@@ -25,6 +26,7 @@ import 'models/connection.dart';
 import 'models/ftoken.dart';
 import 'models/keypair.dart';
 import 'models/notification.dart';
+import 'models/provider.dart';
 import 'models/settings.dart';
 import 'models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
@@ -76,6 +78,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
 
   @protected
+  NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_colors_info(dynamic raw);
 
   @protected
@@ -104,6 +109,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
 
   @protected
+  List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
@@ -118,6 +126,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
+
+  @protected
+  NetworkConfigInfo dco_decode_network_config_info(dynamic raw);
 
   @protected
   String? dco_decode_opt_String(dynamic raw);
@@ -202,6 +213,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
+      SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -231,6 +246,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
 
   @protected
+  List<NetworkConfigInfo> sse_decode_list_network_config_info(
+      SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
@@ -247,6 +266,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
+
+  @protected
+  NetworkConfigInfo sse_decode_network_config_info(
+      SseDeserializer deserializer);
 
   @protected
   String? sse_decode_opt_String(SseDeserializer deserializer);
@@ -342,6 +365,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ConnectionInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
 
   @protected
@@ -374,6 +401,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<FTokenInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_network_config_info(
+      List<NetworkConfigInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer);
 
@@ -393,6 +424,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_wallet_info(
       List<WalletInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_String(String? self, SseSerializer serializer);

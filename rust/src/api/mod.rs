@@ -4,6 +4,7 @@ pub mod book;
 pub mod connections;
 pub mod ledger;
 pub mod methods;
+pub mod network;
 pub mod settings;
 pub mod token;
 pub mod wallet;
