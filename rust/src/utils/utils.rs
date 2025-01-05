@@ -22,14 +22,15 @@ pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
 
 pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
     WalletInfo {
-        networks: w.data.network.clone(),
+        provider: w.data.provider_index,
         auth_type: w.data.biometric_type.clone().into(),
         wallet_name: w.data.wallet_name.clone(),
         wallet_type: w.data.wallet_type.to_str(),
-        wallet_address: w.data.wallet_address.clone(),
+        wallet_address: format!("0x{}", hex::encode(w.data.wallet_address)),
         accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
         selected_account: w.data.selected_account,
         tokens: w.ftokens.iter().map(|v| v.into()).collect(),
+        argon_params: w.data.settings.argon_params.clone().into(),
         cipher_orders: w
             .data
             .settings

@@ -6,6 +6,9 @@ pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
+use zilpay::{
+    background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
+};
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_theme(appearances_code: u8) -> Result<(), String> {

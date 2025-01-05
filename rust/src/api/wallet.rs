@@ -1,4 +1,7 @@
 pub use zilpay::{
+    background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
+};
+pub use zilpay::{
     background::{BackgroundBip39Params, BackgroundSKParams},
     crypto::bip49::Bip49DerivationPath,
     proto::{pubkey::PubKey, secret_key::SecretKey},
@@ -30,8 +33,9 @@ pub async fn add_bip39_wallet(
     passphrase: String,
     wallet_name: String,
     biometric_type: String,
-    networks: &[usize],
+    provider: usize,
     identifiers: &[String],
+    // TODO: add params with ftokens and provder config.
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let accounts_bip39 = accounts
@@ -40,7 +44,7 @@ pub async fn add_bip39_wallet(
             .collect::<Vec<_>>();
         let session = core
             .add_bip39_wallet(BackgroundBip39Params {
-                network: networks,
+                provider,
                 password: &password,
                 mnemonic_str: &mnemonic_str,
                 accounts: &accounts_bip39,
@@ -48,11 +52,16 @@ pub async fn add_bip39_wallet(
                 wallet_name,
                 biometric_type: biometric_type.into(),
                 device_indicators: identifiers,
+                wallet_settings: Default::default(),
+                ftokens: vec![],
             })
             .map_err(ServiceError::BackgroundError)?;
         let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
-        Ok((hex::encode(session), wallet.data.wallet_address.clone()))
+        Ok((
+            hex::encode(session),
+            hex::encode(wallet.data.wallet_address),
+        ))
     })
     .await
     .map_err(Into::into)
@@ -62,32 +71,33 @@ pub async fn add_bip39_wallet(
 pub async fn add_sk_wallet(
     sk: String,
     password: String,
-    account_name: String,
     wallet_name: String,
     biometric_type: String,
     identifiers: &[String],
-    networks: Vec<usize>,
+    provider: usize,
+    // TODO: add params with ftokens and provder config.
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let sk = sk.strip_prefix("0x").unwrap_or(&sk);
         let secret_key = decode_secret_key(&sk)?;
 
         let secret_key = SecretKey::Secp256k1Sha256Zilliqa(secret_key);
-        let session = core
-            .add_sk_wallet(BackgroundSKParams {
-                network: networks,
-                secret_key: &secret_key,
-                account_name,
-                wallet_name,
-                biometric_type: biometric_type.into(),
-                password: &password,
-                device_indicators: identifiers,
-            })
-            .map_err(ServiceError::BackgroundError)?;
-
+        let session = core.add_sk_wallet(BackgroundSKParams {
+            provider,
+            secret_key,
+            wallet_name,
+            biometric_type: biometric_type.into(),
+            password: &password,
+            device_indicators: identifiers,
+            wallet_settings: Default::default(),
+            ftokens: vec![],
+        })?;
         let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
-        Ok((hex::encode(session), wallet.data.wallet_address.clone()))
+        Ok((
+            hex::encode(session),
+            hex::encode(wallet.data.wallet_address),
+        ))
     })
     .await
     .map_err(Into::into)

@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<void> syncBalances({required BigInt walletIndex}) =>
@@ -16,10 +17,7 @@ Future<String> getRates() => RustLib.instance.api.crateApiTokenGetRates();
 Future<void> updateTokenList({required BigInt net}) =>
     RustLib.instance.api.crateApiTokenUpdateTokenList(net: net);
 
-Future<FToken> fetchTokenMeta(
+Future<FTokenInfo> fetchTokenMeta(
         {required String addr, required BigInt walletIndex}) =>
     RustLib.instance.api
         .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
-
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<FToken>>
-abstract class FToken implements RustOpaqueInterface {}

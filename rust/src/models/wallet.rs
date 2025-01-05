@@ -1,4 +1,25 @@
+use zilpay::settings::argon2::ArgonParams;
+
 use super::{account::AccountInfo, ftoken::FTokenInfo};
+
+#[derive(Debug)]
+pub struct WalletArgonParamsInfo {
+    pub memory: u32,
+    pub iterations: u32,
+    pub threads: u32,
+    pub secret: String,
+}
+
+impl From<ArgonParams> for WalletArgonParamsInfo {
+    fn from(value: ArgonParams) -> Self {
+        WalletArgonParamsInfo {
+            memory: value.memory,
+            iterations: value.iterations,
+            threads: value.threads,
+            secret: hex::encode(value.secret),
+        }
+    }
+}
 
 #[derive(Debug)]
 pub struct WalletInfo {
@@ -9,8 +30,9 @@ pub struct WalletInfo {
     pub accounts: Vec<AccountInfo>,
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
-    pub networks: Vec<usize>,
+    pub provider: usize,
     pub cipher_orders: Vec<u8>,
+    pub argon_params: ArgonParams,
     pub currency_convert: Option<String>,
     pub ipfs_node: Option<String>,
     pub ens_enabled: bool,

@@ -13,7 +13,7 @@ class FTokenInfo {
   final String addr;
   final Map<BigInt, String> balances;
   final bool default_;
-  final BigInt netId;
+  final BigInt providerIndex;
 
   const FTokenInfo({
     required this.name,
@@ -22,7 +22,7 @@ class FTokenInfo {
     required this.addr,
     required this.balances,
     required this.default_,
-    required this.netId,
+    required this.providerIndex,
   });
 
   @override
@@ -33,7 +33,7 @@ class FTokenInfo {
       addr.hashCode ^
       balances.hashCode ^
       default_.hashCode ^
-      netId.hashCode;
+      providerIndex.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -46,5 +46,5 @@ class FTokenInfo {
           addr == other.addr &&
           balances == other.balances &&
           default_ == other.default_ &&
-          netId == other.netId;
+          providerIndex == other.providerIndex;
 }

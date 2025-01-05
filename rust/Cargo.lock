@@ -747,18 +747,6 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "b3d1d046238990b9cf5bcde22a3fb3584ee5cf65fb2765f454ed428c7a0063da"
 
 [[package]]
-name = "argon2"
-version = "0.5.3"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3c3610892ee6e0cbce8ae2700349fcf8f98adb0dbfbee85aec3c9179d29cc072"
-dependencies = [
- "base64ct",
- "blake2",
- "cpufeatures",
- "password-hash",
-]
-
-[[package]]
 name = "ark-ff"
 version = "0.3.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -883,6 +871,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "arrayref"
+version = "0.3.9"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "76a2e8124351fda1ef8aaaa3bbd7ebbcb486bbcd4225aca0aa0d84bb2db8fecb"
+
+[[package]]
 name = "arrayvec"
 version = "0.7.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -912,9 +906,9 @@ dependencies = [
 
 [[package]]
 name = "async-trait"
-version = "0.1.82"
+version = "0.1.84"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a27b8a3a6e1a44fa4c8baf1f653e4172e81486d4941f2237e20dc2d0cf4ddff1"
+checksum = "1b1244b10dcd56c92219da4e14caa97e312079e185f04ba3eea25061561dc0a0"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -959,6 +953,9 @@ checksum = "0c4b4d0bd25bd0b74681c0ad21497610ce1b7c91b1022cd21c80c6fbdd9476b0"
 name = "background"
 version = "0.1.0"
 dependencies = [
+ "alloy",
+ "async-trait",
+ "bincode",
  "bip39",
  "cipher 0.1.0",
  "config",
@@ -968,11 +965,14 @@ dependencies = [
  "proto",
  "rand",
  "rand_chacha",
+ "rpc",
  "serde",
  "serde_json",
  "session",
  "settings",
  "storage",
+ "token",
+ "tokio",
  "wallet",
  "zil_errors",
 ]
@@ -1030,7 +1030,12 @@ checksum = "230c5f1ca6a325a32553f8640d31ac9b49f2411e901e427570154868b46da4f7"
 
 [[package]]
 name = "bincode"
-version = "0.1.0"
+version = "1.3.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b1f45e9417d87227c7a56d22e471c6206462cba514c7590c09aff4cf6d1ddcad"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "bip39"
@@ -1089,12 +1094,14 @@ dependencies = [
 ]
 
 [[package]]
-name = "blake2"
-version = "0.10.6"
+name = "blake2b_simd"
+version = "1.0.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "46502ad458c9a52b69d4d4d32775c788b7a1b85e8bc9d482d92250fc0e3f8efe"
+checksum = "23285ad32269793932e830392f2fe2f83e26488fd3ec778883a93c8323735780"
 dependencies = [
- "digest 0.10.7",
+ "arrayref",
+ "arrayvec",
+ "constant_time_eq",
 ]
 
 [[package]]
@@ -1192,13 +1199,12 @@ name = "cipher"
 version = "0.1.0"
 dependencies = [
  "aes-gcm",
- "argon2",
- "bincode",
  "config",
  "hex",
  "ntrulp",
  "rand",
  "rand_chacha",
+ "rust-argon2",
  "serde",
  "tokio",
  "zil_errors",
@@ -1246,6 +1252,12 @@ name = "const-oid"
 version = "0.9.6"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "c2459377285ad874054d797f3ccebf984978aa39129f6eafde5cdc8315b612f8"
+
+[[package]]
+name = "constant_time_eq"
+version = "0.3.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "7c74b8349d32d297c9134b8c88677813a227df8f779daa29bfc29c183fe3dca6"
 
 [[package]]
 name = "core-foundation"
@@ -1933,6 +1945,16 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "6fe2267d4ed49bc07b63801559be28c718ea06c4738b7a03c94df7386d2cde46"
 
 [[package]]
+name = "history"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "proto",
+ "serde",
+ "zil_errors",
+]
+
+[[package]]
 name = "hmac"
 version = "0.12.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2379,15 +2401,19 @@ name = "network"
 version = "0.1.0"
 dependencies = [
  "alloy",
+ "async-trait",
+ "bincode",
  "config",
+ "crypto",
  "proto",
  "reqwest 0.11.27",
+ "rpc",
  "serde",
  "serde_json",
+ "storage",
+ "token",
  "tokio",
- "wallet",
  "zil_errors",
- "zilliqa",
 ]
 
 [[package]]
@@ -2627,17 +2653,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "password-hash"
-version = "0.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "346f04948ba92c43e8469c1ee6736c7563d71012b17d40745260fe106aac2166"
-dependencies = [
- "base64ct",
- "rand_core",
- "subtle",
-]
-
-[[package]]
 name = "paste"
 version = "1.0.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -2845,7 +2860,6 @@ version = "0.1.0"
 dependencies = [
  "alloy",
  "bech32",
- "bincode",
  "bip39",
  "config",
  "crypto",
@@ -2859,6 +2873,7 @@ dependencies = [
  "serde",
  "serde_json",
  "sha2",
+ "tokio",
  "zil_errors",
 ]
 
@@ -3111,6 +3126,22 @@ dependencies = [
 ]
 
 [[package]]
+name = "rpc"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "async-trait",
+ "bincode",
+ "config",
+ "hex",
+ "reqwest 0.11.27",
+ "serde",
+ "serde_json",
+ "tokio",
+ "zil_errors",
+]
+
+[[package]]
 name = "ruint"
 version = "1.12.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3139,6 +3170,17 @@ name = "ruint-macro"
 version = "1.2.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "48fd7bd8a6377e15ad9d42a8ec25371b94ddc67abe7c8b9127bec79bebaaae18"
+
+[[package]]
+name = "rust-argon2"
+version = "2.1.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "9d9848531d60c9cbbcf9d166c885316c24bc0e2a9d3eba0956bb6cbbd79bc6e8"
+dependencies = [
+ "base64 0.21.7",
+ "blake2b_simd",
+ "constant_time_eq",
+]
 
 [[package]]
 name = "rust_lib_zilpay"
@@ -3420,6 +3462,7 @@ dependencies = [
  "config",
  "rand",
  "rand_chacha",
+ "rust-argon2",
  "zil_errors",
 ]
 
@@ -3429,6 +3472,7 @@ version = "0.1.0"
 dependencies = [
  "cipher 0.1.0",
  "config",
+ "rust-argon2",
  "serde",
  "serde_json",
  "zil_errors",
@@ -3568,7 +3612,6 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 name = "storage"
 version = "0.1.0"
 dependencies = [
- "bincode",
  "config",
  "directories",
  "hex",
@@ -3765,6 +3808,20 @@ name = "tinyvec_macros"
 version = "0.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
+
+[[package]]
+name = "token"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "bincode",
+ "config",
+ "proto",
+ "rpc",
+ "serde",
+ "serde_json",
+ "zil_errors",
+]
 
 [[package]]
 name = "tokio"
@@ -4079,21 +4136,25 @@ name = "wallet"
 version = "0.1.0"
 dependencies = [
  "alloy",
+ "async-trait",
  "bincode",
  "bip39",
  "cipher 0.1.0",
  "config",
  "crypto",
  "hex",
+ "history",
+ "network",
  "proto",
  "rand",
  "rand_chacha",
+ "rpc",
  "serde",
- "serde_json",
- "session",
  "settings",
  "sha2",
  "storage",
+ "token",
+ "tokio",
  "zil_errors",
 ]
 
@@ -4511,22 +4572,8 @@ name = "zil_errors"
 version = "0.1.0"
 dependencies = [
  "ntrulp",
+ "rust-argon2",
  "thiserror 1.0.63",
-]
-
-[[package]]
-name = "zilliqa"
-version = "0.1.0"
-dependencies = [
- "config",
- "crypto",
- "hex",
- "proto",
- "reqwest 0.11.27",
- "serde",
- "serde_json",
- "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -4538,6 +4585,7 @@ dependencies = [
  "crypto",
  "proto",
  "settings",
+ "token",
  "wallet",
  "zil_errors",
 ]
@@ -4551,6 +4599,7 @@ dependencies = [
  "crypto",
  "proto",
  "settings",
+ "token",
  "wallet",
  "zil_errors",
  "zilpay",

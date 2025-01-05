@@ -1,4 +1,5 @@
-use zilpay::background::{Background, Language};
+use crate::models::keypair::KeyPairInfo;
+pub use zilpay::background::{bg_crypto::CryptoOperations, Background, Language};
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub fn gen_bip39_words(count: u8) -> Result<String, String> {
@@ -11,16 +12,11 @@ pub fn check_not_exists_bip39_words(words: Vec<String>, _lang: String) -> Vec<us
     Background::find_invalid_bip39_words(&words, Language::English)
 }
 
-pub struct KeyPair {
-    pub sk: String,
-    pub pk: String,
-}
-
 #[flutter_rust_bridge::frb(dart_async)]
-pub fn gen_keypair() -> Result<KeyPair, String> {
+pub fn gen_keypair() -> Result<KeyPairInfo, String> {
     let (sk, pk) = Background::gen_keypair().map_err(|e| e.to_string())?;
 
-    Ok(KeyPair { sk, pk })
+    Ok(KeyPairInfo { sk, pk })
 }
 
 #[flutter_rust_bridge::frb(init)]

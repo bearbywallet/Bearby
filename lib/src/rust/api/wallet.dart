@@ -4,8 +4,6 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
-import '../models/account.dart';
-import '../models/ftoken.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -19,7 +17,7 @@ Future<(String, String)> addBip39Wallet(
         required String passphrase,
         required String walletName,
         required String biometricType,
-        required Uint64List networks,
+        required BigInt provider,
         required List<String> identifiers}) =>
     RustLib.instance.api.crateApiWalletAddBip39Wallet(
         password: password,
@@ -28,25 +26,23 @@ Future<(String, String)> addBip39Wallet(
         passphrase: passphrase,
         walletName: walletName,
         biometricType: biometricType,
-        networks: networks,
+        provider: provider,
         identifiers: identifiers);
 
 Future<(String, String)> addSkWallet(
         {required String sk,
         required String password,
-        required String accountName,
         required String walletName,
         required String biometricType,
         required List<String> identifiers,
-        required Uint64List networks}) =>
+        required BigInt provider}) =>
     RustLib.instance.api.crateApiWalletAddSkWallet(
         sk: sk,
         password: password,
-        accountName: accountName,
         walletName: walletName,
         biometricType: biometricType,
         identifiers: identifiers,
-        networks: networks);
+        provider: provider);
 
 Future<void> addNextBip39Account(
         {required BigInt walletIndex,

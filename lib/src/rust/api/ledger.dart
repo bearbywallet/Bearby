@@ -13,7 +13,8 @@ Future<(String, String)> addLedgerWallet(
         required String ledgerId,
         required String accountName,
         required String biometricType,
-        required List<String> identifiers}) =>
+        required List<String> identifiers,
+        required BigInt providerIndex}) =>
     RustLib.instance.api.crateApiLedgerAddLedgerWallet(
         pubKey: pubKey,
         walletIndex: walletIndex,
@@ -21,7 +22,8 @@ Future<(String, String)> addLedgerWallet(
         ledgerId: ledgerId,
         accountName: accountName,
         biometricType: biometricType,
-        identifiers: identifiers);
+        identifiers: identifiers,
+        providerIndex: providerIndex);
 
 Future<void> addLedgerAccount(
         {required BigInt walletIndex,

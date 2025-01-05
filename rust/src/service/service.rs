@@ -2,7 +2,7 @@ use crate::{frb_generated::StreamSink, utils::errors::ServiceError};
 use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
-use zilpay::background::Background;
+use zilpay::background::{bg_storage::StorageManagement, Background};
 
 pub struct ServiceBackground {
     pub running: bool,

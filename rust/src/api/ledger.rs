@@ -1,3 +1,8 @@
+pub use zilpay::{
+    background::{bg_wallet::WalletManagement, BackgroundLedgerParams},
+    settings::wallet_settings::WalletSettings,
+    wallet::wallet_account::AccountManagement,
+};
 pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
 
 use crate::utils::{
@@ -14,31 +19,38 @@ pub async fn add_ledger_wallet(
     account_name: String,
     biometric_type: String,
     identifiers: &[String],
+    provider_index: usize,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let pub_key_bytes = decode_public_key(&pub_key)?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
-        let params = LedgerParams {
-            networks: vec![0],
-            pub_key: &pub_key,
-            ledger_id: ledger_id.as_bytes().to_vec(),
-            name: account_name,
+        let params = BackgroundLedgerParams {
+            provider_index,
+            pub_key,
+            account_name,
             wallet_index,
             wallet_name,
+            ledger_id: ledger_id.as_bytes().to_vec(),
             biometric_type: biometric_type.into(),
+            wallet_settings: Default::default(),
+            ftokens: vec![], // TODO: add the settings, ftokens, network
         };
 
         let session = core
-            .add_ledger_wallet(params, identifiers)
+            .add_ledger_wallet(params, WalletSettings::default(), identifiers)
             .map_err(ServiceError::BackgroundError)?;
         let wallet = get_last_wallet(core)?;
 
-        Ok((hex::encode(session), wallet.data.wallet_address.clone()))
+        Ok((
+            hex::encode(session),
+            hex::encode(wallet.data.wallet_address),
+        ))
     })
     .await
     .map_err(Into::into)
 }
 
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_account(
     wallet_index: usize,
     account_index: usize,

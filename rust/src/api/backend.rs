@@ -7,7 +7,7 @@ pub use zilpay::{
         notifications::NotificationState,
         theme::{Appearances, Theme},
     },
-    wallet::{ft::FToken, LedgerParams},
+    wallet::LedgerParams,
 };
 
 use crate::{

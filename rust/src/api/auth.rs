@@ -1,3 +1,5 @@
+pub use zilpay::background::bg_wallet::WalletManagement;
+
 use crate::utils::{
     errors::ServiceError,
     utils::{decode_session, with_service_mut},

@@ -5,6 +5,7 @@ use crate::{
         utils::{parse_address, with_service, with_service_mut},
     },
 };
+pub use zilpay::background::bg_book::AddressBookManagement;
 pub use zilpay::background::book::AddressBookEntry;
 pub use zilpay::settings::{
     notifications::NotificationState,

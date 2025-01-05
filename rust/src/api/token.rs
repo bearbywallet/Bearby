@@ -1,9 +1,11 @@
 use crate::{
+    models::ftoken::FTokenInfo,
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::parse_address},
 };
 use std::sync::Arc;
-pub use zilpay::{proto::address::Address, wallet::ft::FToken};
+pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+pub use zilpay::proto::address::Address;
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -61,17 +63,17 @@ pub async fn update_token_list(net: usize) -> Result<(), String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToken, String> {
+pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
         let address = parse_address(addr)?;
 
         let token_meta = core
-            .get_ftoken_meta(wallet_index, address)
+            .fetch_ftoken_meta(wallet_index, address)
             .await
             .map_err(ServiceError::BackgroundError)?;
 
-        Ok(token_meta)
+        Ok(token_meta.into())
     } else {
         Err(ServiceError::NotRunning.to_string())
     }

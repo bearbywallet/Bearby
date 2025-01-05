@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/keypair.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<String> genBip39Words({required int count}) =>
@@ -14,26 +15,5 @@ Future<Uint64List> checkNotExistsBip39Words(
     RustLib.instance.api
         .crateApiMethodsCheckNotExistsBip39Words(words: words, lang: lang);
 
-Future<KeyPair> genKeypair() =>
+Future<KeyPairInfo> genKeypair() =>
     RustLib.instance.api.crateApiMethodsGenKeypair();
-
-class KeyPair {
-  final String sk;
-  final String pk;
-
-  const KeyPair({
-    required this.sk,
-    required this.pk,
-  });
-
-  @override
-  int get hashCode => sk.hashCode ^ pk.hashCode;
-
-  @override
-  bool operator ==(Object other) =>
-      identical(this, other) ||
-      other is KeyPair &&
-          runtimeType == other.runtimeType &&
-          sk == other.sk &&
-          pk == other.pk;
-}
