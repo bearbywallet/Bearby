@@ -30,21 +30,7 @@ pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
         accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
         selected_account: w.data.selected_account,
         tokens: w.ftokens.iter().map(|v| v.into()).collect(),
-        argon_params: w.data.settings.argon_params.clone().into(),
-        cipher_orders: w
-            .data
-            .settings
-            .cipher_orders
-            .iter()
-            .map(|v| v.code())
-            .collect(),
-        currency_convert: w.data.settings.features.currency_convert.clone(),
-        ipfs_node: w.data.settings.features.ipfs_node.clone(),
-        ens_enabled: w.data.settings.features.ens_enabled,
-        gas_control_enabled: w.data.settings.network.gas_control_enabled,
-        node_ranking_enabled: w.data.settings.network.node_ranking_enabled,
-        max_connections: w.data.settings.network.max_connections,
-        request_timeout_secs: w.data.settings.network.request_timeout_secs,
+        settings: w.data.settings.clone().into(),
     }
 }
 

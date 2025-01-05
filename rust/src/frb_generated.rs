@@ -25,7 +25,6 @@
 
 // Section: imports
 
-use crate::models::wallet::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -1468,12 +1467,6 @@ fn wire__crate__api__token__update_token_list_impl(
     )
 }
 
-// Section: related_funcs
-
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>
-);
-
 // Section: dart2rust
 
 impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
@@ -1481,16 +1474,6 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <String>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
-    }
-}
-
-impl SseDecode for WalletInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
 }
 
@@ -1515,16 +1498,6 @@ impl SseDecode
     }
 }
 
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
-    }
-}
-
 impl SseDecode for StreamSink<String, flutter_rust_bridge::for_generated::SseCodec> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1538,6 +1511,18 @@ impl SseDecode for String {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <Vec<u8>>::sse_decode(deserializer);
         return String::from_utf8(inner).unwrap();
+    }
+}
+
+impl SseDecode for crate::models::account::AccountInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_addr = <String>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        return crate::models::account::AccountInfo {
+            addr: var_addr,
+            name: var_name,
+        };
     }
 }
 
@@ -1574,7 +1559,7 @@ impl SseDecode for crate::models::notification::BackgroundNotificationState {
 impl SseDecode for crate::models::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_wallets = <Vec<WalletInfo>>::sse_decode(deserializer);
+        let mut var_wallets = <Vec<crate::models::wallet::WalletInfo>>::sse_decode(deserializer);
         let mut var_notificationsWalletStates = <std::collections::HashMap<
             usize,
             crate::models::notification::BackgroundNotificationState,
@@ -1680,18 +1665,6 @@ impl SseDecode for crate::models::keypair::KeyPairInfo {
     }
 }
 
-impl SseDecode for Vec<WalletInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<WalletInfo>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1699,6 +1672,20 @@ impl SseDecode for Vec<String> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<String>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::account::AccountInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::account::AccountInfo>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -1725,6 +1712,20 @@ impl SseDecode for Vec<crate::models::connection::ConnectionInfo> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<crate::models::connection::ConnectionInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::ftoken::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::ftoken::FTokenInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -1788,6 +1789,20 @@ impl SseDecode for Vec<(usize, String)> {
     }
 }
 
+impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::wallet::WalletInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Option<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1845,6 +1860,13 @@ impl SseDecode for (usize, String) {
     }
 }
 
+impl SseDecode for u32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u32::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for u64 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1868,6 +1890,76 @@ impl SseDecode for usize {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u64::<NativeEndian>().unwrap() as _
+    }
+}
+
+impl SseDecode for crate::models::settings::WalletArgonParamsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_memory = <u32>::sse_decode(deserializer);
+        let mut var_iterations = <u32>::sse_decode(deserializer);
+        let mut var_threads = <u32>::sse_decode(deserializer);
+        let mut var_secret = <String>::sse_decode(deserializer);
+        return crate::models::settings::WalletArgonParamsInfo {
+            memory: var_memory,
+            iterations: var_iterations,
+            threads: var_threads,
+            secret: var_secret,
+        };
+    }
+}
+
+impl SseDecode for crate::models::wallet::WalletInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_walletType = <String>::sse_decode(deserializer);
+        let mut var_walletName = <String>::sse_decode(deserializer);
+        let mut var_authType = <String>::sse_decode(deserializer);
+        let mut var_walletAddress = <String>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<crate::models::account::AccountInfo>>::sse_decode(deserializer);
+        let mut var_selectedAccount = <usize>::sse_decode(deserializer);
+        let mut var_tokens = <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
+        let mut var_provider = <usize>::sse_decode(deserializer);
+        let mut var_settings =
+            <crate::models::settings::WalletSettingsInfo>::sse_decode(deserializer);
+        return crate::models::wallet::WalletInfo {
+            wallet_type: var_walletType,
+            wallet_name: var_walletName,
+            auth_type: var_authType,
+            wallet_address: var_walletAddress,
+            accounts: var_accounts,
+            selected_account: var_selectedAccount,
+            tokens: var_tokens,
+            provider: var_provider,
+            settings: var_settings,
+        };
+    }
+}
+
+impl SseDecode for crate::models::settings::WalletSettingsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_cipherOrders = <Vec<u8>>::sse_decode(deserializer);
+        let mut var_argonParams =
+            <crate::models::settings::WalletArgonParamsInfo>::sse_decode(deserializer);
+        let mut var_currencyConvert = <Option<String>>::sse_decode(deserializer);
+        let mut var_ipfsNode = <Option<String>>::sse_decode(deserializer);
+        let mut var_ensEnabled = <bool>::sse_decode(deserializer);
+        let mut var_gasControlEnabled = <bool>::sse_decode(deserializer);
+        let mut var_nodeRankingEnabled = <bool>::sse_decode(deserializer);
+        let mut var_maxConnections = <u8>::sse_decode(deserializer);
+        let mut var_requestTimeoutSecs = <u32>::sse_decode(deserializer);
+        return crate::models::settings::WalletSettingsInfo {
+            cipher_orders: var_cipherOrders,
+            argon_params: var_argonParams,
+            currency_convert: var_currencyConvert,
+            ipfs_node: var_ipfsNode,
+            ens_enabled: var_ensEnabled,
+            gas_control_enabled: var_gasControlEnabled,
+            node_ranking_enabled: var_nodeRankingEnabled,
+            max_connections: var_maxConnections,
+            request_timeout_secs: var_requestTimeoutSecs,
+        };
     }
 }
 
@@ -1990,20 +2082,26 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<WalletInfo> {
+impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
+        [
+            self.addr.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+        ]
+        .into_dart()
     }
 }
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<WalletInfo> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<WalletInfo>> for WalletInfo {
-    fn into_into_dart(self) -> FrbWrapper<WalletInfo> {
-        self.into()
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::account::AccountInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::account::AccountInfo>
+    for crate::models::account::AccountInfo
+{
+    fn into_into_dart(self) -> crate::models::account::AccountInfo {
+        self
     }
 }
-
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::book::AddressBookEntryInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -2177,18 +2275,90 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::keypair::KeyPairInfo>
         self
     }
 }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::settings::WalletArgonParamsInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.memory.into_into_dart().into_dart(),
+            self.iterations.into_into_dart().into_dart(),
+            self.threads.into_into_dart().into_dart(),
+            self.secret.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::settings::WalletArgonParamsInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletArgonParamsInfo>
+    for crate::models::settings::WalletArgonParamsInfo
+{
+    fn into_into_dart(self) -> crate::models::settings::WalletArgonParamsInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.wallet_type.into_into_dart().into_dart(),
+            self.wallet_name.into_into_dart().into_dart(),
+            self.auth_type.into_into_dart().into_dart(),
+            self.wallet_address.into_into_dart().into_dart(),
+            self.accounts.into_into_dart().into_dart(),
+            self.selected_account.into_into_dart().into_dart(),
+            self.tokens.into_into_dart().into_dart(),
+            self.provider.into_into_dart().into_dart(),
+            self.settings.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::wallet::WalletInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::wallet::WalletInfo>
+    for crate::models::wallet::WalletInfo
+{
+    fn into_into_dart(self) -> crate::models::wallet::WalletInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::settings::WalletSettingsInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.cipher_orders.into_into_dart().into_dart(),
+            self.argon_params.into_into_dart().into_dart(),
+            self.currency_convert.into_into_dart().into_dart(),
+            self.ipfs_node.into_into_dart().into_dart(),
+            self.ens_enabled.into_into_dart().into_dart(),
+            self.gas_control_enabled.into_into_dart().into_dart(),
+            self.node_ranking_enabled.into_into_dart().into_dart(),
+            self.max_connections.into_into_dart().into_dart(),
+            self.request_timeout_secs.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::settings::WalletSettingsInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::settings::WalletSettingsInfo>
+    for crate::models::settings::WalletSettingsInfo
+{
+    fn into_into_dart(self) -> crate::models::settings::WalletSettingsInfo {
+        self
+    }
+}
 
 impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(format!("{:?}", self), serializer);
-    }
-}
-
-impl SseEncode for WalletInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
     }
 }
 
@@ -2211,17 +2381,6 @@ impl SseEncode
     }
 }
 
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
-    }
-}
-
 impl SseEncode for StreamSink<String, flutter_rust_bridge::for_generated::SseCodec> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2233,6 +2392,14 @@ impl SseEncode for String {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <Vec<u8>>::sse_encode(self.into_bytes(), serializer);
+    }
+}
+
+impl SseEncode for crate::models::account::AccountInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.addr, serializer);
+        <String>::sse_encode(self.name, serializer);
     }
 }
 
@@ -2258,7 +2425,7 @@ impl SseEncode for crate::models::notification::BackgroundNotificationState {
 impl SseEncode for crate::models::background::BackgroundState {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<WalletInfo>>::sse_encode(self.wallets, serializer);
+        <Vec<crate::models::wallet::WalletInfo>>::sse_encode(self.wallets, serializer);
         <std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
@@ -2321,22 +2488,22 @@ impl SseEncode for crate::models::keypair::KeyPairInfo {
     }
 }
 
-impl SseEncode for Vec<WalletInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <WalletInfo>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <String>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::account::AccountInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::account::AccountInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2357,6 +2524,16 @@ impl SseEncode for Vec<crate::models::connection::ConnectionInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::connection::ConnectionInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::ftoken::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::ftoken::FTokenInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2405,6 +2582,16 @@ impl SseEncode for Vec<(usize, String)> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <(usize, String)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -2458,6 +2645,13 @@ impl SseEncode for (usize, String) {
     }
 }
 
+impl SseEncode for u32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u32::<NativeEndian>(self).unwrap();
+    }
+}
+
 impl SseEncode for u64 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2487,6 +2681,46 @@ impl SseEncode for usize {
     }
 }
 
+impl SseEncode for crate::models::settings::WalletArgonParamsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u32>::sse_encode(self.memory, serializer);
+        <u32>::sse_encode(self.iterations, serializer);
+        <u32>::sse_encode(self.threads, serializer);
+        <String>::sse_encode(self.secret, serializer);
+    }
+}
+
+impl SseEncode for crate::models::wallet::WalletInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.wallet_type, serializer);
+        <String>::sse_encode(self.wallet_name, serializer);
+        <String>::sse_encode(self.auth_type, serializer);
+        <String>::sse_encode(self.wallet_address, serializer);
+        <Vec<crate::models::account::AccountInfo>>::sse_encode(self.accounts, serializer);
+        <usize>::sse_encode(self.selected_account, serializer);
+        <Vec<crate::models::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
+        <usize>::sse_encode(self.provider, serializer);
+        <crate::models::settings::WalletSettingsInfo>::sse_encode(self.settings, serializer);
+    }
+}
+
+impl SseEncode for crate::models::settings::WalletSettingsInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<u8>>::sse_encode(self.cipher_orders, serializer);
+        <crate::models::settings::WalletArgonParamsInfo>::sse_encode(self.argon_params, serializer);
+        <Option<String>>::sse_encode(self.currency_convert, serializer);
+        <Option<String>>::sse_encode(self.ipfs_node, serializer);
+        <bool>::sse_encode(self.ens_enabled, serializer);
+        <bool>::sse_encode(self.gas_control_enabled, serializer);
+        <bool>::sse_encode(self.node_ranking_enabled, serializer);
+        <u8>::sse_encode(self.max_connections, serializer);
+        <u32>::sse_encode(self.request_timeout_secs, serializer);
+    }
+}
+
 impl SseEncode for i32 {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2502,7 +2736,6 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::models::wallet::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -2512,20 +2745,6 @@ mod io {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_io!();
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>::increment_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
@@ -2539,7 +2758,6 @@ mod web {
     // Section: imports
 
     use super::*;
-    use crate::models::wallet::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -2551,20 +2769,6 @@ mod web {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_web!();
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerWalletInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<WalletInfo>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(target_family = "wasm")]
 pub use web::*;

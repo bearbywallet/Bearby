@@ -5,4 +5,5 @@ pub mod connection;
 pub mod ftoken;
 pub mod keypair;
 pub mod notification;
+pub mod settings;
 pub mod wallet;
