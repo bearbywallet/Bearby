@@ -7,4 +7,5 @@ pub mod methods;
 pub mod network;
 pub mod settings;
 pub mod token;
+pub mod transaction;
 pub mod wallet;

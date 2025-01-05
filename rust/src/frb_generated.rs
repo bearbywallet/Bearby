@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.6.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1872009617;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1776878899;
 
 // Section: executor
 
@@ -454,6 +454,44 @@ fn wire__crate__api__methods__check_not_exists_bip39_words_impl(
         },
     )
 }
+fn wire__crate__api__transaction__clear_requested_transactions_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "clear_requested_transactions",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::transaction::clear_requested_transactions(api_wallet_index)
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__connections__create_new_connection_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -799,6 +837,44 @@ fn wire__crate__api__token__get_rates_impl(
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::token::get_rates().await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__transaction__get_requested_transactions_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "get_requested_transactions",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::transaction::get_requested_transactions(api_wallet_index)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1701,6 +1777,26 @@ impl SseDecode for String {
     }
 }
 
+impl SseDecode for u128 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <String>::sse_decode(deserializer);
+        return inner.parse().unwrap();
+    }
+}
+
+impl SseDecode for crate::models::transaction::AccessListItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_address = <String>::sse_decode(deserializer);
+        let mut var_storageKeys = <Vec<String>>::sse_decode(deserializer);
+        return crate::models::transaction::AccessListItem {
+            address: var_address,
+            storage_keys: var_storageKeys,
+        };
+    }
+}
+
 impl SseDecode for crate::models::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1764,10 +1860,36 @@ impl SseDecode for crate::models::background::BackgroundState {
     }
 }
 
+impl SseDecode for crate::models::transaction::BaseTokenInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_value = <String>::sse_decode(deserializer);
+        let mut var_symbol = <String>::sse_decode(deserializer);
+        let mut var_decimals = <u8>::sse_decode(deserializer);
+        return crate::models::transaction::BaseTokenInfo {
+            value: var_value,
+            symbol: var_symbol,
+            decimals: var_decimals,
+        };
+    }
+}
+
 impl SseDecode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         deserializer.cursor.read_u8().unwrap() != 0
+    }
+}
+
+impl SseDecode for crate::models::transaction::ChainType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut inner = <i32>::sse_decode(deserializer);
+        return match inner {
+            0 => crate::models::transaction::ChainType::Scilla,
+            1 => crate::models::transaction::ChainType::Evm,
+            _ => unreachable!("Invalid variant for ChainType: {}", inner),
+        };
     }
 }
 
@@ -1840,6 +1962,13 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
     }
 }
 
+impl SseDecode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
+    }
+}
+
 impl SseDecode for crate::models::keypair::KeyPairInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1859,6 +1988,20 @@ impl SseDecode for Vec<String> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<String>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::transaction::AccessListItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::transaction::AccessListItem>::sse_decode(
+                deserializer,
+            ));
         }
         return ans_;
     }
@@ -1990,6 +2133,20 @@ impl SseDecode for Vec<(usize, String)> {
     }
 }
 
+impl SseDecode for Vec<crate::models::transaction::TransactionRequestInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(
+                <crate::models::transaction::TransactionRequestInfo>::sse_decode(deserializer),
+            );
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2035,6 +2192,30 @@ impl SseDecode for Option<String> {
     }
 }
 
+impl SseDecode for Option<u128> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u128>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::transaction::BaseTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::models::transaction::BaseTokenInfo>::sse_decode(
+                deserializer,
+            ));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<crate::models::connection::ColorsInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2042,6 +2223,78 @@ impl SseDecode for Option<crate::models::connection::ColorsInfo> {
             return Some(<crate::models::connection::ColorsInfo>::sse_decode(
                 deserializer,
             ));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::transaction::TransactionRequestEVM> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::models::transaction::TransactionRequestEVM>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::transaction::TransactionRequestScilla> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <crate::models::transaction::TransactionRequestScilla>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<u64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<String>>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<Vec<crate::models::transaction::AccessListItem>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(
+                <Vec<crate::models::transaction::AccessListItem>>::sse_decode(deserializer),
+            );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<u8>>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -2078,6 +2331,116 @@ impl SseDecode for (usize, String) {
         let mut var_field0 = <usize>::sse_decode(deserializer);
         let mut var_field1 = <String>::sse_decode(deserializer);
         return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for crate::models::transaction::TransactionMetadataInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        let mut var_hash = <Option<String>>::sse_decode(deserializer);
+        let mut var_info = <Option<String>>::sse_decode(deserializer);
+        let mut var_icon = <Option<String>>::sse_decode(deserializer);
+        let mut var_title = <Option<String>>::sse_decode(deserializer);
+        let mut var_signer = <Option<String>>::sse_decode(deserializer);
+        let mut var_tokenInfo =
+            <Option<crate::models::transaction::BaseTokenInfo>>::sse_decode(deserializer);
+        return crate::models::transaction::TransactionMetadataInfo {
+            provider_index: var_providerIndex,
+            hash: var_hash,
+            info: var_info,
+            icon: var_icon,
+            title: var_title,
+            signer: var_signer,
+            token_info: var_tokenInfo,
+        };
+    }
+}
+
+impl SseDecode for crate::models::transaction::TransactionRequestEVM {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_nonce = <Option<u64>>::sse_decode(deserializer);
+        let mut var_from = <Option<String>>::sse_decode(deserializer);
+        let mut var_to = <Option<String>>::sse_decode(deserializer);
+        let mut var_value = <Option<String>>::sse_decode(deserializer);
+        let mut var_gasLimit = <Option<u64>>::sse_decode(deserializer);
+        let mut var_data = <Option<Vec<u8>>>::sse_decode(deserializer);
+        let mut var_maxFeePerGas = <Option<u128>>::sse_decode(deserializer);
+        let mut var_maxPriorityFeePerGas = <Option<u128>>::sse_decode(deserializer);
+        let mut var_gasPrice = <Option<u128>>::sse_decode(deserializer);
+        let mut var_chainId = <Option<u64>>::sse_decode(deserializer);
+        let mut var_accessList =
+            <Option<Vec<crate::models::transaction::AccessListItem>>>::sse_decode(deserializer);
+        let mut var_blobVersionedHashes = <Option<Vec<String>>>::sse_decode(deserializer);
+        let mut var_maxFeePerBlobGas = <Option<u128>>::sse_decode(deserializer);
+        return crate::models::transaction::TransactionRequestEVM {
+            nonce: var_nonce,
+            from: var_from,
+            to: var_to,
+            value: var_value,
+            gas_limit: var_gasLimit,
+            data: var_data,
+            max_fee_per_gas: var_maxFeePerGas,
+            max_priority_fee_per_gas: var_maxPriorityFeePerGas,
+            gas_price: var_gasPrice,
+            chain_id: var_chainId,
+            access_list: var_accessList,
+            blob_versioned_hashes: var_blobVersionedHashes,
+            max_fee_per_blob_gas: var_maxFeePerBlobGas,
+        };
+    }
+}
+
+impl SseDecode for crate::models::transaction::TransactionRequestInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_metadata =
+            <crate::models::transaction::TransactionMetadataInfo>::sse_decode(deserializer);
+        let mut var_chainType = <crate::models::transaction::ChainType>::sse_decode(deserializer);
+        let mut var_scilla =
+            <Option<crate::models::transaction::TransactionRequestScilla>>::sse_decode(
+                deserializer,
+            );
+        let mut var_evm =
+            <Option<crate::models::transaction::TransactionRequestEVM>>::sse_decode(deserializer);
+        return crate::models::transaction::TransactionRequestInfo {
+            metadata: var_metadata,
+            chain_type: var_chainType,
+            scilla: var_scilla,
+            evm: var_evm,
+        };
+    }
+}
+
+impl SseDecode for crate::models::transaction::TransactionRequestScilla {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_chainId = <u16>::sse_decode(deserializer);
+        let mut var_nonce = <u64>::sse_decode(deserializer);
+        let mut var_gasPrice = <u128>::sse_decode(deserializer);
+        let mut var_gasLimit = <u64>::sse_decode(deserializer);
+        let mut var_toAddr = <String>::sse_decode(deserializer);
+        let mut var_amount = <u128>::sse_decode(deserializer);
+        let mut var_code = <String>::sse_decode(deserializer);
+        let mut var_data = <String>::sse_decode(deserializer);
+        return crate::models::transaction::TransactionRequestScilla {
+            chain_id: var_chainId,
+            nonce: var_nonce,
+            gas_price: var_gasPrice,
+            gas_limit: var_gasLimit,
+            to_addr: var_toAddr,
+            amount: var_amount,
+            code: var_code,
+            data: var_data,
+        };
+    }
+}
+
+impl SseDecode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        deserializer.cursor.read_u16::<NativeEndian>().unwrap()
     }
 }
 
@@ -2184,13 +2547,6 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
     }
 }
 
-impl SseDecode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        deserializer.cursor.read_i32::<NativeEndian>().unwrap()
-    }
-}
-
 fn pde_ffi_dispatcher_primary_impl(
     func_id: i32,
     port: flutter_rust_bridge::for_generated::MessagePort,
@@ -2221,74 +2577,86 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        10 => wire__crate__api__connections__create_new_connection_impl(
+        10 => wire__crate__api__transaction__clear_requested_transactions_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
-        12 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
-        13 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
-        14 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
-        15 => wire__crate__api__connections__get_connections_list_impl(
+        11 => wire__crate__api__connections__create_new_connection_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        16 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
-        17 => wire__crate__api__network__get_provider_impl(port, ptr, rust_vec_len, data_len),
-        18 => wire__crate__api__network__get_providers_impl(port, ptr, rust_vec_len, data_len),
-        19 => wire__crate__api__token__get_rates_impl(port, ptr, rust_vec_len, data_len),
-        20 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
-        21 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
-        22 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
-        23 => wire__crate__api__network__remove_provider_impl(port, ptr, rust_vec_len, data_len),
-        24 => wire__crate__api__wallet__select_account_impl(port, ptr, rust_vec_len, data_len),
-        25 => wire__crate__api__network__select_provider_impl(port, ptr, rust_vec_len, data_len),
-        26 => wire__crate__api__settings__set_global_notifications_impl(
+        12 => wire__crate__api__token__fetch_token_meta_impl(port, ptr, rust_vec_len, data_len),
+        13 => wire__crate__api__methods__gen_bip39_words_impl(port, ptr, rust_vec_len, data_len),
+        14 => wire__crate__api__methods__gen_keypair_impl(port, ptr, rust_vec_len, data_len),
+        15 => wire__crate__api__book__get_address_book_list_impl(port, ptr, rust_vec_len, data_len),
+        16 => wire__crate__api__connections__get_connections_list_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        27 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
-        28 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        29 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        30 => wire__crate__api__settings__set_wallet_gas_control_impl(
+        17 => wire__crate__api__backend__get_data_impl(port, ptr, rust_vec_len, data_len),
+        18 => wire__crate__api__network__get_provider_impl(port, ptr, rust_vec_len, data_len),
+        19 => wire__crate__api__network__get_providers_impl(port, ptr, rust_vec_len, data_len),
+        20 => wire__crate__api__token__get_rates_impl(port, ptr, rust_vec_len, data_len),
+        21 => wire__crate__api__transaction__get_requested_transactions_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        31 => {
+        22 => wire__crate__api__wallet__get_wallets_impl(port, ptr, rust_vec_len, data_len),
+        23 => wire__crate__api__methods__init_app_impl(port, ptr, rust_vec_len, data_len),
+        24 => wire__crate__api__backend__is_service_running_impl(port, ptr, rust_vec_len, data_len),
+        25 => wire__crate__api__network__remove_provider_impl(port, ptr, rust_vec_len, data_len),
+        26 => wire__crate__api__wallet__select_account_impl(port, ptr, rust_vec_len, data_len),
+        27 => wire__crate__api__network__select_provider_impl(port, ptr, rust_vec_len, data_len),
+        28 => wire__crate__api__settings__set_global_notifications_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        29 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
+        30 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
+        31 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
+        32 => wire__crate__api__settings__set_wallet_gas_control_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        33 => {
             wire__crate__api__settings__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
-        32 => wire__crate__api__settings__set_wallet_node_ranking_impl(
+        34 => wire__crate__api__settings__set_wallet_node_ranking_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        33 => wire__crate__api__settings__set_wallet_notifications_impl(
+        35 => wire__crate__api__settings__set_wallet_notifications_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        34 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
-        35 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
-        36 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
-        37 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
-        38 => {
+        36 => wire__crate__api__backend__start_service_impl(port, ptr, rust_vec_len, data_len),
+        37 => wire__crate__api__backend__start_worker_impl(port, ptr, rust_vec_len, data_len),
+        38 => wire__crate__api__backend__stop_service_impl(port, ptr, rust_vec_len, data_len),
+        39 => wire__crate__api__token__sync_balances_impl(port, ptr, rust_vec_len, data_len),
+        40 => {
             wire__crate__api__auth__try_unlock_with_password_impl(port, ptr, rust_vec_len, data_len)
         }
-        39 => {
+        41 => {
             wire__crate__api__auth__try_unlock_with_session_impl(port, ptr, rust_vec_len, data_len)
         }
-        40 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
-        41 => wire__crate__api__token__update_token_list_impl(port, ptr, rust_vec_len, data_len),
+        42 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
+        43 => wire__crate__api__token__update_token_list_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -2307,6 +2675,27 @@ fn pde_ffi_dispatcher_sync_impl(
 
 // Section: rust2dart
 
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::AccessListItem {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.address.into_into_dart().into_dart(),
+            self.storage_keys.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::AccessListItem
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::AccessListItem>
+    for crate::models::transaction::AccessListItem
+{
+    fn into_into_dart(self) -> crate::models::transaction::AccessListItem {
+        self
+    }
+}
 // Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
@@ -2398,6 +2787,49 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::background::BackgroundStat
     for crate::models::background::BackgroundState
 {
     fn into_into_dart(self) -> crate::models::background::BackgroundState {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::BaseTokenInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.value.into_into_dart().into_dart(),
+            self.symbol.into_into_dart().into_dart(),
+            self.decimals.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::BaseTokenInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::BaseTokenInfo>
+    for crate::models::transaction::BaseTokenInfo
+{
+    fn into_into_dart(self) -> crate::models::transaction::BaseTokenInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::ChainType {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        match self {
+            Self::Scilla => 0.into_dart(),
+            Self::Evm => 1.into_dart(),
+            _ => unreachable!(),
+        }
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::ChainType
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::ChainType>
+    for crate::models::transaction::ChainType
+{
+    fn into_into_dart(self) -> crate::models::transaction::ChainType {
         self
     }
 }
@@ -2527,6 +2959,114 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::provider::NetworkConfigInf
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::TransactionMetadataInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.provider_index.into_into_dart().into_dart(),
+            self.hash.into_into_dart().into_dart(),
+            self.info.into_into_dart().into_dart(),
+            self.icon.into_into_dart().into_dart(),
+            self.title.into_into_dart().into_dart(),
+            self.signer.into_into_dart().into_dart(),
+            self.token_info.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::TransactionMetadataInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::TransactionMetadataInfo>
+    for crate::models::transaction::TransactionMetadataInfo
+{
+    fn into_into_dart(self) -> crate::models::transaction::TransactionMetadataInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::TransactionRequestEVM {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.nonce.into_into_dart().into_dart(),
+            self.from.into_into_dart().into_dart(),
+            self.to.into_into_dart().into_dart(),
+            self.value.into_into_dart().into_dart(),
+            self.gas_limit.into_into_dart().into_dart(),
+            self.data.into_into_dart().into_dart(),
+            self.max_fee_per_gas.into_into_dart().into_dart(),
+            self.max_priority_fee_per_gas.into_into_dart().into_dart(),
+            self.gas_price.into_into_dart().into_dart(),
+            self.chain_id.into_into_dart().into_dart(),
+            self.access_list.into_into_dart().into_dart(),
+            self.blob_versioned_hashes.into_into_dart().into_dart(),
+            self.max_fee_per_blob_gas.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::TransactionRequestEVM
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::TransactionRequestEVM>
+    for crate::models::transaction::TransactionRequestEVM
+{
+    fn into_into_dart(self) -> crate::models::transaction::TransactionRequestEVM {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::TransactionRequestInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.metadata.into_into_dart().into_dart(),
+            self.chain_type.into_into_dart().into_dart(),
+            self.scilla.into_into_dart().into_dart(),
+            self.evm.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::TransactionRequestInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::TransactionRequestInfo>
+    for crate::models::transaction::TransactionRequestInfo
+{
+    fn into_into_dart(self) -> crate::models::transaction::TransactionRequestInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::transaction::TransactionRequestScilla {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.chain_id.into_into_dart().into_dart(),
+            self.nonce.into_into_dart().into_dart(),
+            self.gas_price.into_into_dart().into_dart(),
+            self.gas_limit.into_into_dart().into_dart(),
+            self.to_addr.into_into_dart().into_dart(),
+            self.amount.into_into_dart().into_dart(),
+            self.code.into_into_dart().into_dart(),
+            self.data.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::transaction::TransactionRequestScilla
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::transaction::TransactionRequestScilla>
+    for crate::models::transaction::TransactionRequestScilla
+{
+    fn into_into_dart(self) -> crate::models::transaction::TransactionRequestScilla {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::settings::WalletArgonParamsInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -2646,6 +3186,21 @@ impl SseEncode for String {
     }
 }
 
+impl SseEncode for u128 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.to_string(), serializer);
+    }
+}
+
+impl SseEncode for crate::models::transaction::AccessListItem {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.address, serializer);
+        <Vec<String>>::sse_encode(self.storage_keys, serializer);
+    }
+}
+
 impl SseEncode for crate::models::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2684,10 +3239,35 @@ impl SseEncode for crate::models::background::BackgroundState {
     }
 }
 
+impl SseEncode for crate::models::transaction::BaseTokenInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.value, serializer);
+        <String>::sse_encode(self.symbol, serializer);
+        <u8>::sse_encode(self.decimals, serializer);
+    }
+}
+
 impl SseEncode for bool {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         serializer.cursor.write_u8(self as _).unwrap();
+    }
+}
+
+impl SseEncode for crate::models::transaction::ChainType {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(
+            match self {
+                crate::models::transaction::ChainType::Scilla => 0,
+                crate::models::transaction::ChainType::Evm => 1,
+                _ => {
+                    unimplemented!("");
+                }
+            },
+            serializer,
+        );
     }
 }
 
@@ -2731,6 +3311,13 @@ impl SseEncode for crate::models::ftoken::FTokenInfo {
     }
 }
 
+impl SseEncode for i32 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
+    }
+}
+
 impl SseEncode for crate::models::keypair::KeyPairInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2745,6 +3332,16 @@ impl SseEncode for Vec<String> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <String>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::transaction::AccessListItem> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::transaction::AccessListItem>::sse_encode(item, serializer);
         }
     }
 }
@@ -2847,6 +3444,16 @@ impl SseEncode for Vec<(usize, String)> {
     }
 }
 
+impl SseEncode for Vec<crate::models::transaction::TransactionRequestInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::transaction::TransactionRequestInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -2879,12 +3486,92 @@ impl SseEncode for Option<String> {
     }
 }
 
+impl SseEncode for Option<u128> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u128>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::transaction::BaseTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transaction::BaseTokenInfo>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<crate::models::connection::ColorsInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::models::connection::ColorsInfo>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::transaction::TransactionRequestEVM> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transaction::TransactionRequestEVM>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::transaction::TransactionRequestScilla> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::transaction::TransactionRequestScilla>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <u64>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<String>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<String>>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<crate::models::transaction::AccessListItem>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<crate::models::transaction::AccessListItem>>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<u8>>::sse_encode(value, serializer);
         }
     }
 }
@@ -2915,6 +3602,83 @@ impl SseEncode for (usize, String) {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <usize>::sse_encode(self.0, serializer);
         <String>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for crate::models::transaction::TransactionMetadataInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <usize>::sse_encode(self.provider_index, serializer);
+        <Option<String>>::sse_encode(self.hash, serializer);
+        <Option<String>>::sse_encode(self.info, serializer);
+        <Option<String>>::sse_encode(self.icon, serializer);
+        <Option<String>>::sse_encode(self.title, serializer);
+        <Option<String>>::sse_encode(self.signer, serializer);
+        <Option<crate::models::transaction::BaseTokenInfo>>::sse_encode(
+            self.token_info,
+            serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::models::transaction::TransactionRequestEVM {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Option<u64>>::sse_encode(self.nonce, serializer);
+        <Option<String>>::sse_encode(self.from, serializer);
+        <Option<String>>::sse_encode(self.to, serializer);
+        <Option<String>>::sse_encode(self.value, serializer);
+        <Option<u64>>::sse_encode(self.gas_limit, serializer);
+        <Option<Vec<u8>>>::sse_encode(self.data, serializer);
+        <Option<u128>>::sse_encode(self.max_fee_per_gas, serializer);
+        <Option<u128>>::sse_encode(self.max_priority_fee_per_gas, serializer);
+        <Option<u128>>::sse_encode(self.gas_price, serializer);
+        <Option<u64>>::sse_encode(self.chain_id, serializer);
+        <Option<Vec<crate::models::transaction::AccessListItem>>>::sse_encode(
+            self.access_list,
+            serializer,
+        );
+        <Option<Vec<String>>>::sse_encode(self.blob_versioned_hashes, serializer);
+        <Option<u128>>::sse_encode(self.max_fee_per_blob_gas, serializer);
+    }
+}
+
+impl SseEncode for crate::models::transaction::TransactionRequestInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <crate::models::transaction::TransactionMetadataInfo>::sse_encode(
+            self.metadata,
+            serializer,
+        );
+        <crate::models::transaction::ChainType>::sse_encode(self.chain_type, serializer);
+        <Option<crate::models::transaction::TransactionRequestScilla>>::sse_encode(
+            self.scilla,
+            serializer,
+        );
+        <Option<crate::models::transaction::TransactionRequestEVM>>::sse_encode(
+            self.evm, serializer,
+        );
+    }
+}
+
+impl SseEncode for crate::models::transaction::TransactionRequestScilla {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u16>::sse_encode(self.chain_id, serializer);
+        <u64>::sse_encode(self.nonce, serializer);
+        <u128>::sse_encode(self.gas_price, serializer);
+        <u64>::sse_encode(self.gas_limit, serializer);
+        <String>::sse_encode(self.to_addr, serializer);
+        <u128>::sse_encode(self.amount, serializer);
+        <String>::sse_encode(self.code, serializer);
+        <String>::sse_encode(self.data, serializer);
+    }
+}
+
+impl SseEncode for u16 {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        serializer.cursor.write_u16::<NativeEndian>(self).unwrap();
     }
 }
 
@@ -2991,13 +3755,6 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <bool>::sse_encode(self.node_ranking_enabled, serializer);
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);
-    }
-}
-
-impl SseEncode for i32 {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        serializer.cursor.write_i32::<NativeEndian>(self).unwrap();
     }
 }
 
