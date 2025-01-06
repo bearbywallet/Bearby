@@ -4,7 +4,33 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../../frb_generated.dart';
+import 'access_list.dart';
+import 'base_token.dart';
+import 'evm.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'scilla.dart';
+import 'transaction_metadata.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<TransactionRequestInfo>>
-abstract class TransactionRequestInfo implements RustOpaqueInterface {}
+class TransactionRequestInfo {
+  final TransactionMetadataInfo metadata;
+  final TransactionRequestScilla? scilla;
+  final TransactionRequestEVM? evm;
+
+  const TransactionRequestInfo({
+    required this.metadata,
+    this.scilla,
+    this.evm,
+  });
+
+  @override
+  int get hashCode => metadata.hashCode ^ scilla.hashCode ^ evm.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TransactionRequestInfo &&
+          runtimeType == other.runtimeType &&
+          metadata == other.metadata &&
+          scilla == other.scilla &&
+          evm == other.evm;
+}

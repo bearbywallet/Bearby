@@ -4,7 +4,12 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/transactions/access_list.dart';
+import '../models/transactions/base_token.dart';
+import '../models/transactions/evm.dart';
 import '../models/transactions/request.dart';
+import '../models/transactions/scilla.dart';
+import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<List<TransactionRequestInfo>> getRequestedTransactions(
