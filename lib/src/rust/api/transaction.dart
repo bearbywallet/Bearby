@@ -7,6 +7,7 @@ import '../frb_generated.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
 import '../models/transactions/evm.dart';
+import '../models/transactions/history.dart';
 import '../models/transactions/request.dart';
 import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
@@ -25,3 +26,8 @@ Future<void> addRequestedTransactions(
         {required BigInt walletIndex, required TransactionRequestInfo tx}) =>
     RustLib.instance.api.crateApiTransactionAddRequestedTransactions(
         walletIndex: walletIndex, tx: tx);
+
+Future<List<HistoricalTransactionInfo>> getHistory(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionGetHistory(walletIndex: walletIndex);

@@ -1,3 +1,4 @@
+use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{with_service, with_service_mut};
@@ -60,6 +61,19 @@ pub async fn add_requested_transactions(
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactionInfo>, String> {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let history: Vec<HistoricalTransactionInfo> =
+            wallet.history.iter().map(|tx| tx.clone().into()).collect();
+
+        Ok(history)
     })
     .await
     .map_err(Into::into)
