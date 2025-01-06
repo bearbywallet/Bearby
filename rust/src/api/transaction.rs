@@ -1,6 +1,4 @@
-use crate::models::transaction::{
-    TransactionMetadata, TransactionRequestInfo, TransactionRequestScilla,
-};
+use crate::models::transaction::TransactionRequestInfo;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{with_service, with_service_mut};
 pub use zilpay::background::bg_wallet::WalletManagement;
@@ -55,10 +53,11 @@ pub async fn add_requested_transactions(
             .wallets
             .get_mut(wallet_index)
             .ok_or(BackgroundError::WalletNotExists(wallet_index))?;
+        let tx = tx.try_into()?;
 
-        // wallet
-        //     .add_request_transaction(tx)
-        //     .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        wallet
+            .add_request_transaction(tx)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
     })

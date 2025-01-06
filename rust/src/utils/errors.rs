@@ -1,7 +1,7 @@
 use thiserror::Error;
 use zilpay::zil_errors::{
     address::AddressError, background::BackgroundError, settings::SettingsErrors,
-    wallet::WalletErrors,
+    tx::TransactionErrors, wallet::WalletErrors,
 };
 
 #[derive(Debug, Error)]
@@ -29,6 +29,9 @@ pub enum ServiceError {
 
     #[error("settings error: {0}")]
     SettingsError(SettingsErrors),
+
+    #[error("Transaction error: {0}")]
+    TransactionErrors(TransactionErrors),
 
     #[error("Failed to access wallet at index {0}")]
     WalletAccess(usize),
@@ -61,6 +64,12 @@ pub enum ServiceError {
 impl From<BackgroundError> for ServiceError {
     fn from(error: BackgroundError) -> Self {
         ServiceError::BackgroundError(error)
+    }
+}
+
+impl From<TransactionErrors> for ServiceError {
+    fn from(error: TransactionErrors) -> Self {
+        ServiceError::TransactionErrors(error)
     }
 }
 
