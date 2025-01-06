@@ -7,5 +7,5 @@ pub mod keypair;
 pub mod notification;
 pub mod provider;
 pub mod settings;
-pub mod transaction;
+pub mod transactions;
 pub mod wallet;

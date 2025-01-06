@@ -1,4 +1,4 @@
-use crate::models::transaction::TransactionRequestInfo;
+use crate::models::transactions::request::TransactionRequestInfo;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{with_service, with_service_mut};
 pub use zilpay::background::bg_wallet::WalletManagement;
