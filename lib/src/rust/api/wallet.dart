@@ -14,38 +14,18 @@ Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiWalletGetWallets();
 
 Future<(String, String)> addBip39Wallet(
-        {required String password,
-        required String mnemonicStr,
-        required List<(BigInt, String)> accounts,
-        required String passphrase,
-        required String walletName,
-        required String biometricType,
-        required BigInt provider,
-        required List<String> identifiers}) =>
+        {required Bip39AddWalletParams params,
+        required WalletSettingsInfo walletSettings,
+        required List<FTokenInfo> ftokens}) =>
     RustLib.instance.api.crateApiWalletAddBip39Wallet(
-        password: password,
-        mnemonicStr: mnemonicStr,
-        accounts: accounts,
-        passphrase: passphrase,
-        walletName: walletName,
-        biometricType: biometricType,
-        provider: provider,
-        identifiers: identifiers);
+        params: params, walletSettings: walletSettings, ftokens: ftokens);
 
 Future<(String, String)> addSkWallet(
-        {required String sk,
-        required String password,
-        required String walletName,
-        required String biometricType,
-        required List<String> identifiers,
-        required BigInt provider}) =>
+        {required AddSKWalletParams params,
+        required WalletSettingsInfo walletSettings,
+        required List<FTokenInfo> ftokens}) =>
     RustLib.instance.api.crateApiWalletAddSkWallet(
-        sk: sk,
-        password: password,
-        walletName: walletName,
-        biometricType: biometricType,
-        identifiers: identifiers,
-        provider: provider);
+        params: params, walletSettings: walletSettings, ftokens: ftokens);
 
 Future<void> addNextBip39Account(
         {required BigInt walletIndex,
@@ -68,3 +48,89 @@ Future<void> selectAccount(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiWalletSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+class AddSKWalletParams {
+  final String sk;
+  final String password;
+  final String walletName;
+  final String biometricType;
+  final List<String> identifiers;
+  final BigInt provider;
+
+  const AddSKWalletParams({
+    required this.sk,
+    required this.password,
+    required this.walletName,
+    required this.biometricType,
+    required this.identifiers,
+    required this.provider,
+  });
+
+  @override
+  int get hashCode =>
+      sk.hashCode ^
+      password.hashCode ^
+      walletName.hashCode ^
+      biometricType.hashCode ^
+      identifiers.hashCode ^
+      provider.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddSKWalletParams &&
+          runtimeType == other.runtimeType &&
+          sk == other.sk &&
+          password == other.password &&
+          walletName == other.walletName &&
+          biometricType == other.biometricType &&
+          identifiers == other.identifiers &&
+          provider == other.provider;
+}
+
+class Bip39AddWalletParams {
+  final String password;
+  final String mnemonicStr;
+  final List<(BigInt, String)> accounts;
+  final String passphrase;
+  final String walletName;
+  final String biometricType;
+  final BigInt provider;
+  final List<String> identifiers;
+
+  const Bip39AddWalletParams({
+    required this.password,
+    required this.mnemonicStr,
+    required this.accounts,
+    required this.passphrase,
+    required this.walletName,
+    required this.biometricType,
+    required this.provider,
+    required this.identifiers,
+  });
+
+  @override
+  int get hashCode =>
+      password.hashCode ^
+      mnemonicStr.hashCode ^
+      accounts.hashCode ^
+      passphrase.hashCode ^
+      walletName.hashCode ^
+      biometricType.hashCode ^
+      provider.hashCode ^
+      identifiers.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Bip39AddWalletParams &&
+          runtimeType == other.runtimeType &&
+          password == other.password &&
+          mnemonicStr == other.mnemonicStr &&
+          accounts == other.accounts &&
+          passphrase == other.passphrase &&
+          walletName == other.walletName &&
+          biometricType == other.biometricType &&
+          provider == other.provider &&
+          identifiers == other.identifiers;
+}

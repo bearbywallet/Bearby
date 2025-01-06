@@ -107,14 +107,9 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
 
 abstract class RustLibApi extends BaseApi {
   Future<(String, String)> crateApiWalletAddBip39Wallet(
-      {required String password,
-      required String mnemonicStr,
-      required List<(BigInt, String)> accounts,
-      required String passphrase,
-      required String walletName,
-      required String biometricType,
-      required BigInt provider,
-      required List<String> identifiers});
+      {required Bip39AddWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens});
 
   Future<void> crateApiLedgerAddLedgerAccount(
       {required BigInt walletIndex,
@@ -147,12 +142,9 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex, required TransactionRequestInfo tx});
 
   Future<(String, String)> crateApiWalletAddSkWallet(
-      {required String sk,
-      required String password,
-      required String walletName,
-      required String biometricType,
-      required List<String> identifiers,
-      required BigInt provider});
+      {required AddSKWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens});
 
   Future<void> crateApiConnectionsAddWalletToConnection(
       {required String domain, required BigInt walletIndex});
@@ -267,25 +259,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<(String, String)> crateApiWalletAddBip39Wallet(
-      {required String password,
-      required String mnemonicStr,
-      required List<(BigInt, String)> accounts,
-      required String passphrase,
-      required String walletName,
-      required String biometricType,
-      required BigInt provider,
-      required List<String> identifiers}) {
+      {required Bip39AddWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(password, serializer);
-        sse_encode_String(mnemonicStr, serializer);
-        sse_encode_list_record_usize_string(accounts, serializer);
-        sse_encode_String(passphrase, serializer);
-        sse_encode_String(walletName, serializer);
-        sse_encode_String(biometricType, serializer);
-        sse_encode_usize(provider, serializer);
-        sse_encode_list_String(identifiers, serializer);
+        sse_encode_box_autoadd_bip_39_add_wallet_params(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(ftokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
       },
@@ -294,16 +276,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletAddBip39WalletConstMeta,
-      argValues: [
-        password,
-        mnemonicStr,
-        accounts,
-        passphrase,
-        walletName,
-        biometricType,
-        provider,
-        identifiers
-      ],
+      argValues: [params, walletSettings, ftokens],
       apiImpl: this,
     ));
   }
@@ -311,16 +284,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletAddBip39WalletConstMeta =>
       const TaskConstMeta(
         debugName: "add_bip39_wallet",
-        argNames: [
-          "password",
-          "mnemonicStr",
-          "accounts",
-          "passphrase",
-          "walletName",
-          "biometricType",
-          "provider",
-          "identifiers"
-        ],
+        argNames: ["params", "walletSettings", "ftokens"],
       );
 
   @override
@@ -538,21 +502,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<(String, String)> crateApiWalletAddSkWallet(
-      {required String sk,
-      required String password,
-      required String walletName,
-      required String biometricType,
-      required List<String> identifiers,
-      required BigInt provider}) {
+      {required AddSKWalletParams params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(sk, serializer);
-        sse_encode_String(password, serializer);
-        sse_encode_String(walletName, serializer);
-        sse_encode_String(biometricType, serializer);
-        sse_encode_list_String(identifiers, serializer);
-        sse_encode_usize(provider, serializer);
+        sse_encode_box_autoadd_add_sk_wallet_params(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(ftokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 8, port: port_);
       },
@@ -561,28 +519,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletAddSkWalletConstMeta,
-      argValues: [
-        sk,
-        password,
-        walletName,
-        biometricType,
-        identifiers,
-        provider
-      ],
+      argValues: [params, walletSettings, ftokens],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta get kCrateApiWalletAddSkWalletConstMeta => const TaskConstMeta(
         debugName: "add_sk_wallet",
-        argNames: [
-          "sk",
-          "password",
-          "walletName",
-          "biometricType",
-          "identifiers",
-          "provider"
-        ],
+        argNames: ["params", "walletSettings", "ftokens"],
       );
 
   @override
@@ -1607,6 +1551,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return AddSKWalletParams(
+      sk: dco_decode_String(arr[0]),
+      password: dco_decode_String(arr[1]),
+      walletName: dco_decode_String(arr[2]),
+      biometricType: dco_decode_String(arr[3]),
+      identifiers: dco_decode_list_String(arr[4]),
+      provider: dco_decode_usize(arr[5]),
+    );
+  }
+
+  @protected
   AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1664,15 +1624,46 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return Bip39AddWalletParams(
+      password: dco_decode_String(arr[0]),
+      mnemonicStr: dco_decode_String(arr[1]),
+      accounts: dco_decode_list_record_usize_string(arr[2]),
+      passphrase: dco_decode_String(arr[3]),
+      walletName: dco_decode_String(arr[4]),
+      biometricType: dco_decode_String(arr[5]),
+      provider: dco_decode_usize(arr[6]),
+      identifiers: dco_decode_list_String(arr[7]),
+    );
+  }
+
+  @protected
   bool dco_decode_bool(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as bool;
   }
 
   @protected
+  AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_add_sk_wallet_params(raw);
+  }
+
+  @protected
   BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_base_token_info(raw);
+  }
+
+  @protected
+  Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_bip_39_add_wallet_params(raw);
   }
 
   @protected
@@ -2292,6 +2283,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  AddSKWalletParams sse_decode_add_sk_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_sk = sse_decode_String(deserializer);
+    var var_password = sse_decode_String(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_identifiers = sse_decode_list_String(deserializer);
+    var var_provider = sse_decode_usize(deserializer);
+    return AddSKWalletParams(
+        sk: var_sk,
+        password: var_password,
+        walletName: var_walletName,
+        biometricType: var_biometricType,
+        identifiers: var_identifiers,
+        provider: var_provider);
+  }
+
+  @protected
   AddressBookEntryInfo sse_decode_address_book_entry_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2344,9 +2354,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_password = sse_decode_String(deserializer);
+    var var_mnemonicStr = sse_decode_String(deserializer);
+    var var_accounts = sse_decode_list_record_usize_string(deserializer);
+    var var_passphrase = sse_decode_String(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_provider = sse_decode_usize(deserializer);
+    var var_identifiers = sse_decode_list_String(deserializer);
+    return Bip39AddWalletParams(
+        password: var_password,
+        mnemonicStr: var_mnemonicStr,
+        accounts: var_accounts,
+        passphrase: var_passphrase,
+        walletName: var_walletName,
+        biometricType: var_biometricType,
+        provider: var_provider,
+        identifiers: var_identifiers);
+  }
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return deserializer.buffer.getUint8() != 0;
+  }
+
+  @protected
+  AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_add_sk_wallet_params(deserializer));
   }
 
   @protected
@@ -2354,6 +2394,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_base_token_info(deserializer));
+  }
+
+  @protected
+  Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_bip_39_add_wallet_params(deserializer));
   }
 
   @protected
@@ -3147,6 +3194,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.sk, serializer);
+    sse_encode_String(self.password, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_list_String(self.identifiers, serializer);
+    sse_encode_usize(self.provider, serializer);
+  }
+
+  @protected
   void sse_encode_address_book_entry_info(
       AddressBookEntryInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3187,9 +3246,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.password, serializer);
+    sse_encode_String(self.mnemonicStr, serializer);
+    sse_encode_list_record_usize_string(self.accounts, serializer);
+    sse_encode_String(self.passphrase, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_usize(self.provider, serializer);
+    sse_encode_list_String(self.identifiers, serializer);
+  }
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     serializer.buffer.putUint8(self ? 1 : 0);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_add_sk_wallet_params(self, serializer);
   }
 
   @protected
@@ -3197,6 +3277,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       BaseTokenInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_base_token_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bip_39_add_wallet_params(self, serializer);
   }
 
   @protected

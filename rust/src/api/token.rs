@@ -50,9 +50,9 @@ pub async fn get_rates() -> Result<String, String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn update_token_list(net: usize) -> Result<(), String> {
+pub async fn update_token_list(_net: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
+        let _core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
 
         // TODO: add fetch tokens from ZilPay server.
 

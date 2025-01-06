@@ -67,27 +67,20 @@ fn wire__crate__api__wallet__add_bip39_wallet_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_password = <String>::sse_decode(&mut deserializer);
-            let api_mnemonic_str = <String>::sse_decode(&mut deserializer);
-            let api_accounts = <Vec<(usize, String)>>::sse_decode(&mut deserializer);
-            let api_passphrase = <String>::sse_decode(&mut deserializer);
-            let api_wallet_name = <String>::sse_decode(&mut deserializer);
-            let api_biometric_type = <String>::sse_decode(&mut deserializer);
-            let api_provider = <usize>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
+            let api_params =
+                <crate::api::wallet::Bip39AddWalletParams>::sse_decode(&mut deserializer);
+            let api_wallet_settings =
+                <crate::models::settings::WalletSettingsInfo>::sse_decode(&mut deserializer);
+            let api_ftokens =
+                <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::wallet::add_bip39_wallet(
-                            api_password,
-                            api_mnemonic_str,
-                            &api_accounts,
-                            api_passphrase,
-                            api_wallet_name,
-                            api_biometric_type,
-                            api_provider,
-                            &api_identifiers,
+                            api_params,
+                            api_wallet_settings,
+                            api_ftokens,
                         )
                         .await?;
                         Ok(output_ok)
@@ -270,7 +263,7 @@ fn wire__crate__api__wallet__add_next_bip39_account_impl(
                             api_account_index,
                             api_name,
                             api_passphrase,
-                            &api_identifiers,
+                            api_identifiers,
                             api_password,
                             api_session_cipher,
                         )
@@ -385,23 +378,19 @@ fn wire__crate__api__wallet__add_sk_wallet_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_sk = <String>::sse_decode(&mut deserializer);
-            let api_password = <String>::sse_decode(&mut deserializer);
-            let api_wallet_name = <String>::sse_decode(&mut deserializer);
-            let api_biometric_type = <String>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_provider = <usize>::sse_decode(&mut deserializer);
+            let api_params = <crate::api::wallet::AddSKWalletParams>::sse_decode(&mut deserializer);
+            let api_wallet_settings =
+                <crate::models::settings::WalletSettingsInfo>::sse_decode(&mut deserializer);
+            let api_ftokens =
+                <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::wallet::add_sk_wallet(
-                            api_sk,
-                            api_password,
-                            api_wallet_name,
-                            api_biometric_type,
-                            &api_identifiers,
-                            api_provider,
+                            api_params,
+                            api_wallet_settings,
+                            api_ftokens,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1676,7 +1665,7 @@ fn wire__crate__api__auth__try_unlock_with_password_impl(
                         let output_ok = crate::api::auth::try_unlock_with_password(
                             api_password,
                             api_wallet_index,
-                            &api_identifiers,
+                            api_identifiers,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1719,7 +1708,7 @@ fn wire__crate__api__auth__try_unlock_with_session_impl(
                         let output_ok = crate::api::auth::try_unlock_with_session(
                             api_session_cipher,
                             api_wallet_index,
-                            &api_identifiers,
+                            api_identifiers,
                         )
                         .await?;
                         Ok(output_ok)
@@ -1787,12 +1776,12 @@ fn wire__crate__api__token__update_token_list_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_net = <usize>::sse_decode(&mut deserializer);
+            let api__net = <usize>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::token::update_token_list(api_net).await?;
+                        let output_ok = crate::api::token::update_token_list(api__net).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -1881,6 +1870,26 @@ impl SseDecode for crate::models::account::AccountInfo {
     }
 }
 
+impl SseDecode for crate::api::wallet::AddSKWalletParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_sk = <String>::sse_decode(deserializer);
+        let mut var_password = <String>::sse_decode(deserializer);
+        let mut var_walletName = <String>::sse_decode(deserializer);
+        let mut var_biometricType = <String>::sse_decode(deserializer);
+        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
+        let mut var_provider = <usize>::sse_decode(deserializer);
+        return crate::api::wallet::AddSKWalletParams {
+            sk: var_sk,
+            password: var_password,
+            wallet_name: var_walletName,
+            biometric_type: var_biometricType,
+            identifiers: var_identifiers,
+            provider: var_provider,
+        };
+    }
+}
+
 impl SseDecode for crate::models::book::AddressBookEntryInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -1942,6 +1951,30 @@ impl SseDecode for crate::models::transactions::base_token::BaseTokenInfo {
             value: var_value,
             symbol: var_symbol,
             decimals: var_decimals,
+        };
+    }
+}
+
+impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_password = <String>::sse_decode(deserializer);
+        let mut var_mnemonicStr = <String>::sse_decode(deserializer);
+        let mut var_accounts = <Vec<(usize, String)>>::sse_decode(deserializer);
+        let mut var_passphrase = <String>::sse_decode(deserializer);
+        let mut var_walletName = <String>::sse_decode(deserializer);
+        let mut var_biometricType = <String>::sse_decode(deserializer);
+        let mut var_provider = <usize>::sse_decode(deserializer);
+        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
+        return crate::api::wallet::Bip39AddWalletParams {
+            password: var_password,
+            mnemonic_str: var_mnemonicStr,
+            accounts: var_accounts,
+            passphrase: var_passphrase,
+            wallet_name: var_walletName,
+            biometric_type: var_biometricType,
+            provider: var_provider,
+            identifiers: var_identifiers,
         };
     }
 }
@@ -2888,6 +2921,31 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::account::AccountInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddSKWalletParams {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.sk.into_into_dart().into_dart(),
+            self.password.into_into_dart().into_dart(),
+            self.wallet_name.into_into_dart().into_dart(),
+            self.biometric_type.into_into_dart().into_dart(),
+            self.identifiers.into_into_dart().into_dart(),
+            self.provider.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::wallet::AddSKWalletParams
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::wallet::AddSKWalletParams>
+    for crate::api::wallet::AddSKWalletParams
+{
+    fn into_into_dart(self) -> crate::api::wallet::AddSKWalletParams {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::book::AddressBookEntryInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -2979,6 +3037,33 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::transactions::base_token::
     for crate::models::transactions::base_token::BaseTokenInfo
 {
     fn into_into_dart(self) -> crate::models::transactions::base_token::BaseTokenInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::wallet::Bip39AddWalletParams {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.password.into_into_dart().into_dart(),
+            self.mnemonic_str.into_into_dart().into_dart(),
+            self.accounts.into_into_dart().into_dart(),
+            self.passphrase.into_into_dart().into_dart(),
+            self.wallet_name.into_into_dart().into_dart(),
+            self.biometric_type.into_into_dart().into_dart(),
+            self.provider.into_into_dart().into_dart(),
+            self.identifiers.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::wallet::Bip39AddWalletParams
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::wallet::Bip39AddWalletParams>
+    for crate::api::wallet::Bip39AddWalletParams
+{
+    fn into_into_dart(self) -> crate::api::wallet::Bip39AddWalletParams {
         self
     }
 }
@@ -3455,6 +3540,18 @@ impl SseEncode for crate::models::account::AccountInfo {
     }
 }
 
+impl SseEncode for crate::api::wallet::AddSKWalletParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.sk, serializer);
+        <String>::sse_encode(self.password, serializer);
+        <String>::sse_encode(self.wallet_name, serializer);
+        <String>::sse_encode(self.biometric_type, serializer);
+        <Vec<String>>::sse_encode(self.identifiers, serializer);
+        <usize>::sse_encode(self.provider, serializer);
+    }
+}
+
 impl SseEncode for crate::models::book::AddressBookEntryInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3491,6 +3588,20 @@ impl SseEncode for crate::models::transactions::base_token::BaseTokenInfo {
         <String>::sse_encode(self.value, serializer);
         <String>::sse_encode(self.symbol, serializer);
         <u8>::sse_encode(self.decimals, serializer);
+    }
+}
+
+impl SseEncode for crate::api::wallet::Bip39AddWalletParams {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.password, serializer);
+        <String>::sse_encode(self.mnemonic_str, serializer);
+        <Vec<(usize, String)>>::sse_encode(self.accounts, serializer);
+        <String>::sse_encode(self.passphrase, serializer);
+        <String>::sse_encode(self.wallet_name, serializer);
+        <String>::sse_encode(self.biometric_type, serializer);
+        <usize>::sse_encode(self.provider, serializer);
+        <Vec<String>>::sse_encode(self.identifiers, serializer);
     }
 }
 

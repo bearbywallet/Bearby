@@ -9,11 +9,11 @@ use crate::utils::{
 pub async fn try_unlock_with_session(
     session_cipher: String,
     wallet_index: usize,
-    identifiers: &[String],
+    identifiers: Vec<String>,
 ) -> Result<bool, String> {
     let session = decode_session(Some(session_cipher))?;
     with_service_mut(|core| {
-        core.unlock_wallet_with_session(session, identifiers, wallet_index)
+        core.unlock_wallet_with_session(session, &identifiers, wallet_index)
             .map_err(ServiceError::BackgroundError)?;
 
         Ok(true)
@@ -26,10 +26,10 @@ pub async fn try_unlock_with_session(
 pub async fn try_unlock_with_password(
     password: String,
     wallet_index: usize,
-    identifiers: &[String],
+    identifiers: Vec<String>,
 ) -> Result<bool, String> {
     with_service_mut(|core| {
-        core.unlock_wallet_with_password(&password, identifiers, wallet_index)
+        core.unlock_wallet_with_password(&password, &identifiers, wallet_index)
             .map_err(ServiceError::BackgroundError)?;
 
         Ok(true)

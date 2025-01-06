@@ -73,6 +73,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AccountInfo dco_decode_account_info(dynamic raw);
 
   @protected
+  AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw);
+
+  @protected
   AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw);
 
   @protected
@@ -86,10 +89,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BaseTokenInfo dco_decode_base_token_info(dynamic raw);
 
   @protected
+  Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw);
+
+  @protected
   bool dco_decode_bool(dynamic raw);
 
   @protected
+  AddSKWalletParams dco_decode_box_autoadd_add_sk_wallet_params(dynamic raw);
+
+  @protected
   BaseTokenInfo dco_decode_box_autoadd_base_token_info(dynamic raw);
+
+  @protected
+  Bip39AddWalletParams dco_decode_box_autoadd_bip_39_add_wallet_params(
+      dynamic raw);
 
   @protected
   ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
@@ -303,6 +316,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AccountInfo sse_decode_account_info(SseDeserializer deserializer);
 
   @protected
+  AddSKWalletParams sse_decode_add_sk_wallet_params(
+      SseDeserializer deserializer);
+
+  @protected
   AddressBookEntryInfo sse_decode_address_book_entry_info(
       SseDeserializer deserializer);
 
@@ -317,10 +334,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BaseTokenInfo sse_decode_base_token_info(SseDeserializer deserializer);
 
   @protected
+  Bip39AddWalletParams sse_decode_bip_39_add_wallet_params(
+      SseDeserializer deserializer);
+
+  @protected
   bool sse_decode_bool(SseDeserializer deserializer);
 
   @protected
+  AddSKWalletParams sse_decode_box_autoadd_add_sk_wallet_params(
+      SseDeserializer deserializer);
+
+  @protected
   BaseTokenInfo sse_decode_box_autoadd_base_token_info(
+      SseDeserializer deserializer);
+
+  @protected
+  Bip39AddWalletParams sse_decode_box_autoadd_bip_39_add_wallet_params(
       SseDeserializer deserializer);
 
   @protected
@@ -562,6 +591,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_account_info(AccountInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer);
+
+  @protected
   void sse_encode_address_book_entry_info(
       AddressBookEntryInfo self, SseSerializer serializer);
 
@@ -577,11 +610,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_base_token_info(BaseTokenInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer);
+
+  @protected
   void sse_encode_bool(bool self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_add_sk_wallet_params(
+      AddSKWalletParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_base_token_info(
       BaseTokenInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_bip_39_add_wallet_params(
+      Bip39AddWalletParams self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_colors_info(
