@@ -83,12 +83,12 @@ pub async fn add_bip39_wallet(
 }
 
 pub struct AddSKWalletParams {
-    sk: String,
-    password: String,
-    wallet_name: String,
-    biometric_type: String,
-    identifiers: Vec<String>,
-    provider: usize,
+    pub sk: String,
+    pub password: String,
+    pub wallet_name: String,
+    pub biometric_type: String,
+    pub identifiers: Vec<String>,
+    pub provider: usize,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
