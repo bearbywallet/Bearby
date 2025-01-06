@@ -1,7 +1,7 @@
 use thiserror::Error;
 use zilpay::zil_errors::{
     address::AddressError, background::BackgroundError, settings::SettingsErrors,
-    tx::TransactionErrors, wallet::WalletErrors,
+    token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
 };
 
 #[derive(Debug, Error)]
@@ -59,6 +59,12 @@ pub enum ServiceError {
 
     #[error("Invalid public key length")]
     InvalidPublicKeyLength,
+
+    #[error("Settings Error: {0}")]
+    SettingsErrors(SettingsErrors),
+
+    #[error("Token Error: {0}")]
+    TokenError(TokenError),
 }
 
 impl From<BackgroundError> for ServiceError {
@@ -70,6 +76,18 @@ impl From<BackgroundError> for ServiceError {
 impl From<TransactionErrors> for ServiceError {
     fn from(error: TransactionErrors) -> Self {
         ServiceError::TransactionErrors(error)
+    }
+}
+
+impl From<SettingsErrors> for ServiceError {
+    fn from(error: SettingsErrors) -> Self {
+        ServiceError::SettingsErrors(error)
+    }
+}
+
+impl From<TokenError> for ServiceError {
+    fn from(error: TokenError) -> Self {
+        ServiceError::TokenError(error)
     }
 }
 

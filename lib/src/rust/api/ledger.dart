@@ -4,26 +4,16 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/ftoken.dart';
+import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<(String, String)> addLedgerWallet(
-        {required String pubKey,
-        required BigInt walletIndex,
-        required String walletName,
-        required String ledgerId,
-        required String accountName,
-        required String biometricType,
-        required List<String> identifiers,
-        required BigInt providerIndex}) =>
+        {required LedgerParamsInput params,
+        required WalletSettingsInfo walletSettings,
+        required List<FTokenInfo> ftokens}) =>
     RustLib.instance.api.crateApiLedgerAddLedgerWallet(
-        pubKey: pubKey,
-        walletIndex: walletIndex,
-        walletName: walletName,
-        ledgerId: ledgerId,
-        accountName: accountName,
-        biometricType: biometricType,
-        identifiers: identifiers,
-        providerIndex: providerIndex);
+        params: params, walletSettings: walletSettings, ftokens: ftokens);
 
 Future<void> addLedgerAccount(
         {required BigInt walletIndex,
@@ -39,3 +29,50 @@ Future<void> addLedgerAccount(
         pubKey: pubKey,
         identifiers: identifiers,
         sessionCipher: sessionCipher);
+
+class LedgerParamsInput {
+  final String pubKey;
+  final BigInt walletIndex;
+  final String walletName;
+  final String ledgerId;
+  final String accountName;
+  final String biometricType;
+  final List<String> identifiers;
+  final BigInt providerIndex;
+
+  const LedgerParamsInput({
+    required this.pubKey,
+    required this.walletIndex,
+    required this.walletName,
+    required this.ledgerId,
+    required this.accountName,
+    required this.biometricType,
+    required this.identifiers,
+    required this.providerIndex,
+  });
+
+  @override
+  int get hashCode =>
+      pubKey.hashCode ^
+      walletIndex.hashCode ^
+      walletName.hashCode ^
+      ledgerId.hashCode ^
+      accountName.hashCode ^
+      biometricType.hashCode ^
+      identifiers.hashCode ^
+      providerIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is LedgerParamsInput &&
+          runtimeType == other.runtimeType &&
+          pubKey == other.pubKey &&
+          walletIndex == other.walletIndex &&
+          walletName == other.walletName &&
+          ledgerId == other.ledgerId &&
+          accountName == other.accountName &&
+          biometricType == other.biometricType &&
+          identifiers == other.identifiers &&
+          providerIndex == other.providerIndex;
+}

@@ -96,6 +96,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
 
   @protected
+  LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
+
+  @protected
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw);
 
   @protected
@@ -114,6 +117,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt dco_decode_box_autoadd_u_64(dynamic raw);
 
   @protected
+  WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_colors_info(dynamic raw);
 
   @protected
@@ -130,6 +136,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   KeyPairInfo dco_decode_key_pair_info(dynamic raw);
+
+  @protected
+  LedgerParamsInput dco_decode_ledger_params_input(dynamic raw);
 
   @protected
   List<String> dco_decode_list_String(dynamic raw);
@@ -320,6 +329,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
+      SseDeserializer deserializer);
+
+  @protected
   NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
       SseDeserializer deserializer);
 
@@ -339,6 +352,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
 
   @protected
+  WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -356,6 +373,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
+
+  @protected
+  LedgerParamsInput sse_decode_ledger_params_input(
+      SseDeserializer deserializer);
 
   @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer);
@@ -569,6 +590,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ConnectionInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer);
 
@@ -586,6 +611,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
@@ -606,6 +635,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer);

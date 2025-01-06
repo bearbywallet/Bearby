@@ -4,40 +4,55 @@ pub use zilpay::{
     wallet::wallet_account::AccountManagement,
 };
 pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
+pub use zilpay::{token::ft::FToken, zil_errors::token::TokenError};
 
-use crate::utils::{
-    errors::ServiceError,
-    utils::{decode_public_key, decode_session, get_last_wallet, with_service_mut},
+use crate::{
+    models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
+    utils::{
+        errors::ServiceError,
+        utils::{decode_public_key, decode_session, get_last_wallet, with_service_mut},
+    },
 };
+
+pub struct LedgerParamsInput {
+    pub pub_key: String,
+    pub wallet_index: usize,
+    pub wallet_name: String,
+    pub ledger_id: String,
+    pub account_name: String,
+    pub biometric_type: String,
+    pub identifiers: Vec<String>,
+    pub provider_index: usize,
+}
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_wallet(
-    pub_key: String,
-    wallet_index: usize,
-    wallet_name: String,
-    ledger_id: String,
-    account_name: String,
-    biometric_type: String,
-    identifiers: &[String],
-    provider_index: usize,
+    params: LedgerParamsInput,
+    wallet_settings: WalletSettingsInfo,
+    ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        let pub_key_bytes = decode_public_key(&pub_key)?;
+        let pub_key_bytes = decode_public_key(&params.pub_key)?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
+        let ftokens = ftokens
+            .into_iter()
+            .map(TryFrom::try_from)
+            .collect::<Result<Vec<FToken>, TokenError>>()?;
+        let identifiers = params.identifiers;
         let params = BackgroundLedgerParams {
-            provider_index,
+            ftokens,
+            provider_index: params.provider_index,
             pub_key,
-            account_name,
-            wallet_index,
-            wallet_name,
-            ledger_id: ledger_id.as_bytes().to_vec(),
-            biometric_type: biometric_type.into(),
-            wallet_settings: Default::default(),
-            ftokens: vec![], // TODO: add the settings, ftokens, network
+            account_name: params.account_name,
+            wallet_index: params.wallet_index,
+            wallet_name: params.wallet_name,
+            ledger_id: params.ledger_id.as_bytes().to_vec(),
+            biometric_type: params.biometric_type.into(),
+            wallet_settings: wallet_settings.try_into()?,
         };
 
         let session = core
-            .add_ledger_wallet(params, WalletSettings::default(), identifiers)
+            .add_ledger_wallet(params, WalletSettings::default(), &identifiers)
             .map_err(ServiceError::BackgroundError)?;
         let wallet = get_last_wallet(core)?;
 

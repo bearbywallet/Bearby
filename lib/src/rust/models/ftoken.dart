@@ -11,8 +11,10 @@ class FTokenInfo {
   final String symbol;
   final int decimals;
   final String addr;
+  final String? logo;
   final Map<BigInt, String> balances;
   final bool default_;
+  final bool native;
   final BigInt providerIndex;
 
   const FTokenInfo({
@@ -20,8 +22,10 @@ class FTokenInfo {
     required this.symbol,
     required this.decimals,
     required this.addr,
+    this.logo,
     required this.balances,
     required this.default_,
+    required this.native,
     required this.providerIndex,
   });
 
@@ -31,8 +35,10 @@ class FTokenInfo {
       symbol.hashCode ^
       decimals.hashCode ^
       addr.hashCode ^
+      logo.hashCode ^
       balances.hashCode ^
       default_.hashCode ^
+      native.hashCode ^
       providerIndex.hashCode;
 
   @override
@@ -44,7 +50,9 @@ class FTokenInfo {
           symbol == other.symbol &&
           decimals == other.decimals &&
           addr == other.addr &&
+          logo == other.logo &&
           balances == other.balances &&
           default_ == other.default_ &&
+          native == other.native &&
           providerIndex == other.providerIndex;
 }

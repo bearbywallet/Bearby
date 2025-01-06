@@ -29,7 +29,7 @@ pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
         wallet_address: format!("0x{}", hex::encode(w.data.wallet_address)),
         accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
         selected_account: w.data.selected_account,
-        tokens: w.ftokens.iter().map(|v| v.into()).collect(),
+        tokens: w.ftokens.clone().into_iter().map(|v| v.into()).collect(),
         settings: w.data.settings.clone().into(),
     }
 }

@@ -125,14 +125,9 @@ abstract class RustLibApi extends BaseApi {
       String? sessionCipher});
 
   Future<(String, String)> crateApiLedgerAddLedgerWallet(
-      {required String pubKey,
-      required BigInt walletIndex,
-      required String walletName,
-      required String ledgerId,
-      required String accountName,
-      required String biometricType,
-      required List<String> identifiers,
-      required BigInt providerIndex});
+      {required LedgerParamsInput params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens});
 
   Future<void> crateApiBookAddNewBookAddress(
       {required String name, required String addr, required BigInt net});
@@ -380,25 +375,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<(String, String)> crateApiLedgerAddLedgerWallet(
-      {required String pubKey,
-      required BigInt walletIndex,
-      required String walletName,
-      required String ledgerId,
-      required String accountName,
-      required String biometricType,
-      required List<String> identifiers,
-      required BigInt providerIndex}) {
+      {required LedgerParamsInput params,
+      required WalletSettingsInfo walletSettings,
+      required List<FTokenInfo> ftokens}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_String(pubKey, serializer);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_String(walletName, serializer);
-        sse_encode_String(ledgerId, serializer);
-        sse_encode_String(accountName, serializer);
-        sse_encode_String(biometricType, serializer);
-        sse_encode_list_String(identifiers, serializer);
-        sse_encode_usize(providerIndex, serializer);
+        sse_encode_box_autoadd_ledger_params_input(params, serializer);
+        sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
+        sse_encode_list_f_token_info(ftokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 3, port: port_);
       },
@@ -407,16 +392,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiLedgerAddLedgerWalletConstMeta,
-      argValues: [
-        pubKey,
-        walletIndex,
-        walletName,
-        ledgerId,
-        accountName,
-        biometricType,
-        identifiers,
-        providerIndex
-      ],
+      argValues: [params, walletSettings, ftokens],
       apiImpl: this,
     ));
   }
@@ -424,16 +400,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiLedgerAddLedgerWalletConstMeta =>
       const TaskConstMeta(
         debugName: "add_ledger_wallet",
-        argNames: [
-          "pubKey",
-          "walletIndex",
-          "walletName",
-          "ledgerId",
-          "accountName",
-          "biometricType",
-          "identifiers",
-          "providerIndex"
-        ],
+        argNames: ["params", "walletSettings", "ftokens"],
       );
 
   @override
@@ -1721,6 +1688,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_ledger_params_input(raw);
+  }
+
+  @protected
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_network_config_info(raw);
@@ -1751,6 +1724,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt dco_decode_box_autoadd_u_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_u_64(raw);
+  }
+
+  @protected
+  WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_wallet_settings_info(raw);
   }
 
   @protected
@@ -1792,16 +1771,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FTokenInfo dco_decode_f_token_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return FTokenInfo(
       name: dco_decode_String(arr[0]),
       symbol: dco_decode_String(arr[1]),
       decimals: dco_decode_u_8(arr[2]),
       addr: dco_decode_String(arr[3]),
-      balances: dco_decode_Map_usize_String(arr[4]),
-      default_: dco_decode_bool(arr[5]),
-      providerIndex: dco_decode_usize(arr[6]),
+      logo: dco_decode_opt_String(arr[4]),
+      balances: dco_decode_Map_usize_String(arr[5]),
+      default_: dco_decode_bool(arr[6]),
+      native: dco_decode_bool(arr[7]),
+      providerIndex: dco_decode_usize(arr[8]),
     );
   }
 
@@ -1844,6 +1825,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return KeyPairInfo(
       sk: dco_decode_String(arr[0]),
       pk: dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  LedgerParamsInput dco_decode_ledger_params_input(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return LedgerParamsInput(
+      pubKey: dco_decode_String(arr[0]),
+      walletIndex: dco_decode_usize(arr[1]),
+      walletName: dco_decode_String(arr[2]),
+      ledgerId: dco_decode_String(arr[3]),
+      accountName: dco_decode_String(arr[4]),
+      biometricType: dco_decode_String(arr[5]),
+      identifiers: dco_decode_list_String(arr[6]),
+      providerIndex: dco_decode_usize(arr[7]),
     );
   }
 
@@ -2371,6 +2370,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_ledger_params_input(deserializer));
+  }
+
+  @protected
   NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2402,6 +2408,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_u_64(deserializer));
+  }
+
+  @protected
+  WalletSettingsInfo sse_decode_box_autoadd_wallet_settings_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_wallet_settings_info(deserializer));
   }
 
   @protected
@@ -2453,16 +2466,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_symbol = sse_decode_String(deserializer);
     var var_decimals = sse_decode_u_8(deserializer);
     var var_addr = sse_decode_String(deserializer);
+    var var_logo = sse_decode_opt_String(deserializer);
     var var_balances = sse_decode_Map_usize_String(deserializer);
     var var_default_ = sse_decode_bool(deserializer);
+    var var_native = sse_decode_bool(deserializer);
     var var_providerIndex = sse_decode_usize(deserializer);
     return FTokenInfo(
         name: var_name,
         symbol: var_symbol,
         decimals: var_decimals,
         addr: var_addr,
+        logo: var_logo,
         balances: var_balances,
         default_: var_default_,
+        native: var_native,
         providerIndex: var_providerIndex);
   }
 
@@ -2512,6 +2529,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_sk = sse_decode_String(deserializer);
     var var_pk = sse_decode_String(deserializer);
     return KeyPairInfo(sk: var_sk, pk: var_pk);
+  }
+
+  @protected
+  LedgerParamsInput sse_decode_ledger_params_input(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_pubKey = sse_decode_String(deserializer);
+    var var_walletIndex = sse_decode_usize(deserializer);
+    var var_walletName = sse_decode_String(deserializer);
+    var var_ledgerId = sse_decode_String(deserializer);
+    var var_accountName = sse_decode_String(deserializer);
+    var var_biometricType = sse_decode_String(deserializer);
+    var var_identifiers = sse_decode_list_String(deserializer);
+    var var_providerIndex = sse_decode_usize(deserializer);
+    return LedgerParamsInput(
+        pubKey: var_pubKey,
+        walletIndex: var_walletIndex,
+        walletName: var_walletName,
+        ledgerId: var_ledgerId,
+        accountName: var_accountName,
+        biometricType: var_biometricType,
+        identifiers: var_identifiers,
+        providerIndex: var_providerIndex);
   }
 
   @protected
@@ -3174,6 +3214,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_ledger_params_input(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3205,6 +3252,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_64(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_wallet_settings_info(
+      WalletSettingsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_wallet_settings_info(self, serializer);
   }
 
   @protected
@@ -3240,8 +3294,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.symbol, serializer);
     sse_encode_u_8(self.decimals, serializer);
     sse_encode_String(self.addr, serializer);
+    sse_encode_opt_String(self.logo, serializer);
     sse_encode_Map_usize_String(self.balances, serializer);
     sse_encode_bool(self.default_, serializer);
+    sse_encode_bool(self.native, serializer);
     sse_encode_usize(self.providerIndex, serializer);
   }
 
@@ -3275,6 +3331,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.sk, serializer);
     sse_encode_String(self.pk, serializer);
+  }
+
+  @protected
+  void sse_encode_ledger_params_input(
+      LedgerParamsInput self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.pubKey, serializer);
+    sse_encode_usize(self.walletIndex, serializer);
+    sse_encode_String(self.walletName, serializer);
+    sse_encode_String(self.ledgerId, serializer);
+    sse_encode_String(self.accountName, serializer);
+    sse_encode_String(self.biometricType, serializer);
+    sse_encode_list_String(self.identifiers, serializer);
+    sse_encode_usize(self.providerIndex, serializer);
   }
 
   @protected

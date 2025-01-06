@@ -169,27 +169,19 @@ fn wire__crate__api__ledger__add_ledger_wallet_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_pub_key = <String>::sse_decode(&mut deserializer);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_wallet_name = <String>::sse_decode(&mut deserializer);
-            let api_ledger_id = <String>::sse_decode(&mut deserializer);
-            let api_account_name = <String>::sse_decode(&mut deserializer);
-            let api_biometric_type = <String>::sse_decode(&mut deserializer);
-            let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
-            let api_provider_index = <usize>::sse_decode(&mut deserializer);
+            let api_params = <crate::api::ledger::LedgerParamsInput>::sse_decode(&mut deserializer);
+            let api_wallet_settings =
+                <crate::models::settings::WalletSettingsInfo>::sse_decode(&mut deserializer);
+            let api_ftokens =
+                <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok = crate::api::ledger::add_ledger_wallet(
-                            api_pub_key,
-                            api_wallet_index,
-                            api_wallet_name,
-                            api_ledger_id,
-                            api_account_name,
-                            api_biometric_type,
-                            &api_identifiers,
-                            api_provider_index,
+                            api_params,
+                            api_wallet_settings,
+                            api_ftokens,
                         )
                         .await?;
                         Ok(output_ok)
@@ -2015,16 +2007,20 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
         let mut var_symbol = <String>::sse_decode(deserializer);
         let mut var_decimals = <u8>::sse_decode(deserializer);
         let mut var_addr = <String>::sse_decode(deserializer);
+        let mut var_logo = <Option<String>>::sse_decode(deserializer);
         let mut var_balances = <std::collections::HashMap<usize, String>>::sse_decode(deserializer);
         let mut var_default_ = <bool>::sse_decode(deserializer);
+        let mut var_native = <bool>::sse_decode(deserializer);
         let mut var_providerIndex = <usize>::sse_decode(deserializer);
         return crate::models::ftoken::FTokenInfo {
             name: var_name,
             symbol: var_symbol,
             decimals: var_decimals,
             addr: var_addr,
+            logo: var_logo,
             balances: var_balances,
             default: var_default_,
+            native: var_native,
             provider_index: var_providerIndex,
         };
     }
@@ -2083,6 +2079,30 @@ impl SseDecode for crate::models::keypair::KeyPairInfo {
         return crate::models::keypair::KeyPairInfo {
             sk: var_sk,
             pk: var_pk,
+        };
+    }
+}
+
+impl SseDecode for crate::api::ledger::LedgerParamsInput {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_pubKey = <String>::sse_decode(deserializer);
+        let mut var_walletIndex = <usize>::sse_decode(deserializer);
+        let mut var_walletName = <String>::sse_decode(deserializer);
+        let mut var_ledgerId = <String>::sse_decode(deserializer);
+        let mut var_accountName = <String>::sse_decode(deserializer);
+        let mut var_biometricType = <String>::sse_decode(deserializer);
+        let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
+        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        return crate::api::ledger::LedgerParamsInput {
+            pub_key: var_pubKey,
+            wallet_index: var_walletIndex,
+            wallet_name: var_walletName,
+            ledger_id: var_ledgerId,
+            account_name: var_accountName,
+            biometric_type: var_biometricType,
+            identifiers: var_identifiers,
+            provider_index: var_providerIndex,
         };
     }
 }
@@ -3023,8 +3043,10 @@ impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
             self.symbol.into_into_dart().into_dart(),
             self.decimals.into_into_dart().into_dart(),
             self.addr.into_into_dart().into_dart(),
+            self.logo.into_into_dart().into_dart(),
             self.balances.into_into_dart().into_dart(),
             self.default.into_into_dart().into_dart(),
+            self.native.into_into_dart().into_dart(),
             self.provider_index.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -3095,6 +3117,33 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::keypair::KeyPairInfo>
     for crate::models::keypair::KeyPairInfo
 {
     fn into_into_dart(self) -> crate::models::keypair::KeyPairInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.pub_key.into_into_dart().into_dart(),
+            self.wallet_index.into_into_dart().into_dart(),
+            self.wallet_name.into_into_dart().into_dart(),
+            self.ledger_id.into_into_dart().into_dart(),
+            self.account_name.into_into_dart().into_dart(),
+            self.biometric_type.into_into_dart().into_dart(),
+            self.identifiers.into_into_dart().into_dart(),
+            self.provider_index.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::ledger::LedgerParamsInput
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger::LedgerParamsInput>
+    for crate::api::ledger::LedgerParamsInput
+{
+    fn into_into_dart(self) -> crate::api::ledger::LedgerParamsInput {
         self
     }
 }
@@ -3486,8 +3535,10 @@ impl SseEncode for crate::models::ftoken::FTokenInfo {
         <String>::sse_encode(self.symbol, serializer);
         <u8>::sse_encode(self.decimals, serializer);
         <String>::sse_encode(self.addr, serializer);
+        <Option<String>>::sse_encode(self.logo, serializer);
         <std::collections::HashMap<usize, String>>::sse_encode(self.balances, serializer);
         <bool>::sse_encode(self.default, serializer);
+        <bool>::sse_encode(self.native, serializer);
         <usize>::sse_encode(self.provider_index, serializer);
     }
 }
@@ -3529,6 +3580,20 @@ impl SseEncode for crate::models::keypair::KeyPairInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.sk, serializer);
         <String>::sse_encode(self.pk, serializer);
+    }
+}
+
+impl SseEncode for crate::api::ledger::LedgerParamsInput {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.pub_key, serializer);
+        <usize>::sse_encode(self.wallet_index, serializer);
+        <String>::sse_encode(self.wallet_name, serializer);
+        <String>::sse_encode(self.ledger_id, serializer);
+        <String>::sse_encode(self.account_name, serializer);
+        <String>::sse_encode(self.biometric_type, serializer);
+        <Vec<String>>::sse_encode(self.identifiers, serializer);
+        <usize>::sse_encode(self.provider_index, serializer);
     }
 }
 
