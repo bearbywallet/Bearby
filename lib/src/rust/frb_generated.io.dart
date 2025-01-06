@@ -97,14 +97,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  TransactionRequestInfo dco_decode_box_autoadd_transaction_request_info(
+      dynamic raw);
+
+  @protected
   TransactionRequestScilla dco_decode_box_autoadd_transaction_request_scilla(
       dynamic raw);
 
   @protected
   BigInt dco_decode_box_autoadd_u_64(dynamic raw);
-
-  @protected
-  ChainType dco_decode_chain_type(dynamic raw);
 
   @protected
   ColorsInfo dco_decode_colors_info(dynamic raw);
@@ -114,9 +115,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo dco_decode_f_token_info(dynamic raw);
-
-  @protected
-  int dco_decode_i_32(dynamic raw);
 
   @protected
   KeyPairInfo dco_decode_key_pair_info(dynamic raw);
@@ -311,14 +309,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  TransactionRequestInfo sse_decode_box_autoadd_transaction_request_info(
+      SseDeserializer deserializer);
+
+  @protected
   TransactionRequestScilla sse_decode_box_autoadd_transaction_request_scilla(
       SseDeserializer deserializer);
 
   @protected
   BigInt sse_decode_box_autoadd_u_64(SseDeserializer deserializer);
-
-  @protected
-  ChainType sse_decode_chain_type(SseDeserializer deserializer);
 
   @protected
   ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
@@ -328,9 +327,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
-
-  @protected
-  int sse_decode_i_32(SseDeserializer deserializer);
 
   @protected
   KeyPairInfo sse_decode_key_pair_info(SseDeserializer deserializer);
@@ -480,6 +476,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  int sse_decode_i_32(SseDeserializer deserializer);
+
+  @protected
   void sse_encode_AnyhowException(
       AnyhowException self, SseSerializer serializer);
 
@@ -547,14 +546,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       TransactionRequestEVM self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_transaction_request_info(
+      TransactionRequestInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_transaction_request_scilla(
       TransactionRequestScilla self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_u_64(BigInt self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_chain_type(ChainType self, SseSerializer serializer);
 
   @protected
   void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
@@ -565,9 +565,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_i_32(int self, SseSerializer serializer);
 
   @protected
   void sse_encode_key_pair_info(KeyPairInfo self, SseSerializer serializer);
@@ -720,6 +717,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_i_32(int self, SseSerializer serializer);
 }
 
 // Section: wire_class

@@ -51,12 +51,6 @@ class BaseTokenInfo {
           decimals == other.decimals;
 }
 
-enum ChainType {
-  scilla,
-  evm,
-  ;
-}
-
 class TransactionMetadataInfo {
   final BigInt providerIndex;
   final String? hash;
@@ -169,20 +163,17 @@ class TransactionRequestEVM {
 
 class TransactionRequestInfo {
   final TransactionMetadataInfo metadata;
-  final ChainType chainType;
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
 
   const TransactionRequestInfo({
     required this.metadata,
-    required this.chainType,
     this.scilla,
     this.evm,
   });
 
   @override
-  int get hashCode =>
-      metadata.hashCode ^ chainType.hashCode ^ scilla.hashCode ^ evm.hashCode;
+  int get hashCode => metadata.hashCode ^ scilla.hashCode ^ evm.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -190,7 +181,6 @@ class TransactionRequestInfo {
       other is TransactionRequestInfo &&
           runtimeType == other.runtimeType &&
           metadata == other.metadata &&
-          chainType == other.chainType &&
           scilla == other.scilla &&
           evm == other.evm;
 }

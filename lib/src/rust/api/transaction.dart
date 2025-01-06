@@ -15,3 +15,8 @@ Future<List<TransactionRequestInfo>> getRequestedTransactions(
 Future<void> clearRequestedTransactions({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTransactionClearRequestedTransactions(
         walletIndex: walletIndex);
+
+Future<void> addRequestedTransactions(
+        {required BigInt walletIndex, required TransactionRequestInfo tx}) =>
+    RustLib.instance.api.crateApiTransactionAddRequestedTransactions(
+        walletIndex: walletIndex, tx: tx);
