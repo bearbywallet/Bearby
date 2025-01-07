@@ -33,6 +33,7 @@ pub async fn add_ledger_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
+        // TODO: detect network.
         let pub_key_bytes = decode_public_key(&params.pub_key)?;
         let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
         let ftokens = ftokens
