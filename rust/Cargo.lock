@@ -965,6 +965,7 @@ dependencies = [
  "cipher 0.1.0",
  "config",
  "crypto",
+ "errors",
  "hex",
  "network",
  "proto",
@@ -979,7 +980,6 @@ dependencies = [
  "token",
  "tokio",
  "wallet",
- "zil_errors",
 ]
 
 [[package]]
@@ -1205,6 +1205,7 @@ version = "0.1.0"
 dependencies = [
  "aes-gcm",
  "config",
+ "errors",
  "hex",
  "ntrulp",
  "rand",
@@ -1212,7 +1213,6 @@ dependencies = [
  "rust-argon2",
  "serde",
  "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -1325,12 +1325,12 @@ version = "0.1.0"
 dependencies = [
  "bip39",
  "config",
+ "errors",
  "hex",
  "k256",
  "rand",
  "rand_chacha",
  "sha2",
- "zil_errors",
 ]
 
 [[package]]
@@ -1583,6 +1583,16 @@ checksum = "534c5cf6194dfab3db3242765c03bbe257cf92f22b38f6bc0c58d59108a820ba"
 dependencies = [
  "libc",
  "windows-sys 0.52.0",
+]
+
+[[package]]
+name = "errors"
+version = "0.1.0"
+dependencies = [
+ "bincode",
+ "ntrulp",
+ "rust-argon2",
+ "thiserror 1.0.63",
 ]
 
 [[package]]
@@ -1948,9 +1958,9 @@ name = "history"
 version = "0.1.0"
 dependencies = [
  "alloy",
+ "errors",
  "proto",
  "serde",
- "zil_errors",
 ]
 
 [[package]]
@@ -2404,6 +2414,7 @@ dependencies = [
  "bincode",
  "config",
  "crypto",
+ "errors",
  "proto",
  "reqwest 0.11.27",
  "rpc",
@@ -2412,7 +2423,6 @@ dependencies = [
  "storage",
  "token",
  "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -2865,6 +2875,7 @@ dependencies = [
  "bip39",
  "config",
  "crypto",
+ "errors",
  "hex",
  "hmac",
  "k256",
@@ -2876,7 +2887,6 @@ dependencies = [
  "serde_json",
  "sha2",
  "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -3135,12 +3145,13 @@ dependencies = [
  "async-trait",
  "bincode",
  "config",
+ "crypto",
+ "errors",
  "hex",
  "reqwest 0.11.27",
  "serde",
  "serde_json",
  "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -3462,10 +3473,10 @@ version = "0.1.0"
 dependencies = [
  "cipher 0.1.0",
  "config",
+ "errors",
  "rand",
  "rand_chacha",
  "rust-argon2",
- "zil_errors",
 ]
 
 [[package]]
@@ -3474,10 +3485,10 @@ version = "0.1.0"
 dependencies = [
  "cipher 0.1.0",
  "config",
+ "errors",
  "rust-argon2",
  "serde",
  "serde_json",
- "zil_errors",
 ]
 
 [[package]]
@@ -3619,9 +3630,9 @@ version = "0.1.0"
 dependencies = [
  "config",
  "directories",
+ "errors",
  "hex",
  "sled",
- "zil_errors",
 ]
 
 [[package]]
@@ -3821,11 +3832,11 @@ dependencies = [
  "alloy",
  "bincode",
  "config",
+ "errors",
  "proto",
  "rpc",
  "serde",
  "serde_json",
- "zil_errors",
 ]
 
 [[package]]
@@ -4147,6 +4158,7 @@ dependencies = [
  "cipher 0.1.0",
  "config",
  "crypto",
+ "errors",
  "hex",
  "history",
  "network",
@@ -4160,7 +4172,6 @@ dependencies = [
  "storage",
  "token",
  "tokio",
- "zil_errors",
 ]
 
 [[package]]
@@ -4573,15 +4584,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "zil_errors"
-version = "0.1.0"
-dependencies = [
- "ntrulp",
- "rust-argon2",
- "thiserror 1.0.63",
-]
-
-[[package]]
 name = "zilpay"
 version = "0.1.0"
 dependencies = [
@@ -4589,13 +4591,13 @@ dependencies = [
  "cipher 0.1.0",
  "config",
  "crypto",
+ "errors",
  "history",
  "proto",
  "rpc",
  "settings",
  "token",
  "wallet",
- "zil_errors",
 ]
 
 [[package]]
@@ -4606,12 +4608,12 @@ dependencies = [
  "cipher 0.1.0",
  "config",
  "crypto",
+ "errors",
  "history",
  "proto",
  "rpc",
  "settings",
  "token",
  "wallet",
- "zil_errors",
  "zilpay",
 ]

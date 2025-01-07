@@ -1,10 +1,11 @@
+use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::{
     background::{bg_wallet::WalletManagement, BackgroundLedgerParams},
     settings::wallet_settings::WalletSettings,
     wallet::wallet_account::AccountManagement,
 };
+pub use zilpay::{errors::token::TokenError, token::ft::FToken};
 pub use zilpay::{proto::pubkey::PubKey, wallet::LedgerParams};
-pub use zilpay::{token::ft::FToken, zil_errors::token::TokenError};
 
 use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
@@ -56,10 +57,7 @@ pub async fn add_ledger_wallet(
             .map_err(ServiceError::BackgroundError)?;
         let wallet = get_last_wallet(core)?;
 
-        Ok((
-            hex::encode(session),
-            hex::encode(wallet.data.wallet_address),
-        ))
+        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
     })
     .await
     .map_err(Into::into)
@@ -79,12 +77,11 @@ pub async fn add_ledger_account(
 
         core.unlock_wallet_with_session(session, identifiers, wallet_index)?;
 
-        let wallet = core
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(ServiceError::WalletAccess(wallet_index))?;
-        let first_account = wallet
-            .data
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let first_account = data
             .accounts
             .first()
             .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
@@ -99,7 +96,7 @@ pub async fn add_ledger_account(
         };
 
         wallet
-            .add_ledger_account(name, &pub_key, account_index)
+            .add_ledger_account(name, pub_key, account_index, first_account.provider_index)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await

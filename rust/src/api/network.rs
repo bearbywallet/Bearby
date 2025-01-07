@@ -3,10 +3,11 @@ use crate::utils::errors::ServiceError;
 use crate::utils::utils::{with_service, with_service_mut};
 
 pub use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::background::bg_wallet::WalletManagement;
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::proto::address::Address;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
-pub use zilpay::zil_errors::background::BackgroundError;
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
@@ -61,14 +62,16 @@ pub async fn select_provider(provider_index: usize, wallet_index: usize) -> Resu
     with_service_mut(|core| {
         core.get_provider(provider_index)?;
 
-        let wallet = core
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(BackgroundError::WalletNotExists(wallet_index))?;
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        wallet.data.provider_index = provider_index;
+        data.accounts
+            .get_mut(data.selected_account)
+            .map(|acc| acc.provider_index = provider_index);
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())

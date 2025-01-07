@@ -1,5 +1,5 @@
 use thiserror::Error;
-use zilpay::zil_errors::{
+use zilpay::errors::{
     address::AddressError, background::BackgroundError, settings::SettingsErrors,
     token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
 };
