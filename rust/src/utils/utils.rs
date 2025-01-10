@@ -1,10 +1,14 @@
 use std::sync::Arc;
 use zilpay::{
+    background::bg_wallet::WalletManagement,
+    errors::{background::BackgroundError, wallet::WalletErrors},
+};
+pub use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
     crypto::bip49::Bip49DerivationPath,
     proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
-    wallet::Wallet,
+    wallet::{wallet_data::WalletData, Wallet, WalletAddrType},
 };
 
 use crate::{
@@ -19,20 +23,6 @@ pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
         .or_else(|_| Address::from_zil_bech32(&addr))
         .or_else(|_| Address::from_eth_address(&addr))
         .map_err(ServiceError::AddressError)
-}
-
-pub fn wallet_info_from_wallet(w: &Wallet) -> WalletInfo {
-    WalletInfo {
-        provider: w.data.provider_index,
-        auth_type: w.data.biometric_type.clone().into(),
-        wallet_name: w.data.wallet_name.clone(),
-        wallet_type: w.data.wallet_type.to_str(),
-        wallet_address: format!("0x{}", hex::encode(w.data.wallet_address)),
-        accounts: w.data.accounts.iter().map(|v| v.into()).collect(),
-        selected_account: w.data.selected_account,
-        tokens: w.ftokens.clone().into_iter().map(|v| v.into()).collect(),
-        settings: w.data.settings.clone().into(),
-    }
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
@@ -90,11 +80,12 @@ pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceErr
 }
 
 pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
-    let wallets: Vec<WalletInfo> = service
+    let wallets = service
         .wallets
         .iter()
-        .map(wallet_info_from_wallet)
-        .collect();
+        .map(|w| w.try_into())
+        .collect::<Result<Vec<WalletInfo>, WalletErrors>>()
+        .map_err(BackgroundError::WalletError)?;
 
     let notifications_wallet_states = service
         .settings
@@ -150,6 +141,20 @@ where
             .wallets
             .get_mut(wallet_index)
             .ok_or(ServiceError::WalletAccess(wallet_index))?;
+
+        f(wallet)
+    } else {
+        Err(ServiceError::NotRunning)
+    }
+}
+
+pub async fn with_wallet<F, T>(wallet_index: usize, f: F) -> Result<T, ServiceError>
+where
+    F: FnOnce(&Wallet) -> Result<T, ServiceError>,
+{
+    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
+        let core = Arc::clone(&service.core);
+        let wallet = core.get_wallet_by_index(wallet_index)?;
 
         f(wallet)
     } else {

@@ -1,16 +1,16 @@
 use std::str::FromStr;
 
 pub use zilpay::config::sha::SHA256_SIZE;
+pub use zilpay::errors::address::AddressError;
 pub use zilpay::proto::tx::{TransactionMetadata, TransactionRequest};
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
 pub use zilpay::proto::{
     AlloyAccessList, AlloyAccessListItem, AlloyAddress, AlloyBytes, AlloyTxKind,
 };
-pub use zilpay::zil_errors::address::AddressError;
 pub use zilpay::{
+    errors::tx::TransactionErrors,
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
-    zil_errors::tx::TransactionErrors,
 };
 
 use super::base_token::BaseTokenInfo;

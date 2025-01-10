@@ -27,27 +27,60 @@ Future<(String, String)> addSkWallet(
     RustLib.instance.api.crateApiWalletAddSkWallet(
         params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-Future<void> addNextBip39Account(
-        {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required String name,
-        required String passphrase,
-        required List<String> identifiers,
-        String? password,
-        String? sessionCipher}) =>
-    RustLib.instance.api.crateApiWalletAddNextBip39Account(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        name: name,
-        passphrase: passphrase,
-        identifiers: identifiers,
-        password: password,
-        sessionCipher: sessionCipher);
+Future<void> addNextBip39Account({required AddNextBip39AccountParams params}) =>
+    RustLib.instance.api.crateApiWalletAddNextBip39Account(params: params);
 
 Future<void> selectAccount(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiWalletSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+class AddNextBip39AccountParams {
+  final BigInt walletIndex;
+  final BigInt accountIndex;
+  final String name;
+  final String passphrase;
+  final List<String> identifiers;
+  final String? password;
+  final String? sessionCipher;
+  final BigInt providerIndex;
+
+  const AddNextBip39AccountParams({
+    required this.walletIndex,
+    required this.accountIndex,
+    required this.name,
+    required this.passphrase,
+    required this.identifiers,
+    this.password,
+    this.sessionCipher,
+    required this.providerIndex,
+  });
+
+  @override
+  int get hashCode =>
+      walletIndex.hashCode ^
+      accountIndex.hashCode ^
+      name.hashCode ^
+      passphrase.hashCode ^
+      identifiers.hashCode ^
+      password.hashCode ^
+      sessionCipher.hashCode ^
+      providerIndex.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is AddNextBip39AccountParams &&
+          runtimeType == other.runtimeType &&
+          walletIndex == other.walletIndex &&
+          accountIndex == other.accountIndex &&
+          name == other.name &&
+          passphrase == other.passphrase &&
+          identifiers == other.identifiers &&
+          password == other.password &&
+          sessionCipher == other.sessionCipher &&
+          providerIndex == other.providerIndex;
+}
 
 class AddSKWalletParams {
   final String sk;

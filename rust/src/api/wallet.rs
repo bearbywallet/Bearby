@@ -1,7 +1,9 @@
 use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::background::Background;
+use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
+use zilpay::errors::wallet::WalletErrors;
 use zilpay::token::ft::FToken;
-use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::{
     background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
 };
@@ -18,18 +20,24 @@ use crate::{
     models::wallet::WalletInfo,
     utils::{
         errors::ServiceError,
-        utils::{
-            decode_secret_key, decode_session, wallet_info_from_wallet, with_service,
-            with_service_mut, with_wallet_mut,
-        },
+        utils::{decode_session, with_service, with_service_mut, with_wallet_mut},
     },
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
+// #[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
-    with_service(|core| Ok(core.wallets.iter().map(wallet_info_from_wallet).collect()))
-        .await
-        .map_err(Into::into)
+    with_service(|core| {
+        let wallets = core
+            .wallets
+            .iter()
+            .map(|w| w.try_into())
+            .collect::<Result<Vec<WalletInfo>, WalletErrors>>()
+            .map_err(BackgroundError::WalletError)?;
+
+        Ok(wallets)
+    })
+    .await
+    .map_err(Into::into)
 }
 
 pub struct Bip39AddWalletParams {
@@ -50,12 +58,13 @@ pub async fn add_bip39_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        let provider = core.get_provider(params.provider)?;
-        let accounts_bip39 = params
+        let core_ref: &Background = &*core;
+        let provider = core_ref.get_provider(params.provider)?;
+        let accounts_bip49 = params
             .accounts
             .into_iter()
             .map(|(i, name)| (provider.get_bip49(i), name))
-            .collect::<Vec<_>>();
+            .collect::<Vec<(Bip49DerivationPath, String)>>();
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)
@@ -67,7 +76,7 @@ pub async fn add_bip39_wallet(
                 provider: params.provider,
                 password: &params.password,
                 mnemonic_str: &params.mnemonic_str,
-                accounts: &accounts_bip39,
+                accounts: &accounts_bip49,
                 passphrase: &params.passphrase,
                 wallet_name: params.wallet_name,
                 biometric_type: params.biometric_type.into(),
@@ -146,15 +155,17 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         .map_err(ServiceError::BackgroundError)?;
 
         let wallet = core.get_wallet_by_index(params.wallet_index)?;
-        let data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
         let provider = core.get_provider(params.provider_index)?;
         let bip49 = provider.get_bip49(params.account_index);
 
         wallet
-            .add_next_bip39_account(name, &bip49, &passphrase, &seed, params.provider_index)
+            .add_next_bip39_account(
+                params.name,
+                &bip49,
+                &params.passphrase,
+                &seed,
+                params.provider_index,
+            )
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))
     })
     .await

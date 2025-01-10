@@ -13,10 +13,7 @@ use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
     utils::{
         errors::ServiceError,
-        utils::{
-            decode_public_key, decode_session, get_last_wallet, pubkey_from_provider,
-            with_service_mut,
-        },
+        utils::{decode_session, get_last_wallet, pubkey_from_provider, with_service_mut},
     },
 };
 

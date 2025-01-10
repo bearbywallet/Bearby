@@ -1,3 +1,4 @@
+pub use zilpay::rpc::network_config::Bip44Network;
 pub use zilpay::rpc::network_config::NetworkConfig;
 
 pub struct NetworkConfigInfo {
@@ -7,11 +8,13 @@ pub struct NetworkConfigInfo {
     pub urls: Vec<String>,
     pub explorer_urls: Vec<String>,
     pub default: bool,
+    pub bip49: Bip44Network,
 }
 
 impl From<NetworkConfig> for NetworkConfigInfo {
     fn from(value: NetworkConfig) -> Self {
         Self {
+            bip49: value.bip49,
             network_name: value.network_name,
             chain_id: value.chain_id,
             fallback_enabled: value.fallback_enabled,
@@ -25,6 +28,7 @@ impl From<NetworkConfig> for NetworkConfigInfo {
 impl From<NetworkConfigInfo> for NetworkConfig {
     fn from(value: NetworkConfigInfo) -> Self {
         Self {
+            bip49: value.bip49,
             network_name: value.network_name,
             chain_id: value.chain_id,
             fallback_enabled: value.fallback_enabled,

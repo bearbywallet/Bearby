@@ -1,6 +1,6 @@
 use crate::utils::{
     errors::ServiceError,
-    utils::{with_service_mut, with_wallet_mut},
+    utils::{with_service_mut, with_wallet, with_wallet_mut},
 };
 pub use zilpay::settings::{
     notifications::NotificationState,
@@ -60,10 +60,15 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
-        wallet.data.settings.features.currency_convert = currency;
+    with_wallet(wallet_index, |wallet| {
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.settings.features.currency_convert = currency;
+
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -73,9 +78,14 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
-        wallet.data.settings.features.ens_enabled = ens_enabled;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.settings.features.ens_enabled = ens_enabled;
+
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -85,9 +95,14 @@ pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<()
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
-        wallet.data.settings.features.ipfs_node = node;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.settings.features.ipfs_node = node;
+
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -97,9 +112,14 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
-        wallet.data.settings.network.gas_control_enabled = enabled;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.settings.network.gas_control_enabled = enabled;
+
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
@@ -109,9 +129,14 @@ pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Resul
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
-        wallet.data.settings.network.node_ranking_enabled = enabled;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.settings.network.node_ranking_enabled = enabled;
+
         wallet
-            .save_to_storage()
+            .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await

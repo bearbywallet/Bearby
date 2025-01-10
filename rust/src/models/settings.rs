@@ -1,11 +1,11 @@
 pub use zilpay::cipher::options::CipherOrders;
 pub use zilpay::config::sha::SHA256_SIZE;
+pub use zilpay::errors::settings::SettingsErrors;
 pub use zilpay::settings::argon2::ArgonParams;
 pub use zilpay::settings::wallet_settings::WalletSettings;
-pub use zilpay::zil_errors::settings::SettingsErrors;
 use zilpay::{
+    errors::cipher::CipherErrors,
     settings::wallet_settings::{NetworkSettings, WalletFeatures},
-    zil_errors::cipher::CipherErrors,
 };
 
 #[derive(Debug)]

@@ -1,12 +1,13 @@
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{with_service, with_service_mut};
+use crate::utils::utils::with_service;
 pub use zilpay::background::bg_wallet::WalletManagement;
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::proto::address::Address;
+pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
-pub use zilpay::zil_errors::background::BackgroundError;
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_requested_transactions(
@@ -14,11 +15,11 @@ pub async fn get_requested_transactions(
 ) -> Result<Vec<TransactionRequestInfo>, String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
-        let tx_list: Vec<TransactionRequestInfo> = wallet
-            .request_txns
-            .iter()
-            .map(|tx| tx.clone().into())
-            .collect();
+        let request_txns = wallet
+            .get_request_txns()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let tx_list: Vec<TransactionRequestInfo> =
+            request_txns.iter().map(|tx| tx.clone().into()).collect();
 
         Ok(tx_list)
     })
@@ -28,11 +29,8 @@ pub async fn get_requested_transactions(
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn clear_requested_transactions(wallet_index: usize) -> Result<(), String> {
-    with_service_mut(|core| {
-        let wallet = core
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(BackgroundError::WalletNotExists(wallet_index))?;
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
 
         wallet
             .clear_request_transaction()
@@ -49,11 +47,8 @@ pub async fn add_requested_transactions(
     wallet_index: usize,
     tx: TransactionRequestInfo,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
-        let wallet = core
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(BackgroundError::WalletNotExists(wallet_index))?;
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
         let tx = tx.try_into()?;
 
         wallet
@@ -70,8 +65,12 @@ pub async fn add_requested_transactions(
 pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactionInfo>, String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
+        let history = wallet
+            .get_history()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
         let history: Vec<HistoricalTransactionInfo> =
-            wallet.history.iter().map(|tx| tx.clone().into()).collect();
+            history.iter().map(|tx| tx.clone().into()).collect();
 
         Ok(history)
     })

@@ -17,7 +17,6 @@ class WalletInfo {
   final List<AccountInfo> accounts;
   final BigInt selectedAccount;
   final List<FTokenInfo> tokens;
-  final BigInt provider;
   final WalletSettingsInfo settings;
 
   const WalletInfo({
@@ -28,7 +27,6 @@ class WalletInfo {
     required this.accounts,
     required this.selectedAccount,
     required this.tokens,
-    required this.provider,
     required this.settings,
   });
 
@@ -41,7 +39,6 @@ class WalletInfo {
       accounts.hashCode ^
       selectedAccount.hashCode ^
       tokens.hashCode ^
-      provider.hashCode ^
       settings.hashCode;
 
   @override
@@ -56,6 +53,5 @@ class WalletInfo {
           accounts == other.accounts &&
           selectedAccount == other.selectedAccount &&
           tokens == other.tokens &&
-          provider == other.provider &&
           settings == other.settings;
 }

@@ -1,6 +1,5 @@
 use std::collections::HashMap;
-
-use zilpay::{proto::address::Address, token::ft::FToken, zil_errors::token::TokenError};
+use zilpay::{errors::token::TokenError, proto::address::Address, token::ft::FToken};
 
 #[derive(Debug)]
 pub struct FTokenInfo {
