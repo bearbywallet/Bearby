@@ -1,5 +1,7 @@
+use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::errors::token::TokenError;
 use zilpay::token::ft::FToken;
-use zilpay::zil_errors::token::TokenError;
+use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::{
     background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
 };
@@ -11,6 +13,7 @@ pub use zilpay::{
 
 use crate::models::ftoken::FTokenInfo;
 use crate::models::settings::WalletSettingsInfo;
+use crate::utils::utils::secretkey_from_provider;
 use crate::{
     models::wallet::WalletInfo,
     utils::{
@@ -47,11 +50,11 @@ pub async fn add_bip39_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
+        let provider = core.get_provider(params.provider)?;
         let accounts_bip39 = params
             .accounts
             .into_iter()
-            // TODO: detect network by provider id.
-            .map(|(i, name)| (Bip49DerivationPath::Zilliqa(i), name))
+            .map(|(i, name)| (provider.get_bip49(i), name))
             .collect::<Vec<_>>();
         let ftokens = ftokens
             .into_iter()
@@ -73,10 +76,7 @@ pub async fn add_bip39_wallet(
             .map_err(ServiceError::BackgroundError)?;
         let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
-        Ok((
-            hex::encode(session),
-            hex::encode(wallet.data.wallet_address),
-        ))
+        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
     })
     .await
     .map_err(Into::into)
@@ -98,13 +98,13 @@ pub async fn add_sk_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        let sk = params.sk.strip_prefix("0x").unwrap_or(&params.sk);
-        let secret_key = decode_secret_key(&sk)?;
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)
             .collect::<Result<Vec<FToken>, TokenError>>()?;
-        let secret_key = SecretKey::Secp256k1Sha256Zilliqa(secret_key);
+        let provider = core.get_provider(params.provider)?;
+        let bip49 = provider.get_bip49(0);
+        let secret_key = secretkey_from_provider(&params.sk, bip49)?;
         let session = core.add_sk_wallet(BackgroundSKParams {
             ftokens,
             provider: params.provider,
@@ -117,54 +117,45 @@ pub async fn add_sk_wallet(
         })?;
         let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
 
-        Ok((
-            hex::encode(session),
-            hex::encode(wallet.data.wallet_address),
-        ))
+        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
     })
     .await
     .map_err(Into::into)
 }
 
+pub struct AddNextBip39AccountParams {
+    pub wallet_index: usize,
+    pub account_index: usize,
+    pub name: String,
+    pub passphrase: String,
+    pub identifiers: Vec<String>,
+    pub password: Option<String>,
+    pub session_cipher: Option<String>,
+    pub provider_index: usize,
+}
+
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_next_bip39_account(
-    wallet_index: usize,
-    account_index: usize,
-    name: String,
-    passphrase: String,
-    identifiers: Vec<String>,
-    password: Option<String>,
-    session_cipher: Option<String>,
-) -> Result<(), String> {
+pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
     with_service_mut(|core| {
-        let seed = if let Some(pass) = password {
-            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        let seed = if let Some(pass) = params.password {
+            core.unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
         } else {
-            let session = decode_session(session_cipher)?;
-            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+            let session = decode_session(params.session_cipher)?;
+            core.unlock_wallet_with_session(session, &params.identifiers, params.wallet_index)
         }
         .map_err(ServiceError::BackgroundError)?;
 
-        let wallet = core
-            .wallets
-            .get_mut(wallet_index)
-            .ok_or(ServiceError::WalletAccess(wallet_index))?;
+        let wallet = core.get_wallet_by_index(params.wallet_index)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
-        let first_account = wallet
-            .data
-            .accounts
-            .first()
-            .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
-
-        let bip49 = match first_account.pub_key {
-            PubKey::Secp256k1Sha256Zilliqa(_) => Bip49DerivationPath::Zilliqa(account_index),
-            PubKey::Secp256k1Keccak256Ethereum(_) => Bip49DerivationPath::Ethereum(account_index),
-            _ => return Err(ServiceError::AccountTypeNotValid),
-        };
+        let provider = core.get_provider(params.provider_index)?;
+        let bip49 = provider.get_bip49(params.account_index);
 
         wallet
-            .add_next_bip39_account(name, &bip49, &passphrase, &seed)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))
+            .add_next_bip39_account(name, &bip49, &passphrase, &seed, params.provider_index)
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))
     })
     .await
     .map_err(Into::into)

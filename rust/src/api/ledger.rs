@@ -1,4 +1,6 @@
-use zilpay::wallet::wallet_storage::StorageOperations;
+use zilpay::{
+    background::bg_provider::ProvidersManagement, wallet::wallet_storage::StorageOperations,
+};
 pub use zilpay::{
     background::{bg_wallet::WalletManagement, BackgroundLedgerParams},
     settings::wallet_settings::WalletSettings,
@@ -11,7 +13,10 @@ use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
     utils::{
         errors::ServiceError,
-        utils::{decode_public_key, decode_session, get_last_wallet, with_service_mut},
+        utils::{
+            decode_public_key, decode_session, get_last_wallet, pubkey_from_provider,
+            with_service_mut,
+        },
     },
 };
 
@@ -33,9 +38,9 @@ pub async fn add_ledger_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        // TODO: detect network.
-        let pub_key_bytes = decode_public_key(&params.pub_key)?;
-        let pub_key = PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes);
+        let provider = core.get_provider(params.provider_index)?;
+        let bip49 = provider.get_bip49(params.wallet_index);
+        let pub_key = pubkey_from_provider(&params.pub_key, bip49)?;
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)
@@ -87,14 +92,9 @@ pub async fn add_ledger_account(
             .first()
             .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
 
-        let pub_key_bytes = decode_public_key(&pub_key)?;
-        let pub_key = match first_account.pub_key {
-            PubKey::Secp256k1Sha256Zilliqa(_) => PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes),
-            PubKey::Secp256k1Keccak256Ethereum(_) => {
-                PubKey::Secp256k1Keccak256Ethereum(pub_key_bytes)
-            }
-            _ => return Err(ServiceError::AccountTypeNotValid),
-        };
+        let provider = core.get_provider(first_account.provider_index)?;
+        let bip49 = provider.get_bip49(wallet_index);
+        let pub_key = pubkey_from_provider(&pub_key, bip49)?;
 
         wallet
             .add_ledger_account(name, pub_key, account_index, first_account.provider_index)

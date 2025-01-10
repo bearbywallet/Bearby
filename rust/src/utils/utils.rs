@@ -2,7 +2,8 @@ use std::sync::Arc;
 use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
-    proto::address::Address,
+    crypto::bip49::Bip49DerivationPath,
+    proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
     wallet::Wallet,
 };
 
@@ -44,6 +45,38 @@ pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError
         .map_err(|_| ServiceError::DecodeSecretKey)?
         .try_into()
         .map_err(|_| ServiceError::InvalidSecretKeyLength)
+}
+
+pub fn pubkey_from_provider(
+    pub_key: &str,
+    bip49: Bip49DerivationPath,
+) -> Result<PubKey, ServiceError> {
+    let pub_key_bytes = decode_public_key(pub_key)?;
+
+    let pub_key = match bip49 {
+        Bip49DerivationPath::Zilliqa(_) => PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes),
+        Bip49DerivationPath::Ethereum(_) => PubKey::Secp256k1Keccak256Ethereum(pub_key_bytes),
+        Bip49DerivationPath::Bitcoin(_) => PubKey::Secp256k1Bitcoin(pub_key_bytes),
+        Bip49DerivationPath::Solana(_) => PubKey::Ed25519Solana(pub_key_bytes),
+    };
+
+    Ok(pub_key)
+}
+
+pub fn secretkey_from_provider(
+    secret_key: &str,
+    bip49: Bip49DerivationPath,
+) -> Result<SecretKey, ServiceError> {
+    let sk = secret_key.strip_prefix("0x").unwrap_or(secret_key);
+    let secret_key_bytes = decode_secret_key(&sk)?;
+
+    let sk = match bip49 {
+        Bip49DerivationPath::Zilliqa(_) => SecretKey::Secp256k1Sha256Zilliqa(secret_key_bytes),
+        Bip49DerivationPath::Ethereum(_) => SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes),
+        _ => todo!(),
+    };
+
+    Ok(sk)
 }
 
 pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceError> {
