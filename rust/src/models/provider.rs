@@ -1,5 +1,6 @@
 use std::str::FromStr;
 
+use zilpay::errors::network::NetworkErrors;
 pub use zilpay::rpc::network_config::Bip44Network;
 pub use zilpay::rpc::network_config::NetworkConfig;
 
@@ -27,16 +28,17 @@ impl From<NetworkConfig> for NetworkConfigInfo {
     }
 }
 
-impl From<NetworkConfigInfo> for NetworkConfig {
-    fn from(value: NetworkConfigInfo) -> Self {
-        Self {
-            bip49: Bip44Network::from_str(&value.bip49).unwrap_or_default(),
+impl TryFrom<NetworkConfigInfo> for NetworkConfig {
+    type Error = NetworkErrors;
+    fn try_from(value: NetworkConfigInfo) -> Result<Self, Self::Error> {
+        Ok(Self {
+            bip49: Bip44Network::from_str(&value.bip49)?,
             network_name: value.network_name,
             chain_id: value.chain_id,
             fallback_enabled: value.fallback_enabled,
             urls: value.urls,
             explorer_urls: value.explorer_urls,
             default: value.default,
-        }
+        })
     }
 }

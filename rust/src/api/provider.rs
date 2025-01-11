@@ -38,7 +38,7 @@ pub async fn get_provider(provider_index: usize) -> Result<NetworkConfigInfo, St
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<(), String> {
     with_service_mut(|core| {
-        core.add_provider(provider_config.into())?;
+        core.add_provider(provider_config.try_into()?)?;
         Ok(())
     })
     .await

@@ -1,7 +1,7 @@
 use thiserror::Error;
 use zilpay::errors::{
-    address::AddressError, background::BackgroundError, settings::SettingsErrors,
-    token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
+    address::AddressError, background::BackgroundError, network::NetworkErrors,
+    settings::SettingsErrors, token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
 };
 
 #[derive(Debug, Error)]
@@ -65,11 +65,20 @@ pub enum ServiceError {
 
     #[error("Token Error: {0}")]
     TokenError(TokenError),
+
+    #[error("Network Error: {0}")]
+    NetworkErrors(NetworkErrors),
 }
 
 impl From<BackgroundError> for ServiceError {
     fn from(error: BackgroundError) -> Self {
         ServiceError::BackgroundError(error)
+    }
+}
+
+impl From<NetworkErrors> for ServiceError {
+    fn from(error: NetworkErrors) -> Self {
+        ServiceError::NetworkErrors(error)
     }
 }
 
