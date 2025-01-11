@@ -5,7 +5,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/src/rust/api/network.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -160,8 +160,17 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       }
 
       if (configs.isEmpty) {
-        for (final net in networks) {
-          await addProvider(config: net);
+        await addProvidersList(providerConfig: configs);
+      } else {
+        for (final defaultNet in defaultNets) {
+          final exists = configs.any((config) =>
+              config.chainId == defaultNet.chainId &&
+              config.networkName == defaultNet.networkName);
+
+          // Если сеть отсутствует в configs, добавляем её
+          if (!exists && defaultNet.default_) {
+            await addProvider();
+          }
         }
       }
     } catch (e, trace) {
