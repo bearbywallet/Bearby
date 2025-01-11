@@ -5,6 +5,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 
 import 'package:zilpay/components/option_list.dart';
+import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/argon2.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -24,7 +25,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
   int? _provider;
   KeyPairInfo? _keys;
-  WalletArgonParamsInfo? _argonParams;
+  WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
 
   int selectedCipherIndex = 2;
   bool optionsDisabled = false;
@@ -245,16 +246,18 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   }
 
   Uint8List _getCipherOrders() {
+    // TODO: TwoFish is not supporting yet
+    //
     switch (selectedCipherIndex) {
       case 0:
         return Uint8List.fromList([0]); // AESGCM256 only
       case 1:
         return Uint8List.fromList(
-            [0, 1, 2]); // AESGCM256 + TwoFish // TODO: is not supporte yet
+            [0, 1]); // AESGCM256 + TwoFish // TODO: is not supporte yet
       case 2:
-        return Uint8List.fromList([0, 1, 2]); // AESGCM256 + TwoFish + NTRUP1277
+        return Uint8List.fromList([0, 1]); // AESGCM256 + TwoFish + NTRUP1277
       default:
-        return Uint8List.fromList([0, 1, 2]); // AESGCM256 + TwoFish + NTRUP1277
+        return Uint8List.fromList([0, 1]); // AESGCM256 + TwoFish + NTRUP1277
     }
   }
 }

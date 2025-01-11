@@ -47,7 +47,7 @@ class _ArgonSettingsModalContent extends StatefulWidget {
 class _ArgonSettingsModalContentState
     extends State<_ArgonSettingsModalContent> {
   final TextEditingController _secretController = TextEditingController();
-  int selectedParamIndex = 1; // Default to OWASP
+  int selectedParamIndex = 1;
 
   final List<Map<String, String>> argonDescriptions = [
     {

@@ -205,7 +205,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       (String, String) session;
 
-      // TODO: setup from page.
       WalletSettingsInfo settings = WalletSettingsInfo(
         cipherOrders: _cipher!,
         argonParams: _argon2!,

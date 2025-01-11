@@ -31,10 +31,12 @@ impl TryFrom<WalletArgonParamsInfo> for ArgonParams {
     type Error = SettingsErrors;
 
     fn try_from(value: WalletArgonParamsInfo) -> Result<Self, Self::Error> {
-        let secret: [u8; SHA256_SIZE] = hex::decode(&value.secret)
-            .map_err(|e| SettingsErrors::InvalidHex(e.to_string()))?
-            .try_into()
-            .map_err(|_| SettingsErrors::InvalidHashSize(value.secret))?;
+        let secret: [u8; SHA256_SIZE] = match hex::decode(&value.secret) {
+            Ok(hex) => hex
+                .try_into()
+                .unwrap_or(ArgonParams::hash_secret(&value.secret)),
+            Err(_) => ArgonParams::hash_secret(&value.secret),
+        };
 
         Ok(Self {
             secret,
