@@ -16,8 +16,8 @@ class TokenAmountCard extends StatefulWidget {
 
   const TokenAmountCard({
     super.key,
-    this.amount = "1",
-    this.convertAmount = "3,667.88",
+    this.amount = "0",
+    this.convertAmount = "0",
     this.tokenIndex = 0,
     this.showMax = true,
     required this.onMaxTap,
@@ -111,7 +111,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: SvgPicture.network(
-                          viewIcon(token.addr, "Dark"),
+                          token.logo ?? viewIcon(token.addr, "Dark"),
                           width: 30,
                           height: 30,
                           fit: BoxFit.cover,

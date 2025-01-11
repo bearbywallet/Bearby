@@ -148,22 +148,24 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   }
 
   Future<void> _init() async {
-    try {
-      final configs = await getProviders();
+    final configs = await getProviders();
 
-      if (configs.isEmpty) {
-        await addProvidersList(providerConfig: configs);
-      } else {
-        for (final defaultConfig in networks) {
-          for (final storageConfig in configs) {
-            if (defaultConfig.chainId != storageConfig.chainId) {
+    debugPrint("${configs.length}");
+
+    if (configs.isEmpty) {
+      await addProvidersList(providerConfig: networks);
+    } else {
+      for (final defaultConfig in networks) {
+        for (final storageConfig in configs) {
+          if (defaultConfig.chainId != storageConfig.chainId) {
+            try {
               await addProvider(providerConfig: defaultConfig);
+            } catch (e) {
+              debugPrint("add provider $e");
             }
           }
         }
       }
-    } catch (e, trace) {
-      debugPrint('Error in _init: $e\n$trace');
     }
   }
 }

@@ -63,8 +63,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
     final appState = Provider.of<AppState>(context);
     final tokens = appState.wallet?.tokens ?? [];
 
-    // Calculate container height based on content
-    final double headerHeight = 84.0; // Drag handle + padding
+    final double headerHeight = 84.0;
     final double searchBarHeight = 80.0; // Search bar + padding
     final double tokenItemHeight = 56.0; // Height per token item
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
@@ -75,7 +74,6 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
         (tokens.length * tokenItemHeight) +
         bottomPadding;
 
-    // Limit height to 70% of screen height
     final double maxHeight = MediaQuery.of(context).size.height * 0.7;
     final double containerHeight = totalContentHeight.clamp(0.0, maxHeight);
 
@@ -90,7 +88,6 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag Handle
           Container(
             width: 36,
             height: 4,
@@ -115,16 +112,12 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               padding: const EdgeInsets.symmetric(horizontal: 16),
             ),
           ),
-
-          // Token List
           Expanded(
             child: ListView(
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               children: _buildTokenItems(theme, appState),
             ),
           ),
-
-          // Bottom Padding
           SizedBox(height: bottomPadding),
         ],
       ),
@@ -145,7 +138,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               name: token.name,
               addr: token.addr,
               isDefault: token.default_,
-              iconUrl: viewIcon(token.addr, "Light"),
+              iconUrl: token.logo ?? viewIcon(token.addr, "Light"),
               onToggle: (value) => widget.onTokenToggle?.call(token.addr),
               isEnabled: true,
             ))

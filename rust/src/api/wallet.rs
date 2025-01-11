@@ -24,7 +24,7 @@ use crate::{
     },
 };
 
-// #[flutter_rust_bridge::frb(dart_async)]
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     with_service(|core| {
         let wallets = core
@@ -151,8 +151,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         } else {
             let session = decode_session(params.session_cipher)?;
             core.unlock_wallet_with_session(session, &params.identifiers, params.wallet_index)
-        }
-        .map_err(ServiceError::BackgroundError)?;
+        }?;
 
         let wallet = core.get_wallet_by_index(params.wallet_index)?;
         let provider = core.get_provider(params.provider_index)?;

@@ -1,9 +1,5 @@
+use crate::utils::utils::{decode_session, with_service_mut};
 pub use zilpay::background::bg_wallet::WalletManagement;
-
-use crate::utils::{
-    errors::ServiceError,
-    utils::{decode_session, with_service_mut},
-};
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn try_unlock_with_session(
@@ -13,8 +9,7 @@ pub async fn try_unlock_with_session(
 ) -> Result<bool, String> {
     let session = decode_session(Some(session_cipher))?;
     with_service_mut(|core| {
-        core.unlock_wallet_with_session(session, &identifiers, wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
+        core.unlock_wallet_with_session(session, &identifiers, wallet_index)?;
 
         Ok(true)
     })
@@ -29,8 +24,7 @@ pub async fn try_unlock_with_password(
     identifiers: Vec<String>,
 ) -> Result<bool, String> {
     with_service_mut(|core| {
-        core.unlock_wallet_with_password(&password, &identifiers, wallet_index)
-            .map_err(ServiceError::BackgroundError)?;
+        core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
 
         Ok(true)
     })

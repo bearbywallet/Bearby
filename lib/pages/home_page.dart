@@ -95,8 +95,8 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: WalletHeader(
-                              walletName: appState.account!.name,
-                              walletAddress: appState.account!.addr,
+                              walletName: appState.account?.name ?? "",
+                              walletAddress: appState.account?.addr ?? "",
                               primaryPurple: theme.primaryPurple,
                               background: theme.background,
                               textPrimary: theme.textPrimary,
@@ -254,7 +254,8 @@ class _HomePageState extends State<HomePage> {
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,
-                            iconUrl: viewIcon(token.addr, "Light"),
+                            iconUrl:
+                                token.logo ?? viewIcon(token.addr, "Light"),
                             onTap: () =>
                                 {debugPrint("tap token ${token.name}")},
                           );

@@ -94,7 +94,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
-    await syncTokenRates();
+    // await syncTokenRates();
     notifyListeners();
   }
 
@@ -140,10 +140,6 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _connections = await getConnectionsList();
 
     notifyListeners();
-  }
-
-  Future<void> initialize() async {
-    // TODO: init theme form storage
   }
 
   Future<void> updateSelectedAccount(

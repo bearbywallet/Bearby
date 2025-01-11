@@ -25,7 +25,7 @@ impl TryFrom<&Wallet> for WalletInfo {
             auth_type: data.biometric_type.into(),
             wallet_name: data.wallet_name,
             wallet_type: data.wallet_type.to_str(),
-            wallet_address: format!("0x{}", hex::encode(w.wallet_address)),
+            wallet_address: hex::encode(w.wallet_address),
             accounts: data.accounts.iter().map(|v| v.into()).collect(),
             selected_account: data.selected_account,
             tokens: ftokens.into_iter().map(|v| v.into()).collect(),

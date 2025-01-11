@@ -139,14 +139,21 @@ class _LoginPageState extends State<LoginPage> {
         final session =
             await _authGuard.getSession(sessionKey: wallet.walletAddress);
         isAuthenticated = await _authenticateWithSession(
-            session, _selectedWallet, identifiers);
-      } else if (wallet.authType != AuthMethod.none.name) {
+          session,
+          _selectedWallet,
+          identifiers,
+        );
+      } else if (wallet.authType != AuthMethod.none.name &&
+          _passwordController.text.isEmpty) {
         final biometricAuth = await _authenticateWithBiometrics();
         if (biometricAuth) {
           final session =
               await _authGuard.getSession(sessionKey: wallet.walletAddress);
           isAuthenticated = await _authenticateWithSession(
-              session, _selectedWallet, identifiers);
+            session,
+            _selectedWallet,
+            identifiers,
+          );
         }
       } else if (_passwordController.text.isNotEmpty) {
         isAuthenticated = await _authenticateWithPassword(

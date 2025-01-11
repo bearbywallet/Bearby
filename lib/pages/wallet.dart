@@ -86,7 +86,7 @@ class _WalletPageState extends State<WalletPage> {
           title: 'Manage connections',
           iconPath: 'assets/icons/globe.svg',
           onTap: () {
-            if (appState.connections.length > 0) {
+            if (appState.connections.isNotEmpty) {
               showConnectedDappsModal(
                 context: context,
                 onDappDisconnect: _handleDappDisconnect,

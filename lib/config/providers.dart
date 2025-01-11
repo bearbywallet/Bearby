@@ -29,9 +29,9 @@ class DefaultNetworkProviders {
       chainId: BigInt.from(1),
       fallbackEnabled: true,
       urls: [
-        'https://eth-mainnet.g.alchemy.com/v2',
-        'https://mainnet.infura.io/v3',
-        'https://rpc.ankr.com/eth'
+        "https://eth.llamarpc.com",
+        "https://api.zan.top/eth-mainnet",
+        "https://singapore.rpc.blxrbdn.com"
       ],
       explorerUrls: ['https://etherscan.io'],
       default_: true,
@@ -45,10 +45,8 @@ class DefaultNetworkProviders {
       chainId: BigInt.from(56),
       fallbackEnabled: true,
       urls: [
-        'https://bsc-dataseed1.bnbchain.org',
-        'https://bsc-dataseed2.bnbchain.org',
-        'https://bsc-dataseed3.bnbchain.org',
-        'https://bsc-dataseed4.bnbchain.org'
+        "https://binance.llamarpc.com",
+        "https://bsc-pokt.nodies.app",
       ],
       explorerUrls: ['https://bscscan.com'],
       default_: true,
