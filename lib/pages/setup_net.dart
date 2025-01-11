@@ -1,102 +1,37 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:provider/provider.dart';
-import 'package:zilpay/components/toggle_item.dart';
+import 'package:zilpay/components/option_list.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/api/network.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class BlockchainNetwork {
-  final String title;
-  final String subtitle;
-  final int code;
-  bool value;
-
-  BlockchainNetwork({
-    required this.title,
-    required this.subtitle,
-    required this.code,
-    this.value = false,
-  });
-}
-
-class EVMNetwork {
-  final String title;
-  final String subtitle;
-  final int code;
-  bool value;
-
-  EVMNetwork({
-    required this.title,
-    required this.code,
-    required this.subtitle,
-    this.value = false,
-  });
-}
-
-class BlockchainSettingsPage extends StatefulWidget {
-  const BlockchainSettingsPage({
+class SetupNetworkSettingsPage extends StatefulWidget {
+  const SetupNetworkSettingsPage({
     super.key,
   });
 
   @override
-  State<BlockchainSettingsPage> createState() => _BlockchainSettingsPageState();
+  State<SetupNetworkSettingsPage> createState() =>
+      _SetupNetworkSettingsPageState();
 }
 
-class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
+class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
 
-  final TextEditingController _rpcUrlController = TextEditingController();
-  final List<EVMNetwork> _evmNetworks = [
-    EVMNetwork(
-      title: "Zilliqa",
-      subtitle: "Zilliqa network",
-      value: true,
-      code: 0,
-    ),
-    EVMNetwork(
-      title: "Ethereum",
-      subtitle: "Ethereum network",
-      value: false,
-      code: 1,
-    ),
-    EVMNetwork(
-      title: "BSC chain",
-      subtitle: "Binance smart chain network",
-      value: false,
-      code: 2,
-    ),
-  ];
-  final List<BlockchainNetwork> _blockchainNetworks = [
-    BlockchainNetwork(
-      title: "Bitcoin",
-      subtitle: "Bitcoin network",
-      code: 3,
-    ),
-    BlockchainNetwork(
-      title: "Solana",
-      subtitle: "Solana blockchain",
-      code: 4,
-    ),
-    BlockchainNetwork(
-      title: "Tron",
-      subtitle: "TRON network",
-      code: 5,
-    ),
-    BlockchainNetwork(
-      title: "Massa",
-      subtitle: "Massa blockchain",
-      code: 6,
-    ),
-    BlockchainNetwork(
-      title: "NEAR",
-      subtitle: "NEAR Protocol",
-      code: 7,
-    ),
-  ];
+  int selectedNetworkIndex = 0;
+  bool optionsDisabled = false;
+  final networks = DefaultNetworkProviders.defaultNetworks();
+
+  @override
+  void initState() {
+    super.initState();
+    _init();
+  }
 
   @override
   void didChangeDependencies() {
@@ -119,22 +54,6 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   }
 
   @override
-  void dispose() {
-    _rpcUrlController.dispose();
-    super.dispose();
-  }
-
-  void _updateNetworkValue(int index, bool newValue, bool state) {
-    setState(() {
-      if (state) {
-        _evmNetworks[index].value = newValue;
-      } else {
-        _blockchainNetworks[index].value = newValue;
-      }
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
@@ -147,7 +66,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Blockchain Settings',
+                  title: 'Setup Network',
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -159,69 +78,44 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Container(
-                            decoration: BoxDecoration(
-                              color: theme.cardBackground,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              children: List.generate(
-                                  _evmNetworks.length * 2 - 1, (index) {
-                                if (index.isOdd) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child: Divider(
-                                      height: 1,
-                                      color:
-                                          theme.textSecondary.withOpacity(0.2),
-                                    ),
-                                  );
-                                }
-                                final networkIndex = index ~/ 2;
-                                final network = _evmNetworks[networkIndex];
-                                return ToggleItem(
-                                  title: network.title,
-                                  subtitle: network.subtitle,
-                                  value: network.value,
-                                  onChanged: (newValue) => _updateNetworkValue(
-                                      networkIndex, newValue, true),
+                          OptionsList(
+                            disabled: optionsDisabled,
+                            options: List.generate(
+                              networks.length,
+                              (index) {
+                                final network = networks[index];
+                                return OptionItem(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        network.networkName,
+                                        style: TextStyle(
+                                          color: theme.textPrimary,
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'Chain ID: ${network.chainId}',
+                                        style: TextStyle(
+                                          color: theme.primaryPurple,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 8),
+                                    ],
+                                  ),
+                                  isSelected: selectedNetworkIndex == index,
+                                  onSelect: () => setState(
+                                      () => selectedNetworkIndex = index),
                                 );
-                              }),
+                              },
                             ),
-                          ),
-                          SizedBox(height: adaptivePadding),
-                          Container(
-                            decoration: BoxDecoration(
-                              color: theme.cardBackground,
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            child: Column(
-                              children: List.generate(
-                                  _blockchainNetworks.length * 2 - 1, (index) {
-                                if (index.isOdd) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 16),
-                                    child: Divider(
-                                      height: 1,
-                                      color:
-                                          theme.textSecondary.withOpacity(0.2),
-                                    ),
-                                  );
-                                }
-                                final networkIndex = index ~/ 2;
-                                final network =
-                                    _blockchainNetworks[networkIndex];
-                                return ToggleItem(
-                                  title: network.title,
-                                  subtitle: network.subtitle,
-                                  value: network.value,
-                                  onChanged: (newValue) => _updateNetworkValue(
-                                      networkIndex, newValue, false),
-                                );
-                              }),
-                            ),
+                            unselectedOpacity: 0.5,
                           ),
                         ],
                       ),
@@ -233,19 +127,11 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
                   child: CustomButton(
                     text: 'Next',
                     onPressed: () {
-                      final List<int> codes = [
-                        ..._evmNetworks
-                            .where((e) => e.value)
-                            .map((e) => e.code),
-                        ..._blockchainNetworks
-                            .where((e) => e.value)
-                            .map((e) => e.code)
-                      ];
                       Navigator.of(context)
                           .pushNamed('/cipher_setup', arguments: {
                         'bip39': _bip39List,
                         'keys': _keys,
-                        'codes': codes,
+                        'provider': selectedNetworkIndex,
                       });
                     },
                     backgroundColor: theme.primaryPurple,
@@ -259,5 +145,27 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
         ),
       ),
     );
+  }
+
+  Future<void> _init() async {
+    try {
+      final configs = await getProviders();
+
+      for (final net in configs) {
+        debugPrint('''
+        Network: ${net.networkName}
+        ChainId: ${net.chainId}
+        Default: ${net.default_}
+      ''');
+      }
+
+      if (configs.isEmpty) {
+        for (final net in networks) {
+          await addProvider(config: net);
+        }
+      }
+    } catch (e, trace) {
+      debugPrint('Error in _init: $e\n$trace');
+    }
   }
 }

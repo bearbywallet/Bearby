@@ -103,7 +103,7 @@ class AppRouter {
           case '/cipher_setup':
             return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
-            return wrapWithProviders(const BlockchainSettingsPage());
+            return wrapWithProviders(const SetupNetworkSettingsPage());
           case '/gen_bip39':
             return wrapWithProviders(const SecretPhraseGeneratorPage());
           case '/gen_sk':
@@ -137,7 +137,7 @@ class AppRouter {
           case '/cipher_setup':
             return wrapWithProviders(const CipherSettingsPage());
           case '/net_setup':
-            return wrapWithProviders(const BlockchainSettingsPage());
+            return wrapWithProviders(const SetupNetworkSettingsPage());
           case '/gen_sk':
             return wrapWithProviders(const SecretKeyGeneratorPage());
           case '/gen_bip39':
@@ -195,7 +195,7 @@ class AppRouter {
       case '/cipher_setup':
         return wrapWithProviders(const CipherSettingsPage());
       case '/net_setup':
-        return wrapWithProviders(const BlockchainSettingsPage());
+        return wrapWithProviders(const SetupNetworkSettingsPage());
       case '/gen_sk':
         return wrapWithProviders(const SecretKeyGeneratorPage());
       case '/gen_bip39':

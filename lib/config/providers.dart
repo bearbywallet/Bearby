@@ -35,7 +35,7 @@ class DefaultNetworkProviders {
       ],
       explorerUrls: ['https://etherscan.io'],
       default_: true,
-      bip49: "eth:m/44'/60'/0'/0/",
+      bip49: "evm:m/44'/60'/0'/0/",
     );
   }
 
@@ -52,7 +52,7 @@ class DefaultNetworkProviders {
       ],
       explorerUrls: ['https://bscscan.com'],
       default_: true,
-      bip49: "bnb:m/44'/60'/0'/0/",
+      bip49: "evm:m/44'/60'/0'/0/",
     );
   }
 }

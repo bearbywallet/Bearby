@@ -17,3 +17,8 @@ Future<NetworkConfigInfo> getProvider({required BigInt providerIndex}) =>
 Future<void> addProvider({required NetworkConfigInfo providerConfig}) =>
     RustLib.instance.api
         .crateApiProviderAddProvider(providerConfig: providerConfig);
+
+Future<void> addProvidersList(
+        {required List<NetworkConfigInfo> providerConfig}) =>
+    RustLib.instance.api
+        .crateApiProviderAddProvidersList(providerConfig: providerConfig);
