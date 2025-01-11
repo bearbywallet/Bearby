@@ -12,7 +12,8 @@ class DefaultTokens {
         balances: balances,
         default_: true,
         native: true,
-        providerIndex: BigInt.from(0));
+        providerIndex:
+            BigInt.from(0)); //DefaultNetworkProviders.defaultNetworks[0]
   }
 
   static FTokenInfo eth({Map<BigInt, String> balances = const {}}) {
