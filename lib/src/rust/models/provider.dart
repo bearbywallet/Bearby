@@ -6,5 +6,45 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>
-abstract class NetworkConfigInfo implements RustOpaqueInterface {}
+class NetworkConfigInfo {
+  final String networkName;
+  final BigInt chainId;
+  final bool fallbackEnabled;
+  final List<String> urls;
+  final List<String> explorerUrls;
+  final bool default_;
+  final String bip49;
+
+  const NetworkConfigInfo({
+    required this.networkName,
+    required this.chainId,
+    required this.fallbackEnabled,
+    required this.urls,
+    required this.explorerUrls,
+    required this.default_,
+    required this.bip49,
+  });
+
+  @override
+  int get hashCode =>
+      networkName.hashCode ^
+      chainId.hashCode ^
+      fallbackEnabled.hashCode ^
+      urls.hashCode ^
+      explorerUrls.hashCode ^
+      default_.hashCode ^
+      bip49.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is NetworkConfigInfo &&
+          runtimeType == other.runtimeType &&
+          networkName == other.networkName &&
+          chainId == other.chainId &&
+          fallbackEnabled == other.fallbackEnabled &&
+          urls == other.urls &&
+          explorerUrls == other.explorerUrls &&
+          default_ == other.default_ &&
+          bip49 == other.bip49;
+}

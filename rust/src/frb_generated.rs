@@ -25,7 +25,6 @@
 
 // Section: imports
 
-use crate::models::provider::*;
 use flutter_rust_bridge::for_generated::byteorder::{NativeEndian, ReadBytesExt, WriteBytesExt};
 use flutter_rust_bridge::for_generated::{transform_result_dco, Lifetimeable, Lockable};
 use flutter_rust_bridge::{Handler, IntoIntoDart};
@@ -286,7 +285,8 @@ fn wire__crate__api__network__add_provider_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_config = <NetworkConfigInfo>::sse_decode(&mut deserializer);
+            let api_config =
+                <crate::models::provider::NetworkConfigInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -322,7 +322,8 @@ fn wire__crate__api__provider__add_provider_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_provider_config = <NetworkConfigInfo>::sse_decode(&mut deserializer);
+            let api_provider_config =
+                <crate::models::provider::NetworkConfigInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1887,12 +1888,6 @@ fn wire__crate__api__token__update_token_list_impl(
     )
 }
 
-// Section: related_funcs
-
-flutter_rust_bridge::frb_generated_moi_arc_impl_value!(
-    flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>
-);
-
 // Section: dart2rust
 
 impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
@@ -1900,16 +1895,6 @@ impl SseDecode for flutter_rust_bridge::for_generated::anyhow::Error {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut inner = <String>::sse_decode(deserializer);
         return flutter_rust_bridge::for_generated::anyhow::anyhow!("{}", inner);
-    }
-}
-
-impl SseDecode for NetworkConfigInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <RustOpaqueMoi<
-            flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>,
-        >>::sse_decode(deserializer);
-        return flutter_rust_bridge::for_generated::rust_auto_opaque_decode_owned(inner);
     }
 }
 
@@ -1931,16 +1916,6 @@ impl SseDecode
             crate::models::notification::BackgroundNotificationState,
         )>>::sse_decode(deserializer);
         return inner.into_iter().collect();
-    }
-}
-
-impl SseDecode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut inner = <usize>::sse_decode(deserializer);
-        return decode_rust_opaque_moi(inner);
     }
 }
 
@@ -2077,7 +2052,8 @@ impl SseDecode for crate::models::background::BackgroundState {
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
         let mut var_locale = <String>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
-        let mut var_providers = <Vec<NetworkConfigInfo>>::sse_decode(deserializer);
+        let mut var_providers =
+            <Vec<crate::models::provider::NetworkConfigInfo>>::sse_decode(deserializer);
         return crate::models::background::BackgroundState {
             wallets: var_wallets,
             notifications_wallet_states: var_notificationsWalletStates,
@@ -2288,18 +2264,6 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
     }
 }
 
-impl SseDecode for Vec<NetworkConfigInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut len_ = <i32>::sse_decode(deserializer);
-        let mut ans_ = vec![];
-        for idx_ in 0..len_ {
-            ans_.push(<NetworkConfigInfo>::sse_decode(deserializer));
-        }
-        return ans_;
-    }
-}
-
 impl SseDecode for Vec<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2400,6 +2364,20 @@ impl SseDecode for Vec<crate::models::transactions::history::HistoricalTransacti
     }
 }
 
+impl SseDecode for Vec<crate::models::provider::NetworkConfigInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::provider::NetworkConfigInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2483,6 +2461,28 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
             ));
         }
         return ans_;
+    }
+}
+
+impl SseDecode for crate::models::provider::NetworkConfigInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_networkName = <String>::sse_decode(deserializer);
+        let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_fallbackEnabled = <bool>::sse_decode(deserializer);
+        let mut var_urls = <Vec<String>>::sse_decode(deserializer);
+        let mut var_explorerUrls = <Vec<String>>::sse_decode(deserializer);
+        let mut var_default_ = <bool>::sse_decode(deserializer);
+        let mut var_bip49 = <String>::sse_decode(deserializer);
+        return crate::models::provider::NetworkConfigInfo {
+            network_name: var_networkName,
+            chain_id: var_chainId,
+            fallback_enabled: var_fallbackEnabled,
+            urls: var_urls,
+            explorer_urls: var_explorerUrls,
+            default: var_default_,
+            bip49: var_bip49,
+        };
     }
 }
 
@@ -3006,21 +3006,6 @@ fn pde_ffi_dispatcher_sync_impl(
 // Section: rust2dart
 
 // Codec=Dco (DartCObject based), see doc to use other codecs
-impl flutter_rust_bridge::IntoDart for FrbWrapper<NetworkConfigInfo> {
-    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
-        flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self.0)
-            .into_dart()
-    }
-}
-impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for FrbWrapper<NetworkConfigInfo> {}
-
-impl flutter_rust_bridge::IntoIntoDart<FrbWrapper<NetworkConfigInfo>> for NetworkConfigInfo {
-    fn into_into_dart(self) -> FrbWrapper<NetworkConfigInfo> {
-        self.into()
-    }
-}
-
-// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::transactions::access_list::AccessListItem {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3403,6 +3388,32 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger::LedgerParamsInput>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.network_name.into_into_dart().into_dart(),
+            self.chain_id.into_into_dart().into_dart(),
+            self.fallback_enabled.into_into_dart().into_dart(),
+            self.urls.into_into_dart().into_dart(),
+            self.explorer_urls.into_into_dart().into_dart(),
+            self.default.into_into_dart().into_dart(),
+            self.bip49.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::provider::NetworkConfigInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::provider::NetworkConfigInfo>
+    for crate::models::provider::NetworkConfigInfo
+{
+    fn into_into_dart(self) -> crate::models::provider::NetworkConfigInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
     for crate::models::transactions::transaction_metadata::TransactionMetadataInfo
 {
@@ -3628,13 +3639,6 @@ impl SseEncode for flutter_rust_bridge::for_generated::anyhow::Error {
     }
 }
 
-impl SseEncode for NetworkConfigInfo {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>>::sse_encode(flutter_rust_bridge::for_generated::rust_auto_opaque_encode::<_, MoiArc<_>>(self), serializer);
-    }
-}
-
 impl SseEncode for std::collections::HashMap<usize, String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3651,17 +3655,6 @@ impl SseEncode
             usize,
             crate::models::notification::BackgroundNotificationState,
         )>>::sse_encode(self.into_iter().collect(), serializer);
-    }
-}
-
-impl SseEncode
-    for RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>
-{
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        let (ptr, size) = self.sse_encode_raw();
-        <usize>::sse_encode(ptr, serializer);
-        <i32>::sse_encode(size, serializer);
     }
 }
 
@@ -3755,7 +3748,7 @@ impl SseEncode for crate::models::background::BackgroundState {
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
-        <Vec<NetworkConfigInfo>>::sse_encode(self.providers, serializer);
+        <Vec<crate::models::provider::NetworkConfigInfo>>::sse_encode(self.providers, serializer);
     }
 }
 
@@ -3885,16 +3878,6 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
     }
 }
 
-impl SseEncode for Vec<NetworkConfigInfo> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <i32>::sse_encode(self.len() as _, serializer);
-        for item in self {
-            <NetworkConfigInfo>::sse_encode(item, serializer);
-        }
-    }
-}
-
 impl SseEncode for Vec<String> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -3969,6 +3952,16 @@ impl SseEncode for Vec<crate::models::transactions::history::HistoricalTransacti
     }
 }
 
+impl SseEncode for Vec<crate::models::provider::NetworkConfigInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::provider::NetworkConfigInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4036,6 +4029,19 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
         for item in self {
             <crate::models::wallet::WalletInfo>::sse_encode(item, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::models::provider::NetworkConfigInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.network_name, serializer);
+        <u64>::sse_encode(self.chain_id, serializer);
+        <bool>::sse_encode(self.fallback_enabled, serializer);
+        <Vec<String>>::sse_encode(self.urls, serializer);
+        <Vec<String>>::sse_encode(self.explorer_urls, serializer);
+        <bool>::sse_encode(self.default, serializer);
+        <String>::sse_encode(self.bip49, serializer);
     }
 }
 
@@ -4350,7 +4356,6 @@ mod io {
     // Section: imports
 
     use super::*;
-    use crate::models::provider::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -4360,20 +4365,6 @@ mod io {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_io!();
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>::increment_strong_count(ptr as _);
-    }
-
-    #[no_mangle]
-    pub extern "C" fn frbgen_zilpay_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(not(target_family = "wasm"))]
 pub use io::*;
@@ -4387,7 +4378,6 @@ mod web {
     // Section: imports
 
     use super::*;
-    use crate::models::provider::*;
     use flutter_rust_bridge::for_generated::byteorder::{
         NativeEndian, ReadBytesExt, WriteBytesExt,
     };
@@ -4399,20 +4389,6 @@ mod web {
     // Section: boilerplate
 
     flutter_rust_bridge::frb_generated_boilerplate_web!();
-
-    #[wasm_bindgen]
-    pub fn rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>::increment_strong_count(ptr as _);
-    }
-
-    #[wasm_bindgen]
-    pub fn rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-        ptr: *const std::ffi::c_void,
-    ) {
-        MoiArc::<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<NetworkConfigInfo>>::decrement_strong_count(ptr as _);
-    }
 }
 #[cfg(target_family = "wasm")]
 pub use web::*;

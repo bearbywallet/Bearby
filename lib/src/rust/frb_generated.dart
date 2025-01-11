@@ -250,15 +250,6 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiTokenUpdateRates();
 
   Future<void> crateApiTokenUpdateTokenList({required BigInt net});
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_NetworkConfigInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_NetworkConfigInfo;
-
-  CrossPlatformFinalizerArg
-      get rust_arc_decrement_strong_count_NetworkConfigInfoPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -439,8 +430,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-            config, serializer);
+        sse_encode_box_autoadd_network_config_info(config, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 6, port: port_);
       },
@@ -465,8 +455,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-            providerConfig, serializer);
+        sse_encode_box_autoadd_network_config_info(providerConfig, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 7, port: port_);
       },
@@ -831,8 +820,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 21, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo,
+        decodeSuccessData: sse_decode_network_config_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiNetworkGetProviderConstMeta,
@@ -857,8 +845,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 22, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo,
+        decodeSuccessData: sse_decode_network_config_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiProviderGetProviderConstMeta,
@@ -882,8 +869,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 23, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo,
+        decodeSuccessData: sse_decode_list_network_config_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiNetworkGetProvidersConstMeta,
@@ -907,8 +893,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 24, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData:
-            sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo,
+        decodeSuccessData: sse_decode_list_network_config_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiProviderGetProvidersConstMeta,
@@ -1553,26 +1538,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: ["net"],
       );
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_NetworkConfigInfo => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_NetworkConfigInfo => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo;
-
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
-  }
-
-  @protected
-  NetworkConfigInfo
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return NetworkConfigInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1589,14 +1558,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return Map.fromEntries(
         dco_decode_list_record_usize_background_notification_state(raw)
             .map((e) => MapEntry(e.$1, e.$2)));
-  }
-
-  @protected
-  NetworkConfigInfo
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return NetworkConfigInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1717,9 +1678,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notificationsGlobalEnabled: dco_decode_bool(arr[2]),
       locale: dco_decode_String(arr[3]),
       appearances: dco_decode_u_8(arr[4]),
-      providers:
-          dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-              arr[5]),
+      providers: dco_decode_list_network_config_info(arr[5]),
     );
   }
 
@@ -1802,6 +1761,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_ledger_params_input(raw);
+  }
+
+  @protected
+  NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_network_config_info(raw);
   }
 
   @protected
@@ -1952,17 +1917,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<NetworkConfigInfo>
-      dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>)
-        .map(
-            dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo)
-        .toList();
-  }
-
-  @protected
   List<String> dco_decode_list_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_String).toList();
@@ -2011,6 +1965,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_network_config_info).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -2050,6 +2010,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_wallet_info).toList();
+  }
+
+  @protected
+  NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return NetworkConfigInfo(
+      networkName: dco_decode_String(arr[0]),
+      chainId: dco_decode_u_64(arr[1]),
+      fallbackEnabled: dco_decode_bool(arr[2]),
+      urls: dco_decode_list_String(arr[3]),
+      explorerUrls: dco_decode_list_String(arr[4]),
+      default_: dco_decode_bool(arr[5]),
+      bip49: dco_decode_String(arr[6]),
+    );
   }
 
   @protected
@@ -2330,15 +2307,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  NetworkConfigInfo
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return NetworkConfigInfoImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   Map<BigInt, String> sse_decode_Map_usize_String(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2354,15 +2322,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var inner = sse_decode_list_record_usize_background_notification_state(
         deserializer);
     return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
-  }
-
-  @protected
-  NetworkConfigInfo
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return NetworkConfigInfoImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -2478,9 +2437,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
     var var_locale = sse_decode_String(deserializer);
     var var_appearances = sse_decode_u_8(deserializer);
-    var var_providers =
-        sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-            deserializer);
+    var var_providers = sse_decode_list_network_config_info(deserializer);
     return BackgroundState(
         wallets: var_wallets,
         notificationsWalletStates: var_notificationsWalletStates,
@@ -2576,6 +2533,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_ledger_params_input(deserializer));
+  }
+
+  @protected
+  NetworkConfigInfo sse_decode_box_autoadd_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_network_config_info(deserializer));
   }
 
   @protected
@@ -2750,22 +2714,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<NetworkConfigInfo>
-      sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <NetworkConfigInfo>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(
-          sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-              deserializer));
-    }
-    return ans_;
-  }
-
-  @protected
   List<String> sse_decode_list_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2854,6 +2802,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<NetworkConfigInfo> sse_decode_list_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <NetworkConfigInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_network_config_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -2918,6 +2879,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ans_.add(sse_decode_wallet_info(deserializer));
     }
     return ans_;
+  }
+
+  @protected
+  NetworkConfigInfo sse_decode_network_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_networkName = sse_decode_String(deserializer);
+    var var_chainId = sse_decode_u_64(deserializer);
+    var var_fallbackEnabled = sse_decode_bool(deserializer);
+    var var_urls = sse_decode_list_String(deserializer);
+    var var_explorerUrls = sse_decode_list_String(deserializer);
+    var var_default_ = sse_decode_bool(deserializer);
+    var var_bip49 = sse_decode_String(deserializer);
+    return NetworkConfigInfo(
+        networkName: var_networkName,
+        chainId: var_chainId,
+        fallbackEnabled: var_fallbackEnabled,
+        urls: var_urls,
+        explorerUrls: var_explorerUrls,
+        default_: var_default_,
+        bip49: var_bip49);
   }
 
   @protected
@@ -3268,16 +3250,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          NetworkConfigInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as NetworkConfigInfoImpl).frbInternalSseEncode(move: true),
-        serializer);
-  }
-
-  @protected
   void sse_encode_Map_usize_String(
       Map<BigInt, String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3291,16 +3263,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_record_usize_background_notification_state(
         self.entries.map((e) => (e.key, e.value)).toList(), serializer);
-  }
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          NetworkConfigInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as NetworkConfigInfoImpl).frbInternalSseEncode(move: null),
-        serializer);
   }
 
   @protected
@@ -3398,8 +3360,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.notificationsGlobalEnabled, serializer);
     sse_encode_String(self.locale, serializer);
     sse_encode_u_8(self.appearances, serializer);
-    sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-        self.providers, serializer);
+    sse_encode_list_network_config_info(self.providers, serializer);
   }
 
   @protected
@@ -3478,6 +3439,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       LedgerParamsInput self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_ledger_params_input(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_network_config_info(self, serializer);
   }
 
   @protected
@@ -3601,18 +3569,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void
-      sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          List<NetworkConfigInfo> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
-          item, serializer);
-    }
-  }
-
-  @protected
   void sse_encode_list_String(List<String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
@@ -3682,6 +3638,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_network_config_info(
+      List<NetworkConfigInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_network_config_info(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3736,6 +3702,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     for (final item in self) {
       sse_encode_wallet_info(item, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_network_config_info(
+      NetworkConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.networkName, serializer);
+    sse_encode_u_64(self.chainId, serializer);
+    sse_encode_bool(self.fallbackEnabled, serializer);
+    sse_encode_list_String(self.urls, serializer);
+    sse_encode_list_String(self.explorerUrls, serializer);
+    sse_encode_bool(self.default_, serializer);
+    sse_encode_String(self.bip49, serializer);
   }
 
   @protected
@@ -4004,25 +3983,4 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
   }
-}
-
-@sealed
-class NetworkConfigInfoImpl extends RustOpaque implements NetworkConfigInfo {
-  // Not to be used by end users
-  NetworkConfigInfoImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  NetworkConfigInfoImpl.frbInternalSseDecode(
-      BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_NetworkConfigInfo,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_NetworkConfigInfo,
-    rustArcDecrementStrongCountPtr: RustLib
-        .instance.api.rust_arc_decrement_strong_count_NetworkConfigInfoPtr,
-  );
 }
