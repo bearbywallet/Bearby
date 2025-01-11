@@ -249,7 +249,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
       case 0:
         return Uint8List.fromList([0]); // AESGCM256 only
       case 1:
-        return Uint8List.fromList([0, 1]); // AESGCM256 + TwoFish
+        return Uint8List.fromList(
+            [0, 1, 2]); // AESGCM256 + TwoFish // TODO: is not supporte yet
       case 2:
         return Uint8List.fromList([0, 1, 2]); // AESGCM256 + TwoFish + NTRUP1277
       default:

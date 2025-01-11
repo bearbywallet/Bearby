@@ -151,25 +151,14 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     try {
       final configs = await getProviders();
 
-      for (final net in configs) {
-        debugPrint('''
-        Network: ${net.networkName}
-        ChainId: ${net.chainId}
-        Default: ${net.default_}
-      ''');
-      }
-
       if (configs.isEmpty) {
         await addProvidersList(providerConfig: configs);
       } else {
-        for (final defaultNet in defaultNets) {
-          final exists = configs.any((config) =>
-              config.chainId == defaultNet.chainId &&
-              config.networkName == defaultNet.networkName);
-
-          // Если сеть отсутствует в configs, добавляем её
-          if (!exists && defaultNet.default_) {
-            await addProvider();
+        for (final defaultConfig in networks) {
+          for (final storageConfig in configs) {
+            if (defaultConfig.chainId != storageConfig.chainId) {
+              await addProvider(providerConfig: defaultConfig);
+            }
           }
         }
       }
