@@ -32,8 +32,8 @@ class _SecurityPageState extends State<SecurityPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final state = Provider.of<AppState>(context, listen: false);
 
-      if (state.wallet != null && state.wallet!.ipfsNode != null) {
-        _ipfsController.text = state.wallet!.ipfsNode!;
+      if (state.wallet != null && state.wallet!.settings.ipfsNode != null) {
+        _ipfsController.text = state.wallet!.settings.ipfsNode!;
       } else {
         _ipfsController.text = "dweb.link";
       }
@@ -159,7 +159,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 'assets/icons/graph.svg',
                 'Keep in mind that using this feature exposes your IP address to IPFS third-party services.',
                 true,
-                state.wallet!.ensEnabled,
+                state.wallet!.settings.ensEnabled,
                 (value) async {
                   await setWalletEns(
                     walletIndex: BigInt.from(state.selectedWallet),
@@ -175,7 +175,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 'assets/icons/ipfs.svg',
                 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
                 true,
-                state.wallet!.ipfsNode != null,
+                state.wallet!.settings.ipfsNode != null,
                 (value) async {
                   await setWalletIpfsNode(
                     walletIndex: BigInt.from(state.selectedWallet),
@@ -193,7 +193,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 'assets/icons/gas.svg',
                 'Use ZilPay server for optimize your gas usage',
                 true,
-                state.wallet!.gasControlEnabled,
+                state.wallet!.settings.gasControlEnabled,
                 (value) async {
                   await setWalletGasControl(
                     walletIndex: BigInt.from(state.selectedWallet),
@@ -209,7 +209,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 'assets/icons/server.svg',
                 'Make requests to ZilPay server for fetch best node',
                 true,
-                state.wallet!.nodeRankingEnabled,
+                state.wallet!.settings.nodeRankingEnabled,
                 (value) async {
                   await setWalletNodeRanking(
                     walletIndex: BigInt.from(state.selectedWallet),
@@ -330,7 +330,7 @@ class _SecurityPageState extends State<SecurityPage> {
 
   Widget _buildEncryptionSection(AppState state) {
     final theme = state.currentTheme;
-    final algorithms = generateAlgorithms(state.wallet!.cipherOrders);
+    final algorithms = generateAlgorithms(state.wallet!.settings.cipherOrders);
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

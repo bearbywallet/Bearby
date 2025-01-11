@@ -105,7 +105,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncTokenRates() async {
-    if (wallet?.currencyConvert?.isEmpty ?? true) {
+    if (wallet?.settings.currencyConvert?.isEmpty ?? true) {
       return;
     }
 
@@ -124,7 +124,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> updateTokensRates() async {
-    if (wallet?.currencyConvert?.isEmpty ?? true) {
+    if (wallet?.settings.currencyConvert?.isEmpty ?? true) {
       return;
     }
 

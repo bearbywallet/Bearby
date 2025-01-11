@@ -5,7 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class CipherSettingsPage extends StatefulWidget {
@@ -20,7 +20,7 @@ class CipherSettingsPage extends StatefulWidget {
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
   List<int>? _codes;
-  KeyPair? _keys;
+  KeyPairInfo? _keys;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -65,7 +65,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
     final codes = args?['codes'] as List<int>?;
-    final keys = args?['keys'] as KeyPair?;
+    final keys = args?['keys'] as KeyPairInfo?;
 
     if (bip39 == null && codes == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

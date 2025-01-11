@@ -247,7 +247,7 @@ class _HomePageState extends State<HomePage> {
 
                           return TokenCard(
                             currencySymbol:
-                                appState.wallet!.currencyConvert ?? "",
+                                appState.wallet!.settings.currencyConvert ?? "",
                             tokenAmount: tokenAmountValue,
                             tokenAddr: token.addr,
                             tokenDecimals: token.decimals,

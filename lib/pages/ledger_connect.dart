@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:ledger_flutter/ledger_flutter.dart';
 import 'package:permission_handler/permission_handler.dart';
@@ -9,12 +10,15 @@ import 'package:zilliqa_ledger_flutter/zilliqa_ledger_flutter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/ledger_item.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/ledger_connect_dialog.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class LedgerConnectPage extends StatefulWidget {
@@ -323,7 +327,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           DeviceInfoService device = DeviceInfoService();
           List<String> identifiers = await device.getDeviceIdentifiers();
 
-          (String, String) session = await addLedgerWallet(
+          LedgerParamsInput params = LedgerParamsInput(
             pubKey: key.publicKey,
             walletIndex: BigInt.from(index),
             walletName: name,
@@ -332,6 +336,30 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             biometricType:
                 useBiometric ? preferredAuth.name : AuthMethod.none.name,
             identifiers: identifiers,
+            providerIndex: BigInt.zero, // TODO: add provider index.
+          );
+
+          // TODO: setup default settings.
+          WalletSettingsInfo settings = WalletSettingsInfo(
+            // AESGCM256 = 0,
+            // NTRUP1277 = 1,
+            cipherOrders: Uint8List.fromList([0, 1]),
+            argonParams: Argon2DefaultParams.lowMemory(),
+            currencyConvert: "BTC",
+            ipfsNode: "dweb.link",
+            ensEnabled: true,
+            gasControlEnabled: true,
+            nodeRankingEnabled: true,
+            maxConnections: 5,
+            requestTimeoutSecs: 30,
+          );
+          List<FTokenInfo> ftokens =
+              List<FTokenInfo>.empty(); // TODO: add ftokens default .
+
+          (String, String) session = await addLedgerWallet(
+            params: params,
+            walletSettings: settings,
+            ftokens: ftokens,
           );
 
           await _appState.syncData();

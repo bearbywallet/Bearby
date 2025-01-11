@@ -28,12 +28,11 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
       setState(() {
         currencies =
             state.rates.keys.map((code) => Currency(code, '')).toList();
-        ;
       });
 
-      if (state.wallet?.currencyConvert != null) {
+      if (state.wallet?.settings.currencyConvert != null) {
         setState(() {
-          selectedCurrency = state.wallet!.currencyConvert!;
+          selectedCurrency = state.wallet!.settings.currencyConvert!;
         });
       }
     });
@@ -43,7 +42,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
-    final bool isRateFetchEnabled = state.wallet!.currencyConvert != null;
+    final bool isRateFetchEnabled =
+        state.wallet!.settings.currencyConvert != null;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -133,7 +133,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                 ),
               ),
               Switch(
-                value: state.wallet!.currencyConvert != null,
+                value: state.wallet!.settings.currencyConvert != null,
                 onChanged: (value) async {
                   if (value) {
                     await setRateFetcher(

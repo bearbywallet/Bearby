@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/toggle_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class BlockchainNetwork {
@@ -46,7 +47,7 @@ class BlockchainSettingsPage extends StatefulWidget {
 
 class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
   List<String>? _bip39List;
-  KeyPair? _keys;
+  KeyPairInfo? _keys;
 
   final TextEditingController _rpcUrlController = TextEditingController();
   final List<EVMNetwork> _evmNetworks = [
@@ -103,7 +104,7 @@ class _BlockchainSettingsPageState extends State<BlockchainSettingsPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
-    final keys = args?['keys'] as KeyPair?;
+    final keys = args?['keys'] as KeyPairInfo?;
 
     if (bip39 == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

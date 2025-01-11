@@ -134,7 +134,7 @@ class _AddNextBip39AccountContentState
 
         if (_appState.wallet!.walletType
             .contains(WalletType.SecretPhrase.name)) {
-          await addNextBip39Account(
+          AddNextBip39AccountParams params = AddNextBip39AccountParams(
             walletIndex: BigInt.from(_appState.selectedWallet),
             accountIndex: BigInt.from(_index - 1),
             name: _nameController.text,
@@ -144,6 +144,11 @@ class _AddNextBip39AccountContentState
                 ? null
                 : _passwordController.text,
             sessionCipher: session.isEmpty ? null : session,
+            providerIndex: BigInt.zero, // TODO: add provider index.
+          );
+
+          await addNextBip39Account(
+            params: params,
           );
         } else if (_appState.wallet!.walletType
             .contains(WalletType.ledger.name)) {

@@ -6,6 +6,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
@@ -18,7 +19,7 @@ class SecretKeyGeneratorPage extends StatefulWidget {
 }
 
 class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
-  KeyPair _keyPair = KeyPair(sk: "", pk: "");
+  KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
   bool _hasBackupWords = false;
 
   @override
@@ -28,7 +29,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
   }
 
   Future<void> _regenerateKeys() async {
-    KeyPair keyPair = await genKeypair();
+    KeyPairInfo keyPair = await genKeypair();
 
     setState(() {
       _keyPair = keyPair;

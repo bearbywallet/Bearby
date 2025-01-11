@@ -1,18 +1,20 @@
 import 'dart:async';
-import 'package:flutter_rust_bridge/flutter_rust_bridge.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 
 class PasswordSetupPage extends StatefulWidget {
@@ -26,7 +28,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<String>? _bip39List;
   List<int>? _codes;
   // int? _cipher;
-  KeyPair? _keys;
+  KeyPairInfo? _keys;
 
   final AuthService _authService = AuthService();
   late AuthGuard _authGuard;
@@ -59,7 +61,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final codes = args?['codes'] as List<int>?;
     final int? cipher = args?['cipher'];
-    final keys = args?['keys'] as KeyPair?;
+    final keys = args?['keys'] as KeyPairInfo?;
 
     if (bip39 == null && codes == null && cipher == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -186,7 +188,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       _btnController.start();
 
-      Uint64List networkIndexes = Uint64List.fromList(_codes!);
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
@@ -198,8 +199,23 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
       (String, String) session;
 
+      // TODO: setup from page.
+      WalletSettingsInfo settings = WalletSettingsInfo(
+        // AESGCM256 = 0,
+        // NTRUP1277 = 1,
+        cipherOrders: Uint8List.fromList([0, 1]),
+        argonParams: Argon2DefaultParams.lowMemory(),
+        currencyConvert: "BTC",
+        ipfsNode: "dweb.link",
+        ensEnabled: true,
+        gasControlEnabled: true,
+        nodeRankingEnabled: true,
+        maxConnections: 5,
+        requestTimeoutSecs: 30,
+      );
+
       if (_bip39List != null) {
-        session = await addBip39Wallet(
+        Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
           accounts: [
@@ -208,18 +224,29 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           passphrase: "", // TODO: maybe make it
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
-          networks: networkIndexes,
           identifiers: identifiers,
+          provider: BigInt.zero,
+        );
+
+        session = await addBip39Wallet(
+          params: params,
+          walletSettings: settings,
+          ftokens: [], // TODO: add default tokens
         );
       } else if (_keys != null) {
-        session = await addSkWallet(
+        AddSKWalletParams params = AddSKWalletParams(
           sk: _keys!.sk,
           password: _passwordController.text,
           walletName: _walletNameController.text,
-          accountName: "Key 0", // TODO: maybe make it in modal
           biometricType: biometricType.name,
-          networks: networkIndexes,
           identifiers: identifiers,
+          provider: BigInt.zero, // TODO: add select provider from seupt page
+        );
+
+        session = await addSkWallet(
+          params: params,
+          walletSettings: settings,
+          ftokens: [], // TODO: add default tokens
         );
       } else {
         throw "Invalid Wallet gen method";
