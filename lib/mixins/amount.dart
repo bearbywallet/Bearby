@@ -57,11 +57,11 @@ String formatCompactNumber(double value) {
 }
 
 String getConvertedAmount(AppState state, double amount) {
-  if (state.wallet?.currencyConvert?.isEmpty ?? true) {
+  if (state.wallet?.settings.currencyConvert?.isEmpty ?? true) {
     return '-';
   }
 
-  String currency = state.wallet!.currencyConvert!;
+  String currency = state.wallet!.settings.currencyConvert!;
   double? converted = state.rates[currency];
 
   if (converted == null) {

@@ -1708,8 +1708,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BackgroundState dco_decode_background_state(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return BackgroundState(
       wallets: dco_decode_list_wallet_info(arr[0]),
       notificationsWalletStates:
@@ -1717,6 +1717,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notificationsGlobalEnabled: dco_decode_bool(arr[2]),
       locale: dco_decode_String(arr[3]),
       appearances: dco_decode_u_8(arr[4]),
+      providers:
+          dco_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
+              arr[5]),
     );
   }
 
@@ -2475,12 +2478,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
     var var_locale = sse_decode_String(deserializer);
     var var_appearances = sse_decode_u_8(deserializer);
+    var var_providers =
+        sse_decode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
+            deserializer);
     return BackgroundState(
         wallets: var_wallets,
         notificationsWalletStates: var_notificationsWalletStates,
         notificationsGlobalEnabled: var_notificationsGlobalEnabled,
         locale: var_locale,
-        appearances: var_appearances);
+        appearances: var_appearances,
+        providers: var_providers);
   }
 
   @protected
@@ -3391,6 +3398,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.notificationsGlobalEnabled, serializer);
     sse_encode_String(self.locale, serializer);
     sse_encode_u_8(self.appearances, serializer);
+    sse_encode_list_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerNetworkConfigInfo(
+        self.providers, serializer);
   }
 
   @protected

@@ -8,6 +8,7 @@ import 'account.dart';
 import 'ftoken.dart';
 import 'notification.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'provider.dart';
 import 'settings.dart';
 import 'wallet.dart';
 
@@ -17,6 +18,7 @@ class BackgroundState {
   final bool notificationsGlobalEnabled;
   final String locale;
   final int appearances;
+  final List<NetworkConfigInfo> providers;
 
   const BackgroundState({
     required this.wallets,
@@ -24,6 +26,7 @@ class BackgroundState {
     required this.notificationsGlobalEnabled,
     required this.locale,
     required this.appearances,
+    required this.providers,
   });
 
   @override
@@ -32,7 +35,8 @@ class BackgroundState {
       notificationsWalletStates.hashCode ^
       notificationsGlobalEnabled.hashCode ^
       locale.hashCode ^
-      appearances.hashCode;
+      appearances.hashCode ^
+      providers.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -43,5 +47,6 @@ class BackgroundState {
           notificationsWalletStates == other.notificationsWalletStates &&
           notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
           locale == other.locale &&
-          appearances == other.appearances;
+          appearances == other.appearances &&
+          providers == other.providers;
 }

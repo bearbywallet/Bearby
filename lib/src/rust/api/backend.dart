@@ -8,6 +8,7 @@ import '../models/account.dart';
 import '../models/background.dart';
 import '../models/ftoken.dart';
 import '../models/notification.dart';
+import '../models/provider.dart';
 import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
