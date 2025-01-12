@@ -225,7 +225,6 @@ class _ReceivePageState extends State<ReceivePage> {
                                           width: 32,
                                           height: 32,
                                           decoration: BoxDecoration(
-                                            color: Colors.blue,
                                             shape: BoxShape.circle,
                                           ),
                                           child: Center(
