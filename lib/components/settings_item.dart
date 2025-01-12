@@ -49,6 +49,7 @@ class _SettingsItemState extends State<SettingsItem> {
     final borderRadius = _getBorderRadius();
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTapDown: (_) => setState(() => _isPressed = true),
       onTapUp: (_) {
         setState(() => _isPressed = false);

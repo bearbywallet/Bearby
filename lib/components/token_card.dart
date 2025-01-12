@@ -158,6 +158,7 @@ class _TokenCardState extends State<TokenCard> {
           onEnter: (_) => setState(() => isHovered = true),
           onExit: (_) => setState(() => isHovered = false),
           child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTapDown: (_) => setState(() => isPressed = true),
             onTapUp: (_) => setState(() => isPressed = false),
             onTapCancel: () => setState(() => isPressed = false),

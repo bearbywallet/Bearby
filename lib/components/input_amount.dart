@@ -61,8 +61,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             children: [
               Text(
                 widget.amount,
-                style: const TextStyle(
-                  color: Colors.white,
+                style: TextStyle(
+                  color: theme.textPrimary,
                   fontSize: 42,
                   fontWeight: FontWeight.w500,
                 ),
@@ -70,7 +70,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               Text(
                 widget.convertAmount,
                 style: TextStyle(
-                  color: Colors.white.withOpacity(0.7),
+                  color: theme.textPrimary.withOpacity(0.7),
                   fontSize: 28,
                   fontWeight: FontWeight.w400,
                 ),
@@ -92,7 +92,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: Colors.white.withOpacity(0.2),
+                      color: theme.textPrimary.withOpacity(0.2),
                       width: 1.5,
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -105,7 +105,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         height: 24,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: Colors.white.withOpacity(0.2),
+                            color: theme.textPrimary.withOpacity(0.2),
                             width: 1.5,
                           ),
                           borderRadius: BorderRadius.circular(24),
@@ -138,8 +138,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                       const SizedBox(width: 8),
                       Text(
                         token.symbol,
-                        style: const TextStyle(
-                          color: Colors.white,
+                        style: TextStyle(
+                          color: theme.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -166,7 +166,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                   Text(
                     balance.toString(),
                     style: TextStyle(
-                      color: Colors.white.withOpacity(0.7),
+                      color: theme.textPrimary.withOpacity(0.7),
                       fontSize: 14,
                     ),
                   ),
@@ -180,13 +180,13 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                           vertical: 4,
                         ),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: theme.textPrimary.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(6),
                         ),
                         child: Text(
                           'Max',
                           style: TextStyle(
-                            color: Colors.white.withOpacity(0.7),
+                            color: theme.textPrimary.withOpacity(0.7),
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
                           ),

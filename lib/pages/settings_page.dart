@@ -149,6 +149,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildWalletSection(AppTheme theme, AppState appState) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.pushNamed(context, '/wallet'),
       child: Container(
         padding: const EdgeInsets.all(16),
@@ -188,7 +189,10 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 Text(
-                  'Ethereum (ETH)', // TODO: add Network name!
+                  appState
+                      .state
+                      .providers[appState.account!.providerIndex.toInt()]
+                      .networkName,
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,

@@ -67,6 +67,7 @@ class _WalletHeaderState extends State<WalletHeader>
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTapDown: _handleTapDown,
           onTapUp: _handleTapUp,
           onTapCancel: _handleTapCancel,

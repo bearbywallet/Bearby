@@ -101,7 +101,7 @@ class _TileButtonState extends State<TileButton>
           ? SystemMouseCursors.forbidden
           : SystemMouseCursors.click,
       child: GestureDetector(
-        behavior: HitTestBehavior.opaque, // Makes entire area clickable
+        behavior: HitTestBehavior.opaque,
         onTapDown: _handleTapDown,
         onTapUp: _handleTapUp,
         onTapCancel: _handleTapCancel,
@@ -115,8 +115,7 @@ class _TileButtonState extends State<TileButton>
                 child: Container(
                   width: containerSize,
                   height: containerSize,
-                  padding:
-                      EdgeInsets.zero, // Ensures no padding affects click area
+                  padding: EdgeInsets.zero,
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.circular(borderRadius),

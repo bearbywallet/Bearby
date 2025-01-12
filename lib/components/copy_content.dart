@@ -72,6 +72,7 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: (_) => _controller.forward(),
         onTapUp: (_) {
           _controller.reverse();

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/modals/custom_network_modal.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import '../components/custom_app_bar.dart';
@@ -172,7 +173,25 @@ class _NetworkPageState extends State<NetworkPage> {
                     width: double.infinity,
                     child: CustomButton(
                       text: 'Add a custom network',
-                      onPressed: () {},
+                      onPressed: () {
+                        showCustomNetworkModal(
+                          context: context,
+                          theme: theme,
+                          onSave: ({
+                            required String networkName,
+                            required String rpcUrl,
+                            required String chainId,
+                            required String symbol,
+                            required String explorerUrl,
+                          }) {
+                            print('New network: $networkName');
+                            print('RPC URL: $rpcUrl');
+                            print('Chain ID: $chainId');
+                            print('Symbol: $symbol');
+                            print('Explorer URL: $explorerUrl');
+                          },
+                        );
+                      },
                       backgroundColor: theme.primaryPurple,
                       borderRadius: 30.0,
                       height: 50.0,

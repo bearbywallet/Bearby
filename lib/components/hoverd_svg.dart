@@ -39,6 +39,7 @@ class HoverSvgIconState extends State<HoverSvgIcon> {
         minHeight: widget.height + 16,
       ),
       child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
         onTapDown: (_) => setState(() => _isPressed = true),
         onTapUp: (_) => setState(() => _isPressed = false),
         onTapCancel: () => setState(() => _isPressed = false),
