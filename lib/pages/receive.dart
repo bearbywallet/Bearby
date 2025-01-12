@@ -10,6 +10,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
+import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -24,11 +25,21 @@ class ReceivePage extends StatefulWidget {
 class _ReceivePageState extends State<ReceivePage> {
   bool isCopied = false;
   bool isPressedToken = false;
+  int selectedToken = 0;
   String amount = "0";
+
+  final TextEditingController _amountController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    _amountController.text = amount;
+  }
+
+  @override
+  void dispose() {
+    _amountController.dispose();
+    super.dispose();
   }
 
   Future<void> handleCopy(String address) async {
@@ -50,13 +61,15 @@ class _ReceivePageState extends State<ReceivePage> {
     });
   }
 
-  void handleSetAmount() {
-    // Implement set amount functionality
-  }
-
   void handleSelectToken() {
-    // Implement token selection logic here
-    debugPrint('Token selection pressed');
+    showTokenSelectModal(
+      context: context,
+      onTokenSelected: (index) {
+        setState(() {
+          selectedToken = index;
+        });
+      },
+    );
   }
 
   Future<void> handleShare(BuildContext context) async {
@@ -74,7 +87,6 @@ class _ReceivePageState extends State<ReceivePage> {
       final box = context.findRenderObject() as RenderBox?;
       final sharePositionOrigin = box!.localToGlobal(Offset.zero) & box.size;
 
-      // Generate QR code as image
       final qrPainter = QrPainter(
         data: appState.account?.addr ?? "",
         version: QrVersions.auto,
@@ -131,7 +143,7 @@ class _ReceivePageState extends State<ReceivePage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final providerIndex = appState.account?.providerIndex ?? BigInt.zero;
     final provider = appState.state.providers[providerIndex.toInt()];
-    final token = appState.wallet?.tokens[0];
+    final token = appState.wallet?.tokens[selectedToken];
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -312,7 +324,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                   ),
                                 ),
                                 disabled: false,
-                                onPressed: () {},
+                                onPressed: _handleAmountDialog,
                                 backgroundColor: theme.cardBackground,
                                 textColor: theme.primaryPurple,
                               ),
@@ -362,6 +374,95 @@ class _ReceivePageState extends State<ReceivePage> {
         ),
       ),
     );
+  }
+
+  Future<void> _handleAmountDialog() async {
+    _amountController.text = amount;
+
+    final result = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        final theme = Provider.of<AppState>(context).currentTheme;
+
+        return AlertDialog(
+          backgroundColor: theme.cardBackground,
+          title: Text(
+            'Enter Amount',
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          content: TextField(
+            controller: _amountController,
+            keyboardType: const TextInputType.numberWithOptions(decimal: true),
+            inputFormatters: [
+              FilteringTextInputFormatter.allow(RegExp(r'[0-9\,\.]')),
+              TextInputFormatter.withFunction((oldValue, newValue) {
+                return TextEditingValue(
+                  text: newValue.text.replaceAll(',', '.'),
+                  selection: newValue.selection,
+                );
+              }),
+              TextInputFormatter.withFunction((oldValue, newValue) {
+                if (newValue.text.isEmpty) {
+                  return newValue;
+                }
+                if (newValue.text.split('.').length > 2) {
+                  return oldValue;
+                }
+                return newValue;
+              }),
+            ],
+            decoration: InputDecoration(
+              hintText: '0.0',
+              hintStyle: TextStyle(color: theme.textSecondary),
+              enabledBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.primaryPurple),
+              ),
+              focusedBorder: UnderlineInputBorder(
+                borderSide: BorderSide(color: theme.primaryPurple, width: 2),
+              ),
+            ),
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 16,
+            ),
+            autofocus: true,
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(context),
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: theme.textSecondary),
+              ),
+            ),
+            TextButton(
+              onPressed: () {
+                if (_amountController.text.isEmpty) {
+                  _amountController.text = '0';
+                }
+                Navigator.pop(context, _amountController.text);
+              },
+              child: Text(
+                'Confirm',
+                style: TextStyle(
+                  color: theme.primaryPurple,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (result != null) {
+      setState(() {
+        amount = result;
+      });
+    }
   }
 
   String _qrcodeGen(String addr, FTokenInfo token, NetworkConfigInfo provider) {
