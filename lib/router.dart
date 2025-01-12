@@ -8,6 +8,7 @@ import 'package:zilpay/pages/locale.dart';
 import 'package:zilpay/pages/network.dart';
 import 'package:zilpay/pages/notification.dart';
 import 'package:zilpay/pages/password_setup.dart';
+import 'package:zilpay/pages/receive.dart';
 import 'package:zilpay/pages/restore_bip39.dart';
 import 'package:zilpay/pages/security.dart';
 import 'package:zilpay/pages/send.dart';
@@ -77,6 +78,7 @@ class AppRouter {
       '/security',
       '/networks',
       '/send',
+      '/receive',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -166,6 +168,8 @@ class AppRouter {
         return wrapWithProviders(const LoginPage());
       case '/':
         return wrapWithProviders(const MainPage());
+      case '/receive':
+        return wrapWithProviders(const ReceivePage());
       case '/history':
         return wrapWithProviders(const HistoryPage());
       case '/send':

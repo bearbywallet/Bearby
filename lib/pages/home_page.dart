@@ -148,7 +148,9 @@ class _HomePageState extends State<HomePage> {
                                 BlendMode.srcIn,
                               ),
                             ),
-                            onPressed: () {},
+                            onPressed: () {
+                              Navigator.pushNamed(context, '/receive');
+                            },
                             backgroundColor: theme.cardBackground,
                             textColor: theme.primaryPurple,
                           ),

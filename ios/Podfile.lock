@@ -19,9 +19,12 @@ PODS:
   - Protobuf (3.28.3)
   - reactive_ble_mobile (0.0.1):
     - Flutter
+    - FlutterMacOS
     - Protobuf (~> 3.5)
     - SwiftProtobuf (~> 1.0)
   - rust_lib_zilpay (0.0.1):
+    - Flutter
+  - share_plus (0.0.1):
     - Flutter
   - SwiftProtobuf (1.28.2)
   - url_launcher_ios (0.0.1):
@@ -36,8 +39,9 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
-  - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/ios`)
+  - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/darwin`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
+  - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
 SPEC REPOS:
@@ -63,9 +67,11 @@ EXTERNAL SOURCES:
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
   reactive_ble_mobile:
-    :path: ".symlinks/plugins/reactive_ble_mobile/ios"
+    :path: ".symlinks/plugins/reactive_ble_mobile/darwin"
   rust_lib_zilpay:
     :path: ".symlinks/plugins/rust_lib_zilpay/ios"
+  share_plus:
+    :path: ".symlinks/plugins/share_plus/ios"
   url_launcher_ios:
     :path: ".symlinks/plugins/url_launcher_ios/ios"
 
@@ -79,8 +85,9 @@ SPEC CHECKSUMS:
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   Protobuf: 5a8a7781d8e1004302f108977ac2d5b99323146f
-  reactive_ble_mobile: 027a1eb013960fbedab38150e314254fdce8887f
+  reactive_ble_mobile: ea97709e18fa6f0b0592909725d7ae7e1c595b64
   rust_lib_zilpay: c1c8e95f8f1a7815cb3f51142cbdaf40bd269582
+  share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   SwiftProtobuf: 4dbaffec76a39a8dc5da23b40af1a5dc01a4c02d
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d
 

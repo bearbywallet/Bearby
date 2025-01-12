@@ -7,10 +7,12 @@ import 'package:zilpay/state/app_state.dart';
 
 class CopyAddressButton extends StatefulWidget {
   final String address;
+  final bool isShort;
 
   const CopyAddressButton({
     super.key,
     required this.address,
+    this.isShort = true,
   });
 
   @override
@@ -92,17 +94,21 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
                     horizontal: 8,
                     vertical: 4,
                   ),
-                  child: Row(
-                    mainAxisSize: MainAxisSize.min,
+                  child: Wrap(
+                    alignment: WrapAlignment.center,
+                    crossAxisAlignment: WrapCrossAlignment.center,
+                    spacing: 4,
+                    runSpacing: 4,
                     children: [
                       Text(
-                        shortenAddress(widget.address),
+                        widget.isShort
+                            ? shortenAddress(widget.address)
+                            : widget.address,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
                         ),
                       ),
-                      const SizedBox(width: 4),
                       SvgPicture.asset(
                         _isCopied
                             ? 'assets/icons/check.svg'

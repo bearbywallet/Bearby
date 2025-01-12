@@ -118,8 +118,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Padding(
-                            padding:
-                                EdgeInsets.symmetric(vertical: adaptivePadding),
+                            padding: EdgeInsets.symmetric(vertical: 0),
                             child: Row(
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
