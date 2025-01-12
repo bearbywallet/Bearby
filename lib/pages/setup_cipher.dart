@@ -59,6 +59,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
           _argonParams = params;
         });
       },
+      argonParams: _argonParams,
     );
   }
 

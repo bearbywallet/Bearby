@@ -10,6 +10,7 @@ import 'package:zilpay/state/app_state.dart';
 void showArgonSettingsModal({
   required BuildContext context,
   required Function(WalletArgonParamsInfo) onParamsSelected,
+  required WalletArgonParamsInfo argonParams,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -26,6 +27,7 @@ void showArgonSettingsModal({
         ),
         child: _ArgonSettingsModalContent(
           onParamsSelected: onParamsSelected,
+          argonParams: argonParams,
         ),
       );
     },
@@ -34,9 +36,11 @@ void showArgonSettingsModal({
 
 class _ArgonSettingsModalContent extends StatefulWidget {
   final Function(WalletArgonParamsInfo) onParamsSelected;
+  final WalletArgonParamsInfo argonParams;
 
   const _ArgonSettingsModalContent({
     required this.onParamsSelected,
+    required this.argonParams,
   });
 
   @override
@@ -47,7 +51,9 @@ class _ArgonSettingsModalContent extends StatefulWidget {
 class _ArgonSettingsModalContentState
     extends State<_ArgonSettingsModalContent> {
   final TextEditingController _secretController = TextEditingController();
-  int selectedParamIndex = 1;
+  bool _obscurePassword = true;
+
+  late int selectedParamIndex;
 
   final List<Map<String, String>> argonDescriptions = [
     {
@@ -66,6 +72,26 @@ class _ArgonSettingsModalContentState
       'description': 'High security with increased memory and iterations.',
     },
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize with the provided argonParams
+    selectedParamIndex = _getInitialParamIndex();
+    _secretController.text = widget.argonParams.secret;
+  }
+
+  int _getInitialParamIndex() {
+    // Logic to determine initial index based on provided argonParams
+    if (widget.argonParams ==
+        Argon2DefaultParams.lowMemory(secret: widget.argonParams.secret)) {
+      return 0;
+    } else if (widget.argonParams ==
+        Argon2DefaultParams.secure(secret: widget.argonParams.secret)) {
+      return 2;
+    }
+    return 1; // OWASP Default
+  }
 
   @override
   void dispose() {
@@ -89,6 +115,7 @@ class _ArgonSettingsModalContentState
 
   @override
   Widget build(BuildContext context) {
+    // Rest of the build method remains the same
     final theme = Provider.of<AppState>(context).currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -164,12 +191,21 @@ class _ArgonSettingsModalContentState
             padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _secretController,
+              obscureText: _obscurePassword,
+              rightIconPath: _obscurePassword
+                  ? "assets/icons/close_eye.svg"
+                  : "assets/icons/open_eye.svg",
               hint: 'Enter secret (optional)',
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,
               height: 48,
               fontSize: 16,
               padding: const EdgeInsets.symmetric(horizontal: 16),
+              onRightIconTap: () {
+                setState(() {
+                  _obscurePassword = !_obscurePassword;
+                });
+              },
             ),
           ),
           Padding(

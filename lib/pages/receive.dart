@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
@@ -14,6 +15,7 @@ import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({super.key});
@@ -28,12 +30,16 @@ class _ReceivePageState extends State<ReceivePage> {
   int selectedToken = 0;
   String amount = "0";
 
+  final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
+    final appState = Provider.of<AppState>(context, listen: false);
+
     _amountController.text = amount;
+    _accountNameController.text = appState.account?.name ?? "";
   }
 
   @override
@@ -48,7 +54,7 @@ class _ReceivePageState extends State<ReceivePage> {
       isCopied = true;
     });
 
-    await Future<void>.delayed(const Duration(seconds: 3));
+    await Future<void>.delayed(const Duration(seconds: 2));
 
     setState(() {
       isCopied = false;
@@ -289,7 +295,12 @@ class _ReceivePageState extends State<ReceivePage> {
                               ],
                             ),
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 16),
+                            child: _buildAccountNameInput(theme),
+                          ),
+                          const SizedBox(height: 8),
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                             children: [
@@ -339,7 +350,9 @@ class _ReceivePageState extends State<ReceivePage> {
                                     ),
                                   ),
                                   disabled: false,
-                                  onPressed: () {},
+                                  onPressed: () {
+                                    //TODO: if zilliqa we need change from bech32 to base16
+                                  },
                                   backgroundColor: theme.cardBackground,
                                   textColor: theme.primaryPurple,
                                 ),
@@ -462,6 +475,21 @@ class _ReceivePageState extends State<ReceivePage> {
         amount = result;
       });
     }
+  }
+
+  Widget _buildAccountNameInput(AppTheme theme) {
+    return SmartInput(
+      controller: _accountNameController,
+      hint: 'Account name',
+      onChanged: (value) {
+        //TODO: Implement account name change logic
+      },
+      height: 50,
+      rightIconPath: "assets/icons/edit.svg",
+      borderColor: theme.cardBackground,
+      focusedBorderColor: theme.primaryPurple,
+      fontSize: 14,
+    );
   }
 
   String _qrcodeGen(String addr, FTokenInfo token, NetworkConfigInfo provider) {
