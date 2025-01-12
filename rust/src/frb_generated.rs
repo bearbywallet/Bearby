@@ -1811,9 +1811,11 @@ impl SseDecode for crate::models::account::AccountInfo {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_addr = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_providerIndex = <usize>::sse_decode(deserializer);
         return crate::models::account::AccountInfo {
             addr: var_addr,
             name: var_name,
+            provider_index: var_providerIndex,
         };
     }
 }
@@ -2879,6 +2881,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
         [
             self.addr.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
+            self.provider_index.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3539,6 +3542,7 @@ impl SseEncode for crate::models::account::AccountInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.addr, serializer);
         <String>::sse_encode(self.name, serializer);
+        <usize>::sse_encode(self.provider_index, serializer);
     }
 }
 
