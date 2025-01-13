@@ -1,4 +1,5 @@
 import 'dart:io';
+import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -7,9 +8,12 @@ import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -234,11 +238,28 @@ class _ReceivePageState extends State<ReceivePage> {
                                             shape: BoxShape.circle,
                                           ),
                                           child: Center(
-                                            child: Image.network(
-                                              token?.logo ?? "",
+                                            child: AsyncImage(
+                                              url: token?.logo ??
+                                                  viewIcon(
+                                                    token?.addr ?? "",
+                                                    "dark",
+                                                  ),
                                               width: 32,
                                               height: 32,
-                                              fit: BoxFit.cover,
+                                              fit: BoxFit.contain,
+                                              errorWidget: Blockies(
+                                                seed: token?.addr ?? "",
+                                                color: getWalletColor(0),
+                                                bgColor: theme.primaryPurple,
+                                                spotColor: theme.background,
+                                                size: 8,
+                                              ),
+                                              loadingWidget: const Center(
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  strokeWidth: 2,
+                                                ),
+                                              ),
                                             ),
                                           ),
                                         ),

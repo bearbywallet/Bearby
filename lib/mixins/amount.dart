@@ -25,6 +25,9 @@ BigInt adjustAmount(BigInt rawBalance, int decimals) {
 }
 
 double adjustAmountToDouble(BigInt rawBalance, int decimals) {
+  if (rawBalance == BigInt.zero) {
+    return 0;
+  }
   // Calculate divisor (10 ** decimals)
   BigInt divisor = BigInt.from(10).pow(decimals);
 
