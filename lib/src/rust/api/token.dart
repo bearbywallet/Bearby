@@ -14,10 +14,12 @@ Future<void> updateRates() => RustLib.instance.api.crateApiTokenUpdateRates();
 
 Future<String> getRates() => RustLib.instance.api.crateApiTokenGetRates();
 
-Future<void> updateTokenList({required BigInt net}) =>
-    RustLib.instance.api.crateApiTokenUpdateTokenList(net: net);
-
 Future<FTokenInfo> fetchTokenMeta(
         {required String addr, required BigInt walletIndex}) =>
     RustLib.instance.api
         .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
+
+Future<List<FTokenInfo>> addFtoken(
+        {required FTokenInfo meta, required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTokenAddFtoken(meta: meta, walletIndex: walletIndex);

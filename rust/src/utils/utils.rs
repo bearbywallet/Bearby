@@ -19,10 +19,13 @@ use crate::{
 use super::errors::ServiceError;
 
 pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
-    Address::from_zil_base16(&addr)
-        .or_else(|_| Address::from_zil_bech32(&addr))
-        .or_else(|_| Address::from_eth_address(&addr))
-        .map_err(ServiceError::AddressError)
+    if addr.starts_with("0x") {
+        Address::from_eth_address(&addr).map_err(ServiceError::AddressError)
+    } else {
+        Address::from_zil_bech32(&addr)
+            .or_else(|_| Address::from_eth_address(&addr))
+            .map_err(ServiceError::AddressError)
+    }
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {

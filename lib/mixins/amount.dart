@@ -39,16 +39,18 @@ String formatBigNumber(double number) {
 }
 
 String formatCompactNumber(double value) {
+  if (value < 1) {
+    return value.toStringAsFixed(6);
+  }
+
   final suffixes = ['', 'K', 'M', 'B', 'T'];
   var suffixIndex = 0;
 
-  // Find appropriate suffix
   while (value >= 1000 && suffixIndex < suffixes.length - 1) {
     value /= 1000;
     suffixIndex++;
   }
 
-  // Format with one decimal place if there's a fraction
   if (value % 1 != 0) {
     return '${value.toStringAsFixed(1)}${suffixes[suffixIndex]}';
   } else {

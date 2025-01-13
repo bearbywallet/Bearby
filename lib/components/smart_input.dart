@@ -112,6 +112,7 @@ class SmartInputState extends State<SmartInput>
     if (iconPath == null) return null;
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Padding(
         padding:
@@ -140,6 +141,17 @@ class SmartInputState extends State<SmartInput>
         ? (widget.focusedBorderColor ?? defaultFocusedBorderColor)
         : theme.textSecondary;
 
+    // Get the actual border color based on the widget's state
+    Color getBorderColor() {
+      if (widget.disabled) {
+        return widget.borderColor ?? Colors.transparent;
+      }
+      if (_isFocused) {
+        return widget.focusedBorderColor ?? defaultFocusedBorderColor;
+      }
+      return widget.borderColor ?? defaultBorderColor;
+    }
+
     return AnimatedBuilder(
       animation: _shakeAnimation,
       builder: (context, child) {
@@ -154,12 +166,7 @@ class SmartInputState extends State<SmartInput>
                   : theme.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
-                color: widget.disabled
-                    ? defaultBorderColor.withOpacity(0.3)
-                    : _isFocused
-                        ? (widget.focusedBorderColor ??
-                            defaultFocusedBorderColor)
-                        : (widget.borderColor ?? defaultBorderColor),
+                color: getBorderColor(),
                 width: 1.0,
               ),
             ),

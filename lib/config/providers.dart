@@ -30,6 +30,8 @@ class DefaultNetworkProviders {
       fallbackEnabled: true,
       urls: [
         "https://eth.llamarpc.com",
+        "https://1rpc.io/eth",
+        "https://eth.drpc.org",
         "https://api.zan.top/eth-mainnet",
         "https://singapore.rpc.blxrbdn.com"
       ],
@@ -45,8 +47,7 @@ class DefaultNetworkProviders {
       chainId: BigInt.from(56),
       fallbackEnabled: true,
       urls: [
-        "https://binance.llamarpc.com",
-        "https://bsc-pokt.nodies.app",
+        "https://bsc-dataseed.binance.org",
       ],
       explorerUrls: ['https://bscscan.com'],
       default_: true,

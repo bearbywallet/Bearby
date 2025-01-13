@@ -222,10 +222,10 @@ class _HomePageState extends State<HomePage> {
                               showManageTokensModal(
                                 context: context,
                                 onAddToken: () {
-                                  debugPrint('Add new token');
+                                  Navigator.pushNamed(context, '/add_token');
                                 },
-                                onTokenToggle: (String symbol) async {
-                                  debugPrint("symbol $symbol");
+                                onTokenToggle: (String addr) async {
+                                  debugPrint("contract address $addr");
                                 },
                               );
                             },

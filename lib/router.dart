@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/pages/add_token.dart';
 import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/currency_conversion.dart';
@@ -79,6 +80,7 @@ class AppRouter {
       '/networks',
       '/send',
       '/receive',
+      '/add_token',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -170,6 +172,8 @@ class AppRouter {
         return wrapWithProviders(const MainPage());
       case '/receive':
         return wrapWithProviders(const ReceivePage());
+      case '/add_token':
+        return wrapWithProviders(const AddTokenPage());
       case '/history':
         return wrapWithProviders(const HistoryPage());
       case '/send':

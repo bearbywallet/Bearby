@@ -12,6 +12,7 @@ import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 

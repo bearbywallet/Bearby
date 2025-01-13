@@ -8,7 +8,6 @@ import 'package:zilpay/mixins/colors.dart';
 import 'package:http/http.dart' as http;
 import 'package:zilpay/state/app_state.dart';
 
-// TODO: make a cache image loading! remove http
 class TokenCard extends StatefulWidget {
   final String tokenAmount;
   final int tokenDecimals;
@@ -37,16 +36,39 @@ class TokenCard extends StatefulWidget {
   State<TokenCard> createState() => _TokenCardState();
 }
 
-class _TokenCardState extends State<TokenCard> {
+class _TokenCardState extends State<TokenCard>
+    with SingleTickerProviderStateMixin {
   bool isHovered = false;
   bool isPressed = false;
   String? contentType;
   bool isLoading = false;
 
+  late final AnimationController _controller;
+  late final Animation<double> _animation;
+
   @override
   void initState() {
     super.initState();
     _checkImageType();
+
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 150),
+      vsync: this,
+    );
+
+    _animation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 
   Future<void> _checkImageType() async {
@@ -71,7 +93,7 @@ class _TokenCardState extends State<TokenCard> {
 
   Widget _buildIcon(AppState themeProvider) {
     if (isLoading) {
-      return SizedBox(
+      return const SizedBox(
         width: 25,
         height: 25,
       );
@@ -82,7 +104,7 @@ class _TokenCardState extends State<TokenCard> {
         widget.iconUrl,
         width: 32,
         height: 32,
-        placeholderBuilder: (context) => SizedBox(
+        placeholderBuilder: (context) => const SizedBox(
           width: 32,
           height: 32,
           child: Center(
@@ -155,91 +177,122 @@ class _TokenCardState extends State<TokenCard> {
     return Column(
       children: [
         MouseRegion(
-          onEnter: (_) => setState(() => isHovered = true),
-          onExit: (_) => setState(() => isHovered = false),
+          onEnter: (_) {
+            setState(() => isHovered = true);
+            _controller.forward(from: 0.5);
+          },
+          onExit: (_) {
+            setState(() => isHovered = false);
+            _controller.reverse();
+          },
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
-            onTapDown: (_) => setState(() => isPressed = true),
-            onTapUp: (_) => setState(() => isPressed = false),
-            onTapCancel: () => setState(() => isPressed = false),
+            onTapDown: (_) {
+              setState(() => isPressed = true);
+              _controller.forward();
+            },
+            onTapUp: (_) {
+              setState(() => isPressed = false);
+              _controller.reverse();
+            },
+            onTapCancel: () {
+              setState(() => isPressed = false);
+              _controller.reverse();
+            },
             onTap: widget.onTap,
-            child: Container(
-              decoration: BoxDecoration(
-                color: isPressed
-                    ? Colors.grey.withOpacity(0.2)
-                    : isHovered
-                        ? Colors.grey.withOpacity(0.1)
-                        : Colors.transparent,
+            child: AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) => Transform.scale(
+                scale: _animation.value,
+                child: child,
               ),
-              child: Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding,
-                  vertical: adaptivePadding,
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Text(
-                                widget.tokenName,
-                                style: TextStyle(
-                                  color: theme.textPrimary.withOpacity(0.7),
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w500,
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                decoration: const BoxDecoration(),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: adaptivePadding,
+                    vertical: adaptivePadding,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                return Row(
+                                  children: [
+                                    Flexible(
+                                      child: Text(
+                                        widget.tokenName,
+                                        style: TextStyle(
+                                          color: theme.textPrimary
+                                              .withOpacity(0.7),
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                        maxLines: 1,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Text(
+                                      '(${widget.tokenSymbol})',
+                                      style: TextStyle(
+                                        color: theme.textSecondary
+                                            .withOpacity(0.5),
+                                        fontSize: 13,
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
+                            const SizedBox(height: 8),
+                            Row(
+                              children: [
+                                Flexible(
+                                  child: Text(
+                                    amount,
+                                    style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 20,
+                                      fontWeight: FontWeight.w600,
+                                      letterSpacing: 0.5,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
-                              ),
-                              const SizedBox(width: 8),
-                              Text(
-                                '(${widget.tokenSymbol})',
-                                style: TextStyle(
-                                  color: theme.textSecondary.withOpacity(0.5),
-                                  fontSize: 20,
+                                const SizedBox(width: 2),
+                                Text(
+                                  '$convertedAmount${widget.currencySymbol}',
+                                  style: TextStyle(
+                                    color: theme.textSecondary.withOpacity(0.7),
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.w400,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            children: [
-                              Text(
-                                amount,
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.w600,
-                                  letterSpacing: 0.5,
-                                ),
-                              ),
-                              const SizedBox(width: 2),
-                              Text(
-                                '$convertedAmount${widget.currencySymbol}',
-                                style: TextStyle(
-                                  color: theme.textSecondary.withOpacity(0.7),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
+                              ],
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.05),
-                        shape: BoxShape.circle,
+                      const SizedBox(width: 12),
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.05),
+                          shape: BoxShape.circle,
+                        ),
+                        child: ClipOval(
+                          child: _buildIcon(Provider.of<AppState>(context)),
+                        ),
                       ),
-                      child: ClipOval(
-                        child: _buildIcon(Provider.of<AppState>(context)),
-                      ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
             ),
@@ -257,7 +310,6 @@ class _TokenCardState extends State<TokenCard> {
   double _getAmount() {
     try {
       BigInt value = BigInt.parse(widget.tokenAmount);
-
       return adjustAmountToDouble(value, widget.tokenDecimals);
     } catch (e) {
       debugPrint("fail parse amount $e");
