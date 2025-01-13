@@ -9,5 +9,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<String> getImageName({required String dir, required String url}) =>
     RustLib.instance.api.crateApiCacheGetImageName(dir: dir, url: url);
 
-Future<Uint8List> getImageBytes({required String dir, required String url}) =>
+Future<(Uint8List, String)> getImageBytes(
+        {required String dir, required String url}) =>
     RustLib.instance.api.crateApiCacheGetImageBytes(dir: dir, url: url);

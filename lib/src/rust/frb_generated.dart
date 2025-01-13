@@ -176,7 +176,7 @@ abstract class RustLibApi extends BaseApi {
   Future<List<HistoricalTransactionInfo>> crateApiTransactionGetHistory(
       {required BigInt walletIndex});
 
-  Future<Uint8List> crateApiCacheGetImageBytes(
+  Future<(Uint8List, String)> crateApiCacheGetImageBytes(
       {required String dir, required String url});
 
   Future<String> crateApiCacheGetImageName(
@@ -836,7 +836,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Uint8List> crateApiCacheGetImageBytes(
+  Future<(Uint8List, String)> crateApiCacheGetImageBytes(
       {required String dir, required String url}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -847,7 +847,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 22, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeSuccessData: sse_decode_record_list_prim_u_8_strict_string,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiCacheGetImageBytesConstMeta,
@@ -2055,6 +2055,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (Uint8List, String) dco_decode_record_list_prim_u_8_strict_string(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_list_prim_u_8_strict(arr[0]),
+      dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
   (String, String) dco_decode_record_string_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2986,6 +3000,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  (Uint8List, String) sse_decode_record_list_prim_u_8_strict_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
   (String, String) sse_decode_record_string_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3797,6 +3820,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (self != null) {
       sse_encode_list_prim_u_8_strict(self, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_record_list_prim_u_8_strict_string(
+      (Uint8List, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
   }
 
   @protected

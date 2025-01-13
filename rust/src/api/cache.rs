@@ -20,7 +20,7 @@ pub async fn get_image_name(dir: String, url: String) -> Result<String, String> 
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn get_image_bytes(dir: String, url: String) -> Result<Vec<u8>, String> {
+pub async fn get_image_bytes(dir: String, url: String) -> Result<(Vec<u8>, String), String> {
     let cache = Cache::new(PathBuf::from(dir)).map_err(|e| e.to_string())?;
     let image_bytes = cache
         .get_image_bytes(&url)
