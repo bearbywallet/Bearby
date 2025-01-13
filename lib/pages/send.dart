@@ -33,6 +33,18 @@ class _SendTokenPageState extends State<SendTokenPage> {
     _appState = Provider.of<AppState>(context, listen: false);
   }
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final int argTokenIndex = args?['token_index'] ?? 0;
+
+    setState(() {
+      tokenIndex = argTokenIndex;
+    });
+  }
+
   bool get isValidAmount {
     if (amount.endsWith('.')) {
       return false;

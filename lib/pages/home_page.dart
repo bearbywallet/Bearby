@@ -258,8 +258,12 @@ class _HomePageState extends State<HomePage> {
                             showDivider: !isLast,
                             iconUrl:
                                 token.logo ?? viewIcon(token.addr, "Light"),
-                            onTap: () =>
-                                {debugPrint("tap token ${token.name}")},
+                            onTap: () => {
+                              Navigator.of(context).pushNamed(
+                                '/send',
+                                arguments: {'token_index': entry.key},
+                              )
+                            },
                           );
                         }).toList(),
                       ),
