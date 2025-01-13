@@ -108,14 +108,11 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
     setState(() {
       if (hasDecimalPoint) {
-        final parts = amount.split('.');
-        if (parts.length == 2 && parts[1].length < 8) {
-          amount += value;
-        }
+        amount += value;
       } else {
         if (amount == "0") {
           amount = value;
-        } else if (amount.length < 8) {
+        } else {
           amount += value;
         }
       }

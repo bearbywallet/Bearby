@@ -233,8 +233,12 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     const baseSize = 30.0;
     const minSize = 13.0;
     final charCount = text.length;
-    final fontSize =
-        (screenWidth * 0.11) / (charCount > 0 ? charCount * 0.5 : 1);
+
+    if (charCount <= 8) {
+      return baseSize;
+    }
+
+    final fontSize = (screenWidth * 0.12) / ((charCount - 8) * 0.5);
 
     return fontSize.clamp(minSize, baseSize);
   }
