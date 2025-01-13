@@ -1,11 +1,10 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/colors.dart';
-import 'package:http/http.dart' as http;
 import 'package:zilpay/state/app_state.dart';
 
 class TokenCard extends StatefulWidget {
@@ -40,8 +39,6 @@ class _TokenCardState extends State<TokenCard>
     with SingleTickerProviderStateMixin {
   bool isHovered = false;
   bool isPressed = false;
-  String? contentType;
-  bool isLoading = false;
 
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -49,8 +46,6 @@ class _TokenCardState extends State<TokenCard>
   @override
   void initState() {
     super.initState();
-    _checkImageType();
-
     _controller = AnimationController(
       duration: const Duration(milliseconds: 150),
       vsync: this,
@@ -71,97 +66,37 @@ class _TokenCardState extends State<TokenCard>
     super.dispose();
   }
 
-  Future<void> _checkImageType() async {
-    setState(() => isLoading = true);
-    try {
-      final response = await http.head(Uri.parse(widget.iconUrl));
-      if (mounted) {
-        setState(() {
-          contentType = response.headers['content-type'];
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      if (mounted) {
-        setState(() {
-          contentType = null;
-          isLoading = false;
-        });
-      }
-    }
-  }
-
   Widget _buildIcon(AppState themeProvider) {
-    if (isLoading) {
-      return const SizedBox(
-        width: 25,
-        height: 25,
-      );
-    }
-
-    if (contentType?.contains('svg') ?? false) {
-      return SvgPicture.network(
-        widget.iconUrl,
-        width: 32,
-        height: 32,
-        placeholderBuilder: (context) => const SizedBox(
+    return Container(
+      width: 32,
+      height: 32,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: themeProvider.currentTheme.primaryPurple.withOpacity(0.1),
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: AsyncImage(
+          url: widget.iconUrl,
           width: 32,
           height: 32,
-          child: Center(
+          fit: BoxFit.contain,
+          errorWidget: Blockies(
+            seed: widget.tokenAddr,
+            color: getWalletColor(0),
+            bgColor: themeProvider.currentTheme.primaryPurple,
+            spotColor: themeProvider.currentTheme.background,
+            size: 8,
+          ),
+          loadingWidget: const Center(
             child: CircularProgressIndicator(
               strokeWidth: 2,
             ),
           ),
         ),
-      );
-    }
-
-    return Image.network(
-      widget.iconUrl,
-      width: 32,
-      height: 32,
-      fit: BoxFit.contain,
-      headers: const {
-        'Accept': 'image/jpeg,image/png,image/svg+xml,image/*,*/*;q=0.8',
-      },
-      loadingBuilder: (context, child, loadingProgress) {
-        if (loadingProgress == null) return child;
-        return SizedBox(
-          width: 32,
-          height: 32,
-          child: Center(
-            child: CircularProgressIndicator(
-              value: loadingProgress.expectedTotalBytes != null
-                  ? loadingProgress.cumulativeBytesLoaded /
-                      (loadingProgress.expectedTotalBytes ?? 1)
-                  : null,
-              strokeWidth: 2,
-            ),
-          ),
-        );
-      },
-      errorBuilder: (context, error, stackTrace) {
-        return Container(
-          width: 32,
-          height: 32,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-              color: themeProvider.currentTheme.primaryPurple.withOpacity(0.1),
-              width: 2,
-            ),
-          ),
-          child: ClipOval(
-            child: Blockies(
-              seed: widget.tokenAddr,
-              color: getWalletColor(0),
-              bgColor: themeProvider.currentTheme.primaryPurple,
-              spotColor: themeProvider.currentTheme.background,
-              size: 8,
-            ),
-          ),
-        );
-      },
+      ),
     );
   }
 
@@ -287,9 +222,7 @@ class _TokenCardState extends State<TokenCard>
                           color: Colors.white.withOpacity(0.05),
                           shape: BoxShape.circle,
                         ),
-                        child: ClipOval(
-                          child: _buildIcon(Provider.of<AppState>(context)),
-                        ),
+                        child: _buildIcon(Provider.of<AppState>(context)),
                       ),
                     ],
                   ),
@@ -311,8 +244,7 @@ class _TokenCardState extends State<TokenCard>
     try {
       BigInt value = BigInt.parse(widget.tokenAmount);
       return adjustAmountToDouble(value, widget.tokenDecimals);
-    } catch (e) {
-      debugPrint("fail parse amount $e");
+    } catch (_) {
       return 0;
     }
   }

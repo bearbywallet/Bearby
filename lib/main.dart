@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
@@ -10,7 +12,7 @@ import 'package:zilpay/src/rust/frb_generated.dart';
 import 'app.dart';
 
 Future<String> getStoragePath() async {
-  final appDocDir = await getApplicationDocumentsDirectory();
+  final appDocDir = await getApplicationSupportDirectory();
   return appDocDir.path;
 }
 
@@ -23,8 +25,19 @@ Future<void> main() async {
   try {
     String appDocPath = await getStoragePath();
 
+    String cahceDir = '$appDocPath/icons_cache';
+    final directory = Directory(cahceDir);
+
+    if (!await directory.exists()) {
+      await directory.create(recursive: true);
+    }
+
     state = await startService(path: "$appDocPath/storage");
-    final appState = AppState(state: state);
+
+    final appState = AppState(
+      state: state,
+      cahceDir: cahceDir,
+    );
     final authGuard = AuthGuard(state: appState);
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));

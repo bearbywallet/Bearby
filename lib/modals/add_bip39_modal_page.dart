@@ -100,13 +100,6 @@ class _AddNextBip39AccountContentState
         setState(() => _errorMessage = 'Please enter password');
         return false;
       }
-
-      if (_passwordController.text.length < 8) {
-        _passwordInputKey.currentState?.shake();
-        setState(
-            () => _errorMessage = 'Password must be at least 8 characters');
-        return false;
-      }
     }
 
     return isValid;

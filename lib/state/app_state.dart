@@ -12,7 +12,6 @@ import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -22,18 +21,27 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Map<String, double> _rates = {};
 
   late BackgroundState _state;
+  late String _cahceDir;
   int _selectedWallet = 0;
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
 
-  AppState({required BackgroundState state}) {
+  AppState({
+    required BackgroundState state,
+    required String cahceDir,
+  }) {
     WidgetsBinding.instance.addObserver(this);
     _state = state;
+    _cahceDir = cahceDir;
   }
 
   void setSelectedWallet(int index) {
     _selectedWallet = index;
     notifyListeners();
+  }
+
+  String get cahceDir {
+    return _cahceDir;
   }
 
   List<WalletInfo> get wallets {
@@ -90,6 +98,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   int get selectedWallet {
     return _selectedWallet;
   }
+
+  get appDocument => null;
 
   Future<void> syncData() async {
     _state = await getData();
