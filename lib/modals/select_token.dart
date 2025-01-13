@@ -164,10 +164,11 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
     return TokenSelectItem(
+      addr: token.addr,
       symbol: token.symbol,
       name: token.name,
       balance: balance.toString(),
-      iconUrl: viewIcon(token.addr, "Light"),
+      iconUrl: token.logo ?? viewIcon(token.addr, "dark"),
       onTap: () {
         widget.onTokenSelected(tokenIndex);
         Navigator.pop(context);

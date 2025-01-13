@@ -18,6 +18,7 @@ class SendTokenPage extends StatefulWidget {
 }
 
 class _SendTokenPageState extends State<SendTokenPage> {
+  bool _initialized = false;
   int tokenIndex = 0;
   String amount = "0";
   String convertAmount = "0";
@@ -28,21 +29,27 @@ class _SendTokenPageState extends State<SendTokenPage> {
   late final AppState _appState;
 
   @override
-  void initState() {
-    super.initState();
-    _appState = Provider.of<AppState>(context, listen: false);
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final int? argTokenIndex = args?['token_index'];
+
+      if (argTokenIndex != null) {
+        setState(() {
+          tokenIndex = argTokenIndex;
+        });
+      }
+      _initialized = true;
+    }
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final int argTokenIndex = args?['token_index'] ?? 0;
-
-    setState(() {
-      tokenIndex = argTokenIndex;
-    });
+  void initState() {
+    super.initState();
+    _appState = Provider.of<AppState>(context, listen: false);
   }
 
   bool get isValidAmount {

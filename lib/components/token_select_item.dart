@@ -1,10 +1,13 @@
+import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenSelectItem extends StatelessWidget {
   final String symbol;
+  final String addr;
   final String name;
   final String balance;
   final String iconUrl;
@@ -13,6 +16,7 @@ class TokenSelectItem extends StatelessWidget {
 
   const TokenSelectItem({
     super.key,
+    required this.addr,
     required this.symbol,
     required this.name,
     required this.balance,
@@ -40,27 +44,21 @@ class TokenSelectItem extends StatelessWidget {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(iconSize / 2),
-                child: SvgPicture.network(
-                  iconUrl,
+                child: AsyncImage(
+                  url: iconUrl,
                   width: iconSize,
                   height: iconSize,
-                  fit: BoxFit.cover,
-                  placeholderBuilder: (context) => Container(
-                    width: iconSize,
-                    height: iconSize,
-                    decoration: BoxDecoration(
-                      color: theme.textSecondary.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(iconSize / 2),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        width: iconSize / 2,
-                        height: iconSize / 2,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: theme.textSecondary.withOpacity(0.5),
-                        ),
-                      ),
+                  fit: BoxFit.contain,
+                  errorWidget: Blockies(
+                    seed: addr,
+                    color: getWalletColor(0),
+                    bgColor: theme.primaryPurple,
+                    spotColor: theme.background,
+                    size: 8,
+                  ),
+                  loadingWidget: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
                     ),
                   ),
                 ),
