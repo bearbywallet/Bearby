@@ -57,9 +57,9 @@ class _SendTokenPageState extends State<SendTokenPage> {
           token.balances[_appState.wallet!.selectedAccount] ?? '0');
       final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
-      return numAmount > 0 && numAmount <= balance;
+      return numAmount >= 0 && numAmount <= balance;
     } catch (e) {
-      debugPrint("amoutn is not valid $e");
+      debugPrint("amount is not valid $e");
       return false;
     }
   }
@@ -72,7 +72,6 @@ class _SendTokenPageState extends State<SendTokenPage> {
     return true;
   }
 
-  // Combined validation for submit button
   bool get isFormValid => isValidAmount && isValidAddress;
 
   void updateAmount(String value) {
@@ -97,21 +96,30 @@ class _SendTokenPageState extends State<SendTokenPage> {
       if (!hasDecimalPoint) {
         setState(() {
           hasDecimalPoint = true;
-          updateAmount(value);
+          if (amount == "0") {
+            amount = "0.";
+          } else {
+            amount += value;
+          }
         });
       }
-    } else {
-      int decimalIndex = amount.indexOf('.');
-      int wholeNumberLength = decimalIndex == -1 ? amount.length : decimalIndex;
-
-      if (decimalIndex != -1 && amount.length - decimalIndex > 2) {
-        return;
-      }
-
-      if (wholeNumberLength < 8) {
-        updateAmount(value);
-      }
+      return;
     }
+
+    setState(() {
+      if (hasDecimalPoint) {
+        final parts = amount.split('.');
+        if (parts.length == 2 && parts[1].length < 8) {
+          amount += value;
+        }
+      } else {
+        if (amount == "0") {
+          amount = value;
+        } else if (amount.length < 8) {
+          amount += value;
+        }
+      }
+    });
   }
 
   void handleBackspace() {

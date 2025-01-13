@@ -252,7 +252,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                           ),
                                         ),
                                         Text(
-                                          "(${token?.name})",
+                                          "(${token?.symbol})",
                                           style: TextStyle(
                                             color: theme.textSecondary,
                                             fontSize: 12,

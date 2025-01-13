@@ -43,8 +43,11 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
 
+    const double amountHeight = 40.0;
+    const double convertHeight = 20.0;
+
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(
@@ -53,33 +56,47 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         ),
         borderRadius: BorderRadius.circular(16),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      child: Column(
         children: [
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Text(
-                widget.amount,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 42,
-                  fontWeight: FontWeight.w500,
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      height: amountHeight,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.amount,
+                          style: TextStyle(
+                            color: theme.textPrimary,
+                            fontSize:
+                                _calculateFontSize(context, widget.amount),
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      height: convertHeight,
+                      child: Align(
+                        alignment: Alignment.centerLeft,
+                        child: Text(
+                          widget.convertAmount,
+                          style: TextStyle(
+                            color: theme.textPrimary.withOpacity(0.7),
+                            fontSize: 16,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              Text(
-                widget.convertAmount,
-                style: TextStyle(
-                  color: theme.textPrimary.withOpacity(0.7),
-                  fontSize: 28,
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
               GestureDetector(
                 onTap: () {
                   showTokenSelectModal(
@@ -148,54 +165,54 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                   ),
                 ),
               ),
-              const SizedBox(height: 8),
-              Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  if (_getAmount() > balance)
-                    SvgPicture.asset(
-                      "assets/icons/warning.svg",
-                      width: 15,
-                      height: 15,
-                      colorFilter: ColorFilter.mode(
-                        theme.warning.withOpacity(0.7),
-                        BlendMode.srcIn,
-                      ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              if (_getAmount() > balance)
+                SvgPicture.asset(
+                  "assets/icons/warning.svg",
+                  width: 15,
+                  height: 15,
+                  colorFilter: ColorFilter.mode(
+                    theme.warning.withOpacity(0.7),
+                    BlendMode.srcIn,
+                  ),
+                ),
+              const SizedBox(width: 4),
+              Text(
+                balance.toString(),
+                style: TextStyle(
+                  color: theme.textPrimary.withOpacity(0.7),
+                  fontSize: 14,
+                ),
+              ),
+              if (widget.showMax) ...[
+                const SizedBox(width: 8),
+                GestureDetector(
+                  onTap: () => widget.onMaxTap(balance.toString()),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 8,
+                      vertical: 4,
                     ),
-                  const SizedBox(width: 4),
-                  Text(
-                    balance.toString(),
-                    style: TextStyle(
-                      color: theme.textPrimary.withOpacity(0.7),
-                      fontSize: 14,
+                    decoration: BoxDecoration(
+                      color: theme.textPrimary.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      'Max',
+                      style: TextStyle(
+                        color: theme.textPrimary.withOpacity(0.7),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  if (widget.showMax) ...[
-                    const SizedBox(width: 8),
-                    GestureDetector(
-                      onTap: () => widget.onMaxTap(balance.toString()),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.textPrimary.withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(6),
-                        ),
-                        child: Text(
-                          'Max',
-                          style: TextStyle(
-                            color: theme.textPrimary.withOpacity(0.7),
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ],
-              ),
+                ),
+              ],
             ],
           ),
         ],
@@ -209,5 +226,16 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     } catch (e) {
       return 0;
     }
+  }
+
+  double _calculateFontSize(BuildContext context, String text) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    const baseSize = 30.0;
+    const minSize = 13.0;
+    final charCount = text.length;
+    final fontSize =
+        (screenWidth * 0.11) / (charCount > 0 ? charCount * 0.5 : 1);
+
+    return fontSize.clamp(minSize, baseSize);
   }
 }
