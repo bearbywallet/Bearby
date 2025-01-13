@@ -33,6 +33,7 @@ class _ReceivePageState extends State<ReceivePage> {
   bool isPressedToken = false;
   int selectedToken = 0;
   String amount = "0";
+  Key _imageKey = UniqueKey();
 
   final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
@@ -77,6 +78,7 @@ class _ReceivePageState extends State<ReceivePage> {
       onTokenSelected: (index) {
         setState(() {
           selectedToken = index;
+          _imageKey = UniqueKey();
         });
       },
     );
@@ -239,6 +241,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                           ),
                                           child: Center(
                                             child: AsyncImage(
+                                              key: _imageKey,
                                               url: token?.logo ??
                                                   viewIcon(
                                                     token?.addr ?? "",
@@ -265,18 +268,21 @@ class _ReceivePageState extends State<ReceivePage> {
                                         ),
                                         const SizedBox(width: 8),
                                         Text(
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                           token?.name ?? "",
                                           style: TextStyle(
                                             color: theme.textPrimary,
-                                            fontSize: 18,
+                                            fontSize: 12,
                                             fontWeight: FontWeight.bold,
                                           ),
                                         ),
+                                        const SizedBox(width: 2),
                                         Text(
                                           "(${token?.symbol})",
                                           style: TextStyle(
                                             color: theme.textSecondary,
-                                            fontSize: 12,
+                                            fontSize: 18,
                                           ),
                                         ),
                                       ],
