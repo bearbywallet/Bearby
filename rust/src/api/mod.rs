@@ -1,6 +1,7 @@
 pub mod auth;
 pub mod backend;
 pub mod book;
+pub mod cache;
 pub mod connections;
 pub mod ledger;
 pub mod methods;

@@ -6,6 +6,7 @@
 import 'api/auth.dart';
 import 'api/backend.dart';
 import 'api/book.dart';
+import 'api/cache.dart';
 import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/methods.dart';

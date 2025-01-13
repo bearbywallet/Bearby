@@ -1,6 +1,6 @@
 use thiserror::Error;
-use zilpay::errors::{
-    address::AddressError, background::BackgroundError, network::NetworkErrors,
+pub use zilpay::errors::{
+    address::AddressError, background::BackgroundError, cache::CacheError, network::NetworkErrors,
     settings::SettingsErrors, token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
 };
 
@@ -68,11 +68,20 @@ pub enum ServiceError {
 
     #[error("Network Error: {0}")]
     NetworkErrors(NetworkErrors),
+
+    #[error("Cache Error: {0}")]
+    CacheError(CacheError),
 }
 
 impl From<BackgroundError> for ServiceError {
     fn from(error: BackgroundError) -> Self {
         ServiceError::BackgroundError(error)
+    }
+}
+
+impl From<CacheError> for ServiceError {
+    fn from(error: CacheError) -> Self {
+        ServiceError::CacheError(error)
     }
 }
 
