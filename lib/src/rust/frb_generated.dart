@@ -1975,16 +1975,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return NetworkConfigInfo(
-      networkName: dco_decode_String(arr[0]),
-      chainId: dco_decode_u_64(arr[1]),
-      fallbackEnabled: dco_decode_bool(arr[2]),
-      urls: dco_decode_list_String(arr[3]),
-      explorerUrls: dco_decode_list_String(arr[4]),
-      default_: dco_decode_bool(arr[5]),
-      bip49: dco_decode_String(arr[6]),
+      tokenSymbol: dco_decode_String(arr[0]),
+      logo: dco_decode_opt_String(arr[1]),
+      networkName: dco_decode_String(arr[2]),
+      chainId: dco_decode_u_64(arr[3]),
+      fallbackEnabled: dco_decode_bool(arr[4]),
+      urls: dco_decode_list_String(arr[5]),
+      explorerUrls: dco_decode_list_String(arr[6]),
+      default_: dco_decode_bool(arr[7]),
+      bip49: dco_decode_String(arr[8]),
     );
   }
 
@@ -2866,6 +2868,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo sse_decode_network_config_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_tokenSymbol = sse_decode_String(deserializer);
+    var var_logo = sse_decode_opt_String(deserializer);
     var var_networkName = sse_decode_String(deserializer);
     var var_chainId = sse_decode_u_64(deserializer);
     var var_fallbackEnabled = sse_decode_bool(deserializer);
@@ -2874,6 +2878,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_default_ = sse_decode_bool(deserializer);
     var var_bip49 = sse_decode_String(deserializer);
     return NetworkConfigInfo(
+        tokenSymbol: var_tokenSymbol,
+        logo: var_logo,
         networkName: var_networkName,
         chainId: var_chainId,
         fallbackEnabled: var_fallbackEnabled,
@@ -3706,6 +3712,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.tokenSymbol, serializer);
+    sse_encode_opt_String(self.logo, serializer);
     sse_encode_String(self.networkName, serializer);
     sse_encode_u_64(self.chainId, serializer);
     sse_encode_bool(self.fallbackEnabled, serializer);

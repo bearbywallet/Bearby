@@ -2397,6 +2397,8 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
 impl SseDecode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_tokenSymbol = <String>::sse_decode(deserializer);
+        let mut var_logo = <Option<String>>::sse_decode(deserializer);
         let mut var_networkName = <String>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
         let mut var_fallbackEnabled = <bool>::sse_decode(deserializer);
@@ -2405,6 +2407,8 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_default_ = <bool>::sse_decode(deserializer);
         let mut var_bip49 = <String>::sse_decode(deserializer);
         return crate::models::provider::NetworkConfigInfo {
+            token_symbol: var_tokenSymbol,
+            logo: var_logo,
             network_name: var_networkName,
             chain_id: var_chainId,
             fallback_enabled: var_fallbackEnabled,
@@ -3329,6 +3333,8 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger::LedgerParamsInput>
 impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
+            self.token_symbol.into_into_dart().into_dart(),
+            self.logo.into_into_dart().into_dart(),
             self.network_name.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
             self.fallback_enabled.into_into_dart().into_dart(),
@@ -3974,6 +3980,8 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
 impl SseEncode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.token_symbol, serializer);
+        <Option<String>>::sse_encode(self.logo, serializer);
         <String>::sse_encode(self.network_name, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
         <bool>::sse_encode(self.fallback_enabled, serializer);

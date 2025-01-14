@@ -7,6 +7,8 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class NetworkConfigInfo {
+  final String tokenSymbol;
+  final String? logo;
   final String networkName;
   final BigInt chainId;
   final bool fallbackEnabled;
@@ -16,6 +18,8 @@ class NetworkConfigInfo {
   final String bip49;
 
   const NetworkConfigInfo({
+    required this.tokenSymbol,
+    this.logo,
     required this.networkName,
     required this.chainId,
     required this.fallbackEnabled,
@@ -27,6 +31,8 @@ class NetworkConfigInfo {
 
   @override
   int get hashCode =>
+      tokenSymbol.hashCode ^
+      logo.hashCode ^
       networkName.hashCode ^
       chainId.hashCode ^
       fallbackEnabled.hashCode ^
@@ -40,6 +46,8 @@ class NetworkConfigInfo {
       identical(this, other) ||
       other is NetworkConfigInfo &&
           runtimeType == other.runtimeType &&
+          tokenSymbol == other.tokenSymbol &&
+          logo == other.logo &&
           networkName == other.networkName &&
           chainId == other.chainId &&
           fallbackEnabled == other.fallbackEnabled &&
