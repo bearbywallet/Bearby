@@ -1,10 +1,12 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -148,6 +150,9 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildWalletSection(AppTheme theme, AppState appState) {
+    final token = appState.wallet!.tokens[0];
+    final provider = appState.state.providers[token.providerIndex.toInt()];
+
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () => Navigator.pushNamed(context, '/wallet'),
@@ -166,14 +171,27 @@ class _SettingsPageState extends State<SettingsPage> {
                 color: theme.background,
                 borderRadius: BorderRadius.circular(20),
               ),
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(20),
-                child: Blockies(
-                  seed: appState.account!.addr,
+              child: AsyncImage(
+                url: token.logo ??
+                    viewIcon(
+                      token.addr,
+                      appState.state.appearances,
+                      provider.chainId,
+                    ),
+                width: 32,
+                height: 32,
+                fit: BoxFit.contain,
+                errorWidget: Blockies(
+                  seed: appState.wallet!.walletAddress,
                   color: getWalletColor(0),
                   bgColor: theme.primaryPurple,
                   spotColor: theme.background,
                   size: 8,
+                ),
+                loadingWidget: const Center(
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                  ),
                 ),
               ),
             ),

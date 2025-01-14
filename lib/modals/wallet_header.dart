@@ -2,10 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:blockies/blockies.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/add_bip39_modal_page.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -98,6 +100,8 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final token = appState.wallet!.tokens[0];
+    final provider = appState.state.providers[token.providerIndex.toInt()];
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -115,6 +119,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           ),
         ),
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: widget.onManageWallet,
           child: Column(
             children: [
@@ -129,13 +134,27 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                     width: 2,
                   ),
                 ),
-                child: ClipOval(
-                  child: Blockies(
+                child: AsyncImage(
+                  url: token.logo ??
+                      viewIcon(
+                        token.addr,
+                        appState.state.appearances,
+                        provider.chainId,
+                      ),
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.contain,
+                  errorWidget: Blockies(
                     seed: appState.wallet!.walletAddress,
                     color: getWalletColor(0),
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
                     size: 8,
+                  ),
+                  loadingWidget: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
                   ),
                 ),
               ),
