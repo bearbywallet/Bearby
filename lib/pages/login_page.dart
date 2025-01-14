@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 
@@ -285,14 +287,33 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildWalletIcon(WalletInfo wallet, int index, AppState theme) {
+    final token = wallet.tokens[0];
+    final provider = _appState.state.providers[token.providerIndex.toInt()];
+
     return Container(
       padding: const EdgeInsets.all(4),
-      child: Blockies(
-        seed: wallet.walletAddress,
-        color: getWalletColor(index),
-        bgColor: theme.currentTheme.primaryPurple,
-        spotColor: theme.currentTheme.background,
-        size: 8,
+      child: AsyncImage(
+        url: token.logo ??
+            viewIcon(
+              token.addr,
+              _appState.state.appearances,
+              provider.chainId,
+            ),
+        width: 32,
+        height: 32,
+        fit: BoxFit.contain,
+        errorWidget: Blockies(
+          seed: wallet.walletAddress,
+          color: getWalletColor(index),
+          bgColor: theme.currentTheme.primaryPurple,
+          spotColor: theme.currentTheme.background,
+          size: 8,
+        ),
+        loadingWidget: const Center(
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+          ),
+        ),
       ),
     );
   }

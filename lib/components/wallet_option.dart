@@ -29,6 +29,7 @@ class WalletOption extends StatelessWidget {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
