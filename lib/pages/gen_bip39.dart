@@ -6,6 +6,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -92,19 +93,32 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        CheckboxListTile(
-                          title: Text(
-                            'I have backup words',
-                            style: TextStyle(color: theme.textSecondary),
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            splashFactory: NoSplash.splashFactory,
+                            highlightColor: Colors.transparent,
                           ),
-                          value: _hasBackupWords,
-                          onChanged: (newValue) {
-                            setState(() {
-                              _hasBackupWords = newValue!;
-                            });
-                          },
-                          controlAffinity: ListTileControlAffinity.leading,
-                          activeColor: theme.primaryPurple,
+                          child: CheckboxListTile(
+                            title: Text(
+                              'I have backup words',
+                              style: TextStyle(color: theme.textSecondary),
+                            ),
+                            value: _hasBackupWords,
+                            onChanged: (_) {
+                              if (!_hasBackupWords) {
+                                showBackupConfirmationModal(
+                                  context: context,
+                                  onConfirmed: (confirmed) {
+                                    setState(() {
+                                      _hasBackupWords = confirmed;
+                                    });
+                                  },
+                                );
+                              }
+                            },
+                            controlAffinity: ListTileControlAffinity.leading,
+                            activeColor: theme.primaryPurple,
+                          ),
                         ),
                         const SizedBox(height: 16),
                         Padding(

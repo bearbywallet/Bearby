@@ -42,6 +42,9 @@ String formatBigNumber(double number) {
 }
 
 String formatCompactNumber(double value) {
+  if (value == 0.0) {
+    return "0";
+  }
   if (value < 1) {
     return value.toStringAsFixed(6);
   }
