@@ -55,6 +55,7 @@ class _HomePageState extends State<HomePage> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
+    final providers = appState.state.providers;
 
     return SafeArea(
       child: Center(
@@ -256,8 +257,13 @@ class _HomePageState extends State<HomePage> {
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,
-                            iconUrl:
-                                token.logo ?? viewIcon(token.addr, "Light"),
+                            iconUrl: token.logo ??
+                                viewIcon(
+                                  token.addr,
+                                  appState.state.appearances,
+                                  providers[token.providerIndex.toInt()]
+                                      .chainId,
+                                ),
                             onTap: () => {
                               Navigator.of(context).pushNamed(
                                 '/send',

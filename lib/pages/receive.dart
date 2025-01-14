@@ -244,8 +244,9 @@ class _ReceivePageState extends State<ReceivePage> {
                                               key: _imageKey,
                                               url: token?.logo ??
                                                   viewIcon(
-                                                    token?.addr ?? "",
-                                                    "dark",
+                                                    token!.addr,
+                                                    appState.state.appearances,
+                                                    provider.chainId,
                                                   ),
                                               width: 32,
                                               height: 32,

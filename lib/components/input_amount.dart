@@ -45,6 +45,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
+    final provider = appState.state.providers[token.providerIndex.toInt()];
 
     const double amountHeight = 40.0;
     const double convertHeight = 20.0;
@@ -131,7 +132,12 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: AsyncImage(
-                          url: token.logo ?? viewIcon(token.addr, "Dark"),
+                          url: token.logo ??
+                              viewIcon(
+                                token.addr,
+                                appState.state.appearances,
+                                provider.chainId,
+                              ),
                           width: 30,
                           height: 30,
                           fit: BoxFit.contain,

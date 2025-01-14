@@ -139,6 +139,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
 
   Widget _buildTokensList(AppTheme theme, AppState appState) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final providers = appState.state.providers;
 
     return Container(
       padding: EdgeInsets.all(adaptivePadding),
@@ -158,7 +159,12 @@ class _AddTokenPageState extends State<AddTokenPage> {
               tokenName: tokens[i].name,
               tokenSymbol: tokens[i].symbol,
               showDivider: i < tokens.length - 1,
-              iconUrl: tokens[i].logo ?? viewIcon(tokens[i].addr, "Light"),
+              iconUrl: tokens[i].logo ??
+                  viewIcon(
+                    tokens[i].addr,
+                    appState.state.appearances,
+                    providers[tokens[i].providerIndex.toInt()].chainId,
+                  ),
               onTap: () => _onAddToken(
                 i,
                 appState.selectedWallet,

@@ -156,19 +156,28 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
   }
 
   Widget _buildTokenItem(
-      theme.AppTheme theme, AppState appState, dynamic token) {
+    theme.AppTheme theme,
+    AppState appState,
+    FTokenInfo token,
+  ) {
     final tokens = appState.wallet!.tokens;
     final tokenIndex = tokens.indexOf(token);
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
+    final providers = appState.state.providers;
 
     return TokenSelectItem(
       addr: token.addr,
       symbol: token.symbol,
       name: token.name,
       balance: balance.toString(),
-      iconUrl: token.logo ?? viewIcon(token.addr, "dark"),
+      iconUrl: token.logo ??
+          viewIcon(
+            token.addr,
+            appState.state.appearances,
+            providers[token.providerIndex.toInt()].chainId,
+          ),
       onTap: () {
         widget.onTokenSelected(tokenIndex);
         Navigator.pop(context);

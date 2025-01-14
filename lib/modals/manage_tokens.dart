@@ -131,6 +131,8 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
       return [];
     }
 
+    final providers = appState.state.providers;
+
     return appState.wallet!.tokens
         .where((token) =>
             token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -140,7 +142,12 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               name: token.name,
               addr: token.addr,
               isDefault: token.default_,
-              iconUrl: token.logo ?? viewIcon(token.addr, "Light"),
+              iconUrl: token.logo ??
+                  viewIcon(
+                    token.addr,
+                    appState.state.appearances,
+                    providers[token.providerIndex.toInt()].chainId,
+                  ),
               onToggle: (value) => widget.onTokenToggle?.call(token.addr),
               isEnabled: true,
             ))
