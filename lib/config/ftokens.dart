@@ -17,7 +17,7 @@ class DefaultTokens {
         decimals: 12,
         addr: 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
         logo:
-            'https://assets.coingecko.com/coins/images/2687/small/Zilliqa-logo.png',
+            'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/zil.svg',
         balances: {},
         default_: true,
         native: true,
@@ -32,7 +32,7 @@ class DefaultTokens {
         decimals: 18,
         addr: '0x0000000000000000000000000000000000000000',
         logo:
-            'https://assets.coingecko.com/coins/images/279/small/ethereum.png',
+            'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/eth.svg',
         balances: {},
         default_: true,
         native: true,
@@ -46,7 +46,7 @@ class DefaultTokens {
         decimals: 18,
         addr: '0x0000000000000000000000000000000000000000',
         logo:
-            'https://assets.coingecko.com/coins/images/825/small/bnb-icon2_2x.png',
+            'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/bnb.svg',
         balances: {},
         default_: true,
         native: true,

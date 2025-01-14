@@ -40,7 +40,7 @@ class _NetworkPageState extends State<NetworkPage> {
         enabledNetworks.addAll(
           providers.map((provider) => NetworkItem(
                 configInfo: provider,
-                icon: 'https://placeholder.com/icon.png',
+                icon: provider.logo,
                 isEnabled: true,
               )),
         );
@@ -141,7 +141,17 @@ class _NetworkPageState extends State<NetworkPage> {
                             ...filteredEnabledNetworks.map((network) => Padding(
                                   padding: const EdgeInsets.only(bottom: 8),
                                   child: _NetworkTile(
-                                    icon: Image.network(network.icon),
+                                    icon: AsyncImage(
+                                      url: network.icon ?? "",
+                                      width: 24,
+                                      height: 24,
+                                      fit: BoxFit.contain,
+                                      loadingWidget: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
                                     title: network.configInfo.networkName,
                                     isEnabled: network.isEnabled,
                                     isSelected: selectedProvider.networkName ==
@@ -167,7 +177,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                       padding: const EdgeInsets.only(bottom: 8),
                                       child: _NetworkTile(
                                         icon: AsyncImage(
-                                          url: network.icon,
+                                          url: network.icon ?? "",
                                           width: 24,
                                           height: 24,
                                           fit: BoxFit.contain,
@@ -228,7 +238,7 @@ class _NetworkPageState extends State<NetworkPage> {
 
 class NetworkItem {
   final NetworkConfigInfo configInfo;
-  final String icon;
+  final String? icon;
   final bool isEnabled;
 
   NetworkItem({

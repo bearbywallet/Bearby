@@ -11,6 +11,9 @@ class DefaultNetworkProviders {
 
   static NetworkConfigInfo zil() {
     return NetworkConfigInfo(
+      tokenSymbol: "ZIL",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/zil.svg",
       networkName: 'Zilliqa Mainnet',
       chainId: BigInt.from(32770),
       fallbackEnabled: true,
@@ -25,6 +28,9 @@ class DefaultNetworkProviders {
 
   static NetworkConfigInfo eth() {
     return NetworkConfigInfo(
+      tokenSymbol: "ETH",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/eth.svg",
       networkName: 'Ethereum Mainnet',
       chainId: BigInt.from(1),
       fallbackEnabled: true,
@@ -43,6 +49,9 @@ class DefaultNetworkProviders {
 
   static NetworkConfigInfo bsc() {
     return NetworkConfigInfo(
+      tokenSymbol: "BNB",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/bnb.svg",
       networkName: 'BNB Smart Chain Mainnet',
       chainId: BigInt.from(56),
       fallbackEnabled: true,
