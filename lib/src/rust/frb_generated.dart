@@ -256,14 +256,6 @@ abstract class RustLibApi extends BaseApi {
       required List<String> identifiers});
 
   Future<void> crateApiTokenUpdateRates();
-
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_QrConfigInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_QrConfigInfo;
-
-  CrossPlatformFinalizerArg get rust_arc_decrement_strong_count_QrConfigInfoPtr;
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -761,8 +753,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(data, serializer);
-        sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-            config, serializer);
+        sse_encode_box_autoadd_qr_config_info(config, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 18, port: port_);
       },
@@ -1559,26 +1550,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         argNames: [],
       );
 
-  RustArcIncrementStrongCountFnType
-      get rust_arc_increment_strong_count_QrConfigInfo => wire
-          .rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo;
-
-  RustArcDecrementStrongCountFnType
-      get rust_arc_decrement_strong_count_QrConfigInfo => wire
-          .rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo;
-
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return AnyhowException(raw as String);
-  }
-
-  @protected
-  QrConfigInfo
-      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return QrConfigInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1595,14 +1570,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return Map.fromEntries(
         dco_decode_list_record_usize_background_notification_state(raw)
             .map((e) => MapEntry(e.$1, e.$2)));
-  }
-
-  @protected
-  QrConfigInfo
-      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return QrConfigInfoImpl.frbInternalDcoDecode(raw as List<dynamic>);
   }
 
   @protected
@@ -1819,6 +1786,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_box_autoadd_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_network_config_info(raw);
+  }
+
+  @protected
+  QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_qr_config_info(raw);
   }
 
   @protected
@@ -2164,6 +2137,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  QrConfigInfo dco_decode_qr_config_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return QrConfigInfo(
+      size: dco_decode_u_32(arr[0]),
+      gapless: dco_decode_bool(arr[1]),
+      color: dco_decode_u_32(arr[2]),
+      eyeShape: dco_decode_u_8(arr[3]),
+      dataModuleShape: dco_decode_u_8(arr[4]),
+    );
+  }
+
+  @protected
   (Uint8List, String) dco_decode_record_list_prim_u_8_strict_string(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -2389,15 +2377,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  QrConfigInfo
-      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return QrConfigInfoImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
-  }
-
-  @protected
   Map<BigInt, String> sse_decode_Map_usize_String(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2413,15 +2392,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var inner = sse_decode_list_record_usize_background_notification_state(
         deserializer);
     return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
-  }
-
-  @protected
-  QrConfigInfo
-      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    return QrConfigInfoImpl.frbInternalSseDecode(
-        sse_decode_usize(deserializer), sse_decode_i_32(deserializer));
   }
 
   @protected
@@ -2648,6 +2618,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_network_config_info(deserializer));
+  }
+
+  @protected
+  QrConfigInfo sse_decode_box_autoadd_qr_config_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_qr_config_info(deserializer));
   }
 
   @protected
@@ -3146,6 +3123,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  QrConfigInfo sse_decode_qr_config_info(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_size = sse_decode_u_32(deserializer);
+    var var_gapless = sse_decode_bool(deserializer);
+    var var_color = sse_decode_u_32(deserializer);
+    var var_eyeShape = sse_decode_u_8(deserializer);
+    var var_dataModuleShape = sse_decode_u_8(deserializer);
+    return QrConfigInfo(
+        size: var_size,
+        gapless: var_gapless,
+        color: var_color,
+        eyeShape: var_eyeShape,
+        dataModuleShape: var_dataModuleShape);
+  }
+
+  @protected
   (Uint8List, String) sse_decode_record_list_prim_u_8_strict_string(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3386,16 +3379,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void
-      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          QrConfigInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as QrConfigInfoImpl).frbInternalSseEncode(move: true),
-        serializer);
-  }
-
-  @protected
   void sse_encode_Map_usize_String(
       Map<BigInt, String> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3409,16 +3392,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_record_usize_background_notification_state(
         self.entries.map((e) => (e.key, e.value)).toList(), serializer);
-  }
-
-  @protected
-  void
-      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
-          QrConfigInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_usize(
-        (self as QrConfigInfoImpl).frbInternalSseEncode(move: null),
-        serializer);
   }
 
   @protected
@@ -3610,6 +3583,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_network_config_info(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_qr_config_info(
+      QrConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_qr_config_info(self, serializer);
   }
 
   @protected
@@ -4001,6 +3981,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_qr_config_info(QrConfigInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_32(self.size, serializer);
+    sse_encode_bool(self.gapless, serializer);
+    sse_encode_u_32(self.color, serializer);
+    sse_encode_u_8(self.eyeShape, serializer);
+    sse_encode_u_8(self.dataModuleShape, serializer);
+  }
+
+  @protected
   void sse_encode_record_list_prim_u_8_strict_string(
       (Uint8List, String) self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4167,24 +4157,4 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);
   }
-}
-
-@sealed
-class QrConfigInfoImpl extends RustOpaque implements QrConfigInfo {
-  // Not to be used by end users
-  QrConfigInfoImpl.frbInternalDcoDecode(List<dynamic> wire)
-      : super.frbInternalDcoDecode(wire, _kStaticData);
-
-  // Not to be used by end users
-  QrConfigInfoImpl.frbInternalSseDecode(BigInt ptr, int externalSizeOnNative)
-      : super.frbInternalSseDecode(ptr, externalSizeOnNative, _kStaticData);
-
-  static final _kStaticData = RustArcStaticData(
-    rustArcIncrementStrongCount:
-        RustLib.instance.api.rust_arc_increment_strong_count_QrConfigInfo,
-    rustArcDecrementStrongCount:
-        RustLib.instance.api.rust_arc_decrement_strong_count_QrConfigInfo,
-    rustArcDecrementStrongCountPtr:
-        RustLib.instance.api.rust_arc_decrement_strong_count_QrConfigInfoPtr,
-  );
 }

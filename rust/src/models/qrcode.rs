@@ -12,36 +12,8 @@ pub struct QrConfigInfo {
     pub size: u32,
     pub gapless: bool,
     pub color: u32,
-    pub eye_shape: EyeShape,
-    pub data_module_shape: DataModuleShape,
-}
-
-pub enum EyeShapeInfo {
-    Square,
-    Circle,
-}
-
-pub enum DataModuleShapeInfo {
-    Square,
-    Circle,
-}
-
-impl From<EyeShape> for EyeShapeInfo {
-    fn from(value: EyeShape) -> Self {
-        match value {
-            EyeShape::Square => EyeShapeInfo::Square,
-            EyeShape::Circle => EyeShapeInfo::Circle,
-        }
-    }
-}
-
-impl From<DataModuleShape> for DataModuleShapeInfo {
-    fn from(value: DataModuleShape) -> Self {
-        match value {
-            DataModuleShape::Square => DataModuleShapeInfo::Square,
-            DataModuleShape::Circle => DataModuleShapeInfo::Circle,
-        }
-    }
+    pub eye_shape: u8,
+    pub data_module_shape: u8,
 }
 
 impl From<QrConfig> for QrConfigInfo {
@@ -52,23 +24,6 @@ impl From<QrConfig> for QrConfigInfo {
             color: value.color,
             eye_shape: value.eye_shape.into(),
             data_module_shape: value.data_module_shape.into(),
-        }
-    }
-}
-impl From<EyeShapeInfo> for EyeShape {
-    fn from(value: EyeShapeInfo) -> Self {
-        match value {
-            EyeShapeInfo::Square => EyeShape::Square,
-            EyeShapeInfo::Circle => EyeShape::Circle,
-        }
-    }
-}
-
-impl From<DataModuleShapeInfo> for DataModuleShape {
-    fn from(value: DataModuleShapeInfo) -> Self {
-        match value {
-            DataModuleShapeInfo::Square => DataModuleShape::Square,
-            DataModuleShapeInfo::Circle => DataModuleShape::Circle,
         }
     }
 }

@@ -5,8 +5,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
-import 'package:qr_flutter/qr_flutter.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -98,50 +98,50 @@ class _ReceivePageState extends State<ReceivePage> {
       final box = context.findRenderObject() as RenderBox?;
       final sharePositionOrigin = box!.localToGlobal(Offset.zero) & box.size;
 
-      final qrPainter = QrPainter(
-        data: appState.account?.addr ?? "",
-        version: QrVersions.auto,
-        gapless: false,
-        dataModuleStyle: QrDataModuleStyle(
-          dataModuleShape: QrDataModuleShape.circle,
-          color: theme.primaryPurple,
-        ),
-        eyeStyle: QrEyeStyle(
-          eyeShape: QrEyeShape.square,
-          color: theme.primaryPurple,
-        ),
-      );
+      // final qrPainter = QrPainter(
+      //   data: appState.account?.addr ?? "",
+      //   version: QrVersions.auto,
+      //   gapless: false,
+      //   dataModuleStyle: QrDataModuleStyle(
+      //     dataModuleShape: QrDataModuleShape.circle,
+      //     color: theme.primaryPurple,
+      //   ),
+      //   eyeStyle: QrEyeStyle(
+      //     eyeShape: QrEyeShape.square,
+      //     color: theme.primaryPurple,
+      //   ),
+      // );
 
-      final imageData = await qrPainter.toImageData(200.0);
-      if (imageData == null) {
-        throw Exception('Failed to generate QR code');
-      }
+      // final imageData = await qrPainter.toImageData(200.0);
+      // if (imageData == null) {
+      //   throw Exception('Failed to generate QR code');
+      // }
 
-      final tempDir = await getTemporaryDirectory();
-      final file = await File(
-              '${tempDir.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png')
-          .create();
-      await file.writeAsBytes(imageData.buffer.asUint8List());
+      // final tempDir = await getTemporaryDirectory();
+      // final file = await File(
+      //         '${tempDir.path}/qr_code_${DateTime.now().millisecondsSinceEpoch}.png')
+      //     .create();
+      // await file.writeAsBytes(imageData.buffer.asUint8List());
 
-      final shareText = '''My $networkName ($tokenSymbol) address:$address''';
-      final result = await Share.shareXFiles(
-        [XFile(file.path)],
-        text: shareText,
-        subject: '$networkName Address',
-        sharePositionOrigin: sharePositionOrigin,
-      );
+      // final shareText = '''My $networkName ($tokenSymbol) address:$address''';
+      // final result = await Share.shareXFiles(
+      //   [XFile(file.path)],
+      //   text: shareText,
+      //   subject: '$networkName Address',
+      //   sharePositionOrigin: sharePositionOrigin,
+      // );
 
-      if (result.status == ShareResultStatus.success) {
-        debugPrint('Successfully shared the address');
-      } else if (result.status == ShareResultStatus.dismissed) {
-        debugPrint('Share was dismissed');
-      }
+      // if (result.status == ShareResultStatus.success) {
+      //   debugPrint('Successfully shared the address');
+      // } else if (result.status == ShareResultStatus.dismissed) {
+      //   debugPrint('Share was dismissed');
+      // }
 
-      try {
-        await file.delete();
-      } catch (e) {
-        debugPrint('Error deleting temporary file: $e');
-      }
+      // try {
+      //   await file.delete();
+      // } catch (e) {
+      //   debugPrint('Error deleting temporary file: $e');
+      // }
     } catch (e) {
       debugPrint('Error sharing with QR: $e');
     }
@@ -235,26 +235,35 @@ class _ReceivePageState extends State<ReceivePage> {
                                         SizedBox(
                                           width: 220,
                                           height: 220,
-                                          child: QrImageView(
-                                            data: _qrcodeGen(
-                                              appState.account!.addr,
-                                              token,
-                                              provider,
-                                            ),
-                                            version: QrVersions.auto,
+                                          child: AsyncQRcode(
+                                            data: "Your text",
+                                            color: theme.primaryPurple,
                                             size: 220,
-                                            gapless: false,
-                                            backgroundColor: Colors.transparent,
-                                            dataModuleStyle: QrDataModuleStyle(
-                                              dataModuleShape:
-                                                  QrDataModuleShape.circle,
-                                              color: theme.primaryPurple,
-                                            ),
-                                            eyeStyle: QrEyeStyle(
-                                              eyeShape: QrEyeShape.square,
-                                              color: theme.primaryPurple,
-                                            ),
+                                            // loadingWidget:
+                                            //     CustomLoadingIndicator(),
+                                            // errorWidget: CustomErrorWidget(),
+                                            fit: BoxFit.contain,
                                           ),
+                                          // child: QrImageView(
+                                          //   data: _qrcodeGen(
+                                          //     appState.account!.addr,
+                                          //     token,
+                                          //     provider,
+                                          //   ),
+                                          //   version: QrVersions.auto,
+                                          //   size: 220,
+                                          //   gapless: false,
+                                          //   backgroundColor: Colors.transparent,
+                                          //   dataModuleStyle: QrDataModuleStyle(
+                                          //     dataModuleShape:
+                                          //         QrDataModuleShape.circle,
+                                          //     color: theme.primaryPurple,
+                                          //   ),
+                                          //   eyeStyle: QrEyeStyle(
+                                          //     eyeShape: QrEyeShape.square,
+                                          //     color: theme.primaryPurple,
+                                          //   ),
+                                          // ),
                                         ),
                                       const SizedBox(height: 16),
                                       Text(

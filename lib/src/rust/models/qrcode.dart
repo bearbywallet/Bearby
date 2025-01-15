@@ -6,9 +6,6 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-// Rust type: RustOpaqueMoi<flutter_rust_bridge::for_generated::RustAutoOpaqueInner<QrConfigInfo>>
-abstract class QrConfigInfo implements RustOpaqueInterface {}
-
 class QRcodeScanResultInfo {
   final String recipient;
   final String? provider;
@@ -38,4 +35,39 @@ class QRcodeScanResultInfo {
           provider == other.provider &&
           tokenAddress == other.tokenAddress &&
           amount == other.amount;
+}
+
+class QrConfigInfo {
+  final int size;
+  final bool gapless;
+  final int color;
+  final int eyeShape;
+  final int dataModuleShape;
+
+  const QrConfigInfo({
+    required this.size,
+    required this.gapless,
+    required this.color,
+    required this.eyeShape,
+    required this.dataModuleShape,
+  });
+
+  @override
+  int get hashCode =>
+      size.hashCode ^
+      gapless.hashCode ^
+      color.hashCode ^
+      eyeShape.hashCode ^
+      dataModuleShape.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is QrConfigInfo &&
+          runtimeType == other.runtimeType &&
+          size == other.size &&
+          gapless == other.gapless &&
+          color == other.color &&
+          eyeShape == other.eyeShape &&
+          dataModuleShape == other.dataModuleShape;
 }
