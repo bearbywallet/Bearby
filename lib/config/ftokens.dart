@@ -1,5 +1,8 @@
 import 'package:zilpay/src/rust/models/ftoken.dart';
 
+const zeroEVM = "0x0000000000000000000000000000000000000000";
+const zeroZIL = "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz";
+
 class DefaultTokens {
   static List<FTokenInfo> defaultFtokens() {
     // this is math with providers
@@ -15,7 +18,7 @@ class DefaultTokens {
         name: 'Zilliqa',
         symbol: 'ZIL',
         decimals: 12,
-        addr: 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz',
+        addr: zeroZIL,
         logo:
             'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/zil.svg',
         balances: {},
@@ -30,7 +33,7 @@ class DefaultTokens {
         name: 'Ethereum',
         symbol: 'ETH',
         decimals: 18,
-        addr: '0x0000000000000000000000000000000000000000',
+        addr: zeroEVM,
         logo:
             'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/eth.svg',
         balances: {},
@@ -44,7 +47,7 @@ class DefaultTokens {
         name: 'BNB',
         symbol: 'BNB',
         decimals: 18,
-        addr: '0x0000000000000000000000000000000000000000',
+        addr: zeroEVM,
         logo:
             'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/bnb.svg',
         balances: {},
