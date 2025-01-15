@@ -3,12 +3,13 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/select_address.dart';
+import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class WalletSelectionCard extends StatefulWidget {
   final String? walletName;
   final String? address;
-  final Function(String, String) onChange;
+  final Function(QRcodeScanResultInfo, String) onChange;
 
   const WalletSelectionCard({
     super.key,

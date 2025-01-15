@@ -8,6 +8,7 @@ import 'package:zilpay/components/number_keyboard.dart';
 import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SendTokenPage extends StatefulWidget {
@@ -91,9 +92,19 @@ class _SendTokenPageState extends State<SendTokenPage> {
     });
   }
 
-  void updateAddress(String value, String name) {
+  void updateAddress(QRcodeScanResultInfo params, String name) {
     setState(() {
-      address = value;
+      if (params.recipient.isNotEmpty) {
+        address = params.recipient;
+      }
+
+      if (params.amount != null && params.amount!.isNotEmpty) {
+        amount = params.amount!;
+      }
+
+      // TODO: check token address if exits in
+      // if we have token in stash so we can swap to other token
+
       walletName = name;
     });
   }

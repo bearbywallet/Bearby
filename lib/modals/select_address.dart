@@ -5,12 +5,14 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
+import 'package:zilpay/src/rust/api/qrcode.dart';
+import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
 
 void showAddressSelectModal({
   required BuildContext context,
-  required Function(String, String) onAddressSelected,
+  required Function(QRcodeScanResultInfo, String) onAddressSelected,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -34,7 +36,7 @@ void showAddressSelectModal({
 }
 
 class _AddressSelectModalContent extends StatefulWidget {
-  final Function(String, String) onAddressSelected;
+  final Function(QRcodeScanResultInfo, String) onAddressSelected;
 
   const _AddressSelectModalContent({
     required this.onAddressSelected,
@@ -121,10 +123,7 @@ class _AddressSelectModalContentState
               onLeftIconTap: () async {
                 showQRScannerModal(
                   context: context,
-                  onScanned: (String qrCode) {
-                    // Handle the scanned QR code
-                    print('Scanned QR code: $qrCode');
-                  },
+                  onScanned: _parseQrcodRes,
                 );
               },
               borderColor: theme.textPrimary,
@@ -206,7 +205,9 @@ class _AddressSelectModalContentState
   Widget _buildAddressItem(theme.AppTheme theme, AddressItem item) {
     return InkWell(
       onTap: () {
-        widget.onAddressSelected(item.address, item.name);
+        QRcodeScanResultInfo params =
+            QRcodeScanResultInfo(recipient: item.address);
+        widget.onAddressSelected(params, item.name);
         Navigator.pop(context);
       },
       child: Container(
@@ -255,6 +256,16 @@ class _AddressSelectModalContentState
         ),
       ),
     );
+  }
+
+  void _parseQrcodRes(String data) async {
+    try {
+      QRcodeScanResultInfo parsed = await parseQrcodeStr(data: data);
+
+      widget.onAddressSelected(parsed, "Unknown");
+    } catch (e) {
+      debugPrint("error parse qrcode: $e");
+    }
   }
 
   List<AddressItem> _getFilteredMyAccounts(AppState appState) {
