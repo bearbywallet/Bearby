@@ -32,6 +32,8 @@ class TokenAmountCard extends StatefulWidget {
 }
 
 class _TokenAmountCardState extends State<TokenAmountCard> {
+  Key _imageKey = UniqueKey();
+
   @override
   void initState() {
     super.initState();
@@ -105,7 +107,10 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                 onTap: () {
                   showTokenSelectModal(
                     context: context,
-                    onTokenSelected: widget.onTokenSelected,
+                    onTokenSelected: (int index) {
+                      widget.onTokenSelected(index);
+                      _imageKey = UniqueKey();
+                    },
                   );
                 },
                 child: Container(
@@ -132,6 +137,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                           borderRadius: BorderRadius.circular(24),
                         ),
                         child: AsyncImage(
+                          key: _imageKey,
                           url: token.logo ??
                               viewIcon(
                                 token.addr,

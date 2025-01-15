@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
 
@@ -114,9 +115,17 @@ class _AddressSelectModalContentState
             padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
-              hint: 'Search address or name',
-              leftIconPath: 'assets/icons/search.svg',
+              hint: 'Search / Address / ENS',
+              leftIconPath: 'assets/icons/qrcode.svg',
               onChanged: (value) => setState(() => _searchQuery = value),
+              onLeftIconTap: () async {
+                showQRScannerModal(
+                  context: context,
+                  onScanned: (String qrCode) {
+                    print('Scanned QR code: $qrCode');
+                  },
+                );
+              },
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,
               height: 48,

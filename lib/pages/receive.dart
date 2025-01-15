@@ -95,7 +95,6 @@ class _ReceivePageState extends State<ReceivePage> {
     final tokenSymbol = token?.symbol ?? "";
 
     try {
-      // Get RenderBox for sharePositionOrigin (required for iPad)
       final box = context.findRenderObject() as RenderBox?;
       final sharePositionOrigin = box!.localToGlobal(Offset.zero) & box.size;
 
@@ -181,227 +180,112 @@ class _ReceivePageState extends State<ReceivePage> {
                       child: Column(
                         children: [
                           Container(
-                            margin: const EdgeInsets.symmetric(vertical: 16),
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: theme.warning.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Row(
-                              children: [
-                                SvgPicture.asset(
-                                  "assets/icons/warning.svg",
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.warning,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Text(
-                                    'Only send ${provider.networkName}(${token?.symbol}) assets to this address. Other assets will be lost forever.',
-                                    style: TextStyle(
-                                      color: theme.warning,
-                                      fontSize: 14,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: theme.cardBackground,
-                              borderRadius: BorderRadius.circular(12),
-                            ),
+                            width: double.infinity,
+                            constraints: const BoxConstraints(maxWidth: 400),
                             child: Column(
                               children: [
-                                GestureDetector(
-                                  onTapDown: (_) => handlePressedChanged(true),
-                                  onTapUp: (_) => handlePressedChanged(false),
-                                  onTapCancel: () =>
-                                      handlePressedChanged(false),
-                                  onTap: handleSelectToken,
-                                  child: AnimatedOpacity(
-                                    duration: const Duration(milliseconds: 150),
-                                    opacity: isPressedToken ? 0.6 : 1.0,
-                                    child: Row(
-                                      mainAxisSize: MainAxisSize.min,
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: [
-                                        Container(
-                                          width: 32,
-                                          height: 32,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
+                                Container(
+                                  margin: EdgeInsets.symmetric(
+                                      vertical: adaptivePadding),
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    color: theme.warning.withOpacity(0.1),
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/warning.svg",
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.warning,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'Only send ${provider.networkName}(${token?.symbol}) assets to this address. Other assets will be lost forever.',
+                                          style: TextStyle(
+                                            color: theme.warning,
+                                            fontSize: 14,
                                           ),
-                                          child: Center(
-                                            child: AsyncImage(
-                                              key: _imageKey,
-                                              url: token?.logo ??
-                                                  viewIcon(
-                                                    token!.addr,
-                                                    appState.state.appearances,
-                                                    provider.chainId,
-                                                  ),
-                                              width: 32,
-                                              height: 32,
-                                              fit: BoxFit.contain,
-                                              errorWidget: Blockies(
-                                                seed: token?.addr ?? "",
-                                                color: getWalletColor(0),
-                                                bgColor: theme.primaryPurple,
-                                                spotColor: theme.background,
-                                                size: 8,
-                                              ),
-                                              loadingWidget: const Center(
-                                                child:
-                                                    CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                ),
-                                              ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Container(
+                                  width: double.infinity,
+                                  padding: EdgeInsets.all(adaptivePadding),
+                                  decoration: BoxDecoration(
+                                    color: theme.cardBackground,
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      _buildTokenSelector(theme, token),
+                                      const SizedBox(height: 24),
+                                      if (token != null &&
+                                          appState.account != null)
+                                        SizedBox(
+                                          width: 220,
+                                          height: 220,
+                                          child: QrImageView(
+                                            data: _qrcodeGen(
+                                              appState.account!.addr,
+                                              token,
+                                              provider,
+                                            ),
+                                            version: QrVersions.auto,
+                                            size: 220,
+                                            gapless: false,
+                                            backgroundColor: Colors.transparent,
+                                            dataModuleStyle: QrDataModuleStyle(
+                                              dataModuleShape:
+                                                  QrDataModuleShape.circle,
+                                              color: theme.primaryPurple,
+                                            ),
+                                            eyeStyle: QrEyeStyle(
+                                              eyeShape: QrEyeShape.square,
+                                              color: theme.primaryPurple,
                                             ),
                                           ),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                          token?.name ?? "",
-                                          style: TextStyle(
-                                            color: theme.textPrimary,
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                      const SizedBox(height: 16),
+                                      Text(
+                                        appState.account?.addr ?? "",
+                                        style: TextStyle(
+                                          color: theme.textSecondary,
+                                          fontSize: 12,
                                         ),
-                                        const SizedBox(width: 2),
-                                        Text(
-                                          "(${token?.symbol})",
-                                          style: TextStyle(
-                                            color: theme.textSecondary,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                                        textAlign: TextAlign.center,
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                if (token != null && appState.account != null)
-                                  QrImageView(
-                                    data: _qrcodeGen(
-                                      appState.account!.addr,
-                                      token,
-                                      provider,
-                                    ),
-                                    version: QrVersions.auto,
-                                    size: 200,
-                                    gapless: false,
-                                    backgroundColor: Colors.transparent,
-                                    dataModuleStyle: QrDataModuleStyle(
-                                      dataModuleShape: QrDataModuleShape.circle,
-                                      color: theme.primaryPurple,
-                                    ),
-                                    eyeStyle: QrEyeStyle(
-                                      eyeShape: QrEyeShape.square,
-                                      color: theme.primaryPurple,
-                                    ),
-                                  ),
-                                const SizedBox(height: 16),
-                                Text(
-                                  appState.account?.addr ?? "",
-                                  style: TextStyle(
-                                    color: theme.textSecondary,
-                                    fontSize: 12,
-                                  ),
-                                  textAlign: TextAlign.center,
+                                SmartInput(
+                                  controller: _accountNameController,
+                                  hint: 'Account name',
+                                  onChanged: (value) {
+                                    //TODO: Implement account name change logic
+                                  },
+                                  height: 50,
+                                  rightIconPath: "assets/icons/edit.svg",
+                                  borderColor: theme.cardBackground,
+                                  focusedBorderColor: theme.primaryPurple,
+                                  fontSize: 14,
                                 ),
+                                const SizedBox(height: 16),
+                                _buildActionButtons(
+                                    theme, providerIndex, context),
                               ],
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                          Container(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: _buildAccountNameInput(theme),
-                          ),
-                          const SizedBox(height: 8),
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              TileButton(
-                                icon: SvgPicture.asset(
-                                  isCopied
-                                      ? "assets/icons/check.svg"
-                                      : "assets/icons/copy.svg",
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.primaryPurple,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                disabled: false,
-                                onPressed: () async {
-                                  await handleCopy(appState.account!.addr);
-                                },
-                                backgroundColor: theme.cardBackground,
-                                textColor: theme.primaryPurple,
-                              ),
-                              TileButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/hash.svg",
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.primaryPurple,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                disabled: false,
-                                onPressed: _handleAmountDialog,
-                                backgroundColor: theme.cardBackground,
-                                textColor: theme.primaryPurple,
-                              ),
-                              if (providerIndex == BigInt.zero)
-                                TileButton(
-                                  icon: SvgPicture.asset(
-                                    "assets/icons/swap.svg",
-                                    width: 24,
-                                    height: 24,
-                                    colorFilter: ColorFilter.mode(
-                                      theme.primaryPurple,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  disabled: false,
-                                  onPressed: () {
-                                    //TODO: if zilliqa we need change from bech32 to base16
-                                  },
-                                  backgroundColor: theme.cardBackground,
-                                  textColor: theme.primaryPurple,
-                                ),
-                              TileButton(
-                                icon: SvgPicture.asset(
-                                  "assets/icons/share.svg",
-                                  width: 24,
-                                  height: 24,
-                                  colorFilter: ColorFilter.mode(
-                                    theme.primaryPurple,
-                                    BlendMode.srcIn,
-                                  ),
-                                ),
-                                disabled: false,
-                                onPressed: () async {
-                                  await handleShare(context);
-                                },
-                                backgroundColor: theme.cardBackground,
-                                textColor: theme.primaryPurple,
-                              ),
-                            ],
                           ),
                         ],
                       ),
@@ -413,6 +297,162 @@ class _ReceivePageState extends State<ReceivePage> {
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildTokenSelector(AppTheme theme, FTokenInfo? token) {
+    final appState = Provider.of<AppState>(context);
+    final providerIndex = appState.account?.providerIndex ?? BigInt.zero;
+    final provider = appState.state.providers[providerIndex.toInt()];
+
+    return GestureDetector(
+      onTapDown: (_) => handlePressedChanged(true),
+      onTapUp: (_) => handlePressedChanged(false),
+      onTapCancel: () => handlePressedChanged(false),
+      onTap: handleSelectToken,
+      child: AnimatedOpacity(
+        duration: const Duration(milliseconds: 150),
+        opacity: isPressedToken ? 0.6 : 1.0,
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              width: 32,
+              height: 32,
+              decoration: const BoxDecoration(
+                shape: BoxShape.circle,
+              ),
+              child: Center(
+                child: AsyncImage(
+                  key: _imageKey,
+                  url: token?.logo ??
+                      viewIcon(
+                        token!.addr,
+                        appState.state.appearances,
+                        provider.chainId,
+                      ),
+                  width: 32,
+                  height: 32,
+                  fit: BoxFit.contain,
+                  errorWidget: Blockies(
+                    seed: token?.addr ?? "",
+                    color: getWalletColor(0),
+                    bgColor: theme.primaryPurple,
+                    spotColor: theme.background,
+                    size: 8,
+                  ),
+                  loadingWidget: const Center(
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Text(
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+              token?.name ?? "",
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(width: 2),
+            Text(
+              "(${token?.symbol})",
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 18,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActionButtons(
+    AppTheme theme,
+    BigInt providerIndex,
+    BuildContext context,
+  ) {
+    final appState = Provider.of<AppState>(context);
+
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      children: [
+        TileButton(
+          icon: SvgPicture.asset(
+            isCopied ? "assets/icons/check.svg" : "assets/icons/copy.svg",
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple,
+              BlendMode.srcIn,
+            ),
+          ),
+          disabled: false,
+          onPressed: () async {
+            await handleCopy(appState.account!.addr);
+          },
+          backgroundColor: theme.cardBackground,
+          textColor: theme.primaryPurple,
+        ),
+        TileButton(
+          icon: SvgPicture.asset(
+            "assets/icons/hash.svg",
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple,
+              BlendMode.srcIn,
+            ),
+          ),
+          disabled: false,
+          onPressed: _handleAmountDialog,
+          backgroundColor: theme.cardBackground,
+          textColor: theme.primaryPurple,
+        ),
+        if (providerIndex == BigInt.zero)
+          TileButton(
+            icon: SvgPicture.asset(
+              "assets/icons/swap.svg",
+              width: 24,
+              height: 24,
+              colorFilter: ColorFilter.mode(
+                theme.primaryPurple,
+                BlendMode.srcIn,
+              ),
+            ),
+            disabled: false,
+            onPressed: () {
+              //TODO: if zilliqa we need change from bech32 to base16
+            },
+            backgroundColor: theme.cardBackground,
+            textColor: theme.primaryPurple,
+          ),
+        TileButton(
+          icon: SvgPicture.asset(
+            "assets/icons/share.svg",
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple,
+              BlendMode.srcIn,
+            ),
+          ),
+          disabled: false,
+          onPressed: () async {
+            await handleShare(context);
+          },
+          backgroundColor: theme.cardBackground,
+          textColor: theme.primaryPurple,
+        ),
+      ],
     );
   }
 
@@ -503,21 +543,6 @@ class _ReceivePageState extends State<ReceivePage> {
         amount = result;
       });
     }
-  }
-
-  Widget _buildAccountNameInput(AppTheme theme) {
-    return SmartInput(
-      controller: _accountNameController,
-      hint: 'Account name',
-      onChanged: (value) {
-        //TODO: Implement account name change logic
-      },
-      height: 50,
-      rightIconPath: "assets/icons/edit.svg",
-      borderColor: theme.cardBackground,
-      focusedBorderColor: theme.primaryPurple,
-      fontSize: 14,
-    );
   }
 
   String _qrcodeGen(String addr, FTokenInfo token, NetworkConfigInfo provider) {

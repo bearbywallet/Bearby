@@ -35,6 +35,8 @@
 	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
+	<key>NSCameraUsageDescription</key>
+	<string>ZIlPay uses camera for scan qrcodes</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZilPay biometric auth</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
@@ -56,5 +58,7 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
+	<key>io.flutter.embedded_views_preview</key>
+	<true/>
 </dict>
 </plist>

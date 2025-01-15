@@ -9,6 +9,7 @@ PODS:
   - local_auth_darwin (0.0.1):
     - Flutter
     - FlutterMacOS
+  - MTBBarcodeScanner (5.0.11)
   - package_info_plus (0.4.5):
     - Flutter
   - path_provider_foundation (0.0.1):
@@ -17,6 +18,9 @@ PODS:
   - permission_handler_apple (9.3.0):
     - Flutter
   - Protobuf (3.28.3)
+  - qr_code_scanner (0.2.0):
+    - Flutter
+    - MTBBarcodeScanner
   - reactive_ble_mobile (0.0.1):
     - Flutter
     - FlutterMacOS
@@ -39,6 +43,7 @@ DEPENDENCIES:
   - package_info_plus (from `.symlinks/plugins/package_info_plus/ios`)
   - path_provider_foundation (from `.symlinks/plugins/path_provider_foundation/darwin`)
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
+  - qr_code_scanner (from `.symlinks/plugins/qr_code_scanner/ios`)
   - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/darwin`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
@@ -46,6 +51,7 @@ DEPENDENCIES:
 
 SPEC REPOS:
   trunk:
+    - MTBBarcodeScanner
     - Protobuf
     - SwiftProtobuf
 
@@ -66,6 +72,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/path_provider_foundation/darwin"
   permission_handler_apple:
     :path: ".symlinks/plugins/permission_handler_apple/ios"
+  qr_code_scanner:
+    :path: ".symlinks/plugins/qr_code_scanner/ios"
   reactive_ble_mobile:
     :path: ".symlinks/plugins/reactive_ble_mobile/darwin"
   rust_lib_zilpay:
@@ -81,10 +89,12 @@ SPEC CHECKSUMS:
   flutter_secure_storage: 1ed9476fba7e7a782b22888f956cce43e2c62f13
   integration_test: 4a889634ef21a45d28d50d622cf412dc6d9f586e
   local_auth_darwin: 553ce4f9b16d3fdfeafce9cf042e7c9f77c1c391
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
   package_info_plus: af8e2ca6888548050f16fa2f1938db7b5a5df499
   path_provider_foundation: 080d55be775b7414fd5a5ef3ac137b97b097e564
   permission_handler_apple: 4ed2196e43d0651e8ff7ca3483a069d469701f2d
   Protobuf: 5a8a7781d8e1004302f108977ac2d5b99323146f
+  qr_code_scanner: d77f94ecc9abf96d9b9b8fc04ef13f611e5a147a
   reactive_ble_mobile: ea97709e18fa6f0b0592909725d7ae7e1c595b64
   rust_lib_zilpay: c1c8e95f8f1a7815cb3f51142cbdaf40bd269582
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
