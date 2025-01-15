@@ -1,10 +1,16 @@
 use crate::models::qrcode::{QRcodeScanResultInfo, QrConfigInfo};
-pub use zilpay::qrcodes::gen::generate_qr;
+use zilpay::qrcodes::gen::generate_qr_png;
+pub use zilpay::qrcodes::gen::generate_qr_svg;
 pub use zilpay::qrcodes::parse::QRcodeScanResult;
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub fn gen_qrcode(data: String, config: QrConfigInfo) -> Result<String, String> {
-    generate_qr(&data, config.into()).map_err(|e| e.to_string())
+pub fn gen_svg_qrcode(data: String, config: QrConfigInfo) -> Result<String, String> {
+    generate_qr_svg(&data, config.into()).map_err(|e| e.to_string())
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub fn gen_png_qrcode(data: String, config: QrConfigInfo) -> Result<Vec<u8>, String> {
+    generate_qr_png(&data, config.into()).map_err(|e| e.to_string())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
