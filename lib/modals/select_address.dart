@@ -122,6 +122,7 @@ class _AddressSelectModalContentState
                 showQRScannerModal(
                   context: context,
                   onScanned: (String qrCode) {
+                    // Handle the scanned QR code
                     print('Scanned QR code: $qrCode');
                   },
                 );
