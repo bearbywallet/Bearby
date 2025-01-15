@@ -14,6 +14,7 @@ import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
+import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -86,6 +87,7 @@ class _ReceivePageState extends State<ReceivePage> {
       addr,
       token,
     );
+    final test = await genPngQrcode();
 
     debugPrint("res: $test");
     // TODO: make impl for share qrocde!

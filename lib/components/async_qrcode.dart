@@ -70,7 +70,7 @@ class _AsyncQRcodeState extends State<AsyncQRcode> {
         eyeShape: widget.eyeShape.value,
         dataModuleShape: widget.dataModuleShape.value,
       );
-      final svg = await genQrcode(data: widget.data, config: config);
+      final svg = await genSvgQrcode(data: widget.data, config: config);
 
       if (mounted) {
         setState(() {
