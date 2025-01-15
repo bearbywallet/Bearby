@@ -1726,6 +1726,12 @@ dependencies = [
 ]
 
 [[package]]
+name = "fast_qr"
+version = "0.12.7"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "16e326670ab63ef13c7699301dbb3441573ba3288e83c3bb9efaacc91a33fd01"
+
+[[package]]
 name = "fastrand"
 version = "2.1.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3257,6 +3263,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "7f6d64c71eb498fe9eae14ce4ec935c555749aef511cca85b5568910d6e48001"
 dependencies = [
  "bytemuck",
+]
+
+[[package]]
+name = "qrcodes"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "errors",
+ "fast_qr",
 ]
 
 [[package]]
@@ -5143,6 +5158,7 @@ dependencies = [
  "history",
  "network",
  "proto",
+ "qrcodes",
  "rpc",
  "settings",
  "token",
@@ -5162,6 +5178,7 @@ dependencies = [
  "history",
  "network",
  "proto",
+ "qrcodes",
  "rpc",
  "settings",
  "token",

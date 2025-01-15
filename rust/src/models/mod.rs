@@ -6,6 +6,7 @@ pub mod ftoken;
 pub mod keypair;
 pub mod notification;
 pub mod provider;
+pub mod qrcode;
 pub mod settings;
 pub mod transactions;
 pub mod wallet;

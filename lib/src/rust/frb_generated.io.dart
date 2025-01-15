@@ -11,6 +11,7 @@ import 'api/connections.dart';
 import 'api/ledger.dart';
 import 'api/methods.dart';
 import 'api/provider.dart';
+import 'api/qrcode.dart';
 import 'api/settings.dart';
 import 'api/token.dart';
 import 'api/transaction.dart';
@@ -27,6 +28,7 @@ import 'models/ftoken.dart';
 import 'models/keypair.dart';
 import 'models/notification.dart';
 import 'models/provider.dart';
+import 'models/qrcode.dart';
 import 'models/settings.dart';
 import 'models/transactions/access_list.dart';
 import 'models/transactions/base_token.dart';
@@ -46,8 +48,17 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
     required super.portManager,
   });
 
+  CrossPlatformFinalizerArg
+      get rust_arc_decrement_strong_count_QrConfigInfoPtr => wire
+          ._rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfoPtr;
+
   @protected
   AnyhowException dco_decode_AnyhowException(dynamic raw);
+
+  @protected
+  QrConfigInfo
+      dco_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+          dynamic raw);
 
   @protected
   Map<BigInt, String> dco_decode_Map_usize_String(dynamic raw);
@@ -55,6 +66,11 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   Map<BigInt, BackgroundNotificationState>
       dco_decode_Map_usize_background_notification_state(dynamic raw);
+
+  @protected
+  QrConfigInfo
+      dco_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+          dynamic raw);
 
   @protected
   RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw);
@@ -247,6 +263,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
 
   @protected
+  QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
+
+  @protected
   (Uint8List, String) dco_decode_record_list_prim_u_8_strict_string(
       dynamic raw);
 
@@ -306,11 +325,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
 
   @protected
+  QrConfigInfo
+      sse_decode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+          SseDeserializer deserializer);
+
+  @protected
   Map<BigInt, String> sse_decode_Map_usize_String(SseDeserializer deserializer);
 
   @protected
   Map<BigInt, BackgroundNotificationState>
       sse_decode_Map_usize_background_notification_state(
+          SseDeserializer deserializer);
+
+  @protected
+  QrConfigInfo
+      sse_decode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
           SseDeserializer deserializer);
 
   @protected
@@ -527,6 +556,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
+  QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
+      SseDeserializer deserializer);
+
+  @protected
   (Uint8List, String) sse_decode_record_list_prim_u_8_strict_string(
       SseDeserializer deserializer);
 
@@ -596,12 +629,22 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       AnyhowException self, SseSerializer serializer);
 
   @protected
+  void
+      sse_encode_Auto_Owned_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+          QrConfigInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_Map_usize_String(
       Map<BigInt, String> self, SseSerializer serializer);
 
   @protected
   void sse_encode_Map_usize_background_notification_state(
       Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer);
+
+  @protected
+  void
+      sse_encode_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+          QrConfigInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_StreamSink_String_Sse(
@@ -826,6 +869,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Uint8List? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_q_rcode_scan_result_info(
+      QRcodeScanResultInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_record_list_prim_u_8_strict_string(
       (Uint8List, String) self, SseSerializer serializer);
 
@@ -904,4 +951,36 @@ class RustLibWire implements BaseWire {
   /// The symbols are looked up in [dynamicLibrary].
   RustLibWire(ffi.DynamicLibrary dynamicLibrary)
       : _lookup = dynamicLibrary.lookup;
+
+  void
+      rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfoPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_zilpay_rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo');
+  late final _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo =
+      _rust_arc_increment_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfoPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
+
+  void
+      rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+    ffi.Pointer<ffi.Void> ptr,
+  ) {
+    return _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo(
+      ptr,
+    );
+  }
+
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfoPtr =
+      _lookup<ffi.NativeFunction<ffi.Void Function(ffi.Pointer<ffi.Void>)>>(
+          'frbgen_zilpay_rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo');
+  late final _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfo =
+      _rust_arc_decrement_strong_count_RustOpaque_flutter_rust_bridgefor_generatedRustAutoOpaqueInnerQrConfigInfoPtr
+          .asFunction<void Function(ffi.Pointer<ffi.Void>)>();
 }
