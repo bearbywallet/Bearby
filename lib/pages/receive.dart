@@ -16,6 +16,7 @@ import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
@@ -235,8 +236,18 @@ class _ReceivePageState extends State<ReceivePage> {
                                 SmartInput(
                                   controller: _accountNameController,
                                   hint: 'Account name',
-                                  onChanged: (value) {
-                                    //TODO: Implement account name change logic
+                                  onSubmitted: () async {
+                                    if (_accountNameController
+                                        .text.isNotEmpty) {
+                                      await changeAccountName(
+                                        walletIndex: BigInt.from(
+                                            appState.selectedWallet),
+                                        accountIndex:
+                                            appState.wallet!.selectedAccount,
+                                        newName: _accountNameController.text,
+                                      );
+                                      await appState.syncData();
+                                    }
                                   },
                                   height: 50,
                                   rightIconPath: "assets/icons/edit.svg",
