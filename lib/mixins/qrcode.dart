@@ -20,3 +20,11 @@ String generateCryptoUrl({
 
   return buffer.toString();
 }
+
+String generateQRData({
+  required String chain,
+  String? seedPhrase,
+  String? privateKey,
+}) {
+  return 'chain:?seed=$seedPhrase&key=$privateKey';
+}

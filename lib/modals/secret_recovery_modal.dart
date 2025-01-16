@@ -62,7 +62,7 @@ class SecretRecoveryModal extends StatelessWidget {
                   description:
                       'Warning: Never disclose this key. Anyone with your '
                       'private keys can steal any assets held in your account.',
-                  onPressed: _onShowPrivateKeys,
+                  onPressed: () => _onShowPrivateKeys(context),
                   buttonText: 'Export',
                 ),
                 const SizedBox(height: 16),
@@ -115,5 +115,7 @@ class SecretRecoveryModal extends StatelessWidget {
   }
 
   void _onRevealPhrase() {}
-  void _onShowPrivateKeys() {}
+  void _onShowPrivateKeys(BuildContext context) {
+    Navigator.of(context).pushNamed('/reveal_sk');
+  }
 }

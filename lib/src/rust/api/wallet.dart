@@ -6,6 +6,7 @@
 import '../frb_generated.dart';
 import '../models/account.dart';
 import '../models/ftoken.dart';
+import '../models/keypair.dart';
 import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
@@ -57,6 +58,19 @@ Future<void> deleteWallet(
         identifiers: identifiers,
         password: password,
         sessionCipher: sessionCipher);
+
+Future<KeyPairInfo> revealKeypair(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required List<String> identifiers,
+        required String password,
+        String? passphrase}) =>
+    RustLib.instance.api.crateApiWalletRevealKeypair(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        identifiers: identifiers,
+        password: password,
+        passphrase: passphrase);
 
 class AddNextBip39AccountParams {
   final BigInt walletIndex;

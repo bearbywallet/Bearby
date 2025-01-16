@@ -77,6 +77,10 @@ PODS:
     - SwiftProtobuf (~> 1.0)
   - rust_lib_zilpay (0.0.1):
     - Flutter
+  - screen_protector (1.2.1):
+    - Flutter
+    - ScreenProtectorKit (~> 1.3.1)
+  - ScreenProtectorKit (1.3.1)
   - share_plus (0.0.1):
     - Flutter
   - SwiftProtobuf (1.28.2)
@@ -95,6 +99,7 @@ DEPENDENCIES:
   - permission_handler_apple (from `.symlinks/plugins/permission_handler_apple/ios`)
   - reactive_ble_mobile (from `.symlinks/plugins/reactive_ble_mobile/darwin`)
   - rust_lib_zilpay (from `.symlinks/plugins/rust_lib_zilpay/ios`)
+  - screen_protector (from `.symlinks/plugins/screen_protector/ios`)
   - share_plus (from `.symlinks/plugins/share_plus/ios`)
   - url_launcher_ios (from `.symlinks/plugins/url_launcher_ios/ios`)
 
@@ -113,6 +118,7 @@ SPEC REPOS:
     - nanopb
     - PromisesObjC
     - Protobuf
+    - ScreenProtectorKit
     - SwiftProtobuf
 
 EXTERNAL SOURCES:
@@ -138,6 +144,8 @@ EXTERNAL SOURCES:
     :path: ".symlinks/plugins/reactive_ble_mobile/darwin"
   rust_lib_zilpay:
     :path: ".symlinks/plugins/rust_lib_zilpay/ios"
+  screen_protector:
+    :path: ".symlinks/plugins/screen_protector/ios"
   share_plus:
     :path: ".symlinks/plugins/share_plus/ios"
   url_launcher_ios:
@@ -168,6 +176,8 @@ SPEC CHECKSUMS:
   Protobuf: 5a8a7781d8e1004302f108977ac2d5b99323146f
   reactive_ble_mobile: ea97709e18fa6f0b0592909725d7ae7e1c595b64
   rust_lib_zilpay: c1c8e95f8f1a7815cb3f51142cbdaf40bd269582
+  screen_protector: 3d90d44ac886b25335aebd93230b454aef45794a
+  ScreenProtectorKit: 83a6281b02c7a5902ee6eac4f5045f674e902ae4
   share_plus: 50da8cb520a8f0f65671c6c6a99b3617ed10a58a
   SwiftProtobuf: 4dbaffec76a39a8dc5da23b40af1a5dc01a4c02d
   url_launcher_ios: 694010445543906933d732453a59da0a173ae33d

@@ -4,6 +4,7 @@ use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
 use zilpay::token::ft::FToken;
+use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::{
     background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
@@ -15,6 +16,7 @@ pub use zilpay::{
 };
 
 use crate::models::ftoken::FTokenInfo;
+use crate::models::keypair::KeyPairInfo;
 use crate::models::settings::WalletSettingsInfo;
 use crate::utils::utils::{secretkey_from_provider, with_wallet};
 use crate::{
@@ -251,6 +253,27 @@ pub async fn delete_wallet(
         core.delete_wallet(wallet_index)?;
 
         Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn reveal_keypair(
+    wallet_index: usize,
+    account_index: usize,
+    identifiers: Vec<String>,
+    password: String,
+    passphrase: Option<String>,
+) -> Result<KeyPairInfo, String> {
+    with_service_mut(|core| {
+        let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let keypair = wallet
+            .reveal_keypair(account_index, &seed, passphrase.as_deref())
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(keypair.into())
     })
     .await
     .map_err(Into::into)

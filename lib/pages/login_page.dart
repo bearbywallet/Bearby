@@ -93,7 +93,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<bool> _authenticateWithPassword(
-      String password, int walletIndex, List<String> identifiers) async {
+    String password,
+    int walletIndex,
+    List<String> identifiers,
+  ) async {
     try {
       bool unlocked = await tryUnlockWithPassword(
         password: password,
