@@ -41,8 +41,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
 
   @override
   void initState() {
-    super.initState();
     _secureScreen();
+    super.initState();
   }
 
   @override

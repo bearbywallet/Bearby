@@ -39,8 +39,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
 
   @override
   void initState() {
-    super.initState();
     _secureScreen();
+    super.initState();
   }
 
   @override
