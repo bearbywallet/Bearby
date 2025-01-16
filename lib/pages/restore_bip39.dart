@@ -35,7 +35,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
       final nonEmptyWords = _words.where((word) => word.isNotEmpty).toList();
       if (nonEmptyWords.isEmpty) return;
 
-      final List<int> errorIndexes = (await checkNotExistsBip39Words(
+      List<int> errorIndexes = (await checkNotExistsBip39Words(
         words: nonEmptyWords,
         lang: 'english',
       ))

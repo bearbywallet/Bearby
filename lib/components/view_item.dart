@@ -8,6 +8,7 @@ class WalletListItem extends StatefulWidget {
   final String subtitle;
   final dynamic icon;
   final VoidCallback onTap;
+  final bool disabled;
 
   const WalletListItem({
     super.key,
@@ -15,6 +16,7 @@ class WalletListItem extends StatefulWidget {
     required this.subtitle,
     required this.icon,
     required this.onTap,
+    this.disabled = false,
   });
 
   @override
@@ -61,23 +63,25 @@ class _WalletListItemState extends State<WalletListItem>
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final opacity = widget.disabled ? 0.5 : 1.0;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
       child: GestureDetector(
-        onTapDown: (_) => _controller.forward(),
-        onTapUp: (_) => _controller.reverse(),
-        onTapCancel: () => _controller.reverse(),
-        onTap: widget.onTap,
+        onTapDown: widget.disabled ? null : (_) => _controller.forward(),
+        onTapUp: widget.disabled ? null : (_) => _controller.reverse(),
+        onTapCancel: widget.disabled ? null : () => _controller.reverse(),
+        onTap: widget.disabled ? null : widget.onTap,
         child: AnimatedBuilder(
           animation: _controller,
           builder: (context, child) {
             return Transform.scale(
-              scale: _scaleAnimation.value,
+              scale: widget.disabled ? 1.0 : _scaleAnimation.value,
               child: Container(
                 decoration: BoxDecoration(
-                  color:
-                      theme.cardBackground.withOpacity(_opacityAnimation.value),
+                  color: theme.cardBackground.withOpacity(
+                    widget.disabled ? opacity : _opacityAnimation.value,
+                  ),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: child,
@@ -88,7 +92,7 @@ class _WalletListItemState extends State<WalletListItem>
             padding: const EdgeInsets.all(16.0),
             child: Row(
               children: [
-                _buildIcon(),
+                Opacity(opacity: opacity, child: _buildIcon()),
                 const SizedBox(width: 16),
                 Expanded(
                   child: Column(
@@ -97,7 +101,7 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.title,
                         style: TextStyle(
-                          color: theme.textPrimary,
+                          color: theme.textPrimary.withOpacity(opacity),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -106,20 +110,23 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.subtitle,
                         style: TextStyle(
-                          color: theme.textSecondary,
+                          color: theme.textSecondary.withOpacity(opacity),
                           fontSize: 14,
                         ),
                       ),
                     ],
                   ),
                 ),
-                SvgPicture.asset(
-                  'assets/icons/chevron_right.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
+                Opacity(
+                  opacity: opacity,
+                  child: SvgPicture.asset(
+                    'assets/icons/chevron_right.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      theme.textSecondary,
+                      BlendMode.srcIn,
+                    ),
                   ),
                 ),
               ],

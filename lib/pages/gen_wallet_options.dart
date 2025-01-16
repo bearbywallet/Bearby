@@ -54,6 +54,7 @@ class GenWalletOptionsPage extends StatelessWidget {
                 },
               ),
               WalletListItem(
+                disabled: true,
                 title: 'SLIP-0039',
                 subtitle: 'Generate Mnemonic phrase with share',
                 icon: SvgPicture.asset(

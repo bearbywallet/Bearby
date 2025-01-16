@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/config/providers.dart';
+import 'package:zilpay/mixins/qrcode.dart';
+import 'package:zilpay/modals/qr_scanner_modal.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
@@ -54,6 +58,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                 },
               ),
               WalletListItem(
+                disabled: true,
                 title: 'SLIP-0039',
                 subtitle: 'Restore with Shared Mnemonic phrase',
                 icon: SvgPicture.asset(
@@ -93,7 +98,67 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                onTap: () {/* Handle private key restoration */},
+                onTap: () {
+                  showQRScannerModal(
+                    context: context,
+                    onScanned: (String qrData) async {
+                      final values = parseQRSecretData(qrData);
+                      String? symbol = symbolByChainName(values['chain'] ?? "");
+                      String? seed = values['seed'];
+                      String? key = values['key'];
+
+                      if (symbol == null) {
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      if (seed != null) {
+                        try {
+                          final nonEmptyWords = seed
+                              .split(" ")
+                              .where((word) => word.isNotEmpty)
+                              .toList();
+
+                          if (nonEmptyWords.isEmpty) {
+                            Navigator.pop(context);
+
+                            return;
+                          }
+
+                          List<int> errorIndexes =
+                              (await checkNotExistsBip39Words(
+                            words: nonEmptyWords,
+                            lang: 'english',
+                          ))
+                                  .map((e) => e.toInt())
+                                  .toList();
+
+                          if (errorIndexes.isEmpty) {
+                            Navigator.of(context).pushNamed('/net_setup',
+                                arguments: {
+                                  'bip39': nonEmptyWords,
+                                  'symbol': symbol
+                                });
+                          } else {
+                            //TODO: add keypair from sk.
+                            // Navigator.of(context)
+                            //     .pushNamed('/net_setup', arguments: {
+                            //   // 'keys': _keyPair,
+                            //   'symbol': symbol
+                            // });
+                            Navigator.pop(context);
+                            return;
+                          }
+                        } catch (e) {
+                          debugPrint("error: $e");
+                        }
+                      } else if (key != null) {
+                      } else {
+                        Navigator.pop(context);
+                      }
+                    },
+                  );
+                },
               ),
             ],
           ),

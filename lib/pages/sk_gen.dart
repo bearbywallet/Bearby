@@ -13,9 +13,7 @@ import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
-  const SecretKeyGeneratorPage({
-    super.key,
-  });
+  const SecretKeyGeneratorPage({super.key});
 
   @override
   State<SecretKeyGeneratorPage> createState() => _CreateAccountPageState();
@@ -34,7 +32,6 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
 
   Future<void> _regenerateKeys() async {
     KeyPairInfo keyPair = await genKeypair();
-
     setState(() {
       _hasBackupWords = false;
       _keyPair = keyPair;
@@ -69,87 +66,98 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                 padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                 child: Column(
                   children: [
-                    // Top section with HexKeyDisplay
                     Expanded(
-                      flex: 2,
-                      child: Center(
-                        child: HexKeyDisplay(
-                          hexKey: _keyPair.sk,
-                          title: "Private Key",
-                        ),
-                      ),
-                    ),
-                    // Middle section with copy button
-                    Expanded(
-                      flex: 1,
-                      child: Center(
-                        child: TileButton(
-                          icon: SvgPicture.asset(
-                            isCopied
-                                ? "assets/icons/check.svg"
-                                : "assets/icons/copy.svg",
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.primaryPurple,
-                              BlendMode.srcIn,
+                      flex: 4,
+                      child: SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            HexKeyDisplay(
+                              hexKey: _keyPair.sk,
+                              title: "Private Key",
                             ),
-                          ),
-                          disabled: false,
-                          onPressed: () async {
-                            await _handleCopy(_keyPair.sk);
-                          },
-                          backgroundColor: theme.cardBackground,
-                          textColor: theme.primaryPurple,
+                            const SizedBox(height: 16),
+                            HexKeyDisplay(
+                              hexKey: _keyPair.pk,
+                              title: "Public Key",
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                    // Bottom section with checkbox and button
                     Container(
-                      constraints: const BoxConstraints(maxWidth: 480),
+                      height: MediaQuery.of(context).size.height * 0.3,
                       child: Column(
-                        mainAxisSize: MainAxisSize.min,
+                        mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          Theme(
-                            data: Theme.of(context).copyWith(
-                              splashFactory: NoSplash.splashFactory,
-                              highlightColor: Colors.transparent,
-                            ),
-                            child: CheckboxListTile(
-                              title: Text(
-                                'I have backup secret key',
-                                style: TextStyle(color: theme.textSecondary),
+                          TileButton(
+                            icon: SvgPicture.asset(
+                              isCopied
+                                  ? "assets/icons/check.svg"
+                                  : "assets/icons/copy.svg",
+                              width: 24,
+                              height: 24,
+                              colorFilter: ColorFilter.mode(
+                                theme.primaryPurple,
+                                BlendMode.srcIn,
                               ),
-                              value: _hasBackupWords,
-                              onChanged: (_) {
-                                if (!_hasBackupWords) {
-                                  showBackupConfirmationModal(
-                                    context: context,
-                                    onConfirmed: (confirmed) {
-                                      setState(() {
-                                        _hasBackupWords = confirmed;
-                                      });
+                            ),
+                            disabled: false,
+                            onPressed: () async {
+                              await _handleCopy(_keyPair.sk);
+                            },
+                            backgroundColor: theme.cardBackground,
+                            textColor: theme.primaryPurple,
+                          ),
+                          Container(
+                            constraints: const BoxConstraints(maxWidth: 480),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Theme(
+                                  data: Theme.of(context).copyWith(
+                                    splashFactory: NoSplash.splashFactory,
+                                    highlightColor: Colors.transparent,
+                                  ),
+                                  child: CheckboxListTile(
+                                    title: Text(
+                                      'I have backup secret key',
+                                      style:
+                                          TextStyle(color: theme.textSecondary),
+                                    ),
+                                    value: _hasBackupWords,
+                                    onChanged: (_) {
+                                      if (!_hasBackupWords) {
+                                        showBackupConfirmationModal(
+                                          context: context,
+                                          onConfirmed: (confirmed) {
+                                            setState(() {
+                                              _hasBackupWords = confirmed;
+                                            });
+                                          },
+                                        );
+                                      }
                                     },
-                                  );
-                                }
-                              },
-                              controlAffinity: ListTileControlAffinity.leading,
-                              activeColor: theme.primaryPurple,
+                                    controlAffinity:
+                                        ListTileControlAffinity.leading,
+                                    activeColor: theme.primaryPurple,
+                                  ),
+                                ),
+                                CustomButton(
+                                  text: 'Next',
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                      '/net_setup',
+                                      arguments: {'keys': _keyPair},
+                                    );
+                                  },
+                                  backgroundColor: theme.primaryPurple,
+                                  borderRadius: 30.0,
+                                  height: 56.0,
+                                  disabled: !_hasBackupWords,
+                                ),
+                              ],
                             ),
                           ),
-                          const SizedBox(height: 16),
-                          CustomButton(
-                            text: 'Next',
-                            onPressed: () {
-                              Navigator.of(context).pushNamed('/net_setup',
-                                  arguments: {'keys': _keyPair});
-                            },
-                            backgroundColor: theme.primaryPurple,
-                            borderRadius: 30.0,
-                            height: 56.0,
-                            disabled: !_hasBackupWords,
-                          ),
-                          SizedBox(height: adaptivePadding),
                         ],
                       ),
                     ),
@@ -168,9 +176,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
     setState(() {
       isCopied = true;
     });
-
     await Future<void>.delayed(const Duration(seconds: 2));
-
     setState(() {
       isCopied = false;
     });

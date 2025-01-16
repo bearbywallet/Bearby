@@ -12,6 +12,18 @@ String chainNameBySymbol(String symbol) {
   }
 }
 
+String? symbolByChainName(String name) {
+  if (name == "zilliqa") {
+    return DefaultNetworkProviders.zil().tokenSymbol;
+  } else if (name == "ethereum") {
+    return DefaultNetworkProviders.eth().tokenSymbol;
+  } else if (name == "binance") {
+    return DefaultNetworkProviders.bsc().tokenSymbol;
+  }
+
+  return null;
+}
+
 class DefaultNetworkProviders {
   static List<NetworkConfigInfo> defaultNetworks() {
     return [
