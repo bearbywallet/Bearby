@@ -21,7 +21,7 @@ use crate::{
     models::wallet::WalletInfo,
     utils::{
         errors::ServiceError,
-        utils::{decode_session, with_service, with_service_mut, with_wallet_mut},
+        utils::{decode_session, with_service, with_service_mut},
     },
 };
 

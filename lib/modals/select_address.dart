@@ -5,6 +5,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
+import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -119,7 +120,18 @@ class _AddressSelectModalContentState
               controller: _searchController,
               hint: 'Search / Address / ENS',
               leftIconPath: 'assets/icons/qrcode.svg',
-              onChanged: (value) => setState(() => _searchQuery = value),
+              onChanged: (value) async {
+                bool is_address = await isCryptoAddress(addr: value);
+
+                if (is_address) {
+                  QRcodeScanResultInfo params =
+                      QRcodeScanResultInfo(recipient: value);
+                  widget.onAddressSelected(params, "Unknown");
+                  Navigator.pop(context);
+                } else {
+                  setState(() => _searchQuery = value);
+                }
+              },
               onLeftIconTap: () async {
                 showQRScannerModal(
                   context: context,
