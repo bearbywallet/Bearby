@@ -9,6 +9,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 
@@ -130,7 +131,7 @@ class _WalletPageState extends State<WalletPage> {
                       delegate: SliverChildListDelegate([
                         Center(child: _buildWalletHeader(theme, appState)),
                         const SizedBox(height: 16),
-                        _buildWalletNameInput(theme),
+                        _buildWalletNameInput(theme, appState),
                         const SizedBox(height: 32),
                         _buildPreferencesSection(theme),
                       ]),
@@ -189,12 +190,18 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget _buildWalletNameInput(AppTheme theme) {
+  Widget _buildWalletNameInput(AppTheme theme, AppState state) {
     return SmartInput(
       controller: _walletNameController,
       hint: 'Wallet name',
-      onChanged: (value) {
-        // Implement wallet name change logic
+      onSubmitted: () async {
+        if (_walletNameController.text.isNotEmpty) {
+          await changeWalletName(
+            walletIndex: BigInt.from(state.selectedWallet),
+            newName: _walletNameController.text,
+          );
+          await state.syncData();
+        }
       },
       height: 50,
       rightIconPath: "assets/icons/edit.svg",
