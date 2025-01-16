@@ -81,6 +81,20 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                 ),
                 onTap: () {/* Handle private key restoration */},
               ),
+              WalletListItem(
+                title: 'QRcode',
+                subtitle: 'Restore wallet by QRcode scanning',
+                icon: SvgPicture.asset(
+                  'assets/icons/qrcode.svg',
+                  width: 35,
+                  height: 35,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                onTap: () {/* Handle private key restoration */},
+              ),
             ],
           ),
         ),

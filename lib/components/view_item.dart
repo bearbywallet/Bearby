@@ -3,7 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class WalletListItem extends StatelessWidget {
+class WalletListItem extends StatefulWidget {
   final String title;
   final String subtitle;
   final dynamic icon;
@@ -18,17 +18,72 @@ class WalletListItem extends StatelessWidget {
   });
 
   @override
+  State<WalletListItem> createState() => _WalletListItemState();
+}
+
+class _WalletListItemState extends State<WalletListItem>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  late Animation<double> _opacityAnimation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 100),
+      vsync: this,
+    );
+
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+
+    _opacityAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.7,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 4.0),
-      child: Material(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        child: InkWell(
-          onTap: onTap,
-          borderRadius: BorderRadius.circular(12),
+      child: GestureDetector(
+        onTapDown: (_) => _controller.forward(),
+        onTapUp: (_) => _controller.reverse(),
+        onTapCancel: () => _controller.reverse(),
+        onTap: widget.onTap,
+        child: AnimatedBuilder(
+          animation: _controller,
+          builder: (context, child) {
+            return Transform.scale(
+              scale: _scaleAnimation.value,
+              child: Container(
+                decoration: BoxDecoration(
+                  color:
+                      theme.cardBackground.withOpacity(_opacityAnimation.value),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: child,
+              ),
+            );
+          },
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -40,17 +95,20 @@ class WalletListItem extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        title,
+                        widget.title,
                         style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold),
+                          color: theme.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        subtitle,
-                        style:
-                            TextStyle(color: theme.textSecondary, fontSize: 14),
+                        widget.subtitle,
+                        style: TextStyle(
+                          color: theme.textSecondary,
+                          fontSize: 14,
+                        ),
                       ),
                     ],
                   ),
@@ -73,13 +131,13 @@ class WalletListItem extends StatelessWidget {
   }
 
   Widget _buildIcon() {
-    if (icon is IconData) {
-      return Icon(icon as IconData);
-    } else if (icon is Widget) {
-      return icon;
-    } else if (icon is String) {
+    if (widget.icon is IconData) {
+      return Icon(widget.icon as IconData);
+    } else if (widget.icon is Widget) {
+      return widget.icon;
+    } else if (widget.icon is String) {
       return Image.asset(
-        icon,
+        widget.icon,
         width: 24,
         height: 24,
       );
