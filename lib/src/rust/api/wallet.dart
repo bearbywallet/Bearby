@@ -35,6 +35,29 @@ Future<void> selectAccount(
     RustLib.instance.api.crateApiWalletSelectAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<void> changeAccountName(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required String newName}) =>
+    RustLib.instance.api.crateApiWalletChangeAccountName(
+        walletIndex: walletIndex, accountIndex: accountIndex, newName: newName);
+
+Future<void> changeWalletName(
+        {required BigInt walletIndex, required String newName}) =>
+    RustLib.instance.api.crateApiWalletChangeWalletName(
+        walletIndex: walletIndex, newName: newName);
+
+Future<void> deleteWallet(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        String? password,
+        String? sessionCipher}) =>
+    RustLib.instance.api.crateApiWalletDeleteWallet(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        sessionCipher: sessionCipher);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;

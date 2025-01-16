@@ -4,6 +4,7 @@ use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
 use zilpay::token::ft::FToken;
+use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::{
     background::bg_wallet::WalletManagement, wallet::wallet_account::AccountManagement,
 };
@@ -15,7 +16,7 @@ pub use zilpay::{
 
 use crate::models::ftoken::FTokenInfo;
 use crate::models::settings::WalletSettingsInfo;
-use crate::utils::utils::secretkey_from_provider;
+use crate::utils::utils::{secretkey_from_provider, with_wallet};
 use crate::{
     models::wallet::WalletInfo,
     utils::{
@@ -173,10 +174,83 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
+    with_wallet(wallet_index, |wallet| {
         wallet
             .select_account(account_index)
             .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn change_account_name(
+    wallet_index: usize,
+    account_index: usize,
+    new_name: String,
+) -> Result<(), String> {
+    with_wallet(wallet_index, |wallet| {
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let acc = data
+            .accounts
+            .get_mut(account_index)
+            .ok_or(ServiceError::AccountError(
+                account_index,
+                wallet_index,
+                WalletErrors::InvalidAccountIndex(account_index),
+            ))?;
+
+        acc.name = new_name;
+
+        wallet
+            .save_wallet_data(data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result<(), String> {
+    with_wallet(wallet_index, |wallet| {
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.wallet_name = new_name;
+
+        wallet
+            .save_wallet_data(data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn delete_wallet(
+    wallet_index: usize,
+    identifiers: Vec<String>,
+    password: Option<String>,
+    session_cipher: Option<String>,
+) -> Result<(), String> {
+    with_service_mut(|core| {
+        if let Some(pass) = password {
+            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        } else {
+            let session = decode_session(session_cipher)?;
+            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+        }?;
+
+        core.delete_wallet(wallet_index)?;
+
+        Ok(())
     })
     .await
     .map_err(Into::into)
