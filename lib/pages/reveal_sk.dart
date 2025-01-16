@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:screen_protector/screen_protector.dart';
 import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -37,6 +38,26 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
+
+  @override
+  void initState() {
+    super.initState();
+    _secureScreen();
+  }
+
+  @override
+  void dispose() {
+    ScreenProtector.preventScreenshotOff();
+    ScreenProtector.protectDataLeakageOff();
+    ScreenProtector.protectDataLeakageWithBlurOff();
+    super.dispose();
+  }
+
+  Future<void> _secureScreen() async {
+    await ScreenProtector.preventScreenshotOn();
+    await ScreenProtector.protectDataLeakageOn();
+    await ScreenProtector.protectDataLeakageWithBlur();
+  }
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
     _btnController.start();

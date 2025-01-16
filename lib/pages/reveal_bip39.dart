@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:screen_protector/screen_protector.dart';
 import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -11,6 +12,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
@@ -35,6 +37,26 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
+  @override
+  void initState() {
+    super.initState();
+    _secureScreen();
+  }
+
+  @override
+  void dispose() {
+    ScreenProtector.preventScreenshotOff();
+    ScreenProtector.protectDataLeakageOff();
+    ScreenProtector.protectDataLeakageWithBlurOff();
+    super.dispose();
+  }
+
+  Future<void> _secureScreen() async {
+    await ScreenProtector.preventScreenshotOn();
+    await ScreenProtector.protectDataLeakageOn();
+    await ScreenProtector.protectDataLeakageWithBlur();
+  }
+
   void _onPasswordSubmit(BigInt walletIndex) async {
     _btnController.start();
     try {
@@ -47,14 +69,14 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
         identifiers: identifiers,
       );
 
-      // String phrase = await revealSeedPhrase(
-      //   walletIndex: walletIndex,
-      //   identifiers: identifiers,
-      //   password: _passwordController.text,
-      // );
+      String phrase = await revealBip39Phrase(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: _passwordController.text,
+      );
 
       setState(() {
-        // seedPhrase = phrase;
+        seedPhrase = phrase;
         isAuthenticated = true;
         hasError = false;
         errorMessage = null;
@@ -237,6 +259,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
 
   Widget _buildPhraseDisplay(AppTheme theme) {
     final List<String> words = seedPhrase?.split(' ') ?? [];
+    final int itemsPerRow = 3;
+    final int rowCount = (words.length / itemsPerRow).ceil();
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
@@ -246,26 +270,42 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
         borderRadius: BorderRadius.circular(16),
         border: Border.all(color: theme.secondaryPurple),
       ),
-      child: Wrap(
-        spacing: 8,
-        runSpacing: 8,
-        children: List.generate(
-          words.length,
-          (index) => Container(
-            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-            decoration: BoxDecoration(
-              color: theme.background,
-              borderRadius: BorderRadius.circular(8),
-            ),
-            child: Text(
-              '${index + 1}. ${words[index]}',
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 14,
+      child: Column(
+        children: List.generate(rowCount, (rowIndex) {
+          final startIndex = rowIndex * itemsPerRow;
+          final endIndex = (startIndex + itemsPerRow).clamp(0, words.length);
+
+          return Padding(
+            padding: const EdgeInsets.only(bottom: 8),
+            child: Row(
+              children: List.generate(
+                endIndex - startIndex,
+                (index) => Expanded(
+                  child: Container(
+                    margin: EdgeInsets.only(
+                      right: index != itemsPerRow - 1 ? 8 : 0,
+                    ),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 8,
+                    ),
+                    decoration: BoxDecoration(
+                      color: theme.background,
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      '${startIndex + index + 1}. ${words[startIndex + index]}',
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 10,
+                      ),
+                    ),
+                  ),
+                ),
               ),
             ),
-          ),
-        ),
+          );
+        }),
       ),
     );
   }
