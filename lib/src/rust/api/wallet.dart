@@ -72,6 +72,17 @@ Future<KeyPairInfo> revealKeypair(
         password: password,
         passphrase: passphrase);
 
+Future<String> revealBip39Phrase(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        required String password,
+        String? passphrase}) =>
+    RustLib.instance.api.crateApiWalletRevealBip39Phrase(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        passphrase: passphrase);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;

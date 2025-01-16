@@ -278,3 +278,23 @@ pub async fn reveal_keypair(
     .await
     .map_err(Into::into)
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn reveal_bip39_phrase(
+    wallet_index: usize,
+    identifiers: Vec<String>,
+    password: String,
+    _passphrase: Option<String>,
+) -> Result<String, String> {
+    with_service_mut(|core| {
+        let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let m = wallet
+            .reveal_mnemonic(&seed)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(m.to_string())
+    })
+    .await
+    .map_err(Into::into)
+}

@@ -11,6 +11,7 @@ import 'package:zilpay/pages/notification.dart';
 import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/receive.dart';
 import 'package:zilpay/pages/restore_bip39.dart';
+import 'package:zilpay/pages/reveal_bip39.dart';
 import 'package:zilpay/pages/reveal_sk.dart';
 import 'package:zilpay/pages/security.dart';
 import 'package:zilpay/pages/send.dart';
@@ -83,6 +84,7 @@ class AppRouter {
       '/receive',
       '/add_token',
       '/reveal_sk',
+      '/reveal_bip39',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -182,6 +184,8 @@ class AppRouter {
         return wrapWithProviders(const SendTokenPage());
       case '/reveal_sk':
         return wrapWithProviders(const RevealSecretKey());
+      case '/reveal_bip39':
+        return wrapWithProviders(const RevealSecretPhrase());
       case '/browser':
         return wrapWithProviders(const BrowserPage());
       case '/wallet':

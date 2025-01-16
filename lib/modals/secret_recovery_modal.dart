@@ -50,7 +50,7 @@ class SecretRecoveryModal extends StatelessWidget {
                   description: 'If you ever change browsers or move computers, '
                       'you will need this Secret Recovery Phrase to access '
                       'your accounts. Save them somewhere safe and secret.',
-                  onPressed: _onRevealPhrase,
+                  onPressed: () => _onRevealPhrase(context),
                   buttonText: 'Reveal',
                 ),
                 const SizedBox(height: 24)
@@ -114,7 +114,10 @@ class SecretRecoveryModal extends StatelessWidget {
     );
   }
 
-  void _onRevealPhrase() {}
+  void _onRevealPhrase(BuildContext context) {
+    Navigator.of(context).pushNamed('/reveal_bip39');
+  }
+
   void _onShowPrivateKeys(BuildContext context) {
     Navigator.of(context).pushNamed('/reveal_sk');
   }
