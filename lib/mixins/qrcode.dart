@@ -21,10 +21,20 @@ String generateCryptoUrl({
   return buffer.toString();
 }
 
-String generateQRData({
+String generateQRSecretData({
   required String chain,
   String? seedPhrase,
   String? privateKey,
 }) {
-  return 'chain:?seed=$seedPhrase&key=$privateKey';
+  final params = <String>[];
+
+  if (seedPhrase != null) {
+    params.add('seed=$seedPhrase');
+  }
+
+  if (privateKey != null) {
+    params.add('key=$privateKey');
+  }
+
+  return '$chain:?${params.join('&')}';
 }

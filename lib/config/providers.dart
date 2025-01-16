@@ -1,5 +1,17 @@
 import 'package:zilpay/src/rust/models/provider.dart';
 
+String chainNameBySymbol(String symbol) {
+  if (symbol == DefaultNetworkProviders.zil().tokenSymbol) {
+    return "zilliqa";
+  } else if (symbol == DefaultNetworkProviders.eth().tokenSymbol) {
+    return "ethereum";
+  } else if (symbol == DefaultNetworkProviders.bsc().tokenSymbol) {
+    return "binance";
+  } else {
+    return "";
+  }
+}
+
 class DefaultNetworkProviders {
   static List<NetworkConfigInfo> defaultNetworks() {
     return [

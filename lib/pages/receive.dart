@@ -523,21 +523,21 @@ class _ReceivePageState extends State<ReceivePage> {
     if (provider.chainId == DefaultNetworkProviders.zil().chainId) {
       return generateCryptoUrl(
         address: addr,
-        chain: "zilliqa",
+        chain: chainNameBySymbol(provider.tokenSymbol),
         token: token.addr,
         amount: amount,
       );
     } else if (provider.chainId == DefaultNetworkProviders.eth().chainId) {
       return generateCryptoUrl(
         address: addr,
-        chain: "ethereum",
+        chain: chainNameBySymbol(provider.tokenSymbol),
         token: token.addr,
         amount: amount,
       );
     } else if (provider.chainId == DefaultNetworkProviders.bsc().chainId) {
       return generateCryptoUrl(
         address: addr,
-        chain: "binance",
+        chain: chainNameBySymbol(provider.tokenSymbol),
         token: token.addr,
         amount: amount,
       );

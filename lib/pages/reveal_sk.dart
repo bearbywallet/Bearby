@@ -2,15 +2,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -34,7 +38,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
-  void _onPasswordSubmit(BigInt walletIndex) async {
+  void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
     _btnController.start();
     try {
       final device = DeviceInfoService();
@@ -45,8 +49,15 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
         walletIndex: walletIndex,
         identifiers: identifiers,
       );
+      KeyPairInfo keypair = await revealKeypair(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        identifiers: identifiers,
+        password: _passwordController.text,
+      );
 
       setState(() {
+        keys = keypair;
         isAuthenticated = true;
         hasError = false;
         errorMessage = null;
@@ -95,7 +106,9 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscurePassword,
                         onSubmitted: () => _onPasswordSubmit(
-                            BigInt.from(state.selectedWallet)),
+                          BigInt.from(state.selectedWallet),
+                          state.wallet!.selectedAccount,
+                        ),
                         rightIconPath: _obscurePassword
                             ? "assets/icons/close_eye.svg"
                             : "assets/icons/open_eye.svg",
@@ -119,7 +132,9 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         child: RoundedLoadingButton(
                           controller: _btnController,
                           onPressed: () => _onPasswordSubmit(
-                              BigInt.from(state.selectedWallet)),
+                            BigInt.from(state.selectedWallet),
+                            state.wallet!.selectedAccount,
+                          ),
                           successIcon: SvgPicture.asset(
                             'assets/icons/ok.svg',
                             width: 24,
@@ -141,12 +156,14 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                       ),
                     ],
                     if (isAuthenticated) ...[
-                      _buildQrCode(theme),
-                      HexKeyDisplay(
-                        hexKey: '',
-                        title: "Private Key",
-                      ),
-                      const SizedBox(height: 16),
+                      if (keys != null) ...[
+                        _buildQrCode(theme),
+                        HexKeyDisplay(
+                          hexKey: keys!.sk,
+                          title: "",
+                        )
+                      ],
+                      SizedBox(height: adaptivePadding),
                       TileButton(
                         icon: SvgPicture.asset(
                           isCopied
@@ -159,11 +176,11 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                             BlendMode.srcIn,
                           ),
                         ),
-                        onPressed: () => _handleCopy(''),
+                        onPressed: () => _handleCopy(keys?.sk ?? ""),
                         backgroundColor: theme.cardBackground,
                         textColor: theme.primaryPurple,
                       ),
-                      const SizedBox(height: 16),
+                      SizedBox(height: adaptivePadding),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: EdgeInsets.only(bottom: adaptivePadding),
@@ -229,26 +246,33 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   }
 
   Widget _buildQrCode(AppTheme theme) {
+    final state = Provider.of<AppState>(context);
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final account = state.account!;
+    final provider = state.state.providers[account.providerIndex.toInt()];
+
     return Container(
-      height: 200,
-      margin: const EdgeInsets.symmetric(vertical: 16),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      margin: EdgeInsets.symmetric(vertical: adaptivePadding),
       child: Center(
-        child: Text(
-          'QR Code',
-          style: TextStyle(
-            color: theme.textPrimary,
+        child: AsyncQRcode(
+          data: generateQRSecretData(
+            chain: chainNameBySymbol(provider.tokenSymbol),
+            privateKey: keys?.sk,
+          ),
+          size: 160,
+          color: theme.danger,
+          eyeShape: EyeShape.circle,
+          dataModuleShape: DataModuleShape.circle,
+          loadingWidget: CircularProgressIndicator(
+            color: theme.danger,
           ),
         ),
       ),
     );
   }
 
-  Future<void> _handleCopy(String address) async {
-    await Clipboard.setData(ClipboardData(text: address));
+  Future<void> _handleCopy(String key) async {
+    await Clipboard.setData(ClipboardData(text: key));
     setState(() {
       isCopied = true;
     });
