@@ -18,5 +18,8 @@ Future<Uint64List> checkNotExistsBip39Words(
 Future<KeyPairInfo> genKeypair() =>
     RustLib.instance.api.crateApiMethodsGenKeypair();
 
+Future<KeyPairInfo> keypairFromSk({required String sk}) =>
+    RustLib.instance.api.crateApiMethodsKeypairFromSk(sk: sk);
+
 Future<bool> isCryptoAddress({required String addr}) =>
     RustLib.instance.api.crateApiMethodsIsCryptoAddress(addr: addr);

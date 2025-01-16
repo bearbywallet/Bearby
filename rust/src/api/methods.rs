@@ -1,6 +1,6 @@
-use crate::models::keypair::KeyPairInfo;
+use crate::{models::keypair::KeyPairInfo, utils::utils::decode_secret_key};
 pub use zilpay::background::{bg_crypto::CryptoOperations, Background, Language};
-use zilpay::proto::address::Address;
+use zilpay::proto::{address::Address, keypair::KeyPair};
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub fn gen_bip39_words(count: u8) -> Result<String, String> {
@@ -18,6 +18,17 @@ pub fn gen_keypair() -> Result<KeyPairInfo, String> {
     let (sk, pk) = Background::gen_keypair().map_err(|e| e.to_string())?;
 
     Ok(KeyPairInfo { sk, pk })
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub fn keypair_from_sk(sk: String) -> Result<KeyPairInfo, String> {
+    let sk = decode_secret_key(&sk)?;
+    let (pk, sk) = KeyPair::from_sk_bytes(sk).map_err(|e| e.to_string())?;
+
+    Ok(KeyPairInfo {
+        sk: hex::encode(sk),
+        pk: hex::encode(pk),
+    })
 }
 
 #[flutter_rust_bridge::frb(dart_async)]

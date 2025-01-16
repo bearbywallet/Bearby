@@ -94,6 +94,7 @@ class AddWalletOptionsPage extends StatelessWidget {
               ),
               const SizedBox(height: 16),
               WalletListItem(
+                disabled: true,
                 title: 'Watch Account',
                 subtitle: 'For monitor wallet activity without recovery phrase',
                 icon: SvgPicture.asset(

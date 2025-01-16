@@ -5,6 +5,7 @@ import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
@@ -140,19 +141,26 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                                   'symbol': symbol
                                 });
                           } else {
-                            //TODO: add keypair from sk.
-                            // Navigator.of(context)
-                            //     .pushNamed('/net_setup', arguments: {
-                            //   // 'keys': _keyPair,
-                            //   'symbol': symbol
-                            // });
+                            // TODO: maybe error hanlder.
                             Navigator.pop(context);
-                            return;
                           }
                         } catch (e) {
                           debugPrint("error: $e");
                         }
                       } else if (key != null) {
+                        try {
+                          KeyPairInfo keys = await keypairFromSk(sk: key);
+                          Navigator.of(context)
+                              .pushNamed('/net_setup', arguments: {
+                            'keys': keys,
+                            'symbol': symbol,
+                          });
+                          return;
+                        } catch (e) {
+                          debugPrint("error: $e");
+                          Navigator.pop(context);
+                          return;
+                        }
                       } else {
                         Navigator.pop(context);
                       }
