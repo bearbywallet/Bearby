@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -16,6 +17,7 @@ import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -82,15 +84,37 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Future<void> handleShare(FTokenInfo token, String addr) async {
-    String test = _qrcodeGen(
+  Future<void> handleShare(
+    FTokenInfo token,
+    String addr,
+    AppTheme theme,
+  ) async {
+    QrConfigInfo config = QrConfigInfo(
+      size: 600,
+      gapless: false,
+      color: theme.primaryPurple.value,
+      eyeShape: EyeShape.circle.value,
+      dataModuleShape: DataModuleShape.circle.value,
+    );
+    String data = _qrcodeGen(
       addr,
       token,
     );
-    final test = await genPngQrcode();
 
-    debugPrint("res: $test");
-    // TODO: make impl for share qrocde!
+    try {
+      final pngBytes = await genPngQrcode(data: data, config: config);
+      final xFile = XFile.fromData(
+        pngBytes,
+        mimeType: 'image/png',
+        name: 'qrcode.png',
+      );
+      await Share.shareXFiles(
+        [xFile],
+        text: '$addr, amount: $amount',
+      );
+    } catch (e) {
+      debugPrint("error share: $e");
+    }
   }
 
   @override
@@ -383,7 +407,11 @@ class _ReceivePageState extends State<ReceivePage> {
           ),
           disabled: false,
           onPressed: () async {
-            await handleShare(token, appState.account?.addr ?? "");
+            await handleShare(
+              token,
+              appState.account?.addr ?? "",
+              theme,
+            );
           },
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
