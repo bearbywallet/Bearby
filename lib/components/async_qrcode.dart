@@ -61,6 +61,19 @@ class _AsyncQRcodeState extends State<AsyncQRcode> {
     _loadImage();
   }
 
+  @override
+  void didUpdateWidget(AsyncQRcode oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (oldWidget.data != widget.data ||
+        oldWidget.size != widget.size ||
+        oldWidget.gapless != widget.gapless ||
+        oldWidget.color != widget.color ||
+        oldWidget.eyeShape != widget.eyeShape ||
+        oldWidget.dataModuleShape != widget.dataModuleShape) {
+      _loadImage();
+    }
+  }
+
   Future<void> _loadImage() async {
     try {
       QrConfigInfo config = QrConfigInfo(

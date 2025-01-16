@@ -17,6 +17,7 @@ import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -88,6 +89,7 @@ class _ReceivePageState extends State<ReceivePage> {
     FTokenInfo token,
     String addr,
     AppTheme theme,
+    NetworkConfigInfo provider,
   ) async {
     QrConfigInfo config = QrConfigInfo(
       size: 600,
@@ -99,6 +101,7 @@ class _ReceivePageState extends State<ReceivePage> {
     String data = _qrcodeGen(
       addr,
       token,
+      provider,
     );
 
     try {
@@ -209,6 +212,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                             data: _qrcodeGen(
                                               appState.account!.addr,
                                               token,
+                                              provider,
                                             ),
                                             color: theme.primaryPurple,
                                             size: 220,
@@ -340,6 +344,7 @@ class _ReceivePageState extends State<ReceivePage> {
     BuildContext context,
   ) {
     final appState = Provider.of<AppState>(context);
+    final provider = appState.state.providers[providerIndex.toInt()];
     final token = appState.wallet!.tokens[selectedToken];
 
     return Row(
@@ -411,6 +416,7 @@ class _ReceivePageState extends State<ReceivePage> {
               token,
               appState.account?.addr ?? "",
               theme,
+              provider,
             );
           },
           backgroundColor: theme.cardBackground,
@@ -509,22 +515,26 @@ class _ReceivePageState extends State<ReceivePage> {
     }
   }
 
-  String _qrcodeGen(String addr, FTokenInfo token) {
-    if (token.symbol == DefaultNetworkProviders.zil().tokenSymbol) {
+  String _qrcodeGen(
+    String addr,
+    FTokenInfo token,
+    NetworkConfigInfo provider,
+  ) {
+    if (provider.chainId == DefaultNetworkProviders.zil().chainId) {
       return generateCryptoUrl(
         address: addr,
         chain: "zilliqa",
         token: token.addr,
         amount: amount,
       );
-    } else if (token.symbol == DefaultNetworkProviders.eth().tokenSymbol) {
+    } else if (provider.chainId == DefaultNetworkProviders.eth().chainId) {
       return generateCryptoUrl(
         address: addr,
         chain: "ethereum",
         token: token.addr,
         amount: amount,
       );
-    } else if (token.symbol == DefaultNetworkProviders.bsc().tokenSymbol) {
+    } else if (provider.chainId == DefaultNetworkProviders.bsc().chainId) {
       return generateCryptoUrl(
         address: addr,
         chain: "binance",
