@@ -7,6 +7,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
+import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -305,7 +306,18 @@ class _WalletPageState extends State<WalletPage> {
 
   Widget _buildRemoveWalletButton(AppTheme theme) {
     return GestureDetector(
-      onTap: () async {},
+      behavior: HitTestBehavior.opaque,
+      onTap: () async {
+        showModalBottomSheet(
+          context: context,
+          isScrollControlled: true,
+          backgroundColor: theme.cardBackground,
+          shape: const RoundedRectangleBorder(
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          builder: (context) => DeleteWalletModal(),
+        );
+      },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
