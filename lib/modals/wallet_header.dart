@@ -10,6 +10,7 @@ import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/add_bip39_modal_page.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 
 void showWalletModal({
@@ -196,7 +197,6 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   try {
                     await appState.updateSelectedAccount(
                         walletIndex, accountIndex);
-                    _popContent();
                   } catch (e) {
                     debugPrint("select wallet error: $e");
                   }
@@ -246,10 +246,13 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                     height: 40,
                     onTap: () async {
                       try {
-                        // TODO: remove account
-                        print("remove");
+                        await deleteAccount(
+                          walletIndex: BigInt.from(appState.selectedWallet),
+                          accountIndex: appState.wallet!.selectedAccount,
+                        );
+                        await appState.syncData();
                       } catch (e) {
-                        //
+                        debugPrint("try remove account: $e");
                       }
                     },
                   ),

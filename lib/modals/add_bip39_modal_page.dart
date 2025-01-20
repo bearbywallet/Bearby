@@ -281,7 +281,7 @@ class _AddNextBip39AccountContentState
                   Counter(
                     iconSize: 32,
                     iconColor: theme.textPrimary,
-                    minValue: _appState.wallet!.accounts.length + 1,
+                    minValue: 1,
                     maxValue: 255,
                     animationDuration: const Duration(milliseconds: 300),
                     numberStyle: TextStyle(
