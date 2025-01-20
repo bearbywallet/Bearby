@@ -9,7 +9,6 @@ import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 
 class NetworkPage extends StatefulWidget {
