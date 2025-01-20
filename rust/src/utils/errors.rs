@@ -79,6 +79,12 @@ impl From<BackgroundError> for ServiceError {
     }
 }
 
+impl From<AddressError> for ServiceError {
+    fn from(error: AddressError) -> Self {
+        ServiceError::AddressError(error)
+    }
+}
+
 impl From<CacheError> for ServiceError {
     fn from(error: CacheError) -> Self {
         ServiceError::CacheError(error)

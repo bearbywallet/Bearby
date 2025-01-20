@@ -11,7 +11,7 @@ pub struct FTokenInfo {
     pub balances: HashMap<usize, String>,
     pub default: bool,
     pub native: bool,
-    pub provider_index: usize,
+    pub chain_hash: u64,
 }
 
 impl From<FToken> for FTokenInfo {
@@ -31,7 +31,7 @@ impl From<FToken> for FTokenInfo {
             decimals: ft.decimals,
             default: ft.default,
             native: ft.native,
-            provider_index: ft.provider_index,
+            chain_hash: ft.chain_hash,
         }
     }
 }
@@ -49,7 +49,7 @@ impl TryFrom<FTokenInfo> for FToken {
             balances: HashMap::new(),
             default: value.default,
             native: value.native,
-            provider_index: value.provider_index,
+            chain_hash: value.chain_hash,
         })
     }
 }

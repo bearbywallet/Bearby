@@ -4,7 +4,8 @@ use zilpay::wallet::account::Account;
 pub struct AccountInfo {
     pub addr: String,
     pub name: String,
-    pub provider_index: usize,
+    pub chain_hash: u64,
+    pub index: usize,
 }
 
 impl From<&Account> for AccountInfo {
@@ -12,7 +13,8 @@ impl From<&Account> for AccountInfo {
         AccountInfo {
             addr: account.addr.auto_format(),
             name: account.name.clone(),
-            provider_index: account.provider_index,
+            chain_hash: account.chain_hash,
+            index: account.account_type.value(),
         }
     }
 }

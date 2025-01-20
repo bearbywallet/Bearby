@@ -1194,13 +1194,12 @@ fn wire__crate__api__provider__get_provider_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_provider_index = <usize>::sse_decode(&mut deserializer);
+            let api_chain_hash = <u64>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::provider::get_provider(api_provider_index).await?;
+                        let output_ok = crate::api::provider::get_provider(api_chain_hash).await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -2352,11 +2351,13 @@ impl SseDecode for crate::models::account::AccountInfo {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_addr = <String>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
-        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
+        let mut var_index = <usize>::sse_decode(deserializer);
         return crate::models::account::AccountInfo {
             addr: var_addr,
             name: var_name,
-            provider_index: var_providerIndex,
+            chain_hash: var_chainHash,
+            index: var_index,
         };
     }
 }
@@ -2371,7 +2372,7 @@ impl SseDecode for crate::api::wallet::AddNextBip39AccountParams {
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_password = <Option<String>>::sse_decode(deserializer);
         let mut var_sessionCipher = <Option<String>>::sse_decode(deserializer);
-        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::api::wallet::AddNextBip39AccountParams {
             wallet_index: var_walletIndex,
             account_index: var_accountIndex,
@@ -2380,7 +2381,7 @@ impl SseDecode for crate::api::wallet::AddNextBip39AccountParams {
             identifiers: var_identifiers,
             password: var_password,
             session_cipher: var_sessionCipher,
-            provider_index: var_providerIndex,
+            chain_hash: var_chainHash,
         };
     }
 }
@@ -2393,14 +2394,14 @@ impl SseDecode for crate::api::wallet::AddSKWalletParams {
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
-        let mut var_provider = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::api::wallet::AddSKWalletParams {
             sk: var_sk,
             password: var_password,
             wallet_name: var_walletName,
             biometric_type: var_biometricType,
             identifiers: var_identifiers,
-            provider: var_provider,
+            chain_hash: var_chainHash,
         };
     }
 }
@@ -2482,7 +2483,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
         let mut var_passphrase = <String>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
-        let mut var_provider = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         return crate::api::wallet::Bip39AddWalletParams {
             password: var_password,
@@ -2491,7 +2492,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
             passphrase: var_passphrase,
             wallet_name: var_walletName,
             biometric_type: var_biometricType,
-            provider: var_provider,
+            chain_hash: var_chainHash,
             identifiers: var_identifiers,
         };
     }
@@ -2551,6 +2552,22 @@ impl SseDecode for crate::models::connection::ConnectionInfo {
     }
 }
 
+impl SseDecode for crate::models::provider::ExplorerInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_url = <String>::sse_decode(deserializer);
+        let mut var_icon = <Option<String>>::sse_decode(deserializer);
+        let mut var_standard = <u16>::sse_decode(deserializer);
+        return crate::models::provider::ExplorerInfo {
+            name: var_name,
+            url: var_url,
+            icon: var_icon,
+            standard: var_standard,
+        };
+    }
+}
+
 impl SseDecode for crate::models::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2562,7 +2579,7 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
         let mut var_balances = <std::collections::HashMap<usize, String>>::sse_decode(deserializer);
         let mut var_default_ = <bool>::sse_decode(deserializer);
         let mut var_native = <bool>::sse_decode(deserializer);
-        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::models::ftoken::FTokenInfo {
             name: var_name,
             symbol: var_symbol,
@@ -2572,7 +2589,7 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
             balances: var_balances,
             default: var_default_,
             native: var_native,
-            provider_index: var_providerIndex,
+            chain_hash: var_chainHash,
         };
     }
 }
@@ -2644,7 +2661,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_accountName = <String>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
-        let mut var_providerIndex = <usize>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
             pub_key: var_pubKey,
             wallet_index: var_walletIndex,
@@ -2653,7 +2670,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
             account_name: var_accountName,
             biometric_type: var_biometricType,
             identifiers: var_identifiers,
-            provider_index: var_providerIndex,
+            chain_hash: var_chainHash,
         };
     }
 }
@@ -2728,6 +2745,20 @@ impl SseDecode for Vec<crate::models::connection::ConnectionInfo> {
     }
 }
 
+impl SseDecode for Vec<crate::models::provider::ExplorerInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::provider::ExplorerInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<crate::models::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2767,6 +2798,18 @@ impl SseDecode for Vec<crate::models::provider::NetworkConfigInfo> {
             ans_.push(<crate::models::provider::NetworkConfigInfo>::sse_decode(
                 deserializer,
             ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<u16> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<u16>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -2861,25 +2904,28 @@ impl SseDecode for Vec<crate::models::wallet::WalletInfo> {
 impl SseDecode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_tokenSymbol = <String>::sse_decode(deserializer);
-        let mut var_logo = <Option<String>>::sse_decode(deserializer);
-        let mut var_networkName = <String>::sse_decode(deserializer);
+        let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_chain = <String>::sse_decode(deserializer);
+        let mut var_icon = <String>::sse_decode(deserializer);
+        let mut var_rpc = <Vec<String>>::sse_decode(deserializer);
+        let mut var_features = <Vec<u16>>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_slip44 = <u32>::sse_decode(deserializer);
+        let mut var_ens = <String>::sse_decode(deserializer);
+        let mut var_explorers =
+            <Vec<crate::models::provider::ExplorerInfo>>::sse_decode(deserializer);
         let mut var_fallbackEnabled = <bool>::sse_decode(deserializer);
-        let mut var_urls = <Vec<String>>::sse_decode(deserializer);
-        let mut var_explorerUrls = <Vec<String>>::sse_decode(deserializer);
-        let mut var_default_ = <bool>::sse_decode(deserializer);
-        let mut var_bip49 = <String>::sse_decode(deserializer);
         return crate::models::provider::NetworkConfigInfo {
-            token_symbol: var_tokenSymbol,
-            logo: var_logo,
-            network_name: var_networkName,
+            name: var_name,
+            chain: var_chain,
+            icon: var_icon,
+            rpc: var_rpc,
+            features: var_features,
             chain_id: var_chainId,
+            slip_44: var_slip44,
+            ens: var_ens,
+            explorers: var_explorers,
             fallback_enabled: var_fallbackEnabled,
-            urls: var_urls,
-            explorer_urls: var_explorerUrls,
-            default: var_default_,
-            bip49: var_bip49,
         };
     }
 }
@@ -3483,7 +3529,8 @@ impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
         [
             self.addr.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
-            self.provider_index.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
+            self.index.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3510,7 +3557,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddNextBip39AccountPa
             self.identifiers.into_into_dart().into_dart(),
             self.password.into_into_dart().into_dart(),
             self.session_cipher.into_into_dart().into_dart(),
-            self.provider_index.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3535,7 +3582,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddSKWalletParams {
             self.wallet_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
             self.identifiers.into_into_dart().into_dart(),
-            self.provider.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3657,7 +3704,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::Bip39AddWalletParams 
             self.passphrase.into_into_dart().into_dart(),
             self.wallet_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
-            self.provider.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
             self.identifiers.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -3728,6 +3775,29 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::connection::ConnectionInfo
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::provider::ExplorerInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.name.into_into_dart().into_dart(),
+            self.url.into_into_dart().into_dart(),
+            self.icon.into_into_dart().into_dart(),
+            self.standard.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::provider::ExplorerInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::provider::ExplorerInfo>
+    for crate::models::provider::ExplorerInfo
+{
+    fn into_into_dart(self) -> crate::models::provider::ExplorerInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -3739,7 +3809,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
             self.balances.into_into_dart().into_dart(),
             self.default.into_into_dart().into_dart(),
             self.native.into_into_dart().into_dart(),
-            self.provider_index.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3823,7 +3893,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
             self.account_name.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
             self.identifiers.into_into_dart().into_dart(),
-            self.provider_index.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -3843,15 +3913,16 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::ledger::LedgerParamsInput>
 impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.token_symbol.into_into_dart().into_dart(),
-            self.logo.into_into_dart().into_dart(),
-            self.network_name.into_into_dart().into_dart(),
+            self.name.into_into_dart().into_dart(),
+            self.chain.into_into_dart().into_dart(),
+            self.icon.into_into_dart().into_dart(),
+            self.rpc.into_into_dart().into_dart(),
+            self.features.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
+            self.slip_44.into_into_dart().into_dart(),
+            self.ens.into_into_dart().into_dart(),
+            self.explorers.into_into_dart().into_dart(),
             self.fallback_enabled.into_into_dart().into_dart(),
-            self.urls.into_into_dart().into_dart(),
-            self.explorer_urls.into_into_dart().into_dart(),
-            self.default.into_into_dart().into_dart(),
-            self.bip49.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4193,7 +4264,8 @@ impl SseEncode for crate::models::account::AccountInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.addr, serializer);
         <String>::sse_encode(self.name, serializer);
-        <usize>::sse_encode(self.provider_index, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
+        <usize>::sse_encode(self.index, serializer);
     }
 }
 
@@ -4207,7 +4279,7 @@ impl SseEncode for crate::api::wallet::AddNextBip39AccountParams {
         <Vec<String>>::sse_encode(self.identifiers, serializer);
         <Option<String>>::sse_encode(self.password, serializer);
         <Option<String>>::sse_encode(self.session_cipher, serializer);
-        <usize>::sse_encode(self.provider_index, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
     }
 }
 
@@ -4219,7 +4291,7 @@ impl SseEncode for crate::api::wallet::AddSKWalletParams {
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
         <Vec<String>>::sse_encode(self.identifiers, serializer);
-        <usize>::sse_encode(self.provider, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
     }
 }
 
@@ -4272,7 +4344,7 @@ impl SseEncode for crate::api::wallet::Bip39AddWalletParams {
         <String>::sse_encode(self.passphrase, serializer);
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
-        <usize>::sse_encode(self.provider, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
         <Vec<String>>::sse_encode(self.identifiers, serializer);
     }
 }
@@ -4311,6 +4383,16 @@ impl SseEncode for crate::models::connection::ConnectionInfo {
     }
 }
 
+impl SseEncode for crate::models::provider::ExplorerInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.url, serializer);
+        <Option<String>>::sse_encode(self.icon, serializer);
+        <u16>::sse_encode(self.standard, serializer);
+    }
+}
+
 impl SseEncode for crate::models::ftoken::FTokenInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4322,7 +4404,7 @@ impl SseEncode for crate::models::ftoken::FTokenInfo {
         <std::collections::HashMap<usize, String>>::sse_encode(self.balances, serializer);
         <bool>::sse_encode(self.default, serializer);
         <bool>::sse_encode(self.native, serializer);
-        <usize>::sse_encode(self.provider_index, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
     }
 }
 
@@ -4376,7 +4458,7 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.account_name, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
         <Vec<String>>::sse_encode(self.identifiers, serializer);
-        <usize>::sse_encode(self.provider_index, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
     }
 }
 
@@ -4432,6 +4514,16 @@ impl SseEncode for Vec<crate::models::connection::ConnectionInfo> {
     }
 }
 
+impl SseEncode for Vec<crate::models::provider::ExplorerInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::provider::ExplorerInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<crate::models::ftoken::FTokenInfo> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4460,6 +4552,16 @@ impl SseEncode for Vec<crate::models::provider::NetworkConfigInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::provider::NetworkConfigInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<u16> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <u16>::sse_encode(item, serializer);
         }
     }
 }
@@ -4537,15 +4639,16 @@ impl SseEncode for Vec<crate::models::wallet::WalletInfo> {
 impl SseEncode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.token_symbol, serializer);
-        <Option<String>>::sse_encode(self.logo, serializer);
-        <String>::sse_encode(self.network_name, serializer);
+        <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.chain, serializer);
+        <String>::sse_encode(self.icon, serializer);
+        <Vec<String>>::sse_encode(self.rpc, serializer);
+        <Vec<u16>>::sse_encode(self.features, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
+        <u32>::sse_encode(self.slip_44, serializer);
+        <String>::sse_encode(self.ens, serializer);
+        <Vec<crate::models::provider::ExplorerInfo>>::sse_encode(self.explorers, serializer);
         <bool>::sse_encode(self.fallback_enabled, serializer);
-        <Vec<String>>::sse_encode(self.urls, serializer);
-        <Vec<String>>::sse_encode(self.explorer_urls, serializer);
-        <bool>::sse_encode(self.default, serializer);
-        <String>::sse_encode(self.bip49, serializer);
     }
 }
 

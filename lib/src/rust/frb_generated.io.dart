@@ -156,6 +156,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_connection_info(dynamic raw);
 
   @protected
+  ExplorerInfo dco_decode_explorer_info(dynamic raw);
+
+  @protected
   FTokenInfo dco_decode_f_token_info(dynamic raw);
 
   @protected
@@ -187,6 +190,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw);
 
   @protected
+  List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
+
+  @protected
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
 
   @protected
@@ -195,6 +201,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
+
+  @protected
+  Uint16List dco_decode_list_prim_u_16_strict(dynamic raw);
 
   @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -434,6 +443,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer);
 
   @protected
+  ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
+
+  @protected
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
   @protected
@@ -469,6 +481,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<ExplorerInfo> sse_decode_list_explorer_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
 
   @protected
@@ -478,6 +494,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   List<NetworkConfigInfo> sse_decode_list_network_config_info(
       SseDeserializer deserializer);
+
+  @protected
+  Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer);
 
   @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -739,6 +758,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ConnectionInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
   @protected
@@ -775,6 +797,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<ConnectionInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_explorer_info(
+      List<ExplorerInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_f_token_info(
       List<FTokenInfo> self, SseSerializer serializer);
 
@@ -785,6 +811,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_network_config_info(
       List<NetworkConfigInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_prim_u_16_strict(
+      Uint16List self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_prim_u_8_strict(

@@ -25,7 +25,7 @@ pub struct LedgerParamsInput {
     pub account_name: String,
     pub biometric_type: String,
     pub identifiers: Vec<String>,
-    pub provider_index: usize,
+    pub chain_hash: u64,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -35,7 +35,7 @@ pub async fn add_ledger_wallet(
     ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
-        let provider = core.get_provider(params.provider_index)?;
+        let provider = core.get_provider(params.chain_hash)?;
         let bip49 = provider.get_bip49(params.wallet_index);
         let pub_key = pubkey_from_provider(&params.pub_key, bip49)?;
         let ftokens = ftokens
@@ -45,7 +45,7 @@ pub async fn add_ledger_wallet(
         let identifiers = params.identifiers;
         let params = BackgroundLedgerParams {
             ftokens,
-            provider_index: params.provider_index,
+            chain_hash: params.chain_hash,
             pub_key,
             account_name: params.account_name,
             wallet_index: params.wallet_index,
@@ -89,12 +89,12 @@ pub async fn add_ledger_account(
             .first()
             .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
 
-        let provider = core.get_provider(first_account.provider_index)?;
+        let provider = core.get_provider(first_account.chain_hash)?;
         let bip49 = provider.get_bip49(wallet_index);
         let pub_key = pubkey_from_provider(&pub_key, bip49)?;
 
         wallet
-            .add_ledger_account(name, pub_key, account_index, first_account.provider_index)
+            .add_ledger_account(name, pub_key, account_index, first_account.chain_hash)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await

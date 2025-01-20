@@ -1,7 +1,6 @@
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
-    crypto::bip49::Bip49DerivationPath,
     proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
     settings::{
         notifications::NotificationState,

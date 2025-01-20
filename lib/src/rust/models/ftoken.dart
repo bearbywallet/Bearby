@@ -15,7 +15,7 @@ class FTokenInfo {
   final Map<BigInt, String> balances;
   final bool default_;
   final bool native;
-  final BigInt providerIndex;
+  final BigInt chainHash;
 
   const FTokenInfo({
     required this.name,
@@ -26,7 +26,7 @@ class FTokenInfo {
     required this.balances,
     required this.default_,
     required this.native,
-    required this.providerIndex,
+    required this.chainHash,
   });
 
   @override
@@ -39,7 +39,7 @@ class FTokenInfo {
       balances.hashCode ^
       default_.hashCode ^
       native.hashCode ^
-      providerIndex.hashCode;
+      chainHash.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -54,5 +54,5 @@ class FTokenInfo {
           balances == other.balances &&
           default_ == other.default_ &&
           native == other.native &&
-          providerIndex == other.providerIndex;
+          chainHash == other.chainHash;
 }

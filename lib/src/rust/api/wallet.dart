@@ -96,7 +96,7 @@ class AddNextBip39AccountParams {
   final List<String> identifiers;
   final String? password;
   final String? sessionCipher;
-  final BigInt providerIndex;
+  final BigInt chainHash;
 
   const AddNextBip39AccountParams({
     required this.walletIndex,
@@ -106,7 +106,7 @@ class AddNextBip39AccountParams {
     required this.identifiers,
     this.password,
     this.sessionCipher,
-    required this.providerIndex,
+    required this.chainHash,
   });
 
   @override
@@ -118,7 +118,7 @@ class AddNextBip39AccountParams {
       identifiers.hashCode ^
       password.hashCode ^
       sessionCipher.hashCode ^
-      providerIndex.hashCode;
+      chainHash.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -132,7 +132,7 @@ class AddNextBip39AccountParams {
           identifiers == other.identifiers &&
           password == other.password &&
           sessionCipher == other.sessionCipher &&
-          providerIndex == other.providerIndex;
+          chainHash == other.chainHash;
 }
 
 class AddSKWalletParams {
@@ -141,7 +141,7 @@ class AddSKWalletParams {
   final String walletName;
   final String biometricType;
   final List<String> identifiers;
-  final BigInt provider;
+  final BigInt chainHash;
 
   const AddSKWalletParams({
     required this.sk,
@@ -149,7 +149,7 @@ class AddSKWalletParams {
     required this.walletName,
     required this.biometricType,
     required this.identifiers,
-    required this.provider,
+    required this.chainHash,
   });
 
   @override
@@ -159,7 +159,7 @@ class AddSKWalletParams {
       walletName.hashCode ^
       biometricType.hashCode ^
       identifiers.hashCode ^
-      provider.hashCode;
+      chainHash.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -171,7 +171,7 @@ class AddSKWalletParams {
           walletName == other.walletName &&
           biometricType == other.biometricType &&
           identifiers == other.identifiers &&
-          provider == other.provider;
+          chainHash == other.chainHash;
 }
 
 class Bip39AddWalletParams {
@@ -181,7 +181,7 @@ class Bip39AddWalletParams {
   final String passphrase;
   final String walletName;
   final String biometricType;
-  final BigInt provider;
+  final BigInt chainHash;
   final List<String> identifiers;
 
   const Bip39AddWalletParams({
@@ -191,7 +191,7 @@ class Bip39AddWalletParams {
     required this.passphrase,
     required this.walletName,
     required this.biometricType,
-    required this.provider,
+    required this.chainHash,
     required this.identifiers,
   });
 
@@ -203,7 +203,7 @@ class Bip39AddWalletParams {
       passphrase.hashCode ^
       walletName.hashCode ^
       biometricType.hashCode ^
-      provider.hashCode ^
+      chainHash.hashCode ^
       identifiers.hashCode;
 
   @override
@@ -217,6 +217,6 @@ class Bip39AddWalletParams {
           passphrase == other.passphrase &&
           walletName == other.walletName &&
           biometricType == other.biometricType &&
-          provider == other.provider &&
+          chainHash == other.chainHash &&
           identifiers == other.identifiers;
 }

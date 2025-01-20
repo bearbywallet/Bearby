@@ -6,53 +6,85 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-class NetworkConfigInfo {
-  final String tokenSymbol;
-  final String? logo;
-  final String networkName;
-  final BigInt chainId;
-  final bool fallbackEnabled;
-  final List<String> urls;
-  final List<String> explorerUrls;
-  final bool default_;
-  final String bip49;
+class ExplorerInfo {
+  final String name;
+  final String url;
+  final String? icon;
+  final int standard;
 
-  const NetworkConfigInfo({
-    required this.tokenSymbol,
-    this.logo,
-    required this.networkName,
-    required this.chainId,
-    required this.fallbackEnabled,
-    required this.urls,
-    required this.explorerUrls,
-    required this.default_,
-    required this.bip49,
+  const ExplorerInfo({
+    required this.name,
+    required this.url,
+    this.icon,
+    required this.standard,
   });
 
   @override
   int get hashCode =>
-      tokenSymbol.hashCode ^
-      logo.hashCode ^
-      networkName.hashCode ^
+      name.hashCode ^ url.hashCode ^ icon.hashCode ^ standard.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ExplorerInfo &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          url == other.url &&
+          icon == other.icon &&
+          standard == other.standard;
+}
+
+class NetworkConfigInfo {
+  final String name;
+  final String chain;
+  final String icon;
+  final List<String> rpc;
+  final Uint16List features;
+  final BigInt chainId;
+  final int slip44;
+  final String ens;
+  final List<ExplorerInfo> explorers;
+  final bool fallbackEnabled;
+
+  const NetworkConfigInfo({
+    required this.name,
+    required this.chain,
+    required this.icon,
+    required this.rpc,
+    required this.features,
+    required this.chainId,
+    required this.slip44,
+    required this.ens,
+    required this.explorers,
+    required this.fallbackEnabled,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      chain.hashCode ^
+      icon.hashCode ^
+      rpc.hashCode ^
+      features.hashCode ^
       chainId.hashCode ^
-      fallbackEnabled.hashCode ^
-      urls.hashCode ^
-      explorerUrls.hashCode ^
-      default_.hashCode ^
-      bip49.hashCode;
+      slip44.hashCode ^
+      ens.hashCode ^
+      explorers.hashCode ^
+      fallbackEnabled.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is NetworkConfigInfo &&
           runtimeType == other.runtimeType &&
-          tokenSymbol == other.tokenSymbol &&
-          logo == other.logo &&
-          networkName == other.networkName &&
+          name == other.name &&
+          chain == other.chain &&
+          icon == other.icon &&
+          rpc == other.rpc &&
+          features == other.features &&
           chainId == other.chainId &&
-          fallbackEnabled == other.fallbackEnabled &&
-          urls == other.urls &&
-          explorerUrls == other.explorerUrls &&
-          default_ == other.default_ &&
-          bip49 == other.bip49;
+          slip44 == other.slip44 &&
+          ens == other.ens &&
+          explorers == other.explorers &&
+          fallbackEnabled == other.fallbackEnabled;
 }

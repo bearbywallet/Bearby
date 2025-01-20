@@ -17,10 +17,11 @@ pub use zilpay::{
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
     with_service(|core| {
-        Ok(core
-            .providers
-            .iter()
-            .map(|p| p.config.clone().into())
+        let providers = core.get_providers();
+
+        Ok(providers
+            .into_iter()
+            .map(|p| p.config.into())
             .collect::<Vec<NetworkConfigInfo>>())
     })
     .await
@@ -28,11 +29,11 @@ pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn get_provider(provider_index: usize) -> Result<NetworkConfigInfo, String> {
+pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> {
     with_service(|core| {
-        let provider = core.get_provider(provider_index)?;
+        let provider = core.get_provider(chain_hash)?;
 
-        Ok(provider.config.clone().into())
+        Ok(provider.config.into())
     })
     .await
     .map_err(Into::into)
@@ -50,10 +51,11 @@ pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<(), Stri
 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
+        let mut providers = core.get_providers();
+
         for new_provider in &provider_config {
-            if core
-                .providers
+            if providers
                 .iter()
                 .any(|existing| existing.config.chain_id == new_provider.chain_id)
             {
@@ -64,13 +66,12 @@ pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Resu
         }
 
         for new_conf in provider_config {
-            let index = core.providers.len();
-            let new_provider = NetworkProvider::new(new_conf.try_into()?, index);
+            let new_provider = NetworkProvider::new(new_conf.try_into()?);
 
-            core.providers.push(new_provider);
+            providers.push(new_provider);
         }
 
-        core.update_providers()?;
+        core.update_providers(providers)?;
 
         Ok(())
     })

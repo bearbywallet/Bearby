@@ -1,14 +1,15 @@
 use std::sync::Arc;
-use zilpay::{
-    background::bg_wallet::WalletManagement,
-    errors::{background::BackgroundError, wallet::WalletErrors},
-};
+use zilpay::crypto::slip44;
 pub use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
-    crypto::bip49::Bip49DerivationPath,
     proto::{address::Address, pubkey::PubKey, secret_key::SecretKey},
     wallet::{wallet_data::WalletData, Wallet, WalletAddrType},
+};
+pub use zilpay::{
+    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+    crypto::bip49::DerivationPath,
+    errors::{background::BackgroundError, wallet::WalletErrors},
 };
 
 use crate::{
@@ -40,17 +41,15 @@ pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError
         .map_err(|_| ServiceError::InvalidSecretKeyLength)
 }
 
-pub fn pubkey_from_provider(
-    pub_key: &str,
-    bip49: Bip49DerivationPath,
-) -> Result<PubKey, ServiceError> {
+pub fn pubkey_from_provider(pub_key: &str, bip49: DerivationPath) -> Result<PubKey, ServiceError> {
     let pub_key_bytes = decode_public_key(pub_key)?;
 
-    let pub_key = match bip49 {
-        Bip49DerivationPath::Zilliqa(_) => PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes),
-        Bip49DerivationPath::Ethereum(_) => PubKey::Secp256k1Keccak256Ethereum(pub_key_bytes),
-        Bip49DerivationPath::Bitcoin(_) => PubKey::Secp256k1Bitcoin(pub_key_bytes),
-        Bip49DerivationPath::Solana(_) => PubKey::Ed25519Solana(pub_key_bytes),
+    let pub_key = match bip49.slip44 {
+        slip44::ZILLIQA => PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes),
+        slip44::ETHEREUM => PubKey::Secp256k1Keccak256Ethereum(pub_key_bytes),
+        slip44::BITCOIN => PubKey::Secp256k1Bitcoin(pub_key_bytes),
+        slip44::SOLANA => PubKey::Ed25519Solana(pub_key_bytes),
+        _ => todo!(),
     };
 
     Ok(pub_key)
@@ -58,14 +57,14 @@ pub fn pubkey_from_provider(
 
 pub fn secretkey_from_provider(
     secret_key: &str,
-    bip49: Bip49DerivationPath,
+    bip49: DerivationPath,
 ) -> Result<SecretKey, ServiceError> {
     let sk = secret_key.strip_prefix("0x").unwrap_or(secret_key);
     let secret_key_bytes = decode_secret_key(&sk)?;
 
-    let sk = match bip49 {
-        Bip49DerivationPath::Zilliqa(_) => SecretKey::Secp256k1Sha256Zilliqa(secret_key_bytes),
-        Bip49DerivationPath::Ethereum(_) => SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes),
+    let sk = match bip49.slip44 {
+        slip44::ZILLIQA => SecretKey::Secp256k1Sha256Zilliqa(secret_key_bytes),
+        slip44::ETHEREUM => SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes),
         _ => todo!(),
     };
 
@@ -89,6 +88,7 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
         .map(|w| w.try_into())
         .collect::<Result<Vec<WalletInfo>, WalletErrors>>()
         .map_err(BackgroundError::WalletError)?;
+    let providers = service.get_providers();
 
     let notifications_wallet_states = service
         .settings
@@ -104,11 +104,7 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
         notifications_global_enabled: service.settings.notifications.global_enabled,
         locale: service.settings.locale.to_string(),
         appearances: service.settings.theme.appearances.code(),
-        providers: service
-            .providers
-            .iter()
-            .map(|p| p.config.clone().into())
-            .collect(),
+        providers: providers.into_iter().map(|p| p.config.into()).collect(),
     })
 }
 

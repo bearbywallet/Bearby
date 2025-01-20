@@ -9,16 +9,19 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 class AccountInfo {
   final String addr;
   final String name;
-  final BigInt providerIndex;
+  final BigInt chainHash;
+  final BigInt index;
 
   const AccountInfo({
     required this.addr,
     required this.name,
-    required this.providerIndex,
+    required this.chainHash,
+    required this.index,
   });
 
   @override
-  int get hashCode => addr.hashCode ^ name.hashCode ^ providerIndex.hashCode;
+  int get hashCode =>
+      addr.hashCode ^ name.hashCode ^ chainHash.hashCode ^ index.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -27,5 +30,6 @@ class AccountInfo {
           runtimeType == other.runtimeType &&
           addr == other.addr &&
           name == other.name &&
-          providerIndex == other.providerIndex;
+          chainHash == other.chainHash &&
+          index == other.index;
 }

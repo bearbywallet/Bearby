@@ -11,7 +11,7 @@ pub use zilpay::{
 };
 pub use zilpay::{
     background::{BackgroundBip39Params, BackgroundSKParams},
-    crypto::bip49::Bip49DerivationPath,
+    crypto::bip49::DerivationPath,
     proto::{pubkey::PubKey, secret_key::SecretKey},
 };
 
@@ -50,7 +50,7 @@ pub struct Bip39AddWalletParams {
     pub passphrase: String,
     pub wallet_name: String,
     pub biometric_type: String,
-    pub provider: usize,
+    pub chain_hash: u64,
     pub identifiers: Vec<String>,
 }
 
@@ -62,12 +62,12 @@ pub async fn add_bip39_wallet(
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let core_ref: &Background = &*core;
-        let provider = core_ref.get_provider(params.provider)?;
+        let provider = core_ref.get_provider(params.chain_hash)?;
         let accounts_bip49 = params
             .accounts
             .into_iter()
             .map(|(i, name)| (provider.get_bip49(i), name))
-            .collect::<Vec<(Bip49DerivationPath, String)>>();
+            .collect::<Vec<(DerivationPath, String)>>();
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)
@@ -76,7 +76,7 @@ pub async fn add_bip39_wallet(
             .add_bip39_wallet(BackgroundBip39Params {
                 ftokens,
                 wallet_settings: wallet_settings.try_into()?,
-                provider: params.provider,
+                chain_hash: params.chain_hash,
                 password: &params.password,
                 mnemonic_str: &params.mnemonic_str,
                 accounts: &accounts_bip49,
@@ -100,7 +100,7 @@ pub struct AddSKWalletParams {
     pub wallet_name: String,
     pub biometric_type: String,
     pub identifiers: Vec<String>,
-    pub provider: usize,
+    pub chain_hash: u64,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -114,12 +114,12 @@ pub async fn add_sk_wallet(
             .into_iter()
             .map(TryFrom::try_from)
             .collect::<Result<Vec<FToken>, TokenError>>()?;
-        let provider = core.get_provider(params.provider)?;
+        let provider = core.get_provider(params.chain_hash)?;
         let bip49 = provider.get_bip49(0);
         let secret_key = secretkey_from_provider(&params.sk, bip49)?;
         let session = core.add_sk_wallet(BackgroundSKParams {
             ftokens,
-            provider: params.provider,
+            chain_hash: params.chain_hash,
             secret_key,
             wallet_name: params.wallet_name,
             biometric_type: params.biometric_type.into(),
@@ -143,7 +143,7 @@ pub struct AddNextBip39AccountParams {
     pub identifiers: Vec<String>,
     pub password: Option<String>,
     pub session_cipher: Option<String>,
-    pub provider_index: usize,
+    pub chain_hash: u64,
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
@@ -157,7 +157,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         }?;
 
         let wallet = core.get_wallet_by_index(params.wallet_index)?;
-        let provider = core.get_provider(params.provider_index)?;
+        let provider = core.get_provider(params.chain_hash)?;
         let bip49 = provider.get_bip49(params.account_index);
 
         wallet
@@ -166,7 +166,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
                 &bip49,
                 &params.passphrase,
                 &seed,
-                params.provider_index,
+                params.chain_hash,
             )
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))
     })
