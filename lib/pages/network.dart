@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
-import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/modals/custom_network_modal.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 
 class NetworkPage extends StatefulWidget {
@@ -22,8 +23,10 @@ class _NetworkPageState extends State<NetworkPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
-  final List<NetworkItem> enabledNetworks = [];
-  final List<NetworkItem> additionalNetworks = [];
+  final List<NetworkItem> addedMainnetNetworks = [];
+  final List<NetworkItem> addedTestnetNetworks = [];
+  final List<NetworkItem> potentialMainnetNetworks = [];
+  final List<NetworkItem> potentialTestnetNetworks = [];
 
   @override
   void initState() {
@@ -35,25 +38,61 @@ class _NetworkPageState extends State<NetworkPage> {
     try {
       final providers = await getProviders();
 
+      final defaultMainnets = DefaultNetworkProviders.mainnetNetworks();
+      final defaultTestnets = DefaultNetworkProviders.testnetNetworks();
+
       setState(() {
-        enabledNetworks.clear();
-        enabledNetworks.addAll(
-          providers.map((provider) => NetworkItem(
-                configInfo: provider,
-                icon: provider.logo,
-                isEnabled: true,
-              )),
-        );
+        addedMainnetNetworks.clear();
+        addedTestnetNetworks.clear();
+        potentialMainnetNetworks.clear();
+        potentialTestnetNetworks.clear();
+
+        for (var provider in providers) {
+          final networkItem = NetworkItem(
+            configInfo: provider,
+            icon: provider.logo,
+            isEnabled: true,
+            isAdded: true,
+          );
+
+          if (isMainnetNetwork(provider.chainId)) {
+            addedMainnetNetworks.add(networkItem);
+          } else {
+            addedTestnetNetworks.add(networkItem);
+          }
+        }
+
+        for (var network in defaultMainnets) {
+          bool isAlreadyAdded = addedMainnetNetworks
+              .any((added) => added.configInfo.chainId == network.chainId);
+
+          if (!isAlreadyAdded) {
+            potentialMainnetNetworks.add(NetworkItem(
+              configInfo: network,
+              icon: network.logo,
+              isEnabled: true,
+              isAdded: false,
+            ));
+          }
+        }
+
+        for (var network in defaultTestnets) {
+          bool isAlreadyAdded = addedTestnetNetworks
+              .any((added) => added.configInfo.chainId == network.chainId);
+
+          if (!isAlreadyAdded) {
+            potentialTestnetNetworks.add(NetworkItem(
+              configInfo: network,
+              icon: network.logo,
+              isEnabled: true,
+              isAdded: false,
+            ));
+          }
+        }
       });
     } catch (e) {
       debugPrint('Error loading networks: $e');
     }
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
   }
 
   List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks) {
@@ -66,8 +105,69 @@ class _NetworkPageState extends State<NetworkPage> {
         .toList();
   }
 
-  void _handleNetworkSelect(String networkName) {
-    print('Selected network: $networkName');
+  void _handleNetworkSelect(NetworkConfigInfo network) async {
+    // TODO: Implement network selection logic
+    debugPrint('Selected network: ${network.networkName}');
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Widget _buildNetworkSection(
+    String title,
+    List<NetworkItem> networks,
+    AppState state,
+  ) {
+    if (networks.isEmpty) return const SizedBox.shrink();
+    final theme = state.currentTheme;
+    final providerIndex = state.account!.providerIndex;
+    final provider = state.state.providers[providerIndex.toInt()];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
+            color: theme.textSecondary.withOpacity(0.7),
+          ),
+        ),
+        const SizedBox(height: 16),
+        ...networks.map((network) => Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: NetworkTile(
+                iconUrl: network.icon ?? "",
+                title: network.configInfo.networkName,
+                isEnabled: network.isEnabled,
+                isAdded: network.isAdded,
+                isSelected:
+                    provider.tokenSymbol == network.configInfo.tokenSymbol &&
+                        provider.chainId == network.configInfo.chainId,
+                disabled: provider.bip49 != network.configInfo.bip49,
+                onTap: () => _handleNetworkSelect(network.configInfo),
+                onAdd: network.isAdded
+                    ? null
+                    : () async {
+                        await addProvider(providerConfig: network.configInfo);
+                        await state.syncData();
+                        await _loadNetworks();
+                      },
+                onEdit: network.isAdded
+                    ? () {
+                        // TODO: Implement network editing
+                        debugPrint(
+                            'Editing network: ${network.configInfo.networkName}');
+                      }
+                    : null,
+              ),
+            )),
+      ],
+    );
   }
 
   @override
@@ -76,10 +176,12 @@ class _NetworkPageState extends State<NetworkPage> {
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    final filteredEnabledNetworks = _getFilteredNetworks(enabledNetworks);
-    final filteredAdditionalNetworks = _getFilteredNetworks(additionalNetworks);
-    final token = state.wallet!.accounts[state.wallet!.selectedAccount.toInt()];
-    final selectedProvider = state.state.providers[token.providerIndex.toInt()];
+    final filteredAddedMainnet = _getFilteredNetworks(addedMainnetNetworks);
+    final filteredAddedTestnet = _getFilteredNetworks(addedTestnetNetworks);
+    final filteredPotentialMainnet =
+        _getFilteredNetworks(potentialMainnetNetworks);
+    final filteredPotentialTestnet =
+        _getFilteredNetworks(potentialTestnetNetworks);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -114,86 +216,34 @@ class _NetworkPageState extends State<NetworkPage> {
                   ),
                 ),
                 Expanded(
-                  child: ScrollConfiguration(
-                    behavior: const ScrollBehavior().copyWith(
-                      physics: const BouncingScrollPhysics(),
-                      overscroll: true,
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding,
+                      vertical: 24,
                     ),
-                    child: SingleChildScrollView(
-                      physics: const AlwaysScrollableScrollPhysics(),
-                      padding: EdgeInsets.symmetric(
-                        horizontal: adaptivePadding,
-                        vertical: 24,
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          if (filteredEnabledNetworks.isNotEmpty) ...[
-                            Text(
-                              'Enabled networks',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: theme.textSecondary.withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ...filteredEnabledNetworks.map((network) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 8),
-                                  child: _NetworkTile(
-                                    icon: AsyncImage(
-                                      url: network.icon ?? "",
-                                      width: 24,
-                                      height: 24,
-                                      fit: BoxFit.contain,
-                                      loadingWidget: const Center(
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                        ),
-                                      ),
-                                    ),
-                                    title: network.configInfo.networkName,
-                                    isEnabled: network.isEnabled,
-                                    isSelected: selectedProvider.networkName ==
-                                        network.configInfo.networkName,
-                                    onTap: () => _handleNetworkSelect(
-                                        network.configInfo.networkName),
-                                  ),
-                                )),
-                          ],
-                          if (filteredAdditionalNetworks.isNotEmpty) ...[
-                            const SizedBox(height: 24),
-                            Text(
-                              'Additional networks',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: theme.textSecondary.withOpacity(0.7),
-                              ),
-                            ),
-                            const SizedBox(height: 16),
-                            ...filteredAdditionalNetworks
-                                .map((network) => Padding(
-                                      padding: const EdgeInsets.only(bottom: 8),
-                                      child: _NetworkTile(
-                                        icon: AsyncImage(
-                                          url: network.icon ?? "",
-                                          width: 24,
-                                          height: 24,
-                                          fit: BoxFit.contain,
-                                          loadingWidget: const Center(
-                                            child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                            ),
-                                          ),
-                                        ),
-                                        title: network.configInfo.networkName,
-                                        showAddButton: true,
-                                      ),
-                                    )),
-                          ],
-                        ],
-                      ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildNetworkSection('Added Mainnet Networks',
+                            filteredAddedMainnet, state),
+                        if (filteredAddedMainnet.isNotEmpty &&
+                            filteredAddedTestnet.isNotEmpty)
+                          const SizedBox(height: 24),
+                        _buildNetworkSection('Added Testing Networks',
+                            filteredAddedTestnet, state),
+                        if ((filteredAddedMainnet.isNotEmpty ||
+                                filteredAddedTestnet.isNotEmpty) &&
+                            filteredPotentialMainnet.isNotEmpty)
+                          const SizedBox(height: 24),
+                        _buildNetworkSection('Available Mainnet Networks',
+                            filteredPotentialMainnet, state),
+                        if (filteredPotentialMainnet.isNotEmpty &&
+                            filteredPotentialTestnet.isNotEmpty)
+                          const SizedBox(height: 24),
+                        _buildNetworkSection('Available Testing Networks',
+                            filteredPotentialTestnet, state),
+                      ],
                     ),
                   ),
                 ),
@@ -213,12 +263,8 @@ class _NetworkPageState extends State<NetworkPage> {
                           required String symbol,
                           required String explorerUrl,
                         }) {
-                          // Here you can add logic to save the new network
-                          print('New network: $networkName');
-                          print('RPC URL: $rpcUrl');
-                          print('Chain ID: $chainId');
-                          print('Symbol: $symbol');
-                          print('Explorer URL: $explorerUrl');
+                          // TODO: Implement custom network addition
+                          debugPrint('New custom network: $networkName');
                         },
                       );
                     },
@@ -240,92 +286,12 @@ class NetworkItem {
   final NetworkConfigInfo configInfo;
   final String? icon;
   final bool isEnabled;
+  final bool isAdded;
 
   NetworkItem({
     required this.configInfo,
     required this.icon,
     this.isEnabled = false,
+    this.isAdded = false,
   });
-}
-
-class _NetworkTile extends StatelessWidget {
-  final Widget icon;
-  final String title;
-  final bool isEnabled;
-  final bool showAddButton;
-  final bool isSelected;
-  final VoidCallback? onTap;
-
-  const _NetworkTile({
-    required this.icon,
-    required this.title,
-    this.isEnabled = false,
-    this.showAddButton = false,
-    this.isSelected = false,
-    this.onTap,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
-
-    return GestureDetector(
-      onTap: onTap,
-      child: Container(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected
-                ? theme.primaryPurple
-                : theme.textSecondary.withOpacity(0.1),
-            width: isSelected ? 2 : 1,
-          ),
-          color: isSelected ? theme.primaryPurple.withOpacity(0.1) : null,
-        ),
-        child: ListTile(
-          contentPadding:
-              const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-          leading: SizedBox(
-            width: 32,
-            height: 32,
-            child: icon,
-          ),
-          title: Text(
-            title,
-            style: TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-              color: theme.textSecondary,
-            ),
-          ),
-          trailing: showAddButton
-              ? TextButton(
-                  onPressed: () {
-                    // Add button handler
-                  },
-                  style: TextButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                  child: Text(
-                    'Add',
-                    style: TextStyle(
-                      color: theme.textSecondary,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                )
-              : HoverSvgIcon(
-                  assetName: 'assets/icons/edit.svg',
-                  width: 20,
-                  height: 20,
-                  padding: const EdgeInsets.all(8),
-                  color: theme.textSecondary,
-                  onTap: () {
-                    // Show edit modal
-                  },
-                ),
-        ),
-      ),
-    );
-  }
 }

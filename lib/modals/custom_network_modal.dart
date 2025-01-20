@@ -108,27 +108,22 @@ class _CustomNetworkModalContentState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildInputField(
-                    title: 'Network name',
                     controller: _networkNameController,
                     hint: 'Enter network name',
                   ),
                   _buildInputField(
-                    title: 'Default RPC URL',
                     controller: _rpcUrlController,
                     hint: 'Add a URL',
                   ),
                   _buildInputField(
-                    title: 'Chain ID',
                     controller: _chainIdController,
                     hint: 'Enter Chain ID',
                   ),
                   _buildInputField(
-                    title: 'Currency symbol',
                     controller: _symbolController,
                     hint: 'Enter symbol',
                   ),
                   _buildInputField(
-                    title: 'Block explorer URL',
                     controller: _explorerUrlController,
                     hint: 'Add a URL',
                   ),
@@ -164,7 +159,6 @@ class _CustomNetworkModalContentState
   }
 
   Widget _buildInputField({
-    required String title,
     required TextEditingController controller,
     required String hint,
   }) {
@@ -173,15 +167,6 @@ class _CustomNetworkModalContentState
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            title,
-            style: TextStyle(
-              color: widget.theme.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 8),
           SmartInput(
             controller: controller,
             hint: hint,

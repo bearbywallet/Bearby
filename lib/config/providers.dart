@@ -24,12 +24,30 @@ String? symbolByChainName(String name) {
   return null;
 }
 
+bool isMainnetNetwork(BigInt chainId) {
+  final mainnetChainIds = [
+    BigInt.from(1), // Ethereum Mainnet
+    BigInt.from(56), // BNB Smart Chain Mainnet
+    BigInt.from(32770) // Zilliqa Mainnet
+  ];
+
+  return mainnetChainIds.contains(chainId);
+}
+
 class DefaultNetworkProviders {
   static List<NetworkConfigInfo> mainnetNetworks() {
     return [
       zil(),
       eth(),
       bsc(),
+    ];
+  }
+
+  static List<NetworkConfigInfo> testnetNetworks() {
+    return [
+      zilTestnet(),
+      ethTestnet(),
+      bscTestnet(),
     ];
   }
 
@@ -84,6 +102,60 @@ class DefaultNetworkProviders {
       ],
       explorerUrls: ['https://bscscan.com'],
       default_: true,
+      bip49: "evm:m/44'/60'/0'/0/",
+    );
+  }
+
+  static NetworkConfigInfo zilTestnet() {
+    return NetworkConfigInfo(
+      tokenSymbol: "ZIL",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/zil.svg",
+      networkName: 'Zilliqa Testnet',
+      chainId: BigInt.from(32769),
+      fallbackEnabled: true,
+      urls: [
+        'https://dev-api.zilliqa.com',
+      ],
+      explorerUrls: ['https://viewblock.io/zilliqa?network=testnet'],
+      default_: false,
+      bip49: "zil:m/44'/313'/0'/0/",
+    );
+  }
+
+  static NetworkConfigInfo ethTestnet() {
+    return NetworkConfigInfo(
+      tokenSymbol: "ETH",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/eth.svg",
+      networkName: 'Sepolia Testnet',
+      chainId: BigInt.from(11155111),
+      fallbackEnabled: true,
+      urls: [
+        "https://rpc.sepolia.org",
+        "https://rpc2.sepolia.org",
+      ],
+      explorerUrls: ['https://sepolia.etherscan.io'],
+      default_: false,
+      bip49: "evm:m/44'/60'/0'/0/",
+    );
+  }
+
+  static NetworkConfigInfo bscTestnet() {
+    return NetworkConfigInfo(
+      tokenSymbol: "BNB",
+      logo:
+          "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/bnb.svg",
+      networkName: 'BNB Smart Chain Testnet',
+      chainId: BigInt.from(97),
+      fallbackEnabled: true,
+      urls: [
+        "https://data-seed-prebsc-1-s1.binance.org:8545",
+        "https://data-seed-prebsc-2-s1.binance.org:8545",
+        "https://data-seed-prebsc-1-s2.binance.org:8545"
+      ],
+      explorerUrls: ['https://testnet.bscscan.com'],
+      default_: false,
       bip49: "evm:m/44'/60'/0'/0/",
     );
   }
