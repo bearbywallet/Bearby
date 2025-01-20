@@ -259,6 +259,18 @@ pub async fn delete_wallet(
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
+pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
+    with_wallet(wallet_index, |wallet| {
+        wallet
+            .delete_account(account_index)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+#[flutter_rust_bridge::frb(dart_async)]
 pub async fn reveal_keypair(
     wallet_index: usize,
     account_index: usize,

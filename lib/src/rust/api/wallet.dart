@@ -59,6 +59,11 @@ Future<void> deleteWallet(
         password: password,
         sessionCipher: sessionCipher);
 
+Future<void> deleteAccount(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletDeleteAccount(
+        walletIndex: walletIndex, accountIndex: accountIndex);
+
 Future<KeyPairInfo> revealKeypair(
         {required BigInt walletIndex,
         required BigInt accountIndex,

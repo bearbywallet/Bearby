@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:blockies/blockies.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -107,6 +107,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       mainAxisSize: MainAxisSize.min,
       children: [
         GestureDetector(
+          behavior: HitTestBehavior.opaque,
           onTap: () => Navigator.pop(context),
           child: Container(
             width: 36,
@@ -186,7 +187,6 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                 name: account.name,
                 address:
                     shortenAddress(account.addr, leftSize: 8, rightSize: 8),
-                balance: '0.00',
                 onTap: () async {
                   final appState =
                       Provider.of<AppState>(context, listen: false);
@@ -208,58 +208,52 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           ),
         ),
         if (!appState.wallet!.walletType.contains(WalletType.SecretKey.name))
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-            child: InkWell(
-              onTap: () {
-                _pushContent(
-                  AddNextBip39AccountContent(
-                    onBack: _popContent,
-                  ),
-                );
-              },
-              borderRadius: BorderRadius.circular(16),
-              child: Container(
-                height: 64,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 12,
-                ),
-                decoration: BoxDecoration(
-                  border: Border(
-                    top: BorderSide(
-                      color: theme.textPrimary.withOpacity(0.1),
-                      width: 1,
-                    ),
-                  ),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 40,
-                      height: 40,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: theme.textPrimary.withOpacity(0.1),
-                          width: 1,
-                        ),
-                      ),
-                      child: Center(
-                        child: SvgPicture.asset(
-                          'assets/icons/plus.svg',
-                          width: 20,
-                          height: 20,
-                          colorFilter: ColorFilter.mode(
-                            theme.textPrimary,
-                            BlendMode.srcIn,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+          Container(
+            height: 64,
+            padding: const EdgeInsets.symmetric(
+              horizontal: 16,
+              vertical: 12,
+            ),
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: theme.textPrimary.withOpacity(0.1),
+                  width: 1,
                 ),
               ),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                HoverSvgIcon(
+                  assetName: "assets/icons/plus.svg",
+                  color: theme.textPrimary,
+                  width: 40,
+                  height: 40,
+                  onTap: () {
+                    _pushContent(
+                      AddNextBip39AccountContent(
+                        onBack: _popContent,
+                      ),
+                    );
+                  },
+                ),
+                if (appState.wallet?.selectedAccount != BigInt.zero)
+                  HoverSvgIcon(
+                    assetName: "assets/icons/minus.svg",
+                    color: theme.danger,
+                    width: 40,
+                    height: 40,
+                    onTap: () async {
+                      try {
+                        // TODO: remove account
+                        print("remove");
+                      } catch (e) {
+                        //
+                      }
+                    },
+                  ),
+              ],
             ),
           ),
         SizedBox(height: MediaQuery.of(context).padding.bottom),

@@ -7,7 +7,6 @@ import 'package:zilpay/state/app_state.dart';
 class WalletCard extends StatelessWidget {
   final String name;
   final String address;
-  final String balance;
   final VoidCallback onTap;
   final bool isSelected;
   final double? width;
@@ -19,7 +18,6 @@ class WalletCard extends StatelessWidget {
     super.key,
     required this.name,
     required this.address,
-    required this.balance,
     required this.onTap,
     this.isSelected = false,
     this.width,
@@ -92,14 +90,6 @@ class WalletCard extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
-                ),
-              ),
-              Text(
-                balance,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: fontSize ?? 16,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],

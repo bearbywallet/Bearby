@@ -121,9 +121,9 @@ class _AddressSelectModalContentState
               hint: 'Search / Address / ENS',
               leftIconPath: 'assets/icons/qrcode.svg',
               onChanged: (value) async {
-                bool is_address = await isCryptoAddress(addr: value);
+                bool isAddress = await isCryptoAddress(addr: value);
 
-                if (is_address) {
+                if (isAddress) {
                   QRcodeScanResultInfo params =
                       QRcodeScanResultInfo(recipient: value);
                   widget.onAddressSelected(params, "Unknown");
