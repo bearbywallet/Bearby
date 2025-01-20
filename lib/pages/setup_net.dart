@@ -25,7 +25,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
 
   int selectedNetworkIndex = 0;
   bool optionsDisabled = false;
-  final networks = DefaultNetworkProviders.defaultNetworks();
+  final networks = DefaultNetworkProviders.mainnetNetworks();
 
   @override
   void initState() {

@@ -25,7 +25,7 @@ String? symbolByChainName(String name) {
 }
 
 class DefaultNetworkProviders {
-  static List<NetworkConfigInfo> defaultNetworks() {
+  static List<NetworkConfigInfo> mainnetNetworks() {
     return [
       zil(),
       eth(),
