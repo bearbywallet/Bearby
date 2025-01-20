@@ -5,6 +5,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
 
@@ -28,7 +29,6 @@ void showManageTokensModal({
         ),
         child: _ManageTokensModalContent(
           onAddToken: onAddToken,
-          onTokenToggle: onTokenToggle,
         ),
       );
     },
@@ -37,11 +37,9 @@ void showManageTokensModal({
 
 class _ManageTokensModalContent extends StatefulWidget {
   final VoidCallback? onAddToken;
-  final Function(String)? onTokenToggle;
 
   const _ManageTokensModalContent({
     this.onAddToken,
-    this.onTokenToggle,
   });
 
   @override
@@ -148,8 +146,27 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
                     appState.state.appearances,
                     providers[token.providerIndex.toInt()].chainId,
                   ),
-              onToggle: (value) => widget.onTokenToggle?.call(token.addr),
-              isEnabled: true,
+              onToggle: (value) async {
+                if (!value) {
+                  final int index = appState.wallet!.tokens
+                      .indexWhere((t) => t.addr == token.addr);
+
+                  if (index == -1) {
+                    return;
+                  }
+
+                  try {
+                    await rmFtoken(
+                      walletIndex: BigInt.from(appState.selectedWallet),
+                      tokenIndex: BigInt.from(index),
+                    );
+                    await appState.syncData();
+                  } catch (e) {
+                    debugPrint("remove token error: $e");
+                  }
+                }
+              },
+              isEnabled: !token.default_,
             ))
         .toList();
   }
@@ -162,7 +179,7 @@ class _TokenListItem extends StatelessWidget {
   final String iconUrl;
   final Function(bool)? onToggle;
   final bool isEnabled;
-  final bool isDefault; // New property for default token
+  final bool isDefault;
 
   const _TokenListItem({
     required this.symbol,
@@ -170,7 +187,7 @@ class _TokenListItem extends StatelessWidget {
     required this.addr,
     required this.iconUrl,
     required this.isEnabled,
-    required this.isDefault, // Make it required
+    required this.isDefault,
     this.onToggle,
   });
 
