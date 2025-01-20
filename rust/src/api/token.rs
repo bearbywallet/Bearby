@@ -96,3 +96,18 @@ pub async fn add_ftoken(meta: FTokenInfo, wallet_index: usize) -> Result<Vec<FTo
     .await
     .map_err(Into::into)
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn rm_ftoken(wallet_index: usize, token_index: usize) -> Result<(), String> {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+
+        wallet
+            .remove_ftoken(token_index)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
