@@ -5,6 +5,31 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
+Widget networkLabel({
+  required String text,
+  required Color backgroundColor,
+  required Color textColor,
+}) {
+  return Container(
+    padding: const EdgeInsets.symmetric(
+      horizontal: 8,
+      vertical: 2,
+    ),
+    decoration: BoxDecoration(
+      color: backgroundColor.withOpacity(0.1),
+      borderRadius: BorderRadius.circular(4),
+    ),
+    child: Text(
+      text,
+      style: TextStyle(
+        fontSize: 12,
+        fontWeight: FontWeight.w500,
+        color: textColor,
+      ),
+    ),
+  );
+}
+
 class NetworkTile extends StatelessWidget {
   final String? iconUrl;
   final String title;
@@ -12,6 +37,8 @@ class NetworkTile extends StatelessWidget {
   final bool isAdded;
   final bool isSelected;
   final bool disabled;
+  final bool? isTestnet;
+  final bool? isDefault;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
   final VoidCallback? onAdd;
@@ -24,6 +51,8 @@ class NetworkTile extends StatelessWidget {
     this.isAdded = false,
     this.isSelected = false,
     this.disabled = false,
+    this.isTestnet = false,
+    this.isDefault = false,
     this.onTap,
     this.onEdit,
     this.onAdd,
@@ -53,13 +82,39 @@ class NetworkTile extends StatelessWidget {
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: _buildLeadingIcon(),
-            title: Text(
-              title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-                color: _getTextColor(theme),
-              ),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  children: [
+                    if (isTestnet != null)
+                      networkLabel(
+                        text: isTestnet! ? "Testnet" : "Mainnet",
+                        backgroundColor:
+                            isTestnet! ? theme.warning : theme.success,
+                        textColor: isTestnet! ? theme.warning : theme.success,
+                      ),
+                    if (isTestnet != null && isDefault == true)
+                      const SizedBox(width: 8),
+                    if (isDefault == true)
+                      networkLabel(
+                        text: "Default",
+                        backgroundColor: theme.primaryPurple,
+                        textColor: theme.primaryPurple,
+                      ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                    color: _getTextColor(theme),
+                  ),
+                ),
+              ],
             ),
             trailing: _buildTrailingButton(theme),
           ),

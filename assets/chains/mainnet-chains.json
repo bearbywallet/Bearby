@@ -1,8 +1,7 @@
 [
   {
     "name": "Zilliqa Mainnet",
-    "chain": "Zilliqa",
-    "icon": "zilliqa",
+    "chain": "ZIL",
     "rpc": [
       "https://api.zq2-protomainnet.zilliqa.com"
     ],
@@ -92,8 +91,7 @@
   },
   {
     "name": "Polygon Mainnet",
-    "chain": "Polygon",
-    "icon": "polygon",
+    "chain": "POL",
     "rpc": [
       "https://polygon-rpc.com/",
       "https://rpc-mainnet.matic.network",
@@ -107,7 +105,7 @@
     ],
     "faucets": [],
     "nativeCurrency": {
-      "name": "POL",
+      "name": "Polygon",
       "symbol": "POL",
       "decimals": 18
     },
@@ -115,7 +113,7 @@
     "shortName": "polygon",
     "chainId": 137,
     "networkId": 137,
-    "slip44": 966,
+    "slip44": 60,
     "explorers": [
       {
         "name": "polygonscan",
@@ -125,40 +123,6 @@
       {
         "name": "dexguru",
         "url": "https://polygon.dex.guru",
-        "icon": "dexguru",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Fantom Opera",
-    "chain": "FTM",
-    "rpc": [
-      "https://rpc.ftm.tools",
-      "https://fantom-rpc.publicnode.com",
-      "https://fantom.drpc.org"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Fantom",
-      "symbol": "FTM",
-      "decimals": 18
-    },
-    "infoURL": "https://fantom.foundation",
-    "shortName": "fantom",
-    "chainId": 250,
-    "networkId": 250,
-    "icon": "fantom",
-    "explorers": [
-      {
-        "name": "ftmscan",
-        "url": "https://ftmscan.com",
-        "icon": "ftmscan",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "dexguru",
-        "url": "https://fantom.dex.guru",
         "icon": "dexguru",
         "standard": "EIP3091"
       }
@@ -179,7 +143,7 @@
     },
     "infoURL": "https://zksync.io/",
     "shortName": "ethereum",
-    "chainId": 324,
+    "slip44": 60,
     "networkId": 324,
     "icon": "zksync-era",
     "explorers": [
@@ -202,8 +166,7 @@
   },
   {
     "name": "Core Blockchain Mainnet",
-    "chain": "Core",
-    "icon": "core",
+    "chain": "CORE",
     "rpc": [
       "https://rpc.coredao.org/",
       "https://rpc-core.icecreamswap.com",
@@ -225,7 +188,7 @@
     },
     "infoURL": "https://www.coredao.org",
     "shortName": "ethereum",
-    "chainId": 1116,
+    "chainId": 60,
     "networkId": 1116,
     "explorers": [
       {

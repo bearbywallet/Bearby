@@ -3329,6 +3329,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
         let mut var_tokens = <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
         let mut var_settings =
             <crate::models::settings::WalletSettingsInfo>::sse_decode(deserializer);
+        let mut var_defaultChainHash = <u64>::sse_decode(deserializer);
         return crate::models::wallet::WalletInfo {
             wallet_type: var_walletType,
             wallet_name: var_walletName,
@@ -3338,6 +3339,7 @@ impl SseDecode for crate::models::wallet::WalletInfo {
             selected_account: var_selectedAccount,
             tokens: var_tokens,
             settings: var_settings,
+            default_chain_hash: var_defaultChainHash,
         };
     }
 }
@@ -4177,6 +4179,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::wallet::WalletInfo {
             self.selected_account.into_into_dart().into_dart(),
             self.tokens.into_into_dart().into_dart(),
             self.settings.into_into_dart().into_dart(),
+            self.default_chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4995,6 +4998,7 @@ impl SseEncode for crate::models::wallet::WalletInfo {
         <usize>::sse_encode(self.selected_account, serializer);
         <Vec<crate::models::ftoken::FTokenInfo>>::sse_encode(self.tokens, serializer);
         <crate::models::settings::WalletSettingsInfo>::sse_encode(self.settings, serializer);
+        <u64>::sse_encode(self.default_chain_hash, serializer);
     }
 }
 

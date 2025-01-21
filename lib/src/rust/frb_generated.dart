@@ -2707,8 +2707,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   WalletInfo dco_decode_wallet_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return WalletInfo(
       walletType: dco_decode_String(arr[0]),
       walletName: dco_decode_String(arr[1]),
@@ -2718,6 +2718,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       selectedAccount: dco_decode_usize(arr[5]),
       tokens: dco_decode_list_f_token_info(arr[6]),
       settings: dco_decode_wallet_settings_info(arr[7]),
+      defaultChainHash: dco_decode_u_64(arr[8]),
     );
   }
 
@@ -3764,6 +3765,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_selectedAccount = sse_decode_usize(deserializer);
     var var_tokens = sse_decode_list_f_token_info(deserializer);
     var var_settings = sse_decode_wallet_settings_info(deserializer);
+    var var_defaultChainHash = sse_decode_u_64(deserializer);
     return WalletInfo(
         walletType: var_walletType,
         walletName: var_walletName,
@@ -3772,7 +3774,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         accounts: var_accounts,
         selectedAccount: var_selectedAccount,
         tokens: var_tokens,
-        settings: var_settings);
+        settings: var_settings,
+        defaultChainHash: var_defaultChainHash);
   }
 
   @protected
@@ -4617,6 +4620,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_usize(self.selectedAccount, serializer);
     sse_encode_list_f_token_info(self.tokens, serializer);
     sse_encode_wallet_settings_info(self.settings, serializer);
+    sse_encode_u_64(self.defaultChainHash, serializer);
   }
 
   @protected

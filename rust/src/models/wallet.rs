@@ -12,6 +12,7 @@ pub struct WalletInfo {
     pub selected_account: usize,
     pub tokens: Vec<FTokenInfo>,
     pub settings: WalletSettingsInfo,
+    pub default_chain_hash: u64,
 }
 
 impl TryFrom<&Wallet> for WalletInfo {
@@ -22,6 +23,7 @@ impl TryFrom<&Wallet> for WalletInfo {
         let ftokens = w.get_ftokens()?;
 
         Ok(Self {
+            default_chain_hash: data.default_chain_hash,
             auth_type: data.biometric_type.into(),
             wallet_name: data.wallet_name,
             wallet_type: data.wallet_type.to_str(),
