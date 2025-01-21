@@ -2912,7 +2912,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_chainId = <u64>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
-        let mut var_ens = <String>::sse_decode(deserializer);
+        let mut var_ens = <Option<String>>::sse_decode(deserializer);
         let mut var_explorers =
             <Vec<crate::models::provider::ExplorerInfo>>::sse_decode(deserializer);
         let mut var_fallbackEnabled = <bool>::sse_decode(deserializer);
@@ -4650,7 +4650,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
         <u64>::sse_encode(self.chain_id, serializer);
         <u32>::sse_encode(self.slip_44, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
-        <String>::sse_encode(self.ens, serializer);
+        <Option<String>>::sse_encode(self.ens, serializer);
         <Vec<crate::models::provider::ExplorerInfo>>::sse_encode(self.explorers, serializer);
         <bool>::sse_encode(self.fallback_enabled, serializer);
     }

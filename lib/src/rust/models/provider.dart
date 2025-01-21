@@ -43,7 +43,7 @@ class NetworkConfigInfo {
   final BigInt chainId;
   final int slip44;
   final BigInt chainHash;
-  final String ens;
+  final String? ens;
   final List<ExplorerInfo> explorers;
   final bool fallbackEnabled;
 
@@ -56,7 +56,7 @@ class NetworkConfigInfo {
     required this.chainId,
     required this.slip44,
     required this.chainHash,
-    required this.ens,
+    this.ens,
     required this.explorers,
     required this.fallbackEnabled,
   });

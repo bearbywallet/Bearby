@@ -194,6 +194,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         chainHash = matches.first.chainHash;
       }
 
+      print("start ${chainHash}");
+
       if (_useDeviceAuth) {
         final authenticated = await _authService.authenticate(
           allowPinCode: true,
@@ -239,7 +241,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         name: _chain!.nativeCurrency.name,
         symbol: _chain!.nativeCurrency.symbol,
         decimals: _chain!.nativeCurrency.decimals,
-        addr: zeroZIL,
+        addr: zeroEVM, // TODO: depends of chain check the address.
         balances: {},
         default_: true,
         native: true,

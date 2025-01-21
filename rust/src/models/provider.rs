@@ -20,7 +20,7 @@ pub struct NetworkConfigInfo {
     pub chain_id: u64,
     pub slip_44: u32,
     pub chain_hash: u64,
-    pub ens: String,
+    pub ens: Option<String>,
     pub explorers: Vec<ExplorerInfo>,
     pub fallback_enabled: bool,
 }
@@ -65,7 +65,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
             features: value.features,
             chain_id: value.chain_id,
             slip_44: value.slip_44,
-            ens: value.ens.auto_format(),
+            ens: value.ens.map(|a| a.auto_format()),
             explorers,
             fallback_enabled: value.fallback_enabled,
         }
@@ -77,7 +77,7 @@ impl TryFrom<NetworkConfigInfo> for ChainConfig {
 
     fn try_from(value: NetworkConfigInfo) -> Result<Self, Self::Error> {
         let explorers = value.explorers.into_iter().map(Explorer::from).collect();
-        let ens = Address::from_str_hex(&value.ens)?;
+        let ens = value.ens.and_then(|a| Address::from_str_hex(&a).ok());
 
         Ok(ChainConfig {
             name: value.name,

@@ -2408,7 +2408,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       chainId: dco_decode_u_64(arr[5]),
       slip44: dco_decode_u_32(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
-      ens: dco_decode_String(arr[8]),
+      ens: dco_decode_opt_String(arr[8]),
       explorers: dco_decode_list_explorer_info(arr[9]),
       fallbackEnabled: dco_decode_bool(arr[10]),
     );
@@ -3371,7 +3371,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_chainId = sse_decode_u_64(deserializer);
     var var_slip44 = sse_decode_u_32(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
-    var var_ens = sse_decode_String(deserializer);
+    var var_ens = sse_decode_opt_String(deserializer);
     var var_explorers = sse_decode_list_explorer_info(deserializer);
     var var_fallbackEnabled = sse_decode_bool(deserializer);
     return NetworkConfigInfo(
@@ -4285,7 +4285,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_64(self.chainId, serializer);
     sse_encode_u_32(self.slip44, serializer);
     sse_encode_u_64(self.chainHash, serializer);
-    sse_encode_String(self.ens, serializer);
+    sse_encode_opt_String(self.ens, serializer);
     sse_encode_list_explorer_info(self.explorers, serializer);
     sse_encode_bool(self.fallbackEnabled, serializer);
   }
