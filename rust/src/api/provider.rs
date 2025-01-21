@@ -1,7 +1,4 @@
-use crate::{
-    models::provider::NetworkConfigInfo,
-    utils::utils::{with_service, with_service_mut},
-};
+use crate::{models::provider::NetworkConfigInfo, utils::utils::with_service};
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
@@ -40,10 +37,12 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<(), String> {
-    with_service_mut(|core| {
-        core.add_provider(provider_config.try_into()?)?;
-        Ok(())
+pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, String> {
+    with_service(|core| {
+        let config = provider_config.try_into()?;
+        let hash = core.add_provider(config)?;
+
+        Ok(hash)
     })
     .await
     .map_err(Into::into)

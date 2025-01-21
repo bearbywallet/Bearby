@@ -2,7 +2,7 @@ import 'package:flutter/widgets.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;
-  final VoidCallback onPressed;
+  final VoidCallback? onPressed;
   final double borderRadius;
   final Color textColor;
   final Color backgroundColor;
@@ -14,7 +14,7 @@ class CustomButton extends StatefulWidget {
   const CustomButton({
     super.key,
     required this.text,
-    required this.onPressed,
+    this.onPressed,
     this.borderRadius = 30.0,
     this.textColor = const Color(0xFFFFFFFF),
     this.backgroundColor = const Color(0xFF8A2BE2),

@@ -136,7 +136,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiWalletAddNextBip39Account(
       {required AddNextBip39AccountParams params});
 
-  Future<void> crateApiProviderAddProvider(
+  Future<BigInt> crateApiProviderAddProvider(
       {required NetworkConfigInfo providerConfig});
 
   Future<void> crateApiProviderAddProvidersList(
@@ -498,7 +498,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiProviderAddProvider(
+  Future<BigInt> crateApiProviderAddProvider(
       {required NetworkConfigInfo providerConfig}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -508,7 +508,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 7, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
+        decodeSuccessData: sse_decode_u_64,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiProviderAddProviderConstMeta,

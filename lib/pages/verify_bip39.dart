@@ -69,18 +69,20 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                 CustomAppBar(
                   title: 'Verify Secret',
                   onBackPressed: () => Navigator.pop(context),
-                  actionWidget: Text(
-                    'Skip',
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
+                  actionWidget: TextButton(
+                    onPressed: () {
+                      Navigator.of(context).pushNamed('/net_setup',
+                          arguments: {'bip39': _bip39List});
+                    },
+                    child: Text(
+                      'Skip',
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ),
-                  onActionPressed: () {
-                    Navigator.of(context).pushNamed('/net_setup',
-                        arguments: {'bip39': _bip39List});
-                  },
                 ),
                 Expanded(
                   child: _bip39List == null

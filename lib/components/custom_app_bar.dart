@@ -12,8 +12,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
 
   const CustomAppBar({
     super.key,
-    this.title,
     required this.onBackPressed,
+    this.title,
     this.onActionPressed,
     this.actionIcon,
     this.actionWidget,
@@ -53,9 +53,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   textAlign: TextAlign.center,
                 ),
               ),
-            if (actionWidget != null && onActionPressed != null)
-              TextButton(
-                onPressed: onActionPressed,
+            if (actionWidget != null)
+              Padding(
+                padding: const EdgeInsets.only(right: 8.0),
                 child: actionWidget!,
               )
             else if (actionIcon != null && onActionPressed != null)

@@ -1,5 +1,8 @@
 import 'dart:convert';
 
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
+
 String chainNameBySymbol(String symbol) {
   return "ethereum";
 }
@@ -16,6 +19,32 @@ bool isMainnetNetwork(BigInt chainId) {
   ];
 
   return mainnetChainIds.contains(chainId);
+}
+
+extension ChainConverter on Chain {
+  NetworkConfigInfo toNetworkConfigInfo() {
+    return NetworkConfigInfo(
+      name: name,
+      chain: chain,
+      icon: icon,
+      rpc: rpc.map((uri) => uri.toString()).toList(),
+      features: Uint16List.fromList(
+          features.map((f) => f.name.hashCode.toUnsigned(16)).toList()),
+      chainId: BigInt.from(chainId),
+      slip44: slip44,
+      chainHash: BigInt.from(chainId),
+      ens: ens?.registry ?? '',
+      explorers: explorers
+          .map((e) => ExplorerInfo(
+                name: e.name,
+                url: e.url.toString(),
+                icon: e.icon,
+                standard: e.standard.hashCode,
+              ))
+          .toList(),
+      fallbackEnabled: true,
+    );
+  }
 }
 
 class Chain {

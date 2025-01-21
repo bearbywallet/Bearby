@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -23,15 +24,26 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   KeyPairInfo? _keys;
   bool isLoading = true;
   String? errorMessage;
+  bool isTestnet = false;
+
+  final TextEditingController _searchController = TextEditingController();
+  String _searchQuery = '';
 
   int selectedNetworkIndex = 0;
   bool optionsDisabled = false;
-  List<Chain> networks = [];
+  List<Chain> mainnetNetworks = [];
+  List<Chain> testnetNetworks = [];
 
   @override
   void initState() {
     super.initState();
     _loadChains();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   @override
@@ -53,6 +65,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         _keys = keys;
 
         if (symbol != null) {
+          final networks = isTestnet ? testnetNetworks : mainnetNetworks;
           int foundIndex =
               networks.indexWhere((network) => network.chain == symbol);
           if (foundIndex > 0) {
@@ -63,15 +76,34 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     }
   }
 
+  List<Chain> get filteredNetworks {
+    final networks = isTestnet ? testnetNetworks : mainnetNetworks;
+    if (_searchQuery.isEmpty) {
+      return networks;
+    }
+    return networks.where((network) {
+      final searchLower = _searchQuery.toLowerCase();
+      return network.name.toLowerCase().contains(searchLower) ||
+          network.chain.toLowerCase().contains(searchLower) ||
+          network.chainId.toString().contains(searchLower);
+    }).toList();
+  }
+
   Future<void> _loadChains() async {
     try {
-      final String jsonData =
+      final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final List<Chain> mainnetChains = await ChainService.loadChains(jsonData);
+      final String testnetJsonData =
+          await rootBundle.loadString('assets/chains/testnet-chains.json');
+
+      final List<Chain> mainnetChains =
+          await ChainService.loadChains(mainnetJsonData);
+      final List<Chain> testnetChains =
+          await ChainService.loadChains(testnetJsonData);
 
       setState(() {
-        networks.clear();
-        networks.addAll(mainnetChains);
+        mainnetNetworks = mainnetChains;
+        testnetNetworks = testnetChains;
         isLoading = false;
       });
     } catch (e) {
@@ -83,22 +115,42 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     }
   }
 
-  OptionItem _buildNetworkItem(
-    Chain chain,
-    AppTheme theme,
-    int index,
-  ) {
+  OptionItem _buildNetworkItem(Chain chain, AppTheme theme, int index) {
     return OptionItem(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            chain.name,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-            ),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  chain.name,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: isTestnet
+                      ? theme.warning.withOpacity(0.2)
+                      : theme.success.withOpacity(0.2),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isTestnet ? 'Testnet' : 'Mainnet',
+                  style: TextStyle(
+                    color: isTestnet ? theme.warning : theme.success,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ),
+            ],
           ),
           const SizedBox(height: 4),
           Text(
@@ -120,7 +172,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
           if (chain.explorers.isNotEmpty) ...[
             const SizedBox(height: 4),
             Text(
-              'Explorer: ${chain.explorers}',
+              'Explorer: ${chain.explorers.first.name}',
               style: TextStyle(
                 color: theme.textSecondary,
                 fontSize: 12,
@@ -158,8 +210,43 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Setup Network',
+                  actionWidget: Row(
+                    children: [
+                      Text(
+                        'Testnet',
+                        style: TextStyle(
+                          color: theme.textSecondary,
+                          fontSize: 14,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      Switch(
+                        value: isTestnet,
+                        onChanged: (value) {
+                          setState(() {
+                            isTestnet = value;
+                            selectedNetworkIndex = 0;
+                          });
+                        },
+                        activeColor: theme.primaryPurple,
+                      ),
+                    ],
+                  ),
                   onBackPressed: () => Navigator.pop(context),
+                ),
+                Padding(
+                  padding: EdgeInsets.all(adaptivePadding),
+                  child: SmartInput(
+                    controller: _searchController,
+                    hint: 'Search',
+                    leftIconPath: 'assets/icons/search.svg',
+                    onChanged: (value) => setState(() => _searchQuery = value),
+                    borderColor: theme.textPrimary,
+                    focusedBorderColor: theme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
                 ),
                 if (errorMessage != null)
                   Padding(
@@ -173,10 +260,14 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                       textAlign: TextAlign.center,
                     ),
                   )
-                else if (networks.isEmpty)
-                  const Expanded(
+                else if (filteredNetworks.isEmpty)
+                  Expanded(
                     child: Center(
-                      child: Text('No networks available'),
+                      child: Text(
+                        mainnetNetworks.isEmpty && testnetNetworks.isEmpty
+                            ? 'No networks available'
+                            : 'No networks found for "$_searchQuery"',
+                      ),
                     ),
                   )
                 else
@@ -192,9 +283,9 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             OptionsList(
                               disabled: optionsDisabled,
                               options: List.generate(
-                                networks.length,
+                                filteredNetworks.length,
                                 (index) => _buildNetworkItem(
-                                  networks[index],
+                                  filteredNetworks[index],
                                   theme,
                                   index,
                                 ),
@@ -210,7 +301,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                   padding: EdgeInsets.all(adaptivePadding),
                   child: CustomButton(
                     text: 'Next',
-                    onPressed: networks.isEmpty
+                    onPressed: filteredNetworks.isEmpty
                         ? () {}
                         : () {
                             Navigator.of(context).pushNamed(
@@ -218,7 +309,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                               arguments: {
                                 'bip39': _bip39List,
                                 'keys': _keys,
-                                'provider': selectedNetworkIndex,
+                                'chain': isTestnet
+                                    ? testnetNetworks[selectedNetworkIndex]
+                                    : mainnetNetworks[selectedNetworkIndex],
+                                'isTestnet': isTestnet,
                               },
                             );
                           },

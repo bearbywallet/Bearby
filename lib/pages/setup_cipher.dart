@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/argon.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/argon2.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -23,7 +24,7 @@ class CipherSettingsPage extends StatefulWidget {
 
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
-  int? _provider;
+  Chain? _chain;
   KeyPairInfo? _keys;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
 
@@ -77,17 +78,17 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
-    final provider = args?['provider'] as int?;
+    final chain = args?['chain'] as Chain?;
     final keys = args?['keys'] as KeyPairInfo?;
 
-    if (bip39 == null && provider == null && keys == null) {
+    if (bip39 == null && chain == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/initial');
       });
     } else {
       setState(() {
         _bip39List = bip39;
-        _provider = provider;
+        _chain = chain;
         _keys = keys;
       });
     }
@@ -223,7 +224,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                             '/pass_setup',
                             arguments: {
                               'bip39': _bip39List,
-                              'provider': _provider,
+                              'chain': _chain,
                               'keys': _keys,
                               'cipher': _getCipherOrders(),
                               'argon2': _argonParams

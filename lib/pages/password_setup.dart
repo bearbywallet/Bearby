@@ -8,13 +8,16 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
 
@@ -27,7 +30,7 @@ class PasswordSetupPage extends StatefulWidget {
 
 class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<String>? _bip39List;
-  BigInt? _chainHash;
+  Chain? _chain;
   WalletArgonParamsInfo? _argon2;
   Uint8List? _cipher;
   KeyPairInfo? _keys;
@@ -61,19 +64,19 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
-    final chainHash = args?['chainHash'] as BigInt?;
+    final chain = args?['chain'] as Chain?;
     final keys = args?['keys'] as KeyPairInfo?;
     final cipher = args?['cipher'] as Uint8List?;
     final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
 
-    if (bip39 == null && chainHash == null && cipher == null && keys == null) {
+    if (bip39 == null && chain == null && cipher == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/initial');
       });
     } else {
       setState(() {
         _bip39List = bip39;
-        _chainHash = chainHash;
+        _chain = chain;
         _keys = keys;
         _cipher = cipher;
         _argon2 = argon2;
@@ -174,6 +177,23 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     }
 
     try {
+      final BigInt? chainHash;
+      List<NetworkConfigInfo> chains = await getProviders();
+      final matches = chains
+          .where(
+            (chain) =>
+                chain.chainId == BigInt.from(_chain!.chainId) &&
+                chain.slip44 == _chain!.slip44,
+          )
+          .toList();
+
+      if (matches.isEmpty) {
+        NetworkConfigInfo networkInfo = _chain!.toNetworkConfigInfo();
+        chainHash = await addProvider(providerConfig: networkInfo);
+      } else {
+        chainHash = matches.first.chainHash;
+      }
+
       if (_useDeviceAuth) {
         final authenticated = await _authService.authenticate(
           allowPinCode: true,
@@ -215,18 +235,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         maxConnections: 5,
         requestTimeoutSecs: 30,
       );
-      // TODO: need to reject and show error if chainHash is null.
       FTokenInfo ftoken = FTokenInfo(
-        name: 'Zilliqa',
-        symbol: 'ZIL',
-        decimals: 12,
+        name: _chain!.nativeCurrency.name,
+        symbol: _chain!.nativeCurrency.symbol,
+        decimals: _chain!.nativeCurrency.decimals,
         addr: zeroZIL,
-        logo:
-            'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/color/zil.svg',
         balances: {},
         default_: true,
         native: true,
-        chainHash: BigInt.from(0),
+        chainHash: chainHash,
       );
 
       if (_bip39List != null) {
@@ -240,7 +257,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
           identifiers: identifiers,
-          chainHash: _chainHash!,
+          chainHash: chainHash,
         );
 
         session = await addBip39Wallet(
@@ -255,7 +272,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
           identifiers: identifiers,
-          chainHash: _chainHash!,
+          chainHash: chainHash,
         );
 
         session = await addSkWallet(
