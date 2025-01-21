@@ -8,9 +8,9 @@ import 'package:zilpay/components/number_keyboard.dart';
 import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/modals/sign_tx.dart';
+import 'package:zilpay/modals/transfer.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
-import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SendTokenPage extends StatefulWidget {
@@ -153,30 +153,17 @@ class _SendTokenPageState extends State<SendTokenPage> {
     });
   }
 
-  void _showSimpleTransfer(BuildContext context) {
-    // Simple ETH transfer transaction
-    final transaction = TransactionRequestEVM(
-      from: '0x742d35Cc6634C0532925a3b844Bc454e4438f44e',
-      to: '0x123456789abcdef123456789abcdef123456789a',
-      value: '1000000000000000000', // 1 ETH in wei
-      gasLimit: BigInt.from(21000),
-      gasPrice: BigInt.from(20000000000), // 20 Gwei
-      nonce: BigInt.from(0),
-      chainId: BigInt.from(1), // Ethereum mainnet
-    );
-
-    showSignParamsModal(
+  void handleSubmit(FTokenInfo token, String fromAddress) {
+    showConfirmTransferModal(
       context: context,
-      transactions: [transaction],
-      onConfirm: (transactions) {
-        final confirmedTx = transactions.first;
-        print('Confirmed transaction with gas limit: ${confirmedTx.gasLimit}');
-        // Handle transaction signing and sending
+      token: token,
+      amount: amount,
+      fromAddress: fromAddress,
+      toAddress: address!,
+      onConfirm: () {
+        Navigator.pop(context);
       },
     );
-  }
-
-  void handleSubmit() {
     if (isFormValid) {
       // _showSimpleTransfer();
     }
@@ -256,8 +243,10 @@ class _SendTokenPageState extends State<SendTokenPage> {
                             ),
                             CustomButton(
                               text: "Submit",
-                              onPressed: () => _showSimpleTransfer(context),
-                              // onPressed: handleSubmit,
+                              onPressed: () => handleSubmit(
+                                appState.wallet!.tokens[tokenIndex],
+                                appState.account!.addr,
+                              ),
                               disabled: !isFormValid,
                             ),
                           ],
