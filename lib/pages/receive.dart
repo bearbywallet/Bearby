@@ -12,6 +12,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -88,7 +89,7 @@ class _ReceivePageState extends State<ReceivePage> {
     FTokenInfo token,
     String addr,
     AppTheme theme,
-    NetworkConfigInfo provider,
+    NetworkConfigInfo chain,
   ) async {
     QrConfigInfo config = QrConfigInfo(
       size: 600,
@@ -97,10 +98,11 @@ class _ReceivePageState extends State<ReceivePage> {
       eyeShape: EyeShape.circle.value,
       dataModuleShape: DataModuleShape.circle.value,
     );
-    String data = _qrcodeGen(
-      addr,
-      token,
-      provider,
+    String data = generateCryptoUrl(
+      address: addr,
+      chain: chain.shortName,
+      token: token.addr,
+      amount: amount,
     );
 
     try {
@@ -207,10 +209,11 @@ class _ReceivePageState extends State<ReceivePage> {
                                           width: 220,
                                           height: 220,
                                           child: AsyncQRcode(
-                                            data: _qrcodeGen(
-                                              appState.account!.addr,
-                                              token,
-                                              chain,
+                                            data: generateCryptoUrl(
+                                              address: appState.account!.addr,
+                                              chain: chain.shortName,
+                                              token: token.addr,
+                                              amount: amount,
                                             ),
                                             color: theme.primaryPurple,
                                             size: 220,
@@ -521,38 +524,5 @@ class _ReceivePageState extends State<ReceivePage> {
         amount = result;
       });
     }
-  }
-
-  String _qrcodeGen(
-    String addr,
-    FTokenInfo token,
-    NetworkConfigInfo provider,
-  ) {
-    // TODO: remake it.
-    return "";
-    // if (provider.chainId == DefaultNetworkProviders.zil().chainId) {
-    //   return generateCryptoUrl(
-    //     address: addr,
-    //     chain: chainNameBySymbol(provider.tokenSymbol),
-    //     token: token.addr,
-    //     amount: amount,
-    //   );
-    // } else if (provider.chainId == DefaultNetworkProviders.eth().chainId) {
-    //   return generateCryptoUrl(
-    //     address: addr,
-    //     chain: chainNameBySymbol(provider.tokenSymbol),
-    //     token: token.addr,
-    //     amount: amount,
-    //   );
-    // } else if (provider.chainId == DefaultNetworkProviders.bsc().chainId) {
-    //   return generateCryptoUrl(
-    //     address: addr,
-    //     chain: chainNameBySymbol(provider.tokenSymbol),
-    //     token: token.addr,
-    //     amount: amount,
-    //   );
-    // } else {
-    //   return "";
-    // }
   }
 }

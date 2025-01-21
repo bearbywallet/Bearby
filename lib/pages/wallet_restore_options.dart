@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/config/providers.dart';
@@ -104,11 +105,22 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                     context: context,
                     onScanned: (String qrData) async {
                       final values = parseQRSecretData(qrData);
-                      String? symbol = symbolByChainName(values['chain'] ?? "");
+                      String? shortName = values['chain'];
                       String? seed = values['seed'];
                       String? key = values['key'];
 
-                      if (symbol == null) {
+                      if (shortName == null) {
+                        Navigator.pop(context);
+                        return;
+                      }
+
+                      final String mainnetJsonData = await rootBundle
+                          .loadString('assets/chains/mainnet-chains.json');
+                      final List<Chain> mainnetChains =
+                          await ChainService.loadChains(mainnetJsonData);
+
+                      if (!mainnetChains
+                          .any((chain) => chain.shortName == shortName)) {
                         Navigator.pop(context);
                         return;
                       }
@@ -138,7 +150,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                             Navigator.of(context).pushNamed('/net_setup',
                                 arguments: {
                                   'bip39': nonEmptyWords,
-                                  'symbol': symbol
+                                  'shortName': shortName
                                 });
                           } else {
                             // TODO: maybe error hanlder.
@@ -150,11 +162,11 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                       } else if (key != null) {
                         try {
                           KeyPairInfo keys = await keypairFromSk(sk: key);
-                          Navigator.of(context)
-                              .pushNamed('/net_setup', arguments: {
-                            'keys': keys,
-                            'symbol': symbol,
-                          });
+                          Navigator.of(context).pushNamed('/net_setup',
+                              arguments: {
+                                'keys': keys,
+                                'shortName': shortName
+                              });
                           return;
                         } catch (e) {
                           debugPrint("error: $e");

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/modals/custom_network_modal.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -35,8 +34,6 @@ class _NetworkPageState extends State<NetworkPage> {
 
   Future<void> _loadNetworks() async {
     try {
-      final providers = await getProviders();
-
       // TODO: add here fetch from out json file networks.
       final defaultMainnets = [];
       final defaultTestnets = [];
@@ -46,21 +43,6 @@ class _NetworkPageState extends State<NetworkPage> {
         addedTestnetNetworks.clear();
         potentialMainnetNetworks.clear();
         potentialTestnetNetworks.clear();
-
-        for (var provider in providers) {
-          final networkItem = NetworkItem(
-            configInfo: provider,
-            icon: provider.name, // TODO: remake view icon for porviders.
-            isEnabled: true,
-            isAdded: true,
-          );
-
-          if (isMainnetNetwork(provider.chainId)) {
-            addedMainnetNetworks.add(networkItem);
-          } else {
-            addedTestnetNetworks.add(networkItem);
-          }
-        }
 
         for (var network in defaultMainnets) {
           bool isAlreadyAdded = addedMainnetNetworks

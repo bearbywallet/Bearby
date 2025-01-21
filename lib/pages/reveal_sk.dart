@@ -10,7 +10,6 @@ import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/services/device.dart';
@@ -276,7 +275,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
       child: Center(
         child: AsyncQRcode(
           data: generateQRSecretData(
-            chain: chainNameBySymbol(chain.chain),
+            chain: chain.shortName,
             privateKey: keys?.sk,
           ),
           size: 160,

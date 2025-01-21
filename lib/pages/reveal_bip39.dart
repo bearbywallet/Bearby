@@ -9,7 +9,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -320,7 +319,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
       child: Center(
         child: AsyncQRcode(
           data: generateQRSecretData(
-            chain: chainNameBySymbol(chain.chain),
+            chain: chain.shortName,
             seedPhrase: seedPhrase,
           ),
           size: 160,

@@ -3,24 +3,6 @@ import 'dart:convert';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 
-String chainNameBySymbol(String symbol) {
-  return "ethereum";
-}
-
-String? symbolByChainName(String name) {
-  return "ETH";
-}
-
-bool isMainnetNetwork(BigInt chainId) {
-  final mainnetChainIds = [
-    BigInt.from(1), // Ethereum Mainnet
-    BigInt.from(56), // BNB Smart Chain Mainnet
-    BigInt.from(32770) // Zilliqa Mainnet
-  ];
-
-  return mainnetChainIds.contains(chainId);
-}
-
 extension ChainConverter on Chain {
   NetworkConfigInfo toNetworkConfigInfo() {
     return NetworkConfigInfo(

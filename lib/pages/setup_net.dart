@@ -24,6 +24,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   KeyPairInfo? _keys;
   bool isLoading = true;
   String? errorMessage;
+  String? _shortName;
   bool isTestnet = false;
 
   final TextEditingController _searchController = TextEditingController();
@@ -53,7 +54,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
     final keys = args?['keys'] as KeyPairInfo?;
-    final symbol = args?['symbol'] as String?;
+    final shortName = args?['shortName'] as String?;
 
     if (bip39 == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -63,15 +64,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       setState(() {
         _bip39List = bip39;
         _keys = keys;
-
-        if (symbol != null) {
-          final networks = isTestnet ? testnetNetworks : mainnetNetworks;
-          int foundIndex =
-              networks.indexWhere((network) => network.chain == symbol);
-          if (foundIndex > 0) {
-            selectedNetworkIndex = foundIndex;
-          }
-        }
+        _shortName = shortName;
       });
     }
   }
@@ -105,6 +98,15 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         mainnetNetworks = mainnetChains;
         testnetNetworks = testnetChains;
         isLoading = false;
+
+        if (_shortName != null) {
+          final networks = isTestnet ? testnetNetworks : mainnetNetworks;
+          int foundIndex =
+              networks.indexWhere((network) => network.shortName == _shortName);
+          if (foundIndex > 0) {
+            selectedNetworkIndex = foundIndex;
+          }
+        }
       });
     } catch (e) {
       setState(() {
