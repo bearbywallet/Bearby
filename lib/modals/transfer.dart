@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/mixins/addr.dart';
+import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -16,7 +20,10 @@ void showConfirmTransferModal({
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
+    enableDrag: true,
     isDismissible: true,
+    useSafeArea: true,
+    barrierColor: Colors.black54,
     builder: (context) => _ConfirmTransferContent(
       token: token,
       amount: amount,
@@ -44,184 +51,178 @@ class _ConfirmTransferContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
-    final estimatedGas = '0.001';
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    final gas = '0.00254329';
+    final gasUsd = '0.01';
+    final amountUsd = '5.09';
 
     return Container(
       decoration: BoxDecoration(
         color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: const BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
+        ),
       ),
-      padding: const EdgeInsets.all(16),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Container(
-            width: 36,
-            height: 4,
-            decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
-              borderRadius: BorderRadius.circular(2),
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Confirm Transfer',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: theme.textPrimary,
-            ),
-          ),
-          const SizedBox(height: 24),
-          _buildTransferDetails(theme),
-          const SizedBox(height: 24),
-          _buildTransferSummary(theme, estimatedGas),
-          const SizedBox(height: 24),
-          _buildConfirmButton(theme),
-          SizedBox(height: MediaQuery.of(context).padding.bottom),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildTransferDetails(AppTheme theme) {
-    return Column(
-      children: [
-        Row(
+      child: SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
           children: [
-            // TokenIcon(token: token, size: 48),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    '$amount ${token.symbol}',
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: theme.textPrimary,
-                    ),
-                  ),
-                  Text(
-                    formatFiatAmount(amount, 0),
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: theme.textSecondary,
-                    ),
-                  ),
-                ],
+            Container(
+              width: 36,
+              height: 4,
+              margin: const EdgeInsets.symmetric(vertical: 16),
+              decoration: BoxDecoration(
+                color: theme.textSecondary.withOpacity(0.5),
+                borderRadius: BorderRadius.circular(2),
               ),
             ),
+            _buildTokenLogo(appState),
+            const SizedBox(height: 8),
+            Text(
+              'Transfer ${token.symbol}',
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 24),
+            _buildTransferDetails(appState, gas, gasUsd, amountUsd),
+            const SizedBox(height: 24),
+            _buildConfirmButton(theme),
+            const SizedBox(height: 16),
           ],
         ),
-        const SizedBox(height: 24),
-        _buildAddressRow('From', fromAddress, theme),
-        const SizedBox(height: 12),
-        _buildAddressRow('To', toAddress, theme),
-      ],
+      ),
     );
   }
 
-  Widget _buildAddressRow(String label, String address, AppTheme theme) {
-    return Row(
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: theme.textSecondary,
-          ),
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Text(
-            address,
-            style: TextStyle(
-              fontSize: 14,
-              color: theme.textPrimary,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
-    );
-  }
+  Widget _buildTokenLogo(AppState state) {
+    final theme = state.currentTheme;
 
-  Widget _buildTransferSummary(AppTheme theme, String estimatedGas) {
     return Container(
+      width: 64,
+      height: 64,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: theme.primaryPurple.withOpacity(0.1),
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: AsyncImage(
+          url: viewTokenIcon(
+            token,
+            state.chain!.chainId,
+            theme.value,
+          ),
+          width: 32,
+          height: 32,
+          fit: BoxFit.contain,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTransferDetails(
+    AppState appState,
+    String gas,
+    String gasUsd,
+    String convertedAmount,
+  ) {
+    final theme = appState.currentTheme;
+    final token = appState.wallet!.tokens.first;
+
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.background,
-        borderRadius: BorderRadius.circular(12),
+        color: theme.background.withOpacity(0.2),
+        borderRadius: BorderRadius.circular(16),
       ),
       child: Column(
         children: [
-          _buildSummaryRow('Network Fee', '$estimatedGas ZIL', theme),
-          const SizedBox(height: 8),
-          _buildSummaryRow(
-            'Total Amount',
-            '${(double.parse(amount) + double.parse(estimatedGas)).toStringAsFixed(8)} ZIL',
-            theme,
-            true,
-          ),
+          _buildDetailRow('Wallet', appState.account!.name, theme),
+          const SizedBox(height: 16),
+          _buildDetailRow('Recipient', shortenAddress(toAddress), theme),
+          const SizedBox(height: 16),
+          _buildAmountRow('Amount', amount, convertedAmount, theme),
+          const SizedBox(height: 16),
+          _buildAmountRow('Fee', '≈ $gas ${token.symbol}', gasUsd, theme),
         ],
       ),
     );
   }
 
-  Widget _buildSummaryRow(String label, String value, AppTheme theme,
-      [bool isTotal = false]) {
+  Widget _buildDetailRow(String label, String value, AppTheme theme) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Text(
           label,
           style: TextStyle(
-            fontSize: isTotal ? 16 : 14,
-            fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal,
             color: theme.textSecondary,
+            fontSize: 16,
           ),
         ),
         Text(
           value,
           style: TextStyle(
-            fontSize: isTotal ? 16 : 14,
-            fontWeight: isTotal ? FontWeight.w600 : FontWeight.normal,
             color: theme.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w500,
           ),
         ),
       ],
     );
   }
 
-  Widget _buildConfirmButton(AppTheme theme) {
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton(
-        onPressed: onConfirm,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: theme.primaryPurple,
-          padding: const EdgeInsets.symmetric(vertical: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-        ),
-        child: Text(
-          'Confirm',
+  Widget _buildAmountRow(
+      String label, String amount, String usd, AppTheme theme) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
           style: TextStyle(
+            color: theme.textSecondary,
             fontSize: 16,
-            fontWeight: FontWeight.w600,
-            color: theme.background,
           ),
         ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            Text(
+              amount,
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            Text(
+              usd,
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
+  Widget _buildConfirmButton(AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: CustomButton(
+        text: "Confirm",
+        onPressed: onConfirm,
       ),
     );
   }
-}
-
-String formatFiatAmount(String amount, double price) {
-  final value = double.parse(amount) * price;
-  return '\$${value.toStringAsFixed(2)}';
 }
