@@ -31,6 +31,8 @@ class _AsyncImageState extends State<AsyncImage> {
   late final AppState _appState;
   Uint8List? _cachedImageBytes;
   String? _cachedImageExt;
+  bool _isLoading = true;
+  bool _hasError = false;
 
   @override
   void initState() {
@@ -42,6 +44,11 @@ class _AsyncImageState extends State<AsyncImage> {
   Future<void> _loadImage() async {
     if (_cachedImageBytes != null && _cachedImageExt != null) return;
 
+    setState(() {
+      _isLoading = true;
+      _hasError = false;
+    });
+
     try {
       final (bytes, ext) = await getImageBytes(
         dir: _appState.cahceDir,
@@ -52,6 +59,8 @@ class _AsyncImageState extends State<AsyncImage> {
         setState(() {
           _cachedImageBytes = bytes;
           _cachedImageExt = ext;
+          _isLoading = false;
+          _hasError = false;
         });
       }
     } catch (e) {
@@ -59,6 +68,8 @@ class _AsyncImageState extends State<AsyncImage> {
         setState(() {
           _cachedImageBytes = null;
           _cachedImageExt = null;
+          _isLoading = false;
+          _hasError = true;
         });
       }
     }
@@ -68,7 +79,7 @@ class _AsyncImageState extends State<AsyncImage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
 
-    if (_cachedImageBytes == null || _cachedImageExt == null) {
+    if (_hasError) {
       return SizedBox(
         width: widget.width,
         height: widget.height,
@@ -105,7 +116,7 @@ class _AsyncImageState extends State<AsyncImage> {
 
   @override
   Widget build(BuildContext context) {
-    if (_cachedImageBytes == null && _cachedImageExt == null) {
+    if (_isLoading) {
       return SizedBox(
         width: widget.width,
         height: widget.height,

@@ -10,7 +10,7 @@ String viewTokenIcon(FTokenInfo token, BigInt chainId, String? theme) {
 
   switch (chainId.toInt()) {
     case 32770: // ZIL
-      final color = theme == 1 ? 'dark' : 'light';
+      final color = theme == "Light" ? 'dark' : 'light';
       return 'https://meta.viewblock.io/zilliqa.${token.addr}/logo?t=$color';
     case 56: // BSC
       return "https://pancakeswap.finance/images/tokens/${token.addr}.png";

@@ -192,8 +192,8 @@ class _TokenCardState extends State<TokenCard>
                                 Flexible(
                                   child: Text(
                                     amount,
-                                    style: const TextStyle(
-                                      color: Colors.white,
+                                    style: TextStyle(
+                                      color: theme.textPrimary,
                                       fontSize: 20,
                                       fontWeight: FontWeight.w600,
                                       letterSpacing: 0.5,
@@ -234,7 +234,7 @@ class _TokenCardState extends State<TokenCard>
         if (widget.showDivider)
           Container(
             height: 1,
-            color: Colors.white.withOpacity(0.1),
+            color: theme.textPrimary.withOpacity(0.1),
           ),
       ],
     );
