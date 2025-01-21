@@ -171,12 +171,11 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
       symbol: token.symbol,
       name: token.name,
       balance: balance.toString(),
-      iconUrl: token.logo ??
-          viewIcon(
-            token.addr,
-            appState.state.appearances,
-            appState.chain?.chainId ?? BigInt.zero,
-          ),
+      iconUrl: viewTokenIcon(
+        token,
+        appState.chain!.chainId,
+        theme.value,
+      ),
       onTap: () {
         widget.onTokenSelected(tokenIndex);
         Navigator.pop(context);

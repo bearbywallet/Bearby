@@ -1,16 +1,32 @@
-String viewIcon(String addr, int theme, BigInt chainID) {
-  switch (chainID.toInt()) {
-    case 32770: // ZIL
-      final zilAddr =
-          addr == 'zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz' ? 'ZIL' : addr;
-      final color = theme == 1 ? 'dark' : 'light';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 
-      return 'https://meta.viewblock.io/zilliqa.$zilAddr/logo?t=$color';
+String cnd =
+    "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg";
+
+String viewTokenIcon(FTokenInfo token, BigInt chainId, String? theme) {
+  if (token.native) {
+    return chainIcon(token.symbol, theme);
+  }
+
+  switch (chainId.toInt()) {
+    case 32770: // ZIL
+      final color = theme == 1 ? 'dark' : 'light';
+      return 'https://meta.viewblock.io/zilliqa.${token.addr}/logo?t=$color';
     case 56: // BSC
-      return "https://pancakeswap.finance/images/tokens/$addr.png";
+      return "https://pancakeswap.finance/images/tokens/${token.addr}.png";
     case 1: // ETH
-      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/$addr/logo.png";
+      return "https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/${token.addr}/logo.png";
     default:
       return "";
   }
+}
+
+String chainIcon(String symbol, String? theme) {
+  String color = theme == null
+      ? "color"
+      : theme == "Light"
+          ? 'black'
+          : 'white';
+
+  return "$cnd/$color/$symbol.svg".toLowerCase();
 }

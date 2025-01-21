@@ -150,7 +150,6 @@ class _SettingsPageState extends State<SettingsPage> {
   }
 
   Widget _buildWalletSection(AppTheme theme, AppState appState) {
-    final token = appState.wallet!.tokens[0];
     final chain = appState.chain!;
 
     return GestureDetector(
@@ -172,12 +171,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: AsyncImage(
-                url: token.logo ??
-                    viewIcon(
-                      token.addr,
-                      appState.state.appearances,
-                      chain.chainId,
-                    ),
+                url: chainIcon(chain.chain, null),
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,

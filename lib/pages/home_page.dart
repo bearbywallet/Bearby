@@ -256,12 +256,11 @@ class _HomePageState extends State<HomePage> {
                             tokenName: token.name,
                             tokenSymbol: token.symbol,
                             showDivider: !isLast,
-                            iconUrl: token.logo ??
-                                viewIcon(
-                                  token.addr,
-                                  appState.state.appearances,
-                                  appState.chain?.chainId ?? BigInt.zero,
-                                ),
+                            iconUrl: viewTokenIcon(
+                              token,
+                              appState.chain!.chainId,
+                              theme.value,
+                            ),
                             onTap: () => {
                               Navigator.of(context).pushNamed(
                                 '/send',

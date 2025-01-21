@@ -295,12 +295,11 @@ class _LoginPageState extends State<LoginPage> {
     return Container(
       padding: const EdgeInsets.all(4),
       child: AsyncImage(
-        url: token.logo ??
-            viewIcon(
-              token.addr,
-              _appState.state.appearances,
-              state.chain?.chainId ?? BigInt.zero,
-            ),
+        url: viewTokenIcon(
+          token,
+          state.chain!.chainId,
+          state.currentTheme.value,
+        ),
         width: 32,
         height: 32,
         fit: BoxFit.contain,

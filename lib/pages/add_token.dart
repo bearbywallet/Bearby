@@ -158,12 +158,11 @@ class _AddTokenPageState extends State<AddTokenPage> {
               tokenName: tokens[i].name,
               tokenSymbol: tokens[i].symbol,
               showDivider: i < tokens.length - 1,
-              iconUrl: tokens[i].logo ??
-                  viewIcon(
-                    tokens[i].addr,
-                    appState.state.appearances,
-                    appState.chain?.chainId ?? BigInt.zero,
-                  ),
+              iconUrl: viewTokenIcon(
+                tokens[i],
+                appState.chain!.chainId,
+                theme.value,
+              ),
               onTap: () => _onAddToken(
                 i,
                 appState.selectedWallet,

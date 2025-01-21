@@ -138,12 +138,11 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               name: token.name,
               addr: token.addr,
               isDefault: token.default_,
-              iconUrl: token.logo ??
-                  viewIcon(
-                    token.addr,
-                    appState.state.appearances,
-                    appState.chain?.chainId ?? BigInt.zero,
-                  ),
+              iconUrl: viewTokenIcon(
+                token,
+                appState.chain!.chainId,
+                theme.value,
+              ),
               onToggle: (value) async {
                 if (!value) {
                   final int index = appState.wallet!.tokens

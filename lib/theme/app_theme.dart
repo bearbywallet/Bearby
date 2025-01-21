@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 abstract class AppTheme {
+  String value = "Dark";
+
   Color get primaryPurple;
   Color get secondaryPurple;
   Color get background;
@@ -19,6 +21,9 @@ abstract class AppTheme {
 }
 
 class DarkTheme implements AppTheme {
+  @override
+  String value = "Dark";
+
   @override
   Color get primaryPurple => const Color(0xFF8A2BE2);
   @override
@@ -51,6 +56,9 @@ class DarkTheme implements AppTheme {
 }
 
 class LightTheme implements AppTheme {
+  @override
+  String value = "Light";
+
   @override
   Color get primaryPurple => const Color(0xFF6A1B9A);
   @override

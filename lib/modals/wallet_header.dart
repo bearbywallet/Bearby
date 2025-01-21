@@ -101,7 +101,6 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final token = appState.wallet!.tokens[0];
     final chain = appState.chain;
 
     return Column(
@@ -125,41 +124,37 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           onTap: widget.onManageWallet,
           child: Column(
             children: [
-              Container(
-                width: 50,
-                height: 50,
-                margin: const EdgeInsets.only(bottom: 8),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  border: Border.all(
-                    color: theme.primaryPurple.withOpacity(0.1),
-                    width: 2,
+              if (chain != null)
+                Container(
+                  width: 50,
+                  height: 50,
+                  margin: const EdgeInsets.only(bottom: 8),
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: theme.primaryPurple.withOpacity(0.1),
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: AsyncImage(
-                  url: token.logo ??
-                      viewIcon(
-                        token.addr,
-                        appState.state.appearances,
-                        chain!.chainId,
+                  child: AsyncImage(
+                    url: chainIcon(appState.chain!.chain, null),
+                    width: 32,
+                    height: 32,
+                    fit: BoxFit.contain,
+                    errorWidget: Blockies(
+                      seed: appState.wallet!.walletAddress,
+                      color: getWalletColor(0),
+                      bgColor: theme.primaryPurple,
+                      spotColor: theme.background,
+                      size: 8,
+                    ),
+                    loadingWidget: const Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
                       ),
-                  width: 32,
-                  height: 32,
-                  fit: BoxFit.contain,
-                  errorWidget: Blockies(
-                    seed: appState.wallet!.walletAddress,
-                    color: getWalletColor(0),
-                    bgColor: theme.primaryPurple,
-                    spotColor: theme.background,
-                    size: 8,
-                  ),
-                  loadingWidget: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
                     ),
                   ),
                 ),
-              ),
               Text(
                 appState.wallet!.walletName,
                 style: TextStyle(

@@ -138,12 +138,11 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         ),
                         child: AsyncImage(
                           key: _imageKey,
-                          url: token.logo ??
-                              viewIcon(
-                                token.addr,
-                                appState.state.appearances,
-                                provider.chainId,
-                              ),
+                          url: viewTokenIcon(
+                            token,
+                            provider.chainId,
+                            theme.value,
+                          ),
                           width: 30,
                           height: 30,
                           fit: BoxFit.contain,

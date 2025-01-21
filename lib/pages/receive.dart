@@ -9,11 +9,9 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
-import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -301,17 +299,16 @@ class _ReceivePageState extends State<ReceivePage> {
               child: Center(
                 child: AsyncImage(
                   key: _imageKey,
-                  url: token?.logo ??
-                      viewIcon(
-                        token!.addr,
-                        appState.state.appearances,
-                        chain.chainId,
-                      ),
+                  url: viewTokenIcon(
+                    token!,
+                    chain.chainId,
+                    theme.value,
+                  ),
                   width: 32,
                   height: 32,
                   fit: BoxFit.contain,
                   errorWidget: Blockies(
-                    seed: token?.addr ?? "",
+                    seed: token.addr,
                     color: getWalletColor(0),
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
@@ -329,7 +326,7 @@ class _ReceivePageState extends State<ReceivePage> {
             Text(
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
-              token?.name ?? "",
+              token.name,
               style: TextStyle(
                 color: theme.textPrimary,
                 fontSize: 12,
@@ -338,7 +335,7 @@ class _ReceivePageState extends State<ReceivePage> {
             ),
             const SizedBox(width: 2),
             Text(
-              "(${token?.symbol})",
+              "(${token.symbol})",
               style: TextStyle(
                 color: theme.textSecondary,
                 fontSize: 18,
