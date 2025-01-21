@@ -126,8 +126,7 @@ class _ReceivePageState extends State<ReceivePage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final providerIndex = appState.account?.providerIndex ?? BigInt.zero;
-    final provider = appState.state.providers[providerIndex.toInt()];
+    final chain = appState.chain!;
     final token = appState.wallet?.tokens[selectedToken];
 
     return Scaffold(
@@ -182,7 +181,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          'Only send ${provider.networkName}(${token?.symbol}) assets to this address. Other assets will be lost forever.',
+                                          'Only send ${chain.name}(${token?.symbol}) assets to this address. Other assets will be lost forever.',
                                           style: TextStyle(
                                             color: theme.warning,
                                             fontSize: 14,
@@ -213,7 +212,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                             data: _qrcodeGen(
                                               appState.account!.addr,
                                               token,
-                                              provider,
+                                              chain,
                                             ),
                                             color: theme.primaryPurple,
                                             size: 220,
@@ -257,7 +256,10 @@ class _ReceivePageState extends State<ReceivePage> {
                                 ),
                                 const SizedBox(height: 16),
                                 _buildActionButtons(
-                                    theme, providerIndex, context),
+                                  theme,
+                                  chain,
+                                  context,
+                                ),
                               ],
                             ),
                           ),
@@ -276,8 +278,7 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Widget _buildTokenSelector(AppTheme theme, FTokenInfo? token) {
     final appState = Provider.of<AppState>(context);
-    final providerIndex = appState.account?.providerIndex ?? BigInt.zero;
-    final provider = appState.state.providers[providerIndex.toInt()];
+    final chain = appState.chain!;
 
     return GestureDetector(
       onTapDown: (_) => handlePressedChanged(true),
@@ -304,7 +305,7 @@ class _ReceivePageState extends State<ReceivePage> {
                       viewIcon(
                         token!.addr,
                         appState.state.appearances,
-                        provider.chainId,
+                        chain.chainId,
                       ),
                   width: 32,
                   height: 32,
@@ -351,11 +352,10 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Widget _buildActionButtons(
     AppTheme theme,
-    BigInt providerIndex,
+    NetworkConfigInfo chain,
     BuildContext context,
   ) {
     final appState = Provider.of<AppState>(context);
-    final provider = appState.state.providers[providerIndex.toInt()];
     final token = appState.wallet!.tokens[selectedToken];
 
     return Row(
@@ -393,7 +393,7 @@ class _ReceivePageState extends State<ReceivePage> {
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
         ),
-        if (providerIndex == BigInt.zero)
+        if (chain.chain == "ZIL") // TODO: only zil method
           TileButton(
             icon: SvgPicture.asset(
               "assets/icons/swap.svg",
@@ -427,7 +427,7 @@ class _ReceivePageState extends State<ReceivePage> {
               token,
               appState.account?.addr ?? "",
               theme,
-              provider,
+              chain,
             );
           },
           backgroundColor: theme.cardBackground,
@@ -531,29 +531,31 @@ class _ReceivePageState extends State<ReceivePage> {
     FTokenInfo token,
     NetworkConfigInfo provider,
   ) {
-    if (provider.chainId == DefaultNetworkProviders.zil().chainId) {
-      return generateCryptoUrl(
-        address: addr,
-        chain: chainNameBySymbol(provider.tokenSymbol),
-        token: token.addr,
-        amount: amount,
-      );
-    } else if (provider.chainId == DefaultNetworkProviders.eth().chainId) {
-      return generateCryptoUrl(
-        address: addr,
-        chain: chainNameBySymbol(provider.tokenSymbol),
-        token: token.addr,
-        amount: amount,
-      );
-    } else if (provider.chainId == DefaultNetworkProviders.bsc().chainId) {
-      return generateCryptoUrl(
-        address: addr,
-        chain: chainNameBySymbol(provider.tokenSymbol),
-        token: token.addr,
-        amount: amount,
-      );
-    } else {
-      return "";
-    }
+    // TODO: remake it.
+    return "";
+    // if (provider.chainId == DefaultNetworkProviders.zil().chainId) {
+    //   return generateCryptoUrl(
+    //     address: addr,
+    //     chain: chainNameBySymbol(provider.tokenSymbol),
+    //     token: token.addr,
+    //     amount: amount,
+    //   );
+    // } else if (provider.chainId == DefaultNetworkProviders.eth().chainId) {
+    //   return generateCryptoUrl(
+    //     address: addr,
+    //     chain: chainNameBySymbol(provider.tokenSymbol),
+    //     token: token.addr,
+    //     amount: amount,
+    //   );
+    // } else if (provider.chainId == DefaultNetworkProviders.bsc().chainId) {
+    //   return generateCryptoUrl(
+    //     address: addr,
+    //     chain: chainNameBySymbol(provider.tokenSymbol),
+    //     token: token.addr,
+    //     amount: amount,
+    //   );
+    // } else {
+    //   return "";
+    // }
   }
 }

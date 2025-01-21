@@ -42,6 +42,7 @@ class NetworkConfigInfo {
   final Uint16List features;
   final BigInt chainId;
   final int slip44;
+  final BigInt chainHash;
   final String ens;
   final List<ExplorerInfo> explorers;
   final bool fallbackEnabled;
@@ -54,6 +55,7 @@ class NetworkConfigInfo {
     required this.features,
     required this.chainId,
     required this.slip44,
+    required this.chainHash,
     required this.ens,
     required this.explorers,
     required this.fallbackEnabled,
@@ -68,6 +70,7 @@ class NetworkConfigInfo {
       features.hashCode ^
       chainId.hashCode ^
       slip44.hashCode ^
+      chainHash.hashCode ^
       ens.hashCode ^
       explorers.hashCode ^
       fallbackEnabled.hashCode;
@@ -84,6 +87,7 @@ class NetworkConfigInfo {
           features == other.features &&
           chainId == other.chainId &&
           slip44 == other.slip44 &&
+          chainHash == other.chainHash &&
           ens == other.ens &&
           explorers == other.explorers &&
           fallbackEnabled == other.fallbackEnabled;

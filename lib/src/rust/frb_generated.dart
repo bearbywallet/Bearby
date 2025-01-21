@@ -2397,8 +2397,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 10)
-      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return NetworkConfigInfo(
       name: dco_decode_String(arr[0]),
       chain: dco_decode_String(arr[1]),
@@ -2407,9 +2407,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       features: dco_decode_list_prim_u_16_strict(arr[4]),
       chainId: dco_decode_u_64(arr[5]),
       slip44: dco_decode_u_32(arr[6]),
-      ens: dco_decode_String(arr[7]),
-      explorers: dco_decode_list_explorer_info(arr[8]),
-      fallbackEnabled: dco_decode_bool(arr[9]),
+      chainHash: dco_decode_u_64(arr[7]),
+      ens: dco_decode_String(arr[8]),
+      explorers: dco_decode_list_explorer_info(arr[9]),
+      fallbackEnabled: dco_decode_bool(arr[10]),
     );
   }
 
@@ -3369,6 +3370,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_features = sse_decode_list_prim_u_16_strict(deserializer);
     var var_chainId = sse_decode_u_64(deserializer);
     var var_slip44 = sse_decode_u_32(deserializer);
+    var var_chainHash = sse_decode_u_64(deserializer);
     var var_ens = sse_decode_String(deserializer);
     var var_explorers = sse_decode_list_explorer_info(deserializer);
     var var_fallbackEnabled = sse_decode_bool(deserializer);
@@ -3380,6 +3382,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         features: var_features,
         chainId: var_chainId,
         slip44: var_slip44,
+        chainHash: var_chainHash,
         ens: var_ens,
         explorers: var_explorers,
         fallbackEnabled: var_fallbackEnabled);
@@ -4281,6 +4284,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_prim_u_16_strict(self.features, serializer);
     sse_encode_u_64(self.chainId, serializer);
     sse_encode_u_32(self.slip44, serializer);
+    sse_encode_u_64(self.chainHash, serializer);
     sse_encode_String(self.ens, serializer);
     sse_encode_list_explorer_info(self.explorers, serializer);
     sse_encode_bool(self.fallbackEnabled, serializer);

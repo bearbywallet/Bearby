@@ -102,7 +102,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final token = appState.wallet!.tokens[0];
-    final provider = appState.state.providers[token.providerIndex.toInt()];
+    final chain = appState.chain;
 
     return Column(
       mainAxisSize: MainAxisSize.min,
@@ -141,7 +141,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                       viewIcon(
                         token.addr,
                         appState.state.appearances,
-                        provider.chainId,
+                        chain!.chainId,
                       ),
                   width: 32,
                   height: 32,

@@ -12,6 +12,7 @@ import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -83,6 +84,16 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   WalletInfo? get wallet {
     return _state.wallets[_selectedWallet];
+  }
+
+  NetworkConfigInfo? get chain {
+    BigInt? hash = account?.chainHash;
+
+    if (hash == null) {
+      return null;
+    }
+
+    return getChain(hash);
   }
 
   AccountInfo? get account {
@@ -165,5 +176,9 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await setTheme(appearancesCode: code);
     _state = await getData();
     notifyListeners();
+  }
+
+  NetworkConfigInfo? getChain(BigInt hash) {
+    return state.providers.firstWhere((e) => e.chainHash == hash);
   }
 }

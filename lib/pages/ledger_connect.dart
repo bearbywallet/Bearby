@@ -336,7 +336,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             biometricType:
                 useBiometric ? preferredAuth.name : AuthMethod.none.name,
             identifiers: identifiers,
-            providerIndex: BigInt.zero, // TODO: add provider index.
+            chainHash: BigInt.zero, // TODO: add provider index.
           );
 
           // TODO: setup default settings.

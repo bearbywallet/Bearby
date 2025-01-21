@@ -37,8 +37,9 @@ class _NetworkPageState extends State<NetworkPage> {
     try {
       final providers = await getProviders();
 
-      final defaultMainnets = DefaultNetworkProviders.mainnetNetworks();
-      final defaultTestnets = DefaultNetworkProviders.testnetNetworks();
+      // TODO: add here fetch from out json file networks.
+      final defaultMainnets = [];
+      final defaultTestnets = [];
 
       setState(() {
         addedMainnetNetworks.clear();
@@ -49,7 +50,7 @@ class _NetworkPageState extends State<NetworkPage> {
         for (var provider in providers) {
           final networkItem = NetworkItem(
             configInfo: provider,
-            icon: provider.logo,
+            icon: provider.name, // TODO: remake view icon for porviders.
             isEnabled: true,
             isAdded: true,
           );
@@ -98,7 +99,7 @@ class _NetworkPageState extends State<NetworkPage> {
     if (_searchQuery.isEmpty) return networks;
 
     return networks
-        .where((network) => network.configInfo.networkName
+        .where((network) => network.configInfo.name
             .toLowerCase()
             .contains(_searchQuery.toLowerCase()))
         .toList();
@@ -106,7 +107,7 @@ class _NetworkPageState extends State<NetworkPage> {
 
   void _handleNetworkSelect(NetworkConfigInfo network) async {
     // TODO: Implement network selection logic
-    debugPrint('Selected network: ${network.networkName}');
+    debugPrint('Selected network: ${network.name}');
   }
 
   @override
@@ -122,8 +123,7 @@ class _NetworkPageState extends State<NetworkPage> {
   ) {
     if (networks.isEmpty) return const SizedBox.shrink();
     final theme = state.currentTheme;
-    final providerIndex = state.account!.providerIndex;
-    final provider = state.state.providers[providerIndex.toInt()];
+    final provider = state.chain!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -141,13 +141,13 @@ class _NetworkPageState extends State<NetworkPage> {
               padding: const EdgeInsets.only(bottom: 8),
               child: NetworkTile(
                 iconUrl: network.icon ?? "",
-                title: network.configInfo.networkName,
+                title: network.configInfo.name,
                 isEnabled: network.isEnabled,
                 isAdded: network.isAdded,
                 isSelected:
-                    provider.tokenSymbol == network.configInfo.tokenSymbol &&
+                    provider.chainHash == network.configInfo.chainHash &&
                         provider.chainId == network.configInfo.chainId,
-                disabled: provider.bip49 != network.configInfo.bip49,
+                disabled: provider.slip44 != network.configInfo.slip44,
                 onTap: () => _handleNetworkSelect(network.configInfo),
                 onAdd: network.isAdded
                     ? null
@@ -160,7 +160,7 @@ class _NetworkPageState extends State<NetworkPage> {
                     ? () {
                         // TODO: Implement network editing
                         debugPrint(
-                            'Editing network: ${network.configInfo.networkName}');
+                            'Editing network: ${network.configInfo.name}');
                       }
                     : null,
               ),

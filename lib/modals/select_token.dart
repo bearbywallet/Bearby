@@ -165,7 +165,6 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
-    final providers = appState.state.providers;
 
     return TokenSelectItem(
       addr: token.addr,
@@ -176,7 +175,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
           viewIcon(
             token.addr,
             appState.state.appearances,
-            providers[token.providerIndex.toInt()].chainId,
+            appState.chain?.chainId ?? BigInt.zero,
           ),
       onTap: () {
         widget.onTokenSelected(tokenIndex);

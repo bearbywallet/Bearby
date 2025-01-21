@@ -19,6 +19,7 @@ pub struct NetworkConfigInfo {
     pub features: Vec<u16>,
     pub chain_id: u64,
     pub slip_44: u32,
+    pub chain_hash: u64,
     pub ens: String,
     pub explorers: Vec<ExplorerInfo>,
     pub fallback_enabled: bool,
@@ -48,6 +49,7 @@ impl From<Explorer> for ExplorerInfo {
 
 impl From<ChainConfig> for NetworkConfigInfo {
     fn from(value: ChainConfig) -> Self {
+        let chain_hash = value.hash();
         let explorers = value
             .explorers
             .into_iter()
@@ -55,6 +57,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
             .collect();
 
         Self {
+            chain_hash,
             name: value.name,
             chain: value.chain,
             icon: value.icon,

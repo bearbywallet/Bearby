@@ -129,8 +129,6 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
       return [];
     }
 
-    final providers = appState.state.providers;
-
     return appState.wallet!.tokens
         .where((token) =>
             token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
@@ -144,7 +142,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
                   viewIcon(
                     token.addr,
                     appState.state.appearances,
-                    providers[token.providerIndex.toInt()].chainId,
+                    appState.chain?.chainId ?? BigInt.zero,
                   ),
               onToggle: (value) async {
                 if (!value) {

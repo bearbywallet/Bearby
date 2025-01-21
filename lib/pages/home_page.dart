@@ -55,7 +55,6 @@ class _HomePageState extends State<HomePage> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
-    final providers = appState.state.providers;
 
     return SafeArea(
       child: Center(
@@ -261,8 +260,7 @@ class _HomePageState extends State<HomePage> {
                                 viewIcon(
                                   token.addr,
                                   appState.state.appearances,
-                                  providers[token.providerIndex.toInt()]
-                                      .chainId,
+                                  appState.chain?.chainId ?? BigInt.zero,
                                 ),
                             onTap: () => {
                               Navigator.of(context).pushNamed(

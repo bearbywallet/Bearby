@@ -289,9 +289,8 @@ class _LoginPageState extends State<LoginPage> {
     ];
   }
 
-  Widget _buildWalletIcon(WalletInfo wallet, int index, AppState theme) {
+  Widget _buildWalletIcon(WalletInfo wallet, int index, AppState state) {
     final token = wallet.tokens[0];
-    final provider = _appState.state.providers[token.providerIndex.toInt()];
 
     return Container(
       padding: const EdgeInsets.all(4),
@@ -300,7 +299,7 @@ class _LoginPageState extends State<LoginPage> {
             viewIcon(
               token.addr,
               _appState.state.appearances,
-              provider.chainId,
+              state.chain?.chainId ?? BigInt.zero,
             ),
         width: 32,
         height: 32,
@@ -308,8 +307,8 @@ class _LoginPageState extends State<LoginPage> {
         errorWidget: Blockies(
           seed: wallet.walletAddress,
           color: getWalletColor(index),
-          bgColor: theme.currentTheme.primaryPurple,
-          spotColor: theme.currentTheme.background,
+          bgColor: state.currentTheme.primaryPurple,
+          spotColor: state.currentTheme.background,
           size: 8,
         ),
         loadingWidget: const Center(

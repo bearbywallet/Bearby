@@ -269,15 +269,14 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   Widget _buildQrCode(AppTheme theme) {
     final state = Provider.of<AppState>(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final account = state.account!;
-    final provider = state.state.providers[account.providerIndex.toInt()];
+    final chain = state.chain!;
 
     return Container(
       margin: EdgeInsets.symmetric(vertical: adaptivePadding),
       child: Center(
         child: AsyncQRcode(
           data: generateQRSecretData(
-            chain: chainNameBySymbol(provider.tokenSymbol),
+            chain: chainNameBySymbol(chain.chain),
             privateKey: keys?.sk,
           ),
           size: 160,

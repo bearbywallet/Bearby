@@ -2911,6 +2911,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_features = <Vec<u16>>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
+        let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_ens = <String>::sse_decode(deserializer);
         let mut var_explorers =
             <Vec<crate::models::provider::ExplorerInfo>>::sse_decode(deserializer);
@@ -2923,6 +2924,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
             features: var_features,
             chain_id: var_chainId,
             slip_44: var_slip44,
+            chain_hash: var_chainHash,
             ens: var_ens,
             explorers: var_explorers,
             fallback_enabled: var_fallbackEnabled,
@@ -3920,6 +3922,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInf
             self.features.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
             self.slip_44.into_into_dart().into_dart(),
+            self.chain_hash.into_into_dart().into_dart(),
             self.ens.into_into_dart().into_dart(),
             self.explorers.into_into_dart().into_dart(),
             self.fallback_enabled.into_into_dart().into_dart(),
@@ -4646,6 +4649,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
         <Vec<u16>>::sse_encode(self.features, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
         <u32>::sse_encode(self.slip_44, serializer);
+        <u64>::sse_encode(self.chain_hash, serializer);
         <String>::sse_encode(self.ens, serializer);
         <Vec<crate::models::provider::ExplorerInfo>>::sse_encode(self.explorers, serializer);
         <bool>::sse_encode(self.fallback_enabled, serializer);

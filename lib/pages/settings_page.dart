@@ -151,7 +151,7 @@ class _SettingsPageState extends State<SettingsPage> {
 
   Widget _buildWalletSection(AppTheme theme, AppState appState) {
     final token = appState.wallet!.tokens[0];
-    final provider = appState.state.providers[token.providerIndex.toInt()];
+    final chain = appState.chain!;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -176,7 +176,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     viewIcon(
                       token.addr,
                       appState.state.appearances,
-                      provider.chainId,
+                      chain.chainId,
                     ),
                 width: 32,
                 height: 32,
@@ -207,10 +207,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   ),
                 ),
                 Text(
-                  appState
-                      .state
-                      .providers[appState.account!.providerIndex.toInt()]
-                      .networkName,
+                  appState.chain?.name ?? "",
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,

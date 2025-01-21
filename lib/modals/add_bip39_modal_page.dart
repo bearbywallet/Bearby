@@ -121,7 +121,7 @@ class _AddNextBip39AccountContentState
           _loading = true;
           _errorMessage = '';
         });
-        BigInt providerIndex = _appState.account!.providerIndex;
+        BigInt chainHash = _appState.account!.chainHash;
 
         DeviceInfoService device = DeviceInfoService();
         List<String> identifiers = await device.getDeviceIdentifiers();
@@ -138,7 +138,7 @@ class _AddNextBip39AccountContentState
                 ? null
                 : _passwordController.text,
             sessionCipher: session.isEmpty ? null : session,
-            providerIndex: providerIndex,
+            chainHash: chainHash,
           );
 
           await addNextBip39Account(
