@@ -194,8 +194,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         chainHash = matches.first.chainHash;
       }
 
-      print("start ${chainHash}");
-
       if (_useDeviceAuth) {
         final authenticated = await _authService.authenticate(
           allowPinCode: true,

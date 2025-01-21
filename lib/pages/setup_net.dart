@@ -304,14 +304,20 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     onPressed: filteredNetworks.isEmpty
                         ? () {}
                         : () {
+                            final chain = isTestnet
+                                ? testnetNetworks[selectedNetworkIndex]
+                                : mainnetNetworks[selectedNetworkIndex];
+
+                            if (isTestnet) {
+                              chain.testnet = true;
+                            }
+
                             Navigator.of(context).pushNamed(
                               '/cipher_setup',
                               arguments: {
                                 'bip39': _bip39List,
                                 'keys': _keys,
-                                'chain': isTestnet
-                                    ? testnetNetworks[selectedNetworkIndex]
-                                    : mainnetNetworks[selectedNetworkIndex],
+                                'chain': chain,
                                 'isTestnet': isTestnet,
                               },
                             );

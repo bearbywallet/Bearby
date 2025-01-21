@@ -2089,6 +2089,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw as bool;
+  }
+
+  @protected
   ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_colors_info(raw);
@@ -2397,12 +2403,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
     return NetworkConfigInfo(
       name: dco_decode_String(arr[0]),
       chain: dco_decode_String(arr[1]),
-      icon: dco_decode_String(arr[2]),
+      shortName: dco_decode_String(arr[2]),
       rpc: dco_decode_list_String(arr[3]),
       features: dco_decode_list_prim_u_16_strict(arr[4]),
       chainId: dco_decode_u_64(arr[5]),
@@ -2411,6 +2417,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       ens: dco_decode_opt_String(arr[8]),
       explorers: dco_decode_list_explorer_info(arr[9]),
       fallbackEnabled: dco_decode_bool(arr[10]),
+      testnet: dco_decode_opt_box_autoadd_bool(arr[11]),
     );
   }
 
@@ -2430,6 +2437,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_base_token_info(raw);
+  }
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_bool(raw);
   }
 
   @protected
@@ -2950,6 +2963,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_bool(deserializer));
+  }
+
+  @protected
   ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_colors_info(deserializer));
@@ -3365,7 +3384,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_name = sse_decode_String(deserializer);
     var var_chain = sse_decode_String(deserializer);
-    var var_icon = sse_decode_String(deserializer);
+    var var_shortName = sse_decode_String(deserializer);
     var var_rpc = sse_decode_list_String(deserializer);
     var var_features = sse_decode_list_prim_u_16_strict(deserializer);
     var var_chainId = sse_decode_u_64(deserializer);
@@ -3374,10 +3393,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_ens = sse_decode_opt_String(deserializer);
     var var_explorers = sse_decode_list_explorer_info(deserializer);
     var var_fallbackEnabled = sse_decode_bool(deserializer);
+    var var_testnet = sse_decode_opt_box_autoadd_bool(deserializer);
     return NetworkConfigInfo(
         name: var_name,
         chain: var_chain,
-        icon: var_icon,
+        shortName: var_shortName,
         rpc: var_rpc,
         features: var_features,
         chainId: var_chainId,
@@ -3385,7 +3405,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         chainHash: var_chainHash,
         ens: var_ens,
         explorers: var_explorers,
-        fallbackEnabled: var_fallbackEnabled);
+        fallbackEnabled: var_fallbackEnabled,
+        testnet: var_testnet);
   }
 
   @protected
@@ -3417,6 +3438,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_base_token_info(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_bool(deserializer));
     } else {
       return null;
     }
@@ -3949,6 +3981,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_bool(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_colors_info(
       ColorsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4279,7 +4317,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.name, serializer);
     sse_encode_String(self.chain, serializer);
-    sse_encode_String(self.icon, serializer);
+    sse_encode_String(self.shortName, serializer);
     sse_encode_list_String(self.rpc, serializer);
     sse_encode_list_prim_u_16_strict(self.features, serializer);
     sse_encode_u_64(self.chainId, serializer);
@@ -4288,6 +4326,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.ens, serializer);
     sse_encode_list_explorer_info(self.explorers, serializer);
     sse_encode_bool(self.fallbackEnabled, serializer);
+    sse_encode_opt_box_autoadd_bool(self.testnet, serializer);
   }
 
   @protected
@@ -4318,6 +4357,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_base_token_info(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_bool(self, serializer);
     }
   }
 

@@ -95,17 +95,6 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: Text(
-              'Select Token',
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-          Padding(
             padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,

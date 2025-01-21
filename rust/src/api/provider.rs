@@ -39,7 +39,7 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, String> {
     with_service(|core| {
-        let config = provider_config.try_into()?;
+        let config = provider_config.into();
         let hash = core.add_provider(config)?;
 
         Ok(hash)
@@ -65,7 +65,7 @@ pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Resu
         }
 
         for new_conf in provider_config {
-            let new_provider = NetworkProvider::new(new_conf.try_into()?);
+            let new_provider = NetworkProvider::new(new_conf.into());
 
             providers.push(new_provider);
         }

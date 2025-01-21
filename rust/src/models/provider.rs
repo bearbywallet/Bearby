@@ -1,4 +1,4 @@
-use zilpay::{errors::address::AddressError, proto::address::Address};
+use zilpay::proto::address::Address;
 pub use zilpay::{
     errors::network::NetworkErrors,
     rpc::network_config::{ChainConfig, Explorer},
@@ -14,7 +14,7 @@ pub struct ExplorerInfo {
 pub struct NetworkConfigInfo {
     pub name: String,
     pub chain: String,
-    pub icon: String,
+    pub short_name: String,
     pub rpc: Vec<String>,
     pub features: Vec<u16>,
     pub chain_id: u64,
@@ -23,6 +23,7 @@ pub struct NetworkConfigInfo {
     pub ens: Option<String>,
     pub explorers: Vec<ExplorerInfo>,
     pub fallback_enabled: bool,
+    pub testnet: Option<bool>,
 }
 
 impl From<ExplorerInfo> for Explorer {
@@ -57,10 +58,11 @@ impl From<ChainConfig> for NetworkConfigInfo {
             .collect();
 
         Self {
+            testnet: value.testnet,
             chain_hash,
             name: value.name,
             chain: value.chain,
-            icon: value.icon,
+            short_name: value.short_name,
             rpc: value.rpc,
             features: value.features,
             chain_id: value.chain_id,
@@ -72,17 +74,16 @@ impl From<ChainConfig> for NetworkConfigInfo {
     }
 }
 
-impl TryFrom<NetworkConfigInfo> for ChainConfig {
-    type Error = AddressError;
-
-    fn try_from(value: NetworkConfigInfo) -> Result<Self, Self::Error> {
+impl From<NetworkConfigInfo> for ChainConfig {
+    fn from(value: NetworkConfigInfo) -> Self {
         let explorers = value.explorers.into_iter().map(Explorer::from).collect();
         let ens = value.ens.and_then(|a| Address::from_str_hex(&a).ok());
 
-        Ok(ChainConfig {
+        ChainConfig {
+            testnet: value.testnet,
             name: value.name,
             chain: value.chain,
-            icon: value.icon,
+            short_name: value.short_name,
             rpc: value.rpc,
             features: value.features,
             chain_id: value.chain_id,
@@ -90,6 +91,6 @@ impl TryFrom<NetworkConfigInfo> for ChainConfig {
             ens,
             explorers,
             fallback_enabled: value.fallback_enabled,
-        })
+        }
     }
 }

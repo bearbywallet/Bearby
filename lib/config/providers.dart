@@ -24,9 +24,10 @@ bool isMainnetNetwork(BigInt chainId) {
 extension ChainConverter on Chain {
   NetworkConfigInfo toNetworkConfigInfo() {
     return NetworkConfigInfo(
+      testnet: testnet,
+      shortName: shortName,
       name: name,
       chain: chain,
-      icon: icon,
       rpc: rpc.map((uri) => uri.toString()).toList(),
       features: Uint16List.fromList(
           features.map((f) => f.name.hashCode.toUnsigned(16)).toList()),
@@ -48,10 +49,9 @@ extension ChainConverter on Chain {
 }
 
 class Chain {
-  const Chain({
+  Chain({
     required this.name,
     required this.chain,
-    required this.icon,
     required this.rpc,
     required this.features,
     required this.faucets,
@@ -61,13 +61,14 @@ class Chain {
     required this.chainId,
     required this.networkId,
     required this.slip44,
-    this.ens,
     required this.explorers,
+    this.ens,
+    this.testnet,
   });
 
+  bool? testnet;
   final String name;
   final String chain;
-  final String icon;
   final List<Uri> rpc;
   final List<Feature> features;
   final List<Uri> faucets;
@@ -84,7 +85,6 @@ class Chain {
     return Chain(
       name: json['name'] as String? ?? '',
       chain: json['chain'] as String? ?? '',
-      icon: json['icon'] as String? ?? '',
       rpc: (json['rpc'] as List<dynamic>?)
               ?.map((e) => Uri.parse(e as String))
               .toList(growable: false) ??
@@ -118,7 +118,6 @@ class Chain {
   Map<String, dynamic> toJson() => {
         'name': name,
         'chain': chain,
-        'icon': icon,
         'rpc': rpc.map((uri) => uri.toString()).toList(growable: false),
         'features': features.map((f) => f.toJson()).toList(growable: false),
         'faucets': faucets.map((uri) => uri.toString()).toList(growable: false),

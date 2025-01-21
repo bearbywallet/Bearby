@@ -22,6 +22,10 @@ String viewTokenIcon(FTokenInfo token, BigInt chainId, String? theme) {
 }
 
 String chainIcon(String symbol, String? theme) {
+  if (symbol.startsWith("t")) {
+    symbol = symbol.replaceFirst("t", "");
+  }
+
   String color = theme == null
       ? "color"
       : theme == "Light"

@@ -2906,7 +2906,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_chain = <String>::sse_decode(deserializer);
-        let mut var_icon = <String>::sse_decode(deserializer);
+        let mut var_shortName = <String>::sse_decode(deserializer);
         let mut var_rpc = <Vec<String>>::sse_decode(deserializer);
         let mut var_features = <Vec<u16>>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
@@ -2916,10 +2916,11 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_explorers =
             <Vec<crate::models::provider::ExplorerInfo>>::sse_decode(deserializer);
         let mut var_fallbackEnabled = <bool>::sse_decode(deserializer);
+        let mut var_testnet = <Option<bool>>::sse_decode(deserializer);
         return crate::models::provider::NetworkConfigInfo {
             name: var_name,
             chain: var_chain,
-            icon: var_icon,
+            short_name: var_shortName,
             rpc: var_rpc,
             features: var_features,
             chain_id: var_chainId,
@@ -2928,6 +2929,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
             ens: var_ens,
             explorers: var_explorers,
             fallback_enabled: var_fallbackEnabled,
+            testnet: var_testnet,
         };
     }
 }
@@ -2961,6 +2963,17 @@ impl SseDecode for Option<crate::models::transactions::base_token::BaseTokenInfo
             return Some(
                 <crate::models::transactions::base_token::BaseTokenInfo>::sse_decode(deserializer),
             );
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<bool> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<bool>::sse_decode(deserializer));
         } else {
             return None;
         }
@@ -3917,7 +3930,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInf
         [
             self.name.into_into_dart().into_dart(),
             self.chain.into_into_dart().into_dart(),
-            self.icon.into_into_dart().into_dart(),
+            self.short_name.into_into_dart().into_dart(),
             self.rpc.into_into_dart().into_dart(),
             self.features.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
@@ -3926,6 +3939,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInf
             self.ens.into_into_dart().into_dart(),
             self.explorers.into_into_dart().into_dart(),
             self.fallback_enabled.into_into_dart().into_dart(),
+            self.testnet.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -4644,7 +4658,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.name, serializer);
         <String>::sse_encode(self.chain, serializer);
-        <String>::sse_encode(self.icon, serializer);
+        <String>::sse_encode(self.short_name, serializer);
         <Vec<String>>::sse_encode(self.rpc, serializer);
         <Vec<u16>>::sse_encode(self.features, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
@@ -4653,6 +4667,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
         <Option<String>>::sse_encode(self.ens, serializer);
         <Vec<crate::models::provider::ExplorerInfo>>::sse_encode(self.explorers, serializer);
         <bool>::sse_encode(self.fallback_enabled, serializer);
+        <Option<bool>>::sse_encode(self.testnet, serializer);
     }
 }
 
@@ -4682,6 +4697,16 @@ impl SseEncode for Option<crate::models::transactions::base_token::BaseTokenInfo
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <crate::models::transactions::base_token::BaseTokenInfo>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<bool> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <bool>::sse_encode(value, serializer);
         }
     }
 }

@@ -1,8 +1,7 @@
 [
   {
-    "name": "BSC Testnet",
-    "title": "Binance Smart Chain Testnet",
-    "chain": "BSC",
+    "name": "Smart chain Testnet",
+    "chain": "BNB",
     "rpc": [
       "https://data-seed-prebsc-1-s1.binance.org:8545/",
       "https://data-seed-prebsc-2-s1.binance.org:8545/",
@@ -11,19 +10,15 @@
       "https://data-seed-prebsc-1-s3.binance.org:8545/",
       "https://data-seed-prebsc-2-s3.binance.org:8545/"
     ],
-    "faucets": [
-      "https://testnet.bnbchain.org/faucet-smart"
-    ],
     "nativeCurrency": {
       "name": "Binance Chain",
       "symbol": "tBNB",
       "decimals": 18
     },
     "infoURL": "https://www.bnbchain.org",
-    "shortName": "bsc-testnet",
+    "shortName": "binance",
     "chainId": 97,
     "slip44": 60,
-    "icon": "bsc",
     "explorers": [
       {
         "name": "BscScan",

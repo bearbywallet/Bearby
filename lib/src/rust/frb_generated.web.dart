@@ -116,6 +116,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  bool dco_decode_box_autoadd_bool(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
 
   @protected
@@ -238,6 +241,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   BaseTokenInfo? dco_decode_opt_box_autoadd_base_token_info(dynamic raw);
+
+  @protected
+  bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
 
   @protected
   ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw);
@@ -398,6 +404,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -535,6 +544,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   BaseTokenInfo? sse_decode_opt_box_autoadd_base_token_info(
       SseDeserializer deserializer);
+
+  @protected
+  bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
   ColorsInfo? sse_decode_opt_box_autoadd_colors_info(
@@ -710,6 +722,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       Bip39AddWalletParams self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_colors_info(
       ColorsInfo self, SseSerializer serializer);
 
@@ -856,6 +871,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_base_token_info(
       BaseTokenInfo? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_colors_info(

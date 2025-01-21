@@ -13,7 +13,7 @@
       "decimals": 18
     },
     "infoURL": "https://www.zilliqa.com/",
-    "shortName": "zil",
+    "shortName": "zilliqa",
     "chainId": 32770,
     "slip44": 313,
     "explorers": [
@@ -58,7 +58,7 @@
       "decimals": 18
     },
     "infoURL": "https://ethereum.org",
-    "shortName": "eth",
+    "shortName": "ethereum",
     "chainId": 1,
     "networkId": 1,
     "slip44": 60,
@@ -112,7 +112,7 @@
       "decimals": 18
     },
     "infoURL": "https://polygon.technology/",
-    "shortName": "pol",
+    "shortName": "polygon",
     "chainId": 137,
     "networkId": 137,
     "slip44": 966,
@@ -145,7 +145,7 @@
       "decimals": 18
     },
     "infoURL": "https://fantom.foundation",
-    "shortName": "ftm",
+    "shortName": "fantom",
     "chainId": 250,
     "networkId": 250,
     "icon": "fantom",
@@ -178,7 +178,7 @@
       "decimals": 18
     },
     "infoURL": "https://zksync.io/",
-    "shortName": "zksync",
+    "shortName": "ethereum",
     "chainId": 324,
     "networkId": 324,
     "icon": "zksync-era",
@@ -224,7 +224,7 @@
       "decimals": 18
     },
     "infoURL": "https://www.coredao.org",
-    "shortName": "core",
+    "shortName": "ethereum",
     "chainId": 1116,
     "networkId": 1116,
     "explorers": [
@@ -235,185 +235,6 @@
         "standard": "EIP3091"
       }
     ]
-  },
-  {
-    "name": "Mantle",
-    "chain": "ETH",
-    "icon": "mantle",
-    "rpc": [
-      "https://rpc.mantle.xyz",
-      "https://mantle-rpc.publicnode.com"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Mantle",
-      "symbol": "MNT",
-      "decimals": 18
-    },
-    "infoURL": "https://mantle.xyz",
-    "shortName": "mantle",
-    "chainId": 5000,
-    "networkId": 5000,
-    "explorers": [
-      {
-        "name": "mantlescan",
-        "url": "https://mantlescan.xyz",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Mantle Explorer",
-        "url": "https://explorer.mantle.xyz",
-        "standard": "EIP3091"
-      }
-    ],
-    "parent": {
-      "type": "L2",
-      "chain": "eip155-1",
-      "bridges": [
-        {
-          "url": "https://bridge.mantle.xyz"
-        }
-      ]
-    }
-  },
-  {
-    "name": "Base",
-    "chain": "ETH",
-    "rpc": [
-      "https://mainnet.base.org/",
-      "https://developer-access-mainnet.base.org/",
-      "https://base.gateway.tenderly.co",
-      "https://base-rpc.publicnode.com"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "infoURL": "https://base.org",
-    "shortName": "base",
-    "chainId": 8453,
-    "networkId": 8453,
-    "icon": "base",
-    "explorers": [
-      {
-        "name": "basescan",
-        "url": "https://basescan.org",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "basescout",
-        "url": "https://base.blockscout.com",
-        "icon": "blockscout",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "dexguru",
-        "url": "https://base.dex.guru",
-        "icon": "dexguru",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Routescan",
-        "url": "https://base.superscan.network",
-        "standard": "EIP3091"
-      }
-    ],
-    "status": "active"
-  },
-  {
-    "name": "Avalanche C-Chain",
-    "chain": "AVAX",
-    "icon": "avax",
-    "rpc": [
-      "https://api.avax.network/ext/bc/C/rpc",
-      "https://avalanche-c-chain-rpc.publicnode.com"
-    ],
-    "features": [
-      {
-        "name": "EIP1559"
-      }
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Avalanche",
-      "symbol": "AVAX",
-      "decimals": 18
-    },
-    "infoURL": "https://www.avax.network/",
-    "shortName": "avax",
-    "chainId": 43114,
-    "networkId": 43114,
-    "slip44": 9005,
-    "explorers": [
-      {
-        "name": "Etherscan",
-        "url": "https://snowscan.xyz",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Routescan",
-        "url": "https://snowtrace.io",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Avascan",
-        "url": "https://avascan.info",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Linea",
-    "title": "Linea Mainnet",
-    "chain": "ETH",
-    "rpc": [
-      "https://rpc.linea.build",
-      "https://linea-mainnet.infura.io/v3/${INFURA_API_KEY}",
-      "https://linea-rpc.publicnode.com"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Linea Ether",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "infoURL": "https://linea.build",
-    "shortName": "linea",
-    "chainId": 59144,
-    "networkId": 59144,
-    "icon": "linea",
-    "parent": {
-      "type": "L2",
-      "chain": "eip155-1",
-      "bridges": [
-        {
-          "url": "https://bridge.linea.build"
-        }
-      ]
-    },
-    "explorers": [
-      {
-        "name": "Etherscan",
-        "url": "https://lineascan.build",
-        "standard": "EIP3091",
-        "icon": "linea"
-      },
-      {
-        "name": "Blockscout",
-        "url": "https://explorer.linea.build",
-        "standard": "EIP3091",
-        "icon": "linea"
-      },
-      {
-        "name": "L2scan",
-        "url": "https://linea.l2scan.co",
-        "standard": "EIP3091",
-        "icon": "linea"
-      }
-    ],
-    "status": "active"
   }
 ]
 

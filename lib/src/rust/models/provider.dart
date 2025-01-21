@@ -37,7 +37,7 @@ class ExplorerInfo {
 class NetworkConfigInfo {
   final String name;
   final String chain;
-  final String icon;
+  final String shortName;
   final List<String> rpc;
   final Uint16List features;
   final BigInt chainId;
@@ -46,11 +46,12 @@ class NetworkConfigInfo {
   final String? ens;
   final List<ExplorerInfo> explorers;
   final bool fallbackEnabled;
+  final bool? testnet;
 
   const NetworkConfigInfo({
     required this.name,
     required this.chain,
-    required this.icon,
+    required this.shortName,
     required this.rpc,
     required this.features,
     required this.chainId,
@@ -59,13 +60,14 @@ class NetworkConfigInfo {
     this.ens,
     required this.explorers,
     required this.fallbackEnabled,
+    this.testnet,
   });
 
   @override
   int get hashCode =>
       name.hashCode ^
       chain.hashCode ^
-      icon.hashCode ^
+      shortName.hashCode ^
       rpc.hashCode ^
       features.hashCode ^
       chainId.hashCode ^
@@ -73,7 +75,8 @@ class NetworkConfigInfo {
       chainHash.hashCode ^
       ens.hashCode ^
       explorers.hashCode ^
-      fallbackEnabled.hashCode;
+      fallbackEnabled.hashCode ^
+      testnet.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -82,7 +85,7 @@ class NetworkConfigInfo {
           runtimeType == other.runtimeType &&
           name == other.name &&
           chain == other.chain &&
-          icon == other.icon &&
+          shortName == other.shortName &&
           rpc == other.rpc &&
           features == other.features &&
           chainId == other.chainId &&
@@ -90,5 +93,6 @@ class NetworkConfigInfo {
           chainHash == other.chainHash &&
           ens == other.ens &&
           explorers == other.explorers &&
-          fallbackEnabled == other.fallbackEnabled;
+          fallbackEnabled == other.fallbackEnabled &&
+          testnet == other.testnet;
 }

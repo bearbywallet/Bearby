@@ -99,14 +99,6 @@ class TokenSelectItem extends StatelessWidget {
                     fontWeight: FontWeight.w500,
                   ),
                 ),
-                const SizedBox(height: 4),
-                Text(
-                  '\$20',
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
               ],
             ),
           ],
