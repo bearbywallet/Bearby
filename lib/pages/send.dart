@@ -9,8 +9,9 @@ import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/transfer.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class SendTokenPage extends StatefulWidget {
@@ -22,12 +23,12 @@ class SendTokenPage extends StatefulWidget {
 
 class _SendTokenPageState extends State<SendTokenPage> {
   bool _initialized = false;
-  int tokenIndex = 0;
-  String amount = "0";
-  String convertAmount = "0";
-  bool hasDecimalPoint = false;
-  String? address;
-  String? walletName;
+  int _tokenIndex = 0;
+  String _amount = "0";
+  String _convertAmount = "0";
+  bool _hasDecimalPoint = false;
+  String? _address;
+  String? _walletName;
 
   late final AppState _appState;
 
@@ -42,7 +43,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
       if (argTokenIndex != null) {
         setState(() {
-          tokenIndex = argTokenIndex;
+          _tokenIndex = argTokenIndex;
         });
       }
       _initialized = true;
@@ -55,14 +56,14 @@ class _SendTokenPageState extends State<SendTokenPage> {
     _appState = Provider.of<AppState>(context, listen: false);
   }
 
-  bool get isValidAmount {
-    if (amount.endsWith('.')) {
+  bool get _isValidAmount {
+    if (_amount.endsWith('.')) {
       return false;
     }
 
     try {
-      final numAmount = double.parse(amount);
-      final token = _appState.wallet!.tokens[tokenIndex];
+      final numAmount = double.parse(_amount);
+      final token = _appState.wallet!.tokens[_tokenIndex];
       final bigBalance = BigInt.parse(
           token.balances[_appState.wallet!.selectedAccount] ?? '0');
       final balance = adjustAmountToDouble(bigBalance, token.decimals);
@@ -74,22 +75,22 @@ class _SendTokenPageState extends State<SendTokenPage> {
     }
   }
 
-  bool get isValidAddress {
-    if (address == null || address!.isEmpty) {
+  bool get _isValidAddress {
+    if (_address == null || _address!.isEmpty) {
       return false;
     }
 
     return true;
   }
 
-  bool get isFormValid => isValidAmount && isValidAddress;
+  bool get _isFormValid => _isValidAmount && _isValidAddress;
 
   void updateAmount(String value) {
     setState(() {
-      if (amount == "0" && value != ".") {
-        amount = value;
+      if (_amount == "0" && value != ".") {
+        _amount = value;
       } else {
-        amount += value;
+        _amount += value;
       }
     });
   }
@@ -97,29 +98,26 @@ class _SendTokenPageState extends State<SendTokenPage> {
   void updateAddress(QRcodeScanResultInfo params, String name) {
     setState(() {
       if (params.recipient.isNotEmpty) {
-        address = params.recipient;
+        _address = params.recipient;
       }
 
       if (params.amount != null && params.amount!.isNotEmpty) {
-        amount = params.amount!;
+        _amount = params.amount!;
       }
 
-      // TODO: check token address if exits in
-      // if we have token in stash so we can swap to other token
-
-      walletName = name;
+      _walletName = name;
     });
   }
 
   void handleKeyPress(String value) {
     if (value == ".") {
-      if (!hasDecimalPoint) {
+      if (!_hasDecimalPoint) {
         setState(() {
-          hasDecimalPoint = true;
-          if (amount == "0") {
-            amount = "0.";
+          _hasDecimalPoint = true;
+          if (_amount == "0") {
+            _amount = "0.";
           } else {
-            amount += value;
+            _amount += value;
           }
         });
       }
@@ -127,13 +125,13 @@ class _SendTokenPageState extends State<SendTokenPage> {
     }
 
     setState(() {
-      if (hasDecimalPoint) {
-        amount += value;
+      if (_hasDecimalPoint) {
+        _amount += value;
       } else {
-        if (amount == "0") {
-          amount = value;
+        if (_amount == "0") {
+          _amount = value;
         } else {
-          amount += value;
+          _amount += value;
         }
       }
     });
@@ -141,32 +139,42 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
   void handleBackspace() {
     setState(() {
-      if (amount.length > 1) {
-        if (amount[amount.length - 1] == '.') {
-          hasDecimalPoint = false;
+      if (_amount.length > 1) {
+        if (_amount[_amount.length - 1] == '.') {
+          _hasDecimalPoint = false;
         }
-        amount = amount.substring(0, amount.length - 1);
+        _amount = _amount.substring(0, _amount.length - 1);
       } else {
-        amount = "0";
-        hasDecimalPoint = false;
+        _amount = "0";
+        _hasDecimalPoint = false;
       }
     });
   }
 
-  void handleSubmit(FTokenInfo token, String fromAddress) {
-    showConfirmTransferModal(
+  void handleSubmit(AppState appState) async {
+    if (!_isFormValid) {
+      return;
+    }
+
+    BigInt accountIndex = appState.wallet!.selectedAccount;
+    TokenTransferParamsInfo params = TokenTransferParamsInfo(
+      walletIndex: BigInt.from(appState.selectedWallet),
+      accountIndex: accountIndex,
+      tokenIndex: BigInt.from(_tokenIndex),
+      amount: _amount,
+      recipient: _address ?? "",
+    );
+    TransactionRequestInfo tx = await createTokenTransfer(params: params);
+    if (!mounted) return;
+    showConfirmTransactionModal(
       context: context,
-      token: token,
-      amount: amount,
-      fromAddress: fromAddress,
-      toAddress: address!,
+      tx: tx,
+      to: _address!,
+      amount: _amount,
       onConfirm: () {
         Navigator.pop(context);
       },
     );
-    if (isFormValid) {
-      // _showSimpleTransfer();
-    }
   }
 
   @override
@@ -205,18 +213,18 @@ class _SendTokenPageState extends State<SendTokenPage> {
                           children: [
                             const SizedBox(height: 16),
                             TokenAmountCard(
-                              amount: amount,
-                              convertAmount: convertAmount,
-                              tokenIndex: tokenIndex,
+                              amount: _amount,
+                              convertAmount: _convertAmount,
+                              tokenIndex: _tokenIndex,
                               onMaxTap: (String value) {
                                 setState(() {
-                                  amount = value;
+                                  _amount = value;
                                 });
                               },
                               onTokenSelected: (int value) {
                                 setState(() {
-                                  tokenIndex = value;
-                                  amount = '0';
+                                  _tokenIndex = value;
+                                  _amount = '0';
                                 });
                               },
                             ),
@@ -230,8 +238,8 @@ class _SendTokenPageState extends State<SendTokenPage> {
                               ),
                             ),
                             WalletSelectionCard(
-                              address: address,
-                              walletName: walletName,
+                              address: _address,
+                              walletName: _walletName,
                               onChange: updateAddress,
                             ),
                             NumberKeyboard(
@@ -243,11 +251,8 @@ class _SendTokenPageState extends State<SendTokenPage> {
                             ),
                             CustomButton(
                               text: "Submit",
-                              onPressed: () => handleSubmit(
-                                appState.wallet!.tokens[tokenIndex],
-                                appState.account!.addr,
-                              ),
-                              disabled: !isFormValid,
+                              onPressed: () => handleSubmit(appState),
+                              disabled: !_isFormValid,
                             ),
                           ],
                         ),

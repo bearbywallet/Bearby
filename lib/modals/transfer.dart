@@ -4,16 +4,15 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/icon.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
-void showConfirmTransferModal({
+void showConfirmTransactionModal({
   required BuildContext context,
-  required FTokenInfo token,
+  required TransactionRequestInfo tx,
+  required String to,
   required String amount,
-  required String fromAddress,
-  required String toAddress,
   required VoidCallback onConfirm,
 }) {
   showModalBottomSheet<void>(
@@ -24,38 +23,68 @@ void showConfirmTransferModal({
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (context) => _ConfirmTransferContent(
-      token: token,
+    builder: (context) => _ConfirmTransactionContent(
+      tx: tx,
       amount: amount,
-      fromAddress: fromAddress,
-      toAddress: toAddress,
+      to: to,
       onConfirm: onConfirm,
     ),
   );
 }
 
-class _ConfirmTransferContent extends StatelessWidget {
-  final FTokenInfo token;
+class _ConfirmTransactionContent extends StatelessWidget {
+  final TransactionRequestInfo tx;
+  final String to;
   final String amount;
-  final String fromAddress;
-  final String toAddress;
   final VoidCallback onConfirm;
 
-  const _ConfirmTransferContent({
-    required this.token,
+  const _ConfirmTransactionContent({
+    required this.tx,
     required this.amount,
-    required this.fromAddress,
-    required this.toAddress,
+    required this.to,
     required this.onConfirm,
   });
+
+  bool get isEVM => tx.evm != null;
+  String get fromAddress => isEVM ? tx.evm!.from! : tx.metadata.signer!;
+
+  String get gasPrice => isEVM
+      ? tx.evm!.gasPrice?.toString() ?? tx.evm!.maxFeePerGas.toString()
+      : tx.scilla!.gasPrice.toString();
+
+  String get gasLimit =>
+      isEVM ? tx.evm!.gasLimit.toString() : tx.scilla!.gasLimit.toString();
+
+  String calculateGasFee() {
+    if (isEVM) {
+      final BigInt gasLimit = tx.evm?.gasLimit ?? BigInt.from(21000);
+
+      BigInt price;
+      if (tx.evm?.gasPrice != null) {
+        price = tx.evm!.gasPrice!;
+      } else if (tx.evm?.maxFeePerGas != null) {
+        price = tx.evm!.maxFeePerGas!;
+      } else {
+        price = BigInt.from(0);
+      }
+
+      return (price * gasLimit).toString();
+    } else {
+      // TODO: add scilla txns
+      if (tx.scilla == null) {
+        return "0";
+      }
+      return (tx.scilla!.gasPrice * tx.scilla!.gasLimit).toString();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final gas = '0.00254329';
-    final gasUsd = '0.01';
-    final amountUsd = '5.09';
+    final gasFee = calculateGasFee();
+    final gasUsd = '0'; // Add conversion logic
+    final amountUsd = '0'; // Add conversion logic
 
     return Container(
       decoration: BoxDecoration(
@@ -81,15 +110,25 @@ class _ConfirmTransferContent extends StatelessWidget {
             _buildTokenLogo(appState),
             const SizedBox(height: 8),
             Text(
-              'Transfer ${token.symbol}',
+              tx.metadata.title ?? 'Confirm Transaction',
               style: TextStyle(
                 color: theme.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
+            if (tx.metadata.info != null) ...[
+              const SizedBox(height: 8),
+              Text(
+                tx.metadata.info!,
+                style: TextStyle(
+                  color: theme.textSecondary,
+                  fontSize: 16,
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
-            _buildTransferDetails(appState, gas, gasUsd, amountUsd),
+            _buildTransferDetails(appState, gasFee, gasUsd, amountUsd),
             const SizedBox(height: 24),
             _buildConfirmButton(theme),
             const SizedBox(height: 16),
@@ -101,6 +140,9 @@ class _ConfirmTransferContent extends StatelessWidget {
 
   Widget _buildTokenLogo(AppState state) {
     final theme = state.currentTheme;
+    final token = state.wallet!.tokens
+        .firstWhere((t) => t.symbol == tx.metadata.tokenInfo?.symbol);
+    final chainId = tx.evm?.chainId ?? BigInt.from(tx.scilla?.chainId ?? 0);
 
     return Container(
       width: 64,
@@ -116,7 +158,7 @@ class _ConfirmTransferContent extends StatelessWidget {
         child: AsyncImage(
           url: viewTokenIcon(
             token,
-            state.chain!.chainId,
+            chainId,
             theme.value,
           ),
           width: 32,
@@ -134,7 +176,8 @@ class _ConfirmTransferContent extends StatelessWidget {
     String convertedAmount,
   ) {
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens.first;
+    final networkToken =
+        isEVM ? 'ETH' : 'ZIL'; // Add proper network token detection
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -145,13 +188,22 @@ class _ConfirmTransferContent extends StatelessWidget {
       ),
       child: Column(
         children: [
-          _buildDetailRow('Wallet', appState.account!.name, theme),
+          if (tx.metadata.signer != null)
+            _buildDetailRow('From', shortenAddress(fromAddress), theme),
           const SizedBox(height: 16),
-          _buildDetailRow('Recipient', shortenAddress(toAddress), theme),
+          _buildDetailRow('To', shortenAddress(to), theme),
           const SizedBox(height: 16),
           _buildAmountRow('Amount', amount, convertedAmount, theme),
           const SizedBox(height: 16),
-          _buildAmountRow('Fee', '≈ $gas ${token.symbol}', gasUsd, theme),
+          _buildDetailRow('Gas Limit', gasLimit, theme),
+          const SizedBox(height: 16),
+          _buildDetailRow('Gas Price', '$gasPrice Gwei', theme),
+          const SizedBox(height: 16),
+          _buildAmountRow('Network Fee', '$gas $networkToken', gasUsd, theme),
+          if (!isEVM) ...[
+            const SizedBox(height: 16),
+            _buildDetailRow('Chain ID', tx.scilla!.chainId.toString(), theme),
+          ],
         ],
       ),
     );
@@ -181,7 +233,11 @@ class _ConfirmTransferContent extends StatelessWidget {
   }
 
   Widget _buildAmountRow(
-      String label, String amount, String usd, AppTheme theme) {
+    String label,
+    String amount,
+    String usd,
+    AppTheme theme,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -204,7 +260,7 @@ class _ConfirmTransferContent extends StatelessWidget {
               ),
             ),
             Text(
-              usd,
+              '\$$usd',
               style: TextStyle(
                 color: theme.textSecondary,
                 fontSize: 14,
