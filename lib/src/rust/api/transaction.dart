@@ -31,3 +31,42 @@ Future<List<HistoricalTransactionInfo>> getHistory(
         {required BigInt walletIndex}) =>
     RustLib.instance.api
         .crateApiTransactionGetHistory(walletIndex: walletIndex);
+
+Future<TransactionRequestInfo> createTokenTransfer(
+        {required TokenTransferParamsInfo params}) =>
+    RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);
+
+class TokenTransferParamsInfo {
+  final BigInt walletIndex;
+  final BigInt accountIndex;
+  final BigInt tokenIndex;
+  final String amount;
+  final String recipient;
+
+  const TokenTransferParamsInfo({
+    required this.walletIndex,
+    required this.accountIndex,
+    required this.tokenIndex,
+    required this.amount,
+    required this.recipient,
+  });
+
+  @override
+  int get hashCode =>
+      walletIndex.hashCode ^
+      accountIndex.hashCode ^
+      tokenIndex.hashCode ^
+      amount.hashCode ^
+      recipient.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is TokenTransferParamsInfo &&
+          runtimeType == other.runtimeType &&
+          walletIndex == other.walletIndex &&
+          accountIndex == other.accountIndex &&
+          tokenIndex == other.tokenIndex &&
+          amount == other.amount &&
+          recipient == other.recipient;
+}

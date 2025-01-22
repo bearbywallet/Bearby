@@ -137,6 +137,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
   @protected
+  TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
+      dynamic raw);
+
+  @protected
   TransactionRequestEVM dco_decode_box_autoadd_transaction_request_evm(
       dynamic raw);
 
@@ -289,6 +293,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) dco_decode_record_usize_string(dynamic raw);
 
   @protected
+  TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
+
+  @protected
   TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw);
 
   @protected
@@ -426,6 +433,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   QrConfigInfo sse_decode_box_autoadd_qr_config_info(
+      SseDeserializer deserializer);
+
+  @protected
+  TokenTransferParamsInfo sse_decode_box_autoadd_token_transfer_params_info(
       SseDeserializer deserializer);
 
   @protected
@@ -598,6 +609,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
 
   @protected
+  TokenTransferParamsInfo sse_decode_token_transfer_params_info(
+      SseDeserializer deserializer);
+
+  @protected
   TransactionMetadataInfo sse_decode_transaction_metadata_info(
       SseDeserializer deserializer);
 
@@ -747,6 +762,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_qr_config_info(
       QrConfigInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_transaction_request_evm(
@@ -923,6 +942,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_usize_string(
       (BigInt, String) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_token_transfer_params_info(
+      TokenTransferParamsInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_transaction_metadata_info(

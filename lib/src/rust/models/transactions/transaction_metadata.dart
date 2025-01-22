@@ -8,7 +8,7 @@ import 'base_token.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class TransactionMetadataInfo {
-  final BigInt providerIndex;
+  final BigInt chainHash;
   final String? hash;
   final String? info;
   final String? icon;
@@ -17,7 +17,7 @@ class TransactionMetadataInfo {
   final BaseTokenInfo? tokenInfo;
 
   const TransactionMetadataInfo({
-    required this.providerIndex,
+    required this.chainHash,
     this.hash,
     this.info,
     this.icon,
@@ -28,7 +28,7 @@ class TransactionMetadataInfo {
 
   @override
   int get hashCode =>
-      providerIndex.hashCode ^
+      chainHash.hashCode ^
       hash.hashCode ^
       info.hashCode ^
       icon.hashCode ^
@@ -41,7 +41,7 @@ class TransactionMetadataInfo {
       identical(this, other) ||
       other is TransactionMetadataInfo &&
           runtimeType == other.runtimeType &&
-          providerIndex == other.providerIndex &&
+          chainHash == other.chainHash &&
           hash == other.hash &&
           info == other.info &&
           icon == other.icon &&

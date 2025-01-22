@@ -9,6 +9,9 @@ pub enum ServiceError {
     #[error("Service is not running")]
     NotRunning,
 
+    #[error("Parse {0} error: {1}")]
+    ParseError(String, String),
+
     #[error("Failed to acquire lock")]
     MutexLock,
 

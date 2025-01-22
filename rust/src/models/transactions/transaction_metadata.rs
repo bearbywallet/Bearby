@@ -16,7 +16,7 @@ pub use zilpay::{
 use super::base_token::BaseTokenInfo;
 
 pub struct TransactionMetadataInfo {
-    pub provider_index: usize,
+    pub chain_hash: u64,
     pub hash: Option<String>,
     pub info: Option<String>,
     pub icon: Option<String>,
@@ -28,7 +28,7 @@ pub struct TransactionMetadataInfo {
 impl From<TransactionMetadata> for TransactionMetadataInfo {
     fn from(value: TransactionMetadata) -> Self {
         Self {
-            provider_index: value.provider_index,
+            chain_hash: value.chain_hash,
             hash: value.hash,
             info: value.info,
             icon: value.icon,
@@ -46,7 +46,7 @@ impl From<TransactionMetadata> for TransactionMetadataInfo {
 impl From<TransactionMetadataInfo> for TransactionMetadata {
     fn from(value: TransactionMetadataInfo) -> Self {
         Self {
-            provider_index: value.provider_index,
+            chain_hash: value.chain_hash,
             hash: value.hash,
             info: value.info,
             icon: value.icon,
