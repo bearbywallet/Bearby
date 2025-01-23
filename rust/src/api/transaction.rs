@@ -142,25 +142,52 @@ pub async fn cacl_gas_fee(
 ) -> Result<TransactionRequestInfo, String> {
     let chain_hash = params.metadata.chain_hash;
     let mut tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
-    let guard = BACKGROUND_SERVICE.read().await;
-    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
-    let chain = service
-        .core
-        .get_provider(chain_hash)
-        .map_err(ServiceError::BackgroundError)?;
-    let gas = chain
-        .estimate_gas_batch(&tx, 4, None)
-        .await
-        .map_err(ServiceError::NetworkErrors)?;
+    let gas = {
+        let guard = BACKGROUND_SERVICE.read().await;
+        let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+        let chain = service
+            .core
+            .get_provider(chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
+
+        chain
+            .estimate_gas_batch(&tx, 4, None)
+            .await
+            .map_err(ServiceError::NetworkErrors)?
+    };
+
+    let gas_price: u128 = gas.gas_price.try_into().unwrap_or_default();
 
     match tx {
-        TransactionRequest::Ethereum((tx, _)) => {
-            // tx.max_priority_fee_per_gas(max_priority_fee_per_gas)
+        TransactionRequest::Ethereum((ref mut tx, _)) => {
+            let gas_params = [
+                (gas_price, &mut tx.gas_price),
+                (
+                    gas.fee_history.max_fee.try_into().unwrap_or_default(),
+                    &mut tx.max_fee_per_gas,
+                ),
+                (
+                    gas.fee_history.priority_fee.try_into().unwrap_or_default(),
+                    &mut tx.max_priority_fee_per_gas,
+                ),
+            ];
+
+            for (value, param) in gas_params {
+                if value > 0 {
+                    *param = Some(value);
+                }
+            }
+
+            if let Ok(limit) = u64::try_from(gas.tx_estimate_gas) {
+                if limit > 0 {
+                    tx.gas = Some(limit);
+                }
+            }
         }
-        TransactionRequest::Zilliqa(_) => {}
+        TransactionRequest::Zilliqa((ref mut tx, _)) => {
+            tx.gas_price = gas_price;
+        }
     }
 
-    let tx_params = tx.into();
-
-    Ok(tx_params)
+    Ok(tx.into())
 }
