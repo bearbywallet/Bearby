@@ -1,13 +1,17 @@
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
+use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{parse_address, with_service};
+
+pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
 pub use zilpay::errors::background::BackgroundError;
-use zilpay::errors::wallet::WalletErrors;
+pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
-use zilpay::proto::U256;
+pub use zilpay::proto::tx::TransactionRequest;
+pub use zilpay::proto::U256;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
@@ -130,4 +134,33 @@ pub async fn create_token_transfer(
     })
     .await
     .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn cacl_gas_fee(
+    params: TransactionRequestInfo,
+) -> Result<TransactionRequestInfo, String> {
+    let chain_hash = params.metadata.chain_hash;
+    let mut tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let chain = service
+        .core
+        .get_provider(chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    let gas = chain
+        .estimate_gas_batch(&tx, 4, None)
+        .await
+        .map_err(ServiceError::NetworkErrors)?;
+
+    match tx {
+        TransactionRequest::Ethereum((tx, _)) => {
+            // tx.max_priority_fee_per_gas(max_priority_fee_per_gas)
+        }
+        TransactionRequest::Zilliqa(_) => {}
+    }
+
+    let tx_params = tx.into();
+
+    Ok(tx_params)
 }
