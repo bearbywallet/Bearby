@@ -114,7 +114,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             height: 4,
             margin: EdgeInsets.symmetric(vertical: adaptivePadding),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -132,7 +132,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: theme.primaryPurple.withOpacity(0.1),
+                      color: theme.primaryPurple.withValues(alpha: 0.1),
                       width: 2,
                     ),
                   ),
@@ -212,7 +212,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
             decoration: BoxDecoration(
               border: Border(
                 top: BorderSide(
-                  color: theme.textPrimary.withOpacity(0.1),
+                  color: theme.textPrimary.withValues(alpha: 0.1),
                   width: 1,
                 ),
               ),

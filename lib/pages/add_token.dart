@@ -190,7 +190,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
         walletIndex: BigInt.from(walletIndex),
       );
       await appState.syncData();
-
+      if (!mounted) return;
       Navigator.pop(context);
     } catch (e) {
       setState(() {

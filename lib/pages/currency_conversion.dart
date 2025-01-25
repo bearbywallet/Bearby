@@ -150,7 +150,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                   await state.syncData();
                 },
                 activeColor: theme.primaryPurple,
-                activeTrackColor: theme.primaryPurple.withOpacity(0.5),
+                activeTrackColor: theme.primaryPurple.withValues(alpha: 0.5),
               ),
             ],
           ),
@@ -180,7 +180,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: theme.textSecondary.withOpacity(0.1),
+              color: theme.textSecondary.withValues(alpha: 0.1),
               width: 1,
             ),
           ),

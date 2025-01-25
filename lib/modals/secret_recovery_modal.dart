@@ -28,7 +28,7 @@ class SecretRecoveryModal extends StatelessWidget {
             height: 4,
             margin: const EdgeInsets.only(top: 8, bottom: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.3),
+              color: theme.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -105,7 +105,7 @@ class SecretRecoveryModal extends StatelessWidget {
           child: CustomButton(
             text: buttonText,
             onPressed: onPressed,
-            backgroundColor: Colors.red.withOpacity(0.1),
+            backgroundColor: Colors.red.withValues(alpha: 0.1),
             textColor: Colors.red,
             height: 48,
           ),

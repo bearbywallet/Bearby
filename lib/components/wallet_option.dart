@@ -38,7 +38,7 @@ class WalletOption extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration: BoxDecoration(
-          color: theme.cardBackground.withOpacity(0.7),
+          color: theme.cardBackground.withValues(alpha: 0.7),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
             color: isSelected ? theme.primaryPurple : Colors.transparent,
@@ -57,7 +57,7 @@ class WalletOption extends StatelessWidget {
                     width: 40,
                     height: 40,
                     decoration: BoxDecoration(
-                      color: theme.primaryPurple.withOpacity(0.1),
+                      color: theme.primaryPurple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AsyncImage(

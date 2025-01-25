@@ -21,7 +21,7 @@ class CryptoList extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         itemCount: items.length,
         separatorBuilder: (context, index) => Divider(
-          color: theme.textSecondary.withOpacity(0.2),
+          color: theme.textSecondary.withValues(alpha: 0.2),
           height: 1,
         ),
         itemBuilder: (context, index) {

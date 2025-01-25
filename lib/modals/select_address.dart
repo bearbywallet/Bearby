@@ -99,7 +99,7 @@ class _AddressSelectModalContentState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -127,6 +127,8 @@ class _AddressSelectModalContentState
                   QRcodeScanResultInfo params =
                       QRcodeScanResultInfo(recipient: value);
                   widget.onAddressSelected(params, "Unknown");
+                  if (!mounted) return;
+                  // ignore: use_build_context_synchronously
                   Navigator.pop(context);
                 } else {
                   setState(() => _searchQuery = value);
@@ -203,7 +205,7 @@ class _AddressSelectModalContentState
                 Divider(
                   height: 1,
                   thickness: 1,
-                  color: theme.textSecondary.withOpacity(0.1),
+                  color: theme.textSecondary.withValues(alpha: 0.1),
                   endIndent: 16,
                 ),
             ],

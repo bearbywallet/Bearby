@@ -156,7 +156,7 @@ class _NetworkPageState extends State<NetworkPage> {
           style: TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.w500,
-            color: theme.textSecondary.withOpacity(0.7),
+            color: theme.textSecondary.withValues(alpha: 0.7),
           ),
         ),
         const SizedBox(height: 16),

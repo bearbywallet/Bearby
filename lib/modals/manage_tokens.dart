@@ -93,7 +93,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -251,7 +251,7 @@ class _TokenListItem extends StatelessWidget {
                           vertical: 2,
                         ),
                         decoration: BoxDecoration(
-                          color: theme.textSecondary.withOpacity(0.1),
+                          color: theme.textSecondary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(4),
                         ),
                         child: Text(

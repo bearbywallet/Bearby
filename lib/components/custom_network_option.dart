@@ -74,13 +74,13 @@ class CustomNetworkOption extends StatelessWidget {
               padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
               backgroundColor: isSelected
                   ? theme.background
-                  : theme.background.withOpacity(0.5),
+                  : theme.background.withValues(alpha: 0.5),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(8),
                 side: BorderSide(
                   color: isSelected
                       ? theme.primaryPurple
-                      : theme.textSecondary.withOpacity(0.5),
+                      : theme.textSecondary.withValues(alpha: 0.5),
                 ),
               ),
               splashFactory: NoSplash.splashFactory,
@@ -90,7 +90,7 @@ class CustomNetworkOption extends StatelessWidget {
               style: TextStyle(
                 color: isSelected
                     ? theme.primaryPurple
-                    : theme.textPrimary.withOpacity(0.5),
+                    : theme.textPrimary.withValues(alpha: 0.5),
               ),
             ),
           ),

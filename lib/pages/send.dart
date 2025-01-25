@@ -25,35 +25,21 @@ class _SendTokenPageState extends State<SendTokenPage> {
   bool _initialized = false;
   int _tokenIndex = 0;
   String _amount = "0";
-  String _convertAmount = "0";
+  final String _convertAmount = "0";
   bool _hasDecimalPoint = false;
   String? _address;
   String? _walletName;
 
   late final AppState _appState;
 
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  bool get _isFormValid => _isValidAmount && _isValidAddress;
 
-    if (!_initialized) {
-      final args =
-          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-      final int? argTokenIndex = args?['token_index'];
-
-      if (argTokenIndex != null) {
-        setState(() {
-          _tokenIndex = argTokenIndex;
-        });
-      }
-      _initialized = true;
+  bool get _isValidAddress {
+    if (_address == null || _address!.isEmpty) {
+      return false;
     }
-  }
 
-  @override
-  void initState() {
-    super.initState();
-    _appState = Provider.of<AppState>(context, listen: false);
+    return true;
   }
 
   bool get _isValidAmount {
@@ -73,108 +59,6 @@ class _SendTokenPageState extends State<SendTokenPage> {
       debugPrint("amount is not valid $e");
       return false;
     }
-  }
-
-  bool get _isValidAddress {
-    if (_address == null || _address!.isEmpty) {
-      return false;
-    }
-
-    return true;
-  }
-
-  bool get _isFormValid => _isValidAmount && _isValidAddress;
-
-  void updateAmount(String value) {
-    setState(() {
-      if (_amount == "0" && value != ".") {
-        _amount = value;
-      } else {
-        _amount += value;
-      }
-    });
-  }
-
-  void updateAddress(QRcodeScanResultInfo params, String name) {
-    setState(() {
-      if (params.recipient.isNotEmpty) {
-        _address = params.recipient;
-      }
-
-      if (params.amount != null && params.amount!.isNotEmpty) {
-        _amount = params.amount!;
-      }
-
-      _walletName = name;
-    });
-  }
-
-  void handleKeyPress(String value) {
-    if (value == ".") {
-      if (!_hasDecimalPoint) {
-        setState(() {
-          _hasDecimalPoint = true;
-          if (_amount == "0") {
-            _amount = "0.";
-          } else {
-            _amount += value;
-          }
-        });
-      }
-      return;
-    }
-
-    setState(() {
-      if (_hasDecimalPoint) {
-        _amount += value;
-      } else {
-        if (_amount == "0") {
-          _amount = value;
-        } else {
-          _amount += value;
-        }
-      }
-    });
-  }
-
-  void handleBackspace() {
-    setState(() {
-      if (_amount.length > 1) {
-        if (_amount[_amount.length - 1] == '.') {
-          _hasDecimalPoint = false;
-        }
-        _amount = _amount.substring(0, _amount.length - 1);
-      } else {
-        _amount = "0";
-        _hasDecimalPoint = false;
-      }
-    });
-  }
-
-  void handleSubmit(AppState appState) async {
-    if (!_isFormValid) {
-      return;
-    }
-
-    BigInt accountIndex = appState.wallet!.selectedAccount;
-    TokenTransferParamsInfo params = TokenTransferParamsInfo(
-      walletIndex: BigInt.from(appState.selectedWallet),
-      accountIndex: accountIndex,
-      tokenIndex: BigInt.from(_tokenIndex),
-      amount: _amount,
-      recipient: _address ?? "",
-    );
-    TransactionRequestInfo tx = await createTokenTransfer(params: params);
-    if (!mounted) return;
-    showConfirmTransactionModal(
-      context: context,
-      tx: tx,
-      to: _address!,
-      amount: _amount,
-      onConfirm: () {
-        Navigator.pop(context);
-      },
-    );
   }
 
   @override
@@ -233,7 +117,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
                               width: 20,
                               height: 20,
                               colorFilter: ColorFilter.mode(
-                                theme.textSecondary.withOpacity(0.1),
+                                theme.textSecondary.withValues(alpha: 0.1),
                                 BlendMode.srcIn,
                               ),
                             ),
@@ -266,5 +150,121 @@ class _SendTokenPageState extends State<SendTokenPage> {
         ),
       ),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final int? argTokenIndex = args?['token_index'];
+
+      if (argTokenIndex != null) {
+        setState(() {
+          _tokenIndex = argTokenIndex;
+        });
+      }
+      _initialized = true;
+    }
+  }
+
+  void handleBackspace() {
+    setState(() {
+      if (_amount.length > 1) {
+        if (_amount[_amount.length - 1] == '.') {
+          _hasDecimalPoint = false;
+        }
+        _amount = _amount.substring(0, _amount.length - 1);
+      } else {
+        _amount = "0";
+        _hasDecimalPoint = false;
+      }
+    });
+  }
+
+  void handleKeyPress(String value) {
+    if (value == ".") {
+      if (!_hasDecimalPoint) {
+        setState(() {
+          _hasDecimalPoint = true;
+          if (_amount == "0") {
+            _amount = "0.";
+          } else {
+            _amount += value;
+          }
+        });
+      }
+      return;
+    }
+
+    setState(() {
+      if (_hasDecimalPoint) {
+        _amount += value;
+      } else {
+        if (_amount == "0") {
+          _amount = value;
+        } else {
+          _amount += value;
+        }
+      }
+    });
+  }
+
+  void handleSubmit(AppState appState) async {
+    if (!_isFormValid) {
+      return;
+    }
+
+    BigInt accountIndex = appState.wallet!.selectedAccount;
+    TokenTransferParamsInfo params = TokenTransferParamsInfo(
+      walletIndex: BigInt.from(appState.selectedWallet),
+      accountIndex: accountIndex,
+      tokenIndex: BigInt.from(_tokenIndex),
+      amount: _amount,
+      recipient: _address ?? "",
+    );
+    TransactionRequestInfo tx = await createTokenTransfer(params: params);
+    if (!mounted) return;
+    showConfirmTransactionModal(
+      context: context,
+      tx: tx,
+      to: _address!,
+      amount: _amount,
+      onConfirm: () {
+        Navigator.pop(context);
+      },
+    );
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _appState = Provider.of<AppState>(context, listen: false);
+  }
+
+  void updateAddress(QRcodeScanResultInfo params, String name) {
+    setState(() {
+      if (params.recipient.isNotEmpty) {
+        _address = params.recipient;
+      }
+
+      if (params.amount != null && params.amount!.isNotEmpty) {
+        _amount = params.amount!;
+      }
+
+      _walletName = name;
+    });
+  }
+
+  void updateAmount(String value) {
+    setState(() {
+      if (_amount == "0" && value != ".") {
+        _amount = value;
+      } else {
+        _amount += value;
+      }
+    });
   }
 }

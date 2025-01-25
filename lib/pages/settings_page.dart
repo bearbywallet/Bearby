@@ -234,7 +234,7 @@ class _SettingsPageState extends State<SettingsPage> {
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: Divider(
                     height: 1,
-                    color: theme.textSecondary.withOpacity(0.1),
+                    color: theme.textSecondary.withValues(alpha: 0.1),
                   ),
                 ),
             ],

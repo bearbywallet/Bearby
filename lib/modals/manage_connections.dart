@@ -92,7 +92,7 @@ class _ConnectedDappsModalContentState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -156,7 +156,7 @@ class _ConnectedDappsModalContentState
         items.add(
           Divider(
             height: 1,
-            color: theme.textSecondary.withOpacity(0.1),
+            color: theme.textSecondary.withValues(alpha: 0.1),
           ),
         );
       }
@@ -214,14 +214,14 @@ class _DappListItem extends StatelessWidget {
                     width: iconSize,
                     height: iconSize,
                     decoration: BoxDecoration(
-                      color: theme.textSecondary.withOpacity(0.1),
+                      color: theme.textSecondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
                       child: Icon(
                         Icons.link,
                         size: 24,
-                        color: theme.textSecondary.withOpacity(0.5),
+                        color: theme.textSecondary.withValues(alpha: 0.5),
                       ),
                     ),
                   );
@@ -232,7 +232,7 @@ class _DappListItem extends StatelessWidget {
                     width: iconSize,
                     height: iconSize,
                     decoration: BoxDecoration(
-                      color: theme.textSecondary.withOpacity(0.1),
+                      color: theme.textSecondary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Center(
@@ -241,7 +241,7 @@ class _DappListItem extends StatelessWidget {
                         height: 20,
                         child: CircularProgressIndicator(
                           strokeWidth: 2,
-                          color: theme.textSecondary.withOpacity(0.5),
+                          color: theme.textSecondary.withValues(alpha: 0.5),
                           value: loadingProgress.expectedTotalBytes != null
                               ? loadingProgress.cumulativeBytesLoaded /
                                   loadingProgress.expectedTotalBytes!

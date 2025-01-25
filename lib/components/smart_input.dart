@@ -134,7 +134,7 @@ class SmartInputState extends State<SmartInput>
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
-    final defaultBorderColor = theme.textSecondary.withOpacity(0.3);
+    final defaultBorderColor = theme.textSecondary.withValues(alpha: 0.3);
     final defaultFocusedBorderColor = theme.primaryPurple;
 
     final iconColor = _isFocused
@@ -162,7 +162,7 @@ class SmartInputState extends State<SmartInput>
             width: widget.width,
             decoration: BoxDecoration(
               color: widget.disabled
-                  ? theme.cardBackground.withOpacity(0.5)
+                  ? theme.cardBackground.withValues(alpha: 0.5)
                   : theme.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
@@ -201,7 +201,7 @@ class SmartInputState extends State<SmartInput>
                       },
                       style: TextStyle(
                         color: widget.disabled
-                            ? theme.textPrimary.withOpacity(0.5)
+                            ? theme.textPrimary.withValues(alpha: 0.5)
                             : theme.textPrimary,
                         fontSize: widget.fontSize,
                       ),
@@ -210,7 +210,7 @@ class SmartInputState extends State<SmartInput>
                         hintText: widget.hint,
                         hintStyle: TextStyle(
                           color: widget.disabled
-                              ? theme.textSecondary.withOpacity(0.5)
+                              ? theme.textSecondary.withValues(alpha: 0.5)
                               : theme.textSecondary,
                           fontSize: widget.fontSize,
                         ),

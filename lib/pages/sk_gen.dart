@@ -84,7 +84,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                         ),
                       ),
                     ),
-                    Container(
+                    SizedBox(
                       height: MediaQuery.of(context).size.height * 0.3,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,

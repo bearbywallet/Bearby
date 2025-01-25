@@ -90,7 +90,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -114,7 +114,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
               itemCount: _getFilteredTokens(appState).length,
               separatorBuilder: (context, index) => Divider(
                 height: 1,
-                color: theme.textSecondary.withOpacity(0.1),
+                color: theme.textSecondary.withValues(alpha: 0.1),
               ),
               itemBuilder: (context, index) {
                 return _buildTokenItem(

@@ -96,7 +96,7 @@ class _CustomNetworkModalContentState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: widget.theme.textSecondary.withOpacity(0.5),
+              color: widget.theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -170,7 +170,7 @@ class _CustomNetworkModalContentState
           SmartInput(
             controller: controller,
             hint: hint,
-            borderColor: widget.theme.textSecondary.withOpacity(0.3),
+            borderColor: widget.theme.textSecondary.withValues(alpha: 0.3),
             focusedBorderColor: widget.theme.primaryPurple,
             height: 48,
             fontSize: 16,

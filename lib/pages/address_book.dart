@@ -84,7 +84,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
               width: 120,
               height: 120,
               colorFilter: ColorFilter.mode(
-                theme.textSecondary.withOpacity(0.4),
+                theme.textSecondary.withValues(alpha: 0.4),
                 BlendMode.srcIn,
               ),
             ),
@@ -125,7 +125,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
               border: !isLastItem
                   ? Border(
                       bottom: BorderSide(
-                        color: theme.textSecondary.withOpacity(0.1),
+                        color: theme.textSecondary.withValues(alpha: 0.1),
                         width: 1,
                       ),
                     )

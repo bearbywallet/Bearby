@@ -369,6 +369,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           final navContext = context;
 
           if (mounted) {
+            // ignore: use_build_context_synchronously
             Navigator.of(navContext).pushNamed(
               '/',
             );

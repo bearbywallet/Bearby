@@ -60,7 +60,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
       decoration: BoxDecoration(
-        color: theme.cardBackground.withOpacity(widget.opacity),
+        color: theme.cardBackground.withValues(alpha: widget.opacity),
         borderRadius: BorderRadius.circular(16),
         border: widget.hasError
             ? Border.all(

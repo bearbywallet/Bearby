@@ -29,7 +29,6 @@ class BiometricSwitch extends StatelessWidget {
       case AuthMethod.pinCode:
         return 'Enable Device PIN';
       case AuthMethod.none:
-      default:
         return '';
     }
   }
@@ -45,7 +44,6 @@ class BiometricSwitch extends StatelessWidget {
       case AuthMethod.pinCode:
         return 'assets/icons/pin.svg';
       case AuthMethod.none:
-      default:
         return '';
     }
   }
@@ -88,7 +86,7 @@ class BiometricSwitch extends StatelessWidget {
             value: value,
             onChanged: disabled ? null : onChanged,
             activeColor: theme.primaryPurple,
-            activeTrackColor: theme.primaryPurple.withOpacity(0.4),
+            activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
           ),
         ],
       ),

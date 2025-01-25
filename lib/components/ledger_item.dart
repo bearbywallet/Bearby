@@ -88,7 +88,7 @@ class _LedgerItemState extends State<LedgerItem>
             padding: const EdgeInsets.all(16),
             decoration: BoxDecoration(
               color: widget.isSelected
-                  ? theme.primaryPurple.withOpacity(0.1)
+                  ? theme.primaryPurple.withValues(alpha: 0.1)
                   : theme.cardBackground,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
@@ -100,8 +100,8 @@ class _LedgerItemState extends State<LedgerItem>
                   : [
                       BoxShadow(
                         color: widget.isSelected
-                            ? theme.primaryPurple.withOpacity(0.2)
-                            : theme.primaryPurple.withOpacity(0.1),
+                            ? theme.primaryPurple.withValues(alpha: 0.2)
+                            : theme.primaryPurple.withValues(alpha: 0.1),
                         blurRadius: 8,
                         offset: const Offset(0, 4),
                       ),
@@ -140,7 +140,7 @@ class _LedgerItemState extends State<LedgerItem>
                         widget.id,
                         style: TextStyle(
                           color: widget.isSelected
-                              ? theme.primaryPurple.withOpacity(0.8)
+                              ? theme.primaryPurple.withValues(alpha: 0.8)
                               : theme.textSecondary,
                           fontSize: 10,
                         ),
@@ -167,20 +167,20 @@ class _LedgerItemState extends State<LedgerItem>
 
   Color _getContainerBorderColor(AppTheme theme) {
     if (widget.isLoading) {
-      return theme.primaryPurple.withOpacity(0.3);
+      return theme.primaryPurple.withValues(alpha: 0.3);
     }
     if (_isPressed) {
-      return theme.primaryPurple.withOpacity(0.7);
+      return theme.primaryPurple.withValues(alpha: 0.7);
     }
     if (widget.isSelected) {
       return theme.primaryPurple;
     }
-    return theme.primaryPurple.withOpacity(0.8);
+    return theme.primaryPurple.withValues(alpha: 0.8);
   }
 
   Color _getTextColor(AppTheme theme) {
     if (widget.isLoading) {
-      return theme.textPrimary.withOpacity(0.7);
+      return theme.textPrimary.withValues(alpha: 0.7);
     }
     if (widget.isSelected) {
       return theme.primaryPurple;

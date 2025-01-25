@@ -79,8 +79,8 @@ class _WalletListItemState extends State<WalletListItem>
               scale: widget.disabled ? 1.0 : _scaleAnimation.value,
               child: Container(
                 decoration: BoxDecoration(
-                  color: theme.cardBackground.withOpacity(
-                    widget.disabled ? opacity : _opacityAnimation.value,
+                  color: theme.cardBackground.withValues(
+                    alpha: widget.disabled ? opacity : _opacityAnimation.value,
                   ),
                   borderRadius: BorderRadius.circular(12),
                 ),
@@ -101,7 +101,7 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.title,
                         style: TextStyle(
-                          color: theme.textPrimary.withOpacity(opacity),
+                          color: theme.textPrimary.withValues(alpha: opacity),
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
                         ),
@@ -110,7 +110,7 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.subtitle,
                         style: TextStyle(
-                          color: theme.textSecondary.withOpacity(opacity),
+                          color: theme.textSecondary.withValues(alpha: opacity),
                           fontSize: 14,
                         ),
                       ),

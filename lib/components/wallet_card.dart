@@ -39,7 +39,7 @@ class WalletCard extends StatelessWidget {
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(12),
           color: isSelected
-              ? theme.primaryPurple.withOpacity(0.1)
+              ? theme.primaryPurple.withValues(alpha: 0.1)
               : Colors.transparent,
         ),
         child: Container(
@@ -52,7 +52,7 @@ class WalletCard extends StatelessWidget {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: theme.primaryPurple.withOpacity(0.1),
+                    color: theme.primaryPurple.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
@@ -84,7 +84,7 @@ class WalletCard extends StatelessWidget {
                     Text(
                       address,
                       style: TextStyle(
-                        color: theme.textPrimary.withOpacity(0.5),
+                        color: theme.textPrimary.withValues(alpha: 0.5),
                         fontSize: (fontSize ?? 16) - 2,
                       ),
                       overflow: TextOverflow.ellipsis,

@@ -56,6 +56,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       );
       await state.syncData();
       _btnController.success();
+      if (!mounted) return;
       await Navigator.of(context).pushNamed(
         '/login',
       );
@@ -85,7 +86,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
             height: 4,
             margin: const EdgeInsets.only(top: 8, bottom: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.3),
+              color: theme.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

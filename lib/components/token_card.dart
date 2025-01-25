@@ -73,7 +73,8 @@ class _TokenCardState extends State<TokenCard>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: themeProvider.currentTheme.primaryPurple.withOpacity(0.1),
+          color:
+              themeProvider.currentTheme.primaryPurple.withValues(alpha: 0.1),
           width: 2,
         ),
       ),
@@ -165,7 +166,7 @@ class _TokenCardState extends State<TokenCard>
                                         widget.tokenName,
                                         style: TextStyle(
                                           color: theme.textPrimary
-                                              .withOpacity(0.7),
+                                              .withValues(alpha: 0.7),
                                           fontSize: 16,
                                           fontWeight: FontWeight.w500,
                                         ),
@@ -178,7 +179,7 @@ class _TokenCardState extends State<TokenCard>
                                       '(${widget.tokenSymbol})',
                                       style: TextStyle(
                                         color: theme.textSecondary
-                                            .withOpacity(0.5),
+                                            .withValues(alpha: 0.5),
                                         fontSize: 13,
                                       ),
                                     ),
@@ -205,7 +206,8 @@ class _TokenCardState extends State<TokenCard>
                                 Text(
                                   '$convertedAmount${widget.currencySymbol}',
                                   style: TextStyle(
-                                    color: theme.textSecondary.withOpacity(0.7),
+                                    color: theme.textSecondary
+                                        .withValues(alpha: 0.7),
                                     fontSize: 14,
                                     fontWeight: FontWeight.w400,
                                   ),
@@ -219,7 +221,7 @@ class _TokenCardState extends State<TokenCard>
                       Container(
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.05),
+                          color: Colors.white.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: _buildIcon(Provider.of<AppState>(context)),
@@ -234,7 +236,7 @@ class _TokenCardState extends State<TokenCard>
         if (widget.showDivider)
           Container(
             height: 1,
-            color: theme.textPrimary.withOpacity(0.1),
+            color: theme.textPrimary.withValues(alpha: 0.1),
           ),
       ],
     );

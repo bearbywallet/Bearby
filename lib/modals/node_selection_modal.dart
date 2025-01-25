@@ -65,7 +65,7 @@ class _NodeSelectionModalState extends State<NodeSelectionModal> {
                 height: 4,
                 margin: const EdgeInsets.only(top: 8, bottom: 16),
                 decoration: BoxDecoration(
-                  color: widget.theme.textSecondary.withOpacity(0.3),
+                  color: widget.theme.textSecondary.withValues(alpha: 0.3),
                   borderRadius: BorderRadius.circular(2),
                 ),
               ),
@@ -113,7 +113,7 @@ class _NodeSelectionModalState extends State<NodeSelectionModal> {
           border: !isLastItem
               ? Border(
                   bottom: BorderSide(
-                    color: theme.textSecondary.withOpacity(0.1),
+                    color: theme.textSecondary.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 )

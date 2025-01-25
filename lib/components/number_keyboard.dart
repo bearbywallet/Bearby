@@ -90,14 +90,15 @@ class NumberKeyboardState extends State<NumberKeyboard>
                   width: 30,
                   height: 30,
                   colorFilter: ColorFilter.mode(
-                    theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
+                    theme.textPrimary.withValues(alpha: isActive ? 1.0 : 0.5),
                     BlendMode.srcIn,
                   ),
                 )
               : Text(
                   value,
                   style: TextStyle(
-                    color: theme.textPrimary.withOpacity(isActive ? 1.0 : 0.5),
+                    color: theme.textPrimary
+                        .withValues(alpha: isActive ? 1.0 : 0.5),
                     fontSize: 32,
                     fontWeight: FontWeight.w500,
                   ),

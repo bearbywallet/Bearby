@@ -136,7 +136,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                                         if (states
                                             .contains(WidgetState.pressed)) {
                                           return theme.primaryPurple
-                                              .withOpacity(0.7);
+                                              .withValues(alpha: 0.7);
                                         }
                                         return theme.primaryPurple;
                                       },

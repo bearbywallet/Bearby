@@ -92,7 +92,10 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   }
 
   Future<void> _openAppSettings() async {
+    if (!mounted) return;
     await controller.stop();
+
+    // ignore: use_build_context_synchronously
     if (Theme.of(context).platform == TargetPlatform.iOS) {
       await openAppSettings();
     } else {
@@ -160,7 +163,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           height: 4,
           margin: const EdgeInsets.symmetric(vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.white.withOpacity(0.5),
+            color: Colors.white.withValues(alpha: 0.5),
             borderRadius: BorderRadius.circular(2),
           ),
         ),

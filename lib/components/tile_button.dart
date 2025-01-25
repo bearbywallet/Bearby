@@ -122,7 +122,7 @@ class _TileButtonState extends State<TileButton>
                     boxShadow: [
                       if (_isHovered && !widget.disabled)
                         BoxShadow(
-                          color: widget.textColor.withOpacity(0.1),
+                          color: widget.textColor.withValues(alpha: 0.1),
                           blurRadius: 8,
                           spreadRadius: 1,
                         ),

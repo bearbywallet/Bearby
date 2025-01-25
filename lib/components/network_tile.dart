@@ -16,7 +16,7 @@ Widget networkLabel({
       vertical: 2,
     ),
     decoration: BoxDecoration(
-      color: backgroundColor.withOpacity(0.1),
+      color: backgroundColor.withValues(alpha: 0.1),
       borderRadius: BorderRadius.circular(4),
     ),
     child: Text(
@@ -72,7 +72,7 @@ class NetworkTile extends StatelessWidget {
             border: Border.all(
               color: isSelected
                   ? theme.primaryPurple
-                  : theme.textSecondary.withOpacity(0.1),
+                  : theme.textSecondary.withValues(alpha: 0.1),
               width: isSelected ? 2 : 1,
             ),
             color: _getBackgroundColor(theme),
@@ -190,24 +190,24 @@ class NetworkTile extends StatelessWidget {
 
   Color? _getBackgroundColor(AppTheme theme) {
     if (!isEnabled) {
-      return theme.textSecondary.withOpacity(0.05);
+      return theme.textSecondary.withValues(alpha: 0.05);
     }
     if (isSelected) {
-      return theme.primaryPurple.withOpacity(0.1);
+      return theme.primaryPurple.withValues(alpha: 0.1);
     }
-    return theme.textSecondary.withOpacity(0.02);
+    return theme.textSecondary.withValues(alpha: 0.02);
   }
 
   Color _getTextColor(AppTheme theme) {
     if (!isEnabled) {
-      return theme.textSecondary.withOpacity(0.5);
+      return theme.textSecondary.withValues(alpha: 0.5);
     }
     return theme.textSecondary;
   }
 
   Color _getIconColor(AppTheme theme) {
     if (!isEnabled) {
-      return theme.textSecondary.withOpacity(0.5);
+      return theme.textSecondary.withValues(alpha: 0.5);
     }
     return theme.textSecondary;
   }

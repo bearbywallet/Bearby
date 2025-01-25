@@ -157,7 +157,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
                       _count > widget.minValue && !widget.disabled
                           ? widget.iconColor ?? theme.secondaryPurple
                           : (widget.iconColor ?? theme.secondaryPurple)
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                       BlendMode.srcIn,
                     ),
                   ),
@@ -193,7 +193,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
                       _count < widget.maxValue && !widget.disabled
                           ? widget.iconColor ?? theme.secondaryPurple
                           : (widget.iconColor ?? theme.secondaryPurple)
-                              .withOpacity(0.3),
+                              .withValues(alpha: 0.3),
                       BlendMode.srcIn,
                     ),
                   ),

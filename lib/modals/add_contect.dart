@@ -77,8 +77,9 @@ class _AddAddressModalState extends State<AddAddressModal> {
         net: BigInt.zero, // Detect network from wallet
       );
       await widget.state.syncBook();
-
+      if (!mounted) return;
       Navigator.pop(
+        // ignore: use_build_context_synchronously
         context,
       );
     } catch (e) {
@@ -101,7 +102,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
             height: 4,
             margin: const EdgeInsets.only(top: 16, bottom: 16),
             decoration: BoxDecoration(
-              color: widget.theme.textSecondary.withOpacity(0.3),
+              color: widget.theme.textSecondary.withValues(alpha: 0.3),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

@@ -101,7 +101,7 @@ class _LanguagePageState extends State<LanguagePage> {
           border: !isLastItem
               ? Border(
                   bottom: BorderSide(
-                    color: theme.textSecondary.withOpacity(0.1),
+                    color: theme.textSecondary.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 )

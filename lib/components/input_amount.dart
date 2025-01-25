@@ -57,7 +57,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
       decoration: BoxDecoration(
         color: Colors.transparent,
         border: Border.all(
-          color: theme.textSecondary.withOpacity(0.2),
+          color: theme.textSecondary.withValues(alpha: 0.2),
           width: 1.5,
         ),
         borderRadius: BorderRadius.circular(16),
@@ -93,7 +93,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         child: Text(
                           widget.convertAmount,
                           style: TextStyle(
-                            color: theme.textPrimary.withOpacity(0.7),
+                            color: theme.textPrimary.withValues(alpha: 0.7),
                             fontSize: 16,
                             fontWeight: FontWeight.w400,
                           ),
@@ -118,7 +118,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                       const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
                   decoration: BoxDecoration(
                     border: Border.all(
-                      color: theme.textPrimary.withOpacity(0.2),
+                      color: theme.textPrimary.withValues(alpha: 0.2),
                       width: 1.5,
                     ),
                     borderRadius: BorderRadius.circular(16),
@@ -131,7 +131,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         height: 24,
                         decoration: BoxDecoration(
                           border: Border.all(
-                            color: theme.textPrimary.withOpacity(0.2),
+                            color: theme.textPrimary.withValues(alpha: 0.2),
                             width: 1.5,
                           ),
                           borderRadius: BorderRadius.circular(24),
@@ -185,7 +185,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                   width: 15,
                   height: 15,
                   colorFilter: ColorFilter.mode(
-                    theme.warning.withOpacity(0.7),
+                    theme.warning.withValues(alpha: 0.7),
                     BlendMode.srcIn,
                   ),
                 ),
@@ -193,7 +193,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               Text(
                 balance.toString(),
                 style: TextStyle(
-                  color: theme.textPrimary.withOpacity(0.7),
+                  color: theme.textPrimary.withValues(alpha: 0.7),
                   fontSize: 14,
                 ),
               ),
@@ -207,13 +207,13 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: theme.textPrimary.withOpacity(0.1),
+                      color: theme.textPrimary.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(6),
                     ),
                     child: Text(
                       'Max',
                       style: TextStyle(
-                        color: theme.textPrimary.withOpacity(0.7),
+                        color: theme.textPrimary.withValues(alpha: 0.7),
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),

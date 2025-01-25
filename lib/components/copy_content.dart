@@ -88,7 +88,7 @@ class _CopyAddressButtonState extends State<CopyAddressButton>
                 opacity: _opacityAnimation.value,
                 child: Container(
                   decoration: BoxDecoration(
-                    color: theme.textSecondary.withOpacity(0.1),
+                    color: theme.textSecondary.withValues(alpha: 0.1),
                     borderRadius: BorderRadius.circular(6),
                   ),
                   padding: const EdgeInsets.symmetric(

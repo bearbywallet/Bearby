@@ -292,6 +292,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       _appState.setSelectedWallet(_appState.wallets.length - 1);
       _btnController.success();
 
+      if (!mounted) return;
       Navigator.of(context).pushNamed(
         '/',
       );

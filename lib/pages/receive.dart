@@ -162,7 +162,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                       vertical: adaptivePadding),
                                   padding: const EdgeInsets.all(16),
                                   decoration: BoxDecoration(
-                                    color: theme.warning.withOpacity(0.1),
+                                    color: theme.warning.withValues(alpha: 0.1),
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Row(

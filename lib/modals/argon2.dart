@@ -115,7 +115,6 @@ class _ArgonSettingsModalContentState
 
   @override
   Widget build(BuildContext context) {
-    // Rest of the build method remains the same
     final theme = Provider.of<AppState>(context).currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
@@ -137,7 +136,7 @@ class _ArgonSettingsModalContentState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),

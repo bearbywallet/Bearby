@@ -101,7 +101,7 @@ class _SecurityPageState extends State<SecurityPage> {
       children: [
         Container(
           decoration: BoxDecoration(
-            color: theme.cardBackground.withOpacity(0.7),
+            color: theme.cardBackground.withValues(alpha: 0.7),
             borderRadius: BorderRadius.circular(16),
           ),
           child: Column(
@@ -168,7 +168,8 @@ class _SecurityPageState extends State<SecurityPage> {
                   await state.syncData();
                 },
               ),
-              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
                 'IPFS gateway',
@@ -186,7 +187,8 @@ class _SecurityPageState extends State<SecurityPage> {
                 showInput: true,
                 controller: _ipfsController,
               ),
-              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
                 'Gas station',
@@ -202,7 +204,8 @@ class _SecurityPageState extends State<SecurityPage> {
                   await state.syncData();
                 },
               ),
-              Divider(height: 1, color: theme.textSecondary.withOpacity(0.1)),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
                 'Node ranking',
@@ -298,7 +301,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   style: TextStyle(
                     color: value
                         ? theme.textPrimary
-                        : theme.textSecondary.withOpacity(0.5),
+                        : theme.textSecondary.withValues(alpha: 0.5),
                     fontSize: 14,
                   ),
                   decoration: InputDecoration(
@@ -309,7 +312,7 @@ class _SecurityPageState extends State<SecurityPage> {
                     enabledBorder: OutlineInputBorder(
                       borderRadius: BorderRadius.circular(8),
                       borderSide: BorderSide(
-                        color: theme.textSecondary.withOpacity(0.2),
+                        color: theme.textSecondary.withValues(alpha: 0.2),
                       ),
                     ),
                     focusedBorder: OutlineInputBorder(

@@ -228,7 +228,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
       margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: theme.danger.withOpacity(0.1),
+        color: theme.danger.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(color: theme.danger),
       ),

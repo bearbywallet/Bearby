@@ -55,7 +55,7 @@ class _CustomButtonState extends State<CustomButton> {
               widget.text,
               style: TextStyle(
                 color: widget.disabled
-                    ? widget.textColor.withOpacity(0.5)
+                    ? widget.textColor.withValues(alpha: 0.5)
                     : widget.textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
@@ -69,9 +69,9 @@ class _CustomButtonState extends State<CustomButton> {
 
   Color _getBackgroundColor() {
     if (widget.disabled) {
-      return widget.backgroundColor.withOpacity(0.5);
+      return widget.backgroundColor.withValues(alpha: 0.5);
     } else if (_isHovered || _isFocused) {
-      return widget.backgroundColor.withOpacity(0.8);
+      return widget.backgroundColor.withValues(alpha: 0.8);
     } else {
       return widget.backgroundColor;
     }

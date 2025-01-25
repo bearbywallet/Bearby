@@ -248,7 +248,7 @@ class _WalletPageState extends State<WalletPage> {
       if (i < items.length - 1) {
         widgets.add(Divider(
           height: 1,
-          color: theme.textSecondary.withOpacity(0.1),
+          color: theme.textSecondary.withValues(alpha: 0.1),
         ));
       }
     }
@@ -321,7 +321,7 @@ class _WalletPageState extends State<WalletPage> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
-          color: Colors.red.withOpacity(0.1),
+          color: Colors.red.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(_borderRadius),
         ),
         child: Row(

@@ -60,7 +60,7 @@ class _SettingsItemState extends State<SettingsItem> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: _isPressed
-              ? theme.background.withOpacity(1.0)
+              ? theme.background.withValues(alpha: 1.0)
               : Colors.transparent,
           borderRadius: borderRadius,
         ),

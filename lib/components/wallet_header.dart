@@ -87,7 +87,7 @@ class _WalletHeaderState extends State<WalletHeader>
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(
-                      color: widget.primaryPurple.withOpacity(0.1),
+                      color: widget.primaryPurple.withValues(alpha: 0.1),
                       width: 2,
                     ),
                   ),

@@ -79,7 +79,7 @@ class _BackupConfirmationContentState
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withOpacity(0.5),
+              color: theme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -128,7 +128,7 @@ class _ConfirmationItem extends StatelessWidget {
         decoration: BoxDecoration(
           color: isConfirmed
               ? theme.background
-              : theme.background.withOpacity(0.2),
+              : theme.background.withValues(alpha: 0.2),
           borderRadius: BorderRadius.circular(12),
         ),
         child: CheckboxListTile(

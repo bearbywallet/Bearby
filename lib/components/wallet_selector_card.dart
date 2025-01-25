@@ -52,10 +52,10 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
             color: isPressed
-                ? theme.cardBackground.withOpacity(0.6)
+                ? theme.cardBackground.withValues(alpha: 0.6)
                 : Colors.transparent,
             border: Border.all(
-              color: theme.textSecondary.withOpacity(0.2),
+              color: theme.textSecondary.withValues(alpha: 0.2),
               width: 1.5,
             ),
             borderRadius: BorderRadius.circular(16),
@@ -68,7 +68,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                 decoration: BoxDecoration(
                   shape: BoxShape.circle,
                   border: Border.all(
-                    color: theme.primaryPurple.withOpacity(0.1),
+                    color: theme.primaryPurple.withValues(alpha: 0.1),
                     width: 1,
                   ),
                 ),
