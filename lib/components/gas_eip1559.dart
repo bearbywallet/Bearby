@@ -150,7 +150,7 @@ class _GasEIP1559State extends State<GasEIP1559>
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: isSelected
-              ? theme.primaryPurple.withOpacity(0.1)
+              ? theme.primaryPurple.withValues(alpha: 0.1)
               : Colors.transparent,
           borderRadius: BorderRadius.circular(16),
         ),
