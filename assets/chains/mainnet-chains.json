@@ -5,7 +5,7 @@
     "rpc": [
       "https://api.zq2-protomainnet.zilliqa.com"
     ],
-    "faucets": [],
+    "features": [],
     "nativeCurrency": {
       "name": "ZIL",
       "symbol": "ZIL",
@@ -28,28 +28,14 @@
     "chain": "ETH",
     "icon": "ethereum",
     "rpc": [
-      "https://api.mycryptoapi.com/eth",
-      "https://cloudflare-eth.com",
-      "https://ethereum-rpc.publicnode.com",
-      "https://mainnet.gateway.tenderly.co",
-      "https://rpc.blocknative.com/boost",
-      "https://rpc.flashbots.net",
-      "https://rpc.flashbots.net/fast",
-      "https://rpc.mevblocker.io",
-      "https://rpc.mevblocker.io/fast",
-      "https://rpc.mevblocker.io/noreverts",
-      "https://rpc.mevblocker.io/fullprivacy",
-      "https://eth.drpc.org"
+      "https://eth.llamarpc.com",
+      "https://eth-mainnet.public.blastapi.io"
     ],
     "features": [
-      {
-        "name": "EIP155"
-      },
-      {
-        "name": "EIP1559"
-      }
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
     ],
-    "faucets": [],
     "nativeCurrency": {
       "name": "Ether",
       "symbol": "ETH",
@@ -102,12 +88,17 @@
       "https://polygon.gateway.tenderly.co",
       "https://polygon.drpc.org"
     ],
-    "faucets": [],
     "nativeCurrency": {
       "name": "Polygon",
       "symbol": "POL",
       "decimals": 18
     },
+    "features": [
+      "EIP5656",
+      "EIP1153",
+      "EIP6780",
+      "EIP1559"
+    ],
     "infoURL": "https://polygon.technology/",
     "shortName": "polygon",
     "chainId": 137,
@@ -172,12 +163,8 @@
       "https://core.drpc.org"
     ],
     "features": [
-      {
-        "name": "EIP155"
-      },
-      {
-        "name": "EIP1559"
-      }
+      "EIP155",
+      "EIP1559"
     ],
     "faucets": [],
     "nativeCurrency": {
@@ -199,4 +186,3 @@
     ]
   }
 ]
-

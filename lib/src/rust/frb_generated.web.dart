@@ -27,6 +27,7 @@ import 'models/background.dart';
 import 'models/book.dart';
 import 'models/connection.dart';
 import 'models/ftoken.dart';
+import 'models/gas.dart';
 import 'models/keypair.dart';
 import 'models/notification.dart';
 import 'models/provider.dart';
@@ -169,6 +170,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo dco_decode_f_token_info(dynamic raw);
+
+  @protected
+  GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
+
+  @protected
+  GasInfo dco_decode_gas_info(dynamic raw);
 
   @protected
   HistoricalTransactionInfo dco_decode_historical_transaction_info(dynamic raw);
@@ -469,6 +476,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
+
+  @protected
+  GasFeeHistoryInfo sse_decode_gas_fee_history_info(
+      SseDeserializer deserializer);
+
+  @protected
+  GasInfo sse_decode_gas_info(SseDeserializer deserializer);
 
   @protected
   HistoricalTransactionInfo sse_decode_historical_transaction_info(
@@ -798,6 +812,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_gas_fee_history_info(
+      GasFeeHistoryInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_gas_info(GasInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_historical_transaction_info(

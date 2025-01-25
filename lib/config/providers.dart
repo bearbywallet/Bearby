@@ -12,7 +12,7 @@ extension ChainConverter on Chain {
       chain: chain,
       rpc: rpc.map((uri) => uri.toString()).toList(),
       features: Uint16List.fromList(
-          features.map((f) => f.name.hashCode.toUnsigned(16)).toList()),
+          features.map((f) => int.parse(f.replaceAll('EIP', ''))).toList()),
       chainId: BigInt.from(chainId),
       slip44: slip44,
       chainHash: BigInt.from(chainId),
@@ -52,7 +52,7 @@ class Chain {
   final String name;
   final String chain;
   final List<Uri> rpc;
-  final List<Feature> features;
+  final List<String> features;
   final List<Uri> faucets;
   final NativeCurrency nativeCurrency;
   final Uri infoURL;
@@ -72,7 +72,7 @@ class Chain {
               .toList(growable: false) ??
           [],
       features: (json['features'] as List<dynamic>?)
-              ?.map((e) => Feature.fromJson(e as Map<String, dynamic>))
+              ?.map((e) => e as String)
               .toList(growable: false) ??
           [],
       faucets: (json['faucets'] as List<dynamic>?)
@@ -96,40 +96,6 @@ class Chain {
           [],
     );
   }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-        'chain': chain,
-        'rpc': rpc.map((uri) => uri.toString()).toList(growable: false),
-        'features': features.map((f) => f.toJson()).toList(growable: false),
-        'faucets': faucets.map((uri) => uri.toString()).toList(growable: false),
-        'nativeCurrency': nativeCurrency.toJson(),
-        'infoURL': infoURL.toString(),
-        'shortName': shortName,
-        'chainId': chainId,
-        'networkId': networkId,
-        'slip44': slip44,
-        if (ens != null) 'ens': ens!.toJson(),
-        'explorers': explorers.map((e) => e.toJson()).toList(growable: false),
-      };
-}
-
-class Feature {
-  const Feature({
-    required this.name,
-  });
-
-  final String name;
-
-  factory Feature.fromJson(Map<String, dynamic> json) {
-    return Feature(
-      name: json['name'] as String? ?? '',
-    );
-  }
-
-  Map<String, dynamic> toJson() => {
-        'name': name,
-      };
 }
 
 class NativeCurrency {

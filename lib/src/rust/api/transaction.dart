@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/gas.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';
 import '../models/transactions/evm.dart';
@@ -36,8 +37,7 @@ Future<TransactionRequestInfo> createTokenTransfer(
         {required TokenTransferParamsInfo params}) =>
     RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);
 
-Future<TransactionRequestInfo> caclGasFee(
-        {required TransactionRequestInfo params}) =>
+Future<GasInfo> caclGasFee({required TransactionRequestInfo params}) =>
     RustLib.instance.api.crateApiTransactionCaclGasFee(params: params);
 
 class TokenTransferParamsInfo {

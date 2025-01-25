@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -35,10 +37,10 @@ void showConfirmTransactionModal({
 
 class _ConfirmTransactionContent extends StatefulWidget {
   final TransactionRequestInfo tx;
-
   final String to;
   final String amount;
   final VoidCallback onConfirm;
+
   const _ConfirmTransactionContent({
     required this.tx,
     required this.amount,
@@ -53,21 +55,17 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
-  final String _gasUsd = '0';
   final String _amountUsd = '0';
-  String _gasFee = '0';
-  late TransactionRequestInfo _tx;
+  GasInfo? _gasInfo;
+  GasFeeOption _selectedGasType = GasFeeOption.market;
 
-  String get fromAddress => isEVM ? _tx.evm!.from! : _tx.metadata.signer!;
+  bool get isEVM => widget.tx.evm != null;
 
-  String get gasLimit =>
-      isEVM ? _tx.evm!.gasLimit.toString() : _tx.scilla!.gasLimit.toString();
-
-  String get gasPrice => isEVM
-      ? _tx.evm!.gasPrice?.toString() ?? _tx.evm!.maxFeePerGas.toString()
-      : _tx.scilla!.gasPrice.toString();
-
-  bool get isEVM => _tx.evm != null;
+  @override
+  void initState() {
+    super.initState();
+    _handleModalOpen();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,17 +97,17 @@ class _ConfirmTransactionContentState
             _buildTokenLogo(appState),
             const SizedBox(height: 8),
             Text(
-              _tx.metadata.title ?? 'Confirm Transaction',
+              widget.tx.metadata.title ?? 'Confirm Transaction',
               style: TextStyle(
                 color: theme.textPrimary,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            if (_tx.metadata.info != null) ...[
+            if (widget.tx.metadata.info != null) ...[
               const SizedBox(height: 8),
               Text(
-                _tx.metadata.info!,
+                widget.tx.metadata.info!,
                 style: TextStyle(
                   color: theme.textSecondary,
                   fontSize: 16,
@@ -117,8 +115,18 @@ class _ConfirmTransactionContentState
               ),
             ],
             const SizedBox(height: 24),
-            _buildTransferDetails(
-                appState, _gasFee, _gasUsd, _amountUsd, networkToken),
+            _buildTransferDetails(appState, _amountUsd, networkToken),
+            if (_gasInfo != null && isEVM) ...[
+              const SizedBox(height: 16),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                child: GasEIP1559(
+                  gasInfo: _gasInfo!,
+                  selected: _selectedGasType,
+                  onSelect: (type) => setState(() => _selectedGasType = type),
+                ),
+              ),
+            ],
             const SizedBox(height: 24),
             _buildConfirmButton(theme),
             const SizedBox(height: 16),
@@ -126,35 +134,6 @@ class _ConfirmTransactionContentState
         ),
       ),
     );
-  }
-
-  String calculateGasFee() {
-    if (isEVM) {
-      final BigInt gasLimit = _tx.evm?.gasLimit ?? BigInt.from(21000);
-
-      BigInt price;
-      if (_tx.evm?.gasPrice != null) {
-        price = _tx.evm!.gasPrice!;
-      } else if (_tx.evm?.maxFeePerGas != null) {
-        price = _tx.evm!.maxFeePerGas!;
-      } else {
-        price = BigInt.from(0);
-      }
-
-      return (price * gasLimit).toString();
-    } else {
-      if (_tx.scilla == null) {
-        return "0";
-      }
-      return (_tx.scilla!.gasPrice * _tx.scilla!.gasLimit).toString();
-    }
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    _tx = widget.tx;
-    _handleModalOpen();
   }
 
   Widget _buildAmountRow(
@@ -233,8 +212,9 @@ class _ConfirmTransactionContentState
   Widget _buildTokenLogo(AppState state) {
     final theme = state.currentTheme;
     final token = state.wallet!.tokens
-        .firstWhere((t) => t.symbol == _tx.metadata.tokenInfo?.symbol);
-    final chainId = _tx.evm?.chainId ?? BigInt.from(_tx.scilla?.chainId ?? 0);
+        .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
+    final chainId =
+        widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
 
     return Container(
       width: 64,
@@ -263,12 +243,11 @@ class _ConfirmTransactionContentState
 
   Widget _buildTransferDetails(
     AppState appState,
-    String gas,
-    String gasUsd,
     String convertedAmount,
     String networkToken,
   ) {
     final theme = appState.currentTheme;
+    final signer = appState.account;
 
     return Container(
       margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -279,32 +258,21 @@ class _ConfirmTransactionContentState
       ),
       child: Column(
         children: [
-          if (_tx.metadata.signer != null)
-            _buildDetailRow('From', shortenAddress(fromAddress), theme),
+          if (widget.tx.metadata.signer != null)
+            _buildDetailRow('From', shortenAddress(signer?.addr ?? ""), theme),
           const SizedBox(height: 16),
           _buildDetailRow('To', shortenAddress(widget.to), theme),
           const SizedBox(height: 16),
           _buildAmountRow('Amount', widget.amount, convertedAmount, theme),
-          const SizedBox(height: 16),
-          _buildDetailRow('Gas Limit', gasLimit, theme),
-          const SizedBox(height: 16),
-          _buildDetailRow('Gas Price', '$gasPrice Gwei', theme),
-          const SizedBox(height: 16),
-          _buildAmountRow('Network Fee', '$gas $networkToken', gasUsd, theme),
-          if (!isEVM) ...[
-            const SizedBox(height: 16),
-            _buildDetailRow('Chain ID', _tx.scilla!.chainId.toString(), theme),
-          ],
         ],
       ),
     );
   }
 
   Future<void> _handleModalOpen() async {
-    final updatedTx = await caclGasFee(params: _tx);
-    setState(() {
-      _tx = updatedTx;
-      _gasFee = calculateGasFee();
-    });
+    if (isEVM) {
+      final gas = await caclGasFee(params: widget.tx);
+      setState(() => _gasInfo = gas);
+    }
   }
 }

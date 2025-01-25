@@ -1,3 +1,4 @@
+use crate::models::gas::GasInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
@@ -137,11 +138,8 @@ pub async fn create_token_transfer(
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn cacl_gas_fee(
-    params: TransactionRequestInfo,
-) -> Result<TransactionRequestInfo, String> {
+pub async fn cacl_gas_fee(params: TransactionRequestInfo) -> Result<GasInfo, String> {
     let chain_hash = params.metadata.chain_hash;
-    let mut tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
     let gas = {
         let guard = BACKGROUND_SERVICE.read().await;
         let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -149,6 +147,7 @@ pub async fn cacl_gas_fee(
             .core
             .get_provider(chain_hash)
             .map_err(ServiceError::BackgroundError)?;
+        let tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
 
         chain
             .estimate_gas_batch(&tx, 4, None)
@@ -156,38 +155,5 @@ pub async fn cacl_gas_fee(
             .map_err(ServiceError::NetworkErrors)?
     };
 
-    let gas_price: u128 = gas.gas_price.try_into().unwrap_or_default();
-
-    match tx {
-        TransactionRequest::Ethereum((ref mut tx, _)) => {
-            let gas_params = [
-                (gas_price, &mut tx.gas_price),
-                (
-                    gas.fee_history.max_fee.try_into().unwrap_or_default(),
-                    &mut tx.max_fee_per_gas,
-                ),
-                (
-                    gas.fee_history.priority_fee.try_into().unwrap_or_default(),
-                    &mut tx.max_priority_fee_per_gas,
-                ),
-            ];
-
-            for (value, param) in gas_params {
-                if value > 0 {
-                    *param = Some(value);
-                }
-            }
-
-            if let Ok(limit) = u64::try_from(gas.tx_estimate_gas) {
-                if limit > 0 {
-                    tx.gas = Some(limit);
-                }
-            }
-        }
-        TransactionRequest::Zilliqa((ref mut tx, _)) => {
-            tx.gas_price = gas_price;
-        }
-    }
-
-    Ok(tx.into())
+    Ok(gas.into())
 }

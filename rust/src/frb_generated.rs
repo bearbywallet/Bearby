@@ -2671,6 +2671,38 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
     }
 }
 
+impl SseDecode for crate::models::gas::GasFeeHistoryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_maxFee = <u128>::sse_decode(deserializer);
+        let mut var_priorityFee = <u128>::sse_decode(deserializer);
+        let mut var_baseFee = <u128>::sse_decode(deserializer);
+        return crate::models::gas::GasFeeHistoryInfo {
+            max_fee: var_maxFee,
+            priority_fee: var_priorityFee,
+            base_fee: var_baseFee,
+        };
+    }
+}
+
+impl SseDecode for crate::models::gas::GasInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_gasPrice = <u128>::sse_decode(deserializer);
+        let mut var_maxPriorityFee = <u128>::sse_decode(deserializer);
+        let mut var_feeHistory = <crate::models::gas::GasFeeHistoryInfo>::sse_decode(deserializer);
+        let mut var_txEstimateGas = <u64>::sse_decode(deserializer);
+        let mut var_blobBaseFee = <u128>::sse_decode(deserializer);
+        return crate::models::gas::GasInfo {
+            gas_price: var_gasPrice,
+            max_priority_fee: var_maxPriorityFee,
+            fee_history: var_feeHistory,
+            tx_estimate_gas: var_txEstimateGas,
+            blob_base_fee: var_blobBaseFee,
+        };
+    }
+}
+
 impl SseDecode for crate::models::transactions::history::HistoricalTransactionInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -3945,6 +3977,49 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::ftoken::FTokenInfo>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::gas::GasFeeHistoryInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.max_fee.into_into_dart().into_dart(),
+            self.priority_fee.into_into_dart().into_dart(),
+            self.base_fee.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::gas::GasFeeHistoryInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::gas::GasFeeHistoryInfo>
+    for crate::models::gas::GasFeeHistoryInfo
+{
+    fn into_into_dart(self) -> crate::models::gas::GasFeeHistoryInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::gas::GasInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.gas_price.into_into_dart().into_dart(),
+            self.max_priority_fee.into_into_dart().into_dart(),
+            self.fee_history.into_into_dart().into_dart(),
+            self.tx_estimate_gas.into_into_dart().into_dart(),
+            self.blob_base_fee.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::gas::GasInfo {}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::gas::GasInfo>
+    for crate::models::gas::GasInfo
+{
+    fn into_into_dart(self) -> crate::models::gas::GasInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart
     for crate::models::transactions::history::HistoricalTransactionInfo
 {
@@ -4551,6 +4626,26 @@ impl SseEncode for crate::models::ftoken::FTokenInfo {
         <bool>::sse_encode(self.default, serializer);
         <bool>::sse_encode(self.native, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
+    }
+}
+
+impl SseEncode for crate::models::gas::GasFeeHistoryInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u128>::sse_encode(self.max_fee, serializer);
+        <u128>::sse_encode(self.priority_fee, serializer);
+        <u128>::sse_encode(self.base_fee, serializer);
+    }
+}
+
+impl SseEncode for crate::models::gas::GasInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u128>::sse_encode(self.gas_price, serializer);
+        <u128>::sse_encode(self.max_priority_fee, serializer);
+        <crate::models::gas::GasFeeHistoryInfo>::sse_encode(self.fee_history, serializer);
+        <u64>::sse_encode(self.tx_estimate_gas, serializer);
+        <u128>::sse_encode(self.blob_base_fee, serializer);
     }
 }
 
