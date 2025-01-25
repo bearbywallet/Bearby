@@ -4,6 +4,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/addr.dart';
+import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
@@ -100,7 +101,7 @@ class _ConfirmTransactionContentState
               widget.tx.metadata.title ?? 'Confirm Transaction',
               style: TextStyle(
                 color: theme.textPrimary,
-                fontSize: 24,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -217,8 +218,8 @@ class _ConfirmTransactionContentState
         widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
 
     return Container(
-      width: 64,
-      height: 64,
+      width: 32,
+      height: 32,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
