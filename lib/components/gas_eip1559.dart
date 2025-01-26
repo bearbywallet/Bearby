@@ -23,7 +23,7 @@ extension GasFeeOptionX on GasFeeOption {
       case GasFeeOption.low:
         return '🐢';
       case GasFeeOption.market:
-        return '🐉';
+        return '🐼';
       case GasFeeOption.aggressive:
         return '👹';
     }
@@ -135,6 +135,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   }) {
     final theme = appState.currentTheme;
     final isSelected = widget.selected == option;
+    final token = appState.wallet!.tokens.first;
 
     final maxFeePerGas = calculateFeeForOption(
       option,
@@ -269,7 +270,9 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                     ),
                                     Text(
                                       formatGasPriceDetail(
-                                          widget.gasInfo.feeHistory.baseFee),
+                                        widget.gasInfo.feeHistory.baseFee,
+                                        token,
+                                      ),
                                       style: TextStyle(
                                         color: theme.textPrimary,
                                         fontSize: 12,
@@ -296,6 +299,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                           option,
                                           widget.gasInfo.feeHistory.priorityFee,
                                         ),
+                                        token,
                                       ),
                                       style: TextStyle(
                                         color: theme.textPrimary,
@@ -318,7 +322,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                       ),
                                     ),
                                     Text(
-                                      formatGasPriceDetail(maxFeePerGas),
+                                      formatGasPriceDetail(maxFeePerGas, token),
                                       style: TextStyle(
                                         color: theme.textPrimary,
                                         fontSize: 12,
@@ -363,7 +367,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         if (_isExpanded || selectedOption == GasFeeOption.market)
           _buildGasOption(
             option: GasFeeOption.market,
-            textColor: theme.success,
+            textColor: theme.textSecondary,
             appState: appState,
             chain: chain,
             token: token,

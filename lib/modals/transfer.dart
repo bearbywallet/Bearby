@@ -72,7 +72,7 @@ class _ConfirmTransactionContentState
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final networkToken = isEVM ? 'ETH' : 'ZIL';
+    final token = appState.wallet!.tokens.first;
 
     return Container(
       decoration: BoxDecoration(
@@ -116,7 +116,7 @@ class _ConfirmTransactionContentState
               ),
             ],
             const SizedBox(height: 24),
-            _buildTransferDetails(appState, _amountUsd, networkToken),
+            _buildTransferDetails(appState, _amountUsd, token.symbol),
             if (_gasInfo != null && isEVM) ...[
               const SizedBox(height: 16),
               Padding(

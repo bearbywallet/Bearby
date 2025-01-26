@@ -1,32 +1,35 @@
+import 'package:zilpay/src/rust/models/ftoken.dart';
+
 enum GasFeeOption { low, market, aggressive }
 
 BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
   switch (option) {
     case GasFeeOption.low:
-      return priorityFee * BigInt.from(50) ~/ BigInt.from(100);
+      return BigInt.zero;
     case GasFeeOption.market:
-      return priorityFee;
-    case GasFeeOption.aggressive:
       return priorityFee * BigInt.from(150) ~/ BigInt.from(100);
+    case GasFeeOption.aggressive:
+      return priorityFee * BigInt.from(300) ~/ BigInt.from(100);
   }
 }
 
 BigInt calculateMaxFeePerGas(
-    GasFeeOption option, BigInt baseFee, BigInt priorityFee) {
+  GasFeeOption option,
+  BigInt baseFee,
+  BigInt priorityFee,
+) {
   final maxPriorityFee = calculateMaxPriorityFee(option, priorityFee);
   switch (option) {
     case GasFeeOption.low:
-      return baseFee +
-          maxPriorityFee +
-          (baseFee * BigInt.from(5) ~/ BigInt.from(100));
+      return baseFee + maxPriorityFee;
     case GasFeeOption.market:
       return baseFee +
           maxPriorityFee +
-          (baseFee * BigInt.from(10) ~/ BigInt.from(100));
+          (baseFee * BigInt.from(20) ~/ BigInt.from(100));
     case GasFeeOption.aggressive:
       return baseFee +
           maxPriorityFee +
-          (baseFee * BigInt.from(20) ~/ BigInt.from(100));
+          (baseFee * BigInt.from(50) ~/ BigInt.from(100));
   }
 }
 
@@ -64,7 +67,7 @@ BigInt calculateTotalGasCost(
   return effectiveGasPrice * gasLimit;
 }
 
-String formatGasPriceDetail(BigInt price) {
+String formatGasPriceDetail(BigInt price, FTokenInfo token) {
   final gwei = price / BigInt.from(10).pow(9);
 
   if (gwei < 0.1) {
@@ -73,7 +76,7 @@ String formatGasPriceDetail(BigInt price) {
     return '${gwei.toStringAsFixed(2)} Gwei';
   } else {
     final eth = price / BigInt.from(10).pow(18);
-    return '${eth.toStringAsFixed(6)} ETH';
+    return '${eth.toStringAsFixed(6)} ${token.symbol}';
   }
 }
 
