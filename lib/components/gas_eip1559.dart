@@ -56,11 +56,13 @@ extension GasFeeOptionX on GasFeeOption {
 class GasEIP1559 extends StatefulWidget {
   final GasInfo gasInfo;
   final Function(BigInt maxPriorityFee) onChange;
+  final bool disabled;
 
   const GasEIP1559({
     super.key,
     required this.gasInfo,
     required this.onChange,
+    this.disabled = false,
   });
 
   @override
@@ -73,7 +75,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   bool _isExpanded = false;
   GasFeeOption _selected = GasFeeOption.market;
 
-  // Мемоизация часто используемых значений
   late final BigInt _initialMaxPriorityFee;
 
   @override
@@ -88,22 +89,11 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       curve: Curves.easeInOut,
     );
 
-    _validateFees();
     _initialMaxPriorityFee = calculateMaxPriorityFee(
       _selected,
       widget.gasInfo.feeHistory.priorityFee,
     );
     widget.onChange(_initialMaxPriorityFee);
-  }
-
-  void _validateFees() {
-    assert(
-        widget.gasInfo.feeHistory.maxFee >= widget.gasInfo.feeHistory.baseFee,
-        'Max fee must be greater than base fee');
-    assert(
-        widget.gasInfo.feeHistory.maxFee >=
-            widget.gasInfo.feeHistory.priorityFee,
-        'Max fee must be greater than priority fee');
   }
 
   @override
@@ -113,6 +103,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   }
 
   void _handleOptionTap(GasFeeOption option) {
+    if (widget.disabled) return; // Early return if disabled
+
     if (_selected == option) {
       setState(() {
         _isExpanded = !_isExpanded;
@@ -198,14 +190,16 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
           Text(
             label,
             style: TextStyle(
-              color: theme.textSecondary,
+              color: theme.textSecondary
+                  .withValues(alpha: widget.disabled ? 0.5 : 1.0),
               fontSize: 12,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: theme.textPrimary,
+              color: theme.textPrimary
+                  .withValues(alpha: widget.disabled ? 0.5 : 1.0),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -241,36 +235,60 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       curve: Curves.easeOutQuart,
       builder: (context, value, child) => Transform.scale(
         scale: value,
-        child: GestureDetector(
-          onTap: () => _handleOptionTap(option),
-          child: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-            decoration: BoxDecoration(
-              color: isSelected
-                  ? theme.primaryPurple.withValues(alpha: 0.1)
-                  : Colors.transparent,
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Text(option.icon, style: const TextStyle(fontSize: 24)),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+        child: Opacity(
+          opacity: widget.disabled ? 0.5 : 1.0,
+          child: GestureDetector(
+            onTap: widget.disabled ? null : () => _handleOptionTap(option),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.primaryPurple.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Text(option.icon, style: const TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              option.title,
+                              style: TextStyle(
+                                color: theme.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              option.confirmationTime,
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
-                            option.title,
+                            formatGasPrice(
+                                totalGasFee, token.decimals, token.symbol),
                             style: TextStyle(
-                              color: theme.textPrimary,
+                              color: textColor,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            option.confirmationTime,
+                            option.description,
                             style: TextStyle(
                               color: theme.textSecondary,
                               fontSize: 12,
@@ -278,36 +296,15 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          formatGasPrice(
-                              totalGasFee, token.decimals, token.symbol),
-                          style: TextStyle(
-                            color: textColor,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          option.description,
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                if (isSelected)
-                  SizeTransition(
-                    sizeFactor: _expandAnimation,
-                    child: _buildGasDetails(theme, token),
+                    ],
                   ),
-              ],
+                  if (isSelected)
+                    SizeTransition(
+                      sizeFactor: _expandAnimation,
+                      child: _buildGasDetails(theme, token),
+                    ),
+                ],
+              ),
             ),
           ),
         ),

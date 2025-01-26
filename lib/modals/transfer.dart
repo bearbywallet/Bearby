@@ -56,7 +56,17 @@ class _ConfirmTransactionContent extends StatefulWidget {
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
   final String _amountUsd = '0';
-  GasInfo? _gasInfo;
+  GasInfo _gasInfo = GasInfo(
+    gasPrice: BigInt.zero,
+    maxPriorityFee: BigInt.zero,
+    feeHistory: GasFeeHistoryInfo(
+      maxFee: BigInt.zero,
+      priorityFee: BigInt.zero,
+      baseFee: BigInt.zero,
+    ),
+    txEstimateGas: BigInt.zero,
+    blobBaseFee: BigInt.zero,
+  );
 
   bool get isEVM => widget.tx.evm != null;
 
@@ -115,12 +125,13 @@ class _ConfirmTransactionContentState
             ],
             const SizedBox(height: 24),
             _buildTransferDetails(appState, _amountUsd, token.symbol),
-            if (_gasInfo != null && isEVM) ...[
+            if (isEVM) ...[
               const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GasEIP1559(
-                  gasInfo: _gasInfo!,
+                  gasInfo: _gasInfo,
+                  disabled: _gasInfo.gasPrice == BigInt.zero,
                   onChange: (BigInt maxPriorityFee) {
                     print(maxPriorityFee);
                   },
