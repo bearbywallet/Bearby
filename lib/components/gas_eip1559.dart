@@ -68,10 +68,9 @@ class GasEIP1559 extends StatefulWidget {
   State<GasEIP1559> createState() => _GasEIP1559State();
 }
 
-class _GasEIP1559State extends State<GasEIP1559>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _animation;
+class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
+  late AnimationController _expandController;
+  late Animation<double> _expandAnimation;
   bool _isExpanded = false;
   late GasFeeOption _lastSelected;
 
@@ -79,12 +78,12 @@ class _GasEIP1559State extends State<GasEIP1559>
   void initState() {
     super.initState();
     _lastSelected = widget.selected;
-    _controller = AnimationController(
+    _expandController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
     );
-    _animation = CurvedAnimation(
-      parent: _controller,
+    _expandAnimation = CurvedAnimation(
+      parent: _expandController,
       curve: Curves.easeInOut,
     );
 
@@ -103,8 +102,28 @@ class _GasEIP1559State extends State<GasEIP1559>
 
   @override
   void dispose() {
-    _controller.dispose();
+    _expandController.dispose();
     super.dispose();
+  }
+
+  void _handleOptionTap(GasFeeOption option) {
+    if (widget.selected == option) {
+      setState(() {
+        _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _expandController.forward();
+        } else {
+          _expandController.reverse();
+        }
+      });
+    } else {
+      setState(() {
+        _lastSelected = option;
+        _isExpanded = false;
+        _expandController.reverse();
+      });
+      widget.onSelect(option);
+    }
   }
 
   Widget _buildGasOption({
@@ -130,165 +149,196 @@ class _GasEIP1559State extends State<GasEIP1559>
       widget.gasInfo.txEstimateGas,
     );
 
-    return GestureDetector(
-      onTap: () {
-        if (widget.selected == option) {
-          setState(() {
-            _isExpanded = !_isExpanded;
-            if (_isExpanded) {
-              _controller.forward();
-            } else {
-              _controller.reverse();
-            }
-          });
-        } else {
-          _lastSelected = option;
-          widget.onSelect(option);
-        }
-      },
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? theme.primaryPurple.withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Column(
-          children: [
-            Row(
-              children: [
-                Text(option.icon, style: const TextStyle(fontSize: 24)),
-                const SizedBox(width: 12),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
+    return TweenAnimationBuilder<double>(
+      tween: Tween<double>(
+        begin: 0.95,
+        end: isSelected ? 1.0 : 0.95,
+      ),
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeOutQuart,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: GestureDetector(
+            onTap: () => _handleOptionTap(option),
+            child: Container(
+              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+              decoration: BoxDecoration(
+                color: isSelected
+                    ? theme.primaryPurple.withValues(alpha: 0.1)
+                    : Colors.transparent,
+                borderRadius: BorderRadius.circular(16),
+              ),
+              child: Column(
+                children: [
+                  Row(
                     children: [
-                      Text(
-                        option.title,
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontWeight: FontWeight.w600,
+                      Text(option.icon, style: const TextStyle(fontSize: 24)),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              option.title,
+                              style: TextStyle(
+                                color: theme.textPrimary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              option.confirmationTime,
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
                         ),
                       ),
-                      const SizedBox(height: 4),
-                      Text(
-                        option.confirmationTime,
-                        style: TextStyle(
-                          color: theme.textSecondary,
-                          fontSize: 12,
-                        ),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Text(
+                            formatGasPrice(
+                                totalGasFee, token.decimals, token.symbol),
+                            style: TextStyle(
+                              color: textColor,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            option.description,
+                            style: TextStyle(
+                              color: theme.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    Text(
-                      formatGasPrice(totalGasFee, token.decimals, token.symbol),
-                      style: TextStyle(
-                        color: textColor,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      option.description,
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 12,
-                      ),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-            if (isSelected && _isExpanded) ...[
-              const SizedBox(height: 8),
-              Container(
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: theme.background,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Base Fee:',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          formatGasPriceDetail(
-                              widget.gasInfo.feeHistory.baseFee),
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Priority Fee:',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          formatGasPriceDetail(
-                            calculateMaxPriorityFee(
-                              option,
-                              widget.gasInfo.feeHistory.priorityFee,
+                  if (isSelected)
+                    SizeTransition(
+                      sizeFactor: _expandAnimation,
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 8),
+                          Container(
+                            padding: const EdgeInsets.all(8),
+                            decoration: BoxDecoration(
+                              color: theme.background,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Estimated Gas:',
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      '${widget.gasInfo.txEstimateGas}',
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Base Fee:',
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      formatGasPriceDetail(
+                                          widget.gasInfo.feeHistory.baseFee),
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Priority Fee:',
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      formatGasPriceDetail(
+                                        calculateMaxPriorityFee(
+                                          option,
+                                          widget.gasInfo.feeHistory.priorityFee,
+                                        ),
+                                      ),
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      'Max Fee:',
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                    Text(
+                                      formatGasPriceDetail(maxFeePerGas),
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 4),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          'Max Fee:',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 12,
-                          ),
-                        ),
-                        Text(
-                          formatGasPriceDetail(maxFeePerGas),
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+                ],
               ),
-            ],
-          ],
-        ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 
