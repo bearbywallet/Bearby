@@ -305,7 +305,7 @@ class _ConfirmTransactionContentState
       final amount = toWei(widget.amount, token.decimals);
       final balance = BigInt.parse(token.balances[selectedAccount] ?? "0");
 
-      return balance <= amount;
+      return balance >= amount;
     } catch (e) {
       return false;
     }
