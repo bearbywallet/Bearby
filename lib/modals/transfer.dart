@@ -9,6 +9,7 @@ import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
+import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -123,7 +124,7 @@ class _ConfirmTransactionContentState
                   disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
                   onChange: (BigInt maxPriorityFee) {
                     setState(() {
-                      maxPriorityFee = maxPriorityFee;
+                      _maxPriorityFee = maxPriorityFee;
                     });
                   },
                 ),
@@ -191,7 +192,32 @@ class _ConfirmTransactionContentState
                         'Insufficient balance for this transaction');
                   }
 
-                  await Future<void>.delayed(const Duration(seconds: 2));
+                  if (isEVM) {
+                    TransactionRequestEVM newTx = TransactionRequestEVM(
+                      nonce: widget.tx.evm!.nonce,
+                      from: widget.tx.evm!.from,
+                      to: widget.tx.evm!.to,
+                      value: widget.tx.evm!.value,
+                      data: widget.tx.evm!.data,
+                      chainId: widget.tx.evm!.chainId,
+                      accessList: widget.tx.evm!.accessList,
+                      blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
+                      // Fee
+                      maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
+                      maxPriorityFeePerGas: _maxPriorityFee,
+                      gasLimit: _gasInfo.txEstimateGas,
+                      gasPrice: _gasInfo.gasPrice,
+                      maxFeePerGas:
+                          (_gasInfo.feeHistory.baseFee * BigInt.from(2)) +
+                              _maxPriorityFee,
+                    );
+
+                    print(
+                        "maxPriorityFeePerGas: ${newTx.maxPriorityFeePerGas}");
+                  } else {
+                    await Future<void>.delayed(const Duration(seconds: 2));
+                  }
+
                   widget.onConfirm();
                 } catch (e) {
                   setState(() {

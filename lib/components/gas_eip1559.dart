@@ -94,6 +94,21 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     super.dispose();
   }
 
+  @override
+  void didUpdateWidget(GasEIP1559 oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.gasInfo != widget.gasInfo) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        final maxPriorityFee = calculateMaxPriorityFee(
+          _selected,
+          widget.gasInfo.feeHistory.priorityFee,
+        );
+        widget.onChange(maxPriorityFee);
+      });
+    }
+  }
+
   void _handleOptionTap(GasFeeOption option) {
     if (widget.disabled) return;
 
