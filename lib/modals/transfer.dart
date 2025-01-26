@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
@@ -71,8 +73,10 @@ class _ConfirmTransactionContentState
     blobBaseFee: BigInt.zero,
   );
   bool loading = false;
+  String? _error;
 
   bool get isEVM => widget.tx.evm != null;
+  bool get hasError => _error != null;
 
   @override
   void initState() {
@@ -106,11 +110,10 @@ class _ConfirmTransactionContentState
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
+            if (hasError) _buildErrorMessage(theme),
             _buildTokenLogo(appState),
             const SizedBox(height: 4),
-            _buildTransferDetails(
-              appState,
-            ),
+            _buildTransferDetails(appState),
             if (isEVM) ...[
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -132,77 +135,180 @@ class _ConfirmTransactionContentState
     );
   }
 
+  Widget _buildErrorMessage(AppTheme theme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      padding: const EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.danger.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+      ),
+      child: Row(
+        children: [
+          SvgPicture.asset(
+            "assets/icons/warning.svg",
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              theme.danger,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _error!,
+              style: TextStyle(
+                color: theme.danger,
+                fontSize: 14,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildConfirmButton(AppTheme theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SwipeButton(
-        text: "Confirm",
-        onSwipeComplete: () async {
-          setState(() {
-            loading = true;
-          });
-          await Future.delayed(const Duration(seconds: 2));
-          setState(() {
-            loading = false;
-          });
-        },
+        text: hasError ? "Unable to confirm" : "Confirm",
+        onSwipeComplete: hasError
+            ? () async {}
+            : () async {
+                try {
+                  setState(() {
+                    loading = true;
+                    _error = null;
+                  });
+
+                  if (!_hasEnoughBalance()) {
+                    throw Exception(
+                        'Insufficient balance for this transaction');
+                  }
+
+                  if (isEVM && _gasInfo.gasPrice == BigInt.zero) {
+                    throw Exception('Invalid gas price');
+                  }
+
+                  await Future<void>.delayed(const Duration(seconds: 2));
+                  widget.onConfirm();
+                } catch (e) {
+                  setState(() {
+                    _error = e.toString();
+                  });
+                } finally {
+                  setState(() {
+                    loading = false;
+                  });
+                }
+              },
       ),
     );
   }
 
   Widget _buildTokenLogo(AppState state) {
-    const double imageSize = 64;
+    const double imageSize = 54;
     final theme = state.currentTheme;
-    final token = state.wallet!.tokens
-        .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
-    final chainId =
-        widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
 
-    return Container(
-      width: imageSize,
-      height: imageSize,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
-      ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: viewTokenIcon(
-            token,
-            chainId,
-            theme.value,
+    try {
+      final token = state.wallet!.tokens
+          .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
+      final chainId =
+          widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
+
+      return Container(
+        width: imageSize,
+        height: imageSize,
+        decoration: BoxDecoration(
+          shape: BoxShape.circle,
+          border: Border.all(
+            color: theme.primaryPurple.withValues(alpha: 0.1),
+            width: 2,
           ),
-          width: imageSize,
-          height: imageSize,
-          fit: BoxFit.contain,
         ),
-      ),
-    );
+        child: ClipOval(
+          child: AsyncImage(
+            url: viewTokenIcon(
+              token,
+              chainId,
+              theme.value,
+            ),
+            width: imageSize,
+            height: imageSize,
+            fit: BoxFit.contain,
+          ),
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _error = 'Invalid token information';
+      });
+      return const SizedBox.shrink();
+    }
   }
 
-  Widget _buildTransferDetails(
-    AppState appState,
-  ) {
-    final token = appState.wallet!.tokens[widget.tokenIndex];
-    final signer = appState.account;
+  Widget _buildTransferDetails(AppState appState) {
+    try {
+      final token = appState.wallet!.tokens[widget.tokenIndex];
+      final signer = appState.account;
 
-    return Container(
-      padding: const EdgeInsets.all(16),
-      child: TokenTransferAmount(
-        fromAddress: signer!.addr,
-        fromName: signer.name,
-        toAddress: widget.to,
-        amount: widget.amount,
-        symbol: token.symbol,
-      ),
-    );
+      if (signer == null) {
+        throw Exception('No active account found');
+      }
+
+      return Container(
+        padding: const EdgeInsets.all(16),
+        child: TokenTransferAmount(
+          fromAddress: signer.addr,
+          fromName: signer.name,
+          toAddress: widget.to,
+          amount: widget.amount,
+          symbol: token.symbol,
+        ),
+      );
+    } catch (e) {
+      setState(() {
+        _error = 'Failed to load transfer details';
+      });
+      return const SizedBox.shrink();
+    }
   }
 
   Future<void> _handleModalOpen() async {
-    final gas = await caclGasFee(params: widget.tx);
-    setState(() => _gasInfo = gas);
+    try {
+      setState(() {
+        _error = null;
+      });
+
+      final gas = await caclGasFee(params: widget.tx);
+
+      if (!mounted) return;
+
+      setState(() {
+        _gasInfo = gas;
+      });
+    } catch (e) {
+      if (!mounted) return;
+
+      setState(() {
+        _error = 'Failed to calculate gas fee: ${e.toString()}';
+      });
+    }
+  }
+
+  bool _hasEnoughBalance() {
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final token = appState.wallet!.tokens[widget.tokenIndex];
+      final selectedAccount = appState.wallet!.selectedAccount;
+      final amount = toWei(widget.amount, token.decimals);
+      final balance = BigInt.parse(token.balances[selectedAccount] ?? "0");
+
+      return amount < balance;
+    } catch (e) {
+      return false;
+    }
   }
 }
