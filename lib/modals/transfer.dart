@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
@@ -70,6 +70,7 @@ class _ConfirmTransactionContentState
     txEstimateGas: BigInt.zero,
     blobBaseFee: BigInt.zero,
   );
+  bool loading = false;
 
   bool get isEVM => widget.tx.evm != null;
 
@@ -115,7 +116,7 @@ class _ConfirmTransactionContentState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GasEIP1559(
                   gasInfo: _gasInfo,
-                  disabled: _gasInfo.gasPrice == BigInt.zero,
+                  disabled: _gasInfo.gasPrice == BigInt.zero || loading,
                   onChange: (BigInt maxPriorityFee) {
                     print(maxPriorityFee);
                   },
@@ -134,9 +135,17 @@ class _ConfirmTransactionContentState
   Widget _buildConfirmButton(AppTheme theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
-      child: CustomButton(
+      child: SwipeButton(
         text: "Confirm",
-        onPressed: widget.onConfirm,
+        onSwipeComplete: () async {
+          setState(() {
+            loading = true;
+          });
+          await Future.delayed(const Duration(seconds: 2));
+          setState(() {
+            loading = false;
+          });
+        },
       ),
     );
   }
