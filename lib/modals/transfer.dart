@@ -72,8 +72,9 @@ class _ConfirmTransactionContentState
     txEstimateGas: BigInt.zero,
     blobBaseFee: BigInt.zero,
   );
-  bool loading = false;
+  bool _loading = false;
   String? _error;
+  BigInt _maxPriorityFee = BigInt.zero;
 
   bool get isEVM => widget.tx.evm != null;
   bool get hasError => _error != null;
@@ -119,9 +120,11 @@ class _ConfirmTransactionContentState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GasEIP1559(
                   gasInfo: _gasInfo,
-                  disabled: _gasInfo.gasPrice == BigInt.zero || loading,
+                  disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
                   onChange: (BigInt maxPriorityFee) {
-                    print(maxPriorityFee);
+                    setState(() {
+                      maxPriorityFee = maxPriorityFee;
+                    });
                   },
                 ),
               ),
@@ -179,17 +182,13 @@ class _ConfirmTransactionContentState
             : () async {
                 try {
                   setState(() {
-                    loading = true;
+                    _loading = true;
                     _error = null;
                   });
 
                   if (!_hasEnoughBalance()) {
                     throw Exception(
                         'Insufficient balance for this transaction');
-                  }
-
-                  if (isEVM && _gasInfo.gasPrice == BigInt.zero) {
-                    throw Exception('Invalid gas price');
                   }
 
                   await Future<void>.delayed(const Duration(seconds: 2));
@@ -200,7 +199,7 @@ class _ConfirmTransactionContentState
                   });
                 } finally {
                   setState(() {
-                    loading = false;
+                    _loading = false;
                   });
                 }
               },
@@ -306,7 +305,7 @@ class _ConfirmTransactionContentState
       final amount = toWei(widget.amount, token.decimals);
       final balance = BigInt.parse(token.balances[selectedAccount] ?? "0");
 
-      return amount < balance;
+      return balance <= amount;
     } catch (e) {
       return false;
     }
