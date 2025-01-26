@@ -5,6 +5,7 @@ import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 extension GasFeeOptionX on GasFeeOption {
   String get title {
@@ -21,7 +22,7 @@ extension GasFeeOptionX on GasFeeOption {
   String get icon {
     switch (this) {
       case GasFeeOption.low:
-        return '🐢';
+        return '🐥';
       case GasFeeOption.market:
         return '🐼';
       case GasFeeOption.aggressive:
@@ -54,14 +55,12 @@ extension GasFeeOptionX on GasFeeOption {
 
 class GasEIP1559 extends StatefulWidget {
   final GasInfo gasInfo;
-  final Function(GasFeeOption type) onSelect;
-  final GasFeeOption selected;
+  final Function(BigInt maxPriorityFee) onChange;
 
   const GasEIP1559({
     super.key,
     required this.gasInfo,
-    required this.onSelect,
-    this.selected = GasFeeOption.market,
+    required this.onChange,
   });
 
   @override
@@ -69,15 +68,17 @@ class GasEIP1559 extends StatefulWidget {
 }
 
 class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
-  late AnimationController _expandController;
-  late Animation<double> _expandAnimation;
+  late final AnimationController _expandController;
+  late final Animation<double> _expandAnimation;
   bool _isExpanded = false;
-  late GasFeeOption _lastSelected;
+  GasFeeOption _selected = GasFeeOption.market;
+
+  // Мемоизация часто используемых значений
+  late final BigInt _initialMaxPriorityFee;
 
   @override
   void initState() {
     super.initState();
-    _lastSelected = widget.selected;
     _expandController = AnimationController(
       duration: const Duration(milliseconds: 300),
       vsync: this,
@@ -88,6 +89,11 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     );
 
     _validateFees();
+    _initialMaxPriorityFee = calculateMaxPriorityFee(
+      _selected,
+      widget.gasInfo.feeHistory.priorityFee,
+    );
+    widget.onChange(_initialMaxPriorityFee);
   }
 
   void _validateFees() {
@@ -107,23 +113,106 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   }
 
   void _handleOptionTap(GasFeeOption option) {
-    if (widget.selected == option) {
+    if (_selected == option) {
       setState(() {
         _isExpanded = !_isExpanded;
-        if (_isExpanded) {
-          _expandController.forward();
-        } else {
-          _expandController.reverse();
-        }
+        _isExpanded ? _expandController.forward() : _expandController.reverse();
       });
-    } else {
-      setState(() {
-        _lastSelected = option;
-        _isExpanded = false;
-        _expandController.reverse();
-      });
-      widget.onSelect(option);
+      return;
     }
+
+    setState(() {
+      _selected = option;
+      _isExpanded = false;
+      _expandController.reverse();
+    });
+
+    final maxPriorityFee = calculateMaxPriorityFee(
+      option,
+      widget.gasInfo.feeHistory.priorityFee,
+    );
+    widget.onChange(maxPriorityFee);
+  }
+
+  Widget _buildGasDetails(AppTheme theme, FTokenInfo token) {
+    return Column(
+      children: [
+        const SizedBox(height: 8),
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.background,
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Column(
+            children: [
+              _buildDetailRow(
+                'Estimated Gas:',
+                '${widget.gasInfo.txEstimateGas}',
+                theme,
+              ),
+              _buildDetailRow(
+                'Base Fee:',
+                formatGasPriceDetail(
+                  widget.gasInfo.feeHistory.baseFee,
+                  token,
+                ),
+                theme,
+              ),
+              _buildDetailRow(
+                'Priority Fee:',
+                formatGasPriceDetail(
+                  calculateMaxPriorityFee(
+                    _selected,
+                    widget.gasInfo.feeHistory.priorityFee,
+                  ),
+                  token,
+                ),
+                theme,
+              ),
+              _buildDetailRow(
+                'Max Fee:',
+                formatGasPriceDetail(
+                  calculateFeeForOption(
+                    _selected,
+                    widget.gasInfo.feeHistory.baseFee,
+                    widget.gasInfo.feeHistory.priorityFee,
+                  ),
+                  token,
+                ),
+                theme,
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailRow(String label, String value, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 2),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 12,
+            ),
+          ),
+          Text(
+            value,
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
   }
 
   Widget _buildGasOption({
@@ -134,14 +223,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     required FTokenInfo token,
   }) {
     final theme = appState.currentTheme;
-    final isSelected = widget.selected == option;
-    final token = appState.wallet!.tokens.first;
-
-    final maxFeePerGas = calculateFeeForOption(
-      option,
-      widget.gasInfo.feeHistory.baseFee,
-      widget.gasInfo.feeHistory.priorityFee,
-    );
+    final isSelected = _selected == option;
 
     final totalGasFee = calculateTotalGasCost(
       option,
@@ -157,61 +239,38 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       ),
       duration: const Duration(milliseconds: 200),
       curve: Curves.easeOutQuart,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: GestureDetector(
-            onTap: () => _handleOptionTap(option),
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-              decoration: BoxDecoration(
-                color: isSelected
-                    ? theme.primaryPurple.withValues(alpha: 0.1)
-                    : Colors.transparent,
-                borderRadius: BorderRadius.circular(16),
-              ),
-              child: Column(
-                children: [
-                  Row(
-                    children: [
-                      Text(option.icon, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              option.title,
-                              style: TextStyle(
-                                color: theme.textPrimary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                            const SizedBox(height: 4),
-                            Text(
-                              option.confirmationTime,
-                              style: TextStyle(
-                                color: theme.textSecondary,
-                                fontSize: 12,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+      builder: (context, value, child) => Transform.scale(
+        scale: value,
+        child: GestureDetector(
+          onTap: () => _handleOptionTap(option),
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: BoxDecoration(
+              color: isSelected
+                  ? theme.primaryPurple.withValues(alpha: 0.1)
+                  : Colors.transparent,
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Text(option.icon, style: const TextStyle(fontSize: 24)),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            formatGasPrice(
-                                totalGasFee, token.decimals, token.symbol),
+                            option.title,
                             style: TextStyle(
-                              color: textColor,
+                              color: theme.textPrimary,
                               fontWeight: FontWeight.w600,
                             ),
                           ),
                           const SizedBox(height: 4),
                           Text(
-                            option.description,
+                            option.confirmationTime,
                             style: TextStyle(
                               color: theme.textSecondary,
                               fontSize: 12,
@@ -219,130 +278,40 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           ),
                         ],
                       ),
-                    ],
-                  ),
-                  if (isSelected)
-                    SizeTransition(
-                      sizeFactor: _expandAnimation,
-                      child: Column(
-                        children: [
-                          const SizedBox(height: 8),
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: theme.background,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Estimated Gas:',
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      '${widget.gasInfo.txEstimateGas}',
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Base Fee:',
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      formatGasPriceDetail(
-                                        widget.gasInfo.feeHistory.baseFee,
-                                        token,
-                                      ),
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Priority Fee:',
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      formatGasPriceDetail(
-                                        calculateMaxPriorityFee(
-                                          option,
-                                          widget.gasInfo.feeHistory.priorityFee,
-                                        ),
-                                        token,
-                                      ),
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                const SizedBox(height: 4),
-                                Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      'Max Fee:',
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    Text(
-                                      formatGasPriceDetail(maxFeePerGas, token),
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
                     ),
-                ],
-              ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          formatGasPrice(
+                              totalGasFee, token.decimals, token.symbol),
+                          style: TextStyle(
+                            color: textColor,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          option.description,
+                          style: TextStyle(
+                            color: theme.textSecondary,
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                if (isSelected)
+                  SizeTransition(
+                    sizeFactor: _expandAnimation,
+                    child: _buildGasDetails(theme, token),
+                  ),
+              ],
             ),
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -350,13 +319,12 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final selectedOption = _isExpanded ? widget.selected : _lastSelected;
     final chain = appState.chain!;
     final token = appState.wallet!.tokens.first;
 
     return Column(
       children: [
-        if (_isExpanded || selectedOption == GasFeeOption.low)
+        if (_isExpanded || _selected == GasFeeOption.low)
           _buildGasOption(
             option: GasFeeOption.low,
             textColor: theme.warning,
@@ -364,15 +332,15 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
             chain: chain,
             token: token,
           ),
-        if (_isExpanded || selectedOption == GasFeeOption.market)
+        if (_isExpanded || _selected == GasFeeOption.market)
           _buildGasOption(
             option: GasFeeOption.market,
-            textColor: theme.textSecondary,
+            textColor: theme.textPrimary,
             appState: appState,
             chain: chain,
             token: token,
           ),
-        if (_isExpanded || selectedOption == GasFeeOption.aggressive)
+        if (_isExpanded || _selected == GasFeeOption.aggressive)
           _buildGasOption(
             option: GasFeeOption.aggressive,
             textColor: theme.danger,

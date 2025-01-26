@@ -4,7 +4,6 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/addr.dart';
-import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
@@ -58,7 +57,6 @@ class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
   final String _amountUsd = '0';
   GasInfo? _gasInfo;
-  GasFeeOption _selectedGasType = GasFeeOption.market;
 
   bool get isEVM => widget.tx.evm != null;
 
@@ -123,8 +121,9 @@ class _ConfirmTransactionContentState
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GasEIP1559(
                   gasInfo: _gasInfo!,
-                  selected: _selectedGasType,
-                  onSelect: (type) => setState(() => _selectedGasType = type),
+                  onChange: (BigInt maxPriorityFee) {
+                    print(maxPriorityFee);
+                  },
                 ),
               ),
             ],
