@@ -75,8 +75,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   bool _isExpanded = false;
   GasFeeOption _selected = GasFeeOption.market;
 
-  late final BigInt _initialMaxPriorityFee;
-
   @override
   void initState() {
     super.initState();
@@ -88,12 +86,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       parent: _expandController,
       curve: Curves.easeInOut,
     );
-
-    _initialMaxPriorityFee = calculateMaxPriorityFee(
-      _selected,
-      widget.gasInfo.feeHistory.priorityFee,
-    );
-    widget.onChange(_initialMaxPriorityFee);
   }
 
   @override
@@ -103,7 +95,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   }
 
   void _handleOptionTap(GasFeeOption option) {
-    if (widget.disabled) return; // Early return if disabled
+    if (widget.disabled) return;
 
     if (_selected == option) {
       setState(() {

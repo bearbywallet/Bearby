@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:intl/intl.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -77,4 +79,8 @@ String getConvertedAmount(AppState state, double amount) {
   }
 
   return formatCompactNumber(converted * amount);
+}
+
+BigInt toWei(String amount, int decimals) {
+  return BigInt.from(double.parse(amount) * pow(10, decimals));
 }

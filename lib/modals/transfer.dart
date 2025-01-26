@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/addr.dart';
+import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
@@ -16,6 +16,7 @@ void showConfirmTransactionModal({
   required TransactionRequestInfo tx,
   required String to,
   required String amount,
+  required int tokenIndex,
   required VoidCallback onConfirm,
 }) {
   showModalBottomSheet<void>(
@@ -28,6 +29,7 @@ void showConfirmTransactionModal({
     barrierColor: Colors.black54,
     builder: (context) => _ConfirmTransactionContent(
       tx: tx,
+      tokenIndex: tokenIndex,
       amount: amount,
       to: to,
       onConfirm: onConfirm,
@@ -38,6 +40,7 @@ void showConfirmTransactionModal({
 class _ConfirmTransactionContent extends StatefulWidget {
   final TransactionRequestInfo tx;
   final String to;
+  final int tokenIndex;
   final String amount;
   final VoidCallback onConfirm;
 
@@ -45,6 +48,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
     required this.tx,
     required this.amount,
     required this.to,
+    required this.tokenIndex,
     required this.onConfirm,
   });
 
@@ -55,7 +59,6 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
-  final String _amountUsd = '0';
   GasInfo _gasInfo = GasInfo(
     gasPrice: BigInt.zero,
     maxPriorityFee: BigInt.zero,
@@ -80,7 +83,6 @@ class _ConfirmTransactionContentState
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens.first;
 
     return Container(
       decoration: BoxDecoration(
@@ -104,29 +106,11 @@ class _ConfirmTransactionContentState
               ),
             ),
             _buildTokenLogo(appState),
-            const SizedBox(height: 8),
-            Text(
-              widget.tx.metadata.title ?? 'Confirm Transaction',
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+            const SizedBox(height: 4),
+            _buildTransferDetails(
+              appState,
             ),
-            if (widget.tx.metadata.info != null) ...[
-              const SizedBox(height: 8),
-              Text(
-                widget.tx.metadata.info!,
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 16,
-                ),
-              ),
-            ],
-            const SizedBox(height: 24),
-            _buildTransferDetails(appState, _amountUsd, token.symbol),
             if (isEVM) ...[
-              const SizedBox(height: 16),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: GasEIP1559(
@@ -147,46 +131,6 @@ class _ConfirmTransactionContentState
     );
   }
 
-  Widget _buildAmountRow(
-    String label,
-    String amount,
-    String usd,
-    AppTheme theme,
-  ) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 16,
-          ),
-        ),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              amount,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            Text(
-              '\$$usd',
-              style: TextStyle(
-                color: theme.textSecondary,
-                fontSize: 14,
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
-  }
-
   Widget _buildConfirmButton(AppTheme theme) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -197,30 +141,8 @@ class _ConfirmTransactionContentState
     );
   }
 
-  Widget _buildDetailRow(String label, String value, AppTheme theme) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 16,
-          ),
-        ),
-        Text(
-          value,
-          style: TextStyle(
-            color: theme.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildTokenLogo(AppState state) {
+    const double imageSize = 64;
     final theme = state.currentTheme;
     final token = state.wallet!.tokens
         .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
@@ -228,8 +150,8 @@ class _ConfirmTransactionContentState
         widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
 
     return Container(
-      width: 32,
-      height: 32,
+      width: imageSize,
+      height: imageSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -244,8 +166,8 @@ class _ConfirmTransactionContentState
             chainId,
             theme.value,
           ),
-          width: 32,
-          height: 32,
+          width: imageSize,
+          height: imageSize,
           fit: BoxFit.contain,
         ),
       ),
@@ -254,36 +176,24 @@ class _ConfirmTransactionContentState
 
   Widget _buildTransferDetails(
     AppState appState,
-    String convertedAmount,
-    String networkToken,
   ) {
-    final theme = appState.currentTheme;
+    final token = appState.wallet!.tokens[widget.tokenIndex];
     final signer = appState.account;
 
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
       padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.background.withValues(alpha: 0.2),
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          if (widget.tx.metadata.signer != null)
-            _buildDetailRow('From', shortenAddress(signer?.addr ?? ""), theme),
-          const SizedBox(height: 16),
-          _buildDetailRow('To', shortenAddress(widget.to), theme),
-          const SizedBox(height: 16),
-          _buildAmountRow('Amount', widget.amount, convertedAmount, theme),
-        ],
+      child: TokenTransferAmount(
+        fromAddress: signer!.addr,
+        fromName: signer.name,
+        toAddress: widget.to,
+        amount: widget.amount,
+        symbol: token.symbol,
       ),
     );
   }
 
   Future<void> _handleModalOpen() async {
-    if (isEVM) {
-      final gas = await caclGasFee(params: widget.tx);
-      setState(() => _gasInfo = gas);
-    }
+    final gas = await caclGasFee(params: widget.tx);
+    setState(() => _gasInfo = gas);
   }
 }

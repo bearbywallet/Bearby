@@ -10,6 +10,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -218,11 +219,12 @@ class _SendTokenPageState extends State<SendTokenPage> {
     }
 
     BigInt accountIndex = appState.wallet!.selectedAccount;
+    FTokenInfo token = appState.wallet!.tokens[_tokenIndex];
     TokenTransferParamsInfo params = TokenTransferParamsInfo(
       walletIndex: BigInt.from(appState.selectedWallet),
       accountIndex: accountIndex,
       tokenIndex: BigInt.from(_tokenIndex),
-      amount: _amount,
+      amount: toWei(_amount, token.decimals).toString(),
       recipient: _address ?? "",
     );
     TransactionRequestInfo tx = await createTokenTransfer(params: params);
@@ -231,6 +233,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
       context: context,
       tx: tx,
       to: _address!,
+      tokenIndex: _tokenIndex,
       amount: _amount,
       onConfirm: () {
         Navigator.pop(context);
