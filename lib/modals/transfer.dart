@@ -3,6 +3,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/mixins/amount.dart';
@@ -62,6 +63,9 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
+  final _passwordController = TextEditingController();
+  final _passwordInputKey = GlobalKey<SmartInputState>();
+
   GasInfo _gasInfo = GasInfo(
     gasPrice: BigInt.zero,
     maxPriorityFee: BigInt.zero,
@@ -76,6 +80,7 @@ class _ConfirmTransactionContentState
   bool _loading = false;
   String? _error;
   BigInt _maxPriorityFee = BigInt.zero;
+  bool _obscurePassword = true;
 
   bool get isEVM => widget.tx.evm != null;
   bool get hasError => _error != null;
@@ -87,11 +92,21 @@ class _ConfirmTransactionContentState
   }
 
   @override
+  void dispose() {
+    _passwordController.dispose();
+    super.dispose();
+  }
+
+  @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
 
     return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.9,
+      ),
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: const BorderRadius.only(
@@ -103,6 +118,7 @@ class _ConfirmTransactionContentState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
+            // Drag Handle
             Container(
               width: 36,
               height: 4,
@@ -112,27 +128,73 @@ class _ConfirmTransactionContentState
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            if (hasError) _buildErrorMessage(theme),
-            _buildTokenLogo(appState),
-            const SizedBox(height: 4),
-            _buildTransferDetails(appState),
-            if (isEVM) ...[
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: GasEIP1559(
-                  gasInfo: _gasInfo,
-                  disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
-                  onChange: (BigInt maxPriorityFee) {
-                    setState(() {
-                      _maxPriorityFee = maxPriorityFee;
-                    });
-                  },
+            // Scrollable Content
+            Flexible(
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                child: Padding(
+                  padding: EdgeInsets.only(bottom: keyboardHeight),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Error Message (if any)
+                      if (hasError) _buildErrorMessage(theme),
+
+                      // Token Logo
+                      _buildTokenLogo(appState),
+                      const SizedBox(height: 4),
+
+                      // Transfer Details
+                      _buildTransferDetails(appState),
+
+                      // Gas Settings (for EVM)
+                      if (isEVM) ...[
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: GasEIP1559(
+                            gasInfo: _gasInfo,
+                            disabled:
+                                _gasInfo.gasPrice == BigInt.zero || _loading,
+                            onChange: (BigInt maxPriorityFee) {
+                              setState(() {
+                                _maxPriorityFee = maxPriorityFee;
+                              });
+                            },
+                          ),
+                        ),
+                      ],
+
+                      // Password Input
+                      Container(
+                        padding: const EdgeInsets.all(12),
+                        child: SmartInput(
+                          key: _passwordInputKey,
+                          controller: _passwordController,
+                          hint: "Password",
+                          fontSize: 18,
+                          height: 56,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          focusedBorderColor: theme.primaryPurple,
+                          disabled:
+                              _gasInfo.gasPrice == BigInt.zero || _loading,
+                          obscureText: _obscurePassword,
+                          rightIconPath: _obscurePassword
+                              ? "assets/icons/close_eye.svg"
+                              : "assets/icons/open_eye.svg",
+                          onRightIconTap: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
+                        ),
+                      ),
+                      _buildConfirmButton(theme),
+                      SizedBox(height: keyboardHeight > 0 ? 16 : 32),
+                    ],
+                  ),
                 ),
               ),
-            ],
-            const SizedBox(height: 24),
-            _buildConfirmButton(theme),
-            const SizedBox(height: 16),
+            ),
           ],
         ),
       ),
