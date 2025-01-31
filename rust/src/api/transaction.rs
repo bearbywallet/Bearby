@@ -21,58 +21,6 @@ pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn get_requested_transactions(
-    wallet_index: usize,
-) -> Result<Vec<TransactionRequestInfo>, String> {
-    with_service(|core| {
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let request_txns = wallet
-            .get_request_txns()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let tx_list: Vec<TransactionRequestInfo> =
-            request_txns.iter().map(|tx| tx.clone().into()).collect();
-
-        Ok(tx_list)
-    })
-    .await
-    .map_err(Into::into)
-}
-
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn clear_requested_transactions(wallet_index: usize) -> Result<(), String> {
-    with_service(|core| {
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-
-        wallet
-            .clear_request_transaction()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-        Ok(())
-    })
-    .await
-    .map_err(Into::into)
-}
-
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_requested_transactions(
-    wallet_index: usize,
-    tx: TransactionRequestInfo,
-) -> Result<(), String> {
-    with_service(|core| {
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let tx = tx.try_into()?;
-
-        wallet
-            .add_request_transaction(tx)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-        Ok(())
-    })
-    .await
-    .map_err(Into::into)
-}
-
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn sign_send_transactions(
     wallet_index: usize,
     account_index: usize,
@@ -100,15 +48,9 @@ pub async fn sign_send_transactions(
             .map_err(ServiceError::BackgroundError)?;
         let tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
 
-        wallet
-            .add_request_transaction(tx)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let request_txns = wallet
-            .get_request_txns()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let signed_tx = wallet
             .sign_transaction(
-                request_txns.len() - 1,
+                tx,
                 account_index,
                 &seed_bytes,
                 passphrase.as_ref().map(|m| m.as_str()),

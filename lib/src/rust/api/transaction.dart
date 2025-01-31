@@ -14,20 +14,6 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<TransactionRequestInfo>> getRequestedTransactions(
-        {required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiTransactionGetRequestedTransactions(walletIndex: walletIndex);
-
-Future<void> clearRequestedTransactions({required BigInt walletIndex}) =>
-    RustLib.instance.api.crateApiTransactionClearRequestedTransactions(
-        walletIndex: walletIndex);
-
-Future<void> addRequestedTransactions(
-        {required BigInt walletIndex, required TransactionRequestInfo tx}) =>
-    RustLib.instance.api.crateApiTransactionAddRequestedTransactions(
-        walletIndex: walletIndex, tx: tx);
-
 Future<HistoricalTransactionInfo> signSendTransactions(
         {required BigInt walletIndex,
         required BigInt accountIndex,

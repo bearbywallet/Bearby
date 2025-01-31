@@ -233,10 +233,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(BigInt, String)> dco_decode_list_record_usize_string(dynamic raw);
 
   @protected
-  List<TransactionRequestInfo> dco_decode_list_transaction_request_info(
-      dynamic raw);
-
-  @protected
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
   @protected
@@ -545,10 +541,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<(BigInt, String)> sse_decode_list_record_usize_string(
-      SseDeserializer deserializer);
-
-  @protected
-  List<TransactionRequestInfo> sse_decode_list_transaction_request_info(
       SseDeserializer deserializer);
 
   @protected
@@ -887,10 +879,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_record_usize_string(
       List<(BigInt, String)> self, SseSerializer serializer);
-
-  @protected
-  void sse_encode_list_transaction_request_info(
-      List<TransactionRequestInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_wallet_info(
