@@ -15,6 +15,7 @@ import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
+import 'package:zilpay/src/rust/models/transactions/scilla.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -103,6 +104,90 @@ class _ConfirmTransactionContentState
     super.dispose();
   }
 
+  TransactionRequestInfo _prepareEvmTransaction() {
+    final newTx = TransactionRequestEVM(
+      nonce: widget.tx.evm!.nonce,
+      from: widget.tx.evm!.from,
+      to: widget.tx.evm!.to,
+      value: widget.tx.evm!.value,
+      data: widget.tx.evm!.data,
+      chainId: widget.tx.evm!.chainId,
+      accessList: widget.tx.evm!.accessList,
+      blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
+      maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
+      maxPriorityFeePerGas: _maxPriorityFee,
+      gasLimit: _gasInfo.txEstimateGas,
+      gasPrice: _gasInfo.gasPrice,
+      maxFeePerGas:
+          (_gasInfo.feeHistory.baseFee * BigInt.from(2)) + _maxPriorityFee,
+    );
+
+    return TransactionRequestInfo(
+      metadata: widget.tx.metadata,
+      evm: newTx,
+    );
+  }
+
+  TransactionRequestInfo _prepareScillaTransaction() {
+    final newTx = TransactionRequestScilla(
+      chainId: widget.tx.scilla!.chainId,
+      nonce: widget.tx.scilla!.nonce,
+      gasPrice: _gasInfo.gasPrice,
+      gasLimit: widget.tx.scilla!.gasLimit,
+      toAddr: widget.tx.scilla!.toAddr,
+      amount: widget.tx.scilla!.amount,
+      code: widget.tx.scilla!.code,
+      data: widget.tx.scilla!.data,
+    );
+
+    return TransactionRequestInfo(
+      metadata: widget.tx.metadata,
+      scilla: newTx,
+    );
+  }
+
+  Future<bool> _authenticateWithBiometrics() async {
+    return await _authService.authenticate(
+      allowPinCode: true,
+      reason: 'Please authenticate',
+    );
+  }
+
+  Future<void> _handleTransactionSigning(
+      AppState appState, TransactionRequestInfo tx) async {
+    final device = DeviceInfoService();
+    final identifiers = await device.getDeviceIdentifiers();
+
+    if (appState.wallet!.authType != AuthMethod.none.name) {
+      final biometricAuth = await _authenticateWithBiometrics();
+      if (!biometricAuth) return;
+
+      final session = await _authGuard.getSession(
+        sessionKey: appState.wallet!.walletAddress,
+      );
+
+      await signSendTransactions(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+        identifiers: identifiers,
+        tx: tx,
+        password: null,
+        passphrase: null,
+        sessionCipher: session,
+      );
+    } else {
+      await signSendTransactions(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+        identifiers: identifiers,
+        tx: tx,
+        password: _passwordController.text,
+        passphrase: null,
+        sessionCipher: null,
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -124,15 +209,7 @@ class _ConfirmTransactionContentState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: theme.textSecondary.withValues(alpha: 0.5),
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            _buildDragHandle(theme),
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -145,47 +222,8 @@ class _ConfirmTransactionContentState
                       _buildTokenLogo(appState),
                       const SizedBox(height: 4),
                       _buildTransferDetails(appState),
-                      if (isEVM) ...[
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: GasEIP1559(
-                            gasInfo: _gasInfo,
-                            disabled:
-                                _gasInfo.gasPrice == BigInt.zero || _loading,
-                            onChange: (BigInt maxPriorityFee) {
-                              setState(() {
-                                _maxPriorityFee = maxPriorityFee;
-                              });
-                            },
-                          ),
-                        ),
-                      ],
-                      appState.wallet!.authType == AuthMethod.none.name
-                          ? Container(
-                              padding: const EdgeInsets.all(12),
-                              child: SmartInput(
-                                key: _passwordInputKey,
-                                controller: _passwordController,
-                                hint: "Password",
-                                fontSize: 18,
-                                height: 56,
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 20),
-                                focusedBorderColor: theme.primaryPurple,
-                                disabled: _gasInfo.gasPrice == BigInt.zero ||
-                                    _loading,
-                                obscureText: _obscurePassword,
-                                rightIconPath: _obscurePassword
-                                    ? "assets/icons/close_eye.svg"
-                                    : "assets/icons/open_eye.svg",
-                                onRightIconTap: () {
-                                  setState(() {
-                                    _obscurePassword = !_obscurePassword;
-                                  });
-                                },
-                              ),
-                            )
-                          : const SizedBox(height: 16),
+                      if (isEVM) _buildGasSettings(),
+                      _buildAuthenticationInput(appState, theme),
                       _buildConfirmButton(),
                       SizedBox(height: keyboardHeight > 0 ? 16 : 32),
                     ],
@@ -195,6 +233,18 @@ class _ConfirmTransactionContentState
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildDragHandle(AppTheme theme) {
+    return Container(
+      width: 36,
+      height: 4,
+      margin: const EdgeInsets.symmetric(vertical: 16),
+      decoration: BoxDecoration(
+        color: theme.textSecondary.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(2),
       ),
     );
   }
@@ -233,86 +283,85 @@ class _ConfirmTransactionContentState
     );
   }
 
+  Widget _buildGasSettings() {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: GasEIP1559(
+        gasInfo: _gasInfo,
+        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
+        onChange: (BigInt maxPriorityFee) {
+          setState(() {
+            _maxPriorityFee = maxPriorityFee;
+          });
+        },
+      ),
+    );
+  }
+
+  Widget _buildAuthenticationInput(AppState appState, AppTheme theme) {
+    if (appState.wallet!.authType != AuthMethod.none.name) {
+      return const SizedBox(height: 16);
+    }
+
+    return Container(
+      padding: const EdgeInsets.all(12),
+      child: SmartInput(
+        key: _passwordInputKey,
+        controller: _passwordController,
+        hint: "Password",
+        fontSize: 18,
+        height: 56,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        focusedBorderColor: theme.primaryPurple,
+        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
+        obscureText: _obscurePassword,
+        rightIconPath: _obscurePassword
+            ? "assets/icons/close_eye.svg"
+            : "assets/icons/open_eye.svg",
+        onRightIconTap: () {
+          setState(() {
+            _obscurePassword = !_obscurePassword;
+          });
+        },
+      ),
+    );
+  }
+
   Widget _buildConfirmButton() {
     final appState = Provider.of<AppState>(context);
+
+    Future<void> handleConfirmation() async {
+      try {
+        setState(() {
+          _loading = true;
+          _error = null;
+        });
+
+        if (!_hasEnoughBalance()) {
+          throw Exception('Insufficient balance for this transaction');
+        }
+
+        final tx =
+            isEVM ? _prepareEvmTransaction() : _prepareScillaTransaction();
+        await _handleTransactionSigning(appState, tx);
+        widget.onConfirm();
+      } catch (e) {
+        setState(() {
+          _error = e.toString();
+        });
+      } finally {
+        setState(() {
+          _loading = false;
+        });
+      }
+    }
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SwipeButton(
         text: hasError ? "Unable to confirm" : "Confirm",
         disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
-        onSwipeComplete: hasError
-            ? () async {}
-            : () async {
-                try {
-                  setState(() {
-                    _loading = true;
-                    _error = null;
-                  });
-
-                  if (!_hasEnoughBalance()) {
-                    throw Exception(
-                        'Insufficient balance for this transaction');
-                  }
-
-                  if (isEVM) {
-                    TransactionRequestEVM newTx = TransactionRequestEVM(
-                      nonce: widget.tx.evm!.nonce,
-                      from: widget.tx.evm!.from,
-                      to: widget.tx.evm!.to,
-                      value: widget.tx.evm!.value,
-                      data: widget.tx.evm!.data,
-                      chainId: widget.tx.evm!.chainId,
-                      accessList: widget.tx.evm!.accessList,
-                      blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
-                      // Fee
-                      maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
-                      maxPriorityFeePerGas: _maxPriorityFee,
-                      gasLimit: _gasInfo.txEstimateGas,
-                      gasPrice: _gasInfo.gasPrice,
-                      maxFeePerGas:
-                          (_gasInfo.feeHistory.baseFee * BigInt.from(2)) +
-                              _maxPriorityFee,
-                    );
-
-                    print(
-                        "maxPriorityFeePerGas: ${newTx.maxPriorityFeePerGas}");
-                  }
-
-                  final device = DeviceInfoService();
-                  final identifiers = await device.getDeviceIdentifiers();
-
-                  final biometricAuth = await _authService.authenticate(
-                    allowPinCode: true,
-                    reason: 'Please authenticate',
-                  );
-
-                  if (biometricAuth) {
-                    final session = await _authGuard.getSession(
-                      sessionKey: appState.wallet!.walletAddress,
-                    );
-                    final tx = await signSendTransactions(
-                      walletIndex: BigInt.from(appState.selectedWallet),
-                      accountIndex: appState.wallet!.selectedAccount,
-                      identifiers: identifiers,
-                      tx: widget.tx,
-                      password: null,
-                      passphrase: null,
-                      sessionCipher: session,
-                    );
-                  }
-
-                  widget.onConfirm();
-                } catch (e) {
-                  setState(() {
-                    _error = e.toString();
-                  });
-                } finally {
-                  setState(() {
-                    _loading = false;
-                  });
-                }
-              },
+        onSwipeComplete: hasError ? null : handleConfirmation,
       ),
     );
   }

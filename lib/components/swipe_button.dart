@@ -7,16 +7,16 @@ class SwipeButton extends StatefulWidget {
   final double width;
   final double height;
   final String text;
-  final Future<void> Function() onSwipeComplete;
-  final bool disabled; // Added disabled property
+  final Future<void> Function()? onSwipeComplete;
+  final bool disabled;
 
   const SwipeButton({
     super.key,
     this.width = 300.0,
     this.height = 56.0,
     required this.text,
-    required this.onSwipeComplete,
-    this.disabled = false, // Default value is false
+    this.onSwipeComplete,
+    this.disabled = false,
   });
 
   @override
@@ -48,7 +48,7 @@ class _SwipeButtonState extends State<SwipeButton>
   }
 
   void _onDragUpdate(DragUpdateDetails details) {
-    if (_isLoading || widget.disabled) return; // Added disabled check
+    if (_isLoading || widget.disabled) return;
     setState(() {
       _isDragging = true;
       _dragExtent += details.delta.dx;
@@ -57,7 +57,7 @@ class _SwipeButtonState extends State<SwipeButton>
   }
 
   void _onDragEnd(DragEndDetails details) async {
-    if (_isLoading || widget.disabled) return; // Added disabled check
+    if (_isLoading || widget.disabled) return;
     if (_dragExtent >= widget.width - height) {
       setState(() {
         _isLoading = true;
@@ -70,7 +70,9 @@ class _SwipeButtonState extends State<SwipeButton>
         });
       }
 
-      await widget.onSwipeComplete();
+      if (widget.onSwipeComplete != null) {
+        await widget.onSwipeComplete!();
+      }
 
       setState(() {
         _isLoading = false;
