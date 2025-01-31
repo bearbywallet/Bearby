@@ -178,6 +178,7 @@ class _ConfirmTransactionContentState
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SwipeButton(
         text: hasError ? "Unable to confirm" : "Confirm",
+        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
         onSwipeComplete: hasError
             ? () async {}
             : () async {

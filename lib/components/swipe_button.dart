@@ -8,6 +8,7 @@ class SwipeButton extends StatefulWidget {
   final double height;
   final String text;
   final Future<void> Function() onSwipeComplete;
+  final bool disabled; // Added disabled property
 
   const SwipeButton({
     super.key,
@@ -15,6 +16,7 @@ class SwipeButton extends StatefulWidget {
     this.height = 56.0,
     required this.text,
     required this.onSwipeComplete,
+    this.disabled = false, // Default value is false
   });
 
   @override
@@ -46,7 +48,7 @@ class _SwipeButtonState extends State<SwipeButton>
   }
 
   void _onDragUpdate(DragUpdateDetails details) {
-    if (_isLoading) return;
+    if (_isLoading || widget.disabled) return; // Added disabled check
     setState(() {
       _isDragging = true;
       _dragExtent += details.delta.dx;
@@ -55,7 +57,7 @@ class _SwipeButtonState extends State<SwipeButton>
   }
 
   void _onDragEnd(DragEndDetails details) async {
-    if (_isLoading) return;
+    if (_isLoading || widget.disabled) return; // Added disabled check
     if (_dragExtent >= widget.width - height) {
       setState(() {
         _isLoading = true;
@@ -94,7 +96,9 @@ class _SwipeButtonState extends State<SwipeButton>
       width: _shrinkWidth,
       height: height,
       decoration: BoxDecoration(
-        color: theme.primaryPurple,
+        color: widget.disabled
+            ? theme.primaryPurple.withValues(alpha: 0.5)
+            : theme.primaryPurple,
         borderRadius: BorderRadius.circular(height / 2),
       ),
       child: Stack(
@@ -104,7 +108,9 @@ class _SwipeButtonState extends State<SwipeButton>
               child: Text(
                 widget.text,
                 style: TextStyle(
-                  color: theme.textPrimary,
+                  color: widget.disabled
+                      ? theme.textPrimary.withValues(alpha: 0.5)
+                      : theme.textPrimary,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -123,8 +129,8 @@ class _SwipeButtonState extends State<SwipeButton>
             ),
           if (!_isLoading)
             GestureDetector(
-              onHorizontalDragUpdate: _onDragUpdate,
-              onHorizontalDragEnd: _onDragEnd,
+              onHorizontalDragUpdate: widget.disabled ? null : _onDragUpdate,
+              onHorizontalDragEnd: widget.disabled ? null : _onDragEnd,
               child: Container(
                 margin: const EdgeInsets.all(4),
                 child: Stack(
@@ -139,8 +145,14 @@ class _SwipeButtonState extends State<SwipeButton>
                           borderRadius: BorderRadius.circular((height - 8) / 2),
                           gradient: LinearGradient(
                             colors: [
-                              theme.secondaryPurple.withValues(alpha: 0.1),
-                              theme.secondaryPurple,
+                              widget.disabled
+                                  ? theme.secondaryPurple
+                                      .withValues(alpha: 0.05)
+                                  : theme.secondaryPurple
+                                      .withValues(alpha: 0.1),
+                              widget.disabled
+                                  ? theme.secondaryPurple.withValues(alpha: 0.5)
+                                  : theme.secondaryPurple,
                             ],
                             stops: const [0.0, 0.9],
                             begin: Alignment.centerLeft,
@@ -160,7 +172,10 @@ class _SwipeButtonState extends State<SwipeButton>
                               width: height - 8,
                               height: height - 8,
                               decoration: BoxDecoration(
-                                color: theme.secondaryPurple,
+                                color: widget.disabled
+                                    ? theme.secondaryPurple
+                                        .withValues(alpha: 0.5)
+                                    : theme.secondaryPurple,
                                 borderRadius:
                                     BorderRadius.circular((height - 8) / 2),
                                 boxShadow: [
@@ -177,7 +192,9 @@ class _SwipeButtonState extends State<SwipeButton>
                                 width: widget.width,
                                 height: widget.height,
                                 colorFilter: ColorFilter.mode(
-                                  theme.background,
+                                  widget.disabled
+                                      ? theme.background.withValues(alpha: 0.5)
+                                      : theme.background,
                                   BlendMode.srcIn,
                                 ),
                               ),
