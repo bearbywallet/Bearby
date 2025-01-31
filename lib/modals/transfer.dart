@@ -8,6 +8,9 @@ import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/services/auth_guard.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/transactions/evm.dart';
@@ -65,6 +68,8 @@ class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
+  final AuthService _authService = AuthService();
+  late final AuthGuard _authGuard;
 
   GasInfo _gasInfo = GasInfo(
     gasPrice: BigInt.zero,
@@ -88,6 +93,7 @@ class _ConfirmTransactionContentState
   @override
   void initState() {
     super.initState();
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _handleModalOpen();
   }
 
@@ -118,7 +124,6 @@ class _ConfirmTransactionContentState
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Drag Handle
             Container(
               width: 36,
               height: 4,
@@ -128,7 +133,6 @@ class _ConfirmTransactionContentState
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            // Scrollable Content
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),
@@ -137,17 +141,10 @@ class _ConfirmTransactionContentState
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Error Message (if any)
                       if (hasError) _buildErrorMessage(theme),
-
-                      // Token Logo
                       _buildTokenLogo(appState),
                       const SizedBox(height: 4),
-
-                      // Transfer Details
                       _buildTransferDetails(appState),
-
-                      // Gas Settings (for EVM)
                       if (isEVM) ...[
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -163,32 +160,33 @@ class _ConfirmTransactionContentState
                           ),
                         ),
                       ],
-
-                      // Password Input
-                      Container(
-                        padding: const EdgeInsets.all(12),
-                        child: SmartInput(
-                          key: _passwordInputKey,
-                          controller: _passwordController,
-                          hint: "Password",
-                          fontSize: 18,
-                          height: 56,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          focusedBorderColor: theme.primaryPurple,
-                          disabled:
-                              _gasInfo.gasPrice == BigInt.zero || _loading,
-                          obscureText: _obscurePassword,
-                          rightIconPath: _obscurePassword
-                              ? "assets/icons/close_eye.svg"
-                              : "assets/icons/open_eye.svg",
-                          onRightIconTap: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                      ),
-                      _buildConfirmButton(theme),
+                      appState.wallet!.authType == AuthMethod.none.name
+                          ? Container(
+                              padding: const EdgeInsets.all(12),
+                              child: SmartInput(
+                                key: _passwordInputKey,
+                                controller: _passwordController,
+                                hint: "Password",
+                                fontSize: 18,
+                                height: 56,
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 20),
+                                focusedBorderColor: theme.primaryPurple,
+                                disabled: _gasInfo.gasPrice == BigInt.zero ||
+                                    _loading,
+                                obscureText: _obscurePassword,
+                                rightIconPath: _obscurePassword
+                                    ? "assets/icons/close_eye.svg"
+                                    : "assets/icons/open_eye.svg",
+                                onRightIconTap: () {
+                                  setState(() {
+                                    _obscurePassword = !_obscurePassword;
+                                  });
+                                },
+                              ),
+                            )
+                          : const SizedBox(height: 16),
+                      _buildConfirmButton(),
                       SizedBox(height: keyboardHeight > 0 ? 16 : 32),
                     ],
                   ),
@@ -235,7 +233,9 @@ class _ConfirmTransactionContentState
     );
   }
 
-  Widget _buildConfirmButton(AppTheme theme) {
+  Widget _buildConfirmButton() {
+    final appState = Provider.of<AppState>(context);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SwipeButton(
@@ -277,8 +277,29 @@ class _ConfirmTransactionContentState
 
                     print(
                         "maxPriorityFeePerGas: ${newTx.maxPriorityFeePerGas}");
-                  } else {
-                    await Future<void>.delayed(const Duration(seconds: 2));
+                  }
+
+                  final device = DeviceInfoService();
+                  final identifiers = await device.getDeviceIdentifiers();
+
+                  final biometricAuth = await _authService.authenticate(
+                    allowPinCode: true,
+                    reason: 'Please authenticate',
+                  );
+
+                  if (biometricAuth) {
+                    final session = await _authGuard.getSession(
+                      sessionKey: appState.wallet!.walletAddress,
+                    );
+                    final tx = await signSendTransactions(
+                      walletIndex: BigInt.from(appState.selectedWallet),
+                      accountIndex: appState.wallet!.selectedAccount,
+                      identifiers: identifiers,
+                      tx: widget.tx,
+                      password: null,
+                      passphrase: null,
+                      sessionCipher: session,
+                    );
                   }
 
                   widget.onConfirm();

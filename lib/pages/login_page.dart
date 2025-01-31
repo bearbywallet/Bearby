@@ -73,7 +73,10 @@ class _LoginPageState extends State<LoginPage> {
 
   // Authentication Logic
   Future<bool> _authenticateWithSession(
-      String session, int walletIndex, List<String> identifiers) async {
+    String session,
+    int walletIndex,
+    List<String> identifiers,
+  ) async {
     try {
       bool unlocked = await tryUnlockWithSession(
         sessionCipher: session,
