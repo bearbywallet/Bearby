@@ -81,7 +81,7 @@ pub async fn sign_send_transactions(
     session_cipher: Option<String>,
     identifiers: Vec<String>,
     tx: TransactionRequestInfo,
-) -> Result<(), String> {
+) -> Result<HistoricalTransactionInfo, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
@@ -120,11 +120,18 @@ pub async fn sign_send_transactions(
     }
     .map_err(Into::<ServiceError>::into)?;
 
-    core.broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+    let tx = core
+        .broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
         .await
-        .map_err(ServiceError::BackgroundError)?;
+        .map_err(ServiceError::BackgroundError)?
+        .into_iter()
+        .next()
+        .map(|v| v.into())
+        .ok_or(ServiceError::TransactionErrors(
+            zilpay::errors::tx::TransactionErrors::InvalidTxHash,
+        ))?;
 
-    Ok(())
+    Ok(tx)
 }
 
 #[flutter_rust_bridge::frb(dart_async)]

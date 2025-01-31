@@ -28,7 +28,7 @@ Future<void> addRequestedTransactions(
     RustLib.instance.api.crateApiTransactionAddRequestedTransactions(
         walletIndex: walletIndex, tx: tx);
 
-Future<void> signSendTransactions(
+Future<HistoricalTransactionInfo> signSendTransactions(
         {required BigInt walletIndex,
         required BigInt accountIndex,
         String? password,

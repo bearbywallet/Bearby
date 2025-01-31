@@ -284,7 +284,7 @@ abstract class RustLibApi extends BaseApi {
       required bool security,
       required bool balance});
 
-  Future<void> crateApiTransactionSignSendTransactions(
+  Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       String? password,
@@ -1767,7 +1767,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiTransactionSignSendTransactions(
+  Future<HistoricalTransactionInfo> crateApiTransactionSignSendTransactions(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       String? password,
@@ -1789,7 +1789,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 54, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
+        decodeSuccessData: sse_decode_historical_transaction_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionSignSendTransactionsConstMeta,
