@@ -1,16 +1,20 @@
+use std::sync::Arc;
+
 use crate::models::gas::GasInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{parse_address, with_service};
+use crate::utils::utils::{decode_session, parse_address, with_service};
 
 pub use zilpay::background::bg_provider::ProvidersManagement;
+pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
+pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 pub use zilpay::proto::U256;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
@@ -66,6 +70,61 @@ pub async fn add_requested_transactions(
     })
     .await
     .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn sign_send_transactions(
+    wallet_index: usize,
+    account_index: usize,
+    password: Option<String>,
+    passphrase: Option<String>,
+    session_cipher: Option<String>,
+    identifiers: Vec<String>,
+    tx: TransactionRequestInfo,
+) -> Result<(), String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = Arc::clone(&service.core);
+
+    let signed_tx = {
+        let seed_bytes = if let Some(pass) = password {
+            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        } else {
+            let session = decode_session(session_cipher)?;
+            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+        }
+        .map_err(ServiceError::BackgroundError)?;
+
+        let wallet = core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+
+        wallet
+            .add_request_transaction(tx)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let request_txns = wallet
+            .get_request_txns()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let signed_tx = wallet
+            .sign_transaction(
+                request_txns.len() - 1,
+                account_index,
+                &seed_bytes,
+                passphrase.as_ref().map(|m| m.as_str()),
+            )
+            .await
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok::<TransactionReceipt, ServiceError>(signed_tx)
+    }
+    .map_err(Into::<ServiceError>::into)?;
+
+    core.broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+
+    Ok(())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
