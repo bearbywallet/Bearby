@@ -54,14 +54,16 @@ extension GasFeeOptionX on GasFeeOption {
 }
 
 class GasEIP1559 extends StatefulWidget {
-  final GasInfo gasInfo;
-  final Function(BigInt maxPriorityFee) onChange;
+  final RequiredTxParamsInfo txParamsInfo;
+  final Function(BigInt maxPriorityFee) onChangeMaxPriorityFee;
+  final Function(BigInt gasPrice) onChangeGasPrice;
   final bool disabled;
 
   const GasEIP1559({
     super.key,
-    required this.gasInfo,
-    required this.onChange,
+    required this.txParamsInfo,
+    required this.onChangeMaxPriorityFee,
+    required this.onChangeGasPrice,
     this.disabled = false,
   });
 
@@ -98,13 +100,18 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   void didUpdateWidget(GasEIP1559 oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.gasInfo != widget.gasInfo) {
+    if (oldWidget.txParamsInfo != widget.txParamsInfo) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        final maxPriorityFee = calculateMaxPriorityFee(
+        BigInt maxPriorityFee = calculateMaxPriorityFee(
           _selected,
-          widget.gasInfo.feeHistory.priorityFee,
+          widget.txParamsInfo.feeHistory.priorityFee,
         );
-        widget.onChange(maxPriorityFee);
+        BigInt gasPrice = calculateGasPrice(
+          _selected,
+          widget.txParamsInfo.gasPrice,
+        );
+        widget.onChangeMaxPriorityFee(maxPriorityFee);
+        widget.onChangeGasPrice(gasPrice);
       });
     }
   }
@@ -128,9 +135,9 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
     final maxPriorityFee = calculateMaxPriorityFee(
       option,
-      widget.gasInfo.feeHistory.priorityFee,
+      widget.txParamsInfo.feeHistory.priorityFee,
     );
-    widget.onChange(maxPriorityFee);
+    widget.onChangeMaxPriorityFee(maxPriorityFee);
   }
 
   Widget _buildGasDetails(AppTheme theme, FTokenInfo token) {
@@ -145,42 +152,55 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
           ),
           child: Column(
             children: [
+              if (widget.txParamsInfo.txEstimateGas != BigInt.zero)
+                _buildDetailRow(
+                  'Estimated Gas:',
+                  '${widget.txParamsInfo.txEstimateGas}',
+                  theme,
+                ),
               _buildDetailRow(
-                'Estimated Gas:',
-                '${widget.gasInfo.txEstimateGas}',
-                theme,
-              ),
-              _buildDetailRow(
-                'Base Fee:',
+                'Gas Price:',
                 formatGasPriceDetail(
-                  widget.gasInfo.feeHistory.baseFee,
+                  calculateGasPrice(_selected, widget.txParamsInfo.gasPrice),
                   token,
                 ),
                 theme,
               ),
-              _buildDetailRow(
-                'Priority Fee:',
-                formatGasPriceDetail(
-                  calculateMaxPriorityFee(
-                    _selected,
-                    widget.gasInfo.feeHistory.priorityFee,
+              if (widget.txParamsInfo.feeHistory.baseFee != BigInt.zero)
+                _buildDetailRow(
+                  'Base Fee:',
+                  formatGasPriceDetail(
+                    widget.txParamsInfo.feeHistory.baseFee,
+                    token,
                   ),
-                  token,
+                  theme,
                 ),
-                theme,
-              ),
-              _buildDetailRow(
-                'Max Fee:',
-                formatGasPriceDetail(
-                  calculateFeeForOption(
-                    _selected,
-                    widget.gasInfo.feeHistory.baseFee,
-                    widget.gasInfo.feeHistory.priorityFee,
+              if (widget.txParamsInfo.feeHistory.priorityFee != BigInt.zero)
+                _buildDetailRow(
+                  'Priority Fee:',
+                  formatGasPriceDetail(
+                    calculateMaxPriorityFee(
+                      _selected,
+                      widget.txParamsInfo.feeHistory.priorityFee,
+                    ),
+                    token,
                   ),
-                  token,
+                  theme,
                 ),
-                theme,
-              ),
+              if (widget.txParamsInfo.feeHistory.baseFee != BigInt.zero &&
+                  widget.txParamsInfo.feeHistory.priorityFee != BigInt.zero)
+                _buildDetailRow(
+                  'Max Fee:',
+                  formatGasPriceDetail(
+                    calculateFeeForOption(
+                      _selected,
+                      widget.txParamsInfo.feeHistory.baseFee,
+                      widget.txParamsInfo.feeHistory.priorityFee,
+                    ),
+                    token,
+                  ),
+                  theme,
+                ),
             ],
           ),
         ),
@@ -228,9 +248,9 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
     final totalGasFee = calculateTotalGasCost(
       option,
-      widget.gasInfo.feeHistory.baseFee,
-      widget.gasInfo.feeHistory.priorityFee,
-      widget.gasInfo.txEstimateGas,
+      widget.txParamsInfo.feeHistory.baseFee,
+      widget.txParamsInfo.feeHistory.priorityFee,
+      widget.txParamsInfo.txEstimateGas,
     );
 
     return TweenAnimationBuilder<double>(

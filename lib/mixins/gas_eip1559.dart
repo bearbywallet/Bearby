@@ -13,6 +13,22 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
   }
 }
 
+BigInt calculateGasPrice(GasFeeOption option, BigInt gasPrice) {
+  switch (option) {
+    case GasFeeOption.low:
+      // No increase (0%)
+      return gasPrice;
+    case GasFeeOption.market:
+      // Increase by 20%
+      return gasPrice +
+          BigInt.from((gasPrice * BigInt.from(20)) / BigInt.from(100));
+    case GasFeeOption.aggressive:
+      // Increase by 50%
+      return gasPrice +
+          BigInt.from((gasPrice * BigInt.from(50)) / BigInt.from(100));
+  }
+}
+
 BigInt calculateMaxFeePerGas(
   GasFeeOption option,
   BigInt baseFee,

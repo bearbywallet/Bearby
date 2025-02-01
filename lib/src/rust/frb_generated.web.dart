@@ -175,9 +175,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
 
   @protected
-  GasInfo dco_decode_gas_info(dynamic raw);
-
-  @protected
   HistoricalTransactionInfo dco_decode_historical_transaction_info(dynamic raw);
 
   @protected
@@ -294,6 +291,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, String) dco_decode_record_usize_string(dynamic raw);
+
+  @protected
+  RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw);
 
   @protected
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw);
@@ -478,9 +478,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
-  GasInfo sse_decode_gas_info(SseDeserializer deserializer);
-
-  @protected
   HistoricalTransactionInfo sse_decode_historical_transaction_info(
       SseDeserializer deserializer);
 
@@ -613,6 +610,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (BigInt, String) sse_decode_record_usize_string(SseDeserializer deserializer);
+
+  @protected
+  RequiredTxParamsInfo sse_decode_required_tx_params_info(
+      SseDeserializer deserializer);
 
   @protected
   TokenTransferParamsInfo sse_decode_token_transfer_params_info(
@@ -810,9 +811,6 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       GasFeeHistoryInfo self, SseSerializer serializer);
 
   @protected
-  void sse_encode_gas_info(GasInfo self, SseSerializer serializer);
-
-  @protected
   void sse_encode_historical_transaction_info(
       HistoricalTransactionInfo self, SseSerializer serializer);
 
@@ -951,6 +949,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_usize_string(
       (BigInt, String) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_token_transfer_params_info(

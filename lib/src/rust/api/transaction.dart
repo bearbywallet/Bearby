@@ -40,8 +40,12 @@ Future<TransactionRequestInfo> createTokenTransfer(
         {required TokenTransferParamsInfo params}) =>
     RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);
 
-Future<GasInfo> caclGasFee({required TransactionRequestInfo params}) =>
-    RustLib.instance.api.crateApiTransactionCaclGasFee(params: params);
+Future<RequiredTxParamsInfo> caclGasFee(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required TransactionRequestInfo params}) =>
+    RustLib.instance.api.crateApiTransactionCaclGasFee(
+        walletIndex: walletIndex, accountIndex: accountIndex, params: params);
 
 class TokenTransferParamsInfo {
   final BigInt walletIndex;

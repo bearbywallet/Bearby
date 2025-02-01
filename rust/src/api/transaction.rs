@@ -1,6 +1,6 @@
 use std::sync::Arc;
 
-use crate::models::gas::GasInfo;
+use crate::models::gas::RequiredTxParamsInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
@@ -146,7 +146,11 @@ pub async fn create_token_transfer(
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn cacl_gas_fee(params: TransactionRequestInfo) -> Result<GasInfo, String> {
+pub async fn cacl_gas_fee(
+    wallet_index: usize,
+    account_index: usize,
+    params: TransactionRequestInfo,
+) -> Result<RequiredTxParamsInfo, String> {
     let chain_hash = params.metadata.chain_hash;
     let gas = {
         let guard = BACKGROUND_SERVICE.read().await;
@@ -156,9 +160,24 @@ pub async fn cacl_gas_fee(params: TransactionRequestInfo) -> Result<GasInfo, Str
             .get_provider(chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let tx: TransactionRequest = params.try_into().map_err(ServiceError::TransactionErrors)?;
+        let wallet = service
+            .core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let sender_account = data
+            .accounts
+            .get(account_index)
+            .ok_or(ServiceError::AccountError(
+                account_index,
+                wallet_index,
+                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
+            ))?;
 
         chain
-            .estimate_gas_batch(&tx, 4, None)
+            .estimate_params_batch(&tx, &sender_account.addr, 4, None)
             .await
             .map_err(ServiceError::NetworkErrors)?
     };

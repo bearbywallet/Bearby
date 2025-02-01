@@ -30,19 +30,21 @@ class GasFeeHistoryInfo {
           baseFee == other.baseFee;
 }
 
-class GasInfo {
+class RequiredTxParamsInfo {
   final BigInt gasPrice;
   final BigInt maxPriorityFee;
   final GasFeeHistoryInfo feeHistory;
   final BigInt txEstimateGas;
   final BigInt blobBaseFee;
+  final BigInt nonce;
 
-  const GasInfo({
+  const RequiredTxParamsInfo({
     required this.gasPrice,
     required this.maxPriorityFee,
     required this.feeHistory,
     required this.txEstimateGas,
     required this.blobBaseFee,
+    required this.nonce,
   });
 
   @override
@@ -51,16 +53,18 @@ class GasInfo {
       maxPriorityFee.hashCode ^
       feeHistory.hashCode ^
       txEstimateGas.hashCode ^
-      blobBaseFee.hashCode;
+      blobBaseFee.hashCode ^
+      nonce.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      other is GasInfo &&
+      other is RequiredTxParamsInfo &&
           runtimeType == other.runtimeType &&
           gasPrice == other.gasPrice &&
           maxPriorityFee == other.maxPriorityFee &&
           feeHistory == other.feeHistory &&
           txEstimateGas == other.txEstimateGas &&
-          blobBaseFee == other.blobBaseFee;
+          blobBaseFee == other.blobBaseFee &&
+          nonce == other.nonce;
 }

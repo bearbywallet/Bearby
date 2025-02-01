@@ -72,7 +72,7 @@ class _ConfirmTransactionContentState
   final AuthService _authService = AuthService();
   late final AuthGuard _authGuard;
 
-  GasInfo _gasInfo = GasInfo(
+  RequiredTxParamsInfo _txParamsInfo = RequiredTxParamsInfo(
     gasPrice: BigInt.zero,
     maxPriorityFee: BigInt.zero,
     feeHistory: GasFeeHistoryInfo(
@@ -82,10 +82,12 @@ class _ConfirmTransactionContentState
     ),
     txEstimateGas: BigInt.zero,
     blobBaseFee: BigInt.zero,
+    nonce: BigInt.zero,
   );
   bool _loading = false;
   String? _error;
   BigInt _maxPriorityFee = BigInt.zero;
+  BigInt _gasPrice = BigInt.zero;
   bool _obscurePassword = true;
 
   bool get isEVM => widget.tx.evm != null;
@@ -106,7 +108,7 @@ class _ConfirmTransactionContentState
 
   TransactionRequestInfo _prepareEvmTransaction() {
     final newTx = TransactionRequestEVM(
-      nonce: widget.tx.evm!.nonce,
+      nonce: _txParamsInfo.nonce,
       from: widget.tx.evm!.from,
       to: widget.tx.evm!.to,
       value: widget.tx.evm!.value,
@@ -116,10 +118,10 @@ class _ConfirmTransactionContentState
       blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
       maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
       maxPriorityFeePerGas: _maxPriorityFee,
-      gasLimit: _gasInfo.txEstimateGas,
-      gasPrice: _gasInfo.gasPrice,
+      gasLimit: _txParamsInfo.txEstimateGas,
+      gasPrice: _gasPrice,
       maxFeePerGas:
-          (_gasInfo.feeHistory.baseFee * BigInt.from(2)) + _maxPriorityFee,
+          (_txParamsInfo.feeHistory.baseFee * BigInt.from(2)) + _maxPriorityFee,
     );
 
     return TransactionRequestInfo(
@@ -131,8 +133,8 @@ class _ConfirmTransactionContentState
   TransactionRequestInfo _prepareScillaTransaction() {
     final newTx = TransactionRequestScilla(
       chainId: widget.tx.scilla!.chainId,
-      nonce: widget.tx.scilla!.nonce,
-      gasPrice: _gasInfo.gasPrice,
+      nonce: _txParamsInfo.nonce + BigInt.one,
+      gasPrice: _gasPrice,
       gasLimit: widget.tx.scilla!.gasLimit,
       toAddr: widget.tx.scilla!.toAddr,
       amount: widget.tx.scilla!.amount,
@@ -166,7 +168,7 @@ class _ConfirmTransactionContentState
         sessionKey: appState.wallet!.walletAddress,
       );
 
-      await signSendTransactions(
+      final histroy = await signSendTransactions(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
         identifiers: identifiers,
@@ -287,9 +289,14 @@ class _ConfirmTransactionContentState
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: GasEIP1559(
-        gasInfo: _gasInfo,
-        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
-        onChange: (BigInt maxPriorityFee) {
+        txParamsInfo: _txParamsInfo,
+        disabled: _txParamsInfo.gasPrice == BigInt.zero || _loading,
+        onChangeGasPrice: (gasPrice) {
+          setState(() {
+            _gasPrice = gasPrice;
+          });
+        },
+        onChangeMaxPriorityFee: (BigInt maxPriorityFee) {
           setState(() {
             _maxPriorityFee = maxPriorityFee;
           });
@@ -313,7 +320,7 @@ class _ConfirmTransactionContentState
         height: 56,
         padding: const EdgeInsets.symmetric(horizontal: 20),
         focusedBorderColor: theme.primaryPurple,
-        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
+        disabled: _txParamsInfo.gasPrice == BigInt.zero || _loading,
         obscureText: _obscurePassword,
         rightIconPath: _obscurePassword
             ? "assets/icons/close_eye.svg"
@@ -360,7 +367,7 @@ class _ConfirmTransactionContentState
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: SwipeButton(
         text: hasError ? "Unable to confirm" : "Confirm",
-        disabled: _gasInfo.gasPrice == BigInt.zero || _loading,
+        disabled: _txParamsInfo.gasPrice == BigInt.zero || _loading,
         onSwipeComplete: hasError ? null : handleConfirmation,
       ),
     );
@@ -435,17 +442,23 @@ class _ConfirmTransactionContentState
   }
 
   Future<void> _handleModalOpen() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+
     try {
       setState(() {
         _error = null;
       });
 
-      final gas = await caclGasFee(params: widget.tx);
+      final gas = await caclGasFee(
+        params: widget.tx,
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
 
       if (!mounted) return;
 
       setState(() {
-        _gasInfo = gas;
+        _txParamsInfo = gas;
       });
     } catch (e) {
       if (!mounted) return;

@@ -151,8 +151,10 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiConnectionsAddWalletToConnection(
       {required String domain, required BigInt walletIndex});
 
-  Future<GasInfo> crateApiTransactionCaclGasFee(
-      {required TransactionRequestInfo params});
+  Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo params});
 
   Future<void> crateApiWalletChangeAccountName(
       {required BigInt walletIndex,
@@ -612,21 +614,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<GasInfo> crateApiTransactionCaclGasFee(
-      {required TransactionRequestInfo params}) {
+  Future<RequiredTxParamsInfo> crateApiTransactionCaclGasFee(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required TransactionRequestInfo params}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(params, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 11, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_gas_info,
+        decodeSuccessData: sse_decode_required_tx_params_info,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionCaclGasFeeConstMeta,
-      argValues: [params],
+      argValues: [walletIndex, accountIndex, params],
       apiImpl: this,
     ));
   }
@@ -634,7 +640,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTransactionCaclGasFeeConstMeta =>
       const TaskConstMeta(
         debugName: "cacl_gas_fee",
-        argNames: ["params"],
+        argNames: ["walletIndex", "accountIndex", "params"],
       );
 
   @override
@@ -2284,21 +2290,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  GasInfo dco_decode_gas_info(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
-    return GasInfo(
-      gasPrice: dco_decode_U128(arr[0]),
-      maxPriorityFee: dco_decode_U128(arr[1]),
-      feeHistory: dco_decode_gas_fee_history_info(arr[2]),
-      txEstimateGas: dco_decode_u_64(arr[3]),
-      blobBaseFee: dco_decode_U128(arr[4]),
-    );
-  }
-
-  @protected
   HistoricalTransactionInfo dco_decode_historical_transaction_info(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -2631,6 +2622,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (
       dco_decode_usize(arr[0]),
       dco_decode_String(arr[1]),
+    );
+  }
+
+  @protected
+  RequiredTxParamsInfo dco_decode_required_tx_params_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return RequiredTxParamsInfo(
+      gasPrice: dco_decode_U128(arr[0]),
+      maxPriorityFee: dco_decode_U128(arr[1]),
+      feeHistory: dco_decode_gas_fee_history_info(arr[2]),
+      txEstimateGas: dco_decode_u_64(arr[3]),
+      blobBaseFee: dco_decode_U128(arr[4]),
+      nonce: dco_decode_u_64(arr[5]),
     );
   }
 
@@ -3212,22 +3219,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  GasInfo sse_decode_gas_info(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_gasPrice = sse_decode_U128(deserializer);
-    var var_maxPriorityFee = sse_decode_U128(deserializer);
-    var var_feeHistory = sse_decode_gas_fee_history_info(deserializer);
-    var var_txEstimateGas = sse_decode_u_64(deserializer);
-    var var_blobBaseFee = sse_decode_U128(deserializer);
-    return GasInfo(
-        gasPrice: var_gasPrice,
-        maxPriorityFee: var_maxPriorityFee,
-        feeHistory: var_feeHistory,
-        txEstimateGas: var_txEstimateGas,
-        blobBaseFee: var_blobBaseFee);
-  }
-
-  @protected
   HistoricalTransactionInfo sse_decode_historical_transaction_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3697,6 +3688,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_field0 = sse_decode_usize(deserializer);
     var var_field1 = sse_decode_String(deserializer);
     return (var_field0, var_field1);
+  }
+
+  @protected
+  RequiredTxParamsInfo sse_decode_required_tx_params_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_gasPrice = sse_decode_U128(deserializer);
+    var var_maxPriorityFee = sse_decode_U128(deserializer);
+    var var_feeHistory = sse_decode_gas_fee_history_info(deserializer);
+    var var_txEstimateGas = sse_decode_u_64(deserializer);
+    var var_blobBaseFee = sse_decode_U128(deserializer);
+    var var_nonce = sse_decode_u_64(deserializer);
+    return RequiredTxParamsInfo(
+        gasPrice: var_gasPrice,
+        maxPriorityFee: var_maxPriorityFee,
+        feeHistory: var_feeHistory,
+        txEstimateGas: var_txEstimateGas,
+        blobBaseFee: var_blobBaseFee,
+        nonce: var_nonce);
   }
 
   @protected
@@ -4242,16 +4252,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  void sse_encode_gas_info(GasInfo self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_U128(self.gasPrice, serializer);
-    sse_encode_U128(self.maxPriorityFee, serializer);
-    sse_encode_gas_fee_history_info(self.feeHistory, serializer);
-    sse_encode_u_64(self.txEstimateGas, serializer);
-    sse_encode_U128(self.blobBaseFee, serializer);
-  }
-
-  @protected
   void sse_encode_historical_transaction_info(
       HistoricalTransactionInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4626,6 +4626,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.$1, serializer);
     sse_encode_String(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_U128(self.gasPrice, serializer);
+    sse_encode_U128(self.maxPriorityFee, serializer);
+    sse_encode_gas_fee_history_info(self.feeHistory, serializer);
+    sse_encode_u_64(self.txEstimateGas, serializer);
+    sse_encode_U128(self.blobBaseFee, serializer);
+    sse_encode_u_64(self.nonce, serializer);
   }
 
   @protected
