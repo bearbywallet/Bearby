@@ -176,10 +176,12 @@ pub async fn cacl_gas_fee(
                 zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
             ))?;
 
-        chain
+        let gas = chain
             .estimate_params_batch(&tx, &sender_account.addr, 4, None)
             .await
-            .map_err(ServiceError::NetworkErrors)?
+            .map_err(ServiceError::NetworkErrors)?;
+
+        gas
     };
 
     Ok(gas.into())

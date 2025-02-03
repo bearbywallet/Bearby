@@ -7,25 +7,36 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
     case GasFeeOption.low:
       return BigInt.zero;
     case GasFeeOption.market:
-      return priorityFee * BigInt.from(150) ~/ BigInt.from(100);
+      // First multiply by numerator (150) to avoid truncation
+      final multiplied = priorityFee * BigInt.from(150);
+      // Then divide by denominator (100)
+      return multiplied ~/ BigInt.from(100);
     case GasFeeOption.aggressive:
-      return priorityFee * BigInt.from(300) ~/ BigInt.from(100);
+      // First multiply by numerator (300)
+      final multiplied = priorityFee * BigInt.from(300);
+      // Then divide by denominator (100)
+      return multiplied ~/ BigInt.from(100);
   }
 }
 
 BigInt calculateGasPrice(GasFeeOption option, BigInt gasPrice) {
   switch (option) {
     case GasFeeOption.low:
-      // No increase (0%)
       return gasPrice;
+
     case GasFeeOption.market:
-      // Increase by 20%
-      return gasPrice +
-          BigInt.from((gasPrice * BigInt.from(20)) / BigInt.from(100));
+      // First multiply to preserve precision
+      final increase = gasPrice * BigInt.from(20);
+      // Then divide
+      final increasedAmount = increase ~/ BigInt.from(100);
+      return gasPrice + increasedAmount;
+
     case GasFeeOption.aggressive:
-      // Increase by 50%
-      return gasPrice +
-          BigInt.from((gasPrice * BigInt.from(50)) / BigInt.from(100));
+      // First multiply to preserve precision
+      final increase = gasPrice * BigInt.from(50);
+      // Then divide
+      final increasedAmount = increase ~/ BigInt.from(100);
+      return gasPrice + increasedAmount;
   }
 }
 
@@ -63,24 +74,29 @@ BigInt calculateFeeForOption(
 }
 
 BigInt calculateEffectiveGasPrice(
-    GasFeeOption option, BigInt baseFee, BigInt priorityFee) {
+  GasFeeOption option,
+  BigInt baseFee,
+  BigInt priorityFee,
+) {
   final maxPriorityFee = calculateMaxPriorityFee(option, priorityFee);
-  final maxFeePerGas = calculateMaxFeePerGas(option, baseFee, priorityFee);
 
-  final availablePriorityFee = maxFeePerGas - baseFee;
-
-  final effectivePriorityFee = maxPriorityFee < availablePriorityFee
-      ? maxPriorityFee
-      : availablePriorityFee;
-
-  return baseFee + effectivePriorityFee;
+  return maxPriorityFee + baseFee;
 }
 
 BigInt calculateTotalGasCost(
-    GasFeeOption option, BigInt baseFee, BigInt priorityFee, BigInt gasLimit) {
-  final effectiveGasPrice =
-      calculateEffectiveGasPrice(option, baseFee, priorityFee);
-  return effectiveGasPrice * gasLimit;
+  GasFeeOption option,
+  BigInt baseFee,
+  BigInt priorityFee,
+  BigInt gasLimit,
+  BigInt gasPrice,
+) {
+  if (baseFee != BigInt.zero) {
+    final effectiveGasPrice =
+        calculateEffectiveGasPrice(option, baseFee, priorityFee);
+    return effectiveGasPrice * gasLimit;
+  } else {
+    return calculateGasPrice(option, gasPrice) * gasLimit;
+  }
 }
 
 String formatGasPriceDetail(BigInt price, FTokenInfo token) {
@@ -98,5 +114,5 @@ String formatGasPriceDetail(BigInt price, FTokenInfo token) {
 
 String formatGasPrice(BigInt price, int decimals, String symbol) {
   final value = price / BigInt.from(10).pow(decimals);
-  return '${value.toStringAsFixed(5)} $symbol';
+  return '≈ ${value.toStringAsFixed(12)} $symbol';
 }

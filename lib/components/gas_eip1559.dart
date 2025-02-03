@@ -251,6 +251,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       widget.txParamsInfo.feeHistory.baseFee,
       widget.txParamsInfo.feeHistory.priorityFee,
       widget.txParamsInfo.txEstimateGas,
+      widget.txParamsInfo.gasPrice,
     );
 
     return TweenAnimationBuilder<double>(
@@ -307,7 +308,10 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                         children: [
                           Text(
                             formatGasPrice(
-                                totalGasFee, token.decimals, token.symbol),
+                              totalGasFee,
+                              token.decimals,
+                              token.symbol,
+                            ),
                             style: TextStyle(
                               color: textColor,
                               fontWeight: FontWeight.w600,
