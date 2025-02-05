@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
@@ -67,6 +69,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
+  Timer? _timer;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final AuthService _authService = AuthService();
@@ -97,7 +100,20 @@ class _ConfirmTransactionContentState
   void initState() {
     super.initState();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
-    _handleModalOpen();
+    _handleModalOpen(true);
+
+    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
+      if (!mounted) {
+        timer.cancel();
+        return;
+      }
+
+      try {
+        await _handleModalOpen(false);
+      } catch (e) {
+        debugPrint('Error in periodic call: $e');
+      }
+    });
   }
 
   @override
@@ -441,7 +457,7 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Future<void> _handleModalOpen() async {
+  Future<void> _handleModalOpen(bool errorhanlde) async {
     final appState = Provider.of<AppState>(context, listen: false);
 
     try {
@@ -461,11 +477,11 @@ class _ConfirmTransactionContentState
         _txParamsInfo = gas;
       });
     } catch (e) {
-      if (!mounted) return;
-
-      setState(() {
-        _error = 'Failed to calculate gas fee: ${e.toString()}';
-      });
+      if (errorhanlde && mounted) {
+        setState(() {
+          _error = 'Failed to calculate gas fee: ${e.toString()}';
+        });
+      }
     }
   }
 

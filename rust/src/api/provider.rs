@@ -54,14 +54,7 @@ pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Resu
         let mut providers = core.get_providers();
 
         for new_provider in &provider_config {
-            if providers
-                .iter()
-                .any(|existing| existing.config.chain_id == new_provider.chain_id)
-            {
-                return Err(BackgroundError::ProviderAlreadyExists(
-                    new_provider.chain_id,
-                ))?;
-            }
+            providers.retain(|p| p.config.chain_id != new_provider.chain_id);
         }
 
         for new_conf in provider_config {

@@ -28,7 +28,10 @@
     "chain": "ETH",
     "icon": "ethereum",
     "rpc": [
-      "https://eth.llamarpc.com",
+      "https://rpc.payload.de",
+      "https://eth.meowrpc.com",
+      "https://eth.drpc.org",
+      "https://eth.blockrazor.xyz",
       "https://eth-mainnet.public.blastapi.io"
     ],
     "features": [

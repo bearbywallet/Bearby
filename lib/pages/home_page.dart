@@ -21,11 +21,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isMounted = true;
+
   @override
   void initState() {
     super.initState();
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!_isMounted) return;
+
       final appState = Provider.of<AppState>(context, listen: false);
 
       if (appState.wallet == null || appState.account == null) {
@@ -37,13 +41,24 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  @override
+  void dispose() {
+    _isMounted = false;
+    super.dispose();
+  }
+
   Future<void> _refreshData(AppState appState) async {
+    if (!_isMounted) return;
+
     try {
       BigInt index = BigInt.from(appState.selectedWallet);
       await syncBalances(walletIndex: index);
       await appState.updateTokensRates();
       await appState.syncData();
-      setState(() {});
+
+      if (_isMounted) {
+        setState(() {});
+      }
     } catch (e) {
       debugPrint("error sync balance: $e");
     }

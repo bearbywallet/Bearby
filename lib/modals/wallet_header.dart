@@ -191,7 +191,9 @@ class _WalletModalContentState extends State<_WalletModalContent> {
 
                   try {
                     await appState.updateSelectedAccount(
-                        walletIndex, accountIndex);
+                      walletIndex,
+                      accountIndex,
+                    );
                   } catch (e) {
                     debugPrint("select wallet error: $e");
                   }
