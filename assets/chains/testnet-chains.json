@@ -29,6 +29,36 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Sepolia testnet",
+    "chain": "ETH",
+    "rpc": [
+      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
+      "https://rpc-sepolia.rockx.com",
+      "https://rpc.sepolia.dev"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "nativeCurrency": {
+      "name": "tEther",
+      "symbol": "tETH",
+      "decimals": 18
+    },
+    "infoURL": "https://sepolia.dev/",
+    "shortName": "sepolia",
+    "chainId": 11155111,
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Etherscan",
+        "url": "https://sepolia.etherscan.io/",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
 
