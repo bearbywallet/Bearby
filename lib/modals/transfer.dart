@@ -400,8 +400,7 @@ class _ConfirmTransactionContentState
     try {
       final token = state.wallet!.tokens
           .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
-      final chainId =
-          widget.tx.evm?.chainId ?? BigInt.from(widget.tx.scilla?.chainId ?? 0);
+      final chainId = state.chain?.chainId ?? BigInt.zero;
 
       return Container(
         width: imageSize,
