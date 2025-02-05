@@ -293,14 +293,15 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildWalletIcon(WalletInfo wallet, int index, AppState state) {
-    final token = wallet.tokens[0];
+    final token = wallet.tokens.first;
+    final provider = state.getChain(wallet.defaultChainHash);
 
     return Container(
       padding: const EdgeInsets.all(4),
       child: AsyncImage(
         url: viewTokenIcon(
           token,
-          state.chain!.chainId,
+          provider?.chainId ?? BigInt.zero,
           state.currentTheme.value,
         ),
         width: 32,
