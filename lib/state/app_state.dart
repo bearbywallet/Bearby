@@ -165,8 +165,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> updateSelectedAccount(
-      BigInt walletIndex, BigInt accountIndex) async {
+    BigInt walletIndex,
+    BigInt accountIndex,
+  ) async {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
+    await syncData();
 
     notifyListeners();
   }

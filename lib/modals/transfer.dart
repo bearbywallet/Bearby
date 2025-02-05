@@ -69,7 +69,6 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
-  Timer? _timer;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final AuthService _authService = AuthService();
@@ -92,6 +91,7 @@ class _ConfirmTransactionContentState
   BigInt _maxPriorityFee = BigInt.zero;
   BigInt _gasPrice = BigInt.zero;
   bool _obscurePassword = true;
+  Timer? _timerPooling;
 
   bool get isEVM => widget.tx.evm != null;
   bool get hasError => _error != null;
@@ -102,7 +102,8 @@ class _ConfirmTransactionContentState
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _handleModalOpen(true);
 
-    _timer = Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
+    _timerPooling =
+        Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
       if (!mounted) {
         timer.cancel();
         return;
@@ -119,6 +120,9 @@ class _ConfirmTransactionContentState
   @override
   void dispose() {
     _passwordController.dispose();
+    if (_timerPooling != null) {
+      _timerPooling!.cancel();
+    }
     super.dispose();
   }
 
@@ -458,12 +462,18 @@ class _ConfirmTransactionContentState
   }
 
   Future<void> _handleModalOpen(bool errorhanlde) async {
+    if (_loading) {
+      return;
+    }
+
     final appState = Provider.of<AppState>(context, listen: false);
 
     try {
-      setState(() {
-        _error = null;
-      });
+      if (errorhanlde) {
+        setState(() {
+          _error = null;
+        });
+      }
 
       final gas = await caclGasFee(
         params: widget.tx,
@@ -471,11 +481,11 @@ class _ConfirmTransactionContentState
         accountIndex: appState.wallet!.selectedAccount,
       );
 
-      if (!mounted) return;
-
-      setState(() {
-        _txParamsInfo = gas;
-      });
+      if (mounted && gas.gasPrice != BigInt.zero) {
+        setState(() {
+          _txParamsInfo = gas;
+        });
+      }
     } catch (e) {
       if (errorhanlde && mounted) {
         setState(() {

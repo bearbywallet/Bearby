@@ -104,7 +104,10 @@ class _HistoryItemState extends State<HistoryItem>
     );
   }
 
-  Widget _buildTransactionDetails(AppTheme theme) {
+  Widget _buildTransactionDetails(AppState appState) {
+    final theme = appState.currentTheme;
+    final nativeToken = appState.wallet!.tokens.first;
+
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       height: isExpanded ? null : 0,
@@ -147,7 +150,7 @@ class _HistoryItemState extends State<HistoryItem>
             _buildDetailRow(
               theme,
               'Fee:',
-              '${(adjustAmountToDouble(widget.transaction.fee, widget.transaction.tokenInfo!.decimals))} ${widget.transaction.tokenInfo!.symbol}',
+              '${(adjustAmountToDouble(widget.transaction.fee, nativeToken.decimals))} ${appState.chain!.chain}',
               false,
             ),
             if (widget.transaction.confirmed != null)
@@ -171,14 +174,6 @@ class _HistoryItemState extends State<HistoryItem>
   ) {
     return Container(
       padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-      decoration: BoxDecoration(
-        border: Border(
-          bottom: BorderSide(
-            color: theme.textSecondary.withValues(alpha: 0.1),
-            width: 1,
-          ),
-        ),
-      ),
       child: Row(
         children: [
           SizedBox(
@@ -258,8 +253,10 @@ class _HistoryItemState extends State<HistoryItem>
   String _formatAmount() {
     if (widget.transaction.tokenInfo != null) {
       final decimals = widget.transaction.tokenInfo!.decimals;
-      final value = BigInt.parse(widget.transaction.amount);
+      final value = BigInt.parse(
+          widget.transaction.tokenInfo?.value ?? widget.transaction.amount);
       final formattedValue = adjustAmountToDouble(value, decimals);
+
       return '${formatCompactNumber(formattedValue)} ${widget.transaction.tokenInfo!.symbol}';
     }
     return widget.transaction.amount;
@@ -385,16 +382,6 @@ class _HistoryItemState extends State<HistoryItem>
                                         overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      _formatDateTime(),
-                                      style: TextStyle(
-                                        color: theme.textSecondary
-                                            .withValues(alpha: 0.7),
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w400,
-                                      ),
-                                    ),
                                   ],
                                 ),
                               ],
@@ -417,7 +404,26 @@ class _HistoryItemState extends State<HistoryItem>
                         ],
                       ),
                     ),
-                    _buildTransactionDetails(theme),
+                    Padding(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: adaptivePadding,
+                        ),
+                        child: Row(
+                          children: [
+                            Flexible(
+                              child: Text(
+                                _formatDateTime(),
+                                style: TextStyle(
+                                  color: theme.textSecondary
+                                      .withValues(alpha: 0.7),
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w400,
+                                ),
+                              ),
+                            ),
+                          ],
+                        )),
+                    _buildTransactionDetails(state),
                   ],
                 ),
               ),

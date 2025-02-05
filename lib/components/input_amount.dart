@@ -134,7 +134,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                             color: theme.textPrimary.withValues(alpha: 0.2),
                             width: 1.5,
                           ),
-                          borderRadius: BorderRadius.circular(24),
+                          borderRadius: BorderRadius.circular(100),
                         ),
                         child: AsyncImage(
                           key: _imageKey,
