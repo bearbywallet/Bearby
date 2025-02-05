@@ -107,7 +107,7 @@ class _TokenCardState extends State<TokenCard>
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final double tokenAmount = _getAmount();
-    final convertedAmount = getConvertedAmount(state, tokenAmount);
+    // final convertedAmount = getConvertedAmount(state, tokenAmount);
     final String amount = formatCompactNumber(tokenAmount);
 
     return Column(
@@ -200,16 +200,6 @@ class _TokenCardState extends State<TokenCard>
                                       letterSpacing: 0.5,
                                     ),
                                     overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                                const SizedBox(width: 2),
-                                Text(
-                                  '$convertedAmount${widget.currencySymbol}',
-                                  style: TextStyle(
-                                    color: theme.textSecondary
-                                        .withValues(alpha: 0.7),
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.w400,
                                   ),
                                 ),
                               ],

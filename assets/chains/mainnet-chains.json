@@ -3,7 +3,7 @@
     "name": "Zilliqa Mainnet",
     "chain": "ZIL",
     "rpc": [
-      "https://api.zq2-protomainnet.zilliqa.com"
+      "https://api.zilliqa.com"
     ],
     "features": [],
     "nativeCurrency": {

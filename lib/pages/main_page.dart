@@ -20,6 +20,18 @@ class MainPageState extends State<MainPage> {
     const BrowserPage()
   ];
 
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final selectedIndex = args?['selectedIndex'] as int?;
+
+    if (selectedIndex != null) {
+      _selectedIndex = selectedIndex;
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;

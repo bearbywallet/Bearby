@@ -173,7 +173,7 @@ class _HistoryItemState extends State<HistoryItem>
     bool isCopyable,
   ) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
       child: Row(
         children: [
           SizedBox(

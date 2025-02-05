@@ -227,6 +227,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
       amount: toWei(_amount, token.decimals).toString(),
       recipient: _address ?? "",
     );
+
     TransactionRequestInfo tx = await createTokenTransfer(params: params);
     if (!mounted) return;
     showConfirmTransactionModal(
@@ -236,7 +237,9 @@ class _SendTokenPageState extends State<SendTokenPage> {
       tokenIndex: _tokenIndex,
       amount: _amount,
       onConfirm: () {
-        Navigator.pop(context);
+        Navigator.of(context).pushNamed('/history', arguments: {
+          'selectedIndex': 1,
+        });
       },
     );
   }

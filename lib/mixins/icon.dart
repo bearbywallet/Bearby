@@ -25,6 +25,9 @@ String chainIcon(String symbol, String? theme) {
   if (symbol.startsWith("t")) {
     symbol = symbol.replaceFirst("t", "");
   }
+  if (symbol.startsWith("p")) {
+    symbol = symbol.replaceFirst("p", "");
+  }
 
   String color = theme == null
       ? "color"

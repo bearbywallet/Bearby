@@ -27,7 +27,6 @@ import 'state/app_state.dart';
 import 'pages/main_page.dart';
 import 'pages/login_page.dart';
 import 'pages/initial_page.dart';
-import 'pages/history_page.dart';
 import 'pages/browser_page.dart';
 import 'pages/settings_page.dart';
 import 'pages/new_wallet_options.dart';
@@ -178,8 +177,6 @@ class AppRouter {
         return wrapWithProviders(const ReceivePage());
       case '/add_token':
         return wrapWithProviders(const AddTokenPage());
-      case '/history':
-        return wrapWithProviders(const HistoryPage());
       case '/send':
         return wrapWithProviders(const SendTokenPage());
       case '/reveal_sk':

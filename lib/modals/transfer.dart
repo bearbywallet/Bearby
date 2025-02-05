@@ -94,6 +94,7 @@ class _ConfirmTransactionContentState
   Timer? _timerPooling;
 
   bool get isEVM => widget.tx.evm != null;
+  bool get isScilla => widget.tx.scilla != null;
   bool get hasError => _error != null;
 
   @override
@@ -109,11 +110,7 @@ class _ConfirmTransactionContentState
         return;
       }
 
-      try {
-        await _handleModalOpen(false);
-      } catch (e) {
-        debugPrint('Error in periodic call: $e');
-      }
+      await _handleModalOpen(false);
     });
   }
 
@@ -188,7 +185,7 @@ class _ConfirmTransactionContentState
         sessionKey: appState.wallet!.walletAddress,
       );
 
-      final histroy = await signSendTransactions(
+      await signSendTransactions(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
         identifiers: identifiers,
@@ -244,7 +241,7 @@ class _ConfirmTransactionContentState
                       _buildTokenLogo(appState),
                       const SizedBox(height: 4),
                       _buildTransferDetails(appState),
-                      if (isEVM) _buildGasSettings(),
+                      _buildGasSettings(),
                       _buildAuthenticationInput(appState, theme),
                       _buildConfirmButton(),
                       SizedBox(height: keyboardHeight > 0 ? 16 : 32),
@@ -371,7 +368,10 @@ class _ConfirmTransactionContentState
         final tx =
             isEVM ? _prepareEvmTransaction() : _prepareScillaTransaction();
         await _handleTransactionSigning(appState, tx);
-        widget.onConfirm();
+
+        if (mounted) {
+          widget.onConfirm();
+        }
       } catch (e) {
         setState(() {
           _error = e.toString();
@@ -388,7 +388,7 @@ class _ConfirmTransactionContentState
       child: SwipeButton(
         text: hasError ? "Unable to confirm" : "Confirm",
         disabled: _txParamsInfo.gasPrice == BigInt.zero || _loading,
-        onSwipeComplete: hasError ? null : handleConfirmation,
+        onSwipeComplete: handleConfirmation,
       ),
     );
   }
@@ -475,7 +475,7 @@ class _ConfirmTransactionContentState
         });
       }
 
-      final gas = await caclGasFee(
+      RequiredTxParamsInfo gas = await caclGasFee(
         params: widget.tx,
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
@@ -487,6 +487,7 @@ class _ConfirmTransactionContentState
         });
       }
     } catch (e) {
+      debugPrint('Error in periodic call: $e');
       if (errorhanlde && mounted) {
         setState(() {
           _error = 'Failed to calculate gas fee: ${e.toString()}';
