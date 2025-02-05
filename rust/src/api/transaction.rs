@@ -85,7 +85,7 @@ pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactio
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         let history: Vec<HistoricalTransactionInfo> =
-            history.iter().map(|tx| tx.clone().into()).collect();
+            history.into_iter().map(|tx| tx.into()).rev().collect();
 
         Ok(history)
     })
