@@ -108,7 +108,11 @@ class _WalletModalContentState extends State<_WalletModalContent> {
       children: [
         GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () => Navigator.pop(context),
+          onTap: () {
+            Navigator.of(context).pushNamed('/', arguments: {
+              'selectedIndex': 0,
+            });
+          },
           child: Container(
             width: 36,
             height: 4,

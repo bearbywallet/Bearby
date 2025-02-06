@@ -23,6 +23,7 @@ class MainPageState extends State<MainPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final selectedIndex = args?['selectedIndex'] as int?;
@@ -33,9 +34,22 @@ class MainPageState extends State<MainPage> {
   }
 
   void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
+    if (index == _selectedIndex) {
+      return;
+    }
+
+    Navigator.of(context).push(
+      MaterialPageRoute<MainPage>(
+        builder: (context) => const MainPage(),
+        settings: RouteSettings(
+          name: '/',
+          arguments: {'selectedIndex': index},
+        ),
+        barrierDismissible: true,
+        allowSnapshotting: false,
+        fullscreenDialog: true,
+      ),
+    );
   }
 
   @override

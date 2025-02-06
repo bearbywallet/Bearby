@@ -237,7 +237,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
       tokenIndex: _tokenIndex,
       amount: _amount,
       onConfirm: () {
-        Navigator.of(context).pushNamed('/history', arguments: {
+        Navigator.of(context).pushNamed('/', arguments: {
           'selectedIndex': 1,
         });
       },
