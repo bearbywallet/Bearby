@@ -11,9 +11,9 @@ import 'package:zilpay/state/app_state.dart';
 class WalletOption extends StatelessWidget {
   final String title;
   final String address;
+  final int walletIndex;
   final bool isSelected;
   final VoidCallback onTap;
-  final Widget? icon;
   final List<String>? icons;
   final EdgeInsetsGeometry? padding;
 
@@ -23,7 +23,7 @@ class WalletOption extends StatelessWidget {
     required this.address,
     required this.isSelected,
     required this.onTap,
-    this.icon,
+    required this.walletIndex,
     this.icons,
     this.padding = const EdgeInsets.all(16.0),
   });
@@ -32,6 +32,8 @@ class WalletOption extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = Provider.of<AppState>(context).currentTheme;
+    final wallet = appState.wallets[walletIndex];
+    final chain = appState.getChain(wallet.defaultChainHash);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -61,7 +63,7 @@ class WalletOption extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AsyncImage(
-                      url: chainIcon(appState.chain!.chain, null),
+                      url: chainIcon(chain!.chain, null),
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,

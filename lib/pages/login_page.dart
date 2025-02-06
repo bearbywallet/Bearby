@@ -3,9 +3,6 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:blockies/blockies.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 
@@ -13,7 +10,6 @@ import '../components/load_button.dart';
 import '../components/smart_input.dart';
 import '../components/wallet_option.dart';
 import '../mixins/adaptive_size.dart';
-import '../mixins/colors.dart';
 import '../mixins/wallet_type.dart';
 import '../services/auth_guard.dart';
 import '../services/biometric_service.dart';
@@ -262,6 +258,7 @@ class _LoginPageState extends State<LoginPage> {
         title: wallet.walletName.isEmpty
             ? "Wallet ${index + 1}"
             : wallet.walletName,
+        walletIndex: index,
         address: wallet.walletAddress,
         isSelected: _selectedWallet == index,
         padding: const EdgeInsets.all(16),
@@ -270,7 +267,6 @@ class _LoginPageState extends State<LoginPage> {
           _handleAuthentication();
         },
         icons: _getWalletIcons(wallet),
-        icon: _buildWalletIcon(wallet, index, theme),
       ),
     );
   }
@@ -290,37 +286,6 @@ class _LoginPageState extends State<LoginPage> {
         'assets/icons/biometric.svg',
       if (wallet.authType == AuthMethod.pinCode.name) 'assets/icons/pin.svg',
     ];
-  }
-
-  Widget _buildWalletIcon(WalletInfo wallet, int index, AppState state) {
-    final token = wallet.tokens.first;
-    final provider = state.getChain(wallet.defaultChainHash);
-
-    return Container(
-      padding: const EdgeInsets.all(4),
-      child: AsyncImage(
-        url: viewTokenIcon(
-          token,
-          provider?.chainId ?? BigInt.zero,
-          state.currentTheme.value,
-        ),
-        width: 32,
-        height: 32,
-        fit: BoxFit.contain,
-        errorWidget: Blockies(
-          seed: wallet.walletAddress,
-          color: getWalletColor(index),
-          bgColor: state.currentTheme.primaryPurple,
-          spotColor: state.currentTheme.background,
-          size: 8,
-        ),
-        loadingWidget: const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
-        ),
-      ),
-    );
   }
 
   Widget _buildLoginForm(AppState theme) {
