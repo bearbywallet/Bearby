@@ -154,7 +154,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                                 });
                           } else {
                             // TODO: maybe error hanlder.
-                            Navigator.pop(context);
+                            Navigator.pop<void>(context);
                           }
                         } catch (e) {
                           debugPrint("error: $e");

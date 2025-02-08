@@ -37,28 +37,30 @@ class Chain {
     required this.rpc,
     required this.features,
     required this.faucets,
-    required this.nativeCurrency,
+    required this.ftokens,
     required this.infoURL,
     required this.shortName,
     required this.chainId,
-    required this.networkId,
+    this.networkId,
     required this.slip44,
     required this.explorers,
     this.ens,
     this.testnet,
+    this.icon,
   });
 
   bool? testnet;
   final String name;
   final String chain;
+  final String? icon;
   final List<Uri> rpc;
   final List<String> features;
   final List<Uri> faucets;
-  final NativeCurrency nativeCurrency;
+  final List<FToken> ftokens;
   final Uri infoURL;
   final String shortName;
   final int chainId;
-  final int networkId;
+  final int? networkId;
   final int slip44;
   final Ens? ens;
   final List<Explorer> explorers;
@@ -67,6 +69,7 @@ class Chain {
     return Chain(
       name: json['name'] as String? ?? '',
       chain: json['chain'] as String? ?? '',
+      icon: json['icon'] as String?,
       rpc: (json['rpc'] as List<dynamic>?)
               ?.map((e) => Uri.parse(e as String))
               .toList(growable: false) ??
@@ -79,13 +82,14 @@ class Chain {
               ?.map((e) => Uri.parse(e as String))
               .toList(growable: false) ??
           [],
-      nativeCurrency: NativeCurrency.fromJson(
-        json['nativeCurrency'] as Map<String, dynamic>? ?? {},
-      ),
+      ftokens: (json['ftokens'] as List<dynamic>?)
+              ?.map((e) => FToken.fromJson(e as Map<String, dynamic>))
+              .toList(growable: false) ??
+          [],
       infoURL: Uri.parse(json['infoURL'] as String? ?? ''),
       shortName: json['shortName'] as String? ?? '',
       chainId: json['chainId'] as int? ?? 0,
-      networkId: json['networkId'] as int? ?? 0,
+      networkId: json['networkId'] as int?,
       slip44: json['slip44'] as int? ?? 0,
       ens: json['ens'] != null
           ? Ens.fromJson(json['ens'] as Map<String, dynamic>)
@@ -98,22 +102,28 @@ class Chain {
   }
 }
 
-class NativeCurrency {
-  const NativeCurrency({
+class FToken {
+  const FToken({
     required this.name,
     required this.symbol,
     required this.decimals,
+    required this.native,
+    this.addr,
   });
 
+  final bool native;
   final String name;
   final String symbol;
   final int decimals;
+  final String? addr;
 
-  factory NativeCurrency.fromJson(Map<String, dynamic> json) {
-    return NativeCurrency(
+  factory FToken.fromJson(Map<String, dynamic> json) {
+    return FToken(
       name: json['name'] as String? ?? '',
       symbol: json['symbol'] as String? ?? '',
       decimals: json['decimals'] as int? ?? 18,
+      addr: json['addr'] as String?,
+      native: json['native'] as bool,
     );
   }
 
@@ -121,6 +131,8 @@ class NativeCurrency {
         'name': name,
         'symbol': symbol,
         'decimals': decimals,
+        'addr': addr,
+        'native': native,
       };
 }
 

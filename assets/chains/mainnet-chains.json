@@ -6,11 +6,15 @@
       "https://api.zilliqa.com"
     ],
     "features": [],
-    "nativeCurrency": {
-      "name": "ZIL",
-      "symbol": "ZIL",
-      "decimals": 18
-    },
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "ZIL",
+        "symbol": "ZIL",
+        "decimals": 18
+      }
+    ],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
     "chainId": 32770,
@@ -39,11 +43,15 @@
       "EIP1559",
       "EIP4844"
     ],
-    "nativeCurrency": {
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18
-    },
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    ],
     "infoURL": "https://ethereum.org",
     "shortName": "ethereum",
     "chainId": 1,
@@ -73,117 +81,6 @@
       {
         "name": "Routescan",
         "url": "https://ethereum.routescan.io",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Polygon Mainnet",
-    "chain": "POL",
-    "rpc": [
-      "https://polygon-rpc.com/",
-      "https://rpc-mainnet.matic.network",
-      "https://matic-mainnet.chainstacklabs.com",
-      "https://rpc-mainnet.maticvigil.com",
-      "https://rpc-mainnet.matic.quiknode.pro",
-      "https://matic-mainnet-full-rpc.bwarelabs.com",
-      "https://polygon-bor-rpc.publicnode.com",
-      "https://polygon.gateway.tenderly.co",
-      "https://polygon.drpc.org"
-    ],
-    "nativeCurrency": {
-      "name": "Polygon",
-      "symbol": "POL",
-      "decimals": 18
-    },
-    "features": [
-      "EIP5656",
-      "EIP1153",
-      "EIP6780",
-      "EIP1559"
-    ],
-    "infoURL": "https://polygon.technology/",
-    "shortName": "polygon",
-    "chainId": 137,
-    "networkId": 137,
-    "slip44": 60,
-    "explorers": [
-      {
-        "name": "polygonscan",
-        "url": "https://polygonscan.com",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "dexguru",
-        "url": "https://polygon.dex.guru",
-        "icon": "dexguru",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "zkSync Mainnet",
-    "chain": "ETH",
-    "rpc": [
-      "https://mainnet.era.zksync.io",
-      "https://zksync.drpc.org"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Ether",
-      "symbol": "ETH",
-      "decimals": 18
-    },
-    "infoURL": "https://zksync.io/",
-    "shortName": "ethereum",
-    "slip44": 60,
-    "networkId": 324,
-    "icon": "zksync-era",
-    "explorers": [
-      {
-        "name": "zkSync Era Block Explorer",
-        "url": "https://explorer.zksync.io",
-        "icon": "zksync-era",
-        "standard": "EIP3091"
-      }
-    ],
-    "parent": {
-      "type": "L2",
-      "chain": "eip155-1",
-      "bridges": [
-        {
-          "url": "https://bridge.zksync.io/"
-        }
-      ]
-    }
-  },
-  {
-    "name": "Core Blockchain Mainnet",
-    "chain": "CORE",
-    "rpc": [
-      "https://rpc.coredao.org/",
-      "https://rpc-core.icecreamswap.com",
-      "https://core.drpc.org"
-    ],
-    "features": [
-      "EIP155",
-      "EIP1559"
-    ],
-    "faucets": [],
-    "nativeCurrency": {
-      "name": "Core Blockchain Native Token",
-      "symbol": "CORE",
-      "decimals": 18
-    },
-    "infoURL": "https://www.coredao.org",
-    "shortName": "ethereum",
-    "chainId": 60,
-    "networkId": 1116,
-    "explorers": [
-      {
-        "name": "Core Scan",
-        "url": "https://scan.coredao.org",
-        "icon": "core",
         "standard": "EIP3091"
       }
     ]

@@ -236,13 +236,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         requestTimeoutSecs: 30,
       );
       FTokenInfo ftoken = FTokenInfo(
-        name: _chain!.nativeCurrency.name,
-        symbol: _chain!.nativeCurrency.symbol,
-        decimals: _chain!.nativeCurrency.decimals,
-        addr: zeroEVM, // TODO: depends of chain check the address.
+        name: _chain!.ftokens.first.name,
+        symbol: _chain!.ftokens.first.symbol,
+        decimals: _chain!.ftokens.first.decimals,
+        addr: _chain!.ftokens.first.addr ?? zeroEVM,
         balances: {},
         default_: true,
-        native: true,
+        native: _chain!.ftokens.first.native,
         chainHash: chainHash,
       );
 

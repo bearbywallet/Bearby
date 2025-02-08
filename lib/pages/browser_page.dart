@@ -42,7 +42,6 @@ class _BrowserPageState extends State<BrowserPage> {
             });
           },
           onPageFinished: (String url) async {
-            // Inject your custom JavaScript here
             await _controller.runJavaScript('''
               // Your custom JavaScript injection
               console.log('ZilPay Browser Initialized');

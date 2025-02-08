@@ -46,7 +46,7 @@ class MainPageState extends State<MainPage> {
           arguments: {'selectedIndex': index},
         ),
         barrierDismissible: true,
-        allowSnapshotting: false,
+        allowSnapshotting: true,
         fullscreenDialog: true,
       ),
     );

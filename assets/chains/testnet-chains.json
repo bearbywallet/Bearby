@@ -6,11 +6,15 @@
       "https://api.zq2-protomainnet.zilliqa.com"
     ],
     "features": [],
-    "nativeCurrency": {
-      "name": "Proto Zilliqa",
-      "symbol": "pZIL",
-      "decimals": 18
-    },
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Proto Zilliqa",
+        "symbol": "pZIL",
+        "decimals": 18
+      }
+    ],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
     "chainId": 32770,
@@ -37,11 +41,15 @@
     "features": [
       "EIP1559"
     ],
-    "nativeCurrency": {
-      "name": "Binance Chain",
-      "symbol": "tBNB",
-      "decimals": 18
-    },
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Binance Chain",
+        "symbol": "tBNB",
+        "decimals": 18
+      }
+    ],
     "infoURL": "https://www.bnbchain.org",
     "shortName": "binance",
     "chainId": 97,
@@ -67,11 +75,15 @@
       "EIP1559",
       "EIP4844"
     ],
-    "nativeCurrency": {
-      "name": "tEther",
-      "symbol": "tETH",
-      "decimals": 18
-    },
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "tEther",
+        "symbol": "tETH",
+        "decimals": 18
+      }
+    ],
     "infoURL": "https://sepolia.dev/",
     "shortName": "sepolia",
     "chainId": 11155111,
