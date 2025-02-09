@@ -11,6 +11,8 @@ class AccountInfo {
   final int addrType;
   final String name;
   final BigInt chainHash;
+  final BigInt chainId;
+  final int slip44;
   final BigInt index;
 
   const AccountInfo({
@@ -18,6 +20,8 @@ class AccountInfo {
     required this.addrType,
     required this.name,
     required this.chainHash,
+    required this.chainId,
+    required this.slip44,
     required this.index,
   });
 
@@ -27,6 +31,8 @@ class AccountInfo {
       addrType.hashCode ^
       name.hashCode ^
       chainHash.hashCode ^
+      chainId.hashCode ^
+      slip44.hashCode ^
       index.hashCode;
 
   @override
@@ -38,5 +44,7 @@ class AccountInfo {
           addrType == other.addrType &&
           name == other.name &&
           chainHash == other.chainHash &&
+          chainId == other.chainId &&
+          slip44 == other.slip44 &&
           index == other.index;
 }

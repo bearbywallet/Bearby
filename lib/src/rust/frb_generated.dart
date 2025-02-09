@@ -2003,14 +2003,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo dco_decode_account_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return AccountInfo(
       addr: dco_decode_String(arr[0]),
       addrType: dco_decode_u_8(arr[1]),
       name: dco_decode_String(arr[2]),
       chainHash: dco_decode_u_64(arr[3]),
-      index: dco_decode_usize(arr[4]),
+      chainId: dco_decode_u_64(arr[4]),
+      slip44: dco_decode_u_32(arr[5]),
+      index: dco_decode_usize(arr[6]),
     );
   }
 
@@ -2921,12 +2923,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_addrType = sse_decode_u_8(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
+    var var_chainId = sse_decode_u_64(deserializer);
+    var var_slip44 = sse_decode_u_32(deserializer);
     var var_index = sse_decode_usize(deserializer);
     return AccountInfo(
         addr: var_addr,
         addrType: var_addrType,
         name: var_name,
         chainHash: var_chainHash,
+        chainId: var_chainId,
+        slip44: var_slip44,
         index: var_index);
   }
 
@@ -4039,6 +4045,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.addrType, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_64(self.chainId, serializer);
+    sse_encode_u_32(self.slip44, serializer);
     sse_encode_usize(self.index, serializer);
   }
 
