@@ -242,6 +242,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         addr: _chain!.ftokens.first.addr ?? zeroEVM,
         balances: {},
         default_: true,
+        addrType: 1,
         native: _chain!.ftokens.first.native,
         chainHash: chainHash,
       );

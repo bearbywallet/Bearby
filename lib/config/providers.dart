@@ -10,6 +10,7 @@ extension ChainConverter on Chain {
       shortName: shortName,
       name: name,
       chain: chain,
+      chainIds: chainIds != null ? Uint8List.fromList(chainIds!) : null,
       rpc: rpc.map((uri) => uri.toString()).toList(),
       features: Uint16List.fromList(
           features.map((f) => int.parse(f.replaceAll('EIP', ''))).toList()),
@@ -41,6 +42,7 @@ class Chain {
     required this.infoURL,
     required this.shortName,
     required this.chainId,
+    this.chainIds,
     this.networkId,
     required this.slip44,
     required this.explorers,
@@ -52,6 +54,7 @@ class Chain {
   bool? testnet;
   final String name;
   final String chain;
+  final List<int>? chainIds;
   final String? icon;
   final List<Uri> rpc;
   final List<String> features;
@@ -70,6 +73,9 @@ class Chain {
       name: json['name'] as String? ?? '',
       chain: json['chain'] as String? ?? '',
       icon: json['icon'] as String?,
+      chainIds: (json['chainIds'] as List<dynamic>?)
+          ?.map((e) => e as int)
+          .toList(growable: false),
       rpc: (json['rpc'] as List<dynamic>?)
               ?.map((e) => Uri.parse(e as String))
               .toList(growable: false) ??

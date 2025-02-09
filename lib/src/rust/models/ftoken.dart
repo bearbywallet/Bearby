@@ -11,6 +11,7 @@ class FTokenInfo {
   final String symbol;
   final int decimals;
   final String addr;
+  final int addrType;
   final String? logo;
   final Map<BigInt, String> balances;
   final bool default_;
@@ -22,6 +23,7 @@ class FTokenInfo {
     required this.symbol,
     required this.decimals,
     required this.addr,
+    required this.addrType,
     this.logo,
     required this.balances,
     required this.default_,
@@ -35,6 +37,7 @@ class FTokenInfo {
       symbol.hashCode ^
       decimals.hashCode ^
       addr.hashCode ^
+      addrType.hashCode ^
       logo.hashCode ^
       balances.hashCode ^
       default_.hashCode ^
@@ -50,6 +53,7 @@ class FTokenInfo {
           symbol == other.symbol &&
           decimals == other.decimals &&
           addr == other.addr &&
+          addrType == other.addrType &&
           logo == other.logo &&
           balances == other.balances &&
           default_ == other.default_ &&

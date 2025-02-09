@@ -2368,11 +2368,13 @@ impl SseDecode for crate::models::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_addr = <String>::sse_decode(deserializer);
+        let mut var_addrType = <u8>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_index = <usize>::sse_decode(deserializer);
         return crate::models::account::AccountInfo {
             addr: var_addr,
+            addr_type: var_addrType,
             name: var_name,
             chain_hash: var_chainHash,
             index: var_index,
@@ -2593,6 +2595,7 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
         let mut var_symbol = <String>::sse_decode(deserializer);
         let mut var_decimals = <u8>::sse_decode(deserializer);
         let mut var_addr = <String>::sse_decode(deserializer);
+        let mut var_addrType = <u8>::sse_decode(deserializer);
         let mut var_logo = <Option<String>>::sse_decode(deserializer);
         let mut var_balances = <std::collections::HashMap<usize, String>>::sse_decode(deserializer);
         let mut var_default_ = <bool>::sse_decode(deserializer);
@@ -2603,6 +2606,7 @@ impl SseDecode for crate::models::ftoken::FTokenInfo {
             symbol: var_symbol,
             decimals: var_decimals,
             addr: var_addr,
+            addr_type: var_addrType,
             logo: var_logo,
             balances: var_balances,
             default: var_default_,
@@ -2926,6 +2930,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_rpc = <Vec<String>>::sse_decode(deserializer);
         let mut var_features = <Vec<u16>>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
+        let mut var_chainIds = <Option<Vec<u8>>>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_ens = <Option<String>>::sse_decode(deserializer);
@@ -2940,6 +2945,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
             rpc: var_rpc,
             features: var_features,
             chain_id: var_chainId,
+            chain_ids: var_chainIds,
             slip_44: var_slip44,
             chain_hash: var_chainHash,
             ens: var_ens,
@@ -3594,6 +3600,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.addr.into_into_dart().into_dart(),
+            self.addr_type.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.index.into_into_dart().into_dart(),
@@ -3871,6 +3878,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::ftoken::FTokenInfo {
             self.symbol.into_into_dart().into_dart(),
             self.decimals.into_into_dart().into_dart(),
             self.addr.into_into_dart().into_dart(),
+            self.addr_type.into_into_dart().into_dart(),
             self.logo.into_into_dart().into_dart(),
             self.balances.into_into_dart().into_dart(),
             self.default.into_into_dart().into_dart(),
@@ -4007,6 +4015,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInf
             self.rpc.into_into_dart().into_dart(),
             self.features.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
+            self.chain_ids.into_into_dart().into_dart(),
             self.slip_44.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.ens.into_into_dart().into_dart(),
@@ -4403,6 +4412,7 @@ impl SseEncode for crate::models::account::AccountInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.addr, serializer);
+        <u8>::sse_encode(self.addr_type, serializer);
         <String>::sse_encode(self.name, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <usize>::sse_encode(self.index, serializer);
@@ -4540,6 +4550,7 @@ impl SseEncode for crate::models::ftoken::FTokenInfo {
         <String>::sse_encode(self.symbol, serializer);
         <u8>::sse_encode(self.decimals, serializer);
         <String>::sse_encode(self.addr, serializer);
+        <u8>::sse_encode(self.addr_type, serializer);
         <Option<String>>::sse_encode(self.logo, serializer);
         <std::collections::HashMap<usize, String>>::sse_encode(self.balances, serializer);
         <bool>::sse_encode(self.default, serializer);
@@ -4782,6 +4793,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
         <Vec<String>>::sse_encode(self.rpc, serializer);
         <Vec<u16>>::sse_encode(self.features, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
+        <Option<Vec<u8>>>::sse_encode(self.chain_ids, serializer);
         <u32>::sse_encode(self.slip_44, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <Option<String>>::sse_encode(self.ens, serializer);

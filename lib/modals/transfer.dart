@@ -104,7 +104,7 @@ class _ConfirmTransactionContentState
     _handleModalOpen(true);
 
     _timerPooling =
-        Timer.periodic(const Duration(seconds: 2), (Timer timer) async {
+        Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
       if (!mounted) {
         timer.cancel();
         return;

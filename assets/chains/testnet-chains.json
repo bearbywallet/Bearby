@@ -1,23 +1,24 @@
 [
   {
-    "name": "Zilliqa Proto Mainnet",
+    "name": "Zilliqa testnet",
     "chain": "ZIL",
     "rpc": [
-      "https://api.zq2-protomainnet.zilliqa.com"
+      "https://dev-api.zilliqa.com"
     ],
     "features": [],
     "ftokens": [
       {
         "native": true,
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Proto Zilliqa",
-        "symbol": "pZIL",
-        "decimals": 18
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa testnet",
+        "symbol": "tZIL",
+        "decimals": 12
       }
     ],
+    "chainIds": [32770, 2],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
-    "chainId": 32770,
+    "chainId": 333,
     "slip44": 313,
     "explorers": [
       {

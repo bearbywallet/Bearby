@@ -1,3 +1,4 @@
+import 'package:intl/intl.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 
 enum GasFeeOption { low, market, aggressive }
@@ -7,14 +8,12 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
     case GasFeeOption.low:
       return BigInt.zero;
     case GasFeeOption.market:
-      // First multiply by numerator (150) to avoid truncation
       final multiplied = priorityFee * BigInt.from(150);
-      // Then divide by denominator (100)
+
       return multiplied ~/ BigInt.from(100);
     case GasFeeOption.aggressive:
-      // First multiply by numerator (300)
       final multiplied = priorityFee * BigInt.from(300);
-      // Then divide by denominator (100)
+
       return multiplied ~/ BigInt.from(100);
   }
 }
@@ -25,16 +24,14 @@ BigInt calculateGasPrice(GasFeeOption option, BigInt gasPrice) {
       return gasPrice;
 
     case GasFeeOption.market:
-      // First multiply to preserve precision
       final increase = gasPrice * BigInt.from(20);
-      // Then divide
+
       final increasedAmount = increase ~/ BigInt.from(100);
       return gasPrice + increasedAmount;
 
     case GasFeeOption.aggressive:
-      // First multiply to preserve precision
       final increase = gasPrice * BigInt.from(50);
-      // Then divide
+
       final increasedAmount = increase ~/ BigInt.from(100);
       return gasPrice + increasedAmount;
   }
@@ -114,5 +111,6 @@ String formatGasPriceDetail(BigInt price, FTokenInfo token) {
 
 String formatGasPrice(BigInt price, int decimals, String symbol) {
   final value = price / BigInt.from(10).pow(decimals);
-  return '≈ ${value.toStringAsFixed(12)} $symbol';
+  final formatter = NumberFormat('#,##0.##################');
+  return '≈ ${formatter.format(value)} $symbol';
 }

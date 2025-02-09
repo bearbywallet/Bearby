@@ -1973,13 +1973,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo dco_decode_account_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 4)
-      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
     return AccountInfo(
       addr: dco_decode_String(arr[0]),
-      name: dco_decode_String(arr[1]),
-      chainHash: dco_decode_u_64(arr[2]),
-      index: dco_decode_usize(arr[3]),
+      addrType: dco_decode_u_8(arr[1]),
+      name: dco_decode_String(arr[2]),
+      chainHash: dco_decode_u_64(arr[3]),
+      index: dco_decode_usize(arr[4]),
     );
   }
 
@@ -2261,18 +2262,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FTokenInfo dco_decode_f_token_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return FTokenInfo(
       name: dco_decode_String(arr[0]),
       symbol: dco_decode_String(arr[1]),
       decimals: dco_decode_u_8(arr[2]),
       addr: dco_decode_String(arr[3]),
-      logo: dco_decode_opt_String(arr[4]),
-      balances: dco_decode_Map_usize_String(arr[5]),
-      default_: dco_decode_bool(arr[6]),
-      native: dco_decode_bool(arr[7]),
-      chainHash: dco_decode_u_64(arr[8]),
+      addrType: dco_decode_u_8(arr[4]),
+      logo: dco_decode_opt_String(arr[5]),
+      balances: dco_decode_Map_usize_String(arr[6]),
+      default_: dco_decode_bool(arr[7]),
+      native: dco_decode_bool(arr[8]),
+      chainHash: dco_decode_u_64(arr[9]),
     );
   }
 
@@ -2452,8 +2454,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 12)
-      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return NetworkConfigInfo(
       name: dco_decode_String(arr[0]),
       chain: dco_decode_String(arr[1]),
@@ -2461,12 +2463,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       rpc: dco_decode_list_String(arr[3]),
       features: dco_decode_list_prim_u_16_strict(arr[4]),
       chainId: dco_decode_u_64(arr[5]),
-      slip44: dco_decode_u_32(arr[6]),
-      chainHash: dco_decode_u_64(arr[7]),
-      ens: dco_decode_opt_String(arr[8]),
-      explorers: dco_decode_list_explorer_info(arr[9]),
-      fallbackEnabled: dco_decode_bool(arr[10]),
-      testnet: dco_decode_opt_box_autoadd_bool(arr[11]),
+      chainIds: dco_decode_opt_list_prim_u_8_strict(arr[6]),
+      slip44: dco_decode_u_32(arr[7]),
+      chainHash: dco_decode_u_64(arr[8]),
+      ens: dco_decode_opt_String(arr[9]),
+      explorers: dco_decode_list_explorer_info(arr[10]),
+      fallbackEnabled: dco_decode_bool(arr[11]),
+      testnet: dco_decode_opt_box_autoadd_bool(arr[12]),
     );
   }
 
@@ -2879,11 +2882,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AccountInfo sse_decode_account_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_addr = sse_decode_String(deserializer);
+    var var_addrType = sse_decode_u_8(deserializer);
     var var_name = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_index = sse_decode_usize(deserializer);
     return AccountInfo(
         addr: var_addr,
+        addrType: var_addrType,
         name: var_name,
         chainHash: var_chainHash,
         index: var_index);
@@ -3190,6 +3195,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_symbol = sse_decode_String(deserializer);
     var var_decimals = sse_decode_u_8(deserializer);
     var var_addr = sse_decode_String(deserializer);
+    var var_addrType = sse_decode_u_8(deserializer);
     var var_logo = sse_decode_opt_String(deserializer);
     var var_balances = sse_decode_Map_usize_String(deserializer);
     var var_default_ = sse_decode_bool(deserializer);
@@ -3200,6 +3206,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         symbol: var_symbol,
         decimals: var_decimals,
         addr: var_addr,
+        addrType: var_addrType,
         logo: var_logo,
         balances: var_balances,
         default_: var_default_,
@@ -3474,6 +3481,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_rpc = sse_decode_list_String(deserializer);
     var var_features = sse_decode_list_prim_u_16_strict(deserializer);
     var var_chainId = sse_decode_u_64(deserializer);
+    var var_chainIds = sse_decode_opt_list_prim_u_8_strict(deserializer);
     var var_slip44 = sse_decode_u_32(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_ens = sse_decode_opt_String(deserializer);
@@ -3487,6 +3495,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         rpc: var_rpc,
         features: var_features,
         chainId: var_chainId,
+        chainIds: var_chainIds,
         slip44: var_slip44,
         chainHash: var_chainHash,
         ens: var_ens,
@@ -3984,6 +3993,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_account_info(AccountInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.addr, serializer);
+    sse_encode_u_8(self.addrType, serializer);
     sse_encode_String(self.name, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_usize(self.index, serializer);
@@ -4235,6 +4245,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.symbol, serializer);
     sse_encode_u_8(self.decimals, serializer);
     sse_encode_String(self.addr, serializer);
+    sse_encode_u_8(self.addrType, serializer);
     sse_encode_opt_String(self.logo, serializer);
     sse_encode_Map_usize_String(self.balances, serializer);
     sse_encode_bool(self.default_, serializer);
@@ -4451,6 +4462,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.rpc, serializer);
     sse_encode_list_prim_u_16_strict(self.features, serializer);
     sse_encode_u_64(self.chainId, serializer);
+    sse_encode_opt_list_prim_u_8_strict(self.chainIds, serializer);
     sse_encode_u_32(self.slip44, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_opt_String(self.ens, serializer);

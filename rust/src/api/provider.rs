@@ -3,10 +3,7 @@ pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
-use zilpay::{
-    background::bg_provider::ProvidersManagement, errors::background::BackgroundError,
-    network::provider::NetworkProvider,
-};
+use zilpay::{background::bg_provider::ProvidersManagement, network::provider::NetworkProvider};
 pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };
