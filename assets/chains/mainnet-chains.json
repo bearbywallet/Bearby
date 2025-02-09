@@ -26,7 +26,7 @@
     ],
     "infoURL": "https://ethereum.org",
     "shortName": "ethereum",
-    "chainId": 1,
+    "chainIds": [1, 0],
     "networkId": 1,
     "slip44": 60,
     "ens": {

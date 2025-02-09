@@ -1,24 +1,23 @@
 [
   {
-    "name": "Zilliqa testnet",
+    "name": "Zilliqa proto mainnet",
     "chain": "ZIL",
     "rpc": [
-      "https://dev-api.zilliqa.com"
+      "https://api.zq2-protomainnet.zilliqa.com"
     ],
     "features": [],
     "ftokens": [
       {
         "native": true,
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa testnet",
-        "symbol": "tZIL",
+        "name": "Zilliqa protoMainnet",
+        "symbol": "pZIL",
         "decimals": 12
       }
     ],
-    "chainIds": [32770, 2],
+    "chainIds": [2, 32770],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
-    "chainId": 333,
     "slip44": 313,
     "explorers": [
       {
@@ -53,7 +52,7 @@
     ],
     "infoURL": "https://www.bnbchain.org",
     "shortName": "binance",
-    "chainId": 97,
+    "chainIds": [97, 0],
     "slip44": 60,
     "explorers": [
       {
@@ -87,7 +86,7 @@
     ],
     "infoURL": "https://sepolia.dev/",
     "shortName": "sepolia",
-    "chainId": 11155111,
+    "chainIds": [11155111, 0],
     "slip44": 60,
     "explorers": [
       {
