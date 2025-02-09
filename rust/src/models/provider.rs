@@ -18,7 +18,7 @@ pub struct NetworkConfigInfo {
     pub rpc: Vec<String>,
     pub features: Vec<u16>,
     pub chain_id: u64,
-    pub chain_ids: Option<Vec<u8>>,
+    pub chain_ids: Vec<u64>,
     pub slip_44: u32,
     pub chain_hash: u64,
     pub ens: Option<String>,
@@ -52,6 +52,7 @@ impl From<Explorer> for ExplorerInfo {
 impl From<ChainConfig> for NetworkConfigInfo {
     fn from(value: ChainConfig) -> Self {
         let chain_hash = value.hash();
+        let chain_id = value.chain_id();
         let explorers = value
             .explorers
             .into_iter()
@@ -59,15 +60,15 @@ impl From<ChainConfig> for NetworkConfigInfo {
             .collect();
 
         Self {
+            chain_id,
             testnet: value.testnet,
             chain_hash,
             name: value.name,
             chain: value.chain,
             short_name: value.short_name,
-            chain_ids: value.chain_ids,
+            chain_ids: value.chain_ids.to_vec(),
             rpc: value.rpc,
             features: value.features,
-            chain_id: value.chain_id,
             slip_44: value.slip_44,
             ens: value.ens.map(|a| a.auto_format()),
             explorers,
@@ -76,24 +77,29 @@ impl From<ChainConfig> for NetworkConfigInfo {
     }
 }
 
-impl From<NetworkConfigInfo> for ChainConfig {
-    fn from(value: NetworkConfigInfo) -> Self {
+impl TryFrom<NetworkConfigInfo> for ChainConfig {
+    type Error = NetworkErrors;
+
+    fn try_from(value: NetworkConfigInfo) -> Result<Self, Self::Error> {
+        let chain_ids: [u64; 2] = value
+            .chain_ids
+            .try_into()
+            .map_err(|_| NetworkErrors::InvlaidChainConfig)?;
         let explorers = value.explorers.into_iter().map(Explorer::from).collect();
         let ens = value.ens.and_then(|a| Address::from_str_hex(&a).ok());
 
-        ChainConfig {
+        Ok(ChainConfig {
+            chain_ids,
             testnet: value.testnet,
             name: value.name,
             chain: value.chain,
             short_name: value.short_name,
-            chain_ids: value.chain_ids,
             rpc: value.rpc,
             features: value.features,
-            chain_id: value.chain_id,
             slip_44: value.slip_44,
             ens,
             explorers,
             fallback_enabled: value.fallback_enabled,
-        }
+        })
     }
 }

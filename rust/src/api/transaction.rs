@@ -131,13 +131,7 @@ pub async fn create_token_transfer(
                     zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(params.account_index),
                 ))?;
 
-        let tx = core.build_token_transfer(
-            token,
-            sender_account.addr.clone(), //TODO: shit copy bytes.
-            recipient,
-            amount,
-            sender_account.chain_hash,
-        )?;
+        let tx = core.build_token_transfer(token, &sender_account, recipient, amount)?;
 
         Ok(tx.into())
     })

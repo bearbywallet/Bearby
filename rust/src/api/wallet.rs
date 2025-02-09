@@ -166,7 +166,7 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
                 &bip49,
                 &params.passphrase,
                 &seed,
-                params.chain_hash,
+                &provider.config,
             )
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))
     })

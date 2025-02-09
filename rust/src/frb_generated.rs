@@ -2892,6 +2892,18 @@ impl SseDecode for Vec<u16> {
     }
 }
 
+impl SseDecode for Vec<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<u64>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
 impl SseDecode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -2971,7 +2983,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_rpc = <Vec<String>>::sse_decode(deserializer);
         let mut var_features = <Vec<u16>>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
-        let mut var_chainIds = <Option<Vec<u8>>>::sse_decode(deserializer);
+        let mut var_chainIds = <Vec<u64>>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_ens = <Option<String>>::sse_decode(deserializer);
@@ -4768,6 +4780,16 @@ impl SseEncode for Vec<u16> {
     }
 }
 
+impl SseEncode for Vec<u64> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <u64>::sse_encode(item, serializer);
+        }
+    }
+}
+
 impl SseEncode for Vec<u8> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -4835,7 +4857,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
         <Vec<String>>::sse_encode(self.rpc, serializer);
         <Vec<u16>>::sse_encode(self.features, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
-        <Option<Vec<u8>>>::sse_encode(self.chain_ids, serializer);
+        <Vec<u64>>::sse_encode(self.chain_ids, serializer);
         <u32>::sse_encode(self.slip_44, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <Option<String>>::sse_encode(self.ens, serializer);

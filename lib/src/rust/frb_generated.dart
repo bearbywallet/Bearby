@@ -2448,6 +2448,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Uint64List dco_decode_list_prim_u_64_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dcoDecodeUint64List(raw);
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -2493,7 +2499,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       rpc: dco_decode_list_String(arr[3]),
       features: dco_decode_list_prim_u_16_strict(arr[4]),
       chainId: dco_decode_u_64(arr[5]),
-      chainIds: dco_decode_opt_list_prim_u_8_strict(arr[6]),
+      chainIds: dco_decode_list_prim_u_64_strict(arr[6]),
       slip44: dco_decode_u_32(arr[7]),
       chainHash: dco_decode_u_64(arr[8]),
       ens: dco_decode_opt_String(arr[9]),
@@ -3448,6 +3454,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Uint64List sse_decode_list_prim_u_64_strict(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var len_ = sse_decode_i_32(deserializer);
+    return deserializer.buffer.getUint64List(len_);
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -3511,7 +3524,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_rpc = sse_decode_list_String(deserializer);
     var var_features = sse_decode_list_prim_u_16_strict(deserializer);
     var var_chainId = sse_decode_u_64(deserializer);
-    var var_chainIds = sse_decode_opt_list_prim_u_8_strict(deserializer);
+    var var_chainIds = sse_decode_list_prim_u_64_strict(deserializer);
     var var_slip44 = sse_decode_u_32(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_ens = sse_decode_opt_String(deserializer);
@@ -4436,6 +4449,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_prim_u_64_strict(
+      Uint64List self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    serializer.buffer.putUint64List(self);
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -4492,7 +4513,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.rpc, serializer);
     sse_encode_list_prim_u_16_strict(self.features, serializer);
     sse_encode_u_64(self.chainId, serializer);
-    sse_encode_opt_list_prim_u_8_strict(self.chainIds, serializer);
+    sse_encode_list_prim_u_64_strict(self.chainIds, serializer);
     sse_encode_u_32(self.slip44, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_opt_String(self.ens, serializer);

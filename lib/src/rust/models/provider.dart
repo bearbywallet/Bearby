@@ -41,7 +41,7 @@ class NetworkConfigInfo {
   final List<String> rpc;
   final Uint16List features;
   final BigInt chainId;
-  final Uint8List? chainIds;
+  final Uint64List chainIds;
   final int slip44;
   final BigInt chainHash;
   final String? ens;
@@ -56,7 +56,7 @@ class NetworkConfigInfo {
     required this.rpc,
     required this.features,
     required this.chainId,
-    this.chainIds,
+    required this.chainIds,
     required this.slip44,
     required this.chainHash,
     this.ens,

@@ -94,7 +94,7 @@ pub async fn add_ledger_account(
         let pub_key = pubkey_from_provider(&pub_key, bip49)?;
 
         wallet
-            .add_ledger_account(name, pub_key, account_index, first_account.chain_hash)
+            .add_ledger_account(name, pub_key, account_index, &provider.config)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
     })
     .await
