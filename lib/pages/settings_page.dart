@@ -9,6 +9,7 @@ import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/services/social_media.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 
@@ -58,11 +59,12 @@ class _SettingsPageState extends State<SettingsPage> {
                             _buildWalletSection(theme, appState),
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
-                              if (appState.chain?.slip44 ==
-                                  313) // 313 this is officially  zilliqa slip44 number.
+                              if (appState.chain?.slip44 == 313 &&
+                                  appState.wallet !=
+                                      null) // 313 this is officially  zilliqa slip44 number.
                                 Container(
                                   padding: const EdgeInsets.symmetric(
-                                      horizontal: 16, vertical: 12),
+                                      horizontal: 16, vertical: 4),
                                   child: Row(
                                     children: [
                                       SvgPicture.asset(
@@ -85,11 +87,17 @@ class _SettingsPageState extends State<SettingsPage> {
                                         ),
                                       ),
                                       Switch(
+                                        padding: EdgeInsets.all(0),
                                         value: appState.account?.addrType == 0,
-                                        onChanged: (bool value) {
-                                          setState(() {
-                                            // _isZilliqaLegacy = value;
-                                          });
+                                        onChanged: (bool value) async {
+                                          BigInt walletIndex = BigInt.from(
+                                              appState.selectedWallet);
+                                          await zilliqaSwapChain(
+                                            walletIndex: walletIndex,
+                                            accountIndex: appState
+                                                .wallet!.selectedAccount,
+                                          );
+                                          await appState.syncData();
                                         },
                                         activeColor: theme.primaryPurple,
                                         activeTrackColor: theme.primaryPurple
