@@ -310,3 +310,14 @@ pub async fn reveal_bip39_phrase(
     .await
     .map_err(Into::into)
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Result<(), String> {
+    with_service(|core| {
+        core.swap_zilliqa_chain(wallet_index, account_index)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}

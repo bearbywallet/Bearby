@@ -45,8 +45,8 @@ pub fn pubkey_from_provider(pub_key: &str, bip49: DerivationPath) -> Result<PubK
     let pub_key_bytes = decode_public_key(pub_key)?;
 
     let pub_key = match bip49.slip44 {
-        slip44::ZILLIQA => PubKey::Secp256k1Sha256Zilliqa(pub_key_bytes),
-        slip44::ETHEREUM => PubKey::Secp256k1Keccak256Ethereum(pub_key_bytes),
+        slip44::ZILLIQA => PubKey::Secp256k1Sha256(pub_key_bytes),
+        slip44::ETHEREUM => PubKey::Secp256k1Keccak256(pub_key_bytes),
         slip44::BITCOIN => PubKey::Secp256k1Bitcoin(pub_key_bytes),
         slip44::SOLANA => PubKey::Ed25519Solana(pub_key_bytes),
         _ => todo!(),

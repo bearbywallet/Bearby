@@ -78,13 +78,6 @@ class _WalletPageState extends State<WalletPage> {
         onChanged: (value) => debugPrint("enable face id $value"),
       ),
       WalletPreferenceItem(
-        title: 'Zilliqa legacy',
-        iconPath: 'assets/icons/scilla.svg',
-        hasSwitch: true,
-        switchValue: true,
-        onChanged: (value) => debugPrint("enable Zilliqa legacy mode"),
-      ),
-      WalletPreferenceItem(
           title: 'Manage connections',
           iconPath: 'assets/icons/globe.svg',
           onTap: () {

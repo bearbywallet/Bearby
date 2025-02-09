@@ -1,5 +1,6 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
@@ -57,6 +58,46 @@ class _SettingsPageState extends State<SettingsPage> {
                             _buildWalletSection(theme, appState),
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
+                              if (appState.chain?.slip44 ==
+                                  313) // 313 this is officially  zilliqa slip44 number.
+                                Container(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 16, vertical: 12),
+                                  child: Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        'assets/icons/scilla.svg',
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.textPrimary,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 12),
+                                      Expanded(
+                                        child: Text(
+                                          'Zilliqa Legacy',
+                                          style: TextStyle(
+                                            color: theme.textPrimary,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ),
+                                      Switch(
+                                        value: appState.account?.addrType == 0,
+                                        onChanged: (bool value) {
+                                          setState(() {
+                                            // _isZilliqaLegacy = value;
+                                          });
+                                        },
+                                        activeColor: theme.primaryPurple,
+                                        activeTrackColor: theme.primaryPurple
+                                            .withValues(alpha: 0.5),
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               SettingsItem(
                                 title: 'Currency',
                                 trailingSvgPath: 'assets/icons/currency.svg',

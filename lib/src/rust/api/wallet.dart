@@ -88,6 +88,11 @@ Future<String> revealBip39Phrase(
         password: password,
         passphrase: passphrase);
 
+Future<void> zilliqaSwapChain(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletZilliqaSwapChain(
+        walletIndex: walletIndex, accountIndex: accountIndex);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;

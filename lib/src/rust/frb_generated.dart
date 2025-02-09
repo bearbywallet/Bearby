@@ -99,7 +99,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.7.1';
 
   @override
-  int get rustContentHash => -1306905369;
+  int get rustContentHash => -1054926093;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -304,6 +304,9 @@ abstract class RustLibApi extends BaseApi {
       required List<String> identifiers});
 
   Future<void> crateApiTokenUpdateRates();
+
+  Future<void> crateApiWalletZilliqaSwapChain(
+      {required BigInt walletIndex, required BigInt accountIndex});
 }
 
 class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
@@ -1915,6 +1918,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTokenUpdateRatesConstMeta => const TaskConstMeta(
         debugName: "update_rates",
         argNames: [],
+      );
+
+  @override
+  Future<void> crateApiWalletZilliqaSwapChain(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 59, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaSwapChainConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaSwapChainConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_swap_chain",
+        argNames: ["walletIndex", "accountIndex"],
       );
 
   @protected
