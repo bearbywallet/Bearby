@@ -22,17 +22,41 @@ class Jazzicon extends StatefulWidget {
 }
 
 class _JazziconState extends State<Jazzicon> {
-  late final JazziconPainter _painter;
+  late JazziconPainter _painter;
+  String? _previousSeed;
+  double? _previousDiameter;
+  int? _previousShapeCount;
+  AppTheme? _previousTheme;
 
   @override
   void initState() {
     super.initState();
+    _updatePainter();
+  }
+
+  @override
+  void didUpdateWidget(Jazzicon oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.seed != _previousSeed ||
+        widget.diameter != _previousDiameter ||
+        widget.shapeCount != _previousShapeCount ||
+        widget.theme != _previousTheme) {
+      _updatePainter();
+    }
+  }
+
+  void _updatePainter() {
     _painter = JazziconPainter(
       seed: widget.seed,
       diameter: widget.diameter,
       theme: widget.theme,
       shapeCount: widget.shapeCount,
     );
+
+    _previousSeed = widget.seed;
+    _previousDiameter = widget.diameter;
+    _previousShapeCount = widget.shapeCount;
+    _previousTheme = widget.theme;
   }
 
   @override
@@ -42,6 +66,7 @@ class _JazziconState extends State<Jazzicon> {
         child: CustomPaint(
           size: Size(widget.diameter, widget.diameter),
           painter: _painter,
+          isComplex: true, // Указывает Flutter, что отрисовка сложная
         ),
       ),
     );
@@ -100,12 +125,14 @@ class JazziconPainter extends CustomPainter {
     final shapes = <_ShapeConfig>[];
     final List<Color> remainingColors = List<Color>.from(_colors);
 
+    // Фоновый цвет
     final backgroundColor = _genColor(remainingColors);
     shapes.add(_ShapeConfig(
       color: backgroundColor,
       transform: Matrix4.identity(),
     ));
 
+    // Генерация остальных фигур
     for (var i = 0; i < shapeCount - 1; i++) {
       final shapeConfig = _genShape(i, shapeCount - 1, remainingColors);
       shapes.add(shapeConfig);
@@ -169,7 +196,7 @@ class JazziconPainter extends CustomPainter {
       final rect = Rect.fromLTWH(0, 0, size.width, size.height);
       final rrect = RRect.fromRectAndRadius(
         rect,
-        const Radius.circular(16.0),
+        const Radius.circular(4.0),
       );
 
       final paint = Paint()
@@ -183,8 +210,12 @@ class JazziconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(JazziconPainter oldDelegate) =>
-      seed != oldDelegate.seed || shapeCount != oldDelegate.shapeCount;
+  bool shouldRepaint(JazziconPainter oldDelegate) {
+    return seed != oldDelegate.seed ||
+        diameter != oldDelegate.diameter ||
+        shapeCount != oldDelegate.shapeCount ||
+        theme != oldDelegate.theme;
+  }
 }
 
 class _ShapeConfig {
