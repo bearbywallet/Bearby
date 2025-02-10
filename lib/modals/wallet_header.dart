@@ -184,9 +184,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
               final index = entry.key;
               final account = entry.value;
               return WalletCard(
-                name: account.name,
-                address:
-                    shortenAddress(account.addr, leftSize: 8, rightSize: 8),
+                account: account,
                 onTap: () async {
                   final appState =
                       Provider.of<AppState>(context, listen: false);
