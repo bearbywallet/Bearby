@@ -1,24 +1,18 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/copy_content.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/wallet_header.dart';
+import 'package:zilpay/src/rust/models/account.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class WalletHeader extends StatefulWidget {
-  final String walletName;
-  final String walletAddress;
-  final Color primaryPurple;
-  final Color background;
-  final Color textPrimary;
+  final AccountInfo account;
   final Function()? onTap;
 
   const WalletHeader({
     super.key,
-    required this.walletName,
-    required this.walletAddress,
-    required this.primaryPurple,
-    required this.background,
-    required this.textPrimary,
+    required this.account,
     this.onTap,
   });
 
@@ -63,6 +57,9 @@ class _WalletHeaderState extends State<WalletHeader>
 
   @override
   Widget build(BuildContext context) {
+    final state = Provider.of<AppState>(context);
+    final theme = state.currentTheme;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
@@ -81,31 +78,15 @@ class _WalletHeaderState extends State<WalletHeader>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Container(
-                  width: 34,
-                  height: 34,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: widget.primaryPurple.withValues(alpha: 0.1),
-                      width: 2,
-                    ),
-                  ),
-                  child: ClipOval(
-                    child: Blockies(
-                      seed: widget.walletAddress,
-                      color: getWalletColor(0),
-                      bgColor: widget.primaryPurple,
-                      spotColor: widget.background,
-                      size: 8,
-                    ),
-                  ),
+                AvatarAddress(
+                  avatarSize: 50,
+                  account: widget.account,
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  widget.walletName,
+                  widget.account.name,
                   style: TextStyle(
-                    color: widget.textPrimary,
+                    color: theme.textPrimary,
                     fontSize: 24,
                     fontWeight: FontWeight.w600,
                   ),
@@ -116,7 +97,7 @@ class _WalletHeaderState extends State<WalletHeader>
         ),
         const SizedBox(width: 8),
         CopyAddressButton(
-          address: widget.walletAddress,
+          address: widget.account.addr,
         ),
       ],
     );

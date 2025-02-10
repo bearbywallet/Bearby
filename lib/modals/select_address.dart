@@ -1,6 +1,7 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
@@ -152,17 +153,17 @@ class _AddressSelectModalContentState
               padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
               children: [
                 _buildSection(
-                  theme,
+                  appState,
                   'My Accounts',
                   _getFilteredMyAccounts(appState),
                 ),
                 _buildSection(
-                  theme,
+                  appState,
                   'Address Book',
                   _getFilteredAddressBook(appState),
                 ),
                 _buildSection(
-                  theme,
+                  appState,
                   'History',
                   _getFilteredHistory(appState),
                 ),
@@ -176,10 +177,12 @@ class _AddressSelectModalContentState
   }
 
   Widget _buildSection(
-    theme.AppTheme theme,
+    AppState state,
     String title,
     List<AddressItem> items,
   ) {
+    final theme = state.currentTheme;
+
     if (items.isEmpty) return const SizedBox.shrink();
 
     return Column(
@@ -200,7 +203,7 @@ class _AddressSelectModalContentState
           final item = items[index];
           return Column(
             children: [
-              _buildAddressItem(theme, item),
+              _buildAddressItem(state, item),
               if (index < items.length - 1)
                 Divider(
                   height: 1,
@@ -216,7 +219,11 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildAddressItem(theme.AppTheme theme, AddressItem item) {
+  Widget _buildAddressItem(AppState state, AddressItem item) {
+    final theme = state.currentTheme;
+    final account =
+        state.wallet?.accounts.firstWhere((a) => a.addr == item.address);
+
     return InkWell(
       onTap: () {
         QRcodeScanResultInfo params =
@@ -229,19 +236,25 @@ class _AddressSelectModalContentState
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            ClipOval(
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: Blockies(
-                  seed: item.address,
-                  color: getWalletColor(0),
-                  bgColor: theme.primaryPurple,
-                  spotColor: theme.background,
-                  size: 8,
+            if (account != null)
+              AvatarAddress(
+                avatarSize: 50,
+                account: account,
+              )
+            else
+              ClipOval(
+                child: SizedBox(
+                  width: 40,
+                  height: 40,
+                  child: Blockies(
+                    seed: item.address,
+                    color: getWalletColor(0),
+                    bgColor: theme.primaryPurple,
+                    spotColor: theme.background,
+                    size: 8,
+                  ),
                 ),
               ),
-            ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(

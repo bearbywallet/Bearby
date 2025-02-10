@@ -195,6 +195,9 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                       walletIndex,
                       accountIndex,
                     );
+                    if (mounted) {
+                      Navigator.pop<void>(context);
+                    }
                   } catch (e) {
                     debugPrint("select wallet error: $e");
                   }

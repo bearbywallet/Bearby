@@ -89,11 +89,7 @@ class _HomePageState extends State<HomePage> {
                         children: [
                           Expanded(
                             child: WalletHeader(
-                              walletName: appState.account?.name ?? "",
-                              walletAddress: appState.account?.addr ?? "",
-                              primaryPurple: theme.primaryPurple,
-                              background: theme.background,
-                              textPrimary: theme.textPrimary,
+                              account: appState.account!,
                             ),
                           ),
                           HoverSvgIcon(
