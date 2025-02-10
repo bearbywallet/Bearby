@@ -1,5 +1,5 @@
 import 'dart:math';
-import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 
 class JazzColors {
   static const List<Color> colors = [
@@ -16,7 +16,7 @@ class JazzColors {
   ];
 }
 
-class Jazzicon extends StatelessWidget {
+class Jazzicon extends StatefulWidget {
   final double diameter;
   final String seed;
   final int shapeCount;
@@ -29,12 +29,27 @@ class Jazzicon extends StatelessWidget {
   });
 
   @override
+  State<Jazzicon> createState() => _JazziconState();
+}
+
+class _JazziconState extends State<Jazzicon> {
+  late final JazziconPainter _painter;
+
+  @override
+  void initState() {
+    super.initState();
+    _painter = JazziconPainter(
+      seed: widget.seed,
+      shapeCount: widget.shapeCount,
+    );
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return CustomPaint(
-      size: Size(diameter, diameter),
-      painter: JazziconPainter(
-        seed: seed,
-        shapeCount: shapeCount,
+    return RepaintBoundary(
+      child: CustomPaint(
+        size: Size(widget.diameter, widget.diameter),
+        painter: _painter,
       ),
     );
   }
@@ -43,70 +58,83 @@ class Jazzicon extends StatelessWidget {
 class JazziconPainter extends CustomPainter {
   final String seed;
   final int shapeCount;
-  late Random _random;
-  late List<Color> _remainingColors;
+  late final Random _random;
+  late final List<Color> _colors;
+  late final List<_ShapeConfig> _shapes;
 
   JazziconPainter({
     required this.seed,
     required this.shapeCount,
   }) {
-    // Initialize random with seed
     _random = Random(_generateSeedFromString(seed));
-    _remainingColors = List.from(JazzColors.colors);
-    _remainingColors = _hueShift(_remainingColors);
+    _colors = _hueShift(List<Color>.from(JazzColors.colors));
+    _shapes = _generateShapes();
   }
 
   int _generateSeedFromString(String str) {
     return str.codeUnits.fold(0, (prev, curr) => prev + curr);
   }
 
+  List<_ShapeConfig> _generateShapes() {
+    final shapes = <_ShapeConfig>[];
+    final List<Color> remainingColors = List<Color>.from(_colors);
+
+    // Background color
+    final backgroundColor = _genColor(remainingColors);
+    shapes.add(_ShapeConfig(
+      color: backgroundColor,
+      transform: Matrix4.identity(),
+    ));
+
+    // Generate other shapes
+    for (var i = 0; i < shapeCount - 1; i++) {
+      final shapeConfig = _genShapeConfig(i, shapeCount - 1, remainingColors);
+      shapes.add(shapeConfig);
+    }
+
+    return shapes;
+  }
+
   @override
   void paint(Canvas canvas, Size size) {
-    // Background
-    final background = _genColor();
-    canvas.drawRect(
-      Rect.fromLTWH(0, 0, size.width, size.height),
-      Paint()..color = background,
-    );
+    for (final shape in _shapes) {
+      canvas.save();
+      canvas.transform(shape.transform.storage);
 
-    // Generate shapes
-    for (var i = 0; i < shapeCount - 1; i++) {
-      _genShape(canvas, size, i, shapeCount - 1);
+      final rect = Rect.fromLTWH(0, 0, size.width, size.height);
+      canvas.drawRect(rect, Paint()..color = shape.color);
+
+      canvas.restore();
     }
   }
 
-  void _genShape(Canvas canvas, Size size, int i, int total) {
-    final center = Offset(size.width / 2, size.height / 2);
-
+  _ShapeConfig _genShapeConfig(int i, int total, List<Color> remainingColors) {
+    final center = Offset.zero;
     final firstRot = _random.nextDouble();
     final angle = 2 * pi * firstRot;
-    final velocity =
-        (size.width / total * _random.nextDouble()) + (i * size.width / total);
+    final velocity = (_random.nextDouble() + i) / total;
 
     final tx = cos(angle) * velocity;
     final ty = sin(angle) * velocity;
-
     final secondRot = _random.nextDouble();
     final rot = (firstRot * 360) + secondRot * 180;
 
-    canvas.save();
-    canvas.translate(tx, ty);
-    canvas.translate(center.dx, center.dy);
-    canvas.rotate(rot * pi / 180);
-    canvas.translate(-center.dx, -center.dy);
+    final transform = Matrix4.identity()
+      ..translate(tx, ty)
+      ..translate(center.dx, center.dy)
+      ..rotateZ(rot * pi / 180)
+      ..translate(-center.dx, -center.dy);
 
-    final rect = Rect.fromLTWH(0, 0, size.width, size.height);
-    canvas.drawRect(
-      rect,
-      Paint()..color = _genColor(),
+    return _ShapeConfig(
+      color: _genColor(remainingColors),
+      transform: transform,
     );
-
-    canvas.restore();
   }
 
-  Color _genColor() {
-    final idx = (_random.nextDouble() * _remainingColors.length).floor();
-    return _remainingColors.removeAt(idx);
+  Color _genColor(List<Color> remainingColors) {
+    if (remainingColors.isEmpty) return const Color(0xFF000000);
+    final idx = (_random.nextDouble() * remainingColors.length).floor();
+    return remainingColors.removeAt(idx);
   }
 
   List<Color> _hueShift(List<Color> colors) {
@@ -124,5 +152,16 @@ class JazziconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(CustomPainter oldDelegate) => false;
+  bool shouldRepaint(JazziconPainter oldDelegate) =>
+      seed != oldDelegate.seed || shapeCount != oldDelegate.shapeCount;
+}
+
+class _ShapeConfig {
+  final Color color;
+  final Matrix4 transform;
+
+  const _ShapeConfig({
+    required this.color,
+    required this.transform,
+  });
 }

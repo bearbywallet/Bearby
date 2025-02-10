@@ -5,7 +5,6 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -176,9 +175,9 @@ class _WalletModalContentState extends State<_WalletModalContent> {
           ),
           child: ListView(
             shrinkWrap: true,
-            padding: const EdgeInsets.symmetric(
-              horizontal: 24,
-              vertical: 8,
+            padding: EdgeInsets.symmetric(
+              horizontal: adaptivePadding,
+              vertical: adaptivePadding,
             ),
             children: appState.wallet!.accounts.asMap().entries.map((entry) {
               final index = entry.key;
