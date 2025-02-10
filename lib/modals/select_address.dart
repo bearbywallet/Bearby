@@ -10,7 +10,6 @@ import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../theme/app_theme.dart' as theme;
 
 void showAddressSelectModal({
   required BuildContext context,

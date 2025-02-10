@@ -36,6 +36,8 @@ class AvatarAddress extends StatelessWidget {
             ? Jazzicon(
                 diameter: avatarSize,
                 seed: account.addr,
+                theme: theme,
+                shapeCount: 4,
               )
             : Blockies(
                 color: getWalletColor(0),
