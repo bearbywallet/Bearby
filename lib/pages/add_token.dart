@@ -4,7 +4,6 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -150,19 +149,10 @@ class _AddTokenPageState extends State<AddTokenPage> {
         children: [
           for (int i = 0; i < tokens.length; i++)
             TokenCard(
-              currencySymbol: appState.wallet!.settings.currencyConvert ?? "",
+              ftoken: tokens[i],
               tokenAmount:
                   tokens[i].balances[appState.wallet?.selectedAccount] ?? "0",
-              tokenAddr: tokens[i].addr,
-              tokenDecimals: tokens[i].decimals,
-              tokenName: tokens[i].name,
-              tokenSymbol: tokens[i].symbol,
               showDivider: i < tokens.length - 1,
-              iconUrl: viewTokenIcon(
-                tokens[i],
-                appState.chain!.chainId,
-                theme.value,
-              ),
               onTap: () => _onAddToken(
                 i,
                 appState.selectedWallet,

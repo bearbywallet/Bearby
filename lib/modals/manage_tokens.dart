@@ -133,6 +133,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
         .where((token) =>
             token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             token.symbol.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .where((token) => token.addrType == appState.account?.addrType)
         .map((token) => _TokenListItem(
               symbol: token.symbol,
               name: token.name,

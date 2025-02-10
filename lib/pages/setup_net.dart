@@ -156,7 +156,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
           ),
           const SizedBox(height: 4),
           Text(
-            'Chain ID: ${chain.chainId}',
+            'Chain ID: ${chain.chainIds.where((id) => id != 0).toList().join(",")}',
             style: TextStyle(
               color: theme.primaryPurple,
               fontSize: 14,

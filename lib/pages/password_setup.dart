@@ -235,17 +235,21 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         maxConnections: 5,
         requestTimeoutSecs: 30,
       );
-      FTokenInfo ftoken = FTokenInfo(
-        name: _chain!.ftokens.first.name,
-        symbol: _chain!.ftokens.first.symbol,
-        decimals: _chain!.ftokens.first.decimals,
-        addr: _chain!.ftokens.first.addr ?? zeroEVM,
-        balances: {},
-        default_: true,
-        addrType: 1,
-        native: _chain!.ftokens.first.native,
-        chainHash: chainHash,
-      );
+
+      List<FTokenInfo> ftokens = _chain?.ftokens
+              .map((token) => FTokenInfo(
+                    name: token.name,
+                    symbol: token.symbol,
+                    decimals: token.decimals,
+                    addr: token.addr ?? zeroEVM,
+                    balances: {},
+                    default_: true,
+                    addrType: 0,
+                    native: token.native,
+                    chainHash: chainHash ?? BigInt.zero,
+                  ))
+              .toList() ??
+          [];
 
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(
@@ -264,7 +268,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         session = await addBip39Wallet(
           params: params,
           walletSettings: settings,
-          ftokens: [ftoken],
+          ftokens: ftokens,
         );
       } else if (_keys != null) {
         AddSKWalletParams params = AddSKWalletParams(
@@ -279,7 +283,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         session = await addSkWallet(
           params: params,
           walletSettings: settings,
-          ftokens: [ftoken],
+          ftokens: ftokens,
         );
       } else {
         throw "Invalid Wallet gen method";

@@ -5,28 +5,20 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/colors.dart';
+import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenCard extends StatefulWidget {
+  final FTokenInfo ftoken;
   final String tokenAmount;
-  final int tokenDecimals;
-  final String tokenName;
-  final String tokenSymbol;
-  final String tokenAddr;
-  final String iconUrl;
-  final String currencySymbol;
   final bool showDivider;
   final VoidCallback? onTap;
 
   const TokenCard({
     super.key,
     required this.tokenAmount,
-    required this.tokenDecimals,
-    required this.tokenName,
-    required this.tokenSymbol,
-    required this.tokenAddr,
-    required this.iconUrl,
-    required this.currencySymbol,
+    required this.ftoken,
     this.showDivider = true,
     this.onTap,
   });
@@ -66,29 +58,34 @@ class _TokenCardState extends State<TokenCard>
     super.dispose();
   }
 
-  Widget _buildIcon(AppState themeProvider) {
+  Widget _buildIcon(AppState state) {
+    final theme = state.currentTheme;
+
     return Container(
       width: 32,
       height: 32,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color:
-              themeProvider.currentTheme.primaryPurple.withValues(alpha: 0.1),
+          color: theme.primaryPurple.withValues(alpha: 0.1),
           width: 2,
         ),
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: widget.iconUrl,
+          url: viewTokenIcon(
+            widget.ftoken,
+            state.chain!.chainId,
+            theme.value,
+          ),
           width: 32,
           height: 32,
           fit: BoxFit.contain,
           errorWidget: Blockies(
-            seed: widget.tokenAddr,
+            seed: widget.ftoken.addr,
             color: getWalletColor(0),
-            bgColor: themeProvider.currentTheme.primaryPurple,
-            spotColor: themeProvider.currentTheme.background,
+            bgColor: state.currentTheme.primaryPurple,
+            spotColor: state.currentTheme.background,
             size: 8,
           ),
           loadingWidget: const Center(
@@ -163,7 +160,7 @@ class _TokenCardState extends State<TokenCard>
                                   children: [
                                     Flexible(
                                       child: Text(
-                                        widget.tokenName,
+                                        widget.ftoken.name,
                                         style: TextStyle(
                                           color: theme.textPrimary
                                               .withValues(alpha: 0.7),
@@ -176,7 +173,7 @@ class _TokenCardState extends State<TokenCard>
                                     ),
                                     const SizedBox(width: 8),
                                     Text(
-                                      '(${widget.tokenSymbol})',
+                                      '(${widget.ftoken.symbol})',
                                       style: TextStyle(
                                         color: theme.textSecondary
                                             .withValues(alpha: 0.5),
@@ -235,7 +232,7 @@ class _TokenCardState extends State<TokenCard>
   double _getAmount() {
     try {
       BigInt value = BigInt.parse(widget.tokenAmount);
-      return adjustAmountToDouble(value, widget.tokenDecimals);
+      return adjustAmountToDouble(value, widget.ftoken.decimals);
     } catch (_) {
       return 0;
     }

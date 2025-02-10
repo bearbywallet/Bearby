@@ -138,6 +138,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
 
     final tokens = appState.wallet!.tokens;
     return tokens
+        .where((token) => token.addrType == appState.account?.addrType)
         .where((token) =>
             token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             token.symbol.toLowerCase().contains(_searchQuery.toLowerCase()))

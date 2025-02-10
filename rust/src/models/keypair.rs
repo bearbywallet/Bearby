@@ -8,11 +8,11 @@ pub struct KeyPairInfo {
 impl From<KeyPair> for KeyPairInfo {
     fn from(value: KeyPair) -> Self {
         match value {
-            KeyPair::Secp256k1Sha256Zilliqa((pk, sk)) => Self {
+            KeyPair::Secp256k1Sha256((pk, sk)) => Self {
                 sk: hex::encode(sk),
                 pk: hex::encode(pk),
             },
-            KeyPair::Secp256k1Keccak256Ethereum((pk, sk)) => Self {
+            KeyPair::Secp256k1Keccak256((pk, sk)) => Self {
                 sk: hex::encode(sk),
                 pk: hex::encode(pk),
             },

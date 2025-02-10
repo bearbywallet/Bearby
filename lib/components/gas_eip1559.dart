@@ -348,7 +348,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final chain = appState.chain!;
-    final token = appState.wallet!.tokens.first;
+    final token = appState.wallet!.tokens
+        .firstWhere((t) => t.addrType == appState.account?.addrType);
 
     return Column(
       children: [

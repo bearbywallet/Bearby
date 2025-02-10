@@ -7,7 +7,6 @@ import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
 
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -234,6 +233,8 @@ class _HomePageState extends State<HomePage> {
                         children: appState.wallet!.tokens
                             .asMap()
                             .entries
+                            .where((t) =>
+                                t.value.addrType == appState.account?.addrType)
                             .map((entry) {
                           final token = entry.value;
                           final isLast =
@@ -243,24 +244,14 @@ class _HomePageState extends State<HomePage> {
                               "0";
 
                           return TokenCard(
-                            currencySymbol:
-                                appState.wallet!.settings.currencyConvert ?? "",
+                            ftoken: token,
                             tokenAmount: tokenAmountValue,
-                            tokenAddr: token.addr,
-                            tokenDecimals: token.decimals,
-                            tokenName: token.name,
-                            tokenSymbol: token.symbol,
                             showDivider: !isLast,
-                            iconUrl: viewTokenIcon(
-                              token,
-                              appState.chain!.chainId,
-                              theme.value,
-                            ),
-                            onTap: () => {
+                            onTap: () {
                               Navigator.of(context).pushNamed(
                                 '/send',
                                 arguments: {'token_index': entry.key},
-                              )
+                              );
                             },
                           );
                         }).toList(),

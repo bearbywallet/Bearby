@@ -10,9 +10,16 @@
       {
         "native": true,
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa protoMainnet",
+        "name": "Zilliqa Scilla",
         "symbol": "pZIL",
         "decimals": 12
+      },
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa EVM",
+        "symbol": "pZIL",
+        "decimals": 18
       }
     ],
     "chainIds": [2, 32770],

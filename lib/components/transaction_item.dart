@@ -64,8 +64,9 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildIcon(AppState appState) {
     final theme = appState.currentTheme;
-    FTokenInfo token = appState.wallet!.tokens
-        .firstWhere((t) => t.symbol == widget.transaction.tokenInfo?.symbol);
+    FTokenInfo token = appState.wallet!.tokens.firstWhere((t) =>
+        t.symbol == widget.transaction.tokenInfo?.symbol &&
+        t.addrType == appState.account?.addrType);
 
     return Container(
       width: 32,
@@ -106,7 +107,8 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildTransactionDetails(AppState appState) {
     final theme = appState.currentTheme;
-    final nativeToken = appState.wallet!.tokens.first;
+    final nativeToken = appState.wallet!.tokens
+        .firstWhere((t) => t.addrType == appState.account?.addrType);
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
