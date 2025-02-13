@@ -36,10 +36,6 @@ Future<void> main() async {
 
     final ticks = tick();
 
-    ticks.listen((data) {
-      print(data);
-    });
-
     final appState = AppState(
       state: state,
       cahceDir: cahceDir,
