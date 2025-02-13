@@ -13,16 +13,17 @@ import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<BackgroundState> startService({required String path}) =>
-    RustLib.instance.api.crateApiBackendStartService(path: path);
+// These functions have error during generation (see debug logs or enable `stop_on_error: true` for more details): `start_worker`
+
+Future<BackgroundState> loadService({required String path}) =>
+    RustLib.instance.api.crateApiBackendLoadService(path: path);
 
 Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
 
+Stream<int> tick() => RustLib.instance.api.crateApiBackendTick();
+
 Future<bool> isServiceRunning() =>
     RustLib.instance.api.crateApiBackendIsServiceRunning();
-
-Stream<String> startWorker() =>
-    RustLib.instance.api.crateApiBackendStartWorker();
 
 Future<BackgroundState> getData() =>
     RustLib.instance.api.crateApiBackendGetData();

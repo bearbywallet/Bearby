@@ -32,7 +32,13 @@ Future<void> main() async {
       await directory.create(recursive: true);
     }
 
-    state = await startService(path: "$appDocPath/storage");
+    state = await loadService(path: "$appDocPath/storage");
+
+    final ticks = tick();
+
+    ticks.listen((data) {
+      print(data);
+    });
 
     final appState = AppState(
       state: state,

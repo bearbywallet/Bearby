@@ -1,3 +1,5 @@
+use std::{thread::sleep, time::Duration};
+
 pub use zilpay::{
     background::{Background, BackgroundBip39Params, BackgroundSKParams},
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
@@ -17,7 +19,7 @@ use crate::{
 };
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn start_service(path: &str) -> Result<BackgroundState, String> {
+pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
         let bg = ServiceBackground::from_path(path)?;
@@ -41,18 +43,33 @@ pub async fn stop_service() -> Result<(), String> {
     }
 }
 
+pub fn tick(sink: StreamSink<i32>) -> Result<(), String> {
+    let mut ticks = 0;
+    loop {
+        sink.add(ticks).unwrap();
+        sleep(Duration::from_secs(1));
+        if ticks == i32::MAX {
+            break;
+        }
+        ticks += 1;
+    }
+    Ok(())
+}
+
 #[flutter_rust_bridge::frb(dart_async)]
 pub async fn is_service_running() -> bool {
     BACKGROUND_SERVICE.read().await.is_some()
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
-pub async fn start_worker(_sink: StreamSink<String>) -> Result<(), String> {
-    let service = BACKGROUND_SERVICE.read().await;
-    if service.is_some() {
-        return Err("Service is already running".to_string());
-    }
-    Ok(())
+pub async fn start_worker() -> Result<(), String> {
+    with_service(|_core| {
+        //
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
