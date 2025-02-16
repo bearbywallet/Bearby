@@ -1,17 +1,10 @@
-import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
-import 'package:zilpay/services/device.dart';
-import 'package:zilpay/src/rust/api/ledger.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/custom_app_bar.dart';
 import '../../components/smart_input.dart';
@@ -36,9 +29,7 @@ class _AddNextBip39AccountContentState
   final _passphraseController = TextEditingController();
   final _passwordController = TextEditingController();
   late AppState _appState;
-  late AuthGuard _authGuard;
 
-  int _index = 0;
   bool _loading = false;
   bool _obscurePassword = true;
   bool _obscurePassphrase = true;
@@ -60,9 +51,7 @@ class _AddNextBip39AccountContentState
   void initState() {
     super.initState();
     _appState = Provider.of<AppState>(context, listen: false);
-    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _nameController.text = 'Account ${_appState.wallet!.accounts.length + 1}';
-    _index = _appState.wallet!.accounts.length + 1;
   }
 
   bool _validateForm() {
@@ -184,7 +173,6 @@ class _AddNextBip39AccountContentState
                     onChanged: !_loading
                         ? (value) {
                             setState(() {
-                              _index = value;
                               _nameController.text = 'Account $value';
                             });
                           }

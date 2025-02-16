@@ -90,7 +90,7 @@ class _HistoryItemState extends State<HistoryItem>
         height: 32,
         fit: BoxFit.contain,
         errorWidget: Blockies(
-          seed: widget.transaction.id,
+          seed: widget.transaction.transactionHash,
           color: getWalletColor(0),
           bgColor: theme.primaryPurple,
           spotColor: theme.background,
@@ -121,7 +121,7 @@ class _HistoryItemState extends State<HistoryItem>
             _buildDetailRow(
               theme,
               'hash:',
-              "0x${widget.transaction.id}",
+              "0x${widget.transaction.transactionHash}",
               true,
             ),
             _buildDetailRow(
@@ -136,13 +136,6 @@ class _HistoryItemState extends State<HistoryItem>
               widget.transaction.recipient,
               true,
             ),
-            if (widget.transaction.teg != null)
-              _buildDetailRow(
-                theme,
-                'Tag:',
-                widget.transaction.teg!,
-                false,
-              ),
             _buildDetailRow(
               theme,
               'Nonce:',
@@ -155,13 +148,6 @@ class _HistoryItemState extends State<HistoryItem>
               '${(adjustAmountToDouble(widget.transaction.fee, nativeToken.decimals))} ${appState.chain!.chain}',
               false,
             ),
-            if (widget.transaction.confirmed != null)
-              _buildDetailRow(
-                theme,
-                'Block:',
-                widget.transaction.confirmed.toString(),
-                false,
-              ),
           ],
         ),
       ),

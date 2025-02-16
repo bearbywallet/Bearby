@@ -8,6 +8,7 @@ extension ChainConverter on Chain {
     return NetworkConfigInfo(
       testnet: testnet,
       shortName: shortName,
+      diffBlockTime: BigInt.zero,
       name: name,
       chain: chain,
       chainIds: Uint64List.fromList(chainIds),

@@ -34,8 +34,6 @@ Future<void> main() async {
 
     state = await loadService(path: "$appDocPath/storage");
 
-    final ticks = tick();
-
     final appState = AppState(
       state: state,
       cahceDir: cahceDir,
