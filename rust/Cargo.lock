@@ -2928,6 +2928,7 @@ dependencies = [
  "config",
  "crypto",
  "errors",
+ "history",
  "proto",
  "reqwest 0.11.27",
  "rpc",

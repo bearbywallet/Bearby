@@ -20,6 +20,7 @@ pub struct NetworkConfigInfo {
     pub chain_id: u64,
     pub chain_ids: Vec<u64>,
     pub slip_44: u32,
+    pub diff_block_time: u64,
     pub chain_hash: u64,
     pub ens: Option<String>,
     pub explorers: Vec<ExplorerInfo>,
@@ -61,6 +62,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
 
         Self {
             chain_id,
+            diff_block_time: value.diff_block_time,
             testnet: value.testnet,
             chain_hash,
             name: value.name,
@@ -90,6 +92,7 @@ impl TryFrom<NetworkConfigInfo> for ChainConfig {
 
         Ok(ChainConfig {
             chain_ids,
+            diff_block_time: value.diff_block_time,
             testnet: value.testnet,
             name: value.name,
             chain: value.chain,

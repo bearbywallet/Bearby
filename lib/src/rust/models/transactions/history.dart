@@ -8,70 +8,106 @@ import 'base_token.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class HistoricalTransactionInfo {
-  final String id;
+  final String transactionHash;
   final String amount;
   final String sender;
   final String recipient;
-  final String? teg;
+  final String? contractAddress;
   final TransactionStatusInfo status;
-  final BigInt? confirmed;
+  final int? statusCode;
   final BigInt timestamp;
+  final BigInt? blockNumber;
+  final BigInt? gasUsed;
+  final BigInt? gasLimit;
+  final BigInt? gasPrice;
+  final BigInt? blobGasUsed;
+  final BigInt? blobGasPrice;
+  final BigInt? effectiveGasPrice;
   final BigInt fee;
   final String? icon;
   final String? title;
   final BigInt nonce;
   final BaseTokenInfo? tokenInfo;
+  final String chainType;
+  final BigInt chainHash;
 
   const HistoricalTransactionInfo({
-    required this.id,
+    required this.transactionHash,
     required this.amount,
     required this.sender,
     required this.recipient,
-    this.teg,
+    this.contractAddress,
     required this.status,
-    this.confirmed,
+    this.statusCode,
     required this.timestamp,
+    this.blockNumber,
+    this.gasUsed,
+    this.gasLimit,
+    this.gasPrice,
+    this.blobGasUsed,
+    this.blobGasPrice,
+    this.effectiveGasPrice,
     required this.fee,
     this.icon,
     this.title,
     required this.nonce,
     this.tokenInfo,
+    required this.chainType,
+    required this.chainHash,
   });
 
   @override
   int get hashCode =>
-      id.hashCode ^
+      transactionHash.hashCode ^
       amount.hashCode ^
       sender.hashCode ^
       recipient.hashCode ^
-      teg.hashCode ^
+      contractAddress.hashCode ^
       status.hashCode ^
-      confirmed.hashCode ^
+      statusCode.hashCode ^
       timestamp.hashCode ^
+      blockNumber.hashCode ^
+      gasUsed.hashCode ^
+      gasLimit.hashCode ^
+      gasPrice.hashCode ^
+      blobGasUsed.hashCode ^
+      blobGasPrice.hashCode ^
+      effectiveGasPrice.hashCode ^
       fee.hashCode ^
       icon.hashCode ^
       title.hashCode ^
       nonce.hashCode ^
-      tokenInfo.hashCode;
+      tokenInfo.hashCode ^
+      chainType.hashCode ^
+      chainHash.hashCode;
 
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
       other is HistoricalTransactionInfo &&
           runtimeType == other.runtimeType &&
-          id == other.id &&
+          transactionHash == other.transactionHash &&
           amount == other.amount &&
           sender == other.sender &&
           recipient == other.recipient &&
-          teg == other.teg &&
+          contractAddress == other.contractAddress &&
           status == other.status &&
-          confirmed == other.confirmed &&
+          statusCode == other.statusCode &&
           timestamp == other.timestamp &&
+          blockNumber == other.blockNumber &&
+          gasUsed == other.gasUsed &&
+          gasLimit == other.gasLimit &&
+          gasPrice == other.gasPrice &&
+          blobGasUsed == other.blobGasUsed &&
+          blobGasPrice == other.blobGasPrice &&
+          effectiveGasPrice == other.effectiveGasPrice &&
           fee == other.fee &&
           icon == other.icon &&
           title == other.title &&
           nonce == other.nonce &&
-          tokenInfo == other.tokenInfo;
+          tokenInfo == other.tokenInfo &&
+          chainType == other.chainType &&
+          chainHash == other.chainHash;
 }
 
 enum TransactionStatusInfo {

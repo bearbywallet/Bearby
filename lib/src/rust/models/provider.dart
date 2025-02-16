@@ -43,6 +43,7 @@ class NetworkConfigInfo {
   final BigInt chainId;
   final Uint64List chainIds;
   final int slip44;
+  final BigInt diffBlockTime;
   final BigInt chainHash;
   final String? ens;
   final List<ExplorerInfo> explorers;
@@ -58,6 +59,7 @@ class NetworkConfigInfo {
     required this.chainId,
     required this.chainIds,
     required this.slip44,
+    required this.diffBlockTime,
     required this.chainHash,
     this.ens,
     required this.explorers,
@@ -75,6 +77,7 @@ class NetworkConfigInfo {
       chainId.hashCode ^
       chainIds.hashCode ^
       slip44.hashCode ^
+      diffBlockTime.hashCode ^
       chainHash.hashCode ^
       ens.hashCode ^
       explorers.hashCode ^
@@ -94,6 +97,7 @@ class NetworkConfigInfo {
           chainId == other.chainId &&
           chainIds == other.chainIds &&
           slip44 == other.slip44 &&
+          diffBlockTime == other.diffBlockTime &&
           chainHash == other.chainHash &&
           ens == other.ens &&
           explorers == other.explorers &&
