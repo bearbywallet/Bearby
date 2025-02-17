@@ -121,9 +121,16 @@ class _HistoryItemState extends State<HistoryItem>
             _buildDetailRow(
               theme,
               'hash:',
-              "0x${widget.transaction.transactionHash}",
+              widget.transaction.transactionHash,
               true,
             ),
+            if (widget.transaction.error != null)
+              _buildDetailRow(
+                theme,
+                'Error:',
+                widget.transaction.error!,
+                true,
+              ),
             _buildDetailRow(
               theme,
               'From:',

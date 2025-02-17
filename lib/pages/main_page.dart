@@ -38,16 +38,14 @@ class MainPageState extends State<MainPage> {
       return;
     }
 
-    Navigator.of(context).push(
-      MaterialPageRoute<MainPage>(
-        builder: (context) => const MainPage(),
+    Navigator.push(
+      context,
+      PageRouteBuilder<MainPage>(
         settings: RouteSettings(
           name: '/',
           arguments: {'selectedIndex': index},
         ),
-        barrierDismissible: true,
-        allowSnapshotting: true,
-        fullscreenDialog: true,
+        pageBuilder: (_, __, ___) => const MainPage(),
       ),
     );
   }

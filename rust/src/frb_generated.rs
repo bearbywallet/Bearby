@@ -2831,6 +2831,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
         let mut var_fee = <u128>::sse_decode(deserializer);
         let mut var_icon = <Option<String>>::sse_decode(deserializer);
         let mut var_title = <Option<String>>::sse_decode(deserializer);
+        let mut var_error = <Option<String>>::sse_decode(deserializer);
         let mut var_nonce = <u128>::sse_decode(deserializer);
         let mut var_tokenInfo =
             <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
@@ -2857,6 +2858,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
             fee: var_fee,
             icon: var_icon,
             title: var_title,
+            error: var_error,
             nonce: var_nonce,
             token_info: var_tokenInfo,
             chain_type: var_chainType,
@@ -4199,6 +4201,7 @@ impl flutter_rust_bridge::IntoDart
             self.fee.into_into_dart().into_dart(),
             self.icon.into_into_dart().into_dart(),
             self.title.into_into_dart().into_dart(),
+            self.error.into_into_dart().into_dart(),
             self.nonce.into_into_dart().into_dart(),
             self.token_info.into_into_dart().into_dart(),
             self.chain_type.into_into_dart().into_dart(),
@@ -4875,6 +4878,7 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         <u128>::sse_encode(self.fee, serializer);
         <Option<String>>::sse_encode(self.icon, serializer);
         <Option<String>>::sse_encode(self.title, serializer);
+        <Option<String>>::sse_encode(self.error, serializer);
         <u128>::sse_encode(self.nonce, serializer);
         <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_encode(
             self.token_info,
