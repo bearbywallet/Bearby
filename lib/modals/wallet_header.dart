@@ -8,7 +8,6 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
-import 'package:zilpay/modals/add_bip39_modal_page.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -46,12 +45,6 @@ class _WalletModalContent extends StatefulWidget {
 
 class _WalletModalContentState extends State<_WalletModalContent> {
   final List<Widget> _contentStack = [];
-
-  void _pushContent(Widget content) {
-    setState(() {
-      _contentStack.add(content);
-    });
-  }
 
   void _popContent() {
     if (_contentStack.isNotEmpty) {
@@ -105,21 +98,13 @@ class _WalletModalContentState extends State<_WalletModalContent> {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        GestureDetector(
-          behavior: HitTestBehavior.opaque,
-          onTap: () {
-            Navigator.of(context).pushNamed('/', arguments: {
-              'selectedIndex': 0,
-            });
-          },
-          child: Container(
-            width: 36,
-            height: 4,
-            margin: EdgeInsets.symmetric(vertical: adaptivePadding),
-            decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.5),
-              borderRadius: BorderRadius.circular(2),
-            ),
+        Container(
+          width: 36,
+          height: 4,
+          margin: EdgeInsets.symmetric(vertical: adaptivePadding),
+          decoration: BoxDecoration(
+            color: theme.textSecondary.withValues(alpha: 0.5),
+            borderRadius: BorderRadius.circular(2),
           ),
         ),
         GestureDetector(
@@ -196,7 +181,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                       accountIndex,
                     );
                     if (mounted) {
-                      Navigator.pop<void>(context);
+                      Navigator.of(context).pop<void>();
                     }
                   } catch (e) {
                     debugPrint("select wallet error: $e");
@@ -232,11 +217,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   width: 40,
                   height: 40,
                   onTap: () {
-                    _pushContent(
-                      AddNextBip39AccountContent(
-                        onBack: _popContent,
-                      ),
-                    );
+                    Navigator.of(context).pushNamed("/add_account");
                   },
                 ),
                 if (appState.wallet?.selectedAccount != BigInt.zero)

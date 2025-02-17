@@ -101,10 +101,15 @@ class _ConfirmTransactionContentState
   void initState() {
     super.initState();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
+
     _handleModalOpen(true);
 
-    _timerPooling =
-        Timer.periodic(const Duration(seconds: 10), (Timer timer) async {
+    AppState appState = Provider.of<AppState>(context, listen: false);
+    final chainHash = appState.account?.chainHash ?? BigInt.zero;
+    final diffBlockTime = appState.getChain(chainHash)?.diffBlockTime.toInt();
+
+    _timerPooling = Timer.periodic(Duration(seconds: diffBlockTime ?? 10),
+        (Timer timer) async {
       if (!mounted) {
         timer.cancel();
         return;
