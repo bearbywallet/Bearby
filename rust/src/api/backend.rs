@@ -13,7 +13,6 @@ pub use zilpay::{
     wallet::LedgerParams,
 };
 
-use crate::models::transactions::history::JobMessageInfo;
 use crate::{
     frb_generated::StreamSink,
     models::background::BackgroundState,
@@ -81,8 +80,8 @@ pub async fn stop_block_worker() -> Result<(), String> {
 }
 
 pub struct BlockEvent {
-    block_number: Option<u64>,
-    error: Option<String>,
+    pub block_number: Option<u64>,
+    pub error: Option<String>,
 }
 
 pub async fn start_block_worker(
@@ -101,6 +100,11 @@ pub async fn start_block_worker(
             .await
             .map_err(|e| e.to_string())?;
 
+        if let Some(block_handle) = &service.block_handle {
+            block_handle.abort();
+            service.block_handle = None;
+        }
+
         service.block_handle = Some(handle);
     }
 
@@ -110,13 +114,15 @@ pub async fn start_block_worker(
                 sink.add(BlockEvent {
                     block_number: Some(block_number),
                     error: None,
-                });
+                })
+                .unwrap_or_default();
             }
             JobMessage::Error(e) => {
                 sink.add(BlockEvent {
                     block_number: None,
                     error: Some(e),
-                });
+                })
+                .unwrap_or_default();
             }
             _ => break,
         }

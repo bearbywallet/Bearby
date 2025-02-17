@@ -1,6 +1,6 @@
 use super::base_token::BaseTokenInfo;
+use zilpay::history::status::TransactionStatus;
 pub use zilpay::history::transaction::HistoricalTransaction;
-use zilpay::{background::bg_worker::JobMessage, history::status::TransactionStatus};
 
 pub enum TransactionStatusInfo {
     Pending,
