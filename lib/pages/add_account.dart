@@ -5,6 +5,11 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'dart:async';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
+import 'package:zilpay/services/auth_guard.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 
@@ -27,6 +32,17 @@ class _AddAccountState extends State<AddAccount> {
   int _bip39Index = 0;
   bool _obscurePassword = true;
 
+  late AuthGuard _authGuard;
+
+  @override
+  void initState() {
+    super.initState();
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
+    AppState appState = Provider.of<AppState>(context, listen: false);
+    _bip39Index = appState.wallet!.accounts.length;
+    _setAutoAccountName(appState);
+  }
+
   @override
   void dispose() {
     _accountNameController.dispose();
@@ -34,18 +50,39 @@ class _AddAccountState extends State<AddAccount> {
     super.dispose();
   }
 
+  void _setAutoAccountName(AppState appState) {
+    _accountNameController.text = 'Account $_bip39Index';
+  }
+
+  bool _exists(AppState appState) {
+    return appState.wallet?.accounts.any(
+          (account) => account.index.toInt() == _bip39Index,
+        ) ??
+        false;
+  }
+
+  bool _isZIL(AppState appState) {
+    return appState.chain?.slip44 == 313 && appState.wallet != null;
+  }
+
   Future<void> _createAccount(AppState appState) async {
-    if (_accountNameController.text.isEmpty) {
+    if (_exists(appState)) {
       setState(() {
-        _errorMessage = 'Account name cannot be empty';
+        _errorMessage = "Account with inded $_bip39Index already exists";
       });
+
       return;
     }
 
-    if (_passwordController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Password cannot be empty';
-      });
+    if (_accountNameController.text.isEmpty) {
+      _accountNameInputKey.currentState?.shake();
+      return;
+    }
+
+    if (_passwordController.text.isEmpty &&
+        appState.wallet!.authType == AuthMethod.none.name) {
+      _accountNameInputKey.currentState?.shake();
+
       return;
     }
 
@@ -54,17 +91,53 @@ class _AddAccountState extends State<AddAccount> {
       _errorMessage = null;
     });
 
-    try {
-      // Here you would integrate with your Rust API for BIP39 account creation
-      // await createBip39Account(
-      //   name: _accountNameController.text,
-      //   password: _passwordController.text,
-      //   index: _bip39Index,
-      // );
-      // await appState.syncData(); // Sync the new account data
+    String session = "";
 
-      await Future.delayed(const Duration(milliseconds: 1000000));
-      // Navigator.pop(context); // Return to previous screen after success
+    try {
+      session = await _authGuard.getSession(
+          sessionKey: appState.wallet!.walletAddress);
+    } catch (e) {
+      debugPrint("gettting session error: $e");
+    }
+
+    try {
+      BigInt chainHash = appState.account!.chainHash;
+
+      DeviceInfoService device = DeviceInfoService();
+      List<String> identifiers = await device.getDeviceIdentifiers();
+
+      if (appState.wallet!.walletType.contains(WalletType.SecretPhrase.name)) {
+        AddNextBip39AccountParams params = AddNextBip39AccountParams(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: BigInt.from(_bip39Index),
+          name: _accountNameController.text,
+          passphrase: "",
+          identifiers: identifiers,
+          password: _passwordController.text.isEmpty
+              ? null
+              : _passwordController.text,
+          sessionCipher: session.isEmpty ? null : session,
+          chainHash: chainHash,
+        );
+
+        await addNextBip39Account(
+          params: params,
+        );
+      }
+
+      if (!_zilliqaLegacy && _isZIL(appState)) {
+        BigInt walletIndex = BigInt.from(appState.selectedWallet);
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: BigInt.from(_bip39Index),
+        );
+      }
+
+      await appState.syncData();
+
+      if (mounted) {
+        Navigator.pop(context);
+      }
     } catch (e) {
       setState(() {
         _errorMessage = 'Failed to create account: $e';
@@ -182,34 +255,37 @@ class _AddAccountState extends State<AddAccount> {
                                   setState(() {
                                     _bip39Index = value;
                                   });
+                                  _setAutoAccountName(appState);
                                 },
                               ),
                             ],
                           ),
                         ),
+                        if (appState.wallet!.authType ==
+                            AuthMethod.none.name) ...[
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            key: _passwordInputKey,
+                            controller: _passwordController,
+                            hint: "Password",
+                            fontSize: 18,
+                            height: 56,
+                            disabled: _isCreating,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            obscureText: _obscurePassword,
+                            rightIconPath: _obscurePassword
+                                ? "assets/icons/close_eye.svg"
+                                : "assets/icons/open_eye.svg",
+                            onRightIconTap: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                        ],
                         SizedBox(height: adaptivePadding),
-                        SmartInput(
-                          key: _passwordInputKey,
-                          controller: _passwordController,
-                          hint: "Password",
-                          fontSize: 18,
-                          height: 56,
-                          disabled: _isCreating,
-                          padding: const EdgeInsets.symmetric(horizontal: 20),
-                          focusedBorderColor: theme.primaryPurple,
-                          obscureText: _obscurePassword,
-                          rightIconPath: _obscurePassword
-                              ? "assets/icons/close_eye.svg"
-                              : "assets/icons/open_eye.svg",
-                          onRightIconTap: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                        ),
-                        SizedBox(height: adaptivePadding),
-                        if (appState.chain?.slip44 == 313 &&
-                            appState.wallet != null)
+                        if (_isZIL(appState))
                           Container(
                             padding: const EdgeInsets.symmetric(
                                 horizontal: 16, vertical: 4),
