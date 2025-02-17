@@ -1,12 +1,13 @@
-use crate::{frb_generated::StreamSink, utils::errors::ServiceError};
+use crate::utils::errors::ServiceError;
 use lazy_static::lazy_static;
 use std::sync::Arc;
 use tokio::sync::RwLock;
+use tokio::task::JoinHandle;
 use zilpay::background::{bg_storage::StorageManagement, Background};
 
 pub struct ServiceBackground {
     pub running: bool,
-    pub message_sink: Option<StreamSink<String>>,
+    pub block_handle: Option<JoinHandle<()>>,
     pub core: Arc<Background>,
 }
 
@@ -21,7 +22,7 @@ impl ServiceBackground {
         Ok(Self {
             core: Arc::new(core),
             running: true,
-            message_sink: None,
+            block_handle: None,
         })
     }
 
