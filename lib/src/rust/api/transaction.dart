@@ -47,6 +47,11 @@ Future<RequiredTxParamsInfo> caclGasFee(
     RustLib.instance.api.crateApiTransactionCaclGasFee(
         walletIndex: walletIndex, accountIndex: accountIndex, params: params);
 
+Future<List<HistoricalTransactionInfo>> checkPendingTranasctions(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionCheckPendingTranasctions(walletIndex: walletIndex);
+
 class TokenTransferParamsInfo {
   final BigInt walletIndex;
   final BigInt accountIndex;

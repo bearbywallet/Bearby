@@ -189,3 +189,21 @@ pub async fn cacl_gas_fee(
 
     Ok(gas.into())
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn check_pending_tranasctions(
+    wallet_index: usize,
+) -> Result<Vec<HistoricalTransactionInfo>, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+
+    let history = service
+        .core
+        .check_pending_txns(wallet_index)
+        .await
+        .map_err(ServiceError::BackgroundError)?;
+    let history: Vec<HistoricalTransactionInfo> =
+        history.into_iter().map(|tx| tx.into()).rev().collect();
+
+    Ok(history)
+}
