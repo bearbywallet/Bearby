@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'dart:io';
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:zilpay/mixins/notifications_service.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/token.dart';
+import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/src/rust/models/background.dart';
@@ -178,6 +181,46 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await setTheme(appearancesCode: code);
     _state = await getData();
     notifyListeners();
+  }
+
+  Future<void> startTrackHistoryWorker() async {
+    try {
+      final notificationsService = NotificationsService();
+      await notificationsService.init();
+
+      if (Platform.isIOS) {
+        await notificationsService.requestIOSPermissions();
+      }
+
+      await notificationsService.showNotification(
+        id: 1,
+        title: "Заголовок",
+        body: "Текст уведомления",
+        payload: "дополнительные данные",
+      );
+    } catch (e) {
+      debugPrint("LocalNotifications: error: $e");
+    }
+
+    try {
+      final notifications = NotificationsService();
+      Stream<String> stream =
+          startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
+
+      stream.listen((event) async {
+        print("event: $event");
+        await notifications.showNotification(
+          id: 1,
+          title: "Заголовок",
+          body: "Текст уведомления",
+          payload: "дополнительные данные",
+        );
+        // TODO: update transactions.
+        notifyListeners();
+      });
+    } catch (e) {
+      debugPrint("start worker error: $e");
+    }
   }
 
   NetworkConfigInfo? getChain(BigInt hash) {

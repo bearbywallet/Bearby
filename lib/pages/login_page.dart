@@ -176,6 +176,8 @@ class _LoginPageState extends State<LoginPage> {
       } else {
         _handleAuthenticationError();
       }
+
+      await _appState.startTrackHistoryWorker();
     } catch (e) {
       debugPrint("unlock $e");
       _handleAuthenticationError();
