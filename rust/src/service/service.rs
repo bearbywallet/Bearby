@@ -8,6 +8,7 @@ use zilpay::background::{bg_storage::StorageManagement, Background};
 pub struct ServiceBackground {
     pub running: bool,
     pub block_handle: Option<JoinHandle<()>>,
+    pub history_handle: Option<JoinHandle<()>>,
     pub core: Arc<Background>,
 }
 
@@ -23,6 +24,7 @@ impl ServiceBackground {
             core: Arc::new(core),
             running: true,
             block_handle: None,
+            history_handle: None,
         })
     }
 

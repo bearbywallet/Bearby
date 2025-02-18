@@ -52,6 +52,13 @@ Future<List<HistoricalTransactionInfo>> checkPendingTranasctions(
     RustLib.instance.api
         .crateApiTransactionCheckPendingTranasctions(walletIndex: walletIndex);
 
+Stream<String> startHistoryWorker({required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiTransactionStartHistoryWorker(walletIndex: walletIndex);
+
+Future<void> stopHistoryWorker() =>
+    RustLib.instance.api.crateApiTransactionStopHistoryWorker();
+
 class TokenTransferParamsInfo {
   final BigInt walletIndex;
   final BigInt accountIndex;

@@ -1,5 +1,6 @@
 use std::sync::Arc;
 
+use crate::frb_generated::StreamSink;
 use crate::models::gas::RequiredTxParamsInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
@@ -7,9 +8,11 @@ use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
 use crate::utils::utils::{decode_session, parse_address, with_service};
 
+use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
+use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
@@ -206,4 +209,56 @@ pub async fn check_pending_tranasctions(
         history.into_iter().map(|tx| tx.into()).rev().collect();
 
     Ok(history)
+}
+
+pub async fn start_history_worker(
+    wallet_index: usize,
+    sink: StreamSink<String>,
+) -> Result<(), String> {
+    let (tx, mut rx) = mpsc::channel(10);
+
+    {
+        let mut guard = BACKGROUND_SERVICE.write().await;
+        let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+
+        let handle = service
+            .core
+            .start_txns_track_job(wallet_index, tx)
+            .await
+            .map_err(|e| e.to_string())?;
+
+        if let Some(block_handle) = &service.block_handle {
+            block_handle.abort();
+            service.block_handle = None;
+        }
+
+        service.history_handle = Some(handle);
+    }
+
+    while let Some(msg) = rx.recv().await {
+        match msg {
+            JobMessage::Tx => {
+                sink.add(String::with_capacity(0)).unwrap_or_default();
+            }
+            JobMessage::Error(e) => {
+                sink.add(e).unwrap_or_default();
+            }
+            _ => break,
+        }
+    }
+
+    Ok(())
+}
+
+pub async fn stop_history_worker() -> Result<(), String> {
+    let mut guard = BACKGROUND_SERVICE.write().await;
+    let service = guard.as_mut().ok_or(ServiceError::NotRunning)?;
+
+    if let Some(history_handle) = &service.history_handle {
+        history_handle.abort();
+
+        service.history_handle = None;
+    }
+
+    Ok(())
 }

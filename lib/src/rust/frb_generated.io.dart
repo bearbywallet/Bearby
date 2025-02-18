@@ -60,6 +60,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dco_decode_Map_usize_background_notification_state(dynamic raw);
 
   @protected
+  RustStreamSink<String> dco_decode_StreamSink_String_Sse(dynamic raw);
+
+  @protected
   RustStreamSink<BlockEvent> dco_decode_StreamSink_block_event_Sse(dynamic raw);
 
   @protected
@@ -363,6 +366,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Map<BigInt, BackgroundNotificationState>
       sse_decode_Map_usize_background_notification_state(
           SseDeserializer deserializer);
+
+  @protected
+  RustStreamSink<String> sse_decode_StreamSink_String_Sse(
+      SseDeserializer deserializer);
 
   @protected
   RustStreamSink<BlockEvent> sse_decode_StreamSink_block_event_Sse(
@@ -708,6 +715,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_Map_usize_background_notification_state(
       Map<BigInt, BackgroundNotificationState> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_StreamSink_String_Sse(
+      RustStreamSink<String> self, SseSerializer serializer);
 
   @protected
   void sse_encode_StreamSink_block_event_Sse(
