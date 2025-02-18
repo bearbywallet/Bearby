@@ -1,17 +1,14 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
+import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
-import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
+import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 class HistoryItem extends StatefulWidget {
@@ -32,9 +29,7 @@ class HistoryItem extends StatefulWidget {
 
 class _HistoryItemState extends State<HistoryItem>
     with SingleTickerProviderStateMixin {
-  bool isHovered = false;
   bool isPressed = false;
-  bool isExpanded = false;
 
   late final AnimationController _controller;
   late final Animation<double> _animation;
@@ -79,150 +74,29 @@ class _HistoryItemState extends State<HistoryItem>
         ),
       ),
       child: ClipOval(
-          child: AsyncImage(
-        url: widget.transaction.icon ??
-            viewTokenIcon(
-              token,
-              appState.chain!.chainId,
-              theme.value,
-            ),
-        width: 32,
-        height: 32,
-        fit: BoxFit.contain,
-        errorWidget: Blockies(
-          seed: widget.transaction.transactionHash,
-          color: getWalletColor(0),
-          bgColor: theme.primaryPurple,
-          spotColor: theme.background,
-          size: 8,
-        ),
-        loadingWidget: const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
-        ),
-      )),
-    );
-  }
-
-  Widget _buildTransactionDetails(AppState appState) {
-    final theme = appState.currentTheme;
-    final nativeToken = appState.wallet!.tokens
-        .firstWhere((t) => t.addrType == appState.account?.addrType);
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      height: isExpanded ? null : 0,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 0, vertical: 8),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _buildDetailRow(
-              theme,
-              'hash:',
-              widget.transaction.transactionHash,
-              true,
-            ),
-            if (widget.transaction.error != null)
-              _buildDetailRow(
-                theme,
-                'Error:',
-                widget.transaction.error!,
-                true,
+        child: AsyncImage(
+          url: widget.transaction.icon ??
+              viewTokenIcon(
+                token,
+                appState.chain!.chainId,
+                theme.value,
               ),
-            _buildDetailRow(
-              theme,
-              'From:',
-              widget.transaction.sender,
-              true,
+          width: 32,
+          height: 32,
+          fit: BoxFit.contain,
+          errorWidget: Blockies(
+            seed: widget.transaction.transactionHash,
+            color: getWalletColor(0),
+            bgColor: theme.primaryPurple,
+            spotColor: theme.background,
+            size: 8,
+          ),
+          loadingWidget: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
             ),
-            _buildDetailRow(
-              theme,
-              'To:',
-              widget.transaction.recipient,
-              true,
-            ),
-            _buildDetailRow(
-              theme,
-              'Nonce:',
-              widget.transaction.nonce.toString(),
-              false,
-            ),
-            _buildDetailRow(
-              theme,
-              'Fee:',
-              '${(adjustAmountToDouble(widget.transaction.fee, nativeToken.decimals))} ${appState.chain!.chain}',
-              false,
-            ),
-          ],
+          ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildDetailRow(
-    AppTheme theme,
-    String label,
-    String value,
-    bool isCopyable,
-  ) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-      child: Row(
-        children: [
-          SizedBox(
-            child: Text(
-              label,
-              style: TextStyle(
-                color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 11,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-          ),
-          Container(
-            width: 1,
-            height: 16,
-            color: theme.textSecondary.withValues(alpha: 0.1),
-            margin: const EdgeInsets.symmetric(horizontal: 12),
-          ),
-          Expanded(
-            child: Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    value,
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 11,
-                      fontWeight: FontWeight.w400,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-                ),
-                if (isCopyable) ...[
-                  const SizedBox(width: 8),
-                  GestureDetector(
-                    onTap: () => Clipboard.setData(ClipboardData(text: value)),
-                    child: MouseRegion(
-                      cursor: SystemMouseCursors.click,
-                      child: SvgPicture.asset(
-                        "assets/icons/copy.svg",
-                        width: 30,
-                        height: 30,
-                        colorFilter: ColorFilter.mode(
-                          theme.textSecondary.withValues(alpha: 0.4),
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -245,16 +119,93 @@ class _HistoryItemState extends State<HistoryItem>
     return DateFormat('MMM dd, yyyy HH:mm').format(dateTime);
   }
 
-  String _formatAmount() {
+  Widget _buildAmountWithPrice(AppTheme theme) {
     if (widget.transaction.tokenInfo != null) {
+      final formatter = NumberFormat('#,##0.##################');
       final decimals = widget.transaction.tokenInfo!.decimals;
-      final value = BigInt.parse(
-          widget.transaction.tokenInfo?.value ?? widget.transaction.amount);
-      final formattedValue = adjustAmountToDouble(value, decimals);
+      final value = double.parse(widget.transaction.tokenInfo?.value ??
+              widget.transaction.amount) /
+          BigInt.from(10).pow(decimals).toDouble();
+      final formattedValue = formatter.format(value);
+      final price = 0.004;
+      final usdAmount = value * price;
 
-      return '${formatCompactNumber(formattedValue)} ${widget.transaction.tokenInfo!.symbol}';
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            '$formattedValue ${widget.transaction.tokenInfo!.symbol}',
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 16,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+            overflow: TextOverflow.ellipsis,
+          ),
+          const SizedBox(height: 2),
+          Text(
+            '(\$$usdAmount)',
+            style: TextStyle(
+              color: theme.textSecondary.withValues(alpha: 0.7),
+              fontSize: 14,
+              fontWeight: FontWeight.w400,
+            ),
+          ),
+        ],
+      );
     }
-    return widget.transaction.amount;
+    return Text(
+      widget.transaction.amount,
+      style: TextStyle(
+        color: theme.textPrimary,
+        fontSize: 16,
+        fontWeight: FontWeight.w600,
+        letterSpacing: 0.5,
+      ),
+      overflow: TextOverflow.ellipsis,
+    );
+  }
+
+  Widget _buildFeeWithPrice(AppState appState) {
+    final formatter = NumberFormat('#,##0.##################');
+
+    final theme = appState.currentTheme;
+    final token = appState.wallet!.tokens.first;
+    final decimals =
+        widget.transaction.chainType == "EVM" && token.decimals < 18
+            ? 18
+            : token.decimals;
+    final feeBig = widget.transaction.fee.toDouble();
+    final price = 2689.32;
+
+    final value = feeBig / BigInt.from(10).pow(decimals).toDouble();
+    final fee = formatter.format(value);
+    final usdFee = value * price;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          '$fee ${token.symbol}',
+          style: TextStyle(
+            color: theme.textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w400,
+          ),
+          overflow: TextOverflow.ellipsis,
+        ),
+        const SizedBox(height: 2),
+        Text(
+          '(\$$usdFee)',
+          style: TextStyle(
+            color: theme.textSecondary.withValues(alpha: 0.7),
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ],
+    );
   }
 
   @override
@@ -266,14 +217,6 @@ class _HistoryItemState extends State<HistoryItem>
     return Column(
       children: [
         MouseRegion(
-          onEnter: (_) {
-            setState(() => isHovered = true);
-            _controller.forward(from: 0.5);
-          },
-          onExit: (_) {
-            setState(() => isHovered = false);
-            _controller.reverse();
-          },
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapDown: (_) {
@@ -281,10 +224,7 @@ class _HistoryItemState extends State<HistoryItem>
               _controller.forward();
             },
             onTapUp: (_) {
-              setState(() {
-                isPressed = false;
-                isExpanded = !isExpanded;
-              });
+              setState(() => isPressed = false);
               _controller.reverse();
             },
             onTapCancel: () {
@@ -298,127 +238,79 @@ class _HistoryItemState extends State<HistoryItem>
                 scale: _animation.value,
                 child: child,
               ),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: isHovered || isExpanded
-                      ? theme.textPrimary.withValues(alpha: 0.05)
-                      : Colors.transparent,
-                ),
+              child: Padding(
+                padding: EdgeInsets.all(adaptivePadding),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: adaptivePadding,
-                        vertical: adaptivePadding,
-                      ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                LayoutBuilder(
-                                  builder: (context, constraints) {
-                                    return Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getStatusColor(theme)
-                                                .withValues(alpha: 0.1),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            widget.transaction.status.name
-                                                .toUpperCase(),
-                                            style: TextStyle(
-                                              color: _getStatusColor(theme),
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.w600,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 8),
-                                        Flexible(
-                                          child: Text(
-                                            widget.transaction.title ??
-                                                'Transaction',
-                                            style: TextStyle(
-                                              color: theme.textPrimary
-                                                  .withValues(alpha: 0.7),
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                            overflow: TextOverflow.ellipsis,
-                                            maxLines: 1,
-                                          ),
-                                        ),
-                                      ],
-                                    );
-                                  },
-                                ),
-                                const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        _formatAmount(),
-                                        style: TextStyle(
-                                          color: theme.textPrimary,
-                                          fontSize: 20,
-                                          fontWeight: FontWeight.w600,
-                                          letterSpacing: 0.5,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(theme)
+                                          .withValues(alpha: 0.1),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      widget.transaction.status.name
+                                          .toUpperCase(),
+                                      style: TextStyle(
+                                        color: _getStatusColor(theme),
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Row(
-                            children: [
-                              Container(
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white.withValues(alpha: 0.05),
-                                  shape: BoxShape.circle,
-                                ),
-                                child:
-                                    _buildIcon(Provider.of<AppState>(context)),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Flexible(
+                                    child: Text(
+                                      widget.transaction.title ?? 'Transaction',
+                                      style: TextStyle(
+                                        color: theme.textPrimary
+                                            .withValues(alpha: 0.7),
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
                               ),
+                              const SizedBox(height: 8),
+                              _buildAmountWithPrice(theme),
                             ],
                           ),
-                        ],
-                      ),
-                    ),
-                    Padding(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: adaptivePadding,
                         ),
-                        child: Row(
-                          children: [
-                            Flexible(
-                              child: Text(
-                                _formatDateTime(),
-                                style: TextStyle(
-                                  color: theme.textSecondary
-                                      .withValues(alpha: 0.7),
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w400,
-                                ),
-                              ),
-                            ),
-                          ],
-                        )),
-                    _buildTransactionDetails(state),
+                        const SizedBox(width: 12),
+                        _buildIcon(state),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          _formatDateTime(),
+                          style: TextStyle(
+                            color: theme.textSecondary.withValues(alpha: 0.7),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
+                        _buildFeeWithPrice(state),
+                      ],
+                    ),
                   ],
                 ),
               ),

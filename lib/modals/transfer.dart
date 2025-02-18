@@ -113,7 +113,7 @@ class _ConfirmTransactionContentState
     }
 
     _timerPooling =
-        Timer.periodic(Duration(seconds: diffBlockTime!), (Timer timer) async {
+        Timer.periodic(Duration(seconds: diffBlockTime), (Timer timer) async {
       if (!mounted) {
         timer.cancel();
         return;
