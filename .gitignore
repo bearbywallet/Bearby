@@ -44,10 +44,12 @@ app/bin
 .idea
 .gradle
 local.properties
+key.properties
 *.iml
 android/.project
 android/app/.project
 android/app/bin/
+android/app/.cxx/
 *.keystore
 .dart_tool/*
 .dart_tool
