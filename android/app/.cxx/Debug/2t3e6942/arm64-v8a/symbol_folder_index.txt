@@ -1,0 +1,1 @@
+/Users/rinat/projects/zilpay/zilpay-mobile/build/app/intermediates/cxx/Debug/2t3e6942/obj/arm64-v8a

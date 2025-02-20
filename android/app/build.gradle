@@ -12,22 +12,19 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 android {
     namespace = "com.zilpaymobile"
     compileSdk = flutter.compileSdkVersion
-    // ndkVersion = flutter.ndkVersion
-    ndkVersion = "27.0.11902837"
+    ndkVersion = flutter.ndkVersion
 
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_21
-        targetCompatibility = JavaVersion.VERSION_21
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = JavaVersion.VERSION_21
+        jvmTarget = JavaVersion.VERSION_17
     }
 
     defaultConfig {
         applicationId = "com.zilpaymobile"
-        // You can update the following values to match your application needs.
-        // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
@@ -40,10 +37,14 @@ android {
 
     signingConfigs {
         release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            if (project.hasProperty('ZILPAY_UPLOAD_STORE_FILE')) {
+                storeFile file(ZILPAY_UPLOAD_STORE_FILE)
+                storePassword ZILPAY_UPLOAD_STORE_PASSWORD
+                keyAlias ZILPAY_UPLOAD_KEY_ALIAS
+                keyPassword ZILPAY_UPLOAD_KEY_PASSWORD
+            } else {
+                println "Warning: Keystore properties not found, release build may fail."
+            }
         }
     }
 
