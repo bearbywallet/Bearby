@@ -80,7 +80,7 @@ class _TransactionDetailsModalContent extends StatelessWidget {
               child: Column(
                 children: [
                   _buildTokenIcon(appState),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   _buildDetailItem(
                     context,
                     'Status',
@@ -304,7 +304,7 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     bool isCopyable = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 6),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [

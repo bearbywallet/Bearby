@@ -1,13 +1,12 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:flutter_svg/flutter_svg.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
 import 'package:zilpay/components/hoverd_svg.dart';
-import 'package:zilpay/components/linear_refresh_indicator.dart';
+import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/components/image_cache.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});
@@ -16,64 +15,21 @@ class BrowserPage extends StatefulWidget {
   State<BrowserPage> createState() => _BrowserPageState();
 }
 
-class _BrowserPageState extends State<BrowserPage> {
-  late WebViewController _controller;
-  bool _isLoading = true;
-  String _currentUrl = 'https://zilpay.io';
-  final TextEditingController _urlController = TextEditingController();
+class _BrowserPageState extends State<BrowserPage>
+    with SingleTickerProviderStateMixin {
+  late TabController _tabController;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    _initWebView();
-    _urlController.text = _currentUrl;
-  }
-
-  void _initWebView() {
-    _controller = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onPageStarted: (String url) {
-            setState(() {
-              _isLoading = true;
-              _currentUrl = url;
-              _urlController.text = url;
-            });
-          },
-          onPageFinished: (String url) async {
-            await _controller.runJavaScript('''
-              // Your custom JavaScript injection
-              console.log('ZilPay Browser Initialized');
-              
-              // Example: Inject ZilPay object
-              window.zilPay = {
-                wallet: {
-                  net: 'mainnet',
-                  isConnect: true,
-                  // Add more wallet properties
-                }
-              };
-            ''');
-            setState(() {
-              _isLoading = false;
-            });
-          },
-          onWebResourceError: (WebResourceError error) {
-            debugPrint('WebView error: ${error.description}');
-          },
-        ),
-      )
-      ..loadRequest(Uri.parse(_currentUrl));
-  }
-
-  Future<void> _refreshPage() async {
-    await _controller.reload();
+    _tabController = TabController(length: 2, vsync: this);
   }
 
   @override
   void dispose() {
-    _urlController.dispose();
+    _tabController.dispose();
+    _searchController.dispose();
     super.dispose();
   }
 
@@ -81,136 +37,110 @@ class _BrowserPageState extends State<BrowserPage> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final padding = EdgeInsets.symmetric(
+        horizontal: AdaptiveSize.getAdaptivePadding(context, 16));
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    return SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              CupertinoSliverRefreshControl(
-                onRefresh: _refreshPage,
-                builder: (
-                  BuildContext context,
-                  RefreshIndicatorMode refreshState,
-                  double pulledExtent,
-                  double refreshTriggerPullDistance,
-                  double refreshIndicatorExtent,
-                ) {
-                  return LinearRefreshIndicator(
-                    pulledExtent: pulledExtent,
-                    refreshTriggerPullDistance: refreshTriggerPullDistance,
-                    refreshIndicatorExtent: refreshIndicatorExtent,
-                  );
-                },
-              ),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    // Browser Navigation Bar
-                    Padding(
-                      padding: EdgeInsets.all(adaptivePadding),
-                      child: Row(
-                        children: [
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/icons/arrow-left.svg',
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.textSecondary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            onPressed: () async {
-                              if (await _controller.canGoBack()) {
-                                await _controller.goBack();
-                              }
-                            },
-                          ),
-                          IconButton(
-                            icon: SvgPicture.asset(
-                              'assets/icons/arrow-right.svg',
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.textSecondary,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            onPressed: () async {
-                              if (await _controller.canGoForward()) {
-                                await _controller.goForward();
-                              }
-                            },
-                          ),
-                          Expanded(
-                            child: Container(
-                              decoration: BoxDecoration(
-                                color: theme.cardBackground,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: TextField(
-                                controller: _urlController,
-                                decoration: InputDecoration(
-                                  hintText: 'Enter URL',
-                                  contentPadding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 8,
-                                  ),
-                                  border: InputBorder.none,
-                                  hintStyle: TextStyle(
-                                    color: theme.textSecondary,
-                                  ),
-                                ),
-                                style: TextStyle(
-                                  color: theme.textPrimary,
-                                ),
-                                onSubmitted: (url) {
-                                  if (!url.startsWith('http')) {
-                                    url = 'https://$url';
-                                  }
-                                  _controller.loadRequest(Uri.parse(url));
-                                },
-                              ),
-                            ),
-                          ),
-                          HoverSvgIcon(
-                            assetName: 'assets/icons/refresh.svg',
-                            width: 24,
-                            height: 24,
-                            padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                            color: theme.textSecondary,
-                            onTap: _refreshPage,
-                          ),
-                        ],
-                      ),
+    return Scaffold(
+      backgroundColor: theme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            TabBar(
+              controller: _tabController,
+              tabs: [
+                Tab(text: 'Explore'),
+                Tab(text: 'Connected'),
+              ],
+              labelStyle: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600),
+              unselectedLabelStyle: TextStyle(
+                  color: theme.textSecondary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.w600),
+              indicatorColor: theme.primaryPurple,
+              labelColor: theme.textPrimary,
+              unselectedLabelColor: theme.textSecondary,
+              indicatorSize: TabBarIndicatorSize.label,
+              splashFactory: NoSplash.splashFactory,
+            ),
+            Expanded(
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  Center(
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Text('No apps to explore yet',
+                            style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w500)),
+                      ],
                     ),
-                    SizedBox(
-                      height: MediaQuery.of(context).size.height - 150,
-                      child: Stack(
-                        children: [
-                          WebViewWidget(
-                            controller: _controller,
-                          ),
-                          if (_isLoading)
-                            Center(
-                              child: CircularProgressIndicator(
-                                color: theme.primaryPurple,
-                              ),
-                            ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                  ),
+                  GridView.count(
+                    crossAxisCount: 3,
+                    padding: padding.copyWith(top: 32, bottom: 16),
+                    mainAxisSpacing: 16,
+                    crossAxisSpacing: 16,
+                    childAspectRatio: 0.9,
+                    children: [
+                      _buildConnectedTile(
+                          'Plunderswap',
+                          'https://plunderswap.com/icons/ios/apple-touch-icon-180x180.png',
+                          theme),
+                      _buildConnectedTile(
+                          'DragonZIL',
+                          'https://dragonzil.xyz/favicon/android-icon-192x192.png',
+                          theme),
+                      _buildConnectedTile('Zillion',
+                          'https://stake.zilliqa.com/favicon.ico', theme),
+                    ],
+                  ),
+                ],
               ),
-            ],
-          ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: SmartInput(
+                controller: _searchController,
+                hint: 'Search or enter address',
+                leftIconPath: 'assets/icons/search.svg',
+                onChanged: (value) {},
+                borderColor: theme.textPrimary,
+                focusedBorderColor: theme.primaryPurple,
+                height: 48,
+                fontSize: 16,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+              ),
+            ),
+          ],
         ),
       ),
+    );
+  }
+
+  Widget _buildConnectedTile(String label, String url, AppTheme theme) {
+    return TileButton(
+      title: label,
+      icon: AsyncImage(
+          url: url,
+          width: 24,
+          height: 24,
+          fit: BoxFit.contain,
+          errorWidget: HoverSvgIcon(
+              assetName: 'assets/icons/default.svg',
+              width: 24,
+              height: 24,
+              onTap: () {},
+              color: theme.textPrimary)),
+      onPressed: () {},
+      backgroundColor: theme.cardBackground,
+      textColor: theme.primaryPurple,
     );
   }
 }
