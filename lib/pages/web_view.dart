@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -29,18 +30,32 @@ class _WebViewPageState extends State<WebViewPage> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
+      ..addJavaScriptChannel(
+        'FlutterWebView',
+        onMessageReceived: (JavaScriptMessage message) {
+          debugPrint('Received from JS: ${message.message}');
+          String jsCode = 'window.postMessage(${message.message}, "*");';
+          _webViewController.runJavaScript(jsCode).catchError((e) {
+            debugPrint('Error sending message back to JS: $e');
+          });
+        },
+      )
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (String url) {
-            setState(() {
-              _isLoading = true;
-              _hasError = false;
-            });
-          },
-          onPageFinished: (String url) {
-            setState(() {
-              _isLoading = false;
-            });
+          onPageStarted: (String url) => setState(() {
+            _isLoading = true;
+            _hasError = false;
+          }),
+          onPageFinished: (String url) async {
+            setState(() => _isLoading = false);
+            try {
+              String jsCode =
+                  await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+              await _webViewController.runJavaScript(jsCode);
+              debugPrint('inpage.js injected successfully');
+            } catch (e) {
+              debugPrint('Error injecting inpage.js: $e');
+            }
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -49,8 +64,7 @@ class _WebViewPageState extends State<WebViewPage> {
               _errorMessage = error.description;
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                  content: Text('Error loading page: ${error.description}')),
+              SnackBar(content: Text('Error: ${error.description}')),
             );
           },
         ),
@@ -58,9 +72,7 @@ class _WebViewPageState extends State<WebViewPage> {
       ..loadRequest(Uri.parse(widget.initialUrl));
   }
 
-  void _refreshPage() {
-    _webViewController.reload();
-  }
+  void _refreshPage() => _webViewController.reload();
 
   @override
   Widget build(BuildContext context) {
@@ -106,11 +118,7 @@ class _WebViewPageState extends State<WebViewPage> {
             Expanded(
               child: Text(
                 widget.initialUrl,
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 12,
-                  fontWeight: FontWeight.normal,
-                ),
+                style: TextStyle(color: theme.textSecondary, fontSize: 12),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -143,36 +151,26 @@ class _WebViewPageState extends State<WebViewPage> {
                     color: theme.textSecondary,
                   ),
                   const SizedBox(height: 20),
-                  Text(
-                    'Failed to load page',
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  Text('Failed to load',
+                      style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold)),
                   const SizedBox(height: 10),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      _errorMessage,
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 16,
-                      ),
-                    ),
+                    child: Text(_errorMessage,
+                        textAlign: TextAlign.center,
+                        style: TextStyle(
+                            color: theme.textSecondary, fontSize: 16)),
                   ),
                   const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _refreshPage,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: theme.primaryPurple,
-                    ),
-                    child: Text(
-                      'Try Again',
-                      style: TextStyle(color: theme.background),
-                    ),
+                        backgroundColor: theme.primaryPurple),
+                    child: Text('Try Again',
+                        style: TextStyle(color: theme.background)),
                   ),
                 ],
               ),
