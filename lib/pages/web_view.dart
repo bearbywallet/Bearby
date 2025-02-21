@@ -36,7 +36,6 @@ class _WebViewPageState extends State<WebViewPage> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
-      // ..setUserAgent('ZilPayBrowser/1.0')
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) {
@@ -61,12 +60,14 @@ class _WebViewPageState extends State<WebViewPage> {
             String jsCode =
                 await rootBundle.loadString('assets/zilpay_legacy_inject.js');
             await _webViewController.runJavaScript(jsCode);
+            await _sendData();
           },
           onPageFinished: (String url) async {
             setState(() => _isLoading = false);
             String jsCode =
                 await rootBundle.loadString('assets/zilpay_legacy_inject.js');
             await _webViewController.runJavaScript(jsCode);
+            await _sendData();
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -141,21 +142,41 @@ class _WebViewPageState extends State<WebViewPage> {
     return color;
   }
 
+  bool _isDomainConnected(
+      String currentDomain, List<ConnectionInfo> connections) {
+    for (final conn in connections) {
+      final connDomain = conn.domain;
+      if (currentDomain == connDomain ||
+          (currentDomain.endsWith('.$connDomain') &&
+              currentDomain.split('.').length ==
+                  connDomain.split('.').length + 1)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  Future<void> _sendData() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    await appState.syncConnections();
+    final currentDomain = Uri.parse(widget.initialUrl).host;
+    final isConnected = _isDomainConnected(currentDomain, appState.connections);
+
+    _sendResponse(ZilliqaLegacyMessages.getWalletData, {
+      'account': appState.wallet?.walletAddress ?? '',
+      'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
+      'isConnect': isConnected,
+      'isEnable': appState.wallet != null,
+    });
+  }
+
   void _handleZilPayMessage(ZilPayMessage message) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final currentDomain = Uri.parse(widget.initialUrl).host;
 
     switch (message.type) {
       case ZilliqaLegacyMessages.getWalletData:
-        await appState.syncConnections();
-        final isConnected =
-            appState.connections.any((conn) => conn.domain == currentDomain);
-        _sendResponse(ZilliqaLegacyMessages.getWalletData, {
-          'account': appState.wallet?.walletAddress ?? '',
-          'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-          'isConnect': isConnected,
-          'isEnable': appState.wallet != null,
-        });
+        _sendData();
         break;
 
       case ZilliqaLegacyMessages.contentProxyMethod:
@@ -171,10 +192,23 @@ class _WebViewPageState extends State<WebViewPage> {
         break;
 
       case ZilliqaLegacyMessages.connectApp:
+        await appState.syncConnections();
+        final isAlreadyConnected =
+            _isDomainConnected(currentDomain, appState.connections);
+
+        if (isAlreadyConnected) {
+          _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
+            'uuid': message.payload['uuid'] as String? ?? '',
+            'account': appState.account != null
+                ? {'address': appState.account!.addr}
+                : null,
+          });
+          return;
+        }
+
         final title = message.payload['title'] as String? ?? 'Unknown App';
         final uuid = message.payload['uuid'] as String? ?? '';
         final icon = message.payload['icon'] as String? ?? '';
-        final domain = Uri.parse(widget.initialUrl).host;
         final pageInfo = await _extractPageInfo();
 
         if (!mounted) {
@@ -192,13 +226,14 @@ class _WebViewPageState extends State<WebViewPage> {
                 selectedIndices.map((index) => BigInt.from(index)).toList());
 
             ConnectionInfo connectionInfo = ConnectionInfo(
-              domain: domain,
+              domain: currentDomain,
               walletIndexes: walletIndexes,
               favicon: icon,
               title: title,
               description: pageInfo['description'] as String?,
               colors: ColorsInfo(
-                primary: colorsMap?['primary'] as String? ?? '#FFFFFF',
+                primary: colorsMap?['primary'] as String? ??
+                    appState.currentTheme.cardBackground.toString(),
                 secondary: colorsMap?['secondary'] as String?,
                 background: colorsMap?['background'] as String?,
                 text: colorsMap?['text'] as String?,
@@ -221,6 +256,7 @@ class _WebViewPageState extends State<WebViewPage> {
                   ? {'address': appState.account!.addr}
                   : null,
             });
+            await _sendData();
           },
         );
         break;
@@ -238,10 +274,31 @@ class _WebViewPageState extends State<WebViewPage> {
     }
   }
 
+  Map<String, String> _splitDomain(String url) {
+    final uri = Uri.parse(url);
+    final host = uri.host;
+    final parts = host.split('.');
+
+    if (parts.length <= 2) {
+      return {
+        'subdomain': '',
+        'domain': host,
+      };
+    }
+
+    final subdomain = parts[0];
+    final domain = parts.sublist(1).join('.');
+    return {
+      'subdomain': subdomain,
+      'domain': domain,
+    };
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final domainParts = _splitDomain(widget.initialUrl);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -280,9 +337,27 @@ class _WebViewPageState extends State<WebViewPage> {
             ),
             SizedBox(width: 4),
             Expanded(
-              child: Text(
-                widget.initialUrl,
-                style: TextStyle(color: theme.textSecondary, fontSize: 12),
+              child: RichText(
+                text: TextSpan(
+                  children: [
+                    if (domainParts['subdomain']!.isNotEmpty)
+                      TextSpan(
+                        text: '${domainParts['subdomain']}.',
+                        style: TextStyle(
+                          color: theme.textSecondary.withValues(alpha: 0.7),
+                          fontSize: 12,
+                        ),
+                      ),
+                    TextSpan(
+                      text: domainParts['domain'],
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
