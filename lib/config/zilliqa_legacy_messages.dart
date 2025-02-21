@@ -7,7 +7,6 @@ class ZilliqaLegacyMessages {
   static const String getWalletData = '@/$_appPrefix/injected-get-wallet-data';
   static const String addressChanged = '@/$_appPrefix/address-changed';
   static const String networkChanged = '@/$_appPrefix/network-changed';
-  static const String lockStatusUpdated = '@/$_appPrefix/lack-status-updated';
 
   // Content Proxy Messages
   static const String contentProxyMethod =
@@ -27,12 +26,6 @@ class ZilliqaLegacyMessages {
   // Block Updates
   static const String newBlock = '@/$_appPrefix/new-block-created';
 
-  // Encryption/Decryption Messages
-  static const String addEncryption = '@/$_appPrefix/request-add-encryption';
-  static const String responseEncryption = '@/$_appPrefix/response-encryption';
-  static const String addDecryption = '@/$_appPrefix/add-decryption';
-  static const String responseDecryption = '@/$_appPrefix/response-decryption';
-
   // DApp Connection Messages
   static const String connectApp = '@/$_appPrefix/request-to-connect-dapp';
   static const String responseToDapp = '@/$_appPrefix/response-dapp-connect';
@@ -44,7 +37,6 @@ class ZilliqaLegacyMessages {
     getWalletData,
     addressChanged,
     networkChanged,
-    lockStatusUpdated,
     contentProxyMethod,
     contentProxyResult,
     callToSignTx,

@@ -143,18 +143,19 @@ class _WebViewPageState extends State<WebViewPage> {
 
   void _handleZilPayMessage(ZilPayMessage message) async {
     final appState = Provider.of<AppState>(context, listen: false);
+    final currentDomain = Uri.parse(widget.initialUrl).host;
 
     switch (message.type) {
       case ZilliqaLegacyMessages.getWalletData:
+        await appState.syncConnections();
+        final isConnected =
+            appState.connections.any((conn) => conn.domain == currentDomain);
         _sendResponse(ZilliqaLegacyMessages.getWalletData, {
-          'address': appState.wallet?.walletAddress ?? '',
+          'account': appState.wallet?.walletAddress ?? '',
           'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-          'isLocked': appState.wallet == null,
+          'isConnect': isConnected,
+          'isEnable': appState.wallet != null,
         });
-        break;
-
-      case ZilliqaLegacyMessages.lockStatusUpdated:
-        debugPrint('Lock status updated: ${message.payload}');
         break;
 
       case ZilliqaLegacyMessages.contentProxyMethod:
