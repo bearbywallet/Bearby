@@ -5,21 +5,21 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/state/app_state.dart';
 
-class CopyAddressButton extends StatefulWidget {
+class CopyContent extends StatefulWidget {
   final String address;
   final bool isShort;
 
-  const CopyAddressButton({
+  const CopyContent({
     super.key,
     required this.address,
     this.isShort = true,
   });
 
   @override
-  State<CopyAddressButton> createState() => _CopyAddressButtonState();
+  State<CopyContent> createState() => _CopyContentState();
 }
 
-class _CopyAddressButtonState extends State<CopyAddressButton>
+class _CopyContentState extends State<CopyContent>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;

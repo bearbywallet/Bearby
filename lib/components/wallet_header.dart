@@ -96,7 +96,7 @@ class _WalletHeaderState extends State<WalletHeader>
           ),
         ),
         const SizedBox(width: 8),
-        CopyAddressButton(
+        CopyContent(
           address: widget.account.addr,
         ),
       ],
