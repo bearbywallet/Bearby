@@ -32,7 +32,6 @@ class ZilliqaLegacyMessages {
   static const String disconnectApp =
       '@/$_appPrefix/request-to-disconnect-dapp';
 
-  /// All message types as a list for easy iteration
   static const List<String> allTypes = [
     getWalletData,
     addressChanged,
@@ -44,10 +43,6 @@ class ZilliqaLegacyMessages {
     signMessage,
     signMessageResponse,
     newBlock,
-    addEncryption,
-    responseEncryption,
-    addDecryption,
-    responseDecryption,
     connectApp,
     responseToDapp,
     disconnectApp,

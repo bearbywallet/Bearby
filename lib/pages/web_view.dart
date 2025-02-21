@@ -36,7 +36,7 @@ class _WebViewPageState extends State<WebViewPage> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
-      ..setUserAgent('ZilPayBrowser/1.0')
+      // ..setUserAgent('ZilPayBrowser/1.0')
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) {
@@ -186,12 +186,14 @@ class _WebViewPageState extends State<WebViewPage> {
           title: title,
           uuid: uuid,
           iconUrl: icon,
-          onDecision: (accepted) async {
+          onDecision: (accepted, selectedIndices) async {
             final colorsMap = pageInfo['colors'] as Map<String, Object?>?;
+            final walletIndexes = Uint64List.fromList(
+                selectedIndices.map((index) => BigInt.from(index)).toList());
+
             ConnectionInfo connectionInfo = ConnectionInfo(
               domain: domain,
-              walletIndexes:
-                  Uint64List.fromList([BigInt.from(appState.selectedWallet)]),
+              walletIndexes: walletIndexes,
               favicon: icon,
               title: title,
               description: pageInfo['description'] as String?,
@@ -215,8 +217,9 @@ class _WebViewPageState extends State<WebViewPage> {
 
             _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
               'uuid': uuid,
-              'account':
-                  accepted ? {'address': appState.account?.addr ?? ''} : null,
+              'account': accepted && appState.account != null
+                  ? {'address': appState.account!.addr}
+                  : null,
             });
           },
         );

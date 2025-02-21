@@ -10,7 +10,7 @@ void showAppConnectModal({
   required String title,
   required String uuid,
   required String iconUrl,
-  required Function(bool) onDecision,
+  required Function(bool, List<int>) onDecision,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -21,26 +21,34 @@ void showAppConnectModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (BuildContext context) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: _AppConnectModalContent(
-          title: title,
-          uuid: uuid,
-          iconUrl: iconUrl,
-          onDecision: onDecision,
+      return PopScope(
+        canPop: true,
+        onPopInvokedWithResult: (didPop, result) {
+          if (didPop) {
+            onDecision(false, []);
+          }
+        },
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+          ),
+          child: _AppConnectModalContent(
+            title: title,
+            uuid: uuid,
+            iconUrl: iconUrl,
+            onDecision: onDecision,
+          ),
         ),
       );
     },
   );
 }
 
-class _AppConnectModalContent extends StatelessWidget {
+class _AppConnectModalContent extends StatefulWidget {
   final String title;
   final String uuid;
   final String iconUrl;
-  final Function(bool) onDecision;
+  final Function(bool, List<int>) onDecision;
 
   const _AppConnectModalContent({
     required this.title,
@@ -48,6 +56,27 @@ class _AppConnectModalContent extends StatelessWidget {
     required this.iconUrl,
     required this.onDecision,
   });
+
+  @override
+  State<_AppConnectModalContent> createState() =>
+      _AppConnectModalContentState();
+}
+
+class _AppConnectModalContentState extends State<_AppConnectModalContent> {
+  Map<int, bool> _selectedAccounts = {};
+
+  @override
+  void initState() {
+    super.initState();
+    final appState = Provider.of<AppState>(context, listen: false);
+    if (appState.wallet != null) {
+      _selectedAccounts = Map.fromEntries(appState.wallet!.accounts
+              .asMap()
+              .entries
+              .map((entry) => MapEntry(entry.key, true)) // Изменено на true
+          );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -68,7 +97,7 @@ class _AppConnectModalContent extends StatelessWidget {
           _buildDragHandle(theme),
           _buildIcon(theme),
           _buildTitle(theme),
-          _buildDescription(theme),
+          _buildAccountList(appState, theme),
           _buildButtons(theme, context),
           SizedBox(height: bottomPadding + 16),
         ],
@@ -104,7 +133,7 @@ class _AppConnectModalContent extends StatelessWidget {
         child: ClipRRect(
           borderRadius: BorderRadius.circular(14),
           child: AsyncImage(
-            url: iconUrl,
+            url: widget.iconUrl,
             width: 64,
             height: 64,
             fit: BoxFit.cover,
@@ -132,7 +161,7 @@ class _AppConnectModalContent extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       child: Text(
-        title,
+        widget.title,
         style: TextStyle(
           color: theme.textPrimary,
           fontSize: 20,
@@ -143,32 +172,91 @@ class _AppConnectModalContent extends StatelessWidget {
     );
   }
 
-  Widget _buildDescription(AppTheme theme) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Text(
-        'This app wants to connect to your wallet to view your address and request transactions.',
-        style: TextStyle(
-          color: theme.textSecondary,
-          fontSize: 14,
+  Widget _buildAccountList(AppState appState, AppTheme theme) {
+    if (appState.wallet == null || appState.wallet!.accounts.isEmpty) {
+      return Padding(
+        padding: const EdgeInsets.all(16),
+        child: Text(
+          'No accounts available',
+          style: TextStyle(
+            color: theme.textSecondary,
+            fontSize: 14,
+          ),
         ),
-        textAlign: TextAlign.center,
+      );
+    }
+
+    return Container(
+      constraints: BoxConstraints(
+        maxHeight: MediaQuery.of(context).size.height * 0.4,
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: appState.wallet!.accounts.length,
+        itemBuilder: (context, index) {
+          final account = appState.wallet!.accounts[index];
+          final isSelected = _selectedAccounts[index] ?? false;
+
+          return CheckboxListTile(
+            title: Text(
+              account.name,
+              style: TextStyle(color: theme.textPrimary),
+            ),
+            subtitle: Text(
+              account.addr,
+              style: TextStyle(color: theme.textSecondary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            value: isSelected,
+            onChanged: (bool? value) {
+              setState(() {
+                _selectedAccounts[index] = value ?? false;
+              });
+            },
+            activeColor: theme.primaryPurple,
+            checkColor: theme.textPrimary,
+            controlAffinity: ListTileControlAffinity.leading,
+          );
+        },
       ),
     );
   }
 
   Widget _buildButtons(AppTheme theme, BuildContext context) {
+    final bool hasSelection =
+        _selectedAccounts.values.any((selected) => selected);
+
     return Padding(
       padding: const EdgeInsets.all(16),
       child: Row(
         children: [
           Expanded(
             child: CustomButton(
-              text: 'Connect',
+              text: 'Reject',
               onPressed: () {
-                onDecision(true);
+                widget.onDecision(false, []);
                 Navigator.pop(context);
               },
+              backgroundColor: theme.danger.withValues(alpha: 0.1),
+              textColor: theme.danger,
+              height: 48,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: CustomButton(
+              text: 'Connect',
+              onPressed: hasSelection
+                  ? () {
+                      final selectedIndices = _selectedAccounts.entries
+                          .where((entry) => entry.value)
+                          .map((entry) => entry.key)
+                          .toList();
+                      widget.onDecision(true, selectedIndices);
+                      Navigator.pop(context);
+                    }
+                  : null,
               backgroundColor: theme.primaryPurple,
               textColor: theme.textPrimary,
               height: 48,
