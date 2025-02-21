@@ -51,6 +51,8 @@ class _WalletPageState extends State<WalletPage> {
     super.initState();
     final appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
+
+    appState.syncConnections();
   }
 
   @override

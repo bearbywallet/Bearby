@@ -4,6 +4,7 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -25,6 +26,8 @@ class _BrowserPageState extends State<BrowserPage>
   void initState() {
     super.initState();
     _tabController = TabController(length: 2, vsync: this);
+    final appState = Provider.of<AppState>(context, listen: false);
+    appState.syncConnections();
   }
 
   @override
@@ -54,9 +57,7 @@ class _BrowserPageState extends State<BrowserPage>
 
       Navigator.push(
         context,
-        MaterialPageRoute(
-          builder: (context) => WebViewPage(initialUrl: url),
-        ),
+        MaterialPageRoute(builder: (context) => WebViewPage(initialUrl: url)),
       );
     }
   }
@@ -74,6 +75,7 @@ class _BrowserPageState extends State<BrowserPage>
     final padding = EdgeInsets.symmetric(
         horizontal: AdaptiveSize.getAdaptivePadding(context, 16));
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final connections = appState.connections;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -82,7 +84,7 @@ class _BrowserPageState extends State<BrowserPage>
           children: [
             TabBar(
               controller: _tabController,
-              tabs: [
+              tabs: const [
                 Tab(text: 'Explore'),
                 Tab(text: 'Connected'),
               ],
@@ -99,6 +101,7 @@ class _BrowserPageState extends State<BrowserPage>
               unselectedLabelColor: theme.textSecondary,
               indicatorSize: TabBarIndicatorSize.label,
               splashFactory: NoSplash.splashFactory,
+              dividerColor: Colors.transparent, // Убирает белую полоску
             ),
             Expanded(
               child: TabBarView(
@@ -116,25 +119,7 @@ class _BrowserPageState extends State<BrowserPage>
                       ],
                     ),
                   ),
-                  GridView.count(
-                    crossAxisCount: 3,
-                    padding: padding.copyWith(top: 32, bottom: 16),
-                    mainAxisSpacing: 16,
-                    crossAxisSpacing: 16,
-                    childAspectRatio: 0.9,
-                    children: [
-                      _buildConnectedTile(
-                          'Plunderswap',
-                          'https://plunderswap.com/icons/ios/apple-touch-icon-180x180.png',
-                          theme),
-                      _buildConnectedTile(
-                          'DragonZIL',
-                          'https://dragonzil.xyz/favicon/android-icon-192x192.png',
-                          theme),
-                      _buildConnectedTile('Zillion',
-                          'https://stake.zilliqa.com/favicon.ico', theme),
-                    ],
-                  ),
+                  _buildConnectedTab(connections, theme, padding),
                 ],
               ),
             ),
@@ -161,26 +146,63 @@ class _BrowserPageState extends State<BrowserPage>
     );
   }
 
-  Widget _buildConnectedTile(String label, String url, AppTheme theme) {
+  Widget _buildConnectedTab(
+      List<ConnectionInfo> connections, AppTheme theme, EdgeInsets padding) {
+    if (connections.isEmpty) {
+      return Center(
+        child: Text(
+          'No connected apps',
+          style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 16,
+              fontWeight: FontWeight.w500),
+        ),
+      );
+    }
+
+    return GridView.builder(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 3,
+        mainAxisSpacing: 16,
+        crossAxisSpacing: 16,
+        childAspectRatio: 0.9,
+      ),
+      padding: padding.copyWith(top: 32, bottom: 16),
+      itemCount: connections.length,
+      itemBuilder: (context, index) {
+        final connection = connections[index];
+        final url = 'https://${connection.domain}';
+        return _buildConnectedTile(
+          connection.title,
+          connection.favicon ?? 'https://${connection.domain}/favicon.ico',
+          url,
+          theme,
+        );
+      },
+    );
+  }
+
+  Widget _buildConnectedTile(
+      String label, String iconUrl, String url, AppTheme theme) {
     return TileButton(
       title: label,
       icon: AsyncImage(
-          url: url,
+        url: iconUrl,
+        width: 24,
+        height: 24,
+        fit: BoxFit.contain,
+        errorWidget: HoverSvgIcon(
+          assetName: 'assets/icons/default.svg',
           width: 24,
           height: 24,
-          fit: BoxFit.contain,
-          errorWidget: HoverSvgIcon(
-              assetName: 'assets/icons/default.svg',
-              width: 24,
-              height: 24,
-              onTap: () {},
-              color: theme.textPrimary)),
+          onTap: () {},
+          color: theme.textPrimary,
+        ),
+      ),
       onPressed: () {
         Navigator.push(
           context,
-          MaterialPageRoute(
-            builder: (context) => WebViewPage(initialUrl: url),
-          ),
+          MaterialPageRoute(builder: (context) => WebViewPage(initialUrl: url)),
         );
       },
       backgroundColor: theme.cardBackground,

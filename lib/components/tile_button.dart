@@ -140,12 +140,18 @@ class _TileButtonState extends State<TileButton>
                         ),
                         if (hasTitle) ...[
                           const SizedBox(height: 4),
-                          Text(
-                            widget.title!,
-                            style: TextStyle(
-                              color: widget.textColor,
-                              fontSize: 11,
-                              fontWeight: FontWeight.w500,
+                          SizedBox(
+                            width: containerSize - 8,
+                            child: Text(
+                              widget.title!,
+                              style: TextStyle(
+                                color: widget.textColor,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              textAlign: TextAlign.center,
                             ),
                           ),
                         ],

@@ -3,11 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:zilpay/src/rust/api/connections.dart';
+import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/config/zilliqa_legacy_messages.dart';
 import 'package:zilpay/modals/app_connect.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class WebViewPage extends StatefulWidget {
   final String initialUrl;
@@ -33,13 +36,13 @@ class _WebViewPageState extends State<WebViewPage> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
-      ..setUserAgent('ZilPayBrowser/1.0') // Добавлен User-Agent
+      ..setUserAgent('ZilPayBrowser/1.0')
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) {
           try {
             final jsonData =
-                jsonDecode(message.message) as Map<String, dynamic>;
+                jsonDecode(message.message) as Map<String, Object?>;
             final zilPayMessage = ZilPayMessage.fromJson(jsonData);
             _handleZilPayMessage(zilPayMessage);
           } catch (e) {
@@ -72,8 +75,7 @@ class _WebViewPageState extends State<WebViewPage> {
               _errorMessage = error.description;
             });
             ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text('Error: ${error.description}')),
-            );
+                SnackBar(content: Text('Error: ${error.description}')));
           },
         ),
       )
@@ -82,13 +84,64 @@ class _WebViewPageState extends State<WebViewPage> {
 
   void _refreshPage() => _webViewController.reload();
 
-  void _sendResponse(String type, Map<String, dynamic> payload) {
+  void _sendResponse(String type, Map<String, Object?> payload) {
     final response = ZilPayMessage(type: type, payload: payload).toJson();
     final jsonString = jsonEncode(response);
     _webViewController.runJavaScript('window.postMessage($jsonString, "*")');
   }
 
-  void _handleZilPayMessage(ZilPayMessage message) {
+  Future<Map<String, Object?>> _extractPageInfo() async {
+    try {
+      final descriptionResult =
+          await _webViewController.runJavaScriptReturningResult(
+              'document.querySelector("meta[name=\'description\']")?.content || ""');
+      final primaryColorResult =
+          await _webViewController.runJavaScriptReturningResult(
+              'getComputedStyle(document.body).backgroundColor || "#FFFFFF"');
+
+      final description = descriptionResult is String
+          ? descriptionResult.replaceAll('"', '')
+          : '';
+      final primaryColor = primaryColorResult is String
+          ? _parseColor(primaryColorResult)
+          : '#FFFFFF';
+
+      return {
+        'description': description,
+        'colors': {
+          'primary': primaryColor,
+          'secondary': null,
+          'background': null,
+          'text': null,
+        },
+      };
+    } catch (e) {
+      debugPrint('Failed to extract page info: $e');
+      return {
+        'description': '',
+        'colors': {
+          'primary': '#FFFFFF',
+          'secondary': null,
+          'background': null,
+          'text': null
+        },
+      };
+    }
+  }
+
+  String _parseColor(String color) {
+    if (color.startsWith('rgb')) {
+      final rgb = color
+          .replaceAll(RegExp(r'[^0-9,]'), '')
+          .split(',')
+          .map(int.parse)
+          .toList();
+      return '#${rgb[0].toRadixString(16).padLeft(2, '0')}${rgb[1].toRadixString(16).padLeft(2, '0')}${rgb[2].toRadixString(16).padLeft(2, '0')}';
+    }
+    return color;
+  }
+
+  void _handleZilPayMessage(ZilPayMessage message) async {
     final appState = Provider.of<AppState>(context, listen: false);
 
     switch (message.type) {
@@ -120,13 +173,45 @@ class _WebViewPageState extends State<WebViewPage> {
         final title = message.payload['title'] as String? ?? 'Unknown App';
         final uuid = message.payload['uuid'] as String? ?? '';
         final icon = message.payload['icon'] as String? ?? '';
+        final domain = Uri.parse(widget.initialUrl).host;
+        final pageInfo = await _extractPageInfo();
+
+        if (!mounted) {
+          return;
+        }
 
         showAppConnectModal(
           context: context,
           title: title,
           uuid: uuid,
           iconUrl: icon,
-          onDecision: (accepted) {
+          onDecision: (accepted) async {
+            final colorsMap = pageInfo['colors'] as Map<String, Object?>?;
+            ConnectionInfo connectionInfo = ConnectionInfo(
+              domain: domain,
+              walletIndexes:
+                  Uint64List.fromList([BigInt.from(appState.selectedWallet)]),
+              favicon: icon,
+              title: title,
+              description: pageInfo['description'] as String?,
+              colors: ColorsInfo(
+                primary: colorsMap?['primary'] as String? ?? '#FFFFFF',
+                secondary: colorsMap?['secondary'] as String?,
+                background: colorsMap?['background'] as String?,
+                text: colorsMap?['text'] as String?,
+              ),
+              lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+              canReadAccounts: true,
+              canRequestSignatures: true,
+              canSuggestTokens: false,
+              canSuggestTransactions: true,
+            );
+
+            if (accepted) {
+              await createNewConnection(conn: connectionInfo);
+              await appState.syncConnections();
+            }
+
             _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
               'uuid': uuid,
               'account':
