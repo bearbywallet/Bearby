@@ -33,29 +33,28 @@ class _WebViewPageState extends State<WebViewPage> {
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('Received from JS: ${message.message}');
-          String jsCode = 'window.postMessage(${message.message}, "*");';
-          _webViewController.runJavaScript(jsCode).catchError((e) {
-            debugPrint('Error sending message back to JS: $e');
-          });
+          debugPrint('Received from web: ${message.message}');
+          _webViewController.runJavaScript(
+            'window.postMessage(${message.message}, "*")',
+          );
         },
       )
       ..setNavigationDelegate(
         NavigationDelegate(
-          onPageStarted: (String url) => setState(() {
-            _isLoading = true;
-            _hasError = false;
-          }),
+          onPageStarted: (String url) async {
+            setState(() {
+              _isLoading = true;
+              _hasError = false;
+            });
+            String jsCode =
+                await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+            await _webViewController.runJavaScript(jsCode);
+          },
           onPageFinished: (String url) async {
             setState(() => _isLoading = false);
-            try {
-              String jsCode =
-                  await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-              await _webViewController.runJavaScript(jsCode);
-              debugPrint('inpage.js injected successfully');
-            } catch (e) {
-              debugPrint('Error injecting inpage.js: $e');
-            }
+            String jsCode =
+                await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+            await _webViewController.runJavaScript(jsCode);
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -114,7 +113,7 @@ class _WebViewPageState extends State<WebViewPage> {
               onTap: () {},
               color: theme.primaryPurple,
             ),
-            const SizedBox(width: 4),
+            SizedBox(width: 4),
             Expanded(
               child: Text(
                 widget.initialUrl,
@@ -150,21 +149,21 @@ class _WebViewPageState extends State<WebViewPage> {
                     onTap: () {},
                     color: theme.textSecondary,
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   Text('Failed to load',
                       style: TextStyle(
                           color: theme.textPrimary,
                           fontSize: 20,
                           fontWeight: FontWeight.bold)),
-                  const SizedBox(height: 10),
+                  SizedBox(height: 10),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    padding: EdgeInsets.symmetric(horizontal: 20),
                     child: Text(_errorMessage,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                             color: theme.textSecondary, fontSize: 16)),
                   ),
-                  const SizedBox(height: 20),
+                  SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _refreshPage,
                     style: ElevatedButton.styleFrom(

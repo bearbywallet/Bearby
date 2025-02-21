@@ -37,9 +37,10 @@ class _BrowserPageState extends State<BrowserPage>
   void _handleSearch(String value) {
     if (value.isNotEmpty) {
       String query = value.trim();
-      String url;
+      String url = query;
 
-      if (Uri.tryParse(query)?.hasAbsolutePath ?? false) {
+      final uri = Uri.tryParse(query);
+      if (uri != null && (uri.hasScheme && uri.hasAuthority)) {
         url = query.startsWith('http://') || query.startsWith('https://')
             ? query
             : 'https://$query';
