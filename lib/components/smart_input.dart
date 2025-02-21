@@ -12,7 +12,7 @@ class SmartInput extends StatefulWidget {
   final Function(String)? onChanged;
   final Function()? onLeftIconTap;
   final Function()? onRightIconTap;
-  final Function()? onSubmitted;
+  final Function(String)? onSubmitted;
   final Function(bool)? onFocusChanged;
   final String? leftIconPath;
   final String? rightIconPath;
@@ -24,6 +24,8 @@ class SmartInput extends StatefulWidget {
   final EdgeInsets? padding;
   final EdgeInsets? iconPadding;
   final bool disabled;
+  final bool autofocus;
+  final TextInputType keyboardType;
 
   const SmartInput({
     super.key,
@@ -45,6 +47,8 @@ class SmartInput extends StatefulWidget {
     this.padding,
     this.iconPadding,
     this.disabled = false,
+    this.autofocus = false,
+    this.keyboardType = TextInputType.text,
   });
 
   @override
@@ -71,6 +75,14 @@ class SmartInputState extends State<SmartInput>
         .animate(_shakeController);
 
     _focusNode.addListener(_handleFocusChange);
+
+    if (widget.autofocus) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted && !widget.disabled) {
+          FocusScope.of(context).requestFocus(_focusNode);
+        }
+      });
+    }
   }
 
   void _handleFocusChange() {
@@ -141,7 +153,6 @@ class SmartInputState extends State<SmartInput>
         ? (widget.focusedBorderColor ?? defaultFocusedBorderColor)
         : theme.textSecondary;
 
-    // Get the actual border color based on the widget's state
     Color getBorderColor() {
       if (widget.disabled) {
         return widget.borderColor ?? Colors.transparent;
@@ -194,9 +205,9 @@ class SmartInputState extends State<SmartInput>
                       obscureText: widget.obscureText,
                       onChanged: widget.onChanged,
                       enabled: !widget.disabled,
-                      onFieldSubmitted: (_) {
+                      onFieldSubmitted: (value) {
                         if (!widget.disabled) {
-                          widget.onSubmitted?.call();
+                          widget.onSubmitted?.call(value);
                         }
                       },
                       style: TextStyle(
@@ -215,6 +226,10 @@ class SmartInputState extends State<SmartInput>
                           fontSize: widget.fontSize,
                         ),
                       ),
+                      autocorrect: false,
+                      enableSuggestions: false,
+                      autofillHints: null,
+                      keyboardType: widget.keyboardType,
                     ),
                   ),
                 ),

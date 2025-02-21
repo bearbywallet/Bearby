@@ -7,6 +7,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/pages/web_view.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});
@@ -31,6 +32,38 @@ class _BrowserPageState extends State<BrowserPage>
     _tabController.dispose();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _handleSearch(String value) {
+    if (value.isNotEmpty) {
+      String query = value.trim();
+      String url;
+
+      if (Uri.tryParse(query)?.hasAbsolutePath ?? false) {
+        url = query.startsWith('http://') || query.startsWith('https://')
+            ? query
+            : 'https://$query';
+      } else {
+        if (isDomainName(query)) {
+          url = 'https://$query';
+        } else {
+          url = 'https://duckduckgo.com/?q=${Uri.encodeQueryComponent(query)}';
+        }
+      }
+
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => WebViewPage(initialUrl: url),
+        ),
+      );
+    }
+  }
+
+  bool isDomainName(String input) {
+    final domainRegex = RegExp(
+        r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$');
+    return domainRegex.hasMatch(input);
   }
 
   @override
@@ -111,11 +144,14 @@ class _BrowserPageState extends State<BrowserPage>
                 hint: 'Search or enter address',
                 leftIconPath: 'assets/icons/search.svg',
                 onChanged: (value) {},
+                onSubmitted: _handleSearch,
                 borderColor: theme.textPrimary,
                 focusedBorderColor: theme.primaryPurple,
                 height: 48,
                 fontSize: 16,
                 padding: const EdgeInsets.symmetric(horizontal: 16),
+                autofocus: false,
+                keyboardType: TextInputType.url,
               ),
             ),
           ],
@@ -138,7 +174,14 @@ class _BrowserPageState extends State<BrowserPage>
               height: 24,
               onTap: () {},
               color: theme.textPrimary)),
-      onPressed: () {},
+      onPressed: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => WebViewPage(initialUrl: url),
+          ),
+        );
+      },
       backgroundColor: theme.cardBackground,
       textColor: theme.primaryPurple,
     );

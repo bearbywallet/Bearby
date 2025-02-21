@@ -236,7 +236,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                 SmartInput(
                                   controller: _accountNameController,
                                   hint: 'Account name',
-                                  onSubmitted: () async {
+                                  onSubmitted: (_) async {
                                     if (_accountNameController
                                         .text.isNotEmpty) {
                                       await changeAccountName(

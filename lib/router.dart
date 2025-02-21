@@ -21,6 +21,7 @@ import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
 import 'package:zilpay/pages/wallet.dart';
+import 'package:zilpay/pages/web_view.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -86,6 +87,7 @@ class AppRouter {
       '/reveal_sk',
       '/reveal_bip39',
       '/add_account',
+      '/web_view',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -127,6 +129,8 @@ class AppRouter {
             return wrapWithProviders(const AddWalletOptionsPage());
           case '/initial':
             return wrapWithProviders(const InitialPage());
+          case '/web_view':
+            return wrapWithProviders(const WebViewPage(initialUrl: ''));
           default:
             return wrapWithProviders(const InitialPage());
         }
@@ -163,6 +167,8 @@ class AppRouter {
             return wrapWithProviders(const AddWalletOptionsPage());
           case '/initial':
             return wrapWithProviders(const InitialPage());
+          case '/web_view':
+            return wrapWithProviders(const WebViewPage(initialUrl: ''));
           default:
             return wrapWithProviders(const LoginPage());
         }
@@ -229,6 +235,12 @@ class AppRouter {
         return wrapWithProviders(const RestoreSecretPhrasePage());
       case '/initial':
         return wrapWithProviders(const InitialPage());
+      case '/web_view':
+        final uri =
+            Uri.tryParse(settings.name?.replaceFirst('/web_view?', '') ?? '') ??
+                Uri();
+        return wrapWithProviders(
+            WebViewPage(initialUrl: uri.queryParameters['url'] ?? ''));
       default:
         return wrapWithProviders(const MainPage());
     }

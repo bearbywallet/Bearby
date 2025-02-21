@@ -123,7 +123,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscurePassword,
-                        onSubmitted: () => _onPasswordSubmit(
+                        onSubmitted: (_) => _onPasswordSubmit(
                           BigInt.from(state.selectedWallet),
                         ),
                         rightIconPath: _obscurePassword

@@ -125,7 +125,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscurePassword,
-                        onSubmitted: () => _onPasswordSubmit(
+                        onSubmitted: (_) => _onPasswordSubmit(
                           BigInt.from(state.selectedWallet),
                           state.wallet!.selectedAccount,
                         ),

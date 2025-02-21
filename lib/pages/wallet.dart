@@ -188,7 +188,7 @@ class _WalletPageState extends State<WalletPage> {
     return SmartInput(
       controller: _walletNameController,
       hint: 'Wallet name',
-      onSubmitted: () async {
+      onSubmitted: (_) async {
         if (_walletNameController.text.isNotEmpty) {
           await changeWalletName(
             walletIndex: BigInt.from(state.selectedWallet),
