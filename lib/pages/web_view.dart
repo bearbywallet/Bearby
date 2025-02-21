@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -5,6 +6,8 @@ import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/config/zilliqa_legacy_messages.dart';
+import 'package:zilpay/modals/app_connect.dart';
 
 class WebViewPage extends StatefulWidget {
   final String initialUrl;
@@ -30,13 +33,19 @@ class _WebViewPageState extends State<WebViewPage> {
     _webViewController = WebViewController()
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
+      ..setUserAgent('ZilPayBrowser/1.0') // Добавлен User-Agent
       ..addJavaScriptChannel(
         'FlutterWebView',
         onMessageReceived: (JavaScriptMessage message) {
-          debugPrint('Received from web: ${message.message}');
-          _webViewController.runJavaScript(
-            'window.postMessage(${message.message}, "*")',
-          );
+          try {
+            final jsonData =
+                jsonDecode(message.message) as Map<String, dynamic>;
+            final zilPayMessage = ZilPayMessage.fromJson(jsonData);
+            _handleZilPayMessage(zilPayMessage);
+          } catch (e) {
+            debugPrint(
+                'Failed to parse message: ${message.message}, error: $e');
+          }
         },
       )
       ..setNavigationDelegate(
@@ -72,6 +81,73 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   void _refreshPage() => _webViewController.reload();
+
+  void _sendResponse(String type, Map<String, dynamic> payload) {
+    final response = ZilPayMessage(type: type, payload: payload).toJson();
+    final jsonString = jsonEncode(response);
+    _webViewController.runJavaScript('window.postMessage($jsonString, "*")');
+  }
+
+  void _handleZilPayMessage(ZilPayMessage message) {
+    final appState = Provider.of<AppState>(context, listen: false);
+
+    switch (message.type) {
+      case ZilliqaLegacyMessages.getWalletData:
+        _sendResponse(ZilliqaLegacyMessages.getWalletData, {
+          'address': appState.wallet?.walletAddress ?? '',
+          'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
+          'isLocked': appState.wallet == null,
+        });
+        break;
+
+      case ZilliqaLegacyMessages.lockStatusUpdated:
+        debugPrint('Lock status updated: ${message.payload}');
+        break;
+
+      case ZilliqaLegacyMessages.contentProxyMethod:
+        debugPrint('Content proxy method: ${message.payload}');
+        break;
+
+      case ZilliqaLegacyMessages.callToSignTx:
+        debugPrint('Sign transaction request: ${message.payload}');
+        break;
+
+      case ZilliqaLegacyMessages.signMessage:
+        debugPrint('Sign message request: ${message.payload}');
+        break;
+
+      case ZilliqaLegacyMessages.connectApp:
+        final title = message.payload['title'] as String? ?? 'Unknown App';
+        final uuid = message.payload['uuid'] as String? ?? '';
+        final icon = message.payload['icon'] as String? ?? '';
+
+        showAppConnectModal(
+          context: context,
+          title: title,
+          uuid: uuid,
+          iconUrl: icon,
+          onDecision: (accepted) {
+            _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
+              'uuid': uuid,
+              'account':
+                  accepted ? {'address': appState.account?.addr ?? ''} : null,
+            });
+          },
+        );
+        break;
+
+      case ZilliqaLegacyMessages.disconnectApp:
+        debugPrint('Disconnect app request: ${message.payload}');
+        _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
+          'uuid': message.payload['uuid'] as String? ?? '',
+          'account': null,
+        });
+        break;
+
+      default:
+        debugPrint('Unhandled message type: ${message.type}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
