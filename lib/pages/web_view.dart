@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -58,10 +59,12 @@ class _WebViewPageState extends State<WebViewPage> {
           onProgress: (_) async {
             await _initializeZilPayInjection(appState);
           },
-          onPageFinished: (String url) async {
+          onPageFinished: (String url) {
             setState(() {
               _isLoading = false;
             });
+
+            _legacyHandler.handleStartBlockWorker(appState);
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -186,15 +189,17 @@ class _WebViewPageState extends State<WebViewPage> {
           ),
           actions: [
             IconButton(
-              icon: HoverSvgIcon(
-                assetName: 'assets/icons/close.svg',
-                width: 24,
-                height: 24,
-                onTap: () => Navigator.pop(context),
-                color: theme.textPrimary,
-              ),
-              onPressed: () => Navigator.pop(context),
-            ),
+                icon: HoverSvgIcon(
+                  assetName: 'assets/icons/close.svg',
+                  width: 24,
+                  height: 24,
+                  onTap: () => Navigator.pop(context),
+                  color: theme.textPrimary,
+                ),
+                onPressed: () {
+                  stopBlockWorker();
+                  Navigator.pop(context);
+                }),
           ],
         ),
       ),

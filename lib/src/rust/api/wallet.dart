@@ -98,6 +98,10 @@ Future<(String, String)> zilliqaGetBech32Base16Address(
     RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<String> zilliqaLegacyBase16ToBech32({required String base16}) =>
+    RustLib.instance.api
+        .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;

@@ -279,8 +279,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                 children: [
                   Row(
                     children: [
-                      Text(option.icon, style: const TextStyle(fontSize: 24)),
-                      const SizedBox(width: 12),
                       Expanded(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -303,29 +301,34 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           ],
                         ),
                       ),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            formatGasPrice(
-                              totalGasFee,
-                              token.decimals,
-                              token.symbol,
+                      SizedBox(
+                        width: 150,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.end,
+                          children: [
+                            Text(
+                              formatGasPrice(
+                                totalGasFee,
+                                token.decimals,
+                                token.symbol,
+                              ),
+                              overflow: TextOverflow.ellipsis,
+                              maxLines: 1,
+                              style: TextStyle(
+                                color: textColor,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                            style: TextStyle(
-                              color: textColor,
-                              fontWeight: FontWeight.w600,
+                            const SizedBox(height: 4),
+                            Text(
+                              option.description,
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 12,
+                              ),
                             ),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            option.description,
-                            style: TextStyle(
-                              color: theme.textSecondary,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
+                          ],
+                        ),
                       ),
                     ],
                   ),

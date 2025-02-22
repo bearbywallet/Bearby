@@ -3,6 +3,7 @@ use zilpay::background::Background;
 use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
 use zilpay::errors::wallet::WalletErrors;
+use zilpay::proto::address::Address;
 use zilpay::token::ft::FToken;
 use zilpay::wallet::wallet_crypto::WalletCrypto;
 use zilpay::wallet::wallet_storage::StorageOperations;
@@ -348,4 +349,11 @@ pub async fn zilliqa_get_bech32_base16_address(
     })
     .await
     .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String> {
+    let addr = Address::from_zil_base16(&base16).map_err(|e| e.to_string())?;
+
+    Ok(addr.get_zil_bech32().unwrap_or_default())
 }
