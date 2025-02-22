@@ -36,6 +36,9 @@ Future<List<HistoricalTransactionInfo>> getHistory(
     RustLib.instance.api
         .crateApiTransactionGetHistory(walletIndex: walletIndex);
 
+Future<void> clearHistory({required BigInt walletIndex}) => RustLib.instance.api
+    .crateApiTransactionClearHistory(walletIndex: walletIndex);
+
 Future<TransactionRequestInfo> createTokenTransfer(
         {required TokenTransferParamsInfo params}) =>
     RustLib.instance.api.crateApiTransactionCreateTokenTransfer(params: params);

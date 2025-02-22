@@ -6,7 +6,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{decode_session, parse_address, with_service};
+use crate::utils::utils::{decode_session, parse_address, with_service, with_service_mut};
 
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
@@ -91,6 +91,20 @@ pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactio
             history.into_iter().map(|tx| tx.into()).rev().collect();
 
         Ok(history)
+    })
+    .await
+    .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn clear_history(wallet_index: usize) -> Result<(), String> {
+    with_service_mut(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        wallet
+            .clear_history()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
     })
     .await
     .map_err(Into::into)

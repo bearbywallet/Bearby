@@ -72,7 +72,8 @@ class Web3Utils {
     return color;
   }
 
-  static Future<(String?, BigInt?, FTokenInfo?)> fetchTokenMetaLegacyZilliqa({
+  static Future<(String?, BigInt?, FTokenInfo?, String?)>
+      fetchTokenMetaLegacyZilliqa({
     required dynamic data,
     required String contracAddr,
     required BigInt walletIndex,
@@ -80,6 +81,7 @@ class Web3Utils {
     String? toAddress;
     BigInt? tokenAmount;
     FTokenInfo? tokenInfo;
+    String? teg;
 
     try {
       if (data != null) {
@@ -90,10 +92,12 @@ class Web3Utils {
         } else if (data is Map<String, dynamic>) {
           dataMap = data;
         } else {
-          return (null, null, null);
+          return (null, null, null, null);
         }
 
-        if (dataMap['_tag'] == 'Transfer' && dataMap['params'] is List) {
+        teg = dataMap['_tag'];
+
+        if (teg == 'Transfer' && dataMap['params'] is List) {
           List params = dataMap['params'];
 
           final typedParams = params
@@ -136,6 +140,6 @@ class Web3Utils {
       }
     } catch (_) {}
 
-    return (toAddress, tokenAmount, tokenInfo);
+    return (toAddress, tokenAmount, tokenInfo, teg);
   }
 }

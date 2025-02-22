@@ -140,6 +140,9 @@ class _BrowserPageState extends State<BrowserPage>
                 keyboardType: TextInputType.url,
               ),
             ),
+            const SizedBox(
+              height: 4,
+            ),
           ],
         ),
       ),

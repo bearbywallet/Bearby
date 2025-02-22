@@ -204,7 +204,7 @@ class ZilPayLegacyHandler {
                   amount, appState.wallet!.tokens[tokenIndex].decimals)
               .toString();
 
-          final (toAddress, ftAmount, ftMeta) =
+          final (toAddress, ftAmount, ftMeta, teg) =
               await Web3Utils.fetchTokenMetaLegacyZilliqa(
             data: data,
             contracAddr: toAddr,
@@ -226,7 +226,7 @@ class ZilPayLegacyHandler {
           final metadata = TransactionMetadataInfo(
             chainHash: chainHash,
             hash: null,
-            info: null,
+            info: teg,
             icon: icon,
             title: title,
             signer: null,

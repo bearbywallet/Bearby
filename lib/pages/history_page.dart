@@ -3,11 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/transaction_item.dart';
+import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/transaction_details_modal.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
+
+enum SortType { date, status }
 
 class HistoryPage extends StatefulWidget {
   const HistoryPage({super.key});
@@ -19,11 +23,19 @@ class HistoryPage extends StatefulWidget {
 class _HistoryPageState extends State<HistoryPage> {
   List<HistoricalTransactionInfo> _history = [];
   bool _isLoading = true;
+  SortType _sortType = SortType.date;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
     _loadInitialHistory();
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
   }
 
   Future<void> _loadInitialHistory() async {
@@ -70,6 +82,92 @@ class _HistoryPageState extends State<HistoryPage> {
     }
   }
 
+  Future<void> _clearAllTransactions(AppState appState) async {
+    try {
+      await clearHistory(
+        walletIndex: BigInt.from(appState.selectedWallet),
+      );
+      if (mounted) {
+        setState(() {
+          _history = [];
+        });
+      }
+    } catch (e) {
+      debugPrint("Error clearing transactions: $e");
+    }
+  }
+
+  List<HistoricalTransactionInfo> _getSortedAndFilteredHistory() {
+    List<HistoricalTransactionInfo> filteredHistory =
+        _history.where((transaction) {
+      final searchText = _searchController.text.toLowerCase();
+      return [
+        transaction.transactionHash,
+        transaction.amount,
+        transaction.sender,
+        transaction.recipient,
+        transaction.contractAddress ?? '',
+        transaction.title ?? '',
+        transaction.error ?? '',
+        transaction.tokenInfo?.symbol ?? '',
+        transaction.chainType,
+      ].any((field) => field.toLowerCase().contains(searchText));
+    }).toList();
+
+    if (_sortType == SortType.date) {
+      filteredHistory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
+    } else {
+      filteredHistory.sort((a, b) => a.status.index.compareTo(b.status.index));
+    }
+
+    return filteredHistory;
+  }
+
+  Widget _buildHeader(AppState appState, double adaptivePadding) {
+    return Padding(
+      padding: EdgeInsets.all(adaptivePadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            'Transaction History',
+            style: TextStyle(
+              color: appState.currentTheme.textPrimary,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          Row(
+            children: [
+              HoverSvgIcon(
+                assetName: 'assets/icons/down_arrow.svg',
+                width: 24,
+                height: 24,
+                onTap: () {
+                  setState(() {
+                    _sortType = _sortType == SortType.date
+                        ? SortType.status
+                        : SortType.date;
+                  });
+                },
+                color: appState.currentTheme.textPrimary,
+              ),
+              HoverSvgIcon(
+                assetName: 'assets/icons/minus.svg',
+                width: 24,
+                height: 24,
+                onTap: () {
+                  _clearAllTransactions(appState);
+                },
+                color: appState.currentTheme.danger,
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildContent(AppState appState, double adaptivePadding) {
     if (_isLoading) {
       return Center(
@@ -79,7 +177,8 @@ class _HistoryPageState extends State<HistoryPage> {
       );
     }
 
-    if (_history.isEmpty) {
+    final sortedHistory = _getSortedAndFilteredHistory();
+    if (sortedHistory.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -100,9 +199,9 @@ class _HistoryPageState extends State<HistoryPage> {
     return Padding(
       padding: EdgeInsets.all(adaptivePadding),
       child: Column(
-        children: _history.asMap().entries.map((entry) {
+        children: sortedHistory.asMap().entries.map((entry) {
           final transaction = entry.value;
-          final isLast = entry.key == _history.length - 1;
+          final isLast = entry.key == sortedHistory.length - 1;
 
           return HistoryItem(
             transaction: transaction,
@@ -124,40 +223,67 @@ class _HistoryPageState extends State<HistoryPage> {
     final appState = Provider.of<AppState>(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    return SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: CustomScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            slivers: [
-              CupertinoSliverRefreshControl(
-                onRefresh: () async {
-                  await _checkPendingTransactions(appState);
-                },
-                builder: (
-                  BuildContext context,
-                  RefreshIndicatorMode refreshState,
-                  double pulledExtent,
-                  double refreshTriggerPullDistance,
-                  double refreshIndicatorExtent,
-                ) {
-                  return LinearRefreshIndicator(
-                    pulledExtent: pulledExtent,
-                    refreshTriggerPullDistance: refreshTriggerPullDistance,
-                    refreshIndicatorExtent: refreshIndicatorExtent,
-                  );
-                },
+    return Scaffold(
+      backgroundColor: appState.currentTheme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: CustomScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                slivers: [
+                  CupertinoSliverRefreshControl(
+                    onRefresh: () async {
+                      await _checkPendingTransactions(appState);
+                    },
+                    builder: (
+                      BuildContext context,
+                      RefreshIndicatorMode refreshState,
+                      double pulledExtent,
+                      double refreshTriggerPullDistance,
+                      double refreshIndicatorExtent,
+                    ) {
+                      return LinearRefreshIndicator(
+                        pulledExtent: pulledExtent,
+                        refreshTriggerPullDistance: refreshTriggerPullDistance,
+                        refreshIndicatorExtent: refreshIndicatorExtent,
+                      );
+                    },
+                  ),
+                  SliverToBoxAdapter(
+                    child: Column(
+                      children: [
+                        _buildHeader(appState, adaptivePadding),
+                        _buildContent(appState, adaptivePadding),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-              SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    _buildContent(appState, adaptivePadding),
-                  ],
-                ),
+            ),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: SmartInput(
+                controller: _searchController,
+                hint: 'Search transactions...',
+                leftIconPath: 'assets/icons/search.svg',
+                onChanged: (value) {
+                  setState(() {});
+                },
+                onSubmitted: (value) {},
+                borderColor: appState.currentTheme.textPrimary,
+                focusedBorderColor: appState.currentTheme.primaryPurple,
+                height: 48,
+                fontSize: 16,
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                autofocus: false,
+                keyboardType: TextInputType.text,
               ),
-            ],
-          ),
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+          ],
         ),
       ),
     );
