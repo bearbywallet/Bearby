@@ -58,11 +58,13 @@ class ZilPayLegacyHandler {
     required this.initialUrl,
   });
 
-  void _sendResponse(String type, Map<String, Object?> payload, String uuid) {
+  Future<void> _sendResponse(
+      String type, Map<String, Object?> payload, String uuid) async {
     final response =
         ZilPayLegacyMessage(type: type, payload: payload, uuid: uuid).toJson();
     final jsonString = jsonEncode(response);
-    webViewController.runJavaScript('window.postMessage($jsonString, "*")');
+    await webViewController
+        .runJavaScript('window.postMessage($jsonString, "*")');
   }
 
   Future<void> sendData(AppState appState) async {
@@ -86,7 +88,7 @@ class ZilPayLegacyHandler {
           'account': account,
           'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
           'isConnect': isConnected,
-          'isEnable': appState.wallet != null,
+          'isEnable': true,
         },
         "");
   }
@@ -164,13 +166,6 @@ class ZilPayLegacyHandler {
               favicon: icon,
               title: title,
               description: pageInfo['description'] as String?,
-              colors: ColorsInfo(
-                primary: colorsMap?['primary'] as String? ??
-                    appState.currentTheme.cardBackground.toString(),
-                secondary: colorsMap?['secondary'] as String?,
-                background: colorsMap?['background'] as String?,
-                text: colorsMap?['text'] as String?,
-              ),
               lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
               canReadAccounts: true,
               canRequestSignatures: true,
@@ -189,9 +184,12 @@ class ZilPayLegacyHandler {
               account = {"base16": base16, "bech32": bech32};
             }
 
-            _sendResponse(ZilliqaLegacyMessages.responseToDapp,
-                {'account': account}, message.uuid);
-            await sendData(appState);
+            await _sendResponse(
+                ZilliqaLegacyMessages.responseToDapp,
+                {
+                  'account': account,
+                },
+                message.uuid);
           },
         );
         break;

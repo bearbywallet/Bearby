@@ -54,17 +54,14 @@ class _WebViewPageState extends State<WebViewPage> {
               _isLoading = true;
               _hasError = false;
             });
-            String jsCode =
-                await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-            await _webViewController.runJavaScript(jsCode);
-            await _legacyHandler.sendData(appState);
+          },
+          onProgress: (_) async {
+            await _initializeZilPayInjection(appState);
           },
           onPageFinished: (String url) async {
-            setState(() => _isLoading = false);
-            String jsCode =
-                await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-            await _webViewController.runJavaScript(jsCode);
-            await _legacyHandler.sendData(appState);
+            setState(() {
+              _isLoading = false;
+            });
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -72,8 +69,8 @@ class _WebViewPageState extends State<WebViewPage> {
               _hasError = true;
               _errorMessage = error.description;
             });
-            ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text('Error: ${error.description}')));
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //     SnackBar(content: Text('Error: ${error.description}')));
           },
         ),
       )
@@ -85,7 +82,16 @@ class _WebViewPageState extends State<WebViewPage> {
     );
   }
 
-  void _refreshPage() => _webViewController.reload();
+  Future<void> _initializeZilPayInjection(AppState appState) async {
+    String jsCode =
+        await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+    await _webViewController.runJavaScript(jsCode);
+    await _legacyHandler.sendData(appState);
+  }
+
+  void _refreshPage() {
+    _webViewController.reload();
+  }
 
   Map<String, String> _splitDomain(String url) {
     final uri = Uri.parse(url);
@@ -109,80 +115,88 @@ class _WebViewPageState extends State<WebViewPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
-      appBar: AppBar(
-        backgroundColor: theme.cardBackground,
-        elevation: 0,
-        leading: IconButton(
-          icon: _isLoading
-              ? SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: CircularProgressIndicator(
-                    color: theme.primaryPurple,
-                    strokeWidth: 2,
-                  ),
-                )
-              : HoverSvgIcon(
-                  assetName: 'assets/icons/reload.svg',
-                  width: 24,
-                  height: 24,
-                  onTap: _refreshPage,
-                  color: theme.textPrimary,
-                ),
-          onPressed: _refreshPage,
-        ),
-        title: Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            HoverSvgIcon(
-              assetName: 'assets/icons/lock.svg',
-              width: 16,
-              height: 16,
-              onTap: () {},
-              color: theme.primaryPurple,
-            ),
-            SizedBox(width: 4),
-            Expanded(
-              child: RichText(
-                text: TextSpan(
-                  children: [
-                    if (domainParts['subdomain']!.isNotEmpty)
-                      TextSpan(
-                        text: '${domainParts['subdomain']}.',
-                        style: TextStyle(
-                          color: theme.textSecondary.withValues(alpha: 0.7),
-                          fontSize: 12,
-                        ),
-                      ),
-                    TextSpan(
-                      text: domainParts['domain'],
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.bold,
-                      ),
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(50.0),
+        child: AppBar(
+          backgroundColor: theme.cardBackground,
+          elevation: 0,
+          leading: IconButton(
+            icon: _isLoading
+                ? SizedBox(
+                    width: 24,
+                    height: 24,
+                    child: CircularProgressIndicator(
+                      color: theme.primaryPurple,
+                      strokeWidth: 2,
                     ),
-                  ],
-                ),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 1,
+                  )
+                : HoverSvgIcon(
+                    assetName: 'assets/icons/reload.svg',
+                    width: 24,
+                    height: 24,
+                    onTap: _refreshPage,
+                    color: theme.textPrimary,
+                  ),
+            onPressed: _refreshPage,
+          ),
+          title: Stack(
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/lock.svg',
+                    width: 16,
+                    height: 16,
+                    onTap: () {},
+                    color: theme.primaryPurple,
+                  ),
+                  const SizedBox(width: 4),
+                  Expanded(
+                    child: RichText(
+                      text: TextSpan(
+                        children: [
+                          if (domainParts['subdomain']!.isNotEmpty)
+                            TextSpan(
+                              text: '${domainParts['subdomain']}.',
+                              style: TextStyle(
+                                color:
+                                    theme.textSecondary.withValues(alpha: 0.7),
+                                fontSize: 12,
+                              ),
+                            ),
+                          TextSpan(
+                            text: domainParts['domain'],
+                            style: TextStyle(
+                              color: theme.textPrimary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 1,
+                    ),
+                  ),
+                ],
               ),
+            ],
+          ),
+          actions: [
+            IconButton(
+              icon: HoverSvgIcon(
+                assetName: 'assets/icons/close.svg',
+                width: 24,
+                height: 24,
+                onTap: () => Navigator.pop(context),
+                color: theme.textPrimary,
+              ),
+              onPressed: () => Navigator.pop(context),
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: HoverSvgIcon(
-              assetName: 'assets/icons/close.svg',
-              width: 24,
-              height: 24,
-              onTap: () => Navigator.pop(context),
-              color: theme.textPrimary,
-            ),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ],
       ),
       body: _hasError
           ? Center(
@@ -196,27 +210,37 @@ class _WebViewPageState extends State<WebViewPage> {
                     onTap: () {},
                     color: theme.textSecondary,
                   ),
-                  SizedBox(height: 20),
-                  Text('Failed to load',
-                      style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold)),
-                  SizedBox(height: 10),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(_errorMessage,
-                        textAlign: TextAlign.center,
-                        style: TextStyle(
-                            color: theme.textSecondary, fontSize: 16)),
+                  const SizedBox(height: 20),
+                  Text(
+                    'Failed to load',
+                    style: TextStyle(
+                      color: theme.textPrimary,
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                  SizedBox(height: 20),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Text(
+                      _errorMessage,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: theme.textSecondary,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: _refreshPage,
                     style: ElevatedButton.styleFrom(
-                        backgroundColor: theme.primaryPurple),
-                    child: Text('Try Again',
-                        style: TextStyle(color: theme.background)),
+                      backgroundColor: theme.primaryPurple,
+                    ),
+                    child: Text(
+                      'Try Again',
+                      style: TextStyle(color: theme.background),
+                    ),
                   ),
                 ],
               ),
