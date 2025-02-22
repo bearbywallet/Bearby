@@ -18,8 +18,6 @@ Future<BackgroundState> loadService({required String path}) =>
 
 Future<void> stopService() => RustLib.instance.api.crateApiBackendStopService();
 
-Stream<int> tick() => RustLib.instance.api.crateApiBackendTick();
-
 Future<bool> isServiceRunning() =>
     RustLib.instance.api.crateApiBackendIsServiceRunning();
 

@@ -1,5 +1,3 @@
-use std::{thread::sleep, time::Duration};
-
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::{
@@ -46,19 +44,6 @@ pub async fn stop_service() -> Result<(), String> {
     } else {
         Err("Service is not running".to_string())
     }
-}
-
-pub fn tick(sink: StreamSink<i32>) -> Result<(), String> {
-    let mut ticks = 0;
-    loop {
-        sink.add(ticks).unwrap();
-        sleep(Duration::from_secs(1));
-        if ticks == i32::MAX {
-            break;
-        }
-        ticks += 1;
-    }
-    Ok(())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]

@@ -13,6 +13,11 @@ Future<List<NetworkConfigInfo>> getProviders() =>
 Future<NetworkConfigInfo> getProvider({required BigInt chainHash}) =>
     RustLib.instance.api.crateApiProviderGetProvider(chainHash: chainHash);
 
+Future<String> providerReqProxy(
+        {required String payload, required BigInt chainHash}) =>
+    RustLib.instance.api.crateApiProviderProviderReqProxy(
+        payload: payload, chainHash: chainHash);
+
 Future<BigInt> addProvider({required NetworkConfigInfo providerConfig}) =>
     RustLib.instance.api
         .crateApiProviderAddProvider(providerConfig: providerConfig);

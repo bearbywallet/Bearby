@@ -1,4 +1,8 @@
-use crate::{models::provider::NetworkConfigInfo, utils::utils::with_service};
+use crate::{
+    models::provider::NetworkConfigInfo,
+    service::service::BACKGROUND_SERVICE,
+    utils::{errors::ServiceError, utils::with_service},
+};
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
@@ -31,6 +35,23 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
     })
     .await
     .map_err(Into::into)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<String, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let provider = service
+        .core
+        .get_provider(chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+
+    let res = provider
+        .proxy_req(payload)
+        .await
+        .map_err(ServiceError::NetworkErrors)?;
+
+    Ok(res.to_string())
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
