@@ -85,8 +85,8 @@ class _BrowserPageState extends State<BrowserPage>
             TabBar(
               controller: _tabController,
               tabs: const [
-                Tab(text: 'Explore'),
                 Tab(text: 'Connected'),
+                Tab(text: 'Explore'),
               ],
               labelStyle: TextStyle(
                   color: theme.textPrimary,
@@ -101,12 +101,13 @@ class _BrowserPageState extends State<BrowserPage>
               unselectedLabelColor: theme.textSecondary,
               indicatorSize: TabBarIndicatorSize.label,
               splashFactory: NoSplash.splashFactory,
-              dividerColor: Colors.transparent, // Убирает белую полоску
+              dividerColor: Colors.transparent,
             ),
             Expanded(
               child: TabBarView(
                 controller: _tabController,
                 children: [
+                  _buildConnectedTab(connections, theme, padding),
                   Center(
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
@@ -119,7 +120,6 @@ class _BrowserPageState extends State<BrowserPage>
                       ],
                     ),
                   ),
-                  _buildConnectedTab(connections, theme, padding),
                 ],
               ),
             ),
@@ -129,8 +129,12 @@ class _BrowserPageState extends State<BrowserPage>
                 controller: _searchController,
                 hint: 'Search or enter address',
                 leftIconPath: 'assets/icons/search.svg',
+                rightIconPath: "assets/icons/close.svg",
                 onChanged: (value) {},
                 onSubmitted: _handleSearch,
+                onRightIconTap: () {
+                  _searchController.text = "";
+                },
                 borderColor: theme.textPrimary,
                 focusedBorderColor: theme.primaryPurple,
                 height: 48,

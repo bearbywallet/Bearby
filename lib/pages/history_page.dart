@@ -267,8 +267,12 @@ class _HistoryPageState extends State<HistoryPage> {
                 controller: _searchController,
                 hint: 'Search transactions...',
                 leftIconPath: 'assets/icons/search.svg',
+                rightIconPath: "assets/icons/close.svg",
                 onChanged: (value) {
                   setState(() {});
+                },
+                onRightIconTap: () {
+                  _searchController.text = "";
                 },
                 onSubmitted: (value) {},
                 borderColor: appState.currentTheme.textPrimary,
