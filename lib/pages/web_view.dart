@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -43,6 +44,7 @@ class _WebViewPageState extends State<WebViewPage> {
             final jsonData =
                 jsonDecode(message.message) as Map<String, Object?>;
             final zilPayMessage = ZilPayMessage.fromJson(jsonData);
+
             _handleZilPayMessage(zilPayMessage);
           } catch (e) {
             debugPrint(
@@ -85,8 +87,9 @@ class _WebViewPageState extends State<WebViewPage> {
 
   void _refreshPage() => _webViewController.reload();
 
-  void _sendResponse(String type, Map<String, Object?> payload) {
-    final response = ZilPayMessage(type: type, payload: payload).toJson();
+  void _sendResponse(String type, Map<String, Object?> payload, String uuid) {
+    final response =
+        ZilPayMessage(type: type, payload: payload, uuid: uuid).toJson();
     final jsonString = jsonEncode(response);
     _webViewController.runJavaScript('window.postMessage($jsonString, "*")');
   }
@@ -162,12 +165,15 @@ class _WebViewPageState extends State<WebViewPage> {
     final currentDomain = Uri.parse(widget.initialUrl).host;
     final isConnected = _isDomainConnected(currentDomain, appState.connections);
 
-    _sendResponse(ZilliqaLegacyMessages.getWalletData, {
-      'account': appState.wallet?.walletAddress ?? '',
-      'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-      'isConnect': isConnected,
-      'isEnable': appState.wallet != null,
-    });
+    _sendResponse(
+        ZilliqaLegacyMessages.getWalletData,
+        {
+          'account': appState.account?.addr ?? '',
+          'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
+          'isConnect': isConnected,
+          'isEnable': appState.wallet != null,
+        },
+        "");
   }
 
   void _handleZilPayMessage(ZilPayMessage message) async {
@@ -180,7 +186,29 @@ class _WebViewPageState extends State<WebViewPage> {
         break;
 
       case ZilliqaLegacyMessages.contentProxyMethod:
-        debugPrint('Content proxy method: ${message.payload}');
+        AppState appState = Provider.of<AppState>(context, listen: false);
+        BigInt chainHash = appState.chain?.chainHash ?? BigInt.zero;
+        debugPrint('Content proxy method: $message');
+        try {
+          String jsonRes = await providerReqProxy(
+            payload: message.payloadToJsonString(),
+            chainHash: chainHash,
+          );
+
+          _sendResponse(
+              ZilliqaLegacyMessages.responseToDapp,
+              {
+                'resolve': jsonRes,
+              },
+              message.uuid);
+        } catch (e) {
+          _sendResponse(
+              ZilliqaLegacyMessages.responseToDapp,
+              {
+                'reject': e.toString(),
+              },
+              message.uuid);
+        }
         break;
 
       case ZilliqaLegacyMessages.callToSignTx:
@@ -197,17 +225,18 @@ class _WebViewPageState extends State<WebViewPage> {
             _isDomainConnected(currentDomain, appState.connections);
 
         if (isAlreadyConnected) {
-          _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
-            'uuid': message.payload['uuid'] as String? ?? '',
-            'account': appState.account != null
-                ? {'address': appState.account!.addr}
-                : null,
-          });
+          _sendResponse(
+              ZilliqaLegacyMessages.responseToDapp,
+              {
+                'account': appState.account != null
+                    ? {'address': appState.account!.addr}
+                    : null,
+              },
+              message.uuid);
           return;
         }
 
         final title = message.payload['title'] as String? ?? 'Unknown App';
-        final uuid = message.payload['uuid'] as String? ?? '';
         final icon = message.payload['icon'] as String? ?? '';
         final pageInfo = await _extractPageInfo();
 
@@ -218,7 +247,7 @@ class _WebViewPageState extends State<WebViewPage> {
         showAppConnectModal(
           context: context,
           title: title,
-          uuid: uuid,
+          uuid: message.uuid,
           iconUrl: icon,
           onDecision: (accepted, selectedIndices) async {
             final colorsMap = pageInfo['colors'] as Map<String, Object?>?;
@@ -250,12 +279,14 @@ class _WebViewPageState extends State<WebViewPage> {
               await appState.syncConnections();
             }
 
-            _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
-              'uuid': uuid,
-              'account': accepted && appState.account != null
-                  ? {'address': appState.account!.addr}
-                  : null,
-            });
+            _sendResponse(
+                ZilliqaLegacyMessages.responseToDapp,
+                {
+                  'account': accepted && appState.account != null
+                      ? {'address': appState.account!.addr}
+                      : null,
+                },
+                message.uuid);
             await _sendData();
           },
         );
@@ -263,10 +294,12 @@ class _WebViewPageState extends State<WebViewPage> {
 
       case ZilliqaLegacyMessages.disconnectApp:
         debugPrint('Disconnect app request: ${message.payload}');
-        _sendResponse(ZilliqaLegacyMessages.responseToDapp, {
-          'uuid': message.payload['uuid'] as String? ?? '',
-          'account': null,
-        });
+        _sendResponse(
+            ZilliqaLegacyMessages.responseToDapp,
+            {
+              'account': null,
+            },
+            message.uuid);
         break;
 
       default:

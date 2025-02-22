@@ -321,3 +321,31 @@ pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Re
     .await
     .map_err(Into::into)
 }
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn zilliqa_get_bech32_base16_address(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<(String, String), String> {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .accounts
+            .get(account_index)
+            .ok_or(ServiceError::AccountError(
+                account_index,
+                wallet_index,
+                WalletErrors::NoAccounts,
+            ))?;
+
+        Ok((
+            account.addr.get_zil_bech32().unwrap_or_default(),
+            account.addr.get_zil_base16().unwrap_or_default(),
+        ))
+    })
+    .await
+    .map_err(Into::into)
+}

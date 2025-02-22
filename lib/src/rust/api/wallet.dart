@@ -93,6 +93,11 @@ Future<void> zilliqaSwapChain(
     RustLib.instance.api.crateApiWalletZilliqaSwapChain(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<(String, String)> zilliqaGetBech32Base16Address(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(
+        walletIndex: walletIndex, accountIndex: accountIndex);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;
