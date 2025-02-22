@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -164,11 +165,20 @@ class _WebViewPageState extends State<WebViewPage> {
     await appState.syncConnections();
     final currentDomain = Uri.parse(widget.initialUrl).host;
     final isConnected = _isDomainConnected(currentDomain, appState.connections);
+    Map<String, String>? account;
+
+    if (isConnected) {
+      final (bech32, base16) = await zilliqaGetBech32Base16Address(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
+      account = {"base16": base16, "bech32": bech32};
+    }
 
     _sendResponse(
         ZilliqaLegacyMessages.getWalletData,
         {
-          'account': appState.account?.addr ?? '',
+          'account': account,
           'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
           'isConnect': isConnected,
           'isEnable': appState.wallet != null,
@@ -186,7 +196,6 @@ class _WebViewPageState extends State<WebViewPage> {
         break;
 
       case ZilliqaLegacyMessages.contentProxyMethod:
-        AppState appState = Provider.of<AppState>(context, listen: false);
         BigInt chainHash = appState.chain?.chainHash ?? BigInt.zero;
         debugPrint('Content proxy method: $message');
         try {
@@ -196,12 +205,13 @@ class _WebViewPageState extends State<WebViewPage> {
           );
 
           _sendResponse(
-              ZilliqaLegacyMessages.responseToDapp,
+              ZilliqaLegacyMessages.contentProxyResult,
               {
-                'resolve': jsonRes,
+                'resolve': jsonDecode(jsonRes),
               },
               message.uuid);
         } catch (e) {
+          debugPrint('$e');
           _sendResponse(
               ZilliqaLegacyMessages.responseToDapp,
               {
@@ -225,12 +235,17 @@ class _WebViewPageState extends State<WebViewPage> {
             _isDomainConnected(currentDomain, appState.connections);
 
         if (isAlreadyConnected) {
+          final (bech32, base16) = await zilliqaGetBech32Base16Address(
+            walletIndex: BigInt.from(appState.selectedWallet),
+            accountIndex: appState.wallet!.selectedAccount,
+          );
+
+          Map<String, String> account = {"base16": base16, "bech32": bech32};
+
           _sendResponse(
               ZilliqaLegacyMessages.responseToDapp,
               {
-                'account': appState.account != null
-                    ? {'address': appState.account!.addr}
-                    : null,
+                'account': account,
               },
               message.uuid);
           return;
@@ -273,20 +288,21 @@ class _WebViewPageState extends State<WebViewPage> {
               canSuggestTokens: false,
               canSuggestTransactions: true,
             );
+            Map<String, String>? account;
 
             if (accepted) {
               await createNewConnection(conn: connectionInfo);
               await appState.syncConnections();
+              final (bech32, base16) = await zilliqaGetBech32Base16Address(
+                walletIndex: BigInt.from(appState.selectedWallet),
+                accountIndex: appState.wallet!.selectedAccount,
+              );
+
+              account = {"base16": base16, "bech32": bech32};
             }
 
-            _sendResponse(
-                ZilliqaLegacyMessages.responseToDapp,
-                {
-                  'account': accepted && appState.account != null
-                      ? {'address': appState.account!.addr}
-                      : null,
-                },
-                message.uuid);
+            _sendResponse(ZilliqaLegacyMessages.responseToDapp,
+                {'account': account}, message.uuid);
             await _sendData();
           },
         );
