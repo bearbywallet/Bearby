@@ -1,18 +1,12 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
-import 'package:zilpay/src/rust/api/connections.dart';
-import 'package:zilpay/src/rust/api/provider.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/config/zilliqa_legacy_messages.dart';
-import 'package:zilpay/modals/app_connect.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/web3/zilpay_legacy.dart';
+import 'dart:convert';
 
 class WebViewPage extends StatefulWidget {
   final String initialUrl;
@@ -25,6 +19,7 @@ class WebViewPage extends StatefulWidget {
 
 class _WebViewPageState extends State<WebViewPage> {
   late WebViewController _webViewController;
+  late ZilPayLegacyHandler _legacyHandler;
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
@@ -32,7 +27,7 @@ class _WebViewPageState extends State<WebViewPage> {
   @override
   void initState() {
     super.initState();
-    AppState appState = Provider.of<AppState>(context, listen: false);
+    final appState = Provider.of<AppState>(context, listen: false);
     AppTheme theme = appState.currentTheme;
 
     _webViewController = WebViewController()
@@ -43,10 +38,9 @@ class _WebViewPageState extends State<WebViewPage> {
         onMessageReceived: (JavaScriptMessage message) {
           try {
             final jsonData =
-                jsonDecode(message.message) as Map<String, Object?>;
-            final zilPayMessage = ZilPayMessage.fromJson(jsonData);
-
-            _handleZilPayMessage(zilPayMessage);
+                jsonDecode(message.message) as Map<String, dynamic>;
+            final zilPayMessage = ZilPayLegacyMessage.fromJson(jsonData);
+            _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
           } catch (e) {
             debugPrint(
                 'Failed to parse message: ${message.message}, error: $e');
@@ -63,14 +57,14 @@ class _WebViewPageState extends State<WebViewPage> {
             String jsCode =
                 await rootBundle.loadString('assets/zilpay_legacy_inject.js');
             await _webViewController.runJavaScript(jsCode);
-            await _sendData();
+            await _legacyHandler.sendData(appState);
           },
           onPageFinished: (String url) async {
             setState(() => _isLoading = false);
             String jsCode =
                 await rootBundle.loadString('assets/zilpay_legacy_inject.js');
             await _webViewController.runJavaScript(jsCode);
-            await _sendData();
+            await _legacyHandler.sendData(appState);
           },
           onWebResourceError: (WebResourceError error) {
             setState(() {
@@ -84,244 +78,14 @@ class _WebViewPageState extends State<WebViewPage> {
         ),
       )
       ..loadRequest(Uri.parse(widget.initialUrl));
+
+    _legacyHandler = ZilPayLegacyHandler(
+      webViewController: _webViewController,
+      initialUrl: widget.initialUrl,
+    );
   }
 
   void _refreshPage() => _webViewController.reload();
-
-  void _sendResponse(String type, Map<String, Object?> payload, String uuid) {
-    final response =
-        ZilPayMessage(type: type, payload: payload, uuid: uuid).toJson();
-    final jsonString = jsonEncode(response);
-    _webViewController.runJavaScript('window.postMessage($jsonString, "*")');
-  }
-
-  Future<Map<String, Object?>> _extractPageInfo() async {
-    try {
-      final descriptionResult =
-          await _webViewController.runJavaScriptReturningResult(
-              'document.querySelector("meta[name=\'description\']")?.content || ""');
-      final primaryColorResult =
-          await _webViewController.runJavaScriptReturningResult(
-              'getComputedStyle(document.body).backgroundColor || "#FFFFFF"');
-
-      final description = descriptionResult is String
-          ? descriptionResult.replaceAll('"', '')
-          : '';
-      final primaryColor = primaryColorResult is String
-          ? _parseColor(primaryColorResult)
-          : '#FFFFFF';
-
-      return {
-        'description': description,
-        'colors': {
-          'primary': primaryColor,
-          'secondary': null,
-          'background': null,
-          'text': null,
-        },
-      };
-    } catch (e) {
-      debugPrint('Failed to extract page info: $e');
-      return {
-        'description': '',
-        'colors': {
-          'primary': '#FFFFFF',
-          'secondary': null,
-          'background': null,
-          'text': null
-        },
-      };
-    }
-  }
-
-  String _parseColor(String color) {
-    if (color.startsWith('rgb')) {
-      final rgb = color
-          .replaceAll(RegExp(r'[^0-9,]'), '')
-          .split(',')
-          .map(int.parse)
-          .toList();
-      return '#${rgb[0].toRadixString(16).padLeft(2, '0')}${rgb[1].toRadixString(16).padLeft(2, '0')}${rgb[2].toRadixString(16).padLeft(2, '0')}';
-    }
-    return color;
-  }
-
-  bool _isDomainConnected(
-      String currentDomain, List<ConnectionInfo> connections) {
-    for (final conn in connections) {
-      final connDomain = conn.domain;
-      if (currentDomain == connDomain ||
-          (currentDomain.endsWith('.$connDomain') &&
-              currentDomain.split('.').length ==
-                  connDomain.split('.').length + 1)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  Future<void> _sendData() async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    await appState.syncConnections();
-    final currentDomain = Uri.parse(widget.initialUrl).host;
-    final isConnected = _isDomainConnected(currentDomain, appState.connections);
-    Map<String, String>? account;
-
-    if (isConnected) {
-      final (bech32, base16) = await zilliqaGetBech32Base16Address(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
-      );
-      account = {"base16": base16, "bech32": bech32};
-    }
-
-    _sendResponse(
-        ZilliqaLegacyMessages.getWalletData,
-        {
-          'account': account,
-          'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-          'isConnect': isConnected,
-          'isEnable': appState.wallet != null,
-        },
-        "");
-  }
-
-  void _handleZilPayMessage(ZilPayMessage message) async {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final currentDomain = Uri.parse(widget.initialUrl).host;
-
-    switch (message.type) {
-      case ZilliqaLegacyMessages.getWalletData:
-        _sendData();
-        break;
-
-      case ZilliqaLegacyMessages.contentProxyMethod:
-        BigInt chainHash = appState.chain?.chainHash ?? BigInt.zero;
-        debugPrint('Content proxy method: $message');
-        try {
-          String jsonRes = await providerReqProxy(
-            payload: message.payloadToJsonString(),
-            chainHash: chainHash,
-          );
-
-          _sendResponse(
-              ZilliqaLegacyMessages.contentProxyResult,
-              {
-                'resolve': jsonDecode(jsonRes),
-              },
-              message.uuid);
-        } catch (e) {
-          debugPrint('$e');
-          _sendResponse(
-              ZilliqaLegacyMessages.responseToDapp,
-              {
-                'reject': e.toString(),
-              },
-              message.uuid);
-        }
-        break;
-
-      case ZilliqaLegacyMessages.callToSignTx:
-        debugPrint('Sign transaction request: ${message.payload}');
-        break;
-
-      case ZilliqaLegacyMessages.signMessage:
-        debugPrint('Sign message request: ${message.payload}');
-        break;
-
-      case ZilliqaLegacyMessages.connectApp:
-        await appState.syncConnections();
-        final isAlreadyConnected =
-            _isDomainConnected(currentDomain, appState.connections);
-
-        if (isAlreadyConnected) {
-          final (bech32, base16) = await zilliqaGetBech32Base16Address(
-            walletIndex: BigInt.from(appState.selectedWallet),
-            accountIndex: appState.wallet!.selectedAccount,
-          );
-
-          Map<String, String> account = {"base16": base16, "bech32": bech32};
-
-          _sendResponse(
-              ZilliqaLegacyMessages.responseToDapp,
-              {
-                'account': account,
-              },
-              message.uuid);
-          return;
-        }
-
-        final title = message.payload['title'] as String? ?? 'Unknown App';
-        final icon = message.payload['icon'] as String? ?? '';
-        final pageInfo = await _extractPageInfo();
-
-        if (!mounted) {
-          return;
-        }
-
-        showAppConnectModal(
-          context: context,
-          title: title,
-          uuid: message.uuid,
-          iconUrl: icon,
-          onDecision: (accepted, selectedIndices) async {
-            final colorsMap = pageInfo['colors'] as Map<String, Object?>?;
-            final walletIndexes = Uint64List.fromList(
-                selectedIndices.map((index) => BigInt.from(index)).toList());
-
-            ConnectionInfo connectionInfo = ConnectionInfo(
-              domain: currentDomain,
-              walletIndexes: walletIndexes,
-              favicon: icon,
-              title: title,
-              description: pageInfo['description'] as String?,
-              colors: ColorsInfo(
-                primary: colorsMap?['primary'] as String? ??
-                    appState.currentTheme.cardBackground.toString(),
-                secondary: colorsMap?['secondary'] as String?,
-                background: colorsMap?['background'] as String?,
-                text: colorsMap?['text'] as String?,
-              ),
-              lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
-              canReadAccounts: true,
-              canRequestSignatures: true,
-              canSuggestTokens: false,
-              canSuggestTransactions: true,
-            );
-            Map<String, String>? account;
-
-            if (accepted) {
-              await createNewConnection(conn: connectionInfo);
-              await appState.syncConnections();
-              final (bech32, base16) = await zilliqaGetBech32Base16Address(
-                walletIndex: BigInt.from(appState.selectedWallet),
-                accountIndex: appState.wallet!.selectedAccount,
-              );
-
-              account = {"base16": base16, "bech32": bech32};
-            }
-
-            _sendResponse(ZilliqaLegacyMessages.responseToDapp,
-                {'account': account}, message.uuid);
-            await _sendData();
-          },
-        );
-        break;
-
-      case ZilliqaLegacyMessages.disconnectApp:
-        debugPrint('Disconnect app request: ${message.payload}');
-        _sendResponse(
-            ZilliqaLegacyMessages.responseToDapp,
-            {
-              'account': null,
-            },
-            message.uuid);
-        break;
-
-      default:
-        debugPrint('Unhandled message type: ${message.type}');
-    }
-  }
 
   Map<String, String> _splitDomain(String url) {
     final uri = Uri.parse(url);
@@ -329,18 +93,12 @@ class _WebViewPageState extends State<WebViewPage> {
     final parts = host.split('.');
 
     if (parts.length <= 2) {
-      return {
-        'subdomain': '',
-        'domain': host,
-      };
+      return {'subdomain': '', 'domain': host};
     }
 
     final subdomain = parts[0];
     final domain = parts.sublist(1).join('.');
-    return {
-      'subdomain': subdomain,
-      'domain': domain,
-    };
+    return {'subdomain': subdomain, 'domain': domain};
   }
 
   @override

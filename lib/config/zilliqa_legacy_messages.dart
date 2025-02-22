@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 /// Zilliqa Legacy Messages Configuration
 /// Defines message types for communication between the wallet and dApps
 class ZilliqaLegacyMessages {
@@ -49,42 +47,4 @@ class ZilliqaLegacyMessages {
     responseToDapp,
     disconnectApp,
   ];
-}
-
-class ZilPayMessage {
-  final String type;
-  final Map<String, dynamic> payload;
-  final String uuid;
-
-  ZilPayMessage({
-    required this.type,
-    required this.payload,
-    required this.uuid,
-  });
-
-  /// Creates a ZilPayMessage from a JSON map
-  factory ZilPayMessage.fromJson(Map<String, dynamic> json) {
-    final type = json['type'] as String?;
-    final uuid = json['uuid'] ?? "";
-    final payload = json['payload'] as Map<String, dynamic>? ?? {};
-
-    if (type == null || !ZilliqaLegacyMessages.allTypes.contains(type)) {
-      throw FormatException('Invalid or unknown message type: $type');
-    }
-
-    return ZilPayMessage(type: type, payload: payload, uuid: uuid);
-  }
-
-  String payloadToJsonString() {
-    return jsonEncode(payload);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'type': type, 'payload': payload, 'uuid': uuid};
-  }
-
-  @override
-  String toString() {
-    return 'ZilPayMessage(type: $type, payload: $payload uuid: $uuid)';
-  }
 }
