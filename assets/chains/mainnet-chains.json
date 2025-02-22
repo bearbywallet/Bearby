@@ -1,5 +1,41 @@
 [
   {
+    "name": "Zilliqa mainnet",
+    "chain": "ZIL",
+    "rpc": [
+      "https://api.zilliqa.com",
+      "https://ssn.zilpay.io/api"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa Scilla",
+        "symbol": "ZIL",
+        "decimals": 12
+      },
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa EVM",
+        "symbol": "ZIL",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [1, 32769],
+    "infoURL": "https://www.zilliqa.com/",
+    "shortName": "zilliqa",
+    "slip44": 313,
+    "explorers": [
+      {
+        "name": "Viewblock",
+        "url": "https://viewblock.io/zilliqa",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
     "name": "Ethereum Mainnet",
     "chain": "ETH",
     "icon": "ethereum",
