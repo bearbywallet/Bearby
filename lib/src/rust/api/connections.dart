@@ -15,5 +15,8 @@ Future<void> addWalletToConnection(
     RustLib.instance.api.crateApiConnectionsAddWalletToConnection(
         domain: domain, walletIndex: walletIndex);
 
+Future<void> removeConnections({required String domain}) =>
+    RustLib.instance.api.crateApiConnectionsRemoveConnections(domain: domain);
+
 Future<List<ConnectionInfo>> getConnectionsList() =>
     RustLib.instance.api.crateApiConnectionsGetConnectionsList();

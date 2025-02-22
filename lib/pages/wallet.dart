@@ -10,6 +10,7 @@ import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
+import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -61,10 +62,11 @@ class _WalletPageState extends State<WalletPage> {
     super.dispose();
   }
 
-  void _handleDappDisconnect(String url) {
-    // final appState = Provider.of<app_state.AppState>(context, listen: false);
-    // Implement disconnect logic here
-    debugPrint('Disconnecting DApp: $url');
+  void _handleDappDisconnect(String url) async {
+    AppState appState = Provider.of<AppState>(context, listen: false);
+
+    await removeConnections(domain: url);
+    await appState.syncConnections();
   }
 
   List<WalletPreferenceItem> _getPreferenceItems(
