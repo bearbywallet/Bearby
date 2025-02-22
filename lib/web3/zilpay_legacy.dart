@@ -258,8 +258,7 @@ class ZilPayLegacyHandler {
                       'nonce': tx.nonce.toString(),
                       'priority': false,
                       'pubKey': tx.sender,
-                      'signature':
-                          tx.transactionHash, // TODO: add sign to hystory
+                      'signature': tx.sig,
                       'toAddr': tx.recipient,
                       'version': 0,
                       'from': tx.sender,

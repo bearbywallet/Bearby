@@ -2614,8 +2614,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 23)
-      throw Exception('unexpected arr length: expect 23 but see ${arr.length}');
+    if (arr.length != 24)
+      throw Exception('unexpected arr length: expect 24 but see ${arr.length}');
     return HistoricalTransactionInfo(
       transactionHash: dco_decode_String(arr[0]),
       amount: dco_decode_String(arr[1]),
@@ -2636,10 +2636,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       icon: dco_decode_opt_String(arr[16]),
       title: dco_decode_opt_String(arr[17]),
       error: dco_decode_opt_String(arr[18]),
-      nonce: dco_decode_U128(arr[19]),
-      tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[20]),
-      chainType: dco_decode_String(arr[21]),
-      chainHash: dco_decode_u_64(arr[22]),
+      sig: dco_decode_String(arr[19]),
+      nonce: dco_decode_U128(arr[20]),
+      tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[21]),
+      chainType: dco_decode_String(arr[22]),
+      chainHash: dco_decode_u_64(arr[23]),
     );
   }
 
@@ -3614,6 +3615,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_icon = sse_decode_opt_String(deserializer);
     var var_title = sse_decode_opt_String(deserializer);
     var var_error = sse_decode_opt_String(deserializer);
+    var var_sig = sse_decode_String(deserializer);
     var var_nonce = sse_decode_U128(deserializer);
     var var_tokenInfo =
         sse_decode_opt_box_autoadd_base_token_info(deserializer);
@@ -3639,6 +3641,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         icon: var_icon,
         title: var_title,
         error: var_error,
+        sig: var_sig,
         nonce: var_nonce,
         tokenInfo: var_tokenInfo,
         chainType: var_chainType,
@@ -4719,6 +4722,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.icon, serializer);
     sse_encode_opt_String(self.title, serializer);
     sse_encode_opt_String(self.error, serializer);
+    sse_encode_String(self.sig, serializer);
     sse_encode_U128(self.nonce, serializer);
     sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
     sse_encode_String(self.chainType, serializer);

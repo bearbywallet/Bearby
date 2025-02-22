@@ -38,6 +38,7 @@ pub struct HistoricalTransactionInfo {
     pub icon: Option<String>,
     pub title: Option<String>,
     pub error: Option<String>,
+    pub sig: String,
     pub nonce: u128,
     pub token_info: Option<BaseTokenInfo>,
     pub chain_type: String,
@@ -47,6 +48,7 @@ pub struct HistoricalTransactionInfo {
 impl From<HistoricalTransaction> for HistoricalTransactionInfo {
     fn from(value: HistoricalTransaction) -> Self {
         Self {
+            sig: value.sig,
             transaction_hash: value.transaction_hash,
             amount: value.amount.to_string(),
             sender: value.sender,

@@ -27,6 +27,7 @@ class HistoricalTransactionInfo {
   final String? icon;
   final String? title;
   final String? error;
+  final String sig;
   final BigInt nonce;
   final BaseTokenInfo? tokenInfo;
   final String chainType;
@@ -52,6 +53,7 @@ class HistoricalTransactionInfo {
     this.icon,
     this.title,
     this.error,
+    required this.sig,
     required this.nonce,
     this.tokenInfo,
     required this.chainType,
@@ -79,6 +81,7 @@ class HistoricalTransactionInfo {
       icon.hashCode ^
       title.hashCode ^
       error.hashCode ^
+      sig.hashCode ^
       nonce.hashCode ^
       tokenInfo.hashCode ^
       chainType.hashCode ^
@@ -108,6 +111,7 @@ class HistoricalTransactionInfo {
           icon == other.icon &&
           title == other.title &&
           error == other.error &&
+          sig == other.sig &&
           nonce == other.nonce &&
           tokenInfo == other.tokenInfo &&
           chainType == other.chainType &&
