@@ -112,5 +112,8 @@ String formatGasPriceDetail(BigInt price, FTokenInfo token) {
 String formatGasPrice(BigInt price, int decimals, String symbol) {
   final value = price / BigInt.from(10).pow(decimals);
   final formatter = NumberFormat('#,##0.##################');
+
+  formatter.maximumFractionDigits = decimals;
+
   return '≈ ${formatter.format(value)} $symbol';
 }

@@ -30,7 +30,6 @@ class HistoryItem extends StatefulWidget {
 class _HistoryItemState extends State<HistoryItem>
     with SingleTickerProviderStateMixin {
   bool isPressed = false;
-
   late final AnimationController _controller;
   late final Animation<double> _animation;
 
@@ -38,17 +37,9 @@ class _HistoryItemState extends State<HistoryItem>
   void initState() {
     super.initState();
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-
-    _animation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+        duration: const Duration(milliseconds: 150), vsync: this);
+    _animation = Tween<double>(begin: 1.0, end: 0.95)
+        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
   }
 
   @override
@@ -59,43 +50,63 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildIcon(AppState appState) {
     final theme = appState.currentTheme;
-    FTokenInfo token = appState.wallet!.tokens.firstWhere((t) =>
-        t.symbol == widget.transaction.tokenInfo?.symbol &&
-        t.addrType == appState.account?.addrType);
-
+    if (appState.wallet == null || appState.account == null) {
+      return Container(
+        width: 32,
+        height: 32,
+        decoration: BoxDecoration(
+            shape: BoxShape.circle,
+            border: Border.all(
+                color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
+        child: ClipOval(
+          child: Blockies(
+              seed: widget.transaction.transactionHash,
+              color: getWalletColor(0),
+              bgColor: theme.primaryPurple,
+              spotColor: theme.background,
+              size: 8),
+        ),
+      );
+    }
+    final token = appState.wallet!.tokens.firstWhere(
+      (t) =>
+          t.symbol == widget.transaction.tokenInfo?.symbol &&
+          t.addrType == appState.account?.addrType,
+      orElse: () => FTokenInfo(
+        name: '',
+        symbol: widget.transaction.tokenInfo?.symbol ?? '',
+        decimals: widget.transaction.tokenInfo?.decimals ??
+            appState.wallet!.tokens.first.decimals,
+        addr: '',
+        addrType: appState.wallet!.tokens.first.addrType,
+        balances: {},
+        default_: false,
+        native: false,
+        chainHash: BigInt.zero,
+      ),
+    );
     return Container(
       width: 32,
       height: 32,
       decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
-      ),
+          shape: BoxShape.circle,
+          border: Border.all(
+              color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
       child: ClipOval(
         child: AsyncImage(
           url: widget.transaction.icon ??
-              viewTokenIcon(
-                token,
-                appState.chain!.chainId,
-                theme.value,
-              ),
+              viewTokenIcon(token, appState.chain!.chainId, theme.value),
           width: 32,
           height: 32,
           fit: BoxFit.contain,
           errorWidget: Blockies(
-            seed: widget.transaction.transactionHash,
-            color: getWalletColor(0),
-            bgColor: theme.primaryPurple,
-            spotColor: theme.background,
-            size: 8,
-          ),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          ),
+              seed: widget.transaction.transactionHash,
+              color: getWalletColor(0),
+              bgColor: theme.primaryPurple,
+              spotColor: theme.background,
+              size: 8),
+          loadingWidget:
+              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
     );
@@ -114,8 +125,7 @@ class _HistoryItemState extends State<HistoryItem>
 
   String _formatDateTime() {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(
-      widget.transaction.timestamp.toInt() * 1000,
-    );
+        widget.transaction.timestamp.toInt() * 1000);
     return DateFormat('MMM dd, yyyy HH:mm').format(dateTime);
   }
 
@@ -129,46 +139,37 @@ class _HistoryItemState extends State<HistoryItem>
       final formattedValue = formatter.format(value);
       final price = 0.004;
       final usdAmount = value * price;
-
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            '$formattedValue ${widget.transaction.tokenInfo!.symbol}',
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w600,
-              letterSpacing: 0.5,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
+          Text('$formattedValue ${widget.transaction.tokenInfo!.symbol}',
+              style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                  letterSpacing: 0.5),
+              overflow: TextOverflow.ellipsis),
           const SizedBox(height: 2),
-          Text(
-            '(\$$usdAmount)',
-            style: TextStyle(
-              color: theme.textSecondary.withValues(alpha: 0.7),
-              fontSize: 14,
-              fontWeight: FontWeight.w400,
-            ),
-          ),
+          Text('(\$$usdAmount)',
+              style: TextStyle(
+                  color: theme.textSecondary.withValues(alpha: 0.7),
+                  fontSize: 14,
+                  fontWeight: FontWeight.w400)),
         ],
       );
     }
-    return Text(
-      widget.transaction.amount,
-      style: TextStyle(
-        color: theme.textPrimary,
-        fontSize: 16,
-        fontWeight: FontWeight.w600,
-        letterSpacing: 0.5,
-      ),
-      overflow: TextOverflow.ellipsis,
-    );
+    return Text(widget.transaction.amount,
+        style: TextStyle(
+            color: theme.textPrimary,
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            letterSpacing: 0.5),
+        overflow: TextOverflow.ellipsis);
   }
 
   Widget _buildFeeWithPrice(AppState appState) {
     final formatter = NumberFormat('#,##0.##################');
+    formatter.maximumFractionDigits = 10;
 
     final theme = appState.currentTheme;
     final token = appState.wallet!.tokens.first;
@@ -177,8 +178,7 @@ class _HistoryItemState extends State<HistoryItem>
             ? 18
             : token.decimals;
     final feeBig = widget.transaction.fee.toDouble();
-    final price = 2689.32;
-
+    final price = 0;
     final value = feeBig / BigInt.from(10).pow(decimals).toDouble();
     final fee = formatter.format(value);
     final usdFee = value * price;
@@ -186,24 +186,18 @@ class _HistoryItemState extends State<HistoryItem>
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(
-          '$fee ${token.symbol}',
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
-          ),
-          overflow: TextOverflow.ellipsis,
-        ),
+        Text('$fee ${token.symbol}',
+            style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 14,
+                fontWeight: FontWeight.w400),
+            overflow: TextOverflow.ellipsis),
         const SizedBox(height: 2),
-        Text(
-          '(\$$usdFee)',
-          style: TextStyle(
-            color: theme.textSecondary.withValues(alpha: 0.7),
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
-          ),
-        ),
+        Text('(\$$usdFee)',
+            style: TextStyle(
+                color: theme.textSecondary.withValues(alpha: 0.7),
+                fontSize: 12,
+                fontWeight: FontWeight.w400)),
       ],
     );
   }
@@ -213,7 +207,6 @@ class _HistoryItemState extends State<HistoryItem>
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-
     return Column(
       children: [
         MouseRegion(
@@ -234,10 +227,8 @@ class _HistoryItemState extends State<HistoryItem>
             onTap: widget.onTap,
             child: AnimatedBuilder(
               animation: _animation,
-              builder: (context, child) => Transform.scale(
-                scale: _animation.value,
-                child: child,
-              ),
+              builder: (context, child) =>
+                  Transform.scale(scale: _animation.value, child: child),
               child: Padding(
                 padding: EdgeInsets.all(adaptivePadding),
                 child: Column(
@@ -254,36 +245,31 @@ class _HistoryItemState extends State<HistoryItem>
                                 children: [
                                   Container(
                                     padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
+                                        horizontal: 8, vertical: 4),
                                     decoration: BoxDecoration(
-                                      color: _getStatusColor(theme)
-                                          .withValues(alpha: 0.1),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
+                                        color: _getStatusColor(theme)
+                                            .withValues(alpha: 0.1),
+                                        borderRadius:
+                                            BorderRadius.circular(12)),
                                     child: Text(
-                                      widget.transaction.status.name
-                                          .toUpperCase(),
-                                      style: TextStyle(
-                                        color: _getStatusColor(theme),
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                                        widget.transaction.status.name
+                                            .toUpperCase(),
+                                        style: TextStyle(
+                                            color: _getStatusColor(theme),
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w600)),
                                   ),
                                   const SizedBox(width: 8),
                                   Flexible(
                                     child: Text(
-                                      widget.transaction.title ?? 'Transaction',
-                                      style: TextStyle(
-                                        color: theme.textPrimary
-                                            .withValues(alpha: 0.7),
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
+                                        widget.transaction.title ??
+                                            'Transaction',
+                                        style: TextStyle(
+                                            color: theme.textPrimary
+                                                .withValues(alpha: 0.7),
+                                            fontSize: 16,
+                                            fontWeight: FontWeight.w500),
+                                        overflow: TextOverflow.ellipsis),
                                   ),
                                 ],
                               ),
@@ -300,14 +286,12 @@ class _HistoryItemState extends State<HistoryItem>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(
-                          _formatDateTime(),
-                          style: TextStyle(
-                            color: theme.textSecondary.withValues(alpha: 0.7),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
-                          ),
-                        ),
+                        Text(_formatDateTime(),
+                            style: TextStyle(
+                                color:
+                                    theme.textSecondary.withValues(alpha: 0.7),
+                                fontSize: 14,
+                                fontWeight: FontWeight.w400)),
                         _buildFeeWithPrice(state),
                       ],
                     ),
@@ -318,10 +302,7 @@ class _HistoryItemState extends State<HistoryItem>
           ),
         ),
         if (widget.showDivider)
-          Container(
-            height: 1,
-            color: theme.textPrimary.withValues(alpha: 0.1),
-          ),
+          Container(height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
       ],
     );
   }

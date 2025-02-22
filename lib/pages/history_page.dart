@@ -38,6 +38,7 @@ class _HistoryPageState extends State<HistoryPage> {
       final history = await getHistory(
         walletIndex: BigInt.from(appState.selectedWallet),
       );
+
       if (mounted) {
         setState(() {
           _history = history;
