@@ -94,7 +94,7 @@ class _ReceivePageState extends State<ReceivePage> {
     QrConfigInfo config = QrConfigInfo(
       size: 600,
       gapless: false,
-      color: theme.primaryPurple.value,
+      color: theme.primaryPurple.toARGB32(),
       eyeShape: EyeShape.circle.value,
       dataModuleShape: DataModuleShape.circle.value,
     );

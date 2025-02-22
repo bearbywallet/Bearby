@@ -217,7 +217,9 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   width: 40,
                   height: 40,
                   onTap: () {
-                    Navigator.of(context).pushNamed("/add_account");
+                    if (mounted) {
+                      Navigator.of(context).pushNamed("/add_account");
+                    }
                   },
                 ),
                 if (appState.wallet?.selectedAccount != BigInt.zero)

@@ -79,7 +79,7 @@ class _AsyncQRcodeState extends State<AsyncQRcode> {
       QrConfigInfo config = QrConfigInfo(
         size: widget.size,
         gapless: widget.gapless,
-        color: widget.color.value,
+        color: widget.color.toARGB32(),
         eyeShape: widget.eyeShape.value,
         dataModuleShape: widget.dataModuleShape.value,
       );
