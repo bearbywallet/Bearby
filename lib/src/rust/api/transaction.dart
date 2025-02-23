@@ -31,6 +31,23 @@ Future<HistoricalTransactionInfo> signSendTransactions(
         identifiers: identifiers,
         tx: tx);
 
+Future<(String, String)> signMessage(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        String? password,
+        String? passphrase,
+        String? sessionCipher,
+        required List<String> identifiers,
+        required String message}) =>
+    RustLib.instance.api.crateApiTransactionSignMessage(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        password: password,
+        passphrase: passphrase,
+        sessionCipher: sessionCipher,
+        identifiers: identifiers,
+        message: message);
+
 Future<List<HistoricalTransactionInfo>> getHistory(
         {required BigInt walletIndex}) =>
     RustLib.instance.api

@@ -17,6 +17,8 @@ pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManageme
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
+use zilpay::proto::pubkey::PubKey;
+use zilpay::proto::signature::Signature;
 pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 pub use zilpay::proto::U256;
@@ -77,6 +79,50 @@ pub async fn sign_send_transactions(
         ))?;
 
     Ok(tx)
+}
+
+#[flutter_rust_bridge::frb(dart_async)]
+pub async fn sign_message(
+    wallet_index: usize,
+    account_index: usize,
+    password: Option<String>,
+    passphrase: Option<String>,
+    session_cipher: Option<String>,
+    identifiers: Vec<String>,
+    message: String,
+) -> Result<(String, String), String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = Arc::clone(&service.core);
+
+    let signed: (PubKey, Signature) = {
+        let seed_bytes = if let Some(pass) = password {
+            core.unlock_wallet_with_password(&pass, &identifiers, wallet_index)
+        } else {
+            let session = decode_session(session_cipher)?;
+            core.unlock_wallet_with_session(session, &identifiers, wallet_index)
+        }
+        .map_err(ServiceError::BackgroundError)?;
+        let signed = core
+            .sign_message(
+                wallet_index,
+                account_index,
+                &seed_bytes,
+                passphrase.as_ref().map(|s| s.as_ref()),
+                &message,
+            )
+            .map_err(ServiceError::BackgroundError)?;
+
+        Ok::<(PubKey, Signature), ServiceError>(signed)
+    }
+    .map_err(Into::<ServiceError>::into)?;
+    let sig = match signed.1 {
+        Signature::SchnorrSecp256k1Sha256(value) => hex::encode(value),
+        Signature::ECDSASecp256k1Keccak256(value) => hex::encode(value),
+    };
+    let pubkey = signed.0.as_hex_str();
+
+    Ok((pubkey, sig))
 }
 
 #[flutter_rust_bridge::frb(dart_async)]
