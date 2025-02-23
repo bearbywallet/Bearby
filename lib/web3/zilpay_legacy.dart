@@ -16,45 +16,9 @@ import 'package:zilpay/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/config/zilliqa_legacy_messages.dart';
 import 'package:zilpay/modals/app_connect.dart';
+import 'package:zilpay/web3/message.dart';
 import 'package:zilpay/web3/web3_utils.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
-
-class ZilPayLegacyMessage {
-  final String type;
-  final Map<String, dynamic> payload;
-  final String uuid;
-
-  ZilPayLegacyMessage({
-    required this.type,
-    required this.payload,
-    required this.uuid,
-  });
-
-  factory ZilPayLegacyMessage.fromJson(Map<String, dynamic> json) {
-    final type = json['type'] as String?;
-    final uuid = json['uuid'] ?? "";
-    final payload = json['payload'] as Map<String, dynamic>? ?? {};
-
-    if (type == null || !ZilliqaLegacyMessages.allTypes.contains(type)) {
-      throw FormatException('Invalid or unknown message type: $type');
-    }
-
-    return ZilPayLegacyMessage(type: type, payload: payload, uuid: uuid);
-  }
-
-  String payloadToJsonString() {
-    return jsonEncode(payload);
-  }
-
-  Map<String, dynamic> toJson() {
-    return {'type': type, 'payload': payload, 'uuid': uuid};
-  }
-
-  @override
-  String toString() {
-    return 'ZilPayMessage(type: $type, payload: $payload uuid: $uuid)';
-  }
-}
 
 class ZilPayLegacyTransactionParam {
   final String vname;
@@ -92,9 +56,12 @@ class ZilPayLegacyHandler {
   });
 
   Future<void> _sendResponse(
-      String type, Map<String, Object?> payload, String uuid) async {
+    String type,
+    Map<String, Object?> payload,
+    String uuid,
+  ) async {
     final response =
-        ZilPayLegacyMessage(type: type, payload: payload, uuid: uuid).toJson();
+        ZilPayWeb3Message(type: type, payload: payload, uuid: uuid).toJson();
     final jsonString = jsonEncode(response);
     await webViewController
         .runJavaScript('window.postMessage($jsonString, "*")');
@@ -103,11 +70,11 @@ class ZilPayLegacyHandler {
   Future<void> sendData(AppState appState) async {
     await appState.syncConnections();
     final currentDomain = Uri.parse(initialUrl).host;
-    final isConnected =
+    final connected =
         Web3Utils.isDomainConnected(currentDomain, appState.connections);
     Map<String, String>? account;
 
-    if (isConnected) {
+    if (connected != null) {
       final (bech32, base16) = await zilliqaGetBech32Base16Address(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
@@ -120,7 +87,7 @@ class ZilPayLegacyHandler {
         {
           'account': account,
           'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-          'isConnect': isConnected,
+          'isConnect': connected,
           'isEnable': true,
         },
         "");
@@ -140,7 +107,7 @@ class ZilPayLegacyHandler {
   }
 
   Future<void> handleLegacyZilPayMessage(
-    ZilPayLegacyMessage message,
+    ZilPayWeb3Message message,
     BuildContext context,
   ) async {
     final appState = Provider.of<AppState>(context, listen: false);

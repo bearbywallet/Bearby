@@ -84,6 +84,7 @@ flutter:
     - assets/imgs/
     - assets/chains/
     - assets/zilpay_legacy_inject.js
+    - assets/evm_inject.js
     # - images/a_dot_burr.jpeg
     # - images/a_dot_ham.jpeg
 

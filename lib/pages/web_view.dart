@@ -6,6 +6,7 @@ import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/web3/message.dart';
 import 'package:zilpay/web3/zilpay_legacy.dart';
 import 'dart:convert';
 
@@ -40,7 +41,8 @@ class _WebViewPageState extends State<WebViewPage> {
           try {
             final jsonData =
                 jsonDecode(message.message) as Map<String, dynamic>;
-            final zilPayMessage = ZilPayLegacyMessage.fromJson(jsonData);
+
+            final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
             _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
           } catch (e) {
             debugPrint(
@@ -72,8 +74,6 @@ class _WebViewPageState extends State<WebViewPage> {
               _hasError = true;
               _errorMessage = error.description;
             });
-            // ScaffoldMessenger.of(context).showSnackBar(
-            //     SnackBar(content: Text('Error: ${error.description}')));
           },
         ),
       )
@@ -86,8 +86,14 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   Future<void> _initializeZilPayInjection(AppState appState) async {
-    String jsCode =
-        await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+    // scialla
+    // String jsCode =
+    //     await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+    // await _webViewController.runJavaScript(jsCode);
+    // await _legacyHandler.sendData(appState);
+
+    //evm
+    String jsCode = await rootBundle.loadString('assets/evm_inject.js');
     await _webViewController.runJavaScript(jsCode);
     await _legacyHandler.sendData(appState);
   }

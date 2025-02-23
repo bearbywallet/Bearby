@@ -40,13 +40,19 @@ class _BrowserPageState extends State<BrowserPage>
   void _handleSearch(String value) {
     if (value.isNotEmpty) {
       String query = value.trim();
-      String url = query;
+      String url;
 
       final uri = Uri.tryParse(query);
-      if (uri != null && (uri.hasScheme && uri.hasAuthority)) {
-        url = query.startsWith('http://') || query.startsWith('https://')
-            ? query
-            : 'https://$query';
+      if (uri != null) {
+        if (uri.hasScheme && uri.hasAuthority) {
+          url = query;
+        } else if (uri.hasAuthority && uri.port != 0) {
+          url = 'http://$query';
+        } else if (isDomainName(query)) {
+          url = 'https://$query';
+        } else {
+          url = 'https://duckduckgo.com/?q=${Uri.encodeQueryComponent(query)}';
+        }
       } else {
         if (isDomainName(query)) {
           url = 'https://$query';
@@ -63,9 +69,10 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   bool isDomainName(String input) {
+    final domainPart = input.split(':')[0];
     final domainRegex = RegExp(
         r'^([a-zA-Z0-9]([a-zA-Z0-9\-]{0,61}[a-zA-Z0-9])?\.)+[a-zA-Z]{2,}$');
-    return domainRegex.hasMatch(input);
+    return domainRegex.hasMatch(domainPart);
   }
 
   @override

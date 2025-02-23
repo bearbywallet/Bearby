@@ -46,18 +46,20 @@ class Web3Utils {
     }
   }
 
-  static bool isDomainConnected(
-      String currentDomain, List<ConnectionInfo> connections) {
+  static ConnectionInfo? isDomainConnected(
+    String currentDomain,
+    List<ConnectionInfo> connections,
+  ) {
     for (final conn in connections) {
       final connDomain = conn.domain;
       if (currentDomain == connDomain ||
           (currentDomain.endsWith('.$connDomain') &&
               currentDomain.split('.').length ==
                   connDomain.split('.').length + 1)) {
-        return true;
+        return conn;
       }
     }
-    return false;
+    return null;
   }
 
   static String _parseColor(String color) {
