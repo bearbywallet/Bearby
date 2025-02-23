@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -257,9 +258,9 @@ class ZilPayLegacyHandler {
                       'gasPrice': tx.gasPrice.toString(),
                       'nonce': tx.nonce.toString(),
                       'priority': false,
-                      'pubKey': tx.sender,
+                      'pubKey': metadata.signer,
                       'signature': tx.sig,
-                      'toAddr': tx.recipient,
+                      'toAddr': toAddr,
                       'version': 0,
                       'from': tx.sender,
                       'hash': tx.transactionHash,
@@ -288,6 +289,41 @@ class ZilPayLegacyHandler {
 
       case ZilliqaLegacyMessages.signMessage:
         debugPrint('Sign message request: ${message.payload}');
+        final messageContent = message.payload['content'] as String? ?? '';
+        final title = message.payload['title'] as String? ?? 'Sign Message';
+        final icon = message.payload['icon'] as String? ?? '';
+
+        if (!context.mounted) return;
+
+        showSignMessageModal(
+          context: context,
+          message: messageContent,
+          onMessageSigned: (signedMessage) async {
+            await _sendResponse(
+              ZilliqaLegacyMessages.signMessageResponse,
+              {
+                'resolve': {
+                  'message': messageContent,
+                  'signature': signedMessage,
+                  'publicKey': '',
+                },
+              },
+              message.uuid,
+            );
+            if (context.mounted) {
+              Navigator.pop(context);
+            }
+          },
+          onDismiss: () async {
+            await _sendResponse(
+              ZilliqaLegacyMessages.signMessageResponse,
+              {'reject': 'Rejected by user'},
+              message.uuid,
+            );
+          },
+          appTitle: title,
+          appIcon: icon,
+        );
         break;
 
       case ZilliqaLegacyMessages.connectApp:
