@@ -298,14 +298,14 @@ class ZilPayLegacyHandler {
         showSignMessageModal(
           context: context,
           message: messageContent,
-          onMessageSigned: (signedMessage) async {
+          onMessageSigned: (pubkey, sig) async {
             await _sendResponse(
               ZilliqaLegacyMessages.signMessageResponse,
               {
                 'resolve': {
                   'message': messageContent,
-                  'signature': signedMessage,
-                  'publicKey': '',
+                  'signature': sig,
+                  'publicKey': pubkey,
                 },
               },
               message.uuid,
