@@ -310,18 +310,13 @@ class ZilPayLegacyHandler {
           return;
         }
 
-        final title = message.payload['title'] as String? ?? 'Unknown App';
-        final icon = message.payload['icon'] as String? ??
-            ''; // TODO: remake icon to message
-        final pageInfo = await Web3Utils.extractPageInfo(webViewController);
-
         if (!context.mounted) return;
 
         showAppConnectModal(
           context: context,
-          title: title,
+          title: message.title ?? "",
           uuid: message.uuid,
-          iconUrl: icon,
+          iconUrl: message.icon ?? "",
           onDecision: (accepted, selectedIndices) async {
             final walletIndexes = Uint64List.fromList(
                 selectedIndices.map((index) => BigInt.from(index)).toList());
@@ -329,9 +324,10 @@ class ZilPayLegacyHandler {
             ConnectionInfo connectionInfo = ConnectionInfo(
               domain: currentDomain,
               accountIndexes: walletIndexes,
-              favicon: icon,
-              title: title,
-              description: pageInfo['description'] as String?,
+              favicon: message.icon,
+              title: message.title ?? "",
+              colors: message.colors,
+              description: message.description,
               lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
               canReadAccounts: true,
               canRequestSignatures: true,

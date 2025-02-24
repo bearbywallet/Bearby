@@ -133,18 +133,18 @@ class Web3EIP1193Handler {
 
           showAppConnectModal(
               context: context,
-              title: "",
+              title: message.title ?? "",
               uuid: message.uuid,
-              iconUrl: "",
+              iconUrl: message.icon ?? "",
               onDecision: (accepted, selectedIndices) async {
                 final accountIndexes = Uint64List.fromList(selectedIndices);
                 ConnectionInfo connectionInfo = ConnectionInfo(
                   domain: currentDomain,
                   accountIndexes: accountIndexes,
                   favicon: message.icon,
-                  title: "",
-                  colors: null,
-                  description: pageInfo['description'] as String?,
+                  title: message.title ?? "",
+                  colors: message.colors,
+                  description: message.description,
                   lastConnected:
                       BigInt.from(DateTime.now().millisecondsSinceEpoch),
                   canReadAccounts: true,

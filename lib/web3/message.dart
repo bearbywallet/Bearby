@@ -23,11 +23,11 @@ class ZilPayWeb3Message {
 
   factory ZilPayWeb3Message.fromJson(Map<String, dynamic> json) {
     final type = json['type'] as String?;
+    final payload = json['payload'] as Map<String, dynamic>? ?? {};
     String uuid = json['uuid'] ?? "";
     String icon = json['icon'] ?? "";
     String title = json['title'] ?? "";
     String description = json['description'] ?? "";
-    final payload = json['payload'] as Map<String, dynamic>? ?? {};
 
     ColorsInfo? colors;
     if (json['colors'] != null) {
@@ -60,11 +60,18 @@ class ZilPayWeb3Message {
   }
 
   Map<String, dynamic> toJson() {
-    return {'type': type, 'payload': payload, 'uuid': uuid, 'icon': icon};
+    return {
+      'type': type,
+      'payload': payload,
+      'uuid': uuid,
+      'icon': icon,
+      'title': title,
+      'description': description,
+    };
   }
 
   @override
   String toString() {
-    return 'ZilPayMessage(type: $type, payload: $payload uuid: $uuid, icon: $icon)';
+    return 'ZilPayMessage(type: $type, payload: $payload uuid: $uuid, icon: $icon, title: $title)';
   }
 }
