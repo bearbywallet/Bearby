@@ -31,7 +31,7 @@ class ZilPayWeb3Message {
 
     ColorsInfo? colors;
     if (json['colors'] != null) {
-      final colorsJson = json['colors'] as Map<String, String>;
+      final colorsJson = json['colors'] as Map<String, dynamic>;
       colors = ColorsInfo(
         primary: colorsJson['primary'],
         secondary: colorsJson['secondary'],
