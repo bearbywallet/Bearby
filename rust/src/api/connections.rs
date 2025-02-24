@@ -12,39 +12,45 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn create_new_connection(conn: ConnectionInfo) -> Result<(), String> {
+pub async fn create_update_connection(
+    wallet_index: usize,
+    conn: ConnectionInfo,
+) -> Result<(), String> {
     with_service_mut(|core| {
-        core.add_connection(conn.into())
+        let mut connections = core.get_connections(wallet_index);
+
+        if let Some(existing_conn) = connections.iter_mut().find(|c| c.domain == conn.domain) {
+            *existing_conn = conn.into();
+        } else {
+            core.add_connection(wallet_index, conn.into())
+                .map_err(ServiceError::BackgroundError)?;
+        }
+
+        core.save_connection(wallet_index, connections)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn remove_connections(wallet_index: usize, domain: String) -> Result<(), String> {
+    with_service_mut(|core| {
+        core.remove_connection(wallet_index, &domain)
             .map_err(ServiceError::BackgroundError)
     })
     .await
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn add_wallet_to_connection(domain: String, wallet_index: usize) -> Result<(), String> {
-    with_service_mut(|core| {
-        core.add_wallet_to_connection(domain, wallet_index)
-            .map_err(ServiceError::BackgroundError)
+pub async fn get_connections_list(wallet_index: usize) -> Result<Vec<ConnectionInfo>, String> {
+    with_service(|core| {
+        Ok(core
+            .get_connections(wallet_index)
+            .into_iter()
+            .map(Into::into)
+            .collect())
     })
     .await
     .map_err(Into::into)
-}
-
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn remove_connections(domain: String) -> Result<(), String> {
-    with_service_mut(|core| {
-        core.remove_connection(&domain)
-            .map_err(ServiceError::BackgroundError)
-    })
-    .await
-    .map_err(Into::into)
-}
-
-#[flutter_rust_bridge::frb(dart_async)]
-pub async fn get_connections_list() -> Result<Vec<ConnectionInfo>, String> {
-    with_service(|core| Ok(core.get_connections().into_iter().map(Into::into).collect()))
-        .await
-        .map_err(Into::into)
 }

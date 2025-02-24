@@ -1,7 +1,6 @@
 use crate::utils::utils::{decode_session, with_service_mut};
 pub use zilpay::background::bg_wallet::WalletManagement;
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn try_unlock_with_session(
     session_cipher: String,
     wallet_index: usize,
@@ -17,7 +16,6 @@ pub async fn try_unlock_with_session(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn try_unlock_with_password(
     password: String,
     wallet_index: usize,

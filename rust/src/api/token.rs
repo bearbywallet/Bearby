@@ -15,7 +15,6 @@ use zilpay::{
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
@@ -30,7 +29,6 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn update_rates() -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
         let core = Arc::clone(&service.core);
@@ -45,7 +43,6 @@ pub async fn update_rates() -> Result<(), String> {
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_rates() -> Result<String, String> {
     if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
         let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
@@ -57,7 +54,6 @@ pub async fn get_rates() -> Result<String, String> {
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
         let core = Arc::clone(&service.core);
@@ -74,7 +70,6 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ftoken(meta: FTokenInfo, wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
@@ -97,7 +92,6 @@ pub async fn add_ftoken(meta: FTokenInfo, wallet_index: usize) -> Result<Vec<FTo
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn rm_ftoken(wallet_index: usize, token_index: usize) -> Result<(), String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;

@@ -28,7 +28,6 @@ pub struct LedgerParamsInput {
     pub chain_hash: u64,
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_wallet(
     params: LedgerParamsInput,
     wallet_settings: WalletSettingsInfo,
@@ -66,7 +65,6 @@ pub async fn add_ledger_wallet(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_ledger_account(
     wallet_index: usize,
     account_index: usize,

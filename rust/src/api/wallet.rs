@@ -28,7 +28,6 @@ use crate::{
     },
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     with_service(|core| {
         let wallets = core
@@ -55,7 +54,6 @@ pub struct Bip39AddWalletParams {
     pub identifiers: Vec<String>,
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_bip39_wallet(
     params: Bip39AddWalletParams,
     wallet_settings: WalletSettingsInfo,
@@ -104,7 +102,6 @@ pub struct AddSKWalletParams {
     pub chain_hash: u64,
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_sk_wallet(
     params: AddSKWalletParams,
     wallet_settings: WalletSettingsInfo,
@@ -147,7 +144,6 @@ pub struct AddNextBip39AccountParams {
     pub chain_hash: u64,
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
     with_service_mut(|core| {
         let seed = if let Some(pass) = params.password {
@@ -175,7 +171,6 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         wallet
@@ -186,7 +181,6 @@ pub async fn select_account(wallet_index: usize, account_index: usize) -> Result
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn change_account_name(
     wallet_index: usize,
     account_index: usize,
@@ -217,7 +211,6 @@ pub async fn change_account_name(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         let mut data = wallet
@@ -236,7 +229,6 @@ pub async fn change_wallet_name(wallet_index: usize, new_name: String) -> Result
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn delete_wallet(
     wallet_index: usize,
     identifiers: Vec<String>,
@@ -259,7 +251,6 @@ pub async fn delete_wallet(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         wallet
@@ -271,7 +262,7 @@ pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result
     .await
     .map_err(Into::into)
 }
-#[flutter_rust_bridge::frb(dart_async)]
+
 pub async fn reveal_keypair(
     wallet_index: usize,
     account_index: usize,
@@ -292,7 +283,6 @@ pub async fn reveal_keypair(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn reveal_bip39_phrase(
     wallet_index: usize,
     identifiers: Vec<String>,
@@ -312,7 +302,6 @@ pub async fn reveal_bip39_phrase(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Result<(), String> {
     with_service(|core| {
         core.swap_zilliqa_chain(wallet_index, account_index)?;
@@ -323,7 +312,6 @@ pub async fn zilliqa_swap_chain(wallet_index: usize, account_index: usize) -> Re
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn zilliqa_get_bech32_base16_address(
     wallet_index: usize,
     account_index: usize,
@@ -351,7 +339,6 @@ pub async fn zilliqa_get_bech32_base16_address(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String> {
     let addr = Address::from_zil_base16(&base16).map_err(|e| e.to_string())?;
 

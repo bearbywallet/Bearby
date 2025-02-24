@@ -12,7 +12,6 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_new_book_address(name: String, addr: String, net: usize) -> Result<(), String> {
     with_service_mut(|core| {
         let address = parse_address(addr)?;
@@ -25,7 +24,6 @@ pub async fn add_new_book_address(name: String, addr: String, net: usize) -> Res
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_address_book_list() -> Result<Vec<AddressBookEntryInfo>, String> {
     with_service(|core| Ok(core.get_address_book().iter().map(Into::into).collect()))
         .await

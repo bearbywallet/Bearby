@@ -21,7 +21,6 @@ use crate::{
     },
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if guard.is_none() {
@@ -34,7 +33,6 @@ pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn stop_service() -> Result<(), String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
     if let Some(background) = guard.as_mut() {
@@ -46,7 +44,6 @@ pub async fn stop_service() -> Result<(), String> {
     }
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn is_service_running() -> bool {
     BACKGROUND_SERVICE.read().await.is_some()
 }
@@ -116,7 +113,6 @@ pub async fn start_block_worker(
     Ok(())
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_data() -> Result<BackgroundState, String> {
     with_service(get_background_state).await.map_err(Into::into)
 }

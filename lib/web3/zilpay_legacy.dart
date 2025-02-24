@@ -328,7 +328,7 @@ class ZilPayLegacyHandler {
 
             ConnectionInfo connectionInfo = ConnectionInfo(
               domain: currentDomain,
-              walletIndexes: walletIndexes,
+              accountIndexes: walletIndexes,
               favicon: icon,
               title: title,
               description: pageInfo['description'] as String?,
@@ -341,7 +341,10 @@ class ZilPayLegacyHandler {
             Map<String, String>? account;
 
             if (accepted) {
-              await createNewConnection(conn: connectionInfo);
+              await createUpdateConnection(
+                walletIndex: BigInt.from(appState.selectedWallet),
+                conn: connectionInfo,
+              );
               await appState.syncConnections();
               final (bech32, base16) = await zilliqaGetBech32Base16Address(
                 walletIndex: BigInt.from(appState.selectedWallet),

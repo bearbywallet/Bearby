@@ -162,7 +162,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncConnections() async {
-    _connections = await getConnectionsList();
+    _connections =
+        await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
 
     notifyListeners();
   }

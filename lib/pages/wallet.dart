@@ -65,7 +65,10 @@ class _WalletPageState extends State<WalletPage> {
   void _handleDappDisconnect(String url) async {
     AppState appState = Provider.of<AppState>(context, listen: false);
 
-    await removeConnections(domain: url);
+    await removeConnections(
+      walletIndex: BigInt.from(appState.selectedWallet),
+      domain: url,
+    );
     await appState.syncConnections();
   }
 

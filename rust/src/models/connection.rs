@@ -2,7 +2,7 @@ pub use zilpay::background::connections::{Connection, ConnectionPermissions, DAp
 
 #[derive(Debug)]
 pub struct ColorsInfo {
-    pub primary: String,
+    pub primary: Option<String>,
     pub secondary: Option<String>,
     pub background: Option<String>,
     pub text: Option<String>,
@@ -34,7 +34,7 @@ impl From<ColorsInfo> for DAppColors {
 pub struct ConnectionInfo {
     // Base fields
     pub domain: String,
-    pub wallet_indexes: Vec<usize>,
+    pub account_indexes: Vec<usize>,
     pub favicon: Option<String>,
     pub title: String,
     pub description: Option<String>,
@@ -55,7 +55,7 @@ impl From<Connection> for ConnectionInfo {
         ConnectionInfo {
             colors: conn.colors.map(Into::into),
             domain: conn.domain,
-            wallet_indexes: conn.wallet_indexes.into_iter().collect(),
+            account_indexes: conn.account_indexes.into_iter().collect(),
             favicon: conn.favicon,
             title: conn.title,
             description: conn.description,
@@ -74,7 +74,7 @@ impl From<ConnectionInfo> for Connection {
         Connection {
             colors: conn_info.colors.map(Into::into),
             domain: conn_info.domain,
-            wallet_indexes: conn_info.wallet_indexes.into_iter().collect(),
+            account_indexes: conn_info.account_indexes.into_iter().collect(),
             favicon: conn_info.favicon,
             title: conn_info.title,
             description: conn_info.description,

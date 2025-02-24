@@ -7,13 +7,13 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class ColorsInfo {
-  final String primary;
+  final String? primary;
   final String? secondary;
   final String? background;
   final String? text;
 
   const ColorsInfo({
-    required this.primary,
+    this.primary,
     this.secondary,
     this.background,
     this.text,
@@ -39,7 +39,7 @@ class ColorsInfo {
 
 class ConnectionInfo {
   final String domain;
-  final Uint64List walletIndexes;
+  final Uint64List accountIndexes;
   final String? favicon;
   final String title;
   final String? description;
@@ -52,7 +52,7 @@ class ConnectionInfo {
 
   const ConnectionInfo({
     required this.domain,
-    required this.walletIndexes,
+    required this.accountIndexes,
     this.favicon,
     required this.title,
     this.description,
@@ -67,7 +67,7 @@ class ConnectionInfo {
   @override
   int get hashCode =>
       domain.hashCode ^
-      walletIndexes.hashCode ^
+      accountIndexes.hashCode ^
       favicon.hashCode ^
       title.hashCode ^
       description.hashCode ^
@@ -84,7 +84,7 @@ class ConnectionInfo {
       other is ConnectionInfo &&
           runtimeType == other.runtimeType &&
           domain == other.domain &&
-          walletIndexes == other.walletIndexes &&
+          accountIndexes == other.accountIndexes &&
           favicon == other.favicon &&
           title == other.title &&
           description == other.description &&

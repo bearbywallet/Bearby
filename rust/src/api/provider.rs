@@ -12,7 +12,6 @@ pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
     with_service(|core| {
         let providers = core.get_providers();
@@ -26,7 +25,6 @@ pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> {
     with_service(|core| {
         let provider = core.get_provider(chain_hash)?;
@@ -37,7 +35,6 @@ pub async fn get_provider(chain_hash: u64) -> Result<NetworkConfigInfo, String> 
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<String, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -54,7 +51,6 @@ pub async fn provider_req_proxy(payload: String, chain_hash: u64) -> Result<Stri
     Ok(res.to_string())
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, String> {
     with_service(|core| {
         let config = provider_config.try_into()?;
@@ -66,7 +62,6 @@ pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, Str
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Result<(), String> {
     with_service(|core| {
         let mut providers = core.get_providers();

@@ -112,7 +112,6 @@ class Web3EIP1193Handler {
           await appState.syncConnections();
           final foundConnection =
               Web3Utils.isDomainConnected(currentDomain, appState.connections);
-          final pageInfo = await Web3Utils.extractPageInfo(webViewController);
           List<String> addresses =
               (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
 
@@ -122,7 +121,7 @@ class Web3EIP1193Handler {
 
           if (foundConnection != null &&
               appState.wallet?.accounts.length ==
-                  foundConnection.walletIndexes.length) {
+                  foundConnection.accountIndexes.length) {
             return await _sendResponse(
               type: 'ZILPAY_RESPONSE',
               uuid: message.uuid,
@@ -138,10 +137,10 @@ class Web3EIP1193Handler {
               uuid: message.uuid,
               iconUrl: "",
               onDecision: (accepted, selectedIndices) async {
-                final walletIndexes = Uint64List.fromList(selectedIndices);
+                final accountIndexes = Uint64List.fromList(selectedIndices);
                 ConnectionInfo connectionInfo = ConnectionInfo(
                   domain: currentDomain,
-                  walletIndexes: walletIndexes,
+                  accountIndexes: accountIndexes,
                   favicon: message.icon,
                   title: "",
                   colors: null,
@@ -155,14 +154,17 @@ class Web3EIP1193Handler {
                 );
 
                 if (accepted) {
-                  // TODO: create or update
-                  await createNewConnection(conn: connectionInfo);
+                  await createUpdateConnection(
+                      walletIndex: BigInt.from(
+                        appState.selectedWallet,
+                      ),
+                      conn: connectionInfo);
                   await appState.syncConnections();
                 }
 
                 List<String> connectedAddr = Web3Utils.filterByIndexes(
                   addresses,
-                  walletIndexes,
+                  accountIndexes,
                 );
 
                 await _sendResponse(
@@ -180,7 +182,7 @@ class Web3EIP1193Handler {
               (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
           List<String> connectedAddr = Web3Utils.filterByIndexes(
             addresses,
-            foundConnection?.walletIndexes ?? Uint64List.fromList([]),
+            foundConnection?.accountIndexes ?? Uint64List.fromList([]),
           );
           await _sendResponse(
             type: 'ZILPAY_RESPONSE',

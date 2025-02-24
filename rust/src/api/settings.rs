@@ -10,7 +10,6 @@ use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
     with_service_mut(|core| {
         let new_theme = Theme {
@@ -24,7 +23,6 @@ pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_notifications(
     wallet_index: usize,
     transactions: bool,
@@ -48,7 +46,6 @@ pub async fn set_wallet_notifications(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String> {
     with_service_mut(|core| {
         core.set_global_notifications(global_enabled)
@@ -58,7 +55,6 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         let mut data = wallet
@@ -75,7 +71,6 @@ pub async fn set_rate_fetcher(wallet_index: usize, currency: Option<String>) -> 
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         let mut data = wallet
@@ -92,7 +87,6 @@ pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<()
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         let mut data = wallet
@@ -109,7 +103,6 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         let mut data = wallet
@@ -126,7 +119,6 @@ pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Resul
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet_mut(wallet_index, |wallet| {
         let mut data = wallet

@@ -25,7 +25,6 @@ pub use zilpay::proto::U256;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn sign_send_transactions(
     wallet_index: usize,
     account_index: usize,
@@ -81,7 +80,6 @@ pub async fn sign_send_transactions(
     Ok(tx)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn sign_message(
     wallet_index: usize,
     account_index: usize,
@@ -125,7 +123,6 @@ pub async fn sign_message(
     Ok((pubkey, sig))
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactionInfo>, String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
@@ -142,7 +139,6 @@ pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactio
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn clear_history(wallet_index: usize) -> Result<(), String> {
     with_service_mut(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
@@ -164,7 +160,6 @@ pub struct TokenTransferParamsInfo {
     pub recipient: String,
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn create_token_transfer(
     params: TokenTransferParamsInfo,
 ) -> Result<TransactionRequestInfo, String> {
@@ -202,7 +197,6 @@ pub async fn create_token_transfer(
     .map_err(Into::into)
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn cacl_gas_fee(
     wallet_index: usize,
     account_index: usize,
@@ -253,7 +247,6 @@ pub async fn cacl_gas_fee(
     Ok(gas.into())
 }
 
-#[flutter_rust_bridge::frb(dart_async)]
 pub async fn check_pending_tranasctions(
     wallet_index: usize,
 ) -> Result<Vec<HistoricalTransactionInfo>, String> {

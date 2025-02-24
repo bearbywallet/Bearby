@@ -23,3 +23,5 @@ Future<KeyPairInfo> keypairFromSk({required String sk}) =>
 
 Future<bool> isCryptoAddress({required String addr}) =>
     RustLib.instance.api.crateApiMethodsIsCryptoAddress(addr: addr);
+
+Future<void> initApp() => RustLib.instance.api.crateApiMethodsInitApp();
