@@ -134,6 +134,7 @@ class Web3EIP1193Handler {
           showAppConnectModal(
               context: context,
               title: message.title ?? "",
+              colors: message.colors,
               uuid: message.uuid,
               iconUrl: message.icon ?? "",
               onDecision: (accepted, selectedIndices) async {
@@ -155,10 +156,11 @@ class Web3EIP1193Handler {
 
                 if (accepted) {
                   await createUpdateConnection(
-                      walletIndex: BigInt.from(
-                        appState.selectedWallet,
-                      ),
-                      conn: connectionInfo);
+                    walletIndex: BigInt.from(
+                      appState.selectedWallet,
+                    ),
+                    conn: connectionInfo,
+                  );
                   await appState.syncConnections();
                 }
 
@@ -184,6 +186,7 @@ class Web3EIP1193Handler {
             addresses,
             foundConnection?.accountIndexes ?? Uint64List.fromList([]),
           );
+          print(connectedAddr);
           await _sendResponse(
             type: 'ZILPAY_RESPONSE',
             uuid: message.uuid,

@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -11,6 +12,7 @@ void showAppConnectModal({
   required String title,
   required String uuid,
   required String iconUrl,
+  ColorsInfo? colors,
   required Function(bool, List<int>) onDecision,
   VoidCallback? onDismiss,
 }) {
@@ -31,6 +33,7 @@ void showAppConnectModal({
           title: title,
           uuid: uuid,
           iconUrl: iconUrl,
+          colors: colors,
           onDecision: onDecision,
         ),
       );
@@ -42,12 +45,14 @@ class _AppConnectModalContent extends StatefulWidget {
   final String title;
   final String uuid;
   final String iconUrl;
+  final ColorsInfo? colors;
   final Function(bool, List<int>) onDecision;
 
   const _AppConnectModalContent({
     required this.title,
     required this.uuid,
     required this.iconUrl,
+    this.colors,
     required this.onDecision,
   });
 
@@ -71,18 +76,32 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
     }
   }
 
+  Color? _parseColor(String? colorString) {
+    if (colorString == null) return null;
+    try {
+      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final backgroundColor =
+        _parseColor(widget.colors?.background) ?? theme.cardBackground;
+    final primaryColor =
+        _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
+    final secondaryColor =
+        _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
       decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        color: backgroundColor,
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -92,7 +111,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
             height: 4,
             margin: EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.5),
+              color: secondaryColor.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -104,9 +123,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(16),
                 border: Border.all(
-                  color: theme.primaryPurple.withValues(alpha: 0.2),
-                  width: 2,
-                ),
+                    color: primaryColor.withValues(alpha: 0.2), width: 2),
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(14),
@@ -116,20 +133,18 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
                   height: 64,
                   fit: BoxFit.cover,
                   errorWidget: Container(
-                    color: theme.textSecondary.withValues(alpha: 0.1),
+                    color: secondaryColor.withValues(alpha: 0.1),
                     child: HoverSvgIcon(
                       assetName: 'assets/icons/warning.svg',
                       width: 64,
                       height: 64,
                       onTap: () {},
-                      color: theme.textSecondary,
+                      color: secondaryColor,
                     ),
                   ),
                   loadingWidget: Center(
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: theme.primaryPurple,
-                    ),
+                        strokeWidth: 2, color: primaryColor),
                   ),
                 ),
               ),
@@ -140,10 +155,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
             child: Text(
               widget.title,
               style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+                  color: textColor, fontSize: 20, fontWeight: FontWeight.w600),
               textAlign: TextAlign.center,
             ),
           ),
@@ -179,8 +191,8 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
                             Navigator.pop(context);
                           }
                         : null,
-                    backgroundColor: theme.primaryPurple,
-                    textColor: theme.textPrimary,
+                    backgroundColor: primaryColor,
+                    textColor: textColor,
                     height: 48,
                   ),
                 ),
@@ -194,23 +206,25 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
   }
 
   Widget _buildAccountList(AppState appState, AppTheme theme) {
+    final primaryColor =
+        _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
+    final secondaryColor =
+        _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
+
     if (appState.wallet == null || appState.wallet!.accounts.isEmpty) {
       return Padding(
         padding: EdgeInsets.all(16),
         child: Text(
           'No accounts available',
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 14,
-          ),
+          style: TextStyle(color: secondaryColor, fontSize: 14),
         ),
       );
     }
 
     return Container(
-      constraints: BoxConstraints(
-        maxHeight: MediaQuery.of(context).size.height * 0.4,
-      ),
+      constraints:
+          BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.4),
       padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: ListView.builder(
         shrinkWrap: true,
@@ -220,23 +234,18 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
           final isSelected = _selectedAccounts[index] ?? false;
 
           return CheckboxListTile(
-            title: Text(
-              account.name,
-              style: TextStyle(color: theme.textPrimary),
-            ),
-            subtitle: Text(
-              account.addr,
-              style: TextStyle(color: theme.textSecondary, fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
+            title: Text(account.name, style: TextStyle(color: textColor)),
+            subtitle: Text(account.addr,
+                style: TextStyle(color: secondaryColor, fontSize: 12),
+                overflow: TextOverflow.ellipsis),
             value: isSelected,
             onChanged: (bool? value) {
               setState(() {
                 _selectedAccounts[index] = value ?? false;
               });
             },
-            activeColor: theme.primaryPurple,
-            checkColor: theme.textPrimary,
+            activeColor: primaryColor,
+            checkColor: textColor,
             controlAffinity: ListTileControlAffinity.leading,
           );
         },

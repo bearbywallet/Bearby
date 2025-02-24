@@ -316,6 +316,7 @@ class ZilPayLegacyHandler {
           context: context,
           title: message.title ?? "",
           uuid: message.uuid,
+          colors: message.colors,
           iconUrl: message.icon ?? "",
           onDecision: (accepted, selectedIndices) async {
             final walletIndexes = Uint64List.fromList(
