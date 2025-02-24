@@ -22,8 +22,8 @@ void showSignMessageModal({
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    enableDrag: true,
-    isDismissible: true,
+    enableDrag: false,
+    isDismissible: false,
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => _SignMessageModalContent(
@@ -33,7 +33,7 @@ void showSignMessageModal({
       onMessageSigned: onMessageSigned,
       onDismiss: onDismiss,
     ),
-  ).then((_) => onDismiss?.call());
+  );
 }
 
 class _SignMessageModalContent extends StatefulWidget {

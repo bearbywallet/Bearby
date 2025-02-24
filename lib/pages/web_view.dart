@@ -6,6 +6,7 @@ import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/web3/eip_1193.dart';
 import 'package:zilpay/web3/message.dart';
 import 'package:zilpay/web3/zilpay_legacy.dart';
 import 'dart:convert';
@@ -22,6 +23,7 @@ class WebViewPage extends StatefulWidget {
 class _WebViewPageState extends State<WebViewPage> {
   late WebViewController _webViewController;
   late ZilPayLegacyHandler _legacyHandler;
+  late Web3EIP1193Handler _eip1193Handler;
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
@@ -43,7 +45,9 @@ class _WebViewPageState extends State<WebViewPage> {
                 jsonDecode(message.message) as Map<String, dynamic>;
 
             final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
-            _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
+
+            _eip1193Handler.handleWeb3EIP1193Message(zilPayMessage, context);
+            // _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
           } catch (e) {
             debugPrint(
                 'Failed to parse message: ${message.message}, error: $e');
@@ -80,6 +84,10 @@ class _WebViewPageState extends State<WebViewPage> {
       ..loadRequest(Uri.parse(widget.initialUrl));
 
     _legacyHandler = ZilPayLegacyHandler(
+      webViewController: _webViewController,
+      initialUrl: widget.initialUrl,
+    );
+    _eip1193Handler = Web3EIP1193Handler(
       webViewController: _webViewController,
       initialUrl: widget.initialUrl,
     );

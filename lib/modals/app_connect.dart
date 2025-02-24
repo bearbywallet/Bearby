@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -11,6 +12,7 @@ void showAppConnectModal({
   required String uuid,
   required String iconUrl,
   required Function(bool, List<int>) onDecision,
+  VoidCallback? onDismiss,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -33,7 +35,7 @@ void showAppConnectModal({
         ),
       );
     },
-  );
+  ).then((_) => onDismiss?.call());
 }
 
 class _AppConnectModalContent extends StatefulWidget {
@@ -115,10 +117,12 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
                   fit: BoxFit.cover,
                   errorWidget: Container(
                     color: theme.textSecondary.withValues(alpha: 0.1),
-                    child: Icon(
-                      Icons.apps,
+                    child: HoverSvgIcon(
+                      assetName: 'assets/icons/warning.svg',
+                      width: 64,
+                      height: 64,
+                      onTap: () {},
                       color: theme.textSecondary,
-                      size: 32,
                     ),
                   ),
                   loadingWidget: Center(

@@ -62,6 +62,7 @@ class ZilPayLegacyHandler {
   ) async {
     final response =
         ZilPayWeb3Message(type: type, payload: payload, uuid: uuid).toJson();
+
     final jsonString = jsonEncode(response);
     await webViewController
         .runJavaScript('window.postMessage($jsonString, "*")');
@@ -87,7 +88,7 @@ class ZilPayLegacyHandler {
         {
           'account': account,
           'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
-          'isConnect': connected,
+          'isConnect': connected != null,
           'isEnable': true,
         },
         "");
@@ -298,7 +299,7 @@ class ZilPayLegacyHandler {
         final isAlreadyConnected =
             Web3Utils.isDomainConnected(currentDomain, appState.connections);
 
-        if (isAlreadyConnected) {
+        if (isAlreadyConnected != null) {
           final (bech32, base16) = await zilliqaGetBech32Base16Address(
             walletIndex: BigInt.from(appState.selectedWallet),
             accountIndex: appState.wallet!.selectedAccount,
@@ -310,7 +311,8 @@ class ZilPayLegacyHandler {
         }
 
         final title = message.payload['title'] as String? ?? 'Unknown App';
-        final icon = message.payload['icon'] as String? ?? '';
+        final icon = message.payload['icon'] as String? ??
+            ''; // TODO: remake icon to message
         final pageInfo = await Web3Utils.extractPageInfo(webViewController);
 
         if (!context.mounted) return;

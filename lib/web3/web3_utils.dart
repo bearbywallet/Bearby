@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -60,6 +61,18 @@ class Web3Utils {
       }
     }
     return null;
+  }
+
+  static List<String> filterByIndexes(
+    List<String> addresses,
+    Uint64List indexes,
+  ) {
+    return indexes
+        .toList()
+        .where((index) =>
+            index >= BigInt.zero && index < BigInt.from(addresses.length))
+        .map((index) => addresses[index.toInt()])
+        .toList();
   }
 
   static String _parseColor(String color) {

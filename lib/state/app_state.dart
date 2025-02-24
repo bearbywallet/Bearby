@@ -203,18 +203,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     }
 
     try {
-      final notifications = NotificationsService();
       Stream<String> stream =
           startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
 
       stream.listen((event) async {
-        print("event: $event");
-        await notifications.showNotification(
-          id: 1,
-          title: "Заголовок",
-          body: "Текст уведомления",
-          payload: "дополнительные данные",
-        );
         // TODO: update transactions.
         notifyListeners();
       });
