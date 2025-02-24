@@ -97,7 +97,6 @@ class Web3EIP1193Handler {
       final currentDomain = Uri.parse(initialUrl).host;
       final method = message.payload['method'] as String?;
       if (method == null) {
-        debugPrint('Error: No method specified in payload');
         return _returnError(message.uuid,
             Web3EIP1193ErrorCode.unsupportedMethod, 'No method specified');
       }
@@ -186,7 +185,6 @@ class Web3EIP1193Handler {
             addresses,
             foundConnection?.accountIndexes ?? Uint64List.fromList([]),
           );
-          print(connectedAddr);
           await _sendResponse(
             type: 'ZILPAY_RESPONSE',
             uuid: message.uuid,

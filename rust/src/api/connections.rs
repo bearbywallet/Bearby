@@ -21,12 +21,11 @@ pub async fn create_update_connection(
 
         if let Some(existing_conn) = connections.iter_mut().find(|c| c.domain == conn.domain) {
             *existing_conn = conn.into();
+            core.save_connection(wallet_index, connections)?;
         } else {
             core.add_connection(wallet_index, conn.into())
                 .map_err(ServiceError::BackgroundError)?;
         }
-
-        core.save_connection(wallet_index, connections)?;
 
         Ok(())
     })
