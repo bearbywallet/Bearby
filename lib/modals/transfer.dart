@@ -135,7 +135,7 @@ class _ConfirmTransactionContentState
   }
 
   Future<void> _fetchGasFee(bool initial) async {
-    if (_loading || !mounted) return;
+    if (!mounted) return;
     final appState = context.read<AppState>();
     try {
       if (initial) _error = null;
@@ -144,7 +144,7 @@ class _ConfirmTransactionContentState
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
       );
-      if (mounted && gas.gasPrice != BigInt.zero) {
+      if (mounted) {
         setState(() => _txParamsInfo = gas);
       }
     } catch (e) {
@@ -193,7 +193,9 @@ class _ConfirmTransactionContentState
       allowPinCode: true, reason: 'Please authenticate');
 
   Future<HistoricalTransactionInfo?> _signAndSend(
-      AppState appState, TransactionRequestInfo tx) async {
+    AppState appState,
+    TransactionRequestInfo tx,
+  ) async {
     final device = DeviceInfoService();
     final identifiers = await device.getDeviceIdentifiers();
     final wallet = appState.wallet!;

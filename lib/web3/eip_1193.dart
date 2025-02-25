@@ -99,6 +99,8 @@ class Web3EIP1193Handler {
         orElse: () => Web3EIP1193Method.ethRequestAccounts,
       );
 
+      print(message);
+
       switch (zilPayMethod) {
         case Web3EIP1193Method.ethRequestAccounts:
           await _handleEthRequestAccounts(message, context, appState);
