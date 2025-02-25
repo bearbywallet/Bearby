@@ -344,3 +344,16 @@ pub async fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, S
 
     Ok(addr.get_zil_bech32().unwrap_or_default())
 }
+
+pub fn convert_bech32_addresses_to_eth_checksum(addresses: Vec<String>) -> Vec<String> {
+    let converted: Vec<String> = addresses
+        .iter()
+        .filter_map(|a: &String| {
+            Address::from_zil_bech32(a)
+                .ok()
+                .and_then(|v| v.to_eth_checksummed().ok())
+        })
+        .collect();
+
+    converted
+}
