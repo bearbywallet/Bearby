@@ -293,6 +293,8 @@ class _ConfirmTransactionContentState
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GasEIP1559(
+                        timeDiffBlock:
+                            appState.chain?.diffBlockTime.toInt() ?? 10,
                         txParamsInfo: _txParamsInfo,
                         disabled:
                             _txParamsInfo.gasPrice == BigInt.zero || _loading,
