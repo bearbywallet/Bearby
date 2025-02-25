@@ -72,7 +72,7 @@ class ZilPayLegacyHandler {
     await appState.syncConnections();
     final currentDomain = Uri.parse(initialUrl).host;
     final connected =
-        Web3Utils.isDomainConnected(currentDomain, appState.connections);
+        Web3Utils.findConnected(currentDomain, appState.connections);
     Map<String, String>? account;
 
     if (connected != null) {
@@ -95,7 +95,6 @@ class ZilPayLegacyHandler {
   }
 
   void handleStartBlockWorker(AppState appState) {
-    // TODO: add worker.
     // Stream<BlockEvent> blockStream =
     //     startBlockWorker(walletIndex: BigInt.from(appState.selectedWallet));
 
@@ -297,7 +296,7 @@ class ZilPayLegacyHandler {
       case ZilliqaLegacyMessages.connectApp:
         await appState.syncConnections();
         final isAlreadyConnected =
-            Web3Utils.isDomainConnected(currentDomain, appState.connections);
+            Web3Utils.findConnected(currentDomain, appState.connections);
 
         if (isAlreadyConnected != null) {
           final (bech32, base16) = await zilliqaGetBech32Base16Address(

@@ -1,76 +1,29 @@
 import 'dart:convert';
-
 import 'package:flutter/widgets.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/modals/app_connect.dart';
+import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/web3/message.dart';
+import 'dart:developer' as dev;
+
 import 'package:zilpay/web3/web3_utils.dart';
-
-enum Web3EIP1193Method {
-  ethRequestAccounts('eth_requestAccounts'),
-  ethAccounts('eth_accounts'),
-  ethSign('eth_sign'),
-  ethSendTransaction('eth_sendTransaction'),
-  ethGetBalance('eth_getBalance'),
-  ethGetTransactionByHash('eth_getTransactionByHash'),
-  ethGetTransactionReceipt('eth_getTransactionReceipt'),
-  ethCall('eth_call'),
-  ethEstimateGas('eth_estimateGas'),
-  ethBlockNumber('eth_blockNumber'),
-  ethGetBlockByNumber('eth_getBlockByNumber'),
-  ethGetBlockByHash('eth_getBlockByHash'),
-  ethSubscribe('eth_subscribe'),
-  ethUnsubscribe('eth_unsubscribe'),
-  netVersion('net_version'),
-  ethChainId('eth_chainId'),
-  ethGetCode('eth_getCode'),
-  ethGetStorageAt('eth_getStorageAt'),
-  ethGasPrice('eth_gasPrice'),
-  ethSignTypedData('eth_signTypedData'),
-  ethSignTypedDataV4('eth_signTypedData_v4'),
-  ethGetTransactionCount('eth_getTransactionCount'),
-  personalSign('personal_sign'),
-
-  walletAddEthereumChain('wallet_addEthereumChain'),
-  walletSwitchEthereumChain('wallet_switchEthereumChain'),
-  walletWatchAsset('wallet_watchAsset'),
-  walletGetPermissions('wallet_getPermissions'),
-  walletRequestPermissions('wallet_requestPermissions'),
-  walletScanQRCode('wallet_scanQRCode'),
-  ethGetEncryptionPublicKey('eth_getEncryptionPublicKey'),
-  ethDecrypt('eth_decrypt');
-
-  final String value;
-  const Web3EIP1193Method(this.value);
-}
-
-enum Web3EIP1193ErrorCode {
-  userRejectedRequest(4001),
-  unauthorized(4100),
-  unsupportedMethod(4200),
-  disconnected(4900),
-  chainDisconnected(4901),
-  internalError(-32603),
-  invalidInput(-32000);
-
-  final int code;
-  const Web3EIP1193ErrorCode(this.code);
-}
 
 class Web3EIP1193Handler {
   final WebViewController webViewController;
-  final String initialUrl;
+  final String _currentDomain;
 
   Web3EIP1193Handler({
     required this.webViewController,
-    required this.initialUrl,
-  });
+    required String initialUrl,
+  }) : _currentDomain = Uri.parse(initialUrl).host;
 
   Future<void> _sendResponse({
     required String type,
@@ -80,15 +33,12 @@ class Web3EIP1193Handler {
     Web3EIP1193ErrorCode? errorCode,
     String? errorMessage,
   }) async {
-    final responsePayload = <String, dynamic>{};
-    if (payload != null) responsePayload.addAll(payload);
-    if (result != null) responsePayload['result'] = result;
-    if (errorCode != null && errorMessage != null) {
-      responsePayload['error'] = {
-        'code': errorCode.code,
-        'message': errorMessage,
-      };
-    }
+    final responsePayload = {
+      if (payload != null) ...payload,
+      if (result != null) 'result': result,
+      if (errorCode != null && errorMessage != null)
+        'error': {'code': errorCode.code, 'message': errorMessage},
+    };
 
     final response = ZilPayWeb3Message(
       type: type,
@@ -96,9 +46,28 @@ class Web3EIP1193Handler {
       payload: responsePayload,
     ).toJson();
 
-    final jsonString = jsonEncode(response);
     await webViewController
-        .runJavaScript('window.postMessage($jsonString, `*`)');
+        .runJavaScript('window.postMessage(${jsonEncode(response)}, `*`)');
+  }
+
+  void _returnError(
+    String uuid,
+    Web3EIP1193ErrorCode errorCode,
+    String errorMessage,
+  ) =>
+      _sendResponse(
+        type: 'ZILPAY_RESPONSE',
+        uuid: uuid,
+        errorCode: errorCode,
+        errorMessage: errorMessage,
+      );
+
+  Future<List<String>> _getWalletAddresses(AppState appState) async {
+    final addresses =
+        (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
+    return appState.chain?.slip44 == 313
+        ? await convertBech32AddressesToEthChecksum(addresses: addresses)
+        : addresses;
   }
 
   Future<void> handleWeb3EIP1193Message(
@@ -109,11 +78,13 @@ class Web3EIP1193Handler {
     final chain = appState.chain;
 
     try {
-      final currentDomain = Uri.parse(initialUrl).host;
       final method = message.payload['method'] as String?;
       if (method == null) {
-        return _returnError(message.uuid,
-            Web3EIP1193ErrorCode.unsupportedMethod, 'No method specified');
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unsupportedMethod,
+          'No method specified',
+        );
       }
 
       final zilPayMethod = Web3EIP1193Method.values.firstWhere(
@@ -123,289 +94,146 @@ class Web3EIP1193Handler {
 
       switch (zilPayMethod) {
         case Web3EIP1193Method.ethRequestAccounts:
-          await appState.syncConnections();
-          final foundConnection =
-              Web3Utils.isDomainConnected(currentDomain, appState.connections);
-          List<String> addresses =
-              (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
-
-          if (chain?.slip44 == 313) {
-            // TODO: Zilliqa.
-          }
-
-          if (foundConnection != null &&
-              appState.wallet?.accounts.length ==
-                  foundConnection.accountIndexes.length) {
-            return await _sendResponse(
-              type: 'ZILPAY_RESPONSE',
-              uuid: message.uuid,
-              result: addresses,
-            );
-          }
-
-          if (!context.mounted) return;
-
-          showAppConnectModal(
-              context: context,
-              title: message.title ?? "",
-              colors: message.colors,
-              uuid: message.uuid,
-              iconUrl: message.icon ?? "",
-              onDecision: (accepted, selectedIndices) async {
-                final accountIndexes = Uint64List.fromList(selectedIndices);
-                ConnectionInfo connectionInfo = ConnectionInfo(
-                  domain: currentDomain,
-                  accountIndexes: accountIndexes,
-                  favicon: message.icon,
-                  title: message.title ?? "",
-                  colors: message.colors,
-                  description: message.description,
-                  lastConnected:
-                      BigInt.from(DateTime.now().millisecondsSinceEpoch),
-                  canReadAccounts: true,
-                  canRequestSignatures: true,
-                  canSuggestTokens: false,
-                  canSuggestTransactions: true,
-                );
-
-                if (accepted) {
-                  await createUpdateConnection(
-                    walletIndex: BigInt.from(
-                      appState.selectedWallet,
-                    ),
-                    conn: connectionInfo,
-                  );
-                  await appState.syncConnections();
-                }
-
-                List<String> connectedAddr = Web3Utils.filterByIndexes(
-                  addresses,
-                  accountIndexes,
-                );
-
-                await _sendResponse(
-                  type: 'ZILPAY_RESPONSE',
-                  uuid: message.uuid,
-                  result: connectedAddr,
-                );
-              });
+          await _handleEthRequestAccounts(message, context, appState);
           break;
+
         case Web3EIP1193Method.ethAccounts:
-          await appState.syncConnections();
-          final foundConnection =
-              Web3Utils.isDomainConnected(currentDomain, appState.connections);
-          List<String> addresses =
-              (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
-          List<String> connectedAddr = Web3Utils.filterByIndexes(
-            addresses,
-            foundConnection?.accountIndexes ?? Uint64List.fromList([]),
-          );
-          await _sendResponse(
-            type: 'ZILPAY_RESPONSE',
-            uuid: message.uuid,
-            result: connectedAddr,
-          );
-          break;
-        case Web3EIP1193Method.ethSign:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_sign" is not supported');
-          break;
-        case Web3EIP1193Method.ethSendTransaction:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_sendTransaction" is not supported');
-          break;
-        case Web3EIP1193Method.ethGetBalance:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetTransactionByHash:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetTransactionReceipt:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethCall:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethEstimateGas:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethBlockNumber:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetBlockByNumber:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetBlockByHash:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethSubscribe:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_subscribe" is not supported');
-          break;
-        case Web3EIP1193Method.ethUnsubscribe:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_unsubscribe" is not supported');
-          break;
-        case Web3EIP1193Method.netVersion:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethChainId:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetCode:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGetStorageAt:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethGasPrice:
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.ethSignTypedData:
-          debugPrint('Called: eth_signTypedData');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_signTypedData" is not supported');
-          break;
-        case Web3EIP1193Method.ethSignTypedDataV4:
-          debugPrint('Called: eth_signTypedData_v4');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_signTypedData_v4" is not supported');
-          break;
-        case Web3EIP1193Method.ethGetTransactionCount:
-          debugPrint('Called: eth_getTransactionCount');
-          await _proxyRpcRequest(
-            method: zilPayMethod.value,
-            uuid: message.uuid,
-            params: message.payload['params'],
-            chainHash: chain?.chainHash ?? BigInt.zero,
-          );
-          break;
-        case Web3EIP1193Method.personalSign:
-          debugPrint('Called: personal_sign');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "personal_sign" is not supported');
+          await _handleEthAccounts(message, appState);
           break;
 
-        case Web3EIP1193Method.walletAddEthereumChain:
-          debugPrint('Called: wallet_addEthereumChain');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_addEthereumChain" is not supported by ZilPay');
+        case Web3EIP1193Method.ethSign:
+        case Web3EIP1193Method.personalSign:
+          await _handleEthereumSigning(
+            message: message,
+            context: context,
+            appState: appState,
+            isPersonalSign: zilPayMethod == Web3EIP1193Method.personalSign,
+          );
           break;
-        case Web3EIP1193Method.walletSwitchEthereumChain:
-          debugPrint('Called: wallet_switchEthereumChain');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_switchEthereumChain" is not supported by ZilPay');
+
+        case Web3EIP1193Method.ethGetBalance:
+        case Web3EIP1193Method.ethGetTransactionByHash:
+        case Web3EIP1193Method.ethGetTransactionReceipt:
+        case Web3EIP1193Method.ethCall:
+        case Web3EIP1193Method.ethEstimateGas:
+        case Web3EIP1193Method.ethBlockNumber:
+        case Web3EIP1193Method.ethGetBlockByNumber:
+        case Web3EIP1193Method.ethGetBlockByHash:
+        case Web3EIP1193Method.netVersion:
+        case Web3EIP1193Method.ethChainId:
+        case Web3EIP1193Method.ethGetCode:
+        case Web3EIP1193Method.ethGetStorageAt:
+        case Web3EIP1193Method.ethGasPrice:
+        case Web3EIP1193Method.ethGetTransactionCount:
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
-        case Web3EIP1193Method.walletWatchAsset:
-          debugPrint('Called: wallet_watchAsset');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_watchAsset" is not supported by ZilPay');
-          break;
-        case Web3EIP1193Method.walletGetPermissions:
-          debugPrint('Called: wallet_getPermissions');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_getPermissions" is not supported by ZilPay');
-          break;
-        case Web3EIP1193Method.walletRequestPermissions:
-          debugPrint('Called: wallet_requestPermissions');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_requestPermissions" is not supported by ZilPay');
-          break;
-        case Web3EIP1193Method.walletScanQRCode:
-          debugPrint('Called: wallet_scanQRCode');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "wallet_scanQRCode" is not supported by ZilPay');
-          break;
-        case Web3EIP1193Method.ethGetEncryptionPublicKey:
-          debugPrint('Called: eth_getEncryptionPublicKey');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getEncryptionPublicKey" is not supported by ZilPay');
-          break;
-        case Web3EIP1193Method.ethDecrypt:
-          debugPrint('Called: eth_decrypt');
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_decrypt" is not supported by ZilPay');
+
+        default:
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.unsupportedMethod,
+            'Method "${zilPayMethod.value}" is not supported',
+          );
           break;
       }
     } catch (e) {
-      debugPrint('Error handling message: $e');
-      _returnError(message.uuid, Web3EIP1193ErrorCode.internalError,
-          'Error processing message: $e');
+      dev.log('Error handling message: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing message: $e',
+      );
     }
   }
 
-  void _returnError(
-      String uuid, Web3EIP1193ErrorCode errorCode, String errorMessage) {
+  Future<void> _handleEthRequestAccounts(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    await appState.syncConnections();
+    final connection = Web3Utils.findConnected(
+      _currentDomain,
+      appState.connections,
+    );
+    final addresses = await _getWalletAddresses(appState);
+
+    if (connection != null &&
+        appState.wallet?.accounts.length == connection.accountIndexes.length) {
+      return _sendResponse(
+        type: 'ZILPAY_RESPONSE',
+        uuid: message.uuid,
+        result: addresses,
+      );
+    }
+
+    if (!context.mounted) return;
+
+    showAppConnectModal(
+      context: context,
+      title: message.title ?? "",
+      colors: message.colors,
+      uuid: message.uuid,
+      iconUrl: message.icon ?? "",
+      onDecision: (accepted, selectedIndices) async {
+        if (!accepted) {
+          return _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: [],
+          );
+        }
+
+        final accountIndexes = Uint64List.fromList(selectedIndices);
+        final connectionInfo = ConnectionInfo(
+          domain: _currentDomain,
+          accountIndexes: accountIndexes,
+          favicon: message.icon,
+          title: message.title ?? "",
+          colors: message.colors,
+          description: message.description,
+          lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+          canReadAccounts: true,
+          canRequestSignatures: true,
+          canSuggestTokens: false,
+          canSuggestTransactions: true,
+        );
+
+        await createUpdateConnection(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          conn: connectionInfo,
+        );
+        await appState.syncConnections();
+
+        final connectedAddr = filterByIndexes(addresses, accountIndexes);
+        _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: connectedAddr,
+        );
+      },
+    );
+  }
+
+  Future<void> _handleEthAccounts(
+    ZilPayWeb3Message message,
+    AppState appState,
+  ) async {
+    await appState.syncConnections();
+    final connection =
+        Web3Utils.findConnected(_currentDomain, appState.connections);
+    final addresses = await _getWalletAddresses(appState);
+    final connectedAddr =
+        filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
     _sendResponse(
       type: 'ZILPAY_RESPONSE',
-      uuid: uuid,
-      errorCode: errorCode,
-      errorMessage: errorMessage,
+      uuid: message.uuid,
+      result: connectedAddr,
     );
   }
 
@@ -416,27 +244,24 @@ class Web3EIP1193Handler {
     List<dynamic>? params,
   }) async {
     try {
-      final payload = {
+      final payload = jsonEncode({
         'method': method,
         'params': params ?? [],
         'jsonrpc': '2.0',
         'id': uuid,
-      };
+      });
 
-      final payloadJson = jsonEncode(payload);
-      final jsonRes = await providerReqProxy(
-        payload: payloadJson,
-        chainHash: chainHash,
-      );
+      final jsonRes =
+          await providerReqProxy(payload: payload, chainHash: chainHash);
       final response = jsonDecode(jsonRes);
-      if (response.containsKey('error') && response['error'] != null) {
+
+      if (response['error'] != null) {
         final error = response['error'];
         final errorCode =
             error['code'] as int? ?? Web3EIP1193ErrorCode.internalError.code;
-        final errorMessage =
-            error['message'] as String? ?? 'Unknown error from RPC provider';
+        final errorMessage = error['message'] as String? ?? 'Unknown RPC error';
 
-        await _sendResponse(
+        _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: uuid,
           errorCode: Web3EIP1193ErrorCode.values.firstWhere(
@@ -446,18 +271,101 @@ class Web3EIP1193Handler {
           errorMessage: errorMessage,
         );
       } else {
-        await _sendResponse(
+        _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: uuid,
           result: response['result'],
         );
       }
     } catch (e) {
-      debugPrint('RPC proxy error: $e');
+      dev.log('RPC proxy error: $e', name: 'web3_handler');
       _returnError(
         uuid,
         Web3EIP1193ErrorCode.internalError,
         'Failed to proxy RPC request: $e',
+      );
+    }
+  }
+
+  Future<void> _handleEthereumSigning({
+    required ZilPayWeb3Message message,
+    required BuildContext context,
+    required AppState appState,
+    required bool isPersonalSign,
+  }) async {
+    try {
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+
+      if (connection == null) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'This domain is not connected. Please connect first.',
+        );
+      }
+
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null || params.length < 2) {
+        final methodName = isPersonalSign ? 'personal_sign' : 'eth_sign';
+        final paramOrder =
+            isPersonalSign ? '[message, address]' : '[address, message]';
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for $methodName. Required: $paramOrder',
+        );
+      }
+
+      final address =
+          isPersonalSign ? params[1] as String : params[0] as String;
+      final dataToSign =
+          isPersonalSign ? params[0] as String : params[1] as String;
+
+      final addresses = await _getWalletAddresses(appState);
+      final connectedAddresses =
+          filterByIndexes(addresses, connection.accountIndexes);
+
+      if (!connectedAddresses.contains(address)) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'The requested address is not authorized',
+        );
+      }
+
+      final messageContent = isPersonalSign
+          ? decodePersonalSignMessage(dataToSign)
+          : "Ethereum Signed Message:\n${dataToSign.length}\n$dataToSign";
+
+      if (!context.mounted) return;
+
+      showSignMessageModal(
+        context: context,
+        message: messageContent,
+        onMessageSigned: (pubkey, sig) async {
+          await _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: sig,
+          );
+          if (context.mounted) Navigator.pop(context);
+        },
+        onDismiss: () => _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.userRejectedRequest,
+          'User rejected',
+        ),
+        appTitle: isPersonalSign ? 'Sign Message' : 'Sign Ethereum Message',
+        appIcon: message.icon ?? '',
+      );
+    } catch (e) {
+      final method = isPersonalSign ? 'personal_sign' : 'eth_sign';
+      dev.log('Error in $method: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing $method: $e',
       );
     }
   }
