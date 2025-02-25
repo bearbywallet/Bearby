@@ -5,7 +5,6 @@ import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
-
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/token.dart';
@@ -36,8 +35,6 @@ class _HomePageState extends State<HomePage> {
       await syncBalances(walletIndex: index);
       await appState.updateTokensRates();
       await appState.syncData();
-
-      setState(() {});
     } catch (e) {
       debugPrint("error sync balance: $e");
     }
@@ -49,6 +46,10 @@ class _HomePageState extends State<HomePage> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
+
+    final filteredTokens = appState.wallet!.tokens
+        .where((t) => t.addrType == appState.account?.addrType)
+        .toList();
 
     return SafeArea(
       child: Center(
@@ -76,184 +77,177 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
               SliverToBoxAdapter(
-                child: Column(
-                  children: [
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                        horizontal: 16,
-                        vertical: 12,
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: WalletHeader(
+                          account: appState.account!,
+                        ),
                       ),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: WalletHeader(
-                              account: appState.account!,
-                            ),
-                          ),
-                          HoverSvgIcon(
-                            assetName: 'assets/icons/gear.svg',
-                            width: 30,
-                            height: 30,
-                            padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
-                            color: theme.textSecondary,
-                            onTap: () {
-                              Navigator.pushNamed(context, '/settings');
-                            },
-                          ),
-                        ],
+                      HoverSvgIcon(
+                        assetName: 'assets/icons/gear.svg',
+                        width: 30,
+                        height: 30,
+                        padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                        color: theme.textSecondary,
+                        onTap: () {
+                          Navigator.pushNamed(context, '/settings');
+                        },
                       ),
-                    ),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: adaptivePadding),
-                      child: Row(
-                        children: [
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/send.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/send');
-                            },
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal,
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: Row(
+                    children: [
+                      TileButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/send.svg",
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.primaryPurple,
+                            BlendMode.srcIn,
                           ),
-                          SizedBox(width: adaptivePaddingCard),
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/receive.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            onPressed: () {
-                              Navigator.pushNamed(context, '/receive');
-                            },
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
-                          ),
-                          SizedBox(width: adaptivePaddingCard),
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/swap.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            disabled: true,
-                            onPressed: () {},
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
-                          ),
-                          SizedBox(width: adaptivePaddingCard),
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/buy.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            disabled: true,
-                            onPressed: () {},
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
-                          ),
-                          SizedBox(width: adaptivePaddingCard),
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              "assets/icons/sell.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            onPressed: () {},
-                            disabled: true,
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
-                          ),
-                        ],
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/send');
+                        },
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.symmetric(
-                          horizontal: adaptivePadding, vertical: 4),
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          HoverSvgIcon(
-                            assetName: 'assets/icons/manage.svg',
-                            width: 30,
-                            height: 30,
-                            padding: EdgeInsets.fromLTRB(30, adaptivePadding,
-                                adaptivePadding, adaptivePadding),
-                            color: theme.textSecondary,
-                            onTap: () {
-                              showManageTokensModal(
-                                context: context,
-                                onAddToken: () {
-                                  Navigator.pushNamed(context, '/add_token');
-                                },
-                                onTokenToggle: (String addr) async {
-                                  debugPrint("contract address $addr");
-                                },
-                              );
-                            },
+                      SizedBox(width: adaptivePaddingCard),
+                      TileButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/receive.svg",
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.primaryPurple,
+                            BlendMode.srcIn,
                           ),
-                        ],
+                        ),
+                        onPressed: () {
+                          Navigator.pushNamed(context, '/receive');
+                        },
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
                       ),
-                    ),
-                    Padding(
-                      padding: EdgeInsets.all(adaptivePadding),
-                      child: Column(
-                        children: appState.wallet!.tokens
-                            .asMap()
-                            .entries
-                            .where((t) =>
-                                t.value.addrType == appState.account?.addrType)
-                            .map((entry) {
-                          final token = entry.value;
-                          final isLast =
-                              entry.key == appState.wallet!.tokens.length - 1;
-                          String tokenAmountValue = token
-                                  .balances[appState.wallet!.selectedAccount] ??
-                              "0";
-
-                          return TokenCard(
-                            ftoken: token,
-                            tokenAmount: tokenAmountValue,
-                            showDivider: !isLast,
-                            onTap: () {
-                              Navigator.of(context).pushNamed(
-                                '/send',
-                                arguments: {'token_index': entry.key},
-                              );
+                      SizedBox(width: adaptivePaddingCard),
+                      TileButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/swap.svg",
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.primaryPurple,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        disabled: true,
+                        onPressed: () {},
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
+                      ),
+                      SizedBox(width: adaptivePaddingCard),
+                      TileButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/buy.svg",
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.primaryPurple,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        disabled: true,
+                        onPressed: () {},
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
+                      ),
+                      SizedBox(width: adaptivePaddingCard),
+                      TileButton(
+                        icon: SvgPicture.asset(
+                          "assets/icons/sell.svg",
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.primaryPurple,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        onPressed: () {},
+                        disabled: true,
+                        backgroundColor: theme.cardBackground,
+                        textColor: theme.primaryPurple,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              SliverToBoxAdapter(
+                child: Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 4),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      HoverSvgIcon(
+                        assetName: 'assets/icons/manage.svg',
+                        width: 30,
+                        height: 30,
+                        padding: EdgeInsets.fromLTRB(30, adaptivePadding,
+                            adaptivePadding, adaptivePadding),
+                        color: theme.textSecondary,
+                        onTap: () {
+                          showManageTokensModal(
+                            context: context,
+                            onAddToken: () {
+                              Navigator.pushNamed(context, '/add_token');
+                            },
+                            onTokenToggle: (String addr) async {
+                              debugPrint("contract address $addr");
                             },
                           );
-                        }).toList(),
+                        },
                       ),
-                    )
-                  ],
+                    ],
+                  ),
+                ),
+              ),
+              SliverList(
+                delegate: SliverChildBuilderDelegate(
+                  (context, index) {
+                    final token = filteredTokens[index];
+                    final isLast = index == filteredTokens.length - 1;
+                    String tokenAmountValue =
+                        token.balances[appState.wallet!.selectedAccount] ?? "0";
+                    return TokenCard(
+                      ftoken: token,
+                      tokenAmount: tokenAmountValue,
+                      showDivider: !isLast,
+                      onTap: () {
+                        final originalIndex =
+                            appState.wallet!.tokens.indexOf(token);
+                        Navigator.of(context).pushNamed(
+                          '/send',
+                          arguments: {'token_index': originalIndex},
+                        );
+                      },
+                    );
+                  },
+                  childCount: filteredTokens.length,
                 ),
               ),
             ],
