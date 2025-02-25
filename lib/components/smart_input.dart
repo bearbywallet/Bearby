@@ -26,6 +26,9 @@ class SmartInput extends StatefulWidget {
   final bool disabled;
   final bool autofocus;
   final TextInputType keyboardType;
+  final Color? textColor;
+  final Color? secondaryColor;
+  final Color? backgroundColor;
 
   const SmartInput({
     super.key,
@@ -49,6 +52,9 @@ class SmartInput extends StatefulWidget {
     this.disabled = false,
     this.autofocus = false,
     this.keyboardType = TextInputType.text,
+    this.textColor,
+    this.secondaryColor,
+    this.backgroundColor,
   });
 
   @override
@@ -146,19 +152,26 @@ class SmartInputState extends State<SmartInput>
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
-    final defaultBorderColor = theme.textSecondary.withValues(alpha: 0.3);
-    final defaultFocusedBorderColor = theme.primaryPurple;
+    final defaultBorderColor = widget.secondaryColor?.withValues(alpha: 0.3) ??
+        theme.textSecondary.withValues(alpha: 0.3);
+    final defaultFocusedBorderColor =
+        widget.focusedBorderColor ?? theme.primaryPurple;
 
-    final iconColor = _isFocused
-        ? (widget.focusedBorderColor ?? defaultFocusedBorderColor)
-        : theme.textSecondary;
+    final effectiveTextColor = widget.textColor ?? theme.textPrimary;
+    final effectiveSecondaryColor =
+        widget.secondaryColor ?? theme.textSecondary;
+    final effectiveBackgroundColor =
+        widget.backgroundColor ?? theme.cardBackground;
+
+    final iconColor =
+        _isFocused ? defaultFocusedBorderColor : effectiveSecondaryColor;
 
     Color getBorderColor() {
       if (widget.disabled) {
         return widget.borderColor ?? Colors.transparent;
       }
       if (_isFocused) {
-        return widget.focusedBorderColor ?? defaultFocusedBorderColor;
+        return defaultFocusedBorderColor;
       }
       return widget.borderColor ?? defaultBorderColor;
     }
@@ -173,8 +186,8 @@ class SmartInputState extends State<SmartInput>
             width: widget.width,
             decoration: BoxDecoration(
               color: widget.disabled
-                  ? theme.cardBackground.withValues(alpha: 0.5)
-                  : theme.cardBackground,
+                  ? effectiveBackgroundColor.withValues(alpha: 0.5)
+                  : effectiveBackgroundColor,
               borderRadius: BorderRadius.circular(16),
               border: Border.all(
                 color: getBorderColor(),
@@ -212,8 +225,8 @@ class SmartInputState extends State<SmartInput>
                       },
                       style: TextStyle(
                         color: widget.disabled
-                            ? theme.textPrimary.withValues(alpha: 0.5)
-                            : theme.textPrimary,
+                            ? effectiveTextColor.withValues(alpha: 0.5)
+                            : effectiveTextColor,
                         fontSize: widget.fontSize,
                       ),
                       decoration: InputDecoration(
@@ -221,8 +234,8 @@ class SmartInputState extends State<SmartInput>
                         hintText: widget.hint,
                         hintStyle: TextStyle(
                           color: widget.disabled
-                              ? theme.textSecondary.withValues(alpha: 0.5)
-                              : theme.textSecondary,
+                              ? effectiveSecondaryColor.withValues(alpha: 0.5)
+                              : effectiveSecondaryColor,
                           fontSize: widget.fontSize,
                         ),
                       ),

@@ -14,6 +14,8 @@ class TokenTransferAmount extends StatelessWidget {
   final String? fromName;
   final String? toName;
   final bool disabled;
+  final Color? textColor;
+  final Color? secondaryColor;
 
   const TokenTransferAmount({
     super.key,
@@ -24,6 +26,8 @@ class TokenTransferAmount extends StatelessWidget {
     this.fromName,
     this.toName,
     this.disabled = false,
+    this.textColor,
+    this.secondaryColor,
   });
 
   String _formatAddress(String address) {
@@ -79,9 +83,12 @@ class TokenTransferAmount extends StatelessWidget {
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
 
+    final effectiveTextColor = textColor ?? theme.textPrimary;
+    final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
+
     final addressStyle = TextStyle(
       fontSize: 10,
-      color: theme.textPrimary.withValues(alpha: 0.7),
+      color: effectiveTextColor.withValues(alpha: 0.7),
       letterSpacing: 0.5,
       fontWeight: FontWeight.w500,
     );
@@ -89,7 +96,7 @@ class TokenTransferAmount extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
-        color: theme.secondaryPurple.withValues(alpha: 0.05),
+        color: effectiveSecondaryColor.withValues(alpha: 0.05),
         borderRadius: BorderRadius.circular(16),
       ),
       child: Row(
@@ -110,7 +117,7 @@ class TokenTransferAmount extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: theme.primaryPurple.withValues(alpha: 0.1),
+                    color: effectiveSecondaryColor.withValues(alpha: 0.1),
                     shape: BoxShape.circle,
                   ),
                   child: SvgPicture.asset(
@@ -118,7 +125,7 @@ class TokenTransferAmount extends StatelessWidget {
                     width: 24,
                     height: 24,
                     colorFilter: ColorFilter.mode(
-                      theme.primaryPurple,
+                      effectiveSecondaryColor,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -133,7 +140,7 @@ class TokenTransferAmount extends StatelessWidget {
                         style: TextStyle(
                           fontSize: 14,
                           fontWeight: FontWeight.w600,
-                          color: theme.textPrimary,
+                          color: effectiveTextColor,
                           letterSpacing: 0.5,
                         ),
                         overflow: TextOverflow.ellipsis,
@@ -145,7 +152,7 @@ class TokenTransferAmount extends StatelessWidget {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w400,
-                        color: theme.textSecondary.withValues(alpha: 0.7),
+                        color: effectiveSecondaryColor.withValues(alpha: 0.7),
                       ),
                     ),
                   ],

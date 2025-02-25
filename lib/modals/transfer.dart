@@ -14,6 +14,7 @@ import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
+import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
 import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
@@ -27,6 +28,7 @@ void showConfirmTransactionModal({
   required String to,
   required String amount,
   required int tokenIndex,
+  ColorsInfo? colors,
   required Function(HistoricalTransactionInfo) onConfirm,
   VoidCallback? onDismiss,
 }) {
@@ -43,6 +45,7 @@ void showConfirmTransactionModal({
       tokenIndex: tokenIndex,
       amount: amount,
       to: to,
+      colors: colors,
       onConfirm: (tx) {
         onConfirm(tx);
         if (onDismiss != null) {
@@ -62,6 +65,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
   final String to;
   final int tokenIndex;
   final String amount;
+  final ColorsInfo? colors;
   final Function(HistoricalTransactionInfo) onConfirm;
 
   const _ConfirmTransactionContent({
@@ -69,6 +73,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
     required this.amount,
     required this.to,
     required this.tokenIndex,
+    this.colors,
     required this.onConfirm,
   });
 
@@ -228,16 +233,33 @@ class _ConfirmTransactionContentState
     }
   }
 
+  Color? _parseColor(String? colorString) {
+    if (colorString == null) return null;
+    try {
+      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final theme = appState.currentTheme;
 
+    final backgroundColor =
+        _parseColor(widget.colors?.background) ?? theme.cardBackground;
+    final primaryColor =
+        _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
+    final secondaryColor =
+        _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
+
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
       decoration: BoxDecoration(
-        color: theme.cardBackground,
+        color: backgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
@@ -249,7 +271,7 @@ class _ConfirmTransactionContentState
               height: 4,
               margin: const EdgeInsets.symmetric(vertical: 16),
               decoration: BoxDecoration(
-                color: theme.textSecondary.withValues(alpha: 0.5),
+                color: secondaryColor.withValues(alpha: 0.5),
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -287,9 +309,9 @@ class _ConfirmTransactionContentState
                           ],
                         ),
                       ),
-                    _buildTokenLogo(appState),
+                    _buildTokenLogo(appState, primaryColor),
                     const SizedBox(height: 4),
-                    _buildTransferDetails(appState),
+                    _buildTransferDetails(appState, textColor, secondaryColor),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: GasEIP1559(
@@ -302,6 +324,9 @@ class _ConfirmTransactionContentState
                             setState(() => _gasPrice = gasPrice),
                         onChangeMaxPriorityFee: (maxPriorityFee) =>
                             setState(() => _maxPriorityFee = maxPriorityFee),
+                        primaryColor: primaryColor,
+                        textColor: textColor,
+                        secondaryColor: secondaryColor,
                       ),
                     ),
                     if (appState.wallet!.authType == AuthMethod.none.name)
@@ -314,7 +339,7 @@ class _ConfirmTransactionContentState
                           fontSize: 18,
                           height: 56,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
-                          focusedBorderColor: theme.primaryPurple,
+                          focusedBorderColor: primaryColor,
                           disabled:
                               _txParamsInfo.gasPrice == BigInt.zero || _loading,
                           obscureText: _obscurePassword,
@@ -323,6 +348,7 @@ class _ConfirmTransactionContentState
                               : 'assets/icons/open_eye.svg',
                           onRightIconTap: () => setState(
                               () => _obscurePassword = !_obscurePassword),
+                          textColor: textColor,
                         ),
                       )
                     else
@@ -352,6 +378,8 @@ class _ConfirmTransactionContentState
                             setState(() => _loading = false);
                           }
                         },
+                        backgroundColor: primaryColor,
+                        textColor: textColor,
                       ),
                     ),
                     SizedBox(
@@ -368,7 +396,7 @@ class _ConfirmTransactionContentState
     );
   }
 
-  Widget _buildTokenLogo(AppState state) {
+  Widget _buildTokenLogo(AppState state, Color primaryColor) {
     const imageSize = 54.0;
     final theme = state.currentTheme;
     final icon = widget.tx.metadata.icon;
@@ -379,8 +407,8 @@ class _ConfirmTransactionContentState
         height: imageSize,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-              color: theme.primaryPurple.withValues(alpha: 0.1), width: 2),
+          border:
+              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
         ),
         child: ClipOval(
             child: AsyncImage(
@@ -400,8 +428,8 @@ class _ConfirmTransactionContentState
         height: imageSize,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-              color: theme.primaryPurple.withValues(alpha: 0.1), width: 2),
+          border:
+              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
         ),
         child: ClipOval(
           child: AsyncImage(
@@ -417,7 +445,8 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Widget _buildTransferDetails(AppState appState) {
+  Widget _buildTransferDetails(
+      AppState appState, Color textColor, Color secondaryColor) {
     try {
       final ftoken = appState.wallet!.tokens[widget.tokenIndex];
       BaseTokenInfo token = widget.tx.metadata.tokenInfo ??
@@ -433,6 +462,8 @@ class _ConfirmTransactionContentState
           toAddress: widget.to,
           amount: widget.amount,
           symbol: token.symbol,
+          textColor: textColor,
+          secondaryColor: secondaryColor,
         ),
       );
     } catch (e) {

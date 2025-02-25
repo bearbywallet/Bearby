@@ -69,6 +69,8 @@ class GasDetails extends StatelessWidget {
   final FTokenInfo token;
   final AppTheme theme;
   final bool disabled;
+  final Color? textColor;
+  final Color? secondaryColor;
 
   const GasDetails({
     super.key,
@@ -77,10 +79,15 @@ class GasDetails extends StatelessWidget {
     required this.token,
     required this.theme,
     required this.disabled,
+    this.textColor,
+    this.secondaryColor,
   });
 
   @override
   Widget build(BuildContext context) {
+    final effectiveTextColor = textColor ?? theme.textPrimary;
+    final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
+
     return Column(
       children: [
         const SizedBox(height: 8),
@@ -96,7 +103,8 @@ class GasDetails extends StatelessWidget {
                 _buildDetailRow(
                   'Estimated Gas:',
                   '${txParamsInfo.txEstimateGas}',
-                  theme,
+                  effectiveTextColor,
+                  effectiveSecondaryColor,
                 ),
               _buildDetailRow(
                 'Gas Price:',
@@ -104,7 +112,8 @@ class GasDetails extends StatelessWidget {
                   calculateGasPrice(selectedOption, txParamsInfo.gasPrice),
                   token,
                 ),
-                theme,
+                effectiveTextColor,
+                effectiveSecondaryColor,
               ),
               if (txParamsInfo.feeHistory.baseFee != BigInt.zero)
                 _buildDetailRow(
@@ -113,7 +122,8 @@ class GasDetails extends StatelessWidget {
                     txParamsInfo.feeHistory.baseFee,
                     token,
                   ),
-                  theme,
+                  effectiveTextColor,
+                  effectiveSecondaryColor,
                 ),
               if (txParamsInfo.feeHistory.priorityFee != BigInt.zero)
                 _buildDetailRow(
@@ -125,7 +135,8 @@ class GasDetails extends StatelessWidget {
                     ),
                     token,
                   ),
-                  theme,
+                  effectiveTextColor,
+                  effectiveSecondaryColor,
                 ),
               if (txParamsInfo.feeHistory.baseFee != BigInt.zero &&
                   txParamsInfo.feeHistory.priorityFee != BigInt.zero)
@@ -139,7 +150,8 @@ class GasDetails extends StatelessWidget {
                     ),
                     token,
                   ),
-                  theme,
+                  effectiveTextColor,
+                  effectiveSecondaryColor,
                 ),
             ],
           ),
@@ -148,7 +160,8 @@ class GasDetails extends StatelessWidget {
     );
   }
 
-  Widget _buildDetailRow(String label, String value, AppTheme theme) {
+  Widget _buildDetailRow(
+      String label, String value, Color textColor, Color secondaryColor) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
@@ -157,15 +170,14 @@ class GasDetails extends StatelessWidget {
           Text(
             label,
             style: TextStyle(
-              color:
-                  theme.textSecondary.withValues(alpha: disabled ? 0.5 : 1.0),
+              color: secondaryColor.withValues(alpha: disabled ? 0.5 : 1.0),
               fontSize: 12,
             ),
           ),
           Text(
             value,
             style: TextStyle(
-              color: theme.textPrimary.withValues(alpha: disabled ? 0.5 : 1.0),
+              color: textColor.withValues(alpha: disabled ? 0.5 : 1.0),
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
@@ -182,6 +194,9 @@ class GasEIP1559 extends StatefulWidget {
   final Function(BigInt gasPrice) onChangeGasPrice;
   final bool disabled;
   final int timeDiffBlock;
+  final Color? primaryColor;
+  final Color? textColor;
+  final Color? secondaryColor;
 
   const GasEIP1559({
     super.key,
@@ -190,6 +205,9 @@ class GasEIP1559 extends StatefulWidget {
     required this.onChangeGasPrice,
     required this.timeDiffBlock,
     this.disabled = false,
+    this.primaryColor,
+    this.textColor,
+    this.secondaryColor,
   });
 
   @override
@@ -267,12 +285,17 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
   Widget _buildGasOption({
     required GasFeeOption option,
-    required Color textColor,
+    required Color optionTextColor,
     required AppState appState,
     required NetworkConfigInfo chain,
     required FTokenInfo token,
   }) {
     final theme = appState.currentTheme;
+    final effectivePrimaryColor = widget.primaryColor ?? theme.primaryPurple;
+    final effectiveTextColor = widget.textColor ?? theme.textPrimary;
+    final effectiveSecondaryColor =
+        widget.secondaryColor ?? theme.textSecondary;
+
     final isSelected = _selected == option;
     final confirmationTime = option.confirmationTime(widget.timeDiffBlock);
 
@@ -305,7 +328,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                     const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                 decoration: BoxDecoration(
                   color: isSelected
-                      ? theme.primaryPurple.withValues(alpha: 0.1)
+                      ? effectivePrimaryColor.withValues(alpha: 0.1)
                       : Colors.transparent,
                   borderRadius: BorderRadius.circular(16),
                 ),
@@ -316,7 +339,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                         if (isSelected)
                           Icon(
                             Icons.check,
-                            color: theme.primaryPurple,
+                            color: effectivePrimaryColor,
                             size: 16,
                           ),
                         Expanded(
@@ -326,7 +349,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                               Text(
                                 option.title,
                                 style: TextStyle(
-                                  color: theme.textPrimary,
+                                  color: effectiveTextColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -334,7 +357,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                               Text(
                                 confirmationTime,
                                 style: TextStyle(
-                                  color: theme.textSecondary,
+                                  color: effectiveSecondaryColor,
                                   fontSize: 12,
                                 ),
                               ),
@@ -355,7 +378,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(
-                                  color: textColor,
+                                  color: optionTextColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                               ),
@@ -363,7 +386,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                               Text(
                                 option.description,
                                 style: TextStyle(
-                                  color: theme.textSecondary,
+                                  color: effectiveSecondaryColor,
                                   fontSize: 12,
                                 ),
                               ),
@@ -381,6 +404,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           token: token,
                           theme: theme,
                           disabled: widget.disabled,
+                          textColor: effectiveTextColor,
+                          secondaryColor: effectiveSecondaryColor,
                         ),
                       ),
                   ],
@@ -401,12 +426,17 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     final token = appState.wallet!.tokens
         .firstWhere((t) => t.addrType == appState.account?.addrType);
 
+    // Get the option-specific colors, using custom colors or falling back to theme
+    final warningColor = theme.warning;
+    final textColor = widget.textColor ?? theme.textPrimary;
+    final dangerColor = theme.danger;
+
     return Column(
       children: [
         if (_isExpanded || _selected == GasFeeOption.low)
           _buildGasOption(
             option: GasFeeOption.low,
-            textColor: theme.warning,
+            optionTextColor: warningColor,
             appState: appState,
             chain: chain,
             token: token,
@@ -414,7 +444,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         if (_isExpanded || _selected == GasFeeOption.market)
           _buildGasOption(
             option: GasFeeOption.market,
-            textColor: theme.textPrimary,
+            optionTextColor: textColor,
             appState: appState,
             chain: chain,
             token: token,
@@ -422,7 +452,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         if (_isExpanded || _selected == GasFeeOption.aggressive)
           _buildGasOption(
             option: GasFeeOption.aggressive,
-            textColor: theme.danger,
+            optionTextColor: dangerColor,
             appState: appState,
             chain: chain,
             token: token,
