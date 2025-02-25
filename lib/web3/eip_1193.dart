@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/web3/message.dart';
@@ -29,7 +30,21 @@ enum Web3EIP1193Method {
   netVersion('net_version'),
   ethChainId('eth_chainId'),
   ethGetCode('eth_getCode'),
-  ethGetStorageAt('eth_getStorageAt');
+  ethGetStorageAt('eth_getStorageAt'),
+  ethGasPrice('eth_gasPrice'),
+  ethSignTypedData('eth_signTypedData'),
+  ethSignTypedDataV4('eth_signTypedData_v4'),
+  ethGetTransactionCount('eth_getTransactionCount'),
+  personalSign('personal_sign'),
+
+  walletAddEthereumChain('wallet_addEthereumChain'),
+  walletSwitchEthereumChain('wallet_switchEthereumChain'),
+  walletWatchAsset('wallet_watchAsset'),
+  walletGetPermissions('wallet_getPermissions'),
+  walletRequestPermissions('wallet_requestPermissions'),
+  walletScanQRCode('wallet_scanQRCode'),
+  ethGetEncryptionPublicKey('eth_getEncryptionPublicKey'),
+  ethDecrypt('eth_decrypt');
 
   final String value;
   const Web3EIP1193Method(this.value);
@@ -200,36 +215,68 @@ class Web3EIP1193Handler {
               'Method "eth_sendTransaction" is not supported');
           break;
         case Web3EIP1193Method.ethGetBalance:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getBalance" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetTransactionByHash:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getTransactionByHash" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetTransactionReceipt:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getTransactionReceipt" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethCall:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_call" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethEstimateGas:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_estimateGas" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethBlockNumber:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_blockNumber" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetBlockByNumber:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getBlockByNumber" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetBlockByHash:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getBlockByHash" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethSubscribe:
           _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
@@ -240,20 +287,109 @@ class Web3EIP1193Handler {
               'Method "eth_unsubscribe" is not supported');
           break;
         case Web3EIP1193Method.netVersion:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "net_version" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethChainId:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_chainId" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetCode:
-          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getCode" is not supported');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
           break;
         case Web3EIP1193Method.ethGetStorageAt:
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
+          break;
+        case Web3EIP1193Method.ethGasPrice:
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
+          break;
+        case Web3EIP1193Method.ethSignTypedData:
+          debugPrint('Called: eth_signTypedData');
           _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
-              'Method "eth_getStorageAt" is not supported');
+              'Method "eth_signTypedData" is not supported');
+          break;
+        case Web3EIP1193Method.ethSignTypedDataV4:
+          debugPrint('Called: eth_signTypedData_v4');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "eth_signTypedData_v4" is not supported');
+          break;
+        case Web3EIP1193Method.ethGetTransactionCount:
+          debugPrint('Called: eth_getTransactionCount');
+          await _proxyRpcRequest(
+            method: zilPayMethod.value,
+            uuid: message.uuid,
+            params: message.payload['params'],
+            chainHash: chain?.chainHash ?? BigInt.zero,
+          );
+          break;
+        case Web3EIP1193Method.personalSign:
+          debugPrint('Called: personal_sign');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "personal_sign" is not supported');
+          break;
+
+        case Web3EIP1193Method.walletAddEthereumChain:
+          debugPrint('Called: wallet_addEthereumChain');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_addEthereumChain" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.walletSwitchEthereumChain:
+          debugPrint('Called: wallet_switchEthereumChain');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_switchEthereumChain" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.walletWatchAsset:
+          debugPrint('Called: wallet_watchAsset');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_watchAsset" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.walletGetPermissions:
+          debugPrint('Called: wallet_getPermissions');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_getPermissions" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.walletRequestPermissions:
+          debugPrint('Called: wallet_requestPermissions');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_requestPermissions" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.walletScanQRCode:
+          debugPrint('Called: wallet_scanQRCode');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "wallet_scanQRCode" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.ethGetEncryptionPublicKey:
+          debugPrint('Called: eth_getEncryptionPublicKey');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "eth_getEncryptionPublicKey" is not supported by ZilPay');
+          break;
+        case Web3EIP1193Method.ethDecrypt:
+          debugPrint('Called: eth_decrypt');
+          _returnError(message.uuid, Web3EIP1193ErrorCode.unsupportedMethod,
+              'Method "eth_decrypt" is not supported by ZilPay');
           break;
       }
     } catch (e) {
@@ -271,5 +407,58 @@ class Web3EIP1193Handler {
       errorCode: errorCode,
       errorMessage: errorMessage,
     );
+  }
+
+  Future<void> _proxyRpcRequest({
+    required String method,
+    required String uuid,
+    required BigInt chainHash,
+    List<dynamic>? params,
+  }) async {
+    try {
+      final payload = {
+        'method': method,
+        'params': params ?? [],
+        'jsonrpc': '2.0',
+        'id': uuid,
+      };
+
+      final payloadJson = jsonEncode(payload);
+      final jsonRes = await providerReqProxy(
+        payload: payloadJson,
+        chainHash: chainHash,
+      );
+      final response = jsonDecode(jsonRes);
+      if (response.containsKey('error') && response['error'] != null) {
+        final error = response['error'];
+        final errorCode =
+            error['code'] as int? ?? Web3EIP1193ErrorCode.internalError.code;
+        final errorMessage =
+            error['message'] as String? ?? 'Unknown error from RPC provider';
+
+        await _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: uuid,
+          errorCode: Web3EIP1193ErrorCode.values.firstWhere(
+            (e) => e.code == errorCode,
+            orElse: () => Web3EIP1193ErrorCode.internalError,
+          ),
+          errorMessage: errorMessage,
+        );
+      } else {
+        await _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: uuid,
+          result: response['result'],
+        );
+      }
+    } catch (e) {
+      debugPrint('RPC proxy error: $e');
+      _returnError(
+        uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Failed to proxy RPC request: $e',
+      );
+    }
   }
 }

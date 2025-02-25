@@ -38,16 +38,27 @@ class _WebViewPageState extends State<WebViewPage> {
       ..setJavaScriptMode(JavaScriptMode.unrestricted)
       ..setBackgroundColor(theme.background)
       ..addJavaScriptChannel(
-        'FlutterWebView',
+        'ZilPayLegacy',
         onMessageReceived: (JavaScriptMessage message) {
           try {
             final jsonData =
                 jsonDecode(message.message) as Map<String, dynamic>;
-
             final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
-
+            _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
+          } catch (e) {
+            debugPrint(
+                'Failed to parse message: ${message.message}, error: $e');
+          }
+        },
+      )
+      ..addJavaScriptChannel(
+        'EIP1193Channel',
+        onMessageReceived: (JavaScriptMessage message) {
+          try {
+            final jsonData =
+                jsonDecode(message.message) as Map<String, dynamic>;
+            final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
             _eip1193Handler.handleWeb3EIP1193Message(zilPayMessage, context);
-            // _legacyHandler.handleLegacyZilPayMessage(zilPayMessage, context);
           } catch (e) {
             debugPrint(
                 'Failed to parse message: ${message.message}, error: $e');
@@ -61,6 +72,8 @@ class _WebViewPageState extends State<WebViewPage> {
               _isLoading = true;
               _hasError = false;
             });
+            await _webViewController.clearCache();
+            await _webViewController.clearLocalStorage();
           },
           onProgress: (_) async {
             await _initializeZilPayInjection(appState);
@@ -94,16 +107,16 @@ class _WebViewPageState extends State<WebViewPage> {
   }
 
   Future<void> _initializeZilPayInjection(AppState appState) async {
-    // scialla
-    // String jsCode =
-    //     await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-    // await _webViewController.runJavaScript(jsCode);
-    // await _legacyHandler.sendData(appState);
-
-    //evm
-    String jsCode = await rootBundle.loadString('assets/evm_inject.js');
-    await _webViewController.runJavaScript(jsCode);
-    await _legacyHandler.sendData(appState);
+    if (appState.chain?.slip44 == 313) {
+      String eip1193 = await rootBundle.loadString('assets/evm_inject.js');
+      String scilla =
+          await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+      await _webViewController.runJavaScript('$scilla\n$eip1193');
+      await _legacyHandler.sendData(appState);
+    } else if (appState.chain?.slip44 == 60) {
+      String jsCode = await rootBundle.loadString('assets/evm_inject.js');
+      await _webViewController.runJavaScript(jsCode);
+    }
   }
 
   void _refreshPage() {
