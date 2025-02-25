@@ -145,7 +145,6 @@ class ZilPayLegacyHandler {
           String toAddr = message.payload['toAddr'] as String;
           String code = message.payload['code'] ?? "";
           String data = message.payload['data'] ?? "";
-          String icon = message.payload['icon'] ?? "";
           String title = message.payload['title'] ?? "";
 
           BigInt chainHash = appState.chain?.chainHash ?? BigInt.zero;
@@ -195,7 +194,7 @@ class ZilPayLegacyHandler {
             chainHash: chainHash,
             hash: null,
             info: teg,
-            icon: icon,
+            icon: message.icon,
             title: title,
             signer: null,
             tokenInfo: tokenInfo,
@@ -211,6 +210,7 @@ class ZilPayLegacyHandler {
               context: context,
               tx: transactionRequest,
               to: recipient,
+              // colors: message.colors,
               tokenIndex: tokenIndex,
               amount: tokenAmount,
               onConfirm: (tx) {

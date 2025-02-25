@@ -72,8 +72,8 @@ class _WebViewPageState extends State<WebViewPage> {
               _isLoading = true;
               _hasError = false;
             });
-            // await _webViewController.clearCache();
-            // await _webViewController.clearLocalStorage();
+            await _webViewController.clearCache();
+            await _webViewController.clearLocalStorage();
           },
           onProgress: (_) async {
             await _initializeZilPayInjection(appState);

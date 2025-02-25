@@ -4,12 +4,18 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/config/eip1193.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
+import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/transactions/base_token.dart';
+import 'package:zilpay/src/rust/models/transactions/evm.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
+import 'package:zilpay/src/rust/models/transactions/transaction_metadata.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/web3/message.dart';
 import 'dart:developer' as dev;
@@ -54,13 +60,14 @@ class Web3EIP1193Handler {
     String uuid,
     Web3EIP1193ErrorCode errorCode,
     String errorMessage,
-  ) =>
-      _sendResponse(
-        type: 'ZILPAY_RESPONSE',
-        uuid: uuid,
-        errorCode: errorCode,
-        errorMessage: errorMessage,
-      );
+  ) {
+    _sendResponse(
+      type: 'ZILPAY_RESPONSE',
+      uuid: uuid,
+      errorCode: errorCode,
+      errorMessage: errorMessage,
+    );
+  }
 
   Future<List<String>> _getWalletAddresses(AppState appState) async {
     final addresses =
@@ -95,6 +102,9 @@ class Web3EIP1193Handler {
       switch (zilPayMethod) {
         case Web3EIP1193Method.ethRequestAccounts:
           await _handleEthRequestAccounts(message, context, appState);
+          break;
+        case Web3EIP1193Method.walletRequestPermissions:
+          await _handleWalletRequestPermissions(message, context, appState);
           break;
 
         case Web3EIP1193Method.ethAccounts:
@@ -131,6 +141,10 @@ class Web3EIP1193Handler {
             params: message.payload['params'],
             chainHash: chain?.chainHash ?? BigInt.zero,
           );
+          break;
+
+        case Web3EIP1193Method.ethSendTransaction:
+          await _handleEthSendTransaction(message, context, appState);
           break;
 
         default:
@@ -177,7 +191,7 @@ class Web3EIP1193Handler {
     showAppConnectModal(
       context: context,
       title: message.title ?? "",
-      colors: message.colors,
+      // colors: message.colors,
       uuid: message.uuid,
       iconUrl: message.icon ?? "",
       onDecision: (accepted, selectedIndices) async {
@@ -195,7 +209,7 @@ class Web3EIP1193Handler {
           accountIndexes: accountIndexes,
           favicon: message.icon,
           title: message.title ?? "",
-          colors: message.colors,
+          // colors: message.colors,
           description: message.description,
           lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
           canReadAccounts: true,
@@ -342,7 +356,7 @@ class Web3EIP1193Handler {
 
       showSignMessageModal(
         context: context,
-        colors: connection.colors,
+        // colors: connection.colors,
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
@@ -368,5 +382,296 @@ class Web3EIP1193Handler {
         'Error processing $method: $e',
       );
     }
+  }
+
+  Future<void> _handleEthSendTransaction(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    try {
+      final connection = Web3Utils.findConnected(
+        _currentDomain,
+        appState.connections,
+      );
+
+      if (connection == null) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'This domain is not connected. Please connect first.',
+        );
+      }
+
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null ||
+          params.isEmpty ||
+          params[0] is! Map<String, dynamic>) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for eth_sendTransaction',
+        );
+      }
+
+      final txParams = params[0] as Map<String, dynamic>;
+      final from = txParams['from'] as String?;
+
+      if (from == null) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Missing required parameter: from',
+        );
+      }
+
+      final addresses = await _getWalletAddresses(appState);
+      List<String> connectedAddresses =
+          filterByIndexes(addresses, connection.accountIndexes)
+              .map((a) => a.toLowerCase())
+              .toList();
+
+      if (!connectedAddresses.contains(from)) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'The requested address is not authorized',
+        );
+      }
+
+      final BigInt? chainId = txParams['chainId'] != null
+          ? BigInt.parse(txParams['chainId'].toString().replaceFirst('0x', ''),
+              radix: 16)
+          : null;
+      final BigInt? gasLimit = txParams['gas'] != null
+          ? BigInt.parse(txParams['gas'].toString().replaceFirst('0x', ''),
+              radix: 16)
+          : null;
+      final BigInt? maxFeePerGas = txParams['maxFeePerGas'] != null
+          ? BigInt.parse(
+              txParams['maxFeePerGas'].toString().replaceFirst('0x', ''),
+              radix: 16)
+          : null;
+      final BigInt? maxPriorityFeePerGas =
+          txParams['maxPriorityFeePerGas'] != null
+              ? BigInt.parse(
+                  txParams['maxPriorityFeePerGas']
+                      .toString()
+                      .replaceFirst('0x', ''),
+                  radix: 16)
+              : null;
+      final BigInt? gasPrice = txParams['gasPrice'] != null
+          ? BigInt.parse(txParams['gasPrice'].toString().replaceFirst('0x', ''),
+              radix: 16)
+          : null;
+      final String? value = txParams['value'] as String?;
+      final String? to = txParams['to'] as String?;
+
+      final Uint8List? data = txParams['data'] != null
+          ? Uint8List.fromList(
+              hexToBytes(txParams['data'].toString().replaceFirst('0x', '')))
+          : null;
+
+      final evmRequest = TransactionRequestEVM(
+        nonce: null,
+        from: from,
+        to: to,
+        value: value,
+        gasLimit: gasLimit,
+        data: data,
+        maxFeePerGas: maxFeePerGas,
+        maxPriorityFeePerGas: maxPriorityFeePerGas,
+        gasPrice: gasPrice,
+        chainId: chainId,
+        accessList: null,
+        blobVersionedHashes: null,
+        maxFeePerBlobGas: null,
+      );
+
+      final tokenIndex =
+          appState.wallet!.tokens.indexWhere((t) => t.addrType == 1);
+      if (tokenIndex == -1) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.internalError,
+          'No token information found',
+        );
+      }
+
+      final BigInt valueAmount = value != null && value != '0x0'
+          ? BigInt.parse(value.replaceFirst('0x', ''), radix: 16)
+          : BigInt.zero;
+
+      final tokenInfo = BaseTokenInfo(
+        value: valueAmount.toString(),
+        symbol: appState.wallet!.tokens[tokenIndex].symbol,
+        decimals: appState.wallet!.tokens[tokenIndex].decimals,
+      );
+
+      final metadata = TransactionMetadataInfo(
+        chainHash: appState.chain?.chainHash ?? BigInt.zero,
+        hash: null,
+        info: null,
+        icon: message.icon,
+        title: message.title ?? "EVM Transaction",
+        signer: null,
+        tokenInfo: tokenInfo,
+      );
+
+      final transactionRequest = TransactionRequestInfo(
+        metadata: metadata,
+        scilla: null,
+        evm: evmRequest,
+      );
+
+      if (!context.mounted) return;
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: transactionRequest,
+        to: to ?? "",
+        colors: connection.colors,
+        tokenIndex: tokenIndex,
+        amount: adjustAmountToDouble(
+                valueAmount, appState.wallet!.tokens[tokenIndex].decimals)
+            .toString(),
+        onConfirm: (tx) {
+          _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: tx.transactionHash,
+          );
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
+        },
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected the request',
+          );
+        },
+      );
+    } catch (e) {
+      dev.log('Error in eth_sendTransaction: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing eth_sendTransaction: $e',
+      );
+    }
+  }
+
+  Future<void> _handleWalletRequestPermissions(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final params = message.payload['params'] as List<dynamic>?;
+    if (params == null ||
+        params.isEmpty ||
+        params[0] is! Map<String, dynamic>) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Invalid parameters for wallet_requestPermissions',
+      );
+    }
+
+    final requestParams = params[0] as Map<String, dynamic>;
+
+    if (!requestParams.containsKey('eth_accounts')) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Only eth_accounts permission is supported',
+      );
+    }
+
+    await appState.syncConnections();
+    final connection = Web3Utils.findConnected(
+      _currentDomain,
+      appState.connections,
+    );
+    final addresses = await _getWalletAddresses(appState);
+
+    if (connection != null &&
+        appState.wallet?.accounts.length == connection.accountIndexes.length) {
+      return _sendResponse(
+        type: 'ZILPAY_RESPONSE',
+        uuid: message.uuid,
+        result: {
+          'permissions': [
+            {
+              'parentCapability': 'eth_accounts',
+              'caveats': [
+                {
+                  'type': 'filterResponse',
+                  'value': addresses,
+                }
+              ],
+            }
+          ]
+        },
+      );
+    }
+
+    if (!context.mounted) return;
+
+    showAppConnectModal(
+      context: context,
+      title: message.title ?? "",
+      uuid: message.uuid,
+      iconUrl: message.icon ?? "",
+      onDecision: (accepted, selectedIndices) async {
+        if (!accepted) {
+          return _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected the request',
+          );
+        }
+
+        final accountIndexes = Uint64List.fromList(selectedIndices);
+        final connectionInfo = ConnectionInfo(
+          domain: _currentDomain,
+          accountIndexes: accountIndexes,
+          favicon: message.icon,
+          title: message.title ?? "",
+          description: message.description,
+          lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+          canReadAccounts: true,
+          canRequestSignatures: true,
+          canSuggestTokens: false,
+          canSuggestTransactions: true,
+        );
+
+        await createUpdateConnection(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          conn: connectionInfo,
+        );
+        await appState.syncConnections();
+
+        final connectedAddr = filterByIndexes(addresses, accountIndexes);
+        _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: {
+            'permissions': [
+              {
+                'parentCapability': 'eth_accounts',
+                'caveats': [
+                  {
+                    'type': 'filterResponse',
+                    'value': connectedAddr,
+                  }
+                ],
+              }
+            ]
+          },
+        );
+      },
+    );
   }
 }
