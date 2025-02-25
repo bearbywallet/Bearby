@@ -7,6 +7,7 @@ import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../theme/app_theme.dart';
 
@@ -15,31 +16,34 @@ void showSignMessageModal({
   required String message,
   required String appTitle,
   required String appIcon,
-  required Function(String, String) onMessageSigned, // Updated signature
+  ColorsInfo? colors,
+  required Function(String, String) onMessageSigned,
   VoidCallback? onDismiss,
 }) {
   showModalBottomSheet<void>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
-    enableDrag: false,
-    isDismissible: false,
+    enableDrag: true,
+    isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (context) => _SignMessageModalContent(
       message: message,
       appTitle: appTitle,
       appIcon: appIcon,
+      colors: colors,
       onMessageSigned: onMessageSigned,
       onDismiss: onDismiss,
     ),
-  );
+  ).then((_) => onDismiss?.call());
 }
 
 class _SignMessageModalContent extends StatefulWidget {
   final String message;
   final String appTitle;
   final String appIcon;
+  final ColorsInfo? colors;
   final Function(String, String) onMessageSigned;
   final VoidCallback? onDismiss;
 
@@ -47,6 +51,7 @@ class _SignMessageModalContent extends StatefulWidget {
     required this.message,
     required this.appTitle,
     required this.appIcon,
+    this.colors,
     required this.onMessageSigned,
     this.onDismiss,
   });
@@ -110,10 +115,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       );
 
       widget.onMessageSigned(pubkey, sig);
+      if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted) {
-        setState(() => _error = 'Failed to sign message: $e');
-      }
+      if (mounted) setState(() => _error = 'Failed to sign message: $e');
     }
   }
 
@@ -123,42 +127,54 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     if (mounted) setState(() => _loading = false);
   }
 
+  Color? _parseColor(String? colorString) {
+    if (colorString == null) return null;
+    try {
+      return Color(int.parse(colorString.replaceFirst('#', '0xff')));
+    } catch (e) {
+      return null;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final theme = appState.currentTheme;
 
+    final backgroundColor =
+        _parseColor(widget.colors?.background) ?? theme.cardBackground;
+    final primaryColor =
+        _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
+    final secondaryColor =
+        _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
+
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
       decoration: BoxDecoration(
-        color: theme.cardBackground,
+        color: backgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
       ),
       child: SafeArea(
         child: Column(
           mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            _buildDragHandle(theme),
-            Flexible(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                padding: EdgeInsets.only(
-                    bottom: MediaQuery.viewInsetsOf(context).bottom),
-                child: Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(theme),
-                      _buildMessageDisplay(theme),
-                      if (_error != null) _buildError(theme),
-                      if (appState.wallet!.authType == AuthMethod.none.name)
-                        _buildPasswordInput(theme),
-                      _buildSignButton(appState),
-                    ],
-                  ),
-                ),
+            _buildDragHandle(secondaryColor),
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildHeader(textColor, secondaryColor),
+                  _buildMessageDisplay(primaryColor, textColor, secondaryColor),
+                  if (_error != null) _buildError(theme),
+                  if (appState.wallet!.authType == AuthMethod.none.name)
+                    _buildPasswordInput(primaryColor, textColor),
+                  _buildSignButton(appState, primaryColor, textColor),
+                ],
               ),
             ),
           ],
@@ -167,23 +183,23 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     );
   }
 
-  Widget _buildDragHandle(AppTheme theme) => Container(
+  Widget _buildDragHandle(Color secondaryColor) => Container(
         width: 36,
         height: 4,
         margin: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          color: theme.textSecondary.withValues(alpha: 0.5),
+          color: secondaryColor.withValues(alpha: 0.5),
           borderRadius: BorderRadius.circular(2),
         ),
       );
 
-  Widget _buildHeader(AppTheme theme) => Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildHeader(Color textColor, Color secondaryColor) => Column(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           Text(
             'Sign Message',
             style: TextStyle(
-              color: theme.textPrimary,
+              color: textColor,
               fontSize: 20,
               fontWeight: FontWeight.w600,
             ),
@@ -191,60 +207,68 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           const SizedBox(height: 8),
           Text(
             'Review and sign the following message with your wallet.',
-            style: TextStyle(color: theme.textSecondary, fontSize: 14),
+            style: TextStyle(color: secondaryColor, fontSize: 14),
+            textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
         ],
       );
 
-  Widget _buildMessageDisplay(AppTheme theme) => Container(
+  Widget _buildMessageDisplay(
+          Color primaryColor, Color textColor, Color secondaryColor) =>
+      Container(
         padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: theme.background.withValues(alpha: 0.2),
+          color: secondaryColor.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            if (widget.appIcon.isNotEmpty) _buildAppIcon(theme),
+            if (widget.appIcon.isNotEmpty)
+              _buildAppIcon(primaryColor, secondaryColor),
             Text(
               widget.appTitle,
               style: TextStyle(
-                color: theme.textPrimary,
+                color: textColor,
                 fontSize: 18,
                 fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 12),
             Text(
               'Message',
               style: TextStyle(
-                color: theme.textSecondary,
+                color: secondaryColor,
                 fontSize: 14,
                 fontWeight: FontWeight.w500,
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
-            Text(
-              widget.message,
-              style: TextStyle(color: theme.textPrimary, fontSize: 16),
-              maxLines: 5,
-              overflow: TextOverflow.ellipsis,
+            Container(
+              constraints: const BoxConstraints(maxHeight: 100),
+              child: SingleChildScrollView(
+                child: Text(
+                  widget.message,
+                  style: TextStyle(color: textColor, fontSize: 16),
+                  textAlign: TextAlign.center,
+                ),
+              ),
             ),
           ],
         ),
       );
 
-  Widget _buildAppIcon(AppTheme theme) => Container(
+  Widget _buildAppIcon(Color primaryColor, Color secondaryColor) => Container(
         width: 40,
         height: 40,
         margin: const EdgeInsets.only(bottom: 8),
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          border: Border.all(
-            color: theme.primaryPurple.withValues(alpha: 0.1),
-            width: 2,
-          ),
+          border:
+              Border.all(color: primaryColor.withValues(alpha: 0.1), width: 2),
         ),
         child: ClipOval(
           child: Image.network(
@@ -252,16 +276,14 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             fit: BoxFit.cover,
             errorBuilder: (context, error, stackTrace) => Icon(
               Icons.message,
-              color: theme.textSecondary,
+              color: secondaryColor,
               size: 24,
             ),
             loadingBuilder: (context, child, loadingProgress) =>
                 loadingProgress == null
                     ? child
                     : CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: theme.textSecondary,
-                      ),
+                        strokeWidth: 2, color: secondaryColor),
           ),
         ),
       );
@@ -275,6 +297,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Row(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
               SvgPicture.asset(
                 'assets/icons/warning.svg',
@@ -283,18 +306,17 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                 colorFilter: ColorFilter.mode(theme.danger, BlendMode.srcIn),
               ),
               const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  _error!,
-                  style: TextStyle(color: theme.danger, fontSize: 14),
-                ),
+              Text(
+                _error!,
+                style: TextStyle(color: theme.danger, fontSize: 14),
+                textAlign: TextAlign.center,
               ),
             ],
           ),
         ),
       );
 
-  Widget _buildPasswordInput(AppTheme theme) => Padding(
+  Widget _buildPasswordInput(Color primaryColor, Color textColor) => Padding(
         padding: const EdgeInsets.only(top: 16),
         child: SmartInput(
           key: _passwordInputKey,
@@ -303,7 +325,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           fontSize: 18,
           height: 56,
           padding: const EdgeInsets.symmetric(horizontal: 20),
-          focusedBorderColor: theme.primaryPurple,
+          focusedBorderColor: primaryColor,
           disabled: _loading,
           obscureText: _obscurePassword,
           rightIconPath: _obscurePassword
@@ -315,15 +337,21 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         ),
       );
 
-  Widget _buildSignButton(AppState appState) => Padding(
+  Widget _buildSignButton(
+          AppState appState, Color primaryColor, Color textColor) =>
+      Padding(
         padding: EdgeInsets.only(
           top: 16,
           bottom: MediaQuery.viewInsetsOf(context).bottom > 0 ? 16 : 32,
         ),
-        child: SwipeButton(
-          text: _loading ? 'Processing...' : 'Sign Message',
-          disabled: _loading,
-          onSwipeComplete: () async => _handleSignMessage(appState),
+        child: Center(
+          child: SwipeButton(
+            text: _loading ? 'Processing...' : 'Sign Message',
+            disabled: _loading,
+            backgroundColor: primaryColor,
+            textColor: textColor,
+            onSwipeComplete: () async => _handleSignMessage(appState),
+          ),
         ),
       );
 }

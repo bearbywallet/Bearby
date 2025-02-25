@@ -342,6 +342,7 @@ class Web3EIP1193Handler {
 
       showSignMessageModal(
         context: context,
+        colors: connection.colors,
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
@@ -349,7 +350,6 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             result: sig,
           );
-          if (context.mounted) Navigator.pop(context);
         },
         onDismiss: () => _returnError(
           message.uuid,

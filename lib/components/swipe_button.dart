@@ -9,6 +9,9 @@ class SwipeButton extends StatefulWidget {
   final String text;
   final Future<void> Function()? onSwipeComplete;
   final bool disabled;
+  final Color? backgroundColor;
+  final Color? textColor;
+  final Color? secondaryColor;
 
   const SwipeButton({
     super.key,
@@ -17,6 +20,9 @@ class SwipeButton extends StatefulWidget {
     required this.text,
     this.onSwipeComplete,
     this.disabled = false,
+    this.backgroundColor,
+    this.textColor,
+    this.secondaryColor,
   });
 
   @override
@@ -52,22 +58,19 @@ class _SwipeButtonState extends State<SwipeButton>
     setState(() {
       _isDragging = true;
       _dragExtent += details.delta.dx;
-      _dragExtent = _dragExtent.clamp(0.0, widget.width - height);
+      _dragExtent = _dragExtent.clamp(0.0, widget.width - widget.height);
     });
   }
 
   void _onDragEnd(DragEndDetails details) async {
     if (_isLoading || widget.disabled) return;
-    if (_dragExtent >= widget.width - height) {
-      setState(() {
-        _isLoading = true;
-      });
+    if (_dragExtent >= widget.width - widget.height) {
+      setState(() => _isLoading = true);
 
       for (var i = 0; i < 30; i++) {
         await Future.delayed(const Duration(milliseconds: 10));
-        setState(() {
-          _shrinkWidth = widget.width - (i * (widget.width - height) / 30);
-        });
+        setState(() => _shrinkWidth =
+            widget.width - (i * (widget.width - widget.height) / 30));
       }
 
       if (widget.onSwipeComplete != null) {
@@ -87,21 +90,20 @@ class _SwipeButtonState extends State<SwipeButton>
     _controller.reverse();
   }
 
-  double get height => widget.height;
-
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final bgColor = widget.backgroundColor ?? theme.primaryPurple;
+    final txtColor = widget.textColor ?? theme.textPrimary;
+    final secColor = widget.secondaryColor ?? theme.secondaryPurple;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 10),
       width: _shrinkWidth,
-      height: height,
+      height: widget.height,
       decoration: BoxDecoration(
-        color: widget.disabled
-            ? theme.primaryPurple.withValues(alpha: 0.5)
-            : theme.primaryPurple,
-        borderRadius: BorderRadius.circular(height / 2),
+        color: widget.disabled ? bgColor.withValues(alpha: 0.5) : bgColor,
+        borderRadius: BorderRadius.circular(widget.height / 2),
       ),
       child: Stack(
         children: [
@@ -111,8 +113,8 @@ class _SwipeButtonState extends State<SwipeButton>
                 widget.text,
                 style: TextStyle(
                   color: widget.disabled
-                      ? theme.textPrimary.withValues(alpha: 0.5)
-                      : theme.textPrimary,
+                      ? txtColor.withValues(alpha: 0.5)
+                      : txtColor,
                   fontSize: 18,
                   fontWeight: FontWeight.bold,
                 ),
@@ -124,7 +126,7 @@ class _SwipeButtonState extends State<SwipeButton>
                 width: 24,
                 height: 24,
                 child: CircularProgressIndicator(
-                  color: theme.textPrimary,
+                  color: txtColor,
                   strokeWidth: 3,
                 ),
               ),
@@ -140,21 +142,21 @@ class _SwipeButtonState extends State<SwipeButton>
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Container(
-                        width:
-                            _isDragging ? _dragExtent + height - 8 : height - 8,
-                        height: height - 8,
+                        width: _isDragging
+                            ? _dragExtent + widget.height - 8
+                            : widget.height - 8,
+                        height: widget.height - 8,
                         decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular((height - 8) / 2),
+                          borderRadius:
+                              BorderRadius.circular((widget.height - 8) / 2),
                           gradient: LinearGradient(
                             colors: [
                               widget.disabled
-                                  ? theme.secondaryPurple
-                                      .withValues(alpha: 0.05)
-                                  : theme.secondaryPurple
-                                      .withValues(alpha: 0.1),
+                                  ? secColor.withValues(alpha: 0.05)
+                                  : secColor.withValues(alpha: 0.1),
                               widget.disabled
-                                  ? theme.secondaryPurple.withValues(alpha: 0.5)
-                                  : theme.secondaryPurple,
+                                  ? secColor.withValues(alpha: 0.5)
+                                  : secColor,
                             ],
                             stops: const [0.0, 0.9],
                             begin: Alignment.centerLeft,
@@ -166,20 +168,19 @@ class _SwipeButtonState extends State<SwipeButton>
                             if (_isDragging)
                               Expanded(
                                 child: ClipRRect(
-                                  borderRadius:
-                                      BorderRadius.circular((height - 8) / 2),
+                                  borderRadius: BorderRadius.circular(
+                                      (widget.height - 8) / 2),
                                 ),
                               ),
                             Container(
-                              width: height - 8,
-                              height: height - 8,
+                              width: widget.height - 8,
+                              height: widget.height - 8,
                               decoration: BoxDecoration(
                                 color: widget.disabled
-                                    ? theme.secondaryPurple
-                                        .withValues(alpha: 0.5)
-                                    : theme.secondaryPurple,
-                                borderRadius:
-                                    BorderRadius.circular((height - 8) / 2),
+                                    ? secColor.withValues(alpha: 0.5)
+                                    : secColor,
+                                borderRadius: BorderRadius.circular(
+                                    (widget.height - 8) / 2),
                                 boxShadow: [
                                   BoxShadow(
                                     color:
@@ -191,8 +192,8 @@ class _SwipeButtonState extends State<SwipeButton>
                               ),
                               child: SvgPicture.asset(
                                 "assets/icons/right_circle_arrow.svg",
-                                width: widget.width,
-                                height: widget.height,
+                                width: widget.height - 8,
+                                height: widget.height - 8,
                                 colorFilter: ColorFilter.mode(
                                   widget.disabled
                                       ? theme.background.withValues(alpha: 0.5)

@@ -9,3 +9,7 @@ Color getWalletColor(int index) {
 
   return colors[index % colors.length];
 }
+
+String hexStrToColor(Color color) {
+  return '#${color.toARGB32().toRadixString(16).padLeft(8, '0').substring(2)}';
+}
