@@ -1,5 +1,39 @@
 [
   {
+    "name": "Binance smart chain mainnet",
+    "chain": "BSC",
+    "rpc": [
+      "https://bsc-dataseed.bnbchain.org",
+      "https://bsc-dataseed.nariox.org",
+      "https://bsc-dataseed.defibit.io",
+      "https://bsc-dataseed.ninicoin.io",
+      "https://bsc.nodereal.io",
+      "https://bsc-dataseed-public.bnbchain.org",
+      "https://bnb.rpc.subquery.network/public"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Binance",
+        "symbol": "BSC",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [56, 0],
+    "infoURL": "https://bnbchain.org",
+    "shortName": "bnbchain",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Bscscan",
+        "url": "https://bscscan.com/",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
     "name": "Zilliqa mainnet",
     "chain": "ZIL",
     "rpc": [

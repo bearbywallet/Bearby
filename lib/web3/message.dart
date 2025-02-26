@@ -30,15 +30,15 @@ class ZilPayWeb3Message {
     String description = json['description'] ?? "";
 
     ColorsInfo? colors;
-    if (json['colors'] != null) {
-      final colorsJson = json['colors'] as Map<String, dynamic>;
-      colors = ColorsInfo(
-        primary: colorsJson['primary'],
-        secondary: colorsJson['secondary'],
-        background: colorsJson['background'],
-        text: colorsJson['text'],
-      );
-    }
+    // if (json['colors'] != null) {
+    //   final colorsJson = json['colors'] as Map<String, dynamic>;
+    //   colors = ColorsInfo(
+    //     primary: colorsJson['primary'],
+    //     secondary: colorsJson['secondary'],
+    //     background: colorsJson['background'],
+    //     text: colorsJson['text'],
+    //   );
+    // }
 
     if (type == null) {
       throw FormatException('Invalid or unknown message type: $type');
