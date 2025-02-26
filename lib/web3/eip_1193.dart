@@ -107,6 +107,9 @@ class Web3EIP1193Handler {
         case Web3EIP1193Method.walletRequestPermissions:
           await _handleWalletRequestPermissions(message, context, appState);
           break;
+        case Web3EIP1193Method.walletGetPermissions:
+          await _handleWalletGetPermissions(message, appState);
+          break;
 
         case Web3EIP1193Method.ethAccounts:
           await _handleEthAccounts(message, appState);
@@ -359,16 +362,13 @@ class Web3EIP1193Handler {
         );
       }
 
-      // TODO: the backend do it automaticly.
-      final messageContent = isPersonalSign
-          ? decodePersonalSignMessage(dataToSign)
-          : "Ethereum Signed Message:\n${dataToSign.length}\n$dataToSign";
+      final messageContent =
+          isPersonalSign ? decodePersonalSignMessage(dataToSign) : dataToSign;
 
       if (!context.mounted) return;
 
       showSignMessageModal(
         context: context,
-        // colors: connection.colors,
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
@@ -571,6 +571,52 @@ class Web3EIP1193Handler {
         message.uuid,
         Web3EIP1193ErrorCode.internalError,
         'Error processing eth_sendTransaction: $e',
+      );
+    }
+  }
+
+  Future<void> _handleWalletGetPermissions(
+    ZilPayWeb3Message message,
+    AppState appState,
+  ) async {
+    try {
+      await appState.syncConnections();
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+
+      if (connection == null) {
+        return _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: [],
+        );
+      }
+
+      final addresses = await _getWalletAddresses(appState);
+      final connectedAddr =
+          filterByIndexes(addresses, connection.accountIndexes);
+
+      _sendResponse(
+        type: 'ZILPAY_RESPONSE',
+        uuid: message.uuid,
+        result: [
+          {
+            'parentCapability': 'eth_accounts',
+            'caveats': [
+              {
+                'type': 'filterResponse',
+                'value': connectedAddr,
+              }
+            ],
+          }
+        ],
+      );
+    } catch (e) {
+      dev.log('Error in wallet_getPermissions: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing wallet_getPermissions: $e',
       );
     }
   }

@@ -22,6 +22,7 @@ enum Web3EIP1193Method {
   ethSignTypedDataV4('eth_signTypedData_v4'),
   ethGetTransactionCount('eth_getTransactionCount'),
   personalSign('personal_sign'),
+
   walletAddEthereumChain('wallet_addEthereumChain'),
   walletSwitchEthereumChain('wallet_switchEthereumChain'),
   walletWatchAsset('wallet_watchAsset'),
