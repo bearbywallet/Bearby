@@ -1,6 +1,7 @@
 pub use zilpay::network::gas_parse::GasFeeHistory;
 pub use zilpay::network::gas_parse::RequiredTxParams;
 
+#[derive(Default)]
 pub struct GasFeeHistoryInfo {
     pub max_fee: u128,
     pub priority_fee: u128,
@@ -17,6 +18,7 @@ impl From<GasFeeHistory> for GasFeeHistoryInfo {
     }
 }
 
+#[derive(Default)]
 pub struct RequiredTxParamsInfo {
     pub gas_price: u128,
     pub max_priority_fee: u128,

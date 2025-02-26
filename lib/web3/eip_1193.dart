@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
@@ -99,8 +100,6 @@ class Web3EIP1193Handler {
         orElse: () => Web3EIP1193Method.ethRequestAccounts,
       );
 
-      print(message);
-
       switch (zilPayMethod) {
         case Web3EIP1193Method.ethRequestAccounts:
           await _handleEthRequestAccounts(message, context, appState);
@@ -142,6 +141,14 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             params: message.payload['params'],
             chainHash: chain?.chainHash ?? BigInt.zero,
+          );
+          break;
+
+        case Web3EIP1193Method.ethSignTypedDataV4:
+          await _handleEthSignTypedDataV4(
+            message,
+            context,
+            appState,
           );
           break;
 
@@ -201,7 +208,7 @@ class Web3EIP1193Handler {
           return _sendResponse(
             type: 'ZILPAY_RESPONSE',
             uuid: message.uuid,
-            result: [],
+            result: <void>[],
           );
         }
 
@@ -350,6 +357,7 @@ class Web3EIP1193Handler {
         );
       }
 
+      // TODO: the backend do it automaticly.
       final messageContent = isPersonalSign
           ? decodePersonalSignMessage(dataToSign)
           : "Ethereum Signed Message:\n${dataToSign.length}\n$dataToSign";
@@ -675,5 +683,91 @@ class Web3EIP1193Handler {
         );
       },
     );
+  }
+
+  Future<void> _handleEthSignTypedDataV4(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    try {
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+      if (connection == null) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'This domain is not connected. Please connect first.',
+        );
+      }
+
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null || params.length < 2) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for eth_signTypedData_v4. Required: [address, typedData]',
+        );
+      }
+
+      final address = params[0] as String;
+      final rawTypedData = params[1] as String;
+
+      TypedDataEip712 typedDataeip712;
+
+      try {
+        typedDataeip712 = TypedDataEip712.fromJsonString(rawTypedData);
+      } catch (e) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid typedData format: ${e.toString()}',
+        );
+      }
+
+      final addresses = await _getWalletAddresses(appState);
+      final connectedAddresses =
+          filterByIndexes(addresses, connection.accountIndexes);
+
+      final normalizedAddress = address.toLowerCase();
+      final isAuthorized =
+          connectedAddresses.any((a) => a.toLowerCase() == normalizedAddress);
+
+      if (!isAuthorized) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'The requested address is not authorized',
+        );
+      }
+
+      if (!context.mounted) return;
+
+      showSignMessageModal(
+        context: context,
+        typedData: typedDataeip712,
+        onMessageSigned: (pubkey, sig) async {
+          await _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: sig,
+          );
+        },
+        onDismiss: () => _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.userRejectedRequest,
+          'User rejected',
+        ),
+        appTitle: 'Sign Typed Data',
+        appIcon: message.icon ?? '',
+      );
+    } catch (e) {
+      dev.log('Error in eth_signTypedData_v4: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing eth_signTypedData_v4: $e',
+      );
+    }
   }
 }

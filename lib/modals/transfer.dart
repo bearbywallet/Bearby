@@ -124,12 +124,19 @@ class _ConfirmTransactionContentState
     super.dispose();
   }
 
+  bool get _isDisabled {
+    return (_txParamsInfo.gasPrice == BigInt.zero &&
+            _txParamsInfo.maxPriorityFee == BigInt.zero &&
+            _txParamsInfo.txEstimateGas == BigInt.zero) ||
+        _loading;
+  }
+
   void _initGasPolling() {
     _fetchGasFee(true);
     final appState = context.read<AppState>();
     final chainHash = appState.account?.chainHash ?? BigInt.zero;
     final diffBlockTime =
-        appState.getChain(chainHash)?.diffBlockTime.toInt() ?? 10;
+        appState.getChain(chainHash)?.diffBlockTime.toInt() ?? 20;
     _timerPooling = Timer.periodic(
         Duration(seconds: diffBlockTime), (_) => _fetchGasFee(false));
   }
@@ -150,7 +157,7 @@ class _ConfirmTransactionContentState
     } catch (e) {
       debugPrint('Gas fee error: $e');
       if (initial && mounted) {
-        setState(() => _error = 'Gas fee calculation failed: $e');
+        setState(() => _error = e.toString());
       }
     }
   }
@@ -320,8 +327,7 @@ class _ConfirmTransactionContentState
                         timeDiffBlock:
                             appState.chain?.diffBlockTime.toInt() ?? 10,
                         txParamsInfo: _txParamsInfo,
-                        disabled:
-                            _txParamsInfo.gasPrice == BigInt.zero || _loading,
+                        disabled: _isDisabled,
                         onChangeGasPrice: (gasPrice) =>
                             setState(() => _gasPrice = gasPrice),
                         onChangeMaxPriorityFee: (maxPriorityFee) =>
@@ -342,8 +348,7 @@ class _ConfirmTransactionContentState
                           height: 56,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           focusedBorderColor: primaryColor,
-                          disabled:
-                              _txParamsInfo.gasPrice == BigInt.zero || _loading,
+                          disabled: _isDisabled,
                           obscureText: _obscurePassword,
                           rightIconPath: _obscurePassword
                               ? 'assets/icons/close_eye.svg'
@@ -359,8 +364,7 @@ class _ConfirmTransactionContentState
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: SwipeButton(
                         text: _error != null ? 'Unable to confirm' : 'Confirm',
-                        disabled:
-                            _txParamsInfo.gasPrice == BigInt.zero || _loading,
+                        disabled: _isDisabled,
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {

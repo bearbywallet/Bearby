@@ -114,10 +114,7 @@ pub async fn sign_message(
         Ok::<(PubKey, Signature), ServiceError>(signed)
     }
     .map_err(Into::<ServiceError>::into)?;
-    let sig = match signed.1 {
-        Signature::SchnorrSecp256k1Sha256(value) => hex::encode(value),
-        Signature::ECDSASecp256k1Keccak256(value) => hex::encode(value),
-    };
+    let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
     Ok((pubkey, sig))
@@ -158,10 +155,7 @@ pub async fn sign_typed_data_eip712(
         Ok::<(PubKey, Signature), ServiceError>(signed)
     }
     .map_err(Into::<ServiceError>::into)?;
-    let sig = match signed.1 {
-        Signature::SchnorrSecp256k1Sha256(value) => hex::encode(value),
-        Signature::ECDSASecp256k1Keccak256(value) => hex::encode(value),
-    };
+    let sig = signed.1.to_hex_prefixed();
     let pubkey = signed.0.as_hex_str();
 
     Ok((pubkey, sig))
