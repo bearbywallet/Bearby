@@ -19,6 +19,12 @@ android {
         targetCompatibility = JavaVersion.VERSION_17
     }
 
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
+        }
+    }
+
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17
     }
