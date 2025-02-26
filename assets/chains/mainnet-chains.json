@@ -17,7 +17,7 @@
         "native": true,
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Binance",
-        "symbol": "BSC",
+        "symbol": "BNB",
         "decimals": 18
       }
     ],
