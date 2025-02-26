@@ -349,7 +349,9 @@ class Web3EIP1193Handler {
       final connectedAddresses =
           filterByIndexes(addresses, connection.accountIndexes);
 
-      if (!connectedAddresses.contains(address)) {
+      if (!connectedAddresses
+          .map((a) => a.toLowerCase())
+          .contains(address.toLowerCase())) {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -441,7 +443,7 @@ class Web3EIP1193Handler {
               .map((a) => a.toLowerCase())
               .toList();
 
-      if (!connectedAddresses.contains(from)) {
+      if (!connectedAddresses.contains(from.toLowerCase())) {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -730,8 +732,8 @@ class Web3EIP1193Handler {
           filterByIndexes(addresses, connection.accountIndexes);
 
       final normalizedAddress = address.toLowerCase();
-      final isAuthorized =
-          connectedAddresses.any((a) => a.toLowerCase() == normalizedAddress);
+      final isAuthorized = connectedAddresses
+          .any((a) => a.toLowerCase() == normalizedAddress.toLowerCase());
 
       if (!isAuthorized) {
         return _returnError(

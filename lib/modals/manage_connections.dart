@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/state/app_state.dart';
-import '../theme/app_theme.dart' as theme;
 
 void showConnectedDappsModal({
   required BuildContext context,
@@ -55,114 +55,95 @@ class _ConnectedDappsModalContentState
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appTheme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
     final connectedDapps = appState.connections;
 
-    // Calculate container height based on content
-    final double headerHeight = 84.0;
-    final double searchBarHeight = 80.0;
-    final double dappItemHeight = 72.0;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
-
-    // Calculate total content height
-    final double totalContentHeight = headerHeight +
-        searchBarHeight +
-        (connectedDapps.length * dappItemHeight) +
-        bottomPadding;
-
-    // Limit height to 70% of screen height
-    final double maxHeight = MediaQuery.of(context).size.height * 0.7;
-    final double containerHeight = totalContentHeight.clamp(0.0, maxHeight);
+    final filteredDapps = connectedDapps
+        .where((dapp) =>
+            dapp.domain.toLowerCase().contains(_searchQuery.toLowerCase()) ||
+            dapp.title.toLowerCase().contains(_searchQuery.toLowerCase()))
+        .toList();
 
     return Container(
-      height: containerHeight,
+      height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(
+        color: appTheme.cardBackground,
+        borderRadius: BorderRadius.vertical(
           top: Radius.circular(20),
         ),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          // Drag Handle
           Container(
             width: 36,
             height: 4,
-            margin: const EdgeInsets.symmetric(vertical: 16),
+            margin: EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.5),
+              color: appTheme.textSecondary.withValues(alpha: 0.5),
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-
-          // Search Bar
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
               hint: 'Search DApps',
               onChanged: (value) => setState(() => _searchQuery = value),
-              borderColor: theme.textPrimary,
-              focusedBorderColor: theme.primaryPurple,
+              borderColor: appTheme.textPrimary,
+              focusedBorderColor: appTheme.primaryPurple,
               height: 48,
               fontSize: 16,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
+              padding: EdgeInsets.symmetric(horizontal: 16),
+              leftIconPath: 'assets/icons/search.svg',
+              rightIconPath: "assets/icons/close.svg",
+              onRightIconTap: () {
+                _searchController.text = "";
+              },
             ),
           ),
-
-          // DApps List
           Expanded(
-            child: ListView(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              children: _buildDappItems(theme, appState),
-            ),
+            child: filteredDapps.isEmpty
+                ? Center(
+                    child: Text(
+                      'No connected DApps',
+                      style: TextStyle(
+                        color: appTheme.textSecondary,
+                        fontSize: 16,
+                      ),
+                    ),
+                  )
+                : ListView.builder(
+                    padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                    itemCount: filteredDapps.length,
+                    itemBuilder: (context, index) {
+                      final dapp = filteredDapps[index];
+                      return Column(
+                        children: [
+                          _DappListItem(
+                            name: dapp.title,
+                            url: dapp.domain,
+                            iconUrl: dapp.favicon ?? "",
+                            lastConnected: fromLargeBigInt(dapp.lastConnected),
+                            onDisconnect: () =>
+                                widget.onDappDisconnect?.call(dapp.domain),
+                          ),
+                          if (index < filteredDapps.length - 1)
+                            Divider(
+                              height: 1,
+                              color:
+                                  appTheme.textSecondary.withValues(alpha: 0.1),
+                            ),
+                        ],
+                      );
+                    },
+                  ),
           ),
-
-          // Bottom Padding
-          SizedBox(height: bottomPadding),
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
       ),
     );
-  }
-
-  List<Widget> _buildDappItems(theme.AppTheme theme, AppState appState) {
-    if (appState.wallet == null) {
-      return [];
-    }
-
-    final filteredDapps = appState.connections
-        .where((dapp) =>
-            dapp.domain.toLowerCase().contains(_searchQuery.toLowerCase()) ||
-            dapp.title.toLowerCase().contains(_searchQuery.toLowerCase()))
-        .toList();
-
-    final List<Widget> items = [];
-    for (var i = 0; i < filteredDapps.length; i++) {
-      final dapp = filteredDapps[i];
-      items.add(
-        _DappListItem(
-          name: dapp.title,
-          url: dapp.domain,
-          iconUrl: dapp.favicon ?? "",
-          lastConnected: fromLargeBigInt(dapp.lastConnected),
-          onDisconnect: () => widget.onDappDisconnect?.call(dapp.domain),
-        ),
-      );
-
-      // Add divider if not the last item
-      if (i < filteredDapps.length - 1) {
-        items.add(
-          Divider(
-            height: 1,
-            color: theme.textSecondary.withValues(alpha: 0.1),
-          ),
-        );
-      }
-    }
-
-    return items;
   }
 
   DateTime fromLargeBigInt(BigInt timestamp) {
@@ -187,74 +168,55 @@ class _DappListItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appTheme = Provider.of<AppState>(context).currentTheme;
     const double iconSize = 40.0;
 
     return Container(
       margin: EdgeInsets.zero,
-      padding: const EdgeInsets.symmetric(vertical: 12),
+      padding: EdgeInsets.symmetric(vertical: 12),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
+          AsyncImage(
+            url: iconUrl,
             width: iconSize,
             height: iconSize,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
+            fit: BoxFit.cover,
+            loadingWidget: Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(
+                color: appTheme.textSecondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: SizedBox(
+                  width: 20,
+                  height: 20,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: appTheme.textSecondary.withValues(alpha: 0.5),
+                  ),
+                ),
+              ),
             ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                iconUrl,
-                width: iconSize,
-                height: iconSize,
-                fit: BoxFit.cover,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    width: iconSize,
-                    height: iconSize,
-                    decoration: BoxDecoration(
-                      color: theme.textSecondary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: Icon(
-                        Icons.link,
-                        size: 24,
-                        color: theme.textSecondary.withValues(alpha: 0.5),
-                      ),
-                    ),
-                  );
-                },
-                loadingBuilder: (context, child, loadingProgress) {
-                  if (loadingProgress == null) return child;
-                  return Container(
-                    width: iconSize,
-                    height: iconSize,
-                    decoration: BoxDecoration(
-                      color: theme.textSecondary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Center(
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: theme.textSecondary.withValues(alpha: 0.5),
-                          value: loadingProgress.expectedTotalBytes != null
-                              ? loadingProgress.cumulativeBytesLoaded /
-                                  loadingProgress.expectedTotalBytes!
-                              : null,
-                        ),
-                      ),
-                    ),
-                  );
-                },
+            errorWidget: Container(
+              width: iconSize,
+              height: iconSize,
+              decoration: BoxDecoration(
+                color: appTheme.textSecondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Center(
+                child: Icon(
+                  Icons.link,
+                  size: 24,
+                  color: appTheme.textSecondary.withValues(alpha: 0.5),
+                ),
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Column(
               mainAxisSize: MainAxisSize.min,
@@ -263,26 +225,26 @@ class _DappListItem extends StatelessWidget {
                 Text(
                   name,
                   style: TextStyle(
-                    color: theme.textPrimary,
+                    color: appTheme.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                     height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 4),
+                SizedBox(height: 4),
                 Text(
                   url,
                   style: TextStyle(
-                    color: theme.textSecondary,
+                    color: appTheme.textSecondary,
                     fontSize: 14,
                     height: 1.2,
                   ),
                 ),
-                const SizedBox(height: 2),
+                SizedBox(height: 2),
                 Text(
                   'Connected ${_formatLastConnected(lastConnected)}',
                   style: TextStyle(
-                    color: theme.textSecondary,
+                    color: appTheme.textSecondary,
                     fontSize: 12,
                     height: 1.2,
                   ),
@@ -296,7 +258,7 @@ class _DappListItem extends StatelessWidget {
               'assets/icons/disconnect.svg',
               width: 24,
               height: 24,
-              colorFilter: ColorFilter.mode(theme.danger, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(appTheme.danger, BlendMode.srcIn),
             ),
           ),
         ],
