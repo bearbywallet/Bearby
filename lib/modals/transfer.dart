@@ -135,8 +135,13 @@ class _ConfirmTransactionContentState
     _fetchGasFee(true);
     final appState = context.read<AppState>();
     final chainHash = appState.account?.chainHash ?? BigInt.zero;
-    final diffBlockTime =
+    int diffBlockTime =
         appState.getChain(chainHash)?.diffBlockTime.toInt() ?? 20;
+
+    if (diffBlockTime < 10) {
+      diffBlockTime = 10;
+    }
+
     _timerPooling = Timer.periodic(
         Duration(seconds: diffBlockTime), (_) => _fetchGasFee(false));
   }
