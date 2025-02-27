@@ -264,6 +264,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           biometricType: biometricType.name,
           identifiers: identifiers,
           chainHash: chainHash,
+          mnemonicCheck: _chain?.slip44 != 313, // SKIP for ZIlliqa.
         );
 
         session = await addBip39Wallet(
