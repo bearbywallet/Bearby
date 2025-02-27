@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/token_select_item.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
@@ -152,19 +150,11 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
   ) {
     final tokens = appState.wallet!.tokens;
     final tokenIndex = tokens.indexOf(token);
-    final bigBalance =
-        BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
-    final balance = adjustAmountToDouble(bigBalance, token.decimals);
+    final bigBalance = token.balances[appState.wallet!.selectedAccount] ?? '0';
 
     return TokenSelectItem(
-      addr: token.addr,
-      symbol: token.symbol,
-      name: token.name,
-      balance: balance.toString(),
-      iconUrl: processTokenLogo(
-        token,
-        theme.value,
-      ),
+      ftoken: token,
+      balance: bigBalance,
       onTap: () {
         widget.onTokenSelected(tokenIndex);
         Navigator.pop(context);

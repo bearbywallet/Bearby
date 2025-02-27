@@ -367,7 +367,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           ),
                         ),
                         SizedBox(
-                          width: 150,
+                          width: 200,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
@@ -378,9 +378,9 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                   localeStr: '',
                                   symbolStr: token.symbol,
                                   threshold: baseThreshold,
-                                  compact: false,
+                                  compact: true,
                                 )}',
-                                // overflow: TextOverflow.ellipsis,
+                                overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(
                                   color: optionTextColor,

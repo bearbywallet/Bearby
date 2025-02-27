@@ -156,7 +156,7 @@ class _HistoryItemState extends State<HistoryItem>
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text('$formattedValue ${widget.transaction.tokenInfo!.symbol}',
+          Text(formattedValue,
               style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 16,
@@ -211,11 +211,14 @@ class _HistoryItemState extends State<HistoryItem>
           overflow: TextOverflow.ellipsis,
         ),
         const SizedBox(height: 2),
-        Text('(\$$usdFee)',
-            style: TextStyle(
-                color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 12,
-                fontWeight: FontWeight.w400)),
+        Text(
+          '(\$$usdFee)',
+          style: TextStyle(
+            color: theme.textSecondary.withValues(alpha: 0.7),
+            fontSize: 12,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
       ],
     );
   }
@@ -225,6 +228,7 @@ class _HistoryItemState extends State<HistoryItem>
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
     return Column(
       children: [
         MouseRegion(
@@ -304,12 +308,14 @@ class _HistoryItemState extends State<HistoryItem>
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
-                        Text(_formatDateTime(),
-                            style: TextStyle(
-                                color:
-                                    theme.textSecondary.withValues(alpha: 0.7),
-                                fontSize: 14,
-                                fontWeight: FontWeight.w400)),
+                        Text(
+                          _formatDateTime(),
+                          style: TextStyle(
+                            color: theme.textSecondary.withValues(alpha: 0.7),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w400,
+                          ),
+                        ),
                         _buildFeeWithPrice(state),
                       ],
                     ),

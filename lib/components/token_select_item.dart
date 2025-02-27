@@ -2,24 +2,22 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenSelectItem extends StatelessWidget {
-  final String symbol;
-  final String addr;
-  final String name;
+  final FTokenInfo ftoken;
   final String balance;
-  final String iconUrl;
   final VoidCallback onTap;
   final double iconSize;
 
   const TokenSelectItem({
     super.key,
-    required this.addr,
-    required this.symbol,
-    required this.name,
+    required this.ftoken,
     required this.balance,
-    required this.iconUrl,
     required this.onTap,
     this.iconSize = 40.0,
   });
@@ -44,12 +42,12 @@ class TokenSelectItem extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(iconSize / 2),
                 child: AsyncImage(
-                  url: iconUrl,
+                  url: processTokenLogo(ftoken, theme.value),
                   width: iconSize,
                   height: iconSize,
                   fit: BoxFit.contain,
                   errorWidget: Blockies(
-                    seed: addr,
+                    seed: ftoken.addr,
                     color: theme.secondaryPurple,
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
@@ -69,7 +67,7 @@ class TokenSelectItem extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    symbol,
+                    ftoken.symbol,
                     style: TextStyle(
                       color: theme.textPrimary,
                       fontSize: 16,
@@ -78,7 +76,7 @@ class TokenSelectItem extends StatelessWidget {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    name,
+                    ftoken.name,
                     style: TextStyle(
                       color: theme.textSecondary,
                       fontSize: 14,
@@ -91,7 +89,14 @@ class TokenSelectItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  balance,
+                  intlNumberFormating(
+                    value: balance,
+                    decimals: ftoken.decimals,
+                    localeStr: '',
+                    symbolStr: ftoken.symbol,
+                    threshold: baseThreshold,
+                    compact: true,
+                  ),
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,
