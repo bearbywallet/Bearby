@@ -240,6 +240,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
               .map((token) => FTokenInfo(
                     name: token.name,
                     symbol: token.symbol,
+                    logo: token.logo,
                     decimals: token.decimals,
                     addr: token.addr ?? zeroEVM,
                     balances: {},

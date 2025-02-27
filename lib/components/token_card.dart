@@ -4,7 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -72,9 +72,8 @@ class _TokenCardState extends State<TokenCard>
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: viewTokenIcon(
+          url: processTokenLogo(
             widget.ftoken,
-            state.chain!.chainId,
             theme.value,
           ),
           width: 32,

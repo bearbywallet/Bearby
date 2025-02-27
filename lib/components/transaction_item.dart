@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -93,8 +93,7 @@ class _HistoryItemState extends State<HistoryItem>
               color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
       child: ClipOval(
         child: AsyncImage(
-          url: widget.transaction.icon ??
-              viewTokenIcon(token, appState.chain!.chainId, theme.value),
+          url: widget.transaction.icon ?? processTokenLogo(token, theme.value),
           width: 32,
           height: 32,
           fit: BoxFit.contain,

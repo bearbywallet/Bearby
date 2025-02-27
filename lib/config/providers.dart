@@ -54,7 +54,7 @@ class Chain {
     this.icon,
   });
 
-  final bool? testnet;
+  bool? testnet;
   final String name;
   final String chain;
   final String logo;

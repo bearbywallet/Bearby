@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
@@ -138,9 +138,8 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
               name: token.name,
               addr: token.addr,
               isDefault: token.default_,
-              iconUrl: viewTokenIcon(
+              iconUrl: processTokenLogo(
                 token,
-                appState.chain!.chainId,
                 theme.value,
               ),
               onToggle: (value) async {

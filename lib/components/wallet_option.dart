@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class WalletOption extends StatelessWidget {
@@ -62,7 +62,7 @@ class WalletOption extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AsyncImage(
-                      url: chainIcon(chain!.chain, null),
+                      url: preprocessUrl(chain!.logo, theme.value),
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,

@@ -6,7 +6,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -219,7 +219,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: AsyncImage(
-                url: chainIcon(chain.chain, null),
+                url: preprocessUrl(chain.logo, theme.value),
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,

@@ -4,7 +4,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -46,7 +46,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     final balance = adjustAmountToDouble(bigBalance, token.decimals);
-    final chain = appState.chain!;
 
     const double amountHeight = 40.0;
     const double convertHeight = 20.0;
@@ -137,9 +136,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         ),
                         child: AsyncImage(
                           key: _imageKey,
-                          url: viewTokenIcon(
+                          url: processTokenLogo(
                             token,
-                            chain.chainId,
                             theme.value,
                           ),
                           width: 30,

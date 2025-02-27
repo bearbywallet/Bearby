@@ -5,7 +5,7 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -124,7 +124,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                     ),
                   ),
                   child: AsyncImage(
-                    url: chainIcon(appState.chain!.chain, null),
+                    url: preprocessUrl(appState.chain!.logo, theme.value),
                     width: 32,
                     height: 32,
                     fit: BoxFit.contain,

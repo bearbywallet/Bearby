@@ -5,7 +5,7 @@ import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -269,9 +269,8 @@ class _TransactionDetailsModalContent extends StatelessWidget {
         child: AsyncImage(
           url: transaction.icon ??
               (token != null
-                  ? viewTokenIcon(
+                  ? processTokenLogo(
                       token,
-                      appState.chain!.chainId,
                       theme.value,
                     )
                   : null),

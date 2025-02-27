@@ -38,6 +38,7 @@
   {
     "name": "Zilliqa mainnet",
     "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
     "rpc": [
       "https://api.zilliqa.com",
       "https://ssn.zilpay.io/api"
@@ -46,6 +47,7 @@
     "ftokens": [
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
         "name": "Zilliqa Scilla",
         "symbol": "ZIL",
@@ -53,6 +55,7 @@
       },
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Zilliqa EVM",
         "symbol": "ZIL",
@@ -74,7 +77,7 @@
   {
     "name": "Ethereum Mainnet",
     "chain": "ETH",
-    "icon": "ethereum",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
     "rpc": [
       "https://singapore.rpc.blxrbdn.com"
     ],
@@ -86,6 +89,7 @@
     "ftokens": [
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ether",
         "symbol": "ETH",

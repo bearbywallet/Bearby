@@ -10,7 +10,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
@@ -277,9 +277,6 @@ class _ReceivePageState extends State<ReceivePage> {
   }
 
   Widget _buildTokenSelector(AppTheme theme, FTokenInfo? token) {
-    final appState = Provider.of<AppState>(context);
-    final chain = appState.chain!;
-
     return GestureDetector(
       onTapDown: (_) => handlePressedChanged(true),
       onTapUp: (_) => handlePressedChanged(false),
@@ -301,9 +298,8 @@ class _ReceivePageState extends State<ReceivePage> {
               child: Center(
                 child: AsyncImage(
                   key: _imageKey,
-                  url: viewTokenIcon(
+                  url: processTokenLogo(
                     token!,
-                    chain.chainId,
                     theme.value,
                   ),
                   width: 32,

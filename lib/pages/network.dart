@@ -5,7 +5,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/providers.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/custom_network_modal.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -38,6 +38,7 @@ class _NetworkPageState extends State<NetworkPage> {
   String? _shortName;
 
   Future<void> _loadNetworks() async {
+    final appState = Provider.of<AppState>(context);
     try {
       final storedProviders = await getProviders();
       final String mainnetJsonData =
@@ -57,7 +58,7 @@ class _NetworkPageState extends State<NetworkPage> {
         addedNetworks.addAll(
           storedProviders.map((provider) => NetworkItem(
                 configInfo: provider,
-                icon: chainIcon(provider.chain, null),
+                icon: preprocessUrl(provider.logo, appState.currentTheme.value),
                 isEnabled: true,
                 isAdded: true,
               )),
@@ -75,7 +76,7 @@ class _NetworkPageState extends State<NetworkPage> {
             chain.testnet = false;
             return NetworkItem(
               configInfo: chain.toNetworkConfigInfo(),
-              icon: chainIcon(chain.chain, null),
+              icon: preprocessUrl(chain.logo, appState.currentTheme.value),
               isEnabled: true,
               isAdded: false,
             );
@@ -87,7 +88,7 @@ class _NetworkPageState extends State<NetworkPage> {
             chain.testnet = true;
             return NetworkItem(
               configInfo: chain.toNetworkConfigInfo(),
-              icon: chainIcon(chain.chain, null),
+              icon: preprocessUrl(chain.logo, appState.currentTheme.value),
               isEnabled: true,
               isAdded: false,
             );

@@ -2,6 +2,7 @@
   {
     "name": "Zilliqa proto mainnet",
     "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
     "rpc": [
       "https://api.zq2-protomainnet.zilliqa.com"
     ],
@@ -9,6 +10,7 @@
     "ftokens": [
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
         "name": "Zilliqa Scilla",
         "symbol": "pZIL",
@@ -16,6 +18,7 @@
       },
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Zilliqa EVM",
         "symbol": "pZIL",
@@ -37,6 +40,7 @@
   {
     "name": "Smart chain Testnet",
     "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
     "rpc": [
       "https://data-seed-prebsc-1-s1.binance.org:8545/",
       "https://data-seed-prebsc-2-s1.binance.org:8545/",
@@ -51,6 +55,7 @@
     "ftokens": [
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Binance Chain",
         "symbol": "tBNB",
@@ -87,12 +92,14 @@
         "native": true,
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "tEther",
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
         "symbol": "tETH",
         "decimals": 18
       }
     ],
     "infoURL": "https://sepolia.dev/",
     "shortName": "sepolia",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
     "chainIds": [11155111, 0],
     "slip44": 60,
     "explorers": [

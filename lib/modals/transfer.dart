@@ -8,7 +8,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/icon.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -433,7 +433,6 @@ class _ConfirmTransactionContentState
     try {
       final token = state.wallet!.tokens
           .firstWhere((t) => t.symbol == widget.tx.metadata.tokenInfo?.symbol);
-      final chainId = state.chain?.chainId ?? BigInt.zero;
       return Container(
         width: imageSize,
         height: imageSize,
@@ -444,7 +443,7 @@ class _ConfirmTransactionContentState
         ),
         child: ClipOval(
           child: AsyncImage(
-            url: viewTokenIcon(token, chainId, theme.value),
+            url: processTokenLogo(token, theme.value),
             width: imageSize,
             height: imageSize,
             fit: BoxFit.contain,
