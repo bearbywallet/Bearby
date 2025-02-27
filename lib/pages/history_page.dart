@@ -1,5 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart' show defaultTargetPlatform;
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/transaction_item.dart';
@@ -222,45 +223,54 @@ class _HistoryPageState extends State<HistoryPage> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+
+    final slivers = [
+      if (isIOS)
+        CupertinoSliverRefreshControl(
+          onRefresh: () => _checkPendingTransactions(appState),
+          builder: (
+            BuildContext context,
+            RefreshIndicatorMode refreshState,
+            double pulledExtent,
+            double refreshTriggerPullDistance,
+            double refreshIndicatorExtent,
+          ) {
+            return LinearRefreshIndicator(
+              pulledExtent: pulledExtent,
+              refreshTriggerPullDistance: refreshTriggerPullDistance,
+              refreshIndicatorExtent: refreshIndicatorExtent,
+            );
+          },
+        ),
+      SliverToBoxAdapter(
+        child: Column(
+          children: [
+            _buildHeader(appState, adaptivePadding),
+            _buildContent(appState, adaptivePadding),
+          ],
+        ),
+      ),
+    ];
+
+    Widget scrollView = CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
+      slivers: slivers,
+    );
+
+    if (!isIOS) {
+      scrollView = RefreshIndicator(
+        onRefresh: () => _checkPendingTransactions(appState),
+        child: scrollView,
+      );
+    }
 
     return Scaffold(
       backgroundColor: appState.currentTheme.background,
       body: SafeArea(
         child: Column(
           children: [
-            Expanded(
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  CupertinoSliverRefreshControl(
-                    onRefresh: () async {
-                      await _checkPendingTransactions(appState);
-                    },
-                    builder: (
-                      BuildContext context,
-                      RefreshIndicatorMode refreshState,
-                      double pulledExtent,
-                      double refreshTriggerPullDistance,
-                      double refreshIndicatorExtent,
-                    ) {
-                      return LinearRefreshIndicator(
-                        pulledExtent: pulledExtent,
-                        refreshTriggerPullDistance: refreshTriggerPullDistance,
-                        refreshIndicatorExtent: refreshIndicatorExtent,
-                      );
-                    },
-                  ),
-                  SliverToBoxAdapter(
-                    child: Column(
-                      children: [
-                        _buildHeader(appState, adaptivePadding),
-                        _buildContent(appState, adaptivePadding),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+            Expanded(child: scrollView),
             Padding(
               padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
               child: SmartInput(
@@ -284,9 +294,7 @@ class _HistoryPageState extends State<HistoryPage> {
                 keyboardType: TextInputType.text,
               ),
             ),
-            const SizedBox(
-              height: 4,
-            ),
+            const SizedBox(height: 4),
           ],
         ),
       ),

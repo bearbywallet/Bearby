@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
@@ -61,7 +60,7 @@ class _HistoryItemState extends State<HistoryItem>
         child: ClipOval(
           child: Blockies(
               seed: widget.transaction.transactionHash,
-              color: getWalletColor(0),
+              color: theme.secondaryPurple,
               bgColor: theme.primaryPurple,
               spotColor: theme.background,
               size: 8),
@@ -101,7 +100,7 @@ class _HistoryItemState extends State<HistoryItem>
           fit: BoxFit.contain,
           errorWidget: Blockies(
               seed: widget.transaction.transactionHash,
-              color: getWalletColor(0),
+              color: theme.secondaryPurple,
               bgColor: theme.primaryPurple,
               spotColor: theme.background,
               size: 8),

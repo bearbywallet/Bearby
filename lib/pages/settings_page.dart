@@ -5,7 +5,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/services/social_media.dart';
@@ -226,7 +225,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 fit: BoxFit.contain,
                 errorWidget: Blockies(
                   seed: appState.wallet!.walletAddress,
-                  color: getWalletColor(0),
+                  color: theme.secondaryPurple,
                   bgColor: theme.primaryPurple,
                   spotColor: theme.background,
                   size: 8,

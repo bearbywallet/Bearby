@@ -18,6 +18,7 @@ Future<String> getStoragePath() async {
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await RustLib.init();
 
   BackgroundState state;

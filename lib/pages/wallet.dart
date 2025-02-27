@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
@@ -180,7 +179,7 @@ class _WalletPageState extends State<WalletPage> {
             scale: 1.0,
             child: Blockies(
               seed: appState.account!.addr,
-              color: getWalletColor(0),
+              color: theme.secondaryPurple,
               bgColor: theme.primaryPurple,
               spotColor: theme.background,
               size: 8,

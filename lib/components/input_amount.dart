@@ -4,7 +4,6 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -148,7 +147,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                           fit: BoxFit.contain,
                           errorWidget: Blockies(
                             seed: token.addr,
-                            color: getWalletColor(0),
+                            color: theme.secondaryPurple,
                             bgColor: theme.primaryPurple,
                             spotColor: theme.background,
                             size: 8,

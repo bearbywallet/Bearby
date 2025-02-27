@@ -7,7 +7,6 @@ import 'package:zilpay/src/rust/models/notification.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
-import '../mixins/colors.dart';
 import '../state/app_state.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
@@ -216,7 +215,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               padding: const EdgeInsets.all(4),
               child: Blockies(
                 seed: wallet.walletAddress,
-                color: getWalletColor(index),
+                color: theme.secondaryPurple,
                 bgColor: theme.primaryPurple,
                 spotColor: theme.background,
                 size: 8,

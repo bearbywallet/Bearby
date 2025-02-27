@@ -1,7 +1,6 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/select_address.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -75,7 +74,7 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                 child: ClipOval(
                   child: Blockies(
                     seed: widget.address ?? "",
-                    color: getWalletColor(0),
+                    color: theme.secondaryPurple,
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
                     size: 8,

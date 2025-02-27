@@ -5,7 +5,6 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/wallet_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -131,7 +130,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                     fit: BoxFit.contain,
                     errorWidget: Blockies(
                       seed: appState.wallet!.walletAddress,
-                      color: getWalletColor(0),
+                      color: theme.secondaryPurple,
                       bgColor: theme.primaryPurple,
                       spotColor: theme.background,
                       size: 8,

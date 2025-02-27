@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -69,7 +68,7 @@ class WalletOption extends StatelessWidget {
                       fit: BoxFit.contain,
                       errorWidget: Blockies(
                         seed: appState.wallet!.walletAddress,
-                        color: getWalletColor(0),
+                        color: theme.secondaryPurple,
                         bgColor: theme.primaryPurple,
                         spotColor: theme.background,
                         size: 8,

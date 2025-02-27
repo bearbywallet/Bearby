@@ -2,7 +2,6 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenSelectItem extends StatelessWidget {
@@ -51,7 +50,7 @@ class TokenSelectItem extends StatelessWidget {
                   fit: BoxFit.contain,
                   errorWidget: Blockies(
                     seed: addr,
-                    color: getWalletColor(0),
+                    color: theme.secondaryPurple,
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
                     size: 8,

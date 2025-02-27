@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
@@ -247,7 +246,7 @@ class _AddressSelectModalContentState
                   height: 40,
                   child: Blockies(
                     seed: item.address,
-                    color: getWalletColor(0),
+                    color: theme.secondaryPurple,
                     bgColor: theme.primaryPurple,
                     spotColor: theme.background,
                     size: 8,

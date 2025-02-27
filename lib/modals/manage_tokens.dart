@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -214,7 +213,7 @@ class _TokenListItem extends StatelessWidget {
                 fit: BoxFit.contain,
                 errorWidget: Blockies(
                   seed: addr,
-                  color: getWalletColor(0),
+                  color: theme.secondaryPurple,
                   bgColor: theme.primaryPurple,
                   spotColor: theme.background,
                   size: 8,

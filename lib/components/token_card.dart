@@ -4,7 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/mixins/colors.dart';
 import 'package:zilpay/mixins/icon.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -83,7 +82,7 @@ class _TokenCardState extends State<TokenCard>
           fit: BoxFit.contain,
           errorWidget: Blockies(
             seed: widget.ftoken.addr,
-            color: getWalletColor(0),
+            color: theme.secondaryPurple,
             bgColor: state.currentTheme.primaryPurple,
             spotColor: state.currentTheme.background,
             size: 8,
