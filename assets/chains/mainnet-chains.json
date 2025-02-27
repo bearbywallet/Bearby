@@ -2,6 +2,7 @@
   {
     "name": "Binance smart chain mainnet",
     "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
     "rpc": [
       "https://bsc-dataseed.bnbchain.org",
       "https://bsc-dataseed.nariox.org",
@@ -15,6 +16,7 @@
     "ftokens": [
       {
         "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Binance",
         "symbol": "BNB",

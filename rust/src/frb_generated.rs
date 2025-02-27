@@ -3478,6 +3478,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_logo = <String>::sse_decode(deserializer);
         let mut var_chain = <String>::sse_decode(deserializer);
         let mut var_shortName = <String>::sse_decode(deserializer);
         let mut var_rpc = <Vec<String>>::sse_decode(deserializer);
@@ -3494,6 +3495,7 @@ impl SseDecode for crate::models::provider::NetworkConfigInfo {
         let mut var_testnet = <Option<bool>>::sse_decode(deserializer);
         return crate::models::provider::NetworkConfigInfo {
             name: var_name,
+            logo: var_logo,
             chain: var_chain,
             short_name: var_shortName,
             rpc: var_rpc,
@@ -4659,6 +4661,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::provider::NetworkConfigInf
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.name.into_into_dart().into_dart(),
+            self.logo.into_into_dart().into_dart(),
             self.chain.into_into_dart().into_dart(),
             self.short_name.into_into_dart().into_dart(),
             self.rpc.into_into_dart().into_dart(),
@@ -5478,6 +5481,7 @@ impl SseEncode for crate::models::provider::NetworkConfigInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.logo, serializer);
         <String>::sse_encode(self.chain, serializer);
         <String>::sse_encode(self.short_name, serializer);
         <Vec<String>>::sse_encode(self.rpc, serializer);

@@ -6,7 +6,8 @@ import 'package:zilpay/src/rust/models/provider.dart';
 extension ChainConverter on Chain {
   NetworkConfigInfo toNetworkConfigInfo() {
     return NetworkConfigInfo(
-      testnet: testnet,
+      testnet: testnet ?? false,
+      logo: logo,
       shortName: shortName,
       diffBlockTime: BigInt.zero,
       name: name,
@@ -36,6 +37,7 @@ class Chain {
   Chain({
     required this.name,
     required this.chain,
+    required this.logo,
     required this.rpc,
     required this.features,
     required this.faucets,
@@ -52,9 +54,10 @@ class Chain {
     this.icon,
   });
 
-  bool? testnet;
+  final bool? testnet;
   final String name;
   final String chain;
+  final String logo;
   final List<int> chainIds;
   final String? icon;
   final List<Uri> rpc;
@@ -73,26 +76,27 @@ class Chain {
     return Chain(
       name: json['name'] as String? ?? '',
       chain: json['chain'] as String? ?? '',
+      logo: json['logo'] as String? ??
+          '', // Обязательное поле, по умолчанию пустая строка
       icon: json['icon'] as String?,
-      chainIds: (json['chainIds'] as List<dynamic>?)
-              ?.map((e) => e as int)
-              .toList(growable: false) ??
-          [],
+      chainIds:
+          (json['chainIds'] as List<dynamic>?)?.map((e) => e as int).toList() ??
+              [],
       rpc: (json['rpc'] as List<dynamic>?)
               ?.map((e) => Uri.parse(e as String))
-              .toList(growable: false) ??
+              .toList() ??
           [],
       features: (json['features'] as List<dynamic>?)
               ?.map((e) => e as String)
-              .toList(growable: false) ??
+              .toList() ??
           [],
       faucets: (json['faucets'] as List<dynamic>?)
               ?.map((e) => Uri.parse(e as String))
-              .toList(growable: false) ??
+              .toList() ??
           [],
       ftokens: (json['ftokens'] as List<dynamic>?)
               ?.map((e) => FToken.fromJson(e as Map<String, dynamic>))
-              .toList(growable: false) ??
+              .toList() ??
           [],
       infoURL: Uri.parse(json['infoURL'] as String? ?? ''),
       shortName: json['shortName'] as String? ?? '',
@@ -104,7 +108,7 @@ class Chain {
           : null,
       explorers: (json['explorers'] as List<dynamic>?)
               ?.map((e) => Explorer.fromJson(e as Map<String, dynamic>))
-              .toList(growable: false) ??
+              .toList() ??
           [],
     );
   }
@@ -116,6 +120,7 @@ class FToken {
     required this.symbol,
     required this.decimals,
     required this.native,
+    required this.logo,
     this.addr,
   });
 
@@ -124,6 +129,7 @@ class FToken {
   final String symbol;
   final int decimals;
   final String? addr;
+  final String logo;
 
   factory FToken.fromJson(Map<String, dynamic> json) {
     return FToken(
@@ -131,7 +137,8 @@ class FToken {
       symbol: json['symbol'] as String? ?? '',
       decimals: json['decimals'] as int? ?? 18,
       addr: json['addr'] as String?,
-      native: json['native'] as bool,
+      native: json['native'] as bool? ?? false,
+      logo: json['logo'] as String? ?? '',
     );
   }
 
@@ -141,6 +148,7 @@ class FToken {
         'decimals': decimals,
         'addr': addr,
         'native': native,
+        'logo': logo,
       };
 }
 
@@ -187,29 +195,21 @@ class Explorer {
   Map<String, dynamic> toJson() => {
         'name': name,
         'url': url.toString(),
-        if (icon != null) 'icon': icon,
+        'icon': icon,
         'standard': standard,
       };
 }
 
 class ChainService {
   static Future<Chain> loadChain(String jsonString) async {
-    try {
-      final Map<String, dynamic> jsonMap = json.decode(jsonString);
-      return Chain.fromJson(jsonMap);
-    } catch (e) {
-      throw FormatException('Invalid chain JSON format: $e');
-    }
+    final Map<String, dynamic> jsonMap = json.decode(jsonString);
+    return Chain.fromJson(jsonMap);
   }
 
   static Future<List<Chain>> loadChains(String jsonString) async {
-    try {
-      final List<dynamic> jsonList = json.decode(jsonString);
-      return jsonList
-          .map((dynamic json) => Chain.fromJson(json as Map<String, dynamic>))
-          .toList(growable: false);
-    } catch (e) {
-      throw FormatException('Invalid chains JSON format: $e');
-    }
+    final List<dynamic> jsonList = json.decode(jsonString);
+    return jsonList
+        .map((json) => Chain.fromJson(json as Map<String, dynamic>))
+        .toList();
   }
 }

@@ -36,6 +36,7 @@ class ExplorerInfo {
 
 class NetworkConfigInfo {
   final String name;
+  final String logo;
   final String chain;
   final String shortName;
   final List<String> rpc;
@@ -52,6 +53,7 @@ class NetworkConfigInfo {
 
   const NetworkConfigInfo({
     required this.name,
+    required this.logo,
     required this.chain,
     required this.shortName,
     required this.rpc,
@@ -70,6 +72,7 @@ class NetworkConfigInfo {
   @override
   int get hashCode =>
       name.hashCode ^
+      logo.hashCode ^
       chain.hashCode ^
       shortName.hashCode ^
       rpc.hashCode ^
@@ -90,6 +93,7 @@ class NetworkConfigInfo {
       other is NetworkConfigInfo &&
           runtimeType == other.runtimeType &&
           name == other.name &&
+          logo == other.logo &&
           chain == other.chain &&
           shortName == other.shortName &&
           rpc == other.rpc &&

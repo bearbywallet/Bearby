@@ -13,6 +13,7 @@ pub struct ExplorerInfo {
 
 pub struct NetworkConfigInfo {
     pub name: String,
+    pub logo: String,
     pub chain: String,
     pub short_name: String,
     pub rpc: Vec<String>,
@@ -62,6 +63,7 @@ impl From<ChainConfig> for NetworkConfigInfo {
 
         Self {
             chain_id,
+            logo: value.logo,
             diff_block_time: value.diff_block_time,
             testnet: value.testnet,
             chain_hash,
@@ -91,6 +93,7 @@ impl TryFrom<NetworkConfigInfo> for ChainConfig {
         let ens = value.ens.and_then(|a| Address::from_str_hex(&a).ok());
 
         Ok(ChainConfig {
+            logo: value.logo,
             chain_ids,
             diff_block_time: value.diff_block_time,
             testnet: value.testnet,

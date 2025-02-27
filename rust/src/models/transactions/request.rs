@@ -1,4 +1,3 @@
-use flutter_rust_bridge::frb;
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
 pub use zilpay::proto::tx::{TransactionMetadata, TransactionRequest};
@@ -11,8 +10,6 @@ pub use zilpay::{
     errors::tx::TransactionErrors,
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
 };
-
-use crate::models::gas::{GasFeeHistoryInfo, RequiredTxParamsInfo};
 
 use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;

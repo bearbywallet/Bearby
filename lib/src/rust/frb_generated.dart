@@ -2920,23 +2920,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 14)
-      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
+    if (arr.length != 15)
+      throw Exception('unexpected arr length: expect 15 but see ${arr.length}');
     return NetworkConfigInfo(
       name: dco_decode_String(arr[0]),
-      chain: dco_decode_String(arr[1]),
-      shortName: dco_decode_String(arr[2]),
-      rpc: dco_decode_list_String(arr[3]),
-      features: dco_decode_list_prim_u_16_strict(arr[4]),
-      chainId: dco_decode_u_64(arr[5]),
-      chainIds: dco_decode_list_prim_u_64_strict(arr[6]),
-      slip44: dco_decode_u_32(arr[7]),
-      diffBlockTime: dco_decode_u_64(arr[8]),
-      chainHash: dco_decode_u_64(arr[9]),
-      ens: dco_decode_opt_String(arr[10]),
-      explorers: dco_decode_list_explorer_info(arr[11]),
-      fallbackEnabled: dco_decode_bool(arr[12]),
-      testnet: dco_decode_opt_box_autoadd_bool(arr[13]),
+      logo: dco_decode_String(arr[1]),
+      chain: dco_decode_String(arr[2]),
+      shortName: dco_decode_String(arr[3]),
+      rpc: dco_decode_list_String(arr[4]),
+      features: dco_decode_list_prim_u_16_strict(arr[5]),
+      chainId: dco_decode_u_64(arr[6]),
+      chainIds: dco_decode_list_prim_u_64_strict(arr[7]),
+      slip44: dco_decode_u_32(arr[8]),
+      diffBlockTime: dco_decode_u_64(arr[9]),
+      chainHash: dco_decode_u_64(arr[10]),
+      ens: dco_decode_opt_String(arr[11]),
+      explorers: dco_decode_list_explorer_info(arr[12]),
+      fallbackEnabled: dco_decode_bool(arr[13]),
+      testnet: dco_decode_opt_box_autoadd_bool(arr[14]),
     );
   }
 
@@ -4003,6 +4004,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_name = sse_decode_String(deserializer);
+    var var_logo = sse_decode_String(deserializer);
     var var_chain = sse_decode_String(deserializer);
     var var_shortName = sse_decode_String(deserializer);
     var var_rpc = sse_decode_list_String(deserializer);
@@ -4018,6 +4020,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_testnet = sse_decode_opt_box_autoadd_bool(deserializer);
     return NetworkConfigInfo(
         name: var_name,
+        logo: var_logo,
         chain: var_chain,
         shortName: var_shortName,
         rpc: var_rpc,
@@ -5044,6 +5047,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       NetworkConfigInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.name, serializer);
+    sse_encode_String(self.logo, serializer);
     sse_encode_String(self.chain, serializer);
     sse_encode_String(self.shortName, serializer);
     sse_encode_list_String(self.rpc, serializer);
