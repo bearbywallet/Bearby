@@ -46,6 +46,7 @@ pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
 pub struct Bip39AddWalletParams {
     pub password: String,
     pub mnemonic_str: String,
+    pub mnemonic_check: bool,
     pub accounts: Vec<(usize, String)>,
     pub passphrase: String,
     pub wallet_name: String,
@@ -74,6 +75,7 @@ pub async fn add_bip39_wallet(
         let session = core
             .add_bip39_wallet(BackgroundBip39Params {
                 ftokens,
+                mnemonic_check: params.mnemonic_check,
                 wallet_settings: wallet_settings.try_into()?,
                 chain_hash: params.chain_hash,
                 password: &params.password,

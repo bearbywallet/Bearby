@@ -2563,17 +2563,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return Bip39AddWalletParams(
       password: dco_decode_String(arr[0]),
       mnemonicStr: dco_decode_String(arr[1]),
-      accounts: dco_decode_list_record_usize_string(arr[2]),
-      passphrase: dco_decode_String(arr[3]),
-      walletName: dco_decode_String(arr[4]),
-      biometricType: dco_decode_String(arr[5]),
-      chainHash: dco_decode_u_64(arr[6]),
-      identifiers: dco_decode_list_String(arr[7]),
+      mnemonicCheck: dco_decode_bool(arr[2]),
+      accounts: dco_decode_list_record_usize_string(arr[3]),
+      passphrase: dco_decode_String(arr[4]),
+      walletName: dco_decode_String(arr[5]),
+      biometricType: dco_decode_String(arr[6]),
+      chainHash: dco_decode_u_64(arr[7]),
+      identifiers: dco_decode_list_String(arr[8]),
     );
   }
 
@@ -3538,6 +3539,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_password = sse_decode_String(deserializer);
     var var_mnemonicStr = sse_decode_String(deserializer);
+    var var_mnemonicCheck = sse_decode_bool(deserializer);
     var var_accounts = sse_decode_list_record_usize_string(deserializer);
     var var_passphrase = sse_decode_String(deserializer);
     var var_walletName = sse_decode_String(deserializer);
@@ -3547,6 +3549,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return Bip39AddWalletParams(
         password: var_password,
         mnemonicStr: var_mnemonicStr,
+        mnemonicCheck: var_mnemonicCheck,
         accounts: var_accounts,
         passphrase: var_passphrase,
         walletName: var_walletName,
@@ -4693,6 +4696,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.password, serializer);
     sse_encode_String(self.mnemonicStr, serializer);
+    sse_encode_bool(self.mnemonicCheck, serializer);
     sse_encode_list_record_usize_string(self.accounts, serializer);
     sse_encode_String(self.passphrase, serializer);
     sse_encode_String(self.walletName, serializer);

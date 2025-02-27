@@ -3048,6 +3048,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_password = <String>::sse_decode(deserializer);
         let mut var_mnemonicStr = <String>::sse_decode(deserializer);
+        let mut var_mnemonicCheck = <bool>::sse_decode(deserializer);
         let mut var_accounts = <Vec<(usize, String)>>::sse_decode(deserializer);
         let mut var_passphrase = <String>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
@@ -3057,6 +3058,7 @@ impl SseDecode for crate::api::wallet::Bip39AddWalletParams {
         return crate::api::wallet::Bip39AddWalletParams {
             password: var_password,
             mnemonic_str: var_mnemonicStr,
+            mnemonic_check: var_mnemonicCheck,
             accounts: var_accounts,
             passphrase: var_passphrase,
             wallet_name: var_walletName,
@@ -4442,6 +4444,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::Bip39AddWalletParams 
         [
             self.password.into_into_dart().into_dart(),
             self.mnemonic_str.into_into_dart().into_dart(),
+            self.mnemonic_check.into_into_dart().into_dart(),
             self.accounts.into_into_dart().into_dart(),
             self.passphrase.into_into_dart().into_dart(),
             self.wallet_name.into_into_dart().into_dart(),
@@ -5204,6 +5207,7 @@ impl SseEncode for crate::api::wallet::Bip39AddWalletParams {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.password, serializer);
         <String>::sse_encode(self.mnemonic_str, serializer);
+        <bool>::sse_encode(self.mnemonic_check, serializer);
         <Vec<(usize, String)>>::sse_encode(self.accounts, serializer);
         <String>::sse_encode(self.passphrase, serializer);
         <String>::sse_encode(self.wallet_name, serializer);

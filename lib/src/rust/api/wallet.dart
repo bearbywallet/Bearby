@@ -196,6 +196,7 @@ class AddSKWalletParams {
 class Bip39AddWalletParams {
   final String password;
   final String mnemonicStr;
+  final bool mnemonicCheck;
   final List<(BigInt, String)> accounts;
   final String passphrase;
   final String walletName;
@@ -206,6 +207,7 @@ class Bip39AddWalletParams {
   const Bip39AddWalletParams({
     required this.password,
     required this.mnemonicStr,
+    required this.mnemonicCheck,
     required this.accounts,
     required this.passphrase,
     required this.walletName,
@@ -218,6 +220,7 @@ class Bip39AddWalletParams {
   int get hashCode =>
       password.hashCode ^
       mnemonicStr.hashCode ^
+      mnemonicCheck.hashCode ^
       accounts.hashCode ^
       passphrase.hashCode ^
       walletName.hashCode ^
@@ -232,6 +235,7 @@ class Bip39AddWalletParams {
           runtimeType == other.runtimeType &&
           password == other.password &&
           mnemonicStr == other.mnemonicStr &&
+          mnemonicCheck == other.mnemonicCheck &&
           accounts == other.accounts &&
           passphrase == other.passphrase &&
           walletName == other.walletName &&
