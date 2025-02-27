@@ -18,6 +18,7 @@ import 'api/qrcode.dart';
 import 'api/settings.dart';
 import 'api/token.dart';
 import 'api/transaction.dart';
+import 'api/utils.dart';
 import 'api/wallet.dart';
 import 'dart:async';
 import 'dart:convert';
@@ -176,6 +177,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
+
+  @protected
+  double dco_decode_f_64(dynamic raw);
 
   @protected
   FTokenInfo dco_decode_f_token_info(dynamic raw);
@@ -494,6 +498,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_64(SseDeserializer deserializer);
 
   @protected
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
@@ -843,6 +850,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_64(double self, SseSerializer serializer);
 
   @protected
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);

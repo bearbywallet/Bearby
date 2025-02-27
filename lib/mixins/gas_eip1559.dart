@@ -1,4 +1,3 @@
-import 'package:intl/intl.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 
 enum GasFeeOption { low, market, aggressive }
@@ -107,13 +106,4 @@ String formatGasPriceDetail(BigInt price, FTokenInfo token) {
     final eth = price / BigInt.from(10).pow(18);
     return '${eth.toStringAsFixed(6)} ${token.symbol}';
   }
-}
-
-String formatGasPrice(BigInt price, int decimals, String symbol) {
-  final value = price / BigInt.from(10).pow(decimals);
-  final formatter = NumberFormat('#,##0.##################');
-
-  formatter.maximumFractionDigits = decimals;
-
-  return '≈ ${formatter.format(value)} $symbol';
 }

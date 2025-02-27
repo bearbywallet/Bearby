@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -398,32 +399,49 @@ class _TransactionDetailsModalContent extends StatelessWidget {
   }
 
   String _formatAmount(AppState appState) {
-    if (transaction.tokenInfo != null) {
-      final formatter = NumberFormat('#,##0.##################');
-      final decimals = transaction.tokenInfo!.decimals;
-      final value =
-          double.parse(transaction.tokenInfo?.value ?? transaction.amount) /
-              BigInt.from(10).pow(decimals).toDouble();
-      return '${formatter.format(value)} ${transaction.tokenInfo!.symbol}';
-    }
-    return transaction.amount;
+    final token = appState.wallet?.tokens.first;
+    final amount = transaction.tokenInfo?.value ?? transaction.amount;
+    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
+    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
+
+    return intlNumberFormating(
+      value: amount,
+      decimals: decimals,
+      localeStr: '',
+      symbolStr: symbol,
+      threshold: baseThreshold,
+      compact: true,
+    );
   }
 
   String _formatFee(AppState appState) {
-    final formatter = NumberFormat('#,##0.##################');
     final token = appState.wallet!.tokens.first;
     final decimals = transaction.chainType == "EVM" && token.decimals < 18
         ? 18
         : token.decimals;
-    final value =
-        transaction.fee.toDouble() / BigInt.from(10).pow(decimals).toDouble();
-    return '${formatter.format(value)} ${token.symbol}';
+
+    return intlNumberFormating(
+      value: transaction.fee.toString(),
+      decimals: decimals,
+      localeStr: '',
+      symbolStr: token.symbol,
+      threshold: baseThreshold,
+      compact: true,
+    );
   }
 
   String _formatTimestamp() {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(
-        transaction.timestamp.toInt() * 1000);
-    return DateFormat('MMM dd, yyyy HH:mm:ss').format(dateTime);
+      transaction.timestamp.toInt() * 1000,
+    );
+
+    String day = dateTime.day.toString().padLeft(2, '0');
+    String month = dateTime.month.toString().padLeft(2, '0');
+    String year = dateTime.year.toString();
+    String hour = dateTime.hour.toString().padLeft(2, '0');
+    String minute = dateTime.minute.toString().padLeft(2, '0');
+
+    return '$day.$month.$year $hour:$minute';
   }
 
   String _formatGasPrice(BigInt price) {

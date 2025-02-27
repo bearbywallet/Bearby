@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/gas_eip1559.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -370,12 +372,15 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [
                               Text(
-                                formatGasPrice(
-                                  totalGasFee,
-                                  token.decimals,
-                                  token.symbol,
-                                ),
-                                overflow: TextOverflow.ellipsis,
+                                '≈ ${intlNumberFormating(
+                                  value: totalGasFee.toString(),
+                                  decimals: token.decimals,
+                                  localeStr: '',
+                                  symbolStr: token.symbol,
+                                  threshold: baseThreshold,
+                                  compact: false,
+                                )}',
+                                // overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
                                 style: TextStyle(
                                   color: optionTextColor,

@@ -2,9 +2,10 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -101,9 +102,14 @@ class _TokenCardState extends State<TokenCard>
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final double tokenAmount = _getAmount();
-    // final convertedAmount = getConvertedAmount(state, tokenAmount);
-    final String amount = formatCompactNumber(tokenAmount);
+    final String amount = intlNumberFormating(
+      value: widget.tokenAmount,
+      decimals: widget.ftoken.decimals,
+      localeStr: '',
+      symbolStr: widget.ftoken.symbol,
+      threshold: baseThreshold,
+      compact: true,
+    );
 
     return Column(
       children: [
@@ -225,14 +231,5 @@ class _TokenCardState extends State<TokenCard>
           ),
       ],
     );
-  }
-
-  double _getAmount() {
-    try {
-      BigInt value = BigInt.parse(widget.tokenAmount);
-      return adjustAmountToDouble(value, widget.ftoken.decimals);
-    } catch (_) {
-      return 0;
-    }
   }
 }

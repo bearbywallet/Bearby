@@ -3195,6 +3195,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "intl"
+version = "0.1.0"
+dependencies = [
+ "alloy",
+ "num-format",
+]
+
+[[package]]
 name = "ipnet"
 version = "2.10.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3621,6 +3629,16 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn 2.0.96",
+]
+
+[[package]]
+name = "num-format"
+version = "0.4.4"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "a652d9771a63711fd3c3deb670acfbe5c30a4072e664d7a3bf5a9e1056ac72c3"
+dependencies = [
+ "arrayvec",
+ "itoa",
 ]
 
 [[package]]
@@ -4158,7 +4176,7 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "8a56d757972c98b346a9b766e3f02746cde6dd1cd1d1d563472929fdd74bec4d"
 dependencies = [
  "anyhow",
- "itertools 0.10.5",
+ "itertools 0.13.0",
  "proc-macro2",
  "quote",
  "syn 2.0.96",
@@ -4276,7 +4294,7 @@ dependencies = [
  "once_cell",
  "socket2",
  "tracing",
- "windows-sys 0.52.0",
+ "windows-sys 0.59.0",
 ]
 
 [[package]]
@@ -6705,6 +6723,7 @@ dependencies = [
  "crypto",
  "errors",
  "history",
+ "intl",
  "network",
  "proto",
  "qrcodes",
@@ -6725,6 +6744,7 @@ dependencies = [
  "crypto",
  "errors",
  "history",
+ "intl",
  "network",
  "proto",
  "qrcodes",

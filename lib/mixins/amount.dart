@@ -1,8 +1,5 @@
 import 'dart:math';
 
-import 'package:intl/intl.dart';
-import 'package:zilpay/state/app_state.dart';
-
 String formatAmount(BigInt amount) {
   final BigInt billion = BigInt.from(1e9);
   final BigInt million = BigInt.from(1e6);
@@ -18,14 +15,6 @@ String formatAmount(BigInt amount) {
   }
 }
 
-BigInt adjustAmount(BigInt rawBalance, int decimals) {
-  // Calculate divisor (10 ** decimals)
-  BigInt divisor = BigInt.from(10).pow(decimals);
-
-  // Perform the division
-  return rawBalance ~/ divisor;
-}
-
 double adjustAmountToDouble(BigInt rawBalance, int decimals) {
   if (rawBalance == BigInt.zero) {
     return 0;
@@ -35,50 +24,6 @@ double adjustAmountToDouble(BigInt rawBalance, int decimals) {
 
   // Convert to double for decimal places
   return rawBalance.toDouble() / divisor.toDouble();
-}
-
-String formatBigNumber(double number) {
-  final formatter = NumberFormat('#,##0.000', 'en_US');
-
-  return formatter.format(number);
-}
-
-String formatCompactNumber(double value) {
-  if (value == 0.0) {
-    return "0";
-  }
-  if (value < 1) {
-    return value.toStringAsFixed(6);
-  }
-
-  final suffixes = ['', 'K', 'M', 'B', 'T'];
-  var suffixIndex = 0;
-
-  while (value >= 1000 && suffixIndex < suffixes.length - 1) {
-    value /= 1000;
-    suffixIndex++;
-  }
-
-  if (value % 1 != 0) {
-    return '${value.toStringAsFixed(1)}${suffixes[suffixIndex]}';
-  } else {
-    return '${value.toInt()}${suffixes[suffixIndex]}';
-  }
-}
-
-String getConvertedAmount(AppState state, double amount) {
-  if (state.wallet?.settings.currencyConvert?.isEmpty ?? true) {
-    return '-';
-  }
-
-  String currency = state.wallet!.settings.currencyConvert!;
-  double? converted = state.rates[currency];
-
-  if (converted == null) {
-    return '-';
-  }
-
-  return formatCompactNumber(converted * amount);
 }
 
 BigInt toWei(String amount, int decimals) {

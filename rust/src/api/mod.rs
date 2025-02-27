@@ -10,4 +10,5 @@ pub mod qrcode;
 pub mod settings;
 pub mod token;
 pub mod transaction;
+pub mod utils;
 pub mod wallet;

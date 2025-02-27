@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:intl/intl.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -123,20 +124,35 @@ class _HistoryItemState extends State<HistoryItem>
 
   String _formatDateTime() {
     final dateTime = DateTime.fromMillisecondsSinceEpoch(
-        widget.transaction.timestamp.toInt() * 1000);
-    return DateFormat('MMM dd, yyyy HH:mm').format(dateTime);
+      widget.transaction.timestamp.toInt() * 1000,
+    );
+
+    String day = dateTime.day.toString().padLeft(2, '0');
+    String month = dateTime.month.toString().padLeft(2, '0');
+    String year = dateTime.year.toString();
+    String hour = dateTime.hour.toString().padLeft(2, '0');
+    String minute = dateTime.minute.toString().padLeft(2, '0');
+
+    return '$day.$month.$year $hour:$minute';
   }
 
   Widget _buildAmountWithPrice(AppTheme theme) {
     if (widget.transaction.tokenInfo != null) {
-      final formatter = NumberFormat('#,##0.##################');
       final decimals = widget.transaction.tokenInfo!.decimals;
-      final value = double.parse(widget.transaction.tokenInfo?.value ??
-              widget.transaction.amount) /
-          BigInt.from(10).pow(decimals).toDouble();
-      final formattedValue = formatter.format(value);
+      final value =
+          widget.transaction.tokenInfo?.value ?? widget.transaction.amount;
+
+      final formattedValue = intlNumberFormating(
+        value: value,
+        decimals: decimals,
+        localeStr: 'en',
+        symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
+        threshold: baseThreshold,
+        compact: true,
+      );
       final price = 0.004;
-      final usdAmount = value * price;
+      final usdAmount = 0 * price;
+
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -166,30 +182,34 @@ class _HistoryItemState extends State<HistoryItem>
   }
 
   Widget _buildFeeWithPrice(AppState appState) {
-    final formatter = NumberFormat('#,##0.##################');
-    formatter.maximumFractionDigits = 10;
-
     final theme = appState.currentTheme;
     final token = appState.wallet!.tokens.first;
     final decimals =
         widget.transaction.chainType == "EVM" && token.decimals < 18
             ? 18
             : token.decimals;
-    final feeBig = widget.transaction.fee.toDouble();
     final price = 0;
-    final value = feeBig / BigInt.from(10).pow(decimals).toDouble();
-    final fee = formatter.format(value);
-    final usdFee = value * price;
+    final formattedValue = intlNumberFormating(
+      value: widget.transaction.fee.toString(),
+      decimals: decimals,
+      localeStr: 'en',
+      symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
+      threshold: baseThreshold,
+      compact: true,
+    );
+    final usdFee = 0 * price;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text('$fee ${token.symbol}',
-            style: TextStyle(
-                color: theme.textSecondary,
-                fontSize: 14,
-                fontWeight: FontWeight.w400),
-            overflow: TextOverflow.ellipsis),
+        Text(
+          formattedValue,
+          style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 14,
+              fontWeight: FontWeight.w400),
+          overflow: TextOverflow.ellipsis,
+        ),
         const SizedBox(height: 2),
         Text('(\$$usdFee)',
             style: TextStyle(
