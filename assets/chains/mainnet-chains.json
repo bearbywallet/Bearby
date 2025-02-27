@@ -16,7 +16,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/56/%{contract_address}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Binance",
         "symbol": "BNB",
@@ -89,7 +89,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/1/%{contract_address}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ether",
         "symbol": "ETH",

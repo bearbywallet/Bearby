@@ -173,8 +173,20 @@ class _AddTokenPageState extends State<AddTokenPage> {
       setState(() {
         _errorMessage = null;
       });
+      String? templateUrl = appState.wallets[walletIndex].tokens.first.logo;
+      FTokenInfo meta = FTokenInfo(
+        name: tokens[tokenIndex].name,
+        symbol: tokens[tokenIndex].symbol,
+        decimals: tokens[tokenIndex].decimals,
+        addr: tokens[tokenIndex].addr,
+        addrType: tokens[tokenIndex].addrType,
+        balances: tokens[tokenIndex].balances,
+        default_: tokens[tokenIndex].default_,
+        native: tokens[tokenIndex].native,
+        chainHash: tokens[tokenIndex].chainHash,
+        logo: tokens[tokenIndex].logo ?? templateUrl,
+      );
 
-      FTokenInfo meta = tokens[tokenIndex];
       await addFtoken(
         meta: meta,
         walletIndex: BigInt.from(walletIndex),

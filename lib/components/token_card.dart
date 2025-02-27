@@ -60,6 +60,18 @@ class _TokenCardState extends State<TokenCard>
 
   Widget _buildIcon(AppState state) {
     final theme = state.currentTheme;
+    FTokenInfo token = FTokenInfo(
+      name: widget.ftoken.name,
+      symbol: widget.ftoken.symbol,
+      decimals: widget.ftoken.decimals,
+      addr: widget.ftoken.addr,
+      addrType: widget.ftoken.addrType,
+      balances: {},
+      default_: widget.ftoken.default_,
+      native: widget.ftoken.native,
+      chainHash: widget.ftoken.chainHash,
+      logo: widget.ftoken.logo ?? state.wallet?.tokens.first.logo,
+    );
 
     return Container(
       width: 32,
@@ -74,7 +86,7 @@ class _TokenCardState extends State<TokenCard>
       child: ClipOval(
         child: AsyncImage(
           url: processTokenLogo(
-            widget.ftoken,
+            token,
             theme.value,
           ),
           width: 32,

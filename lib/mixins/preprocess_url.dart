@@ -24,8 +24,10 @@ String processTokenLogo(FTokenInfo token, String? theme) {
   if (!logo.contains('%{')) return logo;
 
   String processed = preprocessUrl(logo, theme);
+
   return processed
-      .replaceAll('%{symbol}%', token.symbol)
-      .replaceAll('%{contract_address}%', token.addr)
+      .replaceAll('%{symbol}%',
+          token.symbol.replaceAll("t", "").replaceAll("p", "").toLowerCase())
+      .replaceAll('%{contract_address}%', token.addr.toLowerCase())
       .replaceAll('%{name}%', token.name);
 }

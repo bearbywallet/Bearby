@@ -55,7 +55,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "logo": "https://raw.githubusercontent.com/bnb-chain/tokens-info/master/tokens/%{symbol}%/%{symbol}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Binance Chain",
         "symbol": "tBNB",
