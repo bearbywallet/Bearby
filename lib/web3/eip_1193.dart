@@ -9,8 +9,10 @@ import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
+import 'package:zilpay/modals/watch_asset_modal.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
@@ -157,6 +159,9 @@ class Web3EIP1193Handler {
 
         case Web3EIP1193Method.ethSendTransaction:
           await _handleEthSendTransaction(message, context, appState);
+          break;
+        case Web3EIP1193Method.walletWatchAsset:
+          await _handleWalletWatchAsset(message, context, appState);
           break;
 
         default:
@@ -815,6 +820,99 @@ class Web3EIP1193Handler {
         message.uuid,
         Web3EIP1193ErrorCode.internalError,
         'Error processing eth_signTypedData_v4: $e',
+      );
+    }
+  }
+
+  Future<void> _handleWalletWatchAsset(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final connection =
+        Web3Utils.findConnected(_currentDomain, appState.connections);
+    if (connection == null) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.unauthorized,
+        'This domain is not authorized to suggest tokens.',
+      );
+    }
+
+    final params = message.payload['params'] as Map<String, dynamic>?;
+    if (params == null || params['type'] != 'ERC20') {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.',
+      );
+    }
+
+    final options = params['options'] as Map<String, dynamic>?;
+    if (options == null ||
+        !options.containsKey('address') ||
+        !options.containsKey('symbol') ||
+        !options.containsKey('decimals')) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Missing required fields: address, symbol, or decimals.',
+      );
+    }
+
+    try {
+      final tokenAddress = options['address'] as String;
+      final tokenSymbol = options['symbol'] as String;
+      final tokenImage = options['image'] as String?;
+
+      final tokenExists = appState.wallet?.tokens.any((t) =>
+          t.addr.toLowerCase() == tokenAddress.toLowerCase() &&
+          t.addrType == 1);
+
+      if (tokenExists == true) {
+        return _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: true,
+        );
+      }
+
+      if (!context.mounted) return;
+
+      showWatchAssetModal(
+        context: context,
+        appTitle: message.title ?? "",
+        appIcon: message.icon ?? "",
+        tokenAddress: tokenAddress,
+        tokenName: tokenSymbol,
+        tokenSymbol: tokenSymbol,
+        tokenIconUrl: tokenImage,
+        onConfirm: (ftoken) async {
+          await addFtoken(
+            meta: ftoken,
+            walletIndex: BigInt.from(appState.selectedWallet),
+          );
+          _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: true,
+          );
+          await appState.syncData();
+        },
+        onCancel: () {
+          _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: false,
+          );
+        },
+      );
+    } catch (e) {
+      dev.log('Error in wallet_watchAsset: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing wallet_watchAsset: $e',
       );
     }
   }
