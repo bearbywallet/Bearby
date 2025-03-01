@@ -12,7 +12,7 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Zilliqa EVM",
+        "name": "Zilliqa",
         "symbol": "pZIL",
         "decimals": 18
       },

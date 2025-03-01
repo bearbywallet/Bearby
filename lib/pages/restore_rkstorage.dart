@@ -185,6 +185,22 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                       borderRadius: 30.0,
                       height: 56.0,
                     ),
+                    const SizedBox(height: 8),
+                    Center(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.of(context)
+                              .pushNamed('/new_wallet_options');
+                        },
+                        child: Text(
+                          'Skip',
+                          style: TextStyle(
+                            color: theme.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    ),
                   ],
                 ),
               ),

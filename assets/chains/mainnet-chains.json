@@ -1,5 +1,44 @@
 [
   {
+    "name": "Zilliqa",
+    "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
+    "rpc": [
+      "https://api.zilliqa.com",
+      "https://ssn.zilpay.io/api"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa",
+        "symbol": "ZIL",
+        "decimals": 18
+      },
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa Scilla",
+        "symbol": "ZIL",
+        "decimals": 12
+      }
+    ],
+    "chainIds": [32769, 1],
+    "infoURL": "https://www.zilliqa.com/",
+    "shortName": "zilliqa",
+    "slip44": 313,
+    "explorers": [
+      {
+        "name": "Viewblock",
+        "url": "https://viewblock.io/zilliqa",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
     "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
@@ -31,45 +70,6 @@
       {
         "name": "Bscscan",
         "url": "https://bscscan.com/",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
-    "name": "Zilliqa",
-    "chain": "ZIL",
-    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
-    "rpc": [
-      "https://api.zilliqa.com",
-      "https://ssn.zilpay.io/api"
-    ],
-    "features": [],
-    "ftokens": [
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Zilliqa EVM",
-        "symbol": "ZIL",
-        "decimals": 18
-      },
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
-        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa Scilla",
-        "symbol": "ZIL",
-        "decimals": 12
-      }
-    ],
-    "chainIds": [32769, 1],
-    "infoURL": "https://www.zilliqa.com/",
-    "shortName": "zilliqa",
-    "slip44": 313,
-    "explorers": [
-      {
-        "name": "Viewblock",
-        "url": "https://viewblock.io/zilliqa",
         "standard": "EIP3091"
       }
     ]
