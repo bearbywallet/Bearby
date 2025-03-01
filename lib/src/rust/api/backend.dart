@@ -13,6 +13,9 @@ import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+Future<(String, String)> loadOldDatabaseAndroid() =>
+    RustLib.instance.api.crateApiBackendLoadOldDatabaseAndroid();
+
 Future<BackgroundState> loadService({required String path}) =>
     RustLib.instance.api.crateApiBackendLoadService(path: path);
 

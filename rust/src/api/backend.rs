@@ -1,3 +1,5 @@
+use pbkdf2::pbkdf2_hmac;
+use sha2::Sha512;
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::{
@@ -20,6 +22,48 @@ use crate::{
         utils::{get_background_state, with_service},
     },
 };
+
+fn generate_key(password: &str, salt: &str, cost: u32, length: usize) -> String {
+    let password = password.as_bytes();
+    let salt = salt.as_bytes();
+
+    let mut key = vec![0u8; length / 8];
+    pbkdf2_hmac::<Sha512>(password, salt, cost, &mut key);
+
+    let key_hex = hex::encode(key);
+
+    key_hex
+}
+
+pub async fn load_old_database_android() -> Result<(String, String), String> {
+    let path = "/data/data/com.zilpaymobile/databases/RKStorage";
+    let conn = rusqlite::Connection::open(path).map_err(|e| e.to_string())?;
+    let vault: String = conn
+        .query_row(
+            "SELECT value FROM catalystLocalStorage WHERE key = '@/ZilPay/vault'",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+    let accounts: String = conn
+        .query_row(
+            "SELECT value FROM catalystLocalStorage WHERE key = '@/ZilPay/accounts'",
+            [],
+            |row| row.get(0),
+        )
+        .map_err(|e| e.to_string())?;
+
+    Ok((vault, accounts))
+}
+
+pub async fn try_restore_rkstorage(vault_json: String, password: String) -> Result<String, String> {
+    let salt = "ZilPay";
+    let cost = 5000;
+    let length = 256;
+    let key = generate_key(&password, salt, cost, length);
+
+    Ok(String::new())
+}
 
 pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
     let mut guard = BACKGROUND_SERVICE.write().await;
@@ -115,4 +159,27 @@ pub async fn start_block_worker(
 
 pub async fn get_data() -> Result<BackgroundState, String> {
     with_service(get_background_state).await.map_err(Into::into)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_generate_key() {
+        let password = "123";
+        let salt = "ZilPay";
+        let cost = 5000;
+        let length = 256;
+
+        let result = generate_key(password, salt, cost, length);
+        assert!(result.is_ok());
+
+        let key = result.unwrap();
+
+        dbg!(&key);
+        assert_eq!(key.len(), 64);
+        let key2 = generate_key(password, salt, cost, length).unwrap();
+        assert_eq!(key, key2);
+    }
 }
