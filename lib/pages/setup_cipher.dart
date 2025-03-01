@@ -26,6 +26,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
   Chain? _chain;
   KeyPairInfo? _keys;
+  bool _zilLegacy = false;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
 
   int selectedCipherIndex = 2;
@@ -80,6 +81,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final chain = args?['chain'] as Chain?;
     final keys = args?['keys'] as KeyPairInfo?;
+    final zilLegacy = args?['zilLegacy'] as bool?;
 
     if (bip39 == null && chain == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -90,6 +92,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
         _bip39List = bip39;
         _chain = chain;
         _keys = keys;
+        _zilLegacy = zilLegacy ?? false;
       });
     }
   }
@@ -227,7 +230,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                               'chain': _chain,
                               'keys': _keys,
                               'cipher': _getCipherOrders(),
-                              'argon2': _argonParams
+                              'argon2': _argonParams,
+                              'zilLegacy': _zilLegacy,
                             },
                           );
                         },

@@ -40,7 +40,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   late AppState _appState;
 
   List<AuthMethod> _authMethods = [AuthMethod.none];
-  bool _useDeviceAuth = false;
+  bool _useDeviceAuth = true;
+  bool _zilLegacy = false;
 
   String _errorMessage = '';
   bool _disabled = false;
@@ -67,6 +68,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final chain = args?['chain'] as Chain?;
     final keys = args?['keys'] as KeyPairInfo?;
     final cipher = args?['cipher'] as Uint8List?;
+    final zilLegacy = args?['zilLegacy'] as bool?;
     final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
 
     if (bip39 == null && chain == null && cipher == null && keys == null) {
@@ -80,18 +82,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _keys = keys;
         _cipher = cipher;
         _argon2 = argon2;
+        _zilLegacy = zilLegacy ?? false;
       });
     }
 
-    // Set wallet name based on type
-    if (bip39 != null) {
-      _walletNameController.text =
-          'Seed Wallet ${_appState.wallets.length + 1}';
-    } else if (keys != null) {
-      _walletNameController.text = 'Key Wallet ${_appState.wallets.length + 1}';
-    } else {
-      _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
-    }
+    _walletNameController.text = _generateWalletName();
   }
 
   @override
@@ -100,15 +95,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
-
-    if (_bip39List != null) {
-      _walletNameController.text =
-          'Seed Wallet ${_appState.wallets.length + 1}';
-    } else if (_keys != null) {
-      _walletNameController.text = 'Key Wallet ${_appState.wallets.length + 1}';
-    } else {
-      _walletNameController.text = 'Wallet ${_appState.wallets.length + 1}';
-    }
 
     _checkAuthMethods();
   }
@@ -119,8 +105,22 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     _confirmPasswordController.dispose();
     _walletNameController.dispose();
     _btnController.dispose();
-
     super.dispose();
+  }
+
+  String _generateWalletName() {
+    String type;
+    if (_bip39List != null) {
+      type = "Seed";
+    } else if (_keys != null) {
+      type = "Key";
+    } else {
+      type = "";
+    }
+
+    String networkName = _chain?.name ?? "Universal";
+    int walletNumber = _appState.wallets.length + 1;
+    return "$networkName #$walletNumber ($type)";
   }
 
   bool _validatePasswords() {
@@ -142,26 +142,21 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
     if (_passwordController.text.length < 6) {
       _passwordInputKey.currentState?.shake();
-
       setState(() {
         _errorMessage = 'Password must be at least 8 characters';
         _disabled = false;
       });
-
       return false;
     }
 
     if (_passwordController.text != _confirmPasswordController.text) {
       _confirmPasswordInputKey.currentState?.shake();
-
       setState(() {
         _disabled = false;
         _errorMessage = 'Passwords do not match';
       });
-
       return false;
     }
-
     return true;
   }
 
@@ -199,14 +194,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           allowPinCode: true,
           reason: 'Please authenticate to enable quick access',
         );
-
         setState(() => _useDeviceAuth = authenticated);
-
         if (!authenticated) {
           setState(() {
             _disabled = true;
           });
-
           return;
         }
       }
@@ -217,7 +209,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       List<String> identifiers = await device.getDeviceIdentifiers();
 
       AuthMethod biometricType = AuthMethod.none;
-
       if (_useDeviceAuth) {
         biometricType = _authMethods[0];
       }
@@ -256,15 +247,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
-          accounts: [
-            (BigInt.zero, "Account 0")
-          ], // TODO: add interface for change Account name
-          passphrase: "", // TODO: maybe make it
+          accounts: [(BigInt.zero, "Account 0")],
+          passphrase: "",
           walletName: _walletNameController.text,
           biometricType: biometricType.name,
           identifiers: identifiers,
           chainHash: chainHash,
-          mnemonicCheck: _chain?.slip44 != 313, // SKIP for ZIlliqa.
+          mnemonicCheck: _chain?.slip44 != 313,
         );
 
         session = await addBip39Wallet(
@@ -300,16 +289,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       _btnController.success();
 
       if (!mounted) return;
-      Navigator.of(context).pushNamed(
-        '/',
-      );
+      Navigator.of(context).pushNamed('/');
     } catch (e) {
       setState(() {
         _disabled = false;
         _errorMessage = e.toString();
       });
       _btnController.error();
-
       Timer(const Duration(seconds: 1), () {
         _btnController.reset();
       });
@@ -451,6 +437,51 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                 fontWeight: FontWeight.w500,
                               ),
                             ),
+                            if (_chain?.slip44 == 313)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(horizontal: 4),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        SvgPicture.asset(
+                                          "assets/icons/scilla.svg",
+                                          width: 24,
+                                          height: 24,
+                                          colorFilter: ColorFilter.mode(
+                                            theme.textPrimary,
+                                            BlendMode.srcIn,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 4),
+                                        Text(
+                                          "Legacy",
+                                          style: TextStyle(
+                                            color: theme.textPrimary,
+                                            fontSize: 16,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    Switch(
+                                      value: _zilLegacy,
+                                      onChanged: _disabled
+                                          ? null
+                                          : (value) {
+                                              setState(() {
+                                                _zilLegacy = value;
+                                              });
+                                            },
+                                      activeColor: theme.primaryPurple,
+                                      activeTrackColor: theme.primaryPurple
+                                          .withValues(alpha: 0.4),
+                                    ),
+                                  ],
+                                ),
+                              ),
                             BiometricSwitch(
                               biometricType: _authMethods.first,
                               value: _useDeviceAuth,

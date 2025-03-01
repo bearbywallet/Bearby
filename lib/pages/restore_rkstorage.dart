@@ -2,7 +2,9 @@ import 'dart:convert';
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -11,8 +13,17 @@ import 'package:zilpay/components/button.dart';
 class Account {
   final String name;
   final String address;
+  final String? balance;
+  final int type;
+  final int index;
 
-  Account({required this.name, required this.address});
+  Account({
+    required this.name,
+    required this.address,
+    required this.type,
+    required this.index,
+    this.balance,
+  });
 }
 
 class RestoreRKStorage extends StatefulWidget {
@@ -46,12 +57,27 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
       final accountsJson = jsonDecode(args['accountsJson']!);
       final identities = accountsJson['identities'] as List<dynamic>;
       setState(() {
-        accounts = identities
-            .map((identity) => Account(
-                  name: identity['name'] as String,
-                  address: identity['bech32'] as String,
-                ))
-            .toList();
+        accounts = identities.map((identity) {
+          final balanceMap = identity['balance'] as Map<String, dynamic>?;
+          final mainnetBalance =
+              balanceMap?['mainnet'] as Map<String, dynamic>?;
+          final balance = intlNumberFormating(
+            value: mainnetBalance?['ZIL'] ?? "0",
+            decimals: 12,
+            localeStr: '',
+            symbolStr: 'ZIL',
+            threshold: baseThreshold,
+            compact: true,
+          );
+
+          return Account(
+            name: identity['name'] as String,
+            address: identity['bech32'] as String,
+            type: identity['type'] as int,
+            index: identity['index'] as int,
+            balance: balance,
+          );
+        }).toList();
       });
     } catch (e) {
       Navigator.pop(context);
@@ -153,7 +179,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                     const SizedBox(height: 16),
                     CustomButton(
                       text: 'Restore',
-                      onPressed: _isLoading ? null : _handleRestore,
+                      disabled: _isLoading,
+                      onPressed: _handleRestore,
                       backgroundColor: theme.primaryPurple,
                       borderRadius: 30.0,
                       height: 56.0,
@@ -201,14 +228,23 @@ class AccountItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(account.name,
-                    style: TextStyle(
-                        color: theme.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
-                Text(account.address,
-                    style: TextStyle(color: theme.textSecondary, fontSize: 14),
-                    overflow: TextOverflow.ellipsis),
+                Text(
+                  account.name,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
+                ),
+                Text(
+                  account.address,
+                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  'Balance: ${account.balance ?? '0'} ZIL',
+                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                ),
               ],
             ),
           ),

@@ -7,6 +7,8 @@ import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -25,6 +27,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   bool isLoading = true;
   String? errorMessage;
   String? _shortName;
+  bool _zilLegacy = false;
   bool isTestnet = false;
 
   final TextEditingController _searchController = TextEditingController();
@@ -55,6 +58,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final keys = args?['keys'] as KeyPairInfo?;
     final shortName = args?['shortName'] as String?;
+    final zilLegacy = args?['zilLegacy'] as bool?;
 
     if (bip39 == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -65,6 +69,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         _bip39List = bip39;
         _keys = keys;
         _shortName = shortName;
+        _zilLegacy = zilLegacy ?? false;
       });
     }
   }
@@ -123,67 +128,88 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Expanded(
-                child: Text(
-                  chain.name,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                  ),
+              SizedBox(
+                width: 40,
+                height: 40,
+                child: AsyncImage(
+                  url: preprocessUrl(chain.logo, theme.value),
+                  fit: BoxFit.contain,
+                  errorWidget: const Icon(Icons.error),
                 ),
               ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                decoration: BoxDecoration(
-                  color: isTestnet
-                      ? theme.warning.withValues(alpha: 0.2)
-                      : theme.success.withValues(alpha: 0.2),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  isTestnet ? 'Testnet' : 'Mainnet',
-                  style: TextStyle(
-                    color: isTestnet ? theme.warning : theme.success,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Expanded(
+                          child: Text(
+                            chain.name,
+                            style: TextStyle(
+                              color: theme.textPrimary,
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: isTestnet
+                                ? theme.warning.withValues(alpha: 0.2)
+                                : theme.success.withValues(alpha: 0.2),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Text(
+                            isTestnet ? 'Testnet' : 'Mainnet',
+                            style: TextStyle(
+                              color: isTestnet ? theme.warning : theme.success,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Chain ID: ${chain.chainIds.where((id) => id != 0).toList().join(",")}',
+                      style: TextStyle(
+                        color: theme.primaryPurple,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Token: ${chain.chain}',
+                      style: TextStyle(
+                        color: theme.textSecondary,
+                        fontSize: 14,
+                      ),
+                    ),
+                    if (chain.explorers.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        'Explorer: ${chain.explorers.first.name}',
+                        style: TextStyle(
+                          color: theme.textSecondary,
+                          fontSize: 12,
+                        ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ],
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 4),
-          Text(
-            'Chain ID: ${chain.chainIds.where((id) => id != 0).toList().join(",")}',
-            style: TextStyle(
-              color: theme.primaryPurple,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          const SizedBox(height: 4),
-          Text(
-            'Token: ${chain.chain}',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-            ),
-          ),
-          if (chain.explorers.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Text(
-              'Explorer: ${chain.explorers.first.name}',
-              style: TextStyle(
-                color: theme.textSecondary,
-                fontSize: 12,
-              ),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-          const SizedBox(height: 8),
         ],
       ),
       isSelected: selectedNetworkIndex == index,
@@ -321,6 +347,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                                 'keys': _keys,
                                 'chain': chain,
                                 'isTestnet': isTestnet,
+                                'zilLegacy': _zilLegacy,
                               },
                             );
                           },

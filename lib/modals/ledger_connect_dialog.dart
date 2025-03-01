@@ -168,7 +168,7 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                               : null,
                         ),
                         const SizedBox(height: 16),
-                        BiometricSwitch(
+                        SwitchWithIcon(
                           biometricType: widget.biometricType,
                           value: _useBiometric,
                           disabled: _loading,

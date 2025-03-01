@@ -1,6 +1,6 @@
 [
   {
-    "name": "Zilliqa proto mainnet",
+    "name": "Zilliqa proto",
     "chain": "ZIL",
     "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
     "rpc": [
@@ -11,21 +11,21 @@
       {
         "native": true,
         "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
-        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa Scilla",
-        "symbol": "pZIL",
-        "decimals": 12
-      },
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Zilliqa EVM",
         "symbol": "pZIL",
         "decimals": 18
+      },
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa Scilla",
+        "symbol": "pZIL",
+        "decimals": 12
       }
     ],
-    "chainIds": [2, 32770],
+    "chainIds": [32770, 2],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
     "slip44": 313,
@@ -38,7 +38,7 @@
     ]
   },
   {
-    "name": "Smart chain Testnet",
+    "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
     "rpc": [
@@ -75,7 +75,7 @@
     ]
   },
   {
-    "name": "Sepolia testnet",
+    "name": "Sepolia",
     "chain": "ETH",
     "rpc": [
       "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
