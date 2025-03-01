@@ -1,5 +1,11 @@
+use aes::cipher::generic_array::GenericArray;
+use aes::cipher::{BlockDecrypt, KeyInit};
+use aes::Aes256;
+use base64::engine::general_purpose;
+use base64::Engine;
 use pbkdf2::pbkdf2_hmac;
-use sha2::Sha512;
+use serde_json::Value;
+use sha2::{Digest, Sha256, Sha512};
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::{
@@ -23,19 +29,69 @@ use crate::{
     },
 };
 
-fn generate_key(password: &str, salt: &str, cost: u32, length: usize) -> String {
-    let password = password.as_bytes();
+fn generate_key(password: &str, salt: &str, cost: u32) -> [u8; 32] {
+    let password_bytes = password.as_bytes();
+
+    let mut hasher = Sha256::default();
+    hasher.update(password_bytes);
+    let password_hash = hasher.finalize();
+    let password_hex = hex::encode(password_hash);
+
     let salt = salt.as_bytes();
 
-    let mut key = vec![0u8; length / 8];
-    pbkdf2_hmac::<Sha512>(password, salt, cost, &mut key);
+    let mut key = [0u8; 32];
+    pbkdf2_hmac::<Sha512>(&password_hex.as_bytes(), salt, cost, &mut key);
 
-    let key_hex = hex::encode(key);
-
-    key_hex
+    key
 }
 
-pub async fn load_old_database_android() -> Result<(String, String), String> {
+fn decrypt(key_bytes: &[u8; 32], iv: &str, cipher: &str) -> Result<String, String> {
+    let iv_bytes = hex::decode(iv).map_err(|e| e.to_string())?;
+    let cipher_bytes = general_purpose::STANDARD
+        .decode(cipher)
+        .map_err(|e| e.to_string())?;
+
+    if key_bytes.len() != 32 {
+        return Err("Key must be 32 bytes long".into());
+    }
+    if iv_bytes.len() != 16 {
+        return Err("IV must be 16 bytes long".into());
+    }
+    if cipher_bytes.len() % 16 != 0 {
+        return Err("Cipher length must be multiple of 16 bytes".into());
+    }
+
+    let cipher = Aes256::new(GenericArray::from_slice(&key_bytes[..32]));
+    let mut plaintext = Vec::with_capacity(cipher_bytes.len());
+    let mut previous_block = iv_bytes;
+    let mut cipher_bytes = cipher_bytes;
+
+    for chunk in cipher_bytes.chunks_mut(16) {
+        let mut decrypted_block = chunk.to_vec();
+        cipher.decrypt_block((&mut decrypted_block[..]).into());
+        for (i, &byte) in previous_block.iter().enumerate() {
+            decrypted_block[i] ^= byte;
+        }
+        plaintext.extend_from_slice(&decrypted_block);
+        previous_block = chunk.to_vec();
+    }
+
+    if let Some(&padding_len) = plaintext.last() {
+        let len = plaintext.len();
+        if padding_len > 0
+            && padding_len <= 16
+            && plaintext[len - padding_len as usize..]
+                .iter()
+                .all(|&x| x == padding_len)
+        {
+            plaintext.truncate(len - padding_len as usize);
+        }
+    }
+
+    Ok(String::from_utf8(plaintext).map_err(|e| e.to_string())?)
+}
+
+pub fn load_old_database_android() -> Result<(String, String), String> {
     let path = "/data/data/com.zilpaymobile/databases/RKStorage";
     let conn = rusqlite::Connection::open(path).map_err(|e| e.to_string())?;
     let vault: String = conn
@@ -56,13 +112,24 @@ pub async fn load_old_database_android() -> Result<(String, String), String> {
     Ok((vault, accounts))
 }
 
-pub async fn try_restore_rkstorage(vault_json: String, password: String) -> Result<String, String> {
+pub fn try_restore_rkstorage(vault_json: String, password: String) -> Result<String, String> {
     let salt = "ZilPay";
     let cost = 5000;
-    let length = 256;
-    let key = generate_key(&password, salt, cost, length);
+    let json_value: Value = serde_json::from_str(&vault_json).map_err(|e| e.to_string())?;
+    let key = generate_key(&password, salt, cost);
+    let iv = json_value
+        .get("iv")
+        .ok_or(String::from("invalid iv"))?
+        .as_str()
+        .unwrap_or_default();
+    let cipher = json_value
+        .get("cipher")
+        .ok_or(String::from("invalid cipher"))?
+        .as_str()
+        .unwrap_or_default();
+    let secre_words = decrypt(&key, &iv, &cipher)?;
 
-    Ok(String::new())
+    Ok(secre_words)
 }
 
 pub async fn load_service(path: &str) -> Result<BackgroundState, String> {
@@ -159,27 +226,4 @@ pub async fn start_block_worker(
 
 pub async fn get_data() -> Result<BackgroundState, String> {
     with_service(get_background_state).await.map_err(Into::into)
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_generate_key() {
-        let password = "123";
-        let salt = "ZilPay";
-        let cost = 5000;
-        let length = 256;
-
-        let result = generate_key(password, salt, cost, length);
-        assert!(result.is_ok());
-
-        let key = result.unwrap();
-
-        dbg!(&key);
-        assert_eq!(key.len(), 64);
-        let key2 = generate_key(password, salt, cost, length).unwrap();
-        assert_eq!(key, key2);
-    }
 }

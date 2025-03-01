@@ -13,8 +13,15 @@ import '../models/settings.dart';
 import '../models/wallet.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These functions are ignored because they are not marked as `pub`: `decrypt`, `generate_key`
+
 Future<(String, String)> loadOldDatabaseAndroid() =>
     RustLib.instance.api.crateApiBackendLoadOldDatabaseAndroid();
+
+Future<String> tryRestoreRkstorage(
+        {required String vaultJson, required String password}) =>
+    RustLib.instance.api.crateApiBackendTryRestoreRkstorage(
+        vaultJson: vaultJson, password: password);
 
 Future<BackgroundState> loadService({required String path}) =>
     RustLib.instance.api.crateApiBackendLoadService(path: path);

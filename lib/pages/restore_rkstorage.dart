@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -40,7 +41,6 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
       Navigator.pop(context);
       return;
     }
-
     try {
       _vaultJson = args['vaultJson'];
       final accountsJson = jsonDecode(args['accountsJson']!);
@@ -66,26 +66,29 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
 
   void _handleRestore() async {
     if (_passwordController.text.isEmpty) {
-      setState(() {
-        _errorMessage = 'Please enter the password';
-      });
+      setState(() => _errorMessage = 'Enter password');
       return;
     }
-
     setState(() {
       _isLoading = true;
       _errorMessage = null;
     });
-
-    await Future.delayed(const Duration(seconds: 2));
-
-    setState(() {
-      _isLoading = false;
-    });
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Migration completed successfully!')),
-    );
+    try {
+      String words = await tryRestoreRkstorage(
+        vaultJson: _vaultJson!,
+        password: _passwordController.text,
+      );
+      if (mounted) {
+        Navigator.of(context).pushNamed('/net_setup', arguments: {
+          'bip39': words.split(" "),
+          'zilLegacy': true,
+        });
+      }
+    } catch (e) {
+      setState(() => _errorMessage = 'Error: ${e.toString()}');
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -97,7 +100,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Migrate ZilPay 1.0 to ZilPay 2.0!',
+              title: 'Migrate ZilPay 1.0 to 2.0',
               onBackPressed: () => Navigator.pop(context),
             ),
             Expanded(
@@ -106,11 +109,9 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      'The following accounts will be migrated to ZilPay 2.0. Enter password to confirm.',
-                      style:
-                          TextStyle(color: theme.textSecondary, fontSize: 14),
-                    ),
+                    Text('Accounts to migrate to ZilPay 2.0. Enter password.',
+                        style: TextStyle(
+                            color: theme.textSecondary, fontSize: 14)),
                     const SizedBox(height: 16),
                     Container(
                       padding: const EdgeInsets.all(16.0),
@@ -123,13 +124,9 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                       ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: accounts
-                                .map((account) => AccountItem(account: account))
-                                .toList(),
-                          ),
-                        ],
+                        children: accounts
+                            .map((account) => AccountItem(account: account))
+                            .toList(),
                       ),
                     ),
                     const SizedBox(height: 16),
@@ -140,11 +137,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                       rightIconPath: _obscurePassword
                           ? 'assets/icons/close_eye.svg'
                           : 'assets/icons/open_eye.svg',
-                      onRightIconTap: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
+                      onRightIconTap: () =>
+                          setState(() => _obscurePassword = !_obscurePassword),
                       disabled: _isLoading,
                       focusedBorderColor: theme.primaryPurple,
                       height: 56,
@@ -152,12 +146,10 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                     ),
                     if (_errorMessage != null)
                       Padding(
-                        padding: const EdgeInsets.only(top: 8.0),
-                        child: Text(
-                          _errorMessage!,
-                          style: TextStyle(color: theme.danger, fontSize: 14),
-                        ),
-                      ),
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(_errorMessage!,
+                              style: TextStyle(
+                                  color: theme.danger, fontSize: 14))),
                     const SizedBox(height: 16),
                     CustomButton(
                       text: 'Restore',
@@ -209,19 +201,14 @@ class AccountItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  account.name,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  account.address,
-                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
-                  overflow: TextOverflow.ellipsis,
-                ),
+                Text(account.name,
+                    style: TextStyle(
+                        color: theme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+                Text(account.address,
+                    style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                    overflow: TextOverflow.ellipsis),
               ],
             ),
           ),

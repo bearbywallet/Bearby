@@ -4820,12 +4820,15 @@ dependencies = [
 name = "rust_lib_zilpay"
 version = "0.1.0"
 dependencies = [
+ "aes",
+ "base64 0.22.1",
  "flutter_rust_bridge",
  "hex",
  "lazy_static",
  "once_cell",
  "pbkdf2",
  "rusqlite",
+ "serde_json",
  "sha2",
  "thiserror 1.0.69",
  "tokio",
