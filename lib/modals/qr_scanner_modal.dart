@@ -379,13 +379,21 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               IconButton(
-                icon: Icon(
-                  controller?.torchEnabled == true
-                      ? Icons.flash_on
-                      : Icons.flash_off,
-                  color: Colors.white,
-                  size: 32,
-                ),
+                icon: controller?.torchEnabled == true
+                    ? SvgPicture.asset(
+                        'assets/icons/torch_on.svg',
+                        width: 32,
+                        height: 32,
+                        colorFilter: ColorFilter.mode(
+                            theme.textPrimary, BlendMode.srcIn),
+                      )
+                    : SvgPicture.asset(
+                        'assets/icons/torch_off.svg',
+                        width: 32,
+                        height: 32,
+                        colorFilter: ColorFilter.mode(
+                            theme.textPrimary, BlendMode.srcIn),
+                      ),
                 onPressed: _toggleTorch,
               ),
             ],
