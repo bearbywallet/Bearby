@@ -70,7 +70,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
     final currentIndex = index - 1;
 
     if (word.contains(' ')) {
-      _handlePhrasePaste(word, currentIndex);
+      _handlePhrasePaste(word);
       return;
     }
 
@@ -85,25 +85,24 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
     }
   }
 
-  void _handlePhrasePaste(String phrase, int startIndex) {
-    final words = phrase.trim().split(RegExp(r'\s+'));
+  void _handlePhrasePaste(String phrase) {
+    final words = phrase
+        .trim()
+        .split(RegExp(r'\s+'))
+        .where((word) => word.isNotEmpty)
+        .toList();
 
-    int targetCount = _count;
-    for (int allowedCount in _allowedCounts) {
-      if (words.length <= allowedCount) {
-        targetCount = allowedCount;
-        break;
-      }
-    }
+    int targetCount = _allowedCounts.firstWhere(
+      (count) => count >= words.length,
+      orElse: () => _allowedCounts.last,
+    );
 
     if (targetCount != _count) {
       _handleCountChanged(targetCount, autoAdjust: true);
     }
 
-    for (var i = 0; i < words.length && (startIndex + i) < targetCount; i++) {
-      if (words[i].isNotEmpty) {
-        _words[startIndex + i] = words[i].toLowerCase();
-      }
+    for (var i = 0; i < words.length && i < targetCount; i++) {
+      _words[i] = words[i].toLowerCase();
     }
 
     _validateForm();

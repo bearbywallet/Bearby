@@ -29,6 +29,8 @@ class _HomePageState extends State<HomePage> {
   @override
   void dispose() {
     super.dispose();
+    final appState = Provider.of<AppState>(context);
+    _refreshData(appState);
   }
 
   Future<void> _refreshData(AppState appState) async {
