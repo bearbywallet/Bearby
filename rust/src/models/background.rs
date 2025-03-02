@@ -1,5 +1,6 @@
 use super::{
-    notification::BackgroundNotificationState, provider::NetworkConfigInfo, wallet::WalletInfo,
+    notification::BackgroundNotificationState, provider::NetworkConfigInfo,
+    settings::BrowserSettingsInfo, wallet::WalletInfo,
 };
 use std::collections::HashMap;
 
@@ -9,5 +10,6 @@ pub struct BackgroundState {
     pub notifications_global_enabled: bool,
     pub locale: String,
     pub appearances: u8,
+    pub browser_settings: BrowserSettingsInfo,
     pub providers: Vec<NetworkConfigInfo>,
 }

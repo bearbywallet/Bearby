@@ -3155,6 +3155,8 @@ impl SseDecode for crate::models::background::BackgroundState {
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
         let mut var_locale = <String>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
+        let mut var_browserSettings =
+            <crate::models::settings::BrowserSettingsInfo>::sse_decode(deserializer);
         let mut var_providers =
             <Vec<crate::models::provider::NetworkConfigInfo>>::sse_decode(deserializer);
         return crate::models::background::BackgroundState {
@@ -3163,6 +3165,7 @@ impl SseDecode for crate::models::background::BackgroundState {
             notifications_global_enabled: var_notificationsGlobalEnabled,
             locale: var_locale,
             appearances: var_appearances,
+            browser_settings: var_browserSettings,
             providers: var_providers,
         };
     }
@@ -4605,6 +4608,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::background::BackgroundStat
                 .into_dart(),
             self.locale.into_into_dart().into_dart(),
             self.appearances.into_into_dart().into_dart(),
+            self.browser_settings.into_into_dart().into_dart(),
             self.providers.into_into_dart().into_dart(),
         ]
         .into_dart()
@@ -5431,6 +5435,10 @@ impl SseEncode for crate::models::background::BackgroundState {
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
+        <crate::models::settings::BrowserSettingsInfo>::sse_encode(
+            self.browser_settings,
+            serializer,
+        );
         <Vec<crate::models::provider::NetworkConfigInfo>>::sse_encode(self.providers, serializer);
     }
 }

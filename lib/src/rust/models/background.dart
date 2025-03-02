@@ -18,6 +18,7 @@ class BackgroundState {
   final bool notificationsGlobalEnabled;
   final String locale;
   final int appearances;
+  final BrowserSettingsInfo browserSettings;
   final List<NetworkConfigInfo> providers;
 
   const BackgroundState({
@@ -26,6 +27,7 @@ class BackgroundState {
     required this.notificationsGlobalEnabled,
     required this.locale,
     required this.appearances,
+    required this.browserSettings,
     required this.providers,
   });
 
@@ -36,6 +38,7 @@ class BackgroundState {
       notificationsGlobalEnabled.hashCode ^
       locale.hashCode ^
       appearances.hashCode ^
+      browserSettings.hashCode ^
       providers.hashCode;
 
   @override
@@ -48,5 +51,6 @@ class BackgroundState {
           notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
           locale == other.locale &&
           appearances == other.appearances &&
+          browserSettings == other.browserSettings &&
           providers == other.providers;
 }

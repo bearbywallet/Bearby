@@ -2648,8 +2648,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BackgroundState dco_decode_background_state(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return BackgroundState(
       wallets: dco_decode_list_wallet_info(arr[0]),
       notificationsWalletStates:
@@ -2657,7 +2657,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notificationsGlobalEnabled: dco_decode_bool(arr[2]),
       locale: dco_decode_String(arr[3]),
       appearances: dco_decode_u_8(arr[4]),
-      providers: dco_decode_list_network_config_info(arr[5]),
+      browserSettings: dco_decode_browser_settings_info(arr[5]),
+      providers: dco_decode_list_network_config_info(arr[6]),
     );
   }
 
@@ -3669,6 +3670,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
     var var_locale = sse_decode_String(deserializer);
     var var_appearances = sse_decode_u_8(deserializer);
+    var var_browserSettings = sse_decode_browser_settings_info(deserializer);
     var var_providers = sse_decode_list_network_config_info(deserializer);
     return BackgroundState(
         wallets: var_wallets,
@@ -3676,6 +3678,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         notificationsGlobalEnabled: var_notificationsGlobalEnabled,
         locale: var_locale,
         appearances: var_appearances,
+        browserSettings: var_browserSettings,
         providers: var_providers);
   }
 
@@ -4890,6 +4893,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.notificationsGlobalEnabled, serializer);
     sse_encode_String(self.locale, serializer);
     sse_encode_u_8(self.appearances, serializer);
+    sse_encode_browser_settings_info(self.browserSettings, serializer);
     sse_encode_list_network_config_info(self.providers, serializer);
   }
 

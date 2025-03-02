@@ -101,6 +101,7 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
     Ok(BackgroundState {
         wallets,
         notifications_wallet_states,
+        browser_settings: service.settings.browser.clone().into(),
         notifications_global_enabled: service.settings.notifications.global_enabled,
         locale: service.settings.locale.to_string(),
         appearances: service.settings.theme.appearances.code(),

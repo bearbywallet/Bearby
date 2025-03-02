@@ -4,6 +4,7 @@ import 'package:zilpay/pages/add_account.dart';
 import 'package:zilpay/pages/add_token.dart';
 import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
+import 'package:zilpay/pages/browser_settings.dart';
 import 'package:zilpay/pages/currency_conversion.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/locale.dart';
@@ -89,7 +90,8 @@ class AppRouter {
       '/reveal_bip39',
       '/add_account',
       '/web_view',
-      '/rk_restore'
+      '/rk_restore',
+      'browser_settings',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -233,6 +235,8 @@ class AppRouter {
         return wrapWithProviders(const SecretPhraseGeneratorPage());
       case '/verify_bip39':
         return wrapWithProviders(const SecretPhraseVerifyPage());
+      case '/browser_settings':
+        return wrapWithProviders(const BrowserSettingsPage());
       case '/restore_options':
         return wrapWithProviders(const RestoreWalletOptionsPage());
       case '/gen_options':

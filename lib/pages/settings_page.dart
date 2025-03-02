@@ -156,6 +156,12 @@ class _SettingsPageState extends State<SettingsPage> {
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/language'),
                               ),
+                              SettingsItem(
+                                title: 'Browser',
+                                trailingSvgPath: 'assets/icons/browser.svg',
+                                onTap: () => Navigator.pushNamed(
+                                    context, '/browser_settings'),
+                              ),
                             ]),
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
