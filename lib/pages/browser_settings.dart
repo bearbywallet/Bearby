@@ -121,61 +121,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     }
   }
 
-  Future<void> _setTextScalingFactor(AppState appState, double factor) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(textScalingFactor: factor);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error setting text scaling factor: $e");
-    }
-  }
-
-  Future<void> _toggleGeolocation(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(allowGeolocation: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling geolocation: $e");
-    }
-  }
-
-  Future<void> _toggleCamera(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(allowCamera: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling camera: $e");
-    }
-  }
-
-  Future<void> _toggleMicrophone(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(allowMicrophone: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling microphone: $e");
-    }
-  }
-
-  Future<void> _toggleAutoPlay(AppState appState, bool enabled) async {
-    try {
-      BrowserSettingsInfo newSettings =
-          appState.state.browserSettings.copyWith(allowAutoPlay: enabled);
-      await setBrowserSettings(browserSettings: newSettings);
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling autoplay: $e");
-    }
-  }
-
   void _showSearchEngineModal(AppState appState) {
     showListSelectorModal(
       context: context,
@@ -250,8 +195,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                           _buildPrivacySection(theme, appState),
                           const SizedBox(height: 24),
                           _buildPerformanceSection(theme, appState),
-                          const SizedBox(height: 24),
-                          _buildPermissionsSection(theme, appState),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -409,88 +352,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 settings.cacheEnabled,
                 (value) => _toggleCache(appState, value),
               ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildSliderItem(
-                theme,
-                'Text scaling',
-                'assets/icons/text.svg',
-                'Adjust the size of text on websites',
-                settings.textScalingFactor,
-                (value) => _setTextScalingFactor(appState, value),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPermissionsSection(AppTheme theme, AppState appState) {
-    final settings = appState.state.browserSettings;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(left: 16, bottom: 16),
-          child: Text(
-            'Site Permissions',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        Container(
-          decoration: BoxDecoration(
-            color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              _buildPreferenceItem(
-                theme,
-                'Geolocation',
-                'assets/icons/location.svg',
-                'Allow websites to access your location',
-                true,
-                settings.allowGeolocation,
-                (value) => _toggleGeolocation(appState, value),
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Camera',
-                'assets/icons/camera.svg',
-                'Allow websites to access your camera',
-                true,
-                settings.allowCamera,
-                (value) => _toggleCamera(appState, value),
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Microphone',
-                'assets/icons/microphone.svg',
-                'Allow websites to access your microphone',
-                true,
-                settings.allowMicrophone,
-                (value) => _toggleMicrophone(appState, value),
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Autoplay',
-                'assets/icons/play.svg',
-                'Allow websites to automatically play media',
-                true,
-                settings.allowAutoPlay,
-                (value) => _toggleAutoPlay(appState, value),
-              ),
             ],
           ),
         ),
@@ -637,86 +498,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
               ),
             ),
           ],
-        ],
-      ),
-    );
-  }
-
-  Widget _buildSliderItem(
-    AppTheme theme,
-    String title,
-    String iconPath,
-    String description,
-    double value,
-    Function(double) onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Text(
-                title,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                ),
-              ),
-              const Spacer(),
-              Text(
-                '${(value * 100).toInt()}%',
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 14,
-                ),
-              ),
-            ],
-          ),
-          if (description.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.only(left: 40),
-              child: Text(
-                description,
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ],
-          const SizedBox(height: 12),
-          Padding(
-            padding: const EdgeInsets.only(left: 40, right: 12),
-            child: SliderTheme(
-              data: SliderThemeData(
-                activeTrackColor: theme.primaryPurple,
-                inactiveTrackColor: theme.textSecondary.withValues(alpha: 0.2),
-                thumbColor: theme.primaryPurple,
-                overlayColor: theme.primaryPurple.withValues(alpha: 0.2),
-                trackHeight: 4,
-              ),
-              child: Slider(
-                value: value,
-                min: 0.5,
-                max: 2.0,
-                divisions: 15,
-                onChanged: onChanged,
-              ),
-            ),
-          ),
         ],
       ),
     );
