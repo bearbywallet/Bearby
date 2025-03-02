@@ -42,16 +42,16 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   // Define content blocking options
   final List<ListItem> contentBlockingOptions = [
     ListItem(
-      title: 'Standard',
+      title: 'Off',
+      subtitle: 'No content blocking',
+    ),
+    ListItem(
+      title: 'Moderate',
       subtitle: 'Blocks some trackers and ads',
     ),
     ListItem(
       title: 'Strict',
       subtitle: 'Blocks most trackers and ads',
-    ),
-    ListItem(
-      title: 'Off',
-      subtitle: 'No content blocking',
     ),
   ];
 
@@ -576,6 +576,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     String? subtitleText,
   }) {
     return GestureDetector(
+      behavior: HitTestBehavior.opaque,
       onTap: onTap,
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
