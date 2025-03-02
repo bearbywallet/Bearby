@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
+import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -38,34 +39,47 @@ class _BrowserPageState extends State<BrowserPage>
   }
 
   void _handleSearch(String value) {
-    if (value.isNotEmpty) {
-      String query = value.trim();
-      String url;
+    if (value.isEmpty) return;
 
-      final uri = Uri.tryParse(query);
-      if (uri != null) {
-        if (uri.hasScheme && uri.hasAuthority) {
-          url = query;
-        } else if (uri.hasAuthority && uri.port != 0) {
-          url = 'http://$query';
-        } else if (isDomainName(query)) {
-          url = 'https://$query';
-        } else {
-          url = 'https://duckduckgo.com/?q=${Uri.encodeQueryComponent(query)}';
-        }
+    final appState = Provider.of<AppState>(context, listen: false);
+    final browserSettings = appState.state.browserSettings;
+    final searchEngineIndex = browserSettings.searchEngineIndex;
+    final searchEngine = baseSearchEngines[searchEngineIndex];
+
+    String query = value.trim();
+    String url;
+
+    final uri = Uri.tryParse(query);
+    if (uri != null) {
+      if (uri.hasScheme && uri.hasAuthority) {
+        url = query;
+      } else if (uri.hasAuthority && uri.port != 0) {
+        url = 'http://$query';
+      } else if (isDomainName(query)) {
+        url = 'https://$query';
       } else {
-        if (isDomainName(query)) {
-          url = 'https://$query';
-        } else {
-          url = 'https://duckduckgo.com/?q=${Uri.encodeQueryComponent(query)}';
-        }
+        url = '${searchEngine.url}${Uri.encodeQueryComponent(query)}';
       }
-
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => WebViewPage(initialUrl: url)),
-      );
+    } else {
+      if (isDomainName(query)) {
+        url = 'https://$query';
+      } else {
+        url = '${searchEngine.url}${Uri.encodeQueryComponent(query)}';
+      }
     }
+
+    _openWebView(url);
+  }
+
+  void _openWebView(String url) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => WebViewPage(
+          initialUrl: url,
+        ),
+      ),
+    );
   }
 
   bool isDomainName(String input) {
@@ -135,33 +149,44 @@ class _BrowserPageState extends State<BrowserPage>
                 ),
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: SmartInput(
-                    controller: _searchController,
-                    hint: 'Search or enter address',
-                    leftIconPath: 'assets/icons/search.svg',
-                    rightIconPath: "assets/icons/close.svg",
-                    onChanged: (value) {},
-                    onSubmitted: _handleSearch,
-                    onRightIconTap: () {
-                      _searchController.text = "";
-                    },
-                    borderColor: theme.textPrimary,
-                    focusedBorderColor: theme.primaryPurple,
-                    height: 48,
-                    fontSize: 16,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    autofocus: false,
-                    keyboardType: TextInputType.url,
-                  ),
+                  child: _buildSearchBar(theme),
                 ),
-                const SizedBox(
-                  height: 4,
-                ),
+                const SizedBox(height: 4),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  Widget _buildSearchBar(AppTheme theme) {
+    final appState = Provider.of<AppState>(context);
+    final searchEngineIndex = appState.state.browserSettings.searchEngineIndex;
+    final searchEngine = baseSearchEngines[searchEngineIndex];
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SmartInput(
+          controller: _searchController,
+          hint: 'Search with ${searchEngine.name} or enter address',
+          leftIconPath: 'assets/icons/search.svg',
+          rightIconPath: "assets/icons/close.svg",
+          onChanged: (value) {},
+          onSubmitted: _handleSearch,
+          onRightIconTap: () {
+            _searchController.text = "";
+          },
+          borderColor: theme.textPrimary,
+          focusedBorderColor: theme.primaryPurple,
+          height: 48,
+          fontSize: 16,
+          padding: const EdgeInsets.symmetric(horizontal: 16),
+          autofocus: false,
+          keyboardType: TextInputType.url,
+        ),
+      ],
     );
   }
 
@@ -218,12 +243,7 @@ class _BrowserPageState extends State<BrowserPage>
           color: theme.textPrimary,
         ),
       ),
-      onPressed: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => WebViewPage(initialUrl: url)),
-        );
-      },
+      onPressed: () => _openWebView(url),
       backgroundColor: theme.cardBackground,
       textColor: theme.primaryPurple,
     );

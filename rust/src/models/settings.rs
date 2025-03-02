@@ -108,21 +108,12 @@ impl TryFrom<WalletSettingsInfo> for WalletSettings {
 pub struct BrowserSettingsInfo {
     pub search_engine_index: u8,
 
-    pub javascript_enabled: bool,
     pub cache_enabled: bool,
     pub cookies_enabled: bool,
-    pub form_data_save_enabled: bool,
     pub content_blocking: u8,
 
     pub do_not_track: bool,
     pub incognito_mode: bool,
-    pub clear_cache_on_exit: bool,
-    pub user_agent_override: String,
-
-    pub prefetch_enabled: bool,
-    pub preload_links: bool,
-    pub hardware_acceleration: bool,
-
     pub text_scaling_factor: f32,
 
     pub allow_geolocation: bool,
@@ -130,23 +121,15 @@ pub struct BrowserSettingsInfo {
     pub allow_microphone: bool,
     pub allow_auto_play: bool,
 }
-
 impl From<BrowserSettings> for BrowserSettingsInfo {
     fn from(value: BrowserSettings) -> Self {
         BrowserSettingsInfo {
-            search_engine_index: value.search_enginea_index,
-            javascript_enabled: value.javascript_enabled,
+            search_engine_index: value.search_engine_index,
             cache_enabled: value.cache_enabled,
             cookies_enabled: value.cookies_enabled,
-            form_data_save_enabled: value.form_data_save_enabled,
             content_blocking: value.content_blocking.code(),
             do_not_track: value.do_not_track,
             incognito_mode: value.incognito_mode,
-            clear_cache_on_exit: value.clear_cache_on_exit,
-            user_agent_override: value.user_agent_override,
-            prefetch_enabled: value.prefetch_enabled,
-            preload_links: value.preload_links,
-            hardware_acceleration: value.hardware_acceleration,
             text_scaling_factor: value.text_scaling_factor,
             allow_geolocation: value.allow_geolocation,
             allow_camera: value.allow_camera,
@@ -159,19 +142,12 @@ impl From<BrowserSettings> for BrowserSettingsInfo {
 impl From<BrowserSettingsInfo> for BrowserSettings {
     fn from(value: BrowserSettingsInfo) -> Self {
         BrowserSettings {
-            search_enginea_index: value.search_engine_index,
-            javascript_enabled: value.javascript_enabled,
+            search_engine_index: value.search_engine_index,
             cache_enabled: value.cache_enabled,
             cookies_enabled: value.cookies_enabled,
-            form_data_save_enabled: value.form_data_save_enabled,
             content_blocking: ContentBlockingLevel::from_code(value.content_blocking),
             do_not_track: value.do_not_track,
             incognito_mode: value.incognito_mode,
-            clear_cache_on_exit: value.clear_cache_on_exit,
-            user_agent_override: value.user_agent_override,
-            prefetch_enabled: value.prefetch_enabled,
-            preload_links: value.preload_links,
-            hardware_acceleration: value.hardware_acceleration,
             text_scaling_factor: value.text_scaling_factor,
             allow_geolocation: value.allow_geolocation,
             allow_camera: value.allow_camera,

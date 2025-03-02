@@ -3234,18 +3234,11 @@ impl SseDecode for crate::models::settings::BrowserSettingsInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_searchEngineIndex = <u8>::sse_decode(deserializer);
-        let mut var_javascriptEnabled = <bool>::sse_decode(deserializer);
         let mut var_cacheEnabled = <bool>::sse_decode(deserializer);
         let mut var_cookiesEnabled = <bool>::sse_decode(deserializer);
-        let mut var_formDataSaveEnabled = <bool>::sse_decode(deserializer);
         let mut var_contentBlocking = <u8>::sse_decode(deserializer);
         let mut var_doNotTrack = <bool>::sse_decode(deserializer);
         let mut var_incognitoMode = <bool>::sse_decode(deserializer);
-        let mut var_clearCacheOnExit = <bool>::sse_decode(deserializer);
-        let mut var_userAgentOverride = <String>::sse_decode(deserializer);
-        let mut var_prefetchEnabled = <bool>::sse_decode(deserializer);
-        let mut var_preloadLinks = <bool>::sse_decode(deserializer);
-        let mut var_hardwareAcceleration = <bool>::sse_decode(deserializer);
         let mut var_textScalingFactor = <f32>::sse_decode(deserializer);
         let mut var_allowGeolocation = <bool>::sse_decode(deserializer);
         let mut var_allowCamera = <bool>::sse_decode(deserializer);
@@ -3253,18 +3246,11 @@ impl SseDecode for crate::models::settings::BrowserSettingsInfo {
         let mut var_allowAutoPlay = <bool>::sse_decode(deserializer);
         return crate::models::settings::BrowserSettingsInfo {
             search_engine_index: var_searchEngineIndex,
-            javascript_enabled: var_javascriptEnabled,
             cache_enabled: var_cacheEnabled,
             cookies_enabled: var_cookiesEnabled,
-            form_data_save_enabled: var_formDataSaveEnabled,
             content_blocking: var_contentBlocking,
             do_not_track: var_doNotTrack,
             incognito_mode: var_incognitoMode,
-            clear_cache_on_exit: var_clearCacheOnExit,
-            user_agent_override: var_userAgentOverride,
-            prefetch_enabled: var_prefetchEnabled,
-            preload_links: var_preloadLinks,
-            hardware_acceleration: var_hardwareAcceleration,
             text_scaling_factor: var_textScalingFactor,
             allow_geolocation: var_allowGeolocation,
             allow_camera: var_allowCamera,
@@ -4701,18 +4687,11 @@ impl flutter_rust_bridge::IntoDart for crate::models::settings::BrowserSettingsI
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.search_engine_index.into_into_dart().into_dart(),
-            self.javascript_enabled.into_into_dart().into_dart(),
             self.cache_enabled.into_into_dart().into_dart(),
             self.cookies_enabled.into_into_dart().into_dart(),
-            self.form_data_save_enabled.into_into_dart().into_dart(),
             self.content_blocking.into_into_dart().into_dart(),
             self.do_not_track.into_into_dart().into_dart(),
             self.incognito_mode.into_into_dart().into_dart(),
-            self.clear_cache_on_exit.into_into_dart().into_dart(),
-            self.user_agent_override.into_into_dart().into_dart(),
-            self.prefetch_enabled.into_into_dart().into_dart(),
-            self.preload_links.into_into_dart().into_dart(),
-            self.hardware_acceleration.into_into_dart().into_dart(),
             self.text_scaling_factor.into_into_dart().into_dart(),
             self.allow_geolocation.into_into_dart().into_dart(),
             self.allow_camera.into_into_dart().into_dart(),
@@ -5486,18 +5465,11 @@ impl SseEncode for crate::models::settings::BrowserSettingsInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <u8>::sse_encode(self.search_engine_index, serializer);
-        <bool>::sse_encode(self.javascript_enabled, serializer);
         <bool>::sse_encode(self.cache_enabled, serializer);
         <bool>::sse_encode(self.cookies_enabled, serializer);
-        <bool>::sse_encode(self.form_data_save_enabled, serializer);
         <u8>::sse_encode(self.content_blocking, serializer);
         <bool>::sse_encode(self.do_not_track, serializer);
         <bool>::sse_encode(self.incognito_mode, serializer);
-        <bool>::sse_encode(self.clear_cache_on_exit, serializer);
-        <String>::sse_encode(self.user_agent_override, serializer);
-        <bool>::sse_encode(self.prefetch_enabled, serializer);
-        <bool>::sse_encode(self.preload_links, serializer);
-        <bool>::sse_encode(self.hardware_acceleration, serializer);
         <f32>::sse_encode(self.text_scaling_factor, serializer);
         <bool>::sse_encode(self.allow_geolocation, serializer);
         <bool>::sse_encode(self.allow_camera, serializer);

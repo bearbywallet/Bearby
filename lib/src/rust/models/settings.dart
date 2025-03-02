@@ -8,18 +8,11 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class BrowserSettingsInfo {
   final int searchEngineIndex;
-  final bool javascriptEnabled;
   final bool cacheEnabled;
   final bool cookiesEnabled;
-  final bool formDataSaveEnabled;
   final int contentBlocking;
   final bool doNotTrack;
   final bool incognitoMode;
-  final bool clearCacheOnExit;
-  final String userAgentOverride;
-  final bool prefetchEnabled;
-  final bool preloadLinks;
-  final bool hardwareAcceleration;
   final double textScalingFactor;
   final bool allowGeolocation;
   final bool allowCamera;
@@ -28,18 +21,11 @@ class BrowserSettingsInfo {
 
   const BrowserSettingsInfo({
     required this.searchEngineIndex,
-    required this.javascriptEnabled,
     required this.cacheEnabled,
     required this.cookiesEnabled,
-    required this.formDataSaveEnabled,
     required this.contentBlocking,
     required this.doNotTrack,
     required this.incognitoMode,
-    required this.clearCacheOnExit,
-    required this.userAgentOverride,
-    required this.prefetchEnabled,
-    required this.preloadLinks,
-    required this.hardwareAcceleration,
     required this.textScalingFactor,
     required this.allowGeolocation,
     required this.allowCamera,
@@ -50,18 +36,11 @@ class BrowserSettingsInfo {
   @override
   int get hashCode =>
       searchEngineIndex.hashCode ^
-      javascriptEnabled.hashCode ^
       cacheEnabled.hashCode ^
       cookiesEnabled.hashCode ^
-      formDataSaveEnabled.hashCode ^
       contentBlocking.hashCode ^
       doNotTrack.hashCode ^
       incognitoMode.hashCode ^
-      clearCacheOnExit.hashCode ^
-      userAgentOverride.hashCode ^
-      prefetchEnabled.hashCode ^
-      preloadLinks.hashCode ^
-      hardwareAcceleration.hashCode ^
       textScalingFactor.hashCode ^
       allowGeolocation.hashCode ^
       allowCamera.hashCode ^
@@ -74,18 +53,11 @@ class BrowserSettingsInfo {
       other is BrowserSettingsInfo &&
           runtimeType == other.runtimeType &&
           searchEngineIndex == other.searchEngineIndex &&
-          javascriptEnabled == other.javascriptEnabled &&
           cacheEnabled == other.cacheEnabled &&
           cookiesEnabled == other.cookiesEnabled &&
-          formDataSaveEnabled == other.formDataSaveEnabled &&
           contentBlocking == other.contentBlocking &&
           doNotTrack == other.doNotTrack &&
           incognitoMode == other.incognitoMode &&
-          clearCacheOnExit == other.clearCacheOnExit &&
-          userAgentOverride == other.userAgentOverride &&
-          prefetchEnabled == other.prefetchEnabled &&
-          preloadLinks == other.preloadLinks &&
-          hardwareAcceleration == other.hardwareAcceleration &&
           textScalingFactor == other.textScalingFactor &&
           allowGeolocation == other.allowGeolocation &&
           allowCamera == other.allowCamera &&

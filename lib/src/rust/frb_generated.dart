@@ -2837,27 +2837,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 18)
-      throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
     return BrowserSettingsInfo(
       searchEngineIndex: dco_decode_u_8(arr[0]),
-      javascriptEnabled: dco_decode_bool(arr[1]),
-      cacheEnabled: dco_decode_bool(arr[2]),
-      cookiesEnabled: dco_decode_bool(arr[3]),
-      formDataSaveEnabled: dco_decode_bool(arr[4]),
-      contentBlocking: dco_decode_u_8(arr[5]),
-      doNotTrack: dco_decode_bool(arr[6]),
-      incognitoMode: dco_decode_bool(arr[7]),
-      clearCacheOnExit: dco_decode_bool(arr[8]),
-      userAgentOverride: dco_decode_String(arr[9]),
-      prefetchEnabled: dco_decode_bool(arr[10]),
-      preloadLinks: dco_decode_bool(arr[11]),
-      hardwareAcceleration: dco_decode_bool(arr[12]),
-      textScalingFactor: dco_decode_f_32(arr[13]),
-      allowGeolocation: dco_decode_bool(arr[14]),
-      allowCamera: dco_decode_bool(arr[15]),
-      allowMicrophone: dco_decode_bool(arr[16]),
-      allowAutoPlay: dco_decode_bool(arr[17]),
+      cacheEnabled: dco_decode_bool(arr[1]),
+      cookiesEnabled: dco_decode_bool(arr[2]),
+      contentBlocking: dco_decode_u_8(arr[3]),
+      doNotTrack: dco_decode_bool(arr[4]),
+      incognitoMode: dco_decode_bool(arr[5]),
+      textScalingFactor: dco_decode_f_32(arr[6]),
+      allowGeolocation: dco_decode_bool(arr[7]),
+      allowCamera: dco_decode_bool(arr[8]),
+      allowMicrophone: dco_decode_bool(arr[9]),
+      allowAutoPlay: dco_decode_bool(arr[10]),
     );
   }
 
@@ -3865,18 +3858,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_searchEngineIndex = sse_decode_u_8(deserializer);
-    var var_javascriptEnabled = sse_decode_bool(deserializer);
     var var_cacheEnabled = sse_decode_bool(deserializer);
     var var_cookiesEnabled = sse_decode_bool(deserializer);
-    var var_formDataSaveEnabled = sse_decode_bool(deserializer);
     var var_contentBlocking = sse_decode_u_8(deserializer);
     var var_doNotTrack = sse_decode_bool(deserializer);
     var var_incognitoMode = sse_decode_bool(deserializer);
-    var var_clearCacheOnExit = sse_decode_bool(deserializer);
-    var var_userAgentOverride = sse_decode_String(deserializer);
-    var var_prefetchEnabled = sse_decode_bool(deserializer);
-    var var_preloadLinks = sse_decode_bool(deserializer);
-    var var_hardwareAcceleration = sse_decode_bool(deserializer);
     var var_textScalingFactor = sse_decode_f_32(deserializer);
     var var_allowGeolocation = sse_decode_bool(deserializer);
     var var_allowCamera = sse_decode_bool(deserializer);
@@ -3884,18 +3870,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_allowAutoPlay = sse_decode_bool(deserializer);
     return BrowserSettingsInfo(
         searchEngineIndex: var_searchEngineIndex,
-        javascriptEnabled: var_javascriptEnabled,
         cacheEnabled: var_cacheEnabled,
         cookiesEnabled: var_cookiesEnabled,
-        formDataSaveEnabled: var_formDataSaveEnabled,
         contentBlocking: var_contentBlocking,
         doNotTrack: var_doNotTrack,
         incognitoMode: var_incognitoMode,
-        clearCacheOnExit: var_clearCacheOnExit,
-        userAgentOverride: var_userAgentOverride,
-        prefetchEnabled: var_prefetchEnabled,
-        preloadLinks: var_preloadLinks,
-        hardwareAcceleration: var_hardwareAcceleration,
         textScalingFactor: var_textScalingFactor,
         allowGeolocation: var_allowGeolocation,
         allowCamera: var_allowCamera,
@@ -5069,18 +5048,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       BrowserSettingsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_u_8(self.searchEngineIndex, serializer);
-    sse_encode_bool(self.javascriptEnabled, serializer);
     sse_encode_bool(self.cacheEnabled, serializer);
     sse_encode_bool(self.cookiesEnabled, serializer);
-    sse_encode_bool(self.formDataSaveEnabled, serializer);
     sse_encode_u_8(self.contentBlocking, serializer);
     sse_encode_bool(self.doNotTrack, serializer);
     sse_encode_bool(self.incognitoMode, serializer);
-    sse_encode_bool(self.clearCacheOnExit, serializer);
-    sse_encode_String(self.userAgentOverride, serializer);
-    sse_encode_bool(self.prefetchEnabled, serializer);
-    sse_encode_bool(self.preloadLinks, serializer);
-    sse_encode_bool(self.hardwareAcceleration, serializer);
     sse_encode_f_32(self.textScalingFactor, serializer);
     sse_encode_bool(self.allowGeolocation, serializer);
     sse_encode_bool(self.allowCamera, serializer);
