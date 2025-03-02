@@ -127,6 +127,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool dco_decode_box_autoadd_bool(dynamic raw);
 
   @protected
+  BrowserSettingsInfo dco_decode_box_autoadd_browser_settings_info(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_box_autoadd_colors_info(dynamic raw);
 
   @protected
@@ -170,6 +173,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   WalletSettingsInfo dco_decode_box_autoadd_wallet_settings_info(dynamic raw);
 
   @protected
+  BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_colors_info(dynamic raw);
 
   @protected
@@ -177,6 +183,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
+
+  @protected
+  double dco_decode_f_32(dynamic raw);
 
   @protected
   double dco_decode_f_64(dynamic raw);
@@ -443,6 +452,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
   @protected
+  BrowserSettingsInfo sse_decode_box_autoadd_browser_settings_info(
+      SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_box_autoadd_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -491,6 +504,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  BrowserSettingsInfo sse_decode_browser_settings_info(
+      SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -498,6 +515,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
+
+  @protected
+  double sse_decode_f_32(SseDeserializer deserializer);
 
   @protected
   double sse_decode_f_64(SseDeserializer deserializer);
@@ -792,6 +812,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_colors_info(
       ColorsInfo self, SseSerializer serializer);
 
@@ -842,6 +866,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       WalletSettingsInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_browser_settings_info(
+      BrowserSettingsInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
 
   @protected
@@ -850,6 +878,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_f_32(double self, SseSerializer serializer);
 
   @protected
   void sse_encode_f_64(double self, SseSerializer serializer);

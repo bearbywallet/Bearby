@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
@@ -48,3 +49,8 @@ Future<void> setWalletNodeRanking(
         {required BigInt walletIndex, required bool enabled}) =>
     RustLib.instance.api.crateApiSettingsSetWalletNodeRanking(
         walletIndex: walletIndex, enabled: enabled);
+
+Future<void> setBrowserSettings(
+        {required BrowserSettingsInfo browserSettings}) =>
+    RustLib.instance.api
+        .crateApiSettingsSetBrowserSettings(browserSettings: browserSettings);

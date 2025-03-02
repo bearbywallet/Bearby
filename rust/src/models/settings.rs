@@ -5,7 +5,10 @@ pub use zilpay::settings::argon2::ArgonParams;
 pub use zilpay::settings::wallet_settings::WalletSettings;
 use zilpay::{
     errors::cipher::CipherErrors,
-    settings::wallet_settings::{NetworkSettings, WalletFeatures},
+    settings::{
+        browser::{BrowserSettings, ContentBlockingLevel},
+        wallet_settings::{NetworkSettings, WalletFeatures},
+    },
 };
 
 #[derive(Debug)]
@@ -99,5 +102,81 @@ impl TryFrom<WalletSettingsInfo> for WalletSettings {
                 request_timeout_secs: value.request_timeout_secs,
             },
         })
+    }
+}
+
+pub struct BrowserSettingsInfo {
+    pub search_engine: String,
+
+    pub javascript_enabled: bool,
+    pub cache_enabled: bool,
+    pub cookies_enabled: bool,
+    pub form_data_save_enabled: bool,
+    pub content_blocking: u8,
+
+    pub do_not_track: bool,
+    pub incognito_mode: bool,
+    pub clear_cache_on_exit: bool,
+    pub user_agent_override: String,
+
+    pub prefetch_enabled: bool,
+    pub preload_links: bool,
+    pub hardware_acceleration: bool,
+
+    pub text_scaling_factor: f32,
+
+    pub allow_geolocation: bool,
+    pub allow_camera: bool,
+    pub allow_microphone: bool,
+    pub allow_auto_play: bool,
+}
+
+impl From<BrowserSettings> for BrowserSettingsInfo {
+    fn from(value: BrowserSettings) -> Self {
+        BrowserSettingsInfo {
+            search_engine: value.search_engine,
+            javascript_enabled: value.javascript_enabled,
+            cache_enabled: value.cache_enabled,
+            cookies_enabled: value.cookies_enabled,
+            form_data_save_enabled: value.form_data_save_enabled,
+            content_blocking: value.content_blocking.code(),
+            do_not_track: value.do_not_track,
+            incognito_mode: value.incognito_mode,
+            clear_cache_on_exit: value.clear_cache_on_exit,
+            user_agent_override: value.user_agent_override,
+            prefetch_enabled: value.prefetch_enabled,
+            preload_links: value.preload_links,
+            hardware_acceleration: value.hardware_acceleration,
+            text_scaling_factor: value.text_scaling_factor,
+            allow_geolocation: value.allow_geolocation,
+            allow_camera: value.allow_camera,
+            allow_microphone: value.allow_microphone,
+            allow_auto_play: value.allow_auto_play,
+        }
+    }
+}
+
+impl From<BrowserSettingsInfo> for BrowserSettings {
+    fn from(value: BrowserSettingsInfo) -> Self {
+        BrowserSettings {
+            search_engine: value.search_engine,
+            javascript_enabled: value.javascript_enabled,
+            cache_enabled: value.cache_enabled,
+            cookies_enabled: value.cookies_enabled,
+            form_data_save_enabled: value.form_data_save_enabled,
+            content_blocking: ContentBlockingLevel::from_code(value.content_blocking),
+            do_not_track: value.do_not_track,
+            incognito_mode: value.incognito_mode,
+            clear_cache_on_exit: value.clear_cache_on_exit,
+            user_agent_override: value.user_agent_override,
+            prefetch_enabled: value.prefetch_enabled,
+            preload_links: value.preload_links,
+            hardware_acceleration: value.hardware_acceleration,
+            text_scaling_factor: value.text_scaling_factor,
+            allow_geolocation: value.allow_geolocation,
+            allow_camera: value.allow_camera,
+            allow_microphone: value.allow_microphone,
+            allow_auto_play: value.allow_auto_play,
+        }
     }
 }

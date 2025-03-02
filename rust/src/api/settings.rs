@@ -1,13 +1,17 @@
-use crate::utils::{
-    errors::ServiceError,
-    utils::{with_service_mut, with_wallet, with_wallet_mut},
+use crate::{
+    models::settings::BrowserSettingsInfo,
+    utils::{
+        errors::ServiceError,
+        utils::{with_service_mut, with_wallet, with_wallet_mut},
+    },
 };
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
 use zilpay::{
-    background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
+    background::{bg_settings::SettingsManagement, bg_storage::StorageManagement},
+    wallet::wallet_storage::StorageOperations,
 };
 
 pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
@@ -130,6 +134,17 @@ pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Resu
         wallet
             .save_wallet_data(data)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn set_browser_settings(browser_settings: BrowserSettingsInfo) -> Result<(), String> {
+    with_service_mut(|core| {
+        core.settings.browser = browser_settings.into();
+        core.save_settings()?;
+
+        Ok(())
     })
     .await
     .map_err(Into::into)
