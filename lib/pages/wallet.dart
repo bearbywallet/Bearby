@@ -51,7 +51,6 @@ class _WalletPageState extends State<WalletPage> {
     super.initState();
     final appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
-
     appState.syncConnections();
   }
 
@@ -63,7 +62,6 @@ class _WalletPageState extends State<WalletPage> {
 
   void _handleDappDisconnect(String url) async {
     AppState appState = Provider.of<AppState>(context, listen: false);
-
     await removeConnections(
       walletIndex: BigInt.from(appState.selectedWallet),
       domain: url,
@@ -74,7 +72,6 @@ class _WalletPageState extends State<WalletPage> {
   List<WalletPreferenceItem> _getPreferenceItems(
       BuildContext context, AppTheme theme) {
     final appState = Provider.of<AppState>(context);
-
     return [
       WalletPreferenceItem(
         title: 'Use Face ID',
@@ -116,48 +113,49 @@ class _WalletPageState extends State<WalletPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: '',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: CustomScrollView(
-                slivers: [
-                  SliverPadding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    sliver: SliverList(
-                      delegate: SliverChildListDelegate([
-                        Center(child: _buildWalletHeader(theme, appState)),
-                        const SizedBox(height: 16),
-                        _buildWalletNameInput(theme, appState),
-                        const SizedBox(height: 32),
-                        _buildPreferencesSection(theme),
-                      ]),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: CustomAppBar(
+                    title: '',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                SliverPadding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  sliver: SliverList(
+                    delegate: SliverChildListDelegate([
+                      Center(child: _buildWalletHeader(theme, appState)),
+                      const SizedBox(height: 16),
+                      _buildWalletNameInput(theme, appState),
+                      const SizedBox(height: 32),
+                      _buildPreferencesSection(theme),
+                    ]),
+                  ),
+                ),
+                SliverFillRemaining(
+                  hasScrollBody: false,
+                  fillOverscroll: true,
+                  child: Padding(
+                    padding: EdgeInsets.only(
+                      left: adaptivePadding,
+                      right: adaptivePadding,
+                      bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        _buildRemoveWalletButton(theme),
+                      ],
                     ),
                   ),
-                  SliverFillRemaining(
-                    hasScrollBody: false,
-                    fillOverscroll: true,
-                    child: Padding(
-                      padding: EdgeInsets.only(
-                        left: adaptivePadding,
-                        right: adaptivePadding,
-                        bottom: 24 + MediaQuery.of(context).viewInsets.bottom,
-                      ),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.end,
-                        children: [
-                          _buildRemoveWalletButton(theme),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
       resizeToAvoidBottomInset: true,
@@ -241,7 +239,6 @@ class _WalletPageState extends State<WalletPage> {
   List<Widget> _buildPreferenceItems(AppTheme theme) {
     final items = _getPreferenceItems(context, theme);
     final List<Widget> widgets = [];
-
     for (var i = 0; i < items.length; i++) {
       widgets.add(_buildPreferenceItem(theme, items[i]));
       if (i < items.length - 1) {
@@ -251,13 +248,11 @@ class _WalletPageState extends State<WalletPage> {
         ));
       }
     }
-
     return widgets;
   }
 
   Widget _buildPreferenceItem(AppTheme theme, WalletPreferenceItem item) {
     final appState = Provider.of<AppState>(context);
-
     return GestureDetector(
       onTap: item.onTap,
       child: Padding(

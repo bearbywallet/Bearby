@@ -41,17 +41,14 @@ class _HistoryPageState extends State<HistoryPage> {
 
   Future<void> _loadInitialHistory() async {
     final appState = Provider.of<AppState>(context, listen: false);
-
     if (appState.wallet == null || appState.account == null) {
       if (mounted) Navigator.of(context).pop();
       return;
     }
-
     try {
       final history = await getHistory(
         walletIndex: BigInt.from(appState.selectedWallet),
       );
-
       if (mounted) {
         setState(() {
           _history = history;
@@ -114,13 +111,11 @@ class _HistoryPageState extends State<HistoryPage> {
         transaction.chainType,
       ].any((field) => field.toLowerCase().contains(searchText));
     }).toList();
-
     if (_sortType == SortType.date) {
       filteredHistory.sort((a, b) => b.timestamp.compareTo(a.timestamp));
     } else {
       filteredHistory.sort((a, b) => a.status.index.compareTo(b.status.index));
     }
-
     return filteredHistory;
   }
 
@@ -177,7 +172,6 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
       );
     }
-
     final sortedHistory = _getSortedAndFilteredHistory();
     if (sortedHistory.isEmpty) {
       return Center(
@@ -196,14 +190,12 @@ class _HistoryPageState extends State<HistoryPage> {
         ),
       );
     }
-
     return Padding(
       padding: EdgeInsets.all(adaptivePadding),
       child: Column(
         children: sortedHistory.asMap().entries.map((entry) {
           final transaction = entry.value;
           final isLast = entry.key == sortedHistory.length - 1;
-
           return HistoryItem(
             transaction: transaction,
             showDivider: !isLast,
@@ -268,34 +260,39 @@ class _HistoryPageState extends State<HistoryPage> {
     return Scaffold(
       backgroundColor: appState.currentTheme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(child: scrollView),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-              child: SmartInput(
-                controller: _searchController,
-                hint: 'Search transactions...',
-                leftIconPath: 'assets/icons/search.svg',
-                rightIconPath: "assets/icons/close.svg",
-                onChanged: (value) {
-                  setState(() {});
-                },
-                onRightIconTap: () {
-                  _searchController.text = "";
-                },
-                onSubmitted: (value) {},
-                borderColor: appState.currentTheme.textPrimary,
-                focusedBorderColor: appState.currentTheme.primaryPurple,
-                height: 48,
-                fontSize: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                autofocus: false,
-                keyboardType: TextInputType.text,
-              ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Expanded(child: scrollView),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: SmartInput(
+                    controller: _searchController,
+                    hint: 'Search transactions...',
+                    leftIconPath: 'assets/icons/search.svg',
+                    rightIconPath: "assets/icons/close.svg",
+                    onChanged: (value) {
+                      setState(() {});
+                    },
+                    onRightIconTap: () {
+                      _searchController.text = "";
+                    },
+                    onSubmitted: (value) {},
+                    borderColor: appState.currentTheme.textPrimary,
+                    focusedBorderColor: appState.currentTheme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    autofocus: false,
+                    keyboardType: TextInputType.text,
+                  ),
+                ),
+                const SizedBox(height: 4),
+              ],
             ),
-            const SizedBox(height: 4),
-          ],
+          ),
         ),
       ),
     );

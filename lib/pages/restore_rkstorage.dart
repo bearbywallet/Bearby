@@ -46,16 +46,14 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
     super.didChangeDependencies();
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
-    if (args == null ||
-        args['vaultJson'] == null ||
-        args['accountsJson'] == null) {
+    if (args == null || args['vaultJson'] == null) {
       Navigator.pop(context);
       return;
     }
+    _vaultJson = args['vaultJson'];
     try {
-      _vaultJson = args['vaultJson'];
-      final accountsJson = jsonDecode(args['accountsJson']!);
-      final identities = accountsJson['identities'] as List<dynamic>;
+      final accountsJson = jsonDecode(args['accountsJson'] ?? '{}');
+      final identities = (accountsJson['identities'] as List<dynamic>?) ?? [];
       setState(() {
         accounts = identities.map((identity) {
           final balanceMap = identity['balance'] as Map<String, dynamic>?;
@@ -69,18 +67,20 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
             threshold: baseThreshold,
             compact: true,
           );
-
           return Account(
-            name: identity['name'] as String,
-            address: identity['bech32'] as String,
-            type: identity['type'] as int,
-            index: identity['index'] as int,
+            name: identity['name'] as String? ?? 'Unnamed',
+            address: identity['bech32'] as String? ?? '',
+            type: identity['type'] as int? ?? 0,
+            index: identity['index'] as int? ?? 0,
             balance: balance,
           );
         }).toList();
       });
     } catch (e) {
-      Navigator.pop(context);
+      debugPrint("Error parsing accounts JSON: $e");
+      setState(() {
+        accounts = [];
+      });
     }
   }
 
@@ -123,89 +123,102 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: 'Migrate ZilPay 1.0 to 2.0',
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text('Accounts to migrate to ZilPay 2.0. Enter password.',
-                        style: TextStyle(
-                            color: theme.textSecondary, fontSize: 14)),
-                    const SizedBox(height: 16),
-                    Container(
-                      padding: const EdgeInsets.all(16.0),
-                      decoration: BoxDecoration(
-                        color: theme.cardBackground,
-                        borderRadius: BorderRadius.circular(12),
-                        border: Border.all(
-                            color:
-                                theme.secondaryPurple.withValues(alpha: 0.2)),
-                      ),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: accounts
-                            .map((account) => AccountItem(account: account))
-                            .toList(),
-                      ),
-                    ),
-                    const SizedBox(height: 16),
-                    SmartInput(
-                      controller: _passwordController,
-                      hint: 'Password',
-                      obscureText: _obscurePassword,
-                      rightIconPath: _obscurePassword
-                          ? 'assets/icons/close_eye.svg'
-                          : 'assets/icons/open_eye.svg',
-                      onRightIconTap: () =>
-                          setState(() => _obscurePassword = !_obscurePassword),
-                      disabled: _isLoading,
-                      focusedBorderColor: theme.primaryPurple,
-                      height: 56,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                    ),
-                    if (_errorMessage != null)
-                      Padding(
-                          padding: const EdgeInsets.only(top: 8.0),
-                          child: Text(_errorMessage!,
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: CustomScrollView(
+              slivers: [
+                SliverToBoxAdapter(
+                  child: CustomAppBar(
+                    title: 'Migrate ZilPay 1.0 to 2.0',
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        if (accounts.isNotEmpty) ...[
+                          Text(
+                              'Accounts to migrate to ZilPay 2.0. Enter password.',
                               style: TextStyle(
-                                  color: theme.danger, fontSize: 14))),
-                    const SizedBox(height: 16),
-                    CustomButton(
-                      text: 'Restore',
-                      disabled: _isLoading,
-                      onPressed: _handleRestore,
-                      backgroundColor: theme.primaryPurple,
-                      borderRadius: 30.0,
-                      height: 56.0,
-                    ),
-                    const SizedBox(height: 8),
-                    Center(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed('/new_wallet_options');
-                        },
-                        child: Text(
-                          'Skip',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
+                                  color: theme.textSecondary, fontSize: 14)),
+                          const SizedBox(height: 16),
+                          Container(
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(12),
+                              border: Border.all(
+                                  color: theme.secondaryPurple
+                                      .withValues(alpha: 0.2)),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: accounts
+                                  .map((account) =>
+                                      AccountItem(account: account))
+                                  .toList(),
+                            ),
+                          ),
+                          const SizedBox(height: 16),
+                        ],
+                        SmartInput(
+                          controller: _passwordController,
+                          hint: 'Password',
+                          obscureText: _obscurePassword,
+                          rightIconPath: _obscurePassword
+                              ? 'assets/icons/close_eye.svg'
+                              : 'assets/icons/open_eye.svg',
+                          onRightIconTap: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
+                          disabled: _isLoading,
+                          focusedBorderColor: theme.primaryPurple,
+                          height: 56,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                        ),
+                        if (_errorMessage != null)
+                          Padding(
+                            padding: const EdgeInsets.only(top: 8.0),
+                            child: Text(_errorMessage!,
+                                style: TextStyle(
+                                    color: theme.danger, fontSize: 14)),
+                          ),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: CustomButton(
+                            text: 'Restore',
+                            disabled: _isLoading,
+                            onPressed: _handleRestore,
+                            backgroundColor: theme.primaryPurple,
+                            borderRadius: 30.0,
+                            height: 56.0,
                           ),
                         ),
-                      ),
+                        const SizedBox(height: 8),
+                        Center(
+                          child: SizedBox(
+                            width: 100,
+                            child: TextButton(
+                              onPressed: () => Navigator.of(context)
+                                  .pushNamed('/new_wallet_options'),
+                              child: Text('Skip',
+                                  style: TextStyle(
+                                      color: theme.textSecondary,
+                                      fontSize: 14)),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
-              ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
@@ -244,23 +257,16 @@ class AccountItem extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  account.name,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
-                  ),
-                ),
-                Text(
-                  account.address,
-                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
-                  overflow: TextOverflow.ellipsis,
-                ),
-                Text(
-                  'Balance: ${account.balance ?? '0'} ZIL',
-                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
-                ),
+                Text(account.name,
+                    style: TextStyle(
+                        color: theme.textPrimary,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16)),
+                Text(account.address,
+                    style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                    overflow: TextOverflow.ellipsis),
+                Text('Balance: ${account.balance ?? '0'} ZIL',
+                    style: TextStyle(color: theme.textSecondary, fontSize: 14)),
               ],
             ),
           ),

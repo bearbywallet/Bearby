@@ -338,36 +338,32 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                   children: [
                     Row(
                       children: [
-                        if (isSelected)
-                          Icon(
-                            Icons.check,
-                            color: effectivePrimaryColor,
-                            size: 16,
-                          ),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                option.title,
-                                style: TextStyle(
-                                  color: effectiveTextColor,
-                                  fontWeight: FontWeight.w600,
-                                ),
-                              ),
-                              const SizedBox(height: 4),
-                              Text(
-                                confirmationTime,
-                                style: TextStyle(
-                                  color: effectiveSecondaryColor,
-                                  fontSize: 12,
-                                ),
-                              ),
-                            ],
-                          ),
+                        Text(
+                          option.icon,
+                          style: const TextStyle(fontSize: 16),
                         ),
-                        SizedBox(
-                          width: 200,
+                        const SizedBox(width: 8),
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              option.title,
+                              style: TextStyle(
+                                color: effectiveTextColor,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              confirmationTime,
+                              style: TextStyle(
+                                color: effectiveSecondaryColor,
+                                fontSize: 12,
+                              ),
+                            ),
+                          ],
+                        ),
+                        Expanded(
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.end,
                             children: [

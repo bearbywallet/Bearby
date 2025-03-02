@@ -81,7 +81,7 @@ class _AddAccountState extends State<AddAccount> {
 
     if (_passwordController.text.isEmpty &&
         appState.wallet!.authType == AuthMethod.none.name) {
-      _accountNameInputKey.currentState?.shake();
+      _passwordInputKey.currentState?.shake();
 
       return;
     }

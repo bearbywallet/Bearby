@@ -18,6 +18,9 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<(String, String)> loadOldDatabaseAndroid() =>
     RustLib.instance.api.crateApiBackendLoadOldDatabaseAndroid();
 
+Future<(String, String)> loadOldDatabaseIos({required String baseDir}) =>
+    RustLib.instance.api.crateApiBackendLoadOldDatabaseIos(baseDir: baseDir);
+
 Future<String> tryRestoreRkstorage(
         {required String vaultJson, required String password}) =>
     RustLib.instance.api.crateApiBackendTryRestoreRkstorage(

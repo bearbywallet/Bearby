@@ -26,7 +26,7 @@
         "decimals": 12
       }
     ],
-    "chainIds": [32769, 1],
+    "chainIds": [1, 32769],
     "infoURL": "https://www.zilliqa.com/",
     "shortName": "zilliqa",
     "slip44": 313,

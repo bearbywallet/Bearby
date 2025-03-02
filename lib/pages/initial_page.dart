@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -34,7 +35,14 @@ class _InitialPageState extends State<InitialPage> {
           _isRestoreAvailable = true;
         });
       } else if (Platform.isIOS) {
-        // iOS-specific code
+        final appDocDir = await getApplicationSupportDirectory();
+        final (vaultJson, accountsJson) =
+            await loadOldDatabaseIos(baseDir: appDocDir.path);
+        setState(() {
+          _vaultJson = vaultJson;
+          _accountsJson = accountsJson;
+          _isRestoreAvailable = true;
+        });
       }
     } catch (_) {
       setState(() {

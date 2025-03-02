@@ -1,10 +1,12 @@
+use std::fs;
+
 use aes::cipher::generic_array::GenericArray;
 use aes::cipher::{BlockDecrypt, KeyInit};
 use aes::Aes256;
 use base64::engine::general_purpose;
 use base64::Engine;
 use pbkdf2::pbkdf2_hmac;
-use serde_json::Value;
+use serde_json::{from_str, Value};
 use sha2::{Digest, Sha256, Sha512};
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_worker::{JobMessage, WorkerManager};
@@ -108,6 +110,22 @@ pub fn load_old_database_android() -> Result<(String, String), String> {
             |row| row.get(0),
         )
         .map_err(|e| e.to_string())?;
+
+    Ok((vault, accounts))
+}
+
+pub fn load_old_database_ios(base_dir: String) -> Result<(String, String), String> {
+    let file = "org.reactjs.native.zilpayMobile/RCTAsyncLocalStorage_V1/manifest.json";
+    let path = format!("{}/{}", base_dir, file);
+    let content = fs::read_to_string(&path).map_err(|e| e.to_string())?;
+    let json: Value = from_str(&content).map_err(|e| e.to_string())?;
+
+    if !json.is_object() {
+        return Err("JSON is not an object".to_string());
+    }
+
+    let vault = json["@/ZilPay/vault"].as_str().unwrap_or("").to_string();
+    let accounts = json["@/ZilPay/accounts"].as_str().unwrap_or("").to_string();
 
     Ok((vault, accounts))
 }

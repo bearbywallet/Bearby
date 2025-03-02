@@ -25,8 +25,8 @@ Future<void> main() async {
 
   try {
     String appDocPath = await getStoragePath();
-
     String cahceDir = '$appDocPath/icons_cache';
+
     final directory = Directory(cahceDir);
 
     if (!await directory.exists()) {
