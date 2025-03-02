@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/modals/list_selector.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -15,6 +16,44 @@ class BrowserSettingsPage extends StatefulWidget {
 
 class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   final TextEditingController _userAgentController = TextEditingController();
+  int _selectedSearchEngineIndex = 0;
+  int _selectedContentBlockingIndex = 0;
+
+  // Define search engine options
+  final List<ListItem> searchEngines = [
+    ListItem(
+      title: 'Google',
+      subtitle: 'google.com',
+    ),
+    ListItem(
+      title: 'DuckDuckGo',
+      subtitle: 'duckduckgo.com',
+    ),
+    ListItem(
+      title: 'Bing',
+      subtitle: 'bing.com',
+    ),
+    ListItem(
+      title: 'Yahoo',
+      subtitle: 'yahoo.com',
+    ),
+  ];
+
+  // Define content blocking options
+  final List<ListItem> contentBlockingOptions = [
+    ListItem(
+      title: 'Standard',
+      subtitle: 'Blocks some trackers and ads',
+    ),
+    ListItem(
+      title: 'Strict',
+      subtitle: 'Blocks most trackers and ads',
+    ),
+    ListItem(
+      title: 'Off',
+      subtitle: 'No content blocking',
+    ),
+  ];
 
   @override
   void initState() {
@@ -30,6 +69,11 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
     // Set up the controllers with current values
     _userAgentController.text = settings.userAgentOverride;
+
+    // Set selected indices based on settings
+    // In a real implementation, you would retrieve these from your settings
+    _selectedSearchEngineIndex = 0; // Default to Google
+    _selectedContentBlockingIndex = 0; // Default to Standard
   }
 
   @override
@@ -172,14 +216,54 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   // Function to show search engine modal
   void _showSearchEngineModal() {
-    // This function will trigger the search engine modal
-    debugPrint("Show search engine modal");
+    showListSelectorModal(
+      context: context,
+      title: 'Search Engine',
+      items: searchEngines,
+      selectedIndex: _selectedSearchEngineIndex,
+      onItemSelected: (index) async {
+        setState(() {
+          _selectedSearchEngineIndex = index;
+        });
+        // Here you would save this selection to your settings
+        final appState = Provider.of<AppState>(context, listen: false);
+        try {
+          // await setBrowserSearchEngine(
+          //   walletIndex: BigInt.from(appState.selectedWallet),
+          //   engineIndex: index,
+          // );
+          await appState.syncData();
+        } catch (e) {
+          debugPrint("Error setting search engine: $e");
+        }
+      },
+    );
   }
 
   // Function to show content blocking modal
   void _showContentBlockingModal() {
-    // This function will trigger the content blocking modal
-    debugPrint("Show content blocking modal");
+    showListSelectorModal(
+      context: context,
+      title: 'Content Blocking',
+      items: contentBlockingOptions,
+      selectedIndex: _selectedContentBlockingIndex,
+      onItemSelected: (index) async {
+        setState(() {
+          _selectedContentBlockingIndex = index;
+        });
+        // Here you would save this selection to your settings
+        final appState = Provider.of<AppState>(context, listen: false);
+        try {
+          // await setBrowserContentBlocking(
+          //   walletIndex: BigInt.from(appState.selectedWallet),
+          //   blockingIndex: index,
+          // );
+          await appState.syncData();
+        } catch (e) {
+          debugPrint("Error setting content blocking: $e");
+        }
+      },
+    );
   }
 
   @override
@@ -259,6 +343,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 'assets/icons/search.svg',
                 'Configure your default search engine',
                 () => _showSearchEngineModal(),
+                subtitleText: searchEngines[_selectedSearchEngineIndex].title,
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
@@ -268,6 +353,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 'assets/icons/shield.svg',
                 'Configure content blocking settings',
                 () => _showContentBlockingModal(),
+                subtitleText:
+                    contentBlockingOptions[_selectedContentBlockingIndex].title,
               ),
             ],
           ),
@@ -485,8 +572,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     String title,
     String iconPath,
     String description,
-    VoidCallback onTap,
-  ) {
+    VoidCallback onTap, {
+    String? subtitleText,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: Padding(
@@ -507,12 +595,28 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 ),
                 const SizedBox(width: 16),
                 Expanded(
-                  child: Text(
-                    title,
-                    style: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 16,
-                    ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        title,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 16,
+                        ),
+                      ),
+                      if (subtitleText != null) ...[
+                        const SizedBox(height: 4),
+                        Text(
+                          subtitleText,
+                          style: TextStyle(
+                            color: theme.primaryPurple,
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ],
+                    ],
                   ),
                 ),
                 SvgPicture.asset(
