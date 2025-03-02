@@ -2,10 +2,57 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/list_selector.dart';
+import 'package:zilpay/src/rust/api/settings.dart';
+import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+
+extension BrowserSettingsInfoExtension on BrowserSettingsInfo {
+  BrowserSettingsInfo copyWith({
+    int? searchEngineIndex,
+    bool? javascriptEnabled,
+    bool? cacheEnabled,
+    bool? cookiesEnabled,
+    bool? formDataSaveEnabled,
+    int? contentBlocking,
+    bool? doNotTrack,
+    bool? incognitoMode,
+    bool? clearCacheOnExit,
+    String? userAgentOverride,
+    bool? prefetchEnabled,
+    bool? preloadLinks,
+    bool? hardwareAcceleration,
+    double? textScalingFactor,
+    bool? allowGeolocation,
+    bool? allowCamera,
+    bool? allowMicrophone,
+    bool? allowAutoPlay,
+  }) {
+    return BrowserSettingsInfo(
+      searchEngineIndex: searchEngineIndex ?? this.searchEngineIndex,
+      javascriptEnabled: javascriptEnabled ?? this.javascriptEnabled,
+      cacheEnabled: cacheEnabled ?? this.cacheEnabled,
+      cookiesEnabled: cookiesEnabled ?? this.cookiesEnabled,
+      formDataSaveEnabled: formDataSaveEnabled ?? this.formDataSaveEnabled,
+      contentBlocking: contentBlocking ?? this.contentBlocking,
+      doNotTrack: doNotTrack ?? this.doNotTrack,
+      incognitoMode: incognitoMode ?? this.incognitoMode,
+      clearCacheOnExit: clearCacheOnExit ?? this.clearCacheOnExit,
+      userAgentOverride: userAgentOverride ?? this.userAgentOverride,
+      prefetchEnabled: prefetchEnabled ?? this.prefetchEnabled,
+      preloadLinks: preloadLinks ?? this.preloadLinks,
+      hardwareAcceleration: hardwareAcceleration ?? this.hardwareAcceleration,
+      textScalingFactor: textScalingFactor ?? this.textScalingFactor,
+      allowGeolocation: allowGeolocation ?? this.allowGeolocation,
+      allowCamera: allowCamera ?? this.allowCamera,
+      allowMicrophone: allowMicrophone ?? this.allowMicrophone,
+      allowAutoPlay: allowAutoPlay ?? this.allowAutoPlay,
+    );
+  }
+}
 
 class BrowserSettingsPage extends StatefulWidget {
   const BrowserSettingsPage({super.key});
@@ -15,31 +62,10 @@ class BrowserSettingsPage extends StatefulWidget {
 }
 
 class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
-  final TextEditingController _userAgentController = TextEditingController();
-  int _selectedSearchEngineIndex = 0;
-  int _selectedContentBlockingIndex = 0;
+  final List<ListItem> searchEngines = baseSearchEngines
+      .map((s) => ListItem(title: s.name, subtitle: s.description))
+      .toList();
 
-  // Define search engine options
-  final List<ListItem> searchEngines = [
-    ListItem(
-      title: 'Google',
-      subtitle: 'google.com',
-    ),
-    ListItem(
-      title: 'DuckDuckGo',
-      subtitle: 'duckduckgo.com',
-    ),
-    ListItem(
-      title: 'Bing',
-      subtitle: 'bing.com',
-    ),
-    ListItem(
-      title: 'Yahoo',
-      subtitle: 'yahoo.com',
-    ),
-  ];
-
-  // Define content blocking options
   final List<ListItem> contentBlockingOptions = [
     ListItem(
       title: 'Off',
@@ -58,36 +84,18 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _initializeSettings();
-    });
-  }
-
-  void _initializeSettings() {
-    final appState = Provider.of<AppState>(context, listen: false);
-    final settings = appState.state.browserSettings;
-
-    // Set up the controllers with current values
-    _userAgentController.text = settings.userAgentOverride;
-
-    // Set selected indices based on settings
-    // In a real implementation, you would retrieve these from your settings
-    _selectedSearchEngineIndex = 0; // Default to Google
-    _selectedContentBlockingIndex = 0; // Default to Standard
   }
 
   @override
   void dispose() {
-    _userAgentController.dispose();
     super.dispose();
   }
 
   Future<void> _toggleCache(AppState appState, bool enabled) async {
     try {
-      // await setBrowserCache(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(cacheEnabled: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling cache: $e");
@@ -96,34 +104,20 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleCookies(AppState appState, bool enabled) async {
     try {
-      // await setBrowserCookies(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(cookiesEnabled: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling cookies: $e");
     }
   }
 
-  Future<void> _toggleFormData(AppState appState, bool enabled) async {
-    try {
-      // await setBrowserFormData(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling form data: $e");
-    }
-  }
-
   Future<void> _toggleDoNotTrack(AppState appState, bool enabled) async {
     try {
-      // await setBrowserDoNotTrack(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(doNotTrack: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling do not track: $e");
@@ -132,34 +126,20 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleIncognitoMode(AppState appState, bool enabled) async {
     try {
-      // await setBrowserIncognitoMode(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(incognitoMode: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling incognito mode: $e");
     }
   }
 
-  Future<void> _toggleClearCacheOnExit(AppState appState, bool enabled) async {
-    try {
-      // await setBrowserClearCacheOnExit(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
-      await appState.syncData();
-    } catch (e) {
-      debugPrint("Error toggling clear cache on exit: $e");
-    }
-  }
-
   Future<void> _setTextScalingFactor(AppState appState, double factor) async {
     try {
-      // await setBrowserTextScalingFactor(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   factor: factor,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(textScalingFactor: factor);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error setting text scaling factor: $e");
@@ -168,10 +148,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleGeolocation(AppState appState, bool enabled) async {
     try {
-      // await setBrowserGeolocation(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(allowGeolocation: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling geolocation: $e");
@@ -180,10 +159,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleCamera(AppState appState, bool enabled) async {
     try {
-      // await setBrowserCamera(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(allowCamera: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling camera: $e");
@@ -192,10 +170,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleMicrophone(AppState appState, bool enabled) async {
     try {
-      // await setBrowserMicrophone(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(allowMicrophone: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling microphone: $e");
@@ -204,34 +181,27 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
 
   Future<void> _toggleAutoPlay(AppState appState, bool enabled) async {
     try {
-      // await setBrowserAutoPlay(
-      //   walletIndex: BigInt.from(appState.selectedWallet),
-      //   enabled: enabled,
-      // );
+      BrowserSettingsInfo newSettings =
+          appState.state.browserSettings.copyWith(allowAutoPlay: enabled);
+      await setBrowserSettings(browserSettings: newSettings);
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling autoplay: $e");
     }
   }
 
-  // Function to show search engine modal
-  void _showSearchEngineModal() {
+  void _showSearchEngineModal(AppState appState) {
     showListSelectorModal(
       context: context,
       title: 'Search Engine',
       items: searchEngines,
-      selectedIndex: _selectedSearchEngineIndex,
+      selectedIndex: appState.state.browserSettings.searchEngineIndex,
       onItemSelected: (index) async {
-        setState(() {
-          _selectedSearchEngineIndex = index;
-        });
-        // Here you would save this selection to your settings
         final appState = Provider.of<AppState>(context, listen: false);
         try {
-          // await setBrowserSearchEngine(
-          //   walletIndex: BigInt.from(appState.selectedWallet),
-          //   engineIndex: index,
-          // );
+          BrowserSettingsInfo newSettings =
+              appState.state.browserSettings.copyWith(searchEngineIndex: index);
+          await setBrowserSettings(browserSettings: newSettings);
           await appState.syncData();
         } catch (e) {
           debugPrint("Error setting search engine: $e");
@@ -240,24 +210,18 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     );
   }
 
-  // Function to show content blocking modal
-  void _showContentBlockingModal() {
+  void _showContentBlockingModal(AppState appState) {
     showListSelectorModal(
       context: context,
       title: 'Content Blocking',
       items: contentBlockingOptions,
-      selectedIndex: _selectedContentBlockingIndex,
+      selectedIndex: appState.state.browserSettings.contentBlocking,
       onItemSelected: (index) async {
-        setState(() {
-          _selectedContentBlockingIndex = index;
-        });
-        // Here you would save this selection to your settings
         final appState = Provider.of<AppState>(context, listen: false);
         try {
-          // await setBrowserContentBlocking(
-          //   walletIndex: BigInt.from(appState.selectedWallet),
-          //   blockingIndex: index,
-          // );
+          BrowserSettingsInfo newSettings =
+              appState.state.browserSettings.copyWith(contentBlocking: index);
+          await setBrowserSettings(browserSettings: newSettings);
           await appState.syncData();
         } catch (e) {
           debugPrint("Error setting content blocking: $e");
@@ -342,8 +306,10 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 'Search Engine',
                 'assets/icons/search.svg',
                 'Configure your default search engine',
-                () => _showSearchEngineModal(),
-                subtitleText: searchEngines[_selectedSearchEngineIndex].title,
+                () => _showSearchEngineModal(appState),
+                subtitleText: searchEngines[
+                        appState.state.browserSettings.searchEngineIndex]
+                    .title,
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
@@ -352,9 +318,10 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 'Content Blocking',
                 'assets/icons/shield.svg',
                 'Configure content blocking settings',
-                () => _showContentBlockingModal(),
-                subtitleText:
-                    contentBlockingOptions[_selectedContentBlockingIndex].title,
+                () => _showContentBlockingModal(appState),
+                subtitleText: contentBlockingOptions[
+                        appState.state.browserSettings.contentBlocking]
+                    .title,
               ),
             ],
           ),
@@ -399,17 +366,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 theme,
-                'Form data',
-                'assets/icons/document.svg',
-                'Remember form data for auto-fill',
-                true,
-                settings.formDataSaveEnabled,
-                (value) => _toggleFormData(appState, value),
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
                 'Do Not Track',
                 'assets/icons/shield.svg',
                 'Request websites not to track your browsing',
@@ -427,17 +383,6 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 true,
                 settings.incognitoMode,
                 (value) => _toggleIncognitoMode(appState, value),
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Clear cache on exit',
-                'assets/icons/reload.svg',
-                'Remove all cached data when closing the browser',
-                true,
-                settings.clearCacheOnExit,
-                (value) => _toggleClearCacheOnExit(appState, value),
               ),
             ],
           ),

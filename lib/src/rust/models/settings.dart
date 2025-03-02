@@ -7,7 +7,7 @@ import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class BrowserSettingsInfo {
-  final String searchEngine;
+  final int searchEngineIndex;
   final bool javascriptEnabled;
   final bool cacheEnabled;
   final bool cookiesEnabled;
@@ -27,7 +27,7 @@ class BrowserSettingsInfo {
   final bool allowAutoPlay;
 
   const BrowserSettingsInfo({
-    required this.searchEngine,
+    required this.searchEngineIndex,
     required this.javascriptEnabled,
     required this.cacheEnabled,
     required this.cookiesEnabled,
@@ -49,7 +49,7 @@ class BrowserSettingsInfo {
 
   @override
   int get hashCode =>
-      searchEngine.hashCode ^
+      searchEngineIndex.hashCode ^
       javascriptEnabled.hashCode ^
       cacheEnabled.hashCode ^
       cookiesEnabled.hashCode ^
@@ -73,7 +73,7 @@ class BrowserSettingsInfo {
       identical(this, other) ||
       other is BrowserSettingsInfo &&
           runtimeType == other.runtimeType &&
-          searchEngine == other.searchEngine &&
+          searchEngineIndex == other.searchEngineIndex &&
           javascriptEnabled == other.javascriptEnabled &&
           cacheEnabled == other.cacheEnabled &&
           cookiesEnabled == other.cookiesEnabled &&

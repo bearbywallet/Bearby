@@ -2840,7 +2840,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 18)
       throw Exception('unexpected arr length: expect 18 but see ${arr.length}');
     return BrowserSettingsInfo(
-      searchEngine: dco_decode_String(arr[0]),
+      searchEngineIndex: dco_decode_u_8(arr[0]),
       javascriptEnabled: dco_decode_bool(arr[1]),
       cacheEnabled: dco_decode_bool(arr[2]),
       cookiesEnabled: dco_decode_bool(arr[3]),
@@ -3864,7 +3864,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BrowserSettingsInfo sse_decode_browser_settings_info(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_searchEngine = sse_decode_String(deserializer);
+    var var_searchEngineIndex = sse_decode_u_8(deserializer);
     var var_javascriptEnabled = sse_decode_bool(deserializer);
     var var_cacheEnabled = sse_decode_bool(deserializer);
     var var_cookiesEnabled = sse_decode_bool(deserializer);
@@ -3883,7 +3883,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_allowMicrophone = sse_decode_bool(deserializer);
     var var_allowAutoPlay = sse_decode_bool(deserializer);
     return BrowserSettingsInfo(
-        searchEngine: var_searchEngine,
+        searchEngineIndex: var_searchEngineIndex,
         javascriptEnabled: var_javascriptEnabled,
         cacheEnabled: var_cacheEnabled,
         cookiesEnabled: var_cookiesEnabled,
@@ -5068,7 +5068,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_browser_settings_info(
       BrowserSettingsInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.searchEngine, serializer);
+    sse_encode_u_8(self.searchEngineIndex, serializer);
     sse_encode_bool(self.javascriptEnabled, serializer);
     sse_encode_bool(self.cacheEnabled, serializer);
     sse_encode_bool(self.cookiesEnabled, serializer);

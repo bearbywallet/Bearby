@@ -106,7 +106,7 @@ impl TryFrom<WalletSettingsInfo> for WalletSettings {
 }
 
 pub struct BrowserSettingsInfo {
-    pub search_engine: String,
+    pub search_engine_index: u8,
 
     pub javascript_enabled: bool,
     pub cache_enabled: bool,
@@ -134,7 +134,7 @@ pub struct BrowserSettingsInfo {
 impl From<BrowserSettings> for BrowserSettingsInfo {
     fn from(value: BrowserSettings) -> Self {
         BrowserSettingsInfo {
-            search_engine: value.search_engine,
+            search_engine_index: value.search_enginea_index,
             javascript_enabled: value.javascript_enabled,
             cache_enabled: value.cache_enabled,
             cookies_enabled: value.cookies_enabled,
@@ -159,7 +159,7 @@ impl From<BrowserSettings> for BrowserSettingsInfo {
 impl From<BrowserSettingsInfo> for BrowserSettings {
     fn from(value: BrowserSettingsInfo) -> Self {
         BrowserSettings {
-            search_engine: value.search_engine,
+            search_enginea_index: value.search_engine_index,
             javascript_enabled: value.javascript_enabled,
             cache_enabled: value.cache_enabled,
             cookies_enabled: value.cookies_enabled,

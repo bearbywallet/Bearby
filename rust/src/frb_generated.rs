@@ -3233,7 +3233,7 @@ impl SseDecode for bool {
 impl SseDecode for crate::models::settings::BrowserSettingsInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_searchEngine = <String>::sse_decode(deserializer);
+        let mut var_searchEngineIndex = <u8>::sse_decode(deserializer);
         let mut var_javascriptEnabled = <bool>::sse_decode(deserializer);
         let mut var_cacheEnabled = <bool>::sse_decode(deserializer);
         let mut var_cookiesEnabled = <bool>::sse_decode(deserializer);
@@ -3252,7 +3252,7 @@ impl SseDecode for crate::models::settings::BrowserSettingsInfo {
         let mut var_allowMicrophone = <bool>::sse_decode(deserializer);
         let mut var_allowAutoPlay = <bool>::sse_decode(deserializer);
         return crate::models::settings::BrowserSettingsInfo {
-            search_engine: var_searchEngine,
+            search_engine_index: var_searchEngineIndex,
             javascript_enabled: var_javascriptEnabled,
             cache_enabled: var_cacheEnabled,
             cookies_enabled: var_cookiesEnabled,
@@ -4700,7 +4700,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::backend::BlockEvent>
 impl flutter_rust_bridge::IntoDart for crate::models::settings::BrowserSettingsInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.search_engine.into_into_dart().into_dart(),
+            self.search_engine_index.into_into_dart().into_dart(),
             self.javascript_enabled.into_into_dart().into_dart(),
             self.cache_enabled.into_into_dart().into_dart(),
             self.cookies_enabled.into_into_dart().into_dart(),
@@ -5485,7 +5485,7 @@ impl SseEncode for bool {
 impl SseEncode for crate::models::settings::BrowserSettingsInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.search_engine, serializer);
+        <u8>::sse_encode(self.search_engine_index, serializer);
         <bool>::sse_encode(self.javascript_enabled, serializer);
         <bool>::sse_encode(self.cache_enabled, serializer);
         <bool>::sse_encode(self.cookies_enabled, serializer);
