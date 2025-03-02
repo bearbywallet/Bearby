@@ -84,77 +84,82 @@ class _BrowserPageState extends State<BrowserPage>
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final connections = appState.connections;
 
-    return Scaffold(
-      backgroundColor: theme.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            TabBar(
-              controller: _tabController,
-              tabs: const [
-                Tab(text: 'Connected'),
-                Tab(text: 'Explore'),
-              ],
-              labelStyle: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600),
-              unselectedLabelStyle: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 18,
-                  fontWeight: FontWeight.w600),
-              indicatorColor: theme.primaryPurple,
-              labelColor: theme.textPrimary,
-              unselectedLabelColor: theme.textSecondary,
-              indicatorSize: TabBarIndicatorSize.label,
-              splashFactory: NoSplash.splashFactory,
-              dividerColor: Colors.transparent,
-            ),
-            Expanded(
-              child: TabBarView(
-                controller: _tabController,
-                children: [
-                  _buildConnectedTab(connections, theme, padding),
-                  Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        Text('No apps to explore yet',
-                            style: TextStyle(
-                                color: theme.textSecondary,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500)),
-                      ],
-                    ),
+    return SafeArea(
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Scaffold(
+            backgroundColor: theme.background,
+            body: Column(
+              children: [
+                TabBar(
+                  controller: _tabController,
+                  tabs: const [
+                    Tab(text: 'Connected'),
+                    Tab(text: 'Explore'),
+                  ],
+                  labelStyle: TextStyle(
+                      color: theme.textPrimary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600),
+                  unselectedLabelStyle: TextStyle(
+                      color: theme.textSecondary,
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600),
+                  indicatorColor: theme.primaryPurple,
+                  labelColor: theme.textPrimary,
+                  unselectedLabelColor: theme.textSecondary,
+                  indicatorSize: TabBarIndicatorSize.label,
+                  splashFactory: NoSplash.splashFactory,
+                  dividerColor: Colors.transparent,
+                ),
+                Expanded(
+                  child: TabBarView(
+                    controller: _tabController,
+                    children: [
+                      _buildConnectedTab(connections, theme, padding),
+                      Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text('No apps to explore yet',
+                                style: TextStyle(
+                                    color: theme.textSecondary,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500)),
+                          ],
+                        ),
+                      ),
+                    ],
                   ),
-                ],
-              ),
+                ),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: SmartInput(
+                    controller: _searchController,
+                    hint: 'Search or enter address',
+                    leftIconPath: 'assets/icons/search.svg',
+                    rightIconPath: "assets/icons/close.svg",
+                    onChanged: (value) {},
+                    onSubmitted: _handleSearch,
+                    onRightIconTap: () {
+                      _searchController.text = "";
+                    },
+                    borderColor: theme.textPrimary,
+                    focusedBorderColor: theme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    autofocus: false,
+                    keyboardType: TextInputType.url,
+                  ),
+                ),
+                const SizedBox(
+                  height: 4,
+                ),
+              ],
             ),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-              child: SmartInput(
-                controller: _searchController,
-                hint: 'Search or enter address',
-                leftIconPath: 'assets/icons/search.svg',
-                rightIconPath: "assets/icons/close.svg",
-                onChanged: (value) {},
-                onSubmitted: _handleSearch,
-                onRightIconTap: () {
-                  _searchController.text = "";
-                },
-                borderColor: theme.textPrimary,
-                focusedBorderColor: theme.primaryPurple,
-                height: 48,
-                fontSize: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                autofocus: false,
-                keyboardType: TextInputType.url,
-              ),
-            ),
-            const SizedBox(
-              height: 4,
-            ),
-          ],
+          ),
         ),
       ),
     );
