@@ -1,8 +1,8 @@
 import 'dart:convert';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
@@ -26,7 +26,7 @@ import 'dart:developer' as dev;
 import 'package:zilpay/web3/web3_utils.dart';
 
 class Web3EIP1193Handler {
-  final WebViewController webViewController;
+  final InAppWebViewController webViewController;
   final String _currentDomain;
 
   Web3EIP1193Handler({
@@ -55,8 +55,23 @@ class Web3EIP1193Handler {
       payload: responsePayload,
     ).toJson();
 
-    await webViewController
-        .runJavaScript('window.postMessage(${jsonEncode(response)}, `*`)');
+    final jsResponse = jsonEncode(response);
+    final jsCode = '''
+    (function() {
+      const responseData = $jsResponse;
+      if (window.__zilpay_response_handlers && window.__zilpay_response_handlers["$uuid"]) {
+        const handler = window.__zilpay_response_handlers["$uuid"];
+        handler(responseData);
+        delete window.__zilpay_response_handlers["$uuid"];
+      } else {
+        window.dispatchEvent(new MessageEvent('message', { 
+          data: responseData
+        }));
+      }
+    })();
+    ''';
+
+    await webViewController.evaluateJavascript(source: jsCode);
   }
 
   void _returnError(

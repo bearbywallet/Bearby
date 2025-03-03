@@ -1,8 +1,8 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
@@ -48,7 +48,7 @@ class ZilPayLegacyTransactionParam {
 }
 
 class ZilPayLegacyHandler {
-  final WebViewController webViewController;
+  final InAppWebViewController webViewController;
   final String initialUrl;
   StreamSubscription<BlockEvent>? _blockStreamSubscription;
 
@@ -71,8 +71,8 @@ class ZilPayLegacyHandler {
         ZilPayWeb3Message(type: type, payload: payload, uuid: uuid).toJson();
 
     final jsonString = jsonEncode(response);
-    await webViewController
-        .runJavaScript('window.postMessage($jsonString, "*")');
+    await webViewController.evaluateJavascript(
+        source: 'window.postMessage($jsonString, "*")');
   }
 
   Future<Map<String, String>?> _getAccountIfConnected(AppState appState) async {

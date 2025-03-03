@@ -1,59 +1,46 @@
 import 'dart:io';
-
+import 'dart:convert';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/web3/eip_1193.dart';
 import 'package:zilpay/web3/message.dart';
 import 'package:zilpay/web3/zilpay_legacy.dart';
-import 'dart:convert';
 
 class WebViewPage extends StatefulWidget {
   final String initialUrl;
-
   const WebViewPage({super.key, required this.initialUrl});
-
   @override
   State<WebViewPage> createState() => _WebViewPageState();
 }
 
 class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
-  late WebViewController _webViewController;
+  InAppWebViewController? _webViewController;
   ZilPayLegacyHandler? _legacyHandler;
   Web3EIP1193Handler? _eip1193Handler;
+  CookieManager? _cookieManager;
   bool _isLoading = false;
   bool _hasError = false;
   String _errorMessage = '';
   String _currentUrl = '';
-  WebViewCookieManager? _cookieManager;
+  double _progress = 0;
 
-  static const String _iosUserAgent =
-      'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1';
-  static const String _androidUserAgent =
-      'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
-
-  String get _baseUserAgent =>
-      Platform.isIOS ? _iosUserAgent : _androidUserAgent;
+  String get _baseUserAgent => Platform.isIOS
+      ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+      : 'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    final appState = Provider.of<AppState>(context, listen: false);
-    AppTheme theme = appState.currentTheme;
-
-    if (!appState.state.browserSettings.cookiesEnabled) {
-      _cookieManager = WebViewCookieManager();
-      _cookieManager!.clearCookies();
-    }
-
+    _cookieManager = CookieManager.instance();
     _currentUrl = widget.initialUrl;
-    _initWebViewController(theme, appState);
   }
 
   @override
@@ -66,155 +53,163 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed && _hasError) {
+    if (state == AppLifecycleState.resumed &&
+        _hasError &&
+        _webViewController != null) {
       _refreshPage();
     }
   }
 
-  void _initWebViewController(AppTheme theme, AppState appState) {
-    _webViewController = WebViewController()
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(theme.background);
+  void _setupJavaScriptHandlers() {
+    if (_webViewController == null) return;
 
-    String userAgent = _baseUserAgent;
-    if (appState.state.browserSettings.doNotTrack) {
-      userAgent += ' DNT:1';
-    } else {
-      userAgent += ' ZilPay/1.0';
-    }
-    _webViewController.setUserAgent(userAgent);
-
-    _setupJavaScriptChannels();
-    _setupNavigationDelegate(appState);
-    _loadUrlWithTimeout(widget.initialUrl);
-
-    if (appState.state.browserSettings.textScalingFactor != 1.0) {
-      _applyTextScalingFactor(appState);
-    }
-  }
-
-  Future<void> _loadUrlWithTimeout(String url) async {
-    try {
-      _webViewController.loadRequest(Uri.parse(url));
-      Future.delayed(const Duration(seconds: 15), () {
-        if (_isLoading && mounted) {
-          setState(() {
-            _isLoading = false;
-          });
-        }
-      });
-    } catch (e) {
-      setState(() {
-        _hasError = true;
-        _errorMessage = 'Failed to load URL: $e';
-      });
-    }
-  }
-
-  void _setupJavaScriptChannels() {
-    _webViewController.platform.setOnConsoleMessage((text) {
-      debugPrint("console message: $text");
-    });
-
-    PlatformWebViewControllerCreationParams dd;
-
-    _webViewController.addJavaScriptChannel(
-      'ZilPayLegacy',
-      onMessageReceived: (JavaScriptMessage message) {
+    _webViewController?.addJavaScriptHandler(
+      handlerName: 'ZilPayLegacy',
+      callback: (args) {
         try {
-          final jsonData = jsonDecode(message.message) as Map<String, dynamic>;
+          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
-
           _legacyHandler ??= ZilPayLegacyHandler(
-            webViewController: _webViewController,
+            webViewController: _webViewController!,
             initialUrl: _currentUrl,
           );
-
           _legacyHandler!.handleLegacyZilPayMessage(zilPayMessage, context);
         } catch (e) {
           debugPrint("$e");
         }
+        return null;
       },
     );
 
-    _webViewController.addJavaScriptChannel(
-      'EIP1193Channel',
-      onMessageReceived: (JavaScriptMessage message) {
-        debugPrint(message.message);
+    _webViewController?.addJavaScriptHandler(
+      handlerName: 'EIP1193Channel',
+      callback: (args) {
         try {
-          final jsonData = jsonDecode(message.message) as Map<String, dynamic>;
+          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
-
           _eip1193Handler ??= Web3EIP1193Handler(
-            webViewController: _webViewController,
+            webViewController: _webViewController!,
             initialUrl: _currentUrl,
           );
-
           _eip1193Handler!.handleWeb3EIP1193Message(zilPayMessage, context);
         } catch (e) {
           debugPrint("$e");
         }
+        return null;
       },
     );
   }
 
-  void _setupNavigationDelegate(AppState appState) {
-    _webViewController.setNavigationDelegate(
-      NavigationDelegate(
-        onNavigationRequest: (NavigationRequest request) {
-          return NavigationDecision.navigate;
-        },
-        onPageStarted: (String url) async {
-          setState(() {
-            _isLoading = true;
-            _hasError = false;
-            _currentUrl = url;
+  Future<void> _applyTextScalingFactor(AppState appState) async {
+    try {
+      await _webViewController?.evaluateJavascript(
+          source:
+              'document.documentElement.style.fontSize = \'${(appState.state.browserSettings.textScalingFactor * 100).toInt()}%\';');
+    } catch (e) {
+      debugPrint("$e");
+    }
+  }
+
+  void _applyContentBlockingSettings(AppState appState) {
+    final level = appState.state.browserSettings.contentBlocking;
+    String jsCode = '';
+
+    if (level == 1) {
+      jsCode = '''
+        (function() {
+          const adSelectors = [
+            'iframe[src*="doubleclick.net"]',
+            'iframe[src*="googleadservices"]',
+            'div[id*="google_ads_"]',
+            'div[class*="ad-container"]',
+            'div[class*="advertisement"]'
+          ];
+          adSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
           });
-
-          if (!appState.state.browserSettings.cacheEnabled) {
-            await _webViewController.clearCache();
-          }
-
-          if (appState.state.browserSettings.incognitoMode) {
-            await _webViewController.clearCache();
-            await _webViewController.clearLocalStorage();
-            if (_cookieManager != null) {
-              await _cookieManager!.clearCookies();
-            }
-          }
-        },
-        onProgress: (int progress) async {
-          if (progress > 30) {
-            await _initializeZilPayInjection(appState);
-          }
-        },
-        onPageFinished: (String url) {
-          setState(() {
-            _isLoading = false;
-            _currentUrl = url;
+        })();
+      ''';
+    } else if (level == 2) {
+      jsCode = '''
+        (function() {
+          const blockSelectors = [
+            'iframe[src*="doubleclick.net"]',
+            'iframe[src*="googleadservices"]',
+            'iframe[src*="facebook"]',
+            'iframe[src*="twitter"]',
+            'iframe[src*="instagram"]',
+            'div[id*="google_ads_"]',
+            'div[class*="ad-"]',
+            'div[id*="ad-"]',
+            'div[class*="social-"]',
+            'div[class*="tracking"]',
+            'script[src*="analytics"]',
+            'script[src*="tracker"]',
+            'script[src*="pixel"]'
+          ];
+          blockSelectors.forEach(selector => {
+            document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
           });
+          window.ga = function() {};
+          window.fbq = function() {};
+        })();
+      ''';
+    }
 
-          _applyContentBlockingSettings(appState);
+    if (jsCode.isNotEmpty) {
+      try {
+        _webViewController?.evaluateJavascript(source: jsCode);
+      } catch (e) {
+        debugPrint("$e");
+      }
+    }
+  }
 
-          if (_legacyHandler != null) {
-            _legacyHandler!.handleStartBlockWorker(appState);
-          }
-        },
-        onWebResourceError: (WebResourceError error) {
-          if (_shouldIgnoreError(error)) return;
+  Future<void> _initializeZilPayInjection(AppState appState) async {
+    try {
+      if (appState.chain?.slip44 == 313) {
+        String eip1193 = await rootBundle.loadString('assets/evm_inject.js');
+        String scilla =
+            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+        await _webViewController?.evaluateJavascript(
+            source: '$scilla\n$eip1193');
+        _legacyHandler ??= ZilPayLegacyHandler(
+          webViewController: _webViewController!,
+          initialUrl: _currentUrl,
+        );
+        await _legacyHandler!.sendData(appState);
+      } else if (appState.chain?.slip44 == 60) {
+        // String jsCode = await rootBundle.loadString('assets/evm_inject.js');
+        await _webViewController?.injectJavascriptFileFromAsset(
+          assetFilePath: 'assets/evm_inject.js',
+        );
+      }
+    } catch (e) {
+      debugPrint("$e");
+    }
+  }
 
-          setState(() {
-            _isLoading = false;
-            _hasError = true;
-            _errorMessage = '${error.errorCode}: ${error.description}';
-          });
-        },
-      ),
-    );
+  void _refreshPage() {
+    _webViewController?.reload();
+  }
+
+  Map<String, String> _splitDomain(String url) {
+    try {
+      final uri = Uri.parse(url);
+      final host = uri.host;
+      final parts = host.split('.');
+      if (parts.length <= 2) {
+        return {'subdomain': '', 'domain': host};
+      }
+      final subdomain = parts[0];
+      final domain = parts.sublist(1).join('.');
+      return {'subdomain': subdomain, 'domain': domain};
+    } catch (e) {
+      return {'subdomain': '', 'domain': url};
+    }
   }
 
   bool _shouldIgnoreError(WebResourceError error) {
-    final ignoredErrorCodes = [-6, -30, 404, 204, -105, -2, -1];
     final ignoredErrorContents = [
       'favicon.ico',
       'robots.txt',
@@ -229,140 +224,16 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       'ERR_NAME_NOT_RESOLVED',
       'net::ERR_NAME_NOT_RESOLVED',
       'net::ERR_CLEARTEXT_NOT_PERMITTED',
+      'CLEARTEXT_NOT_PERMITTED',
       'DNS_PROBE_FINISHED'
     ];
-
-    if (ignoredErrorCodes.contains(error.errorCode)) {
-      return true;
-    }
 
     for (final term in ignoredErrorContents) {
       if (error.description.toLowerCase().contains(term)) {
         return true;
       }
     }
-
     return false;
-  }
-
-  Future<void> _applyTextScalingFactor(AppState appState) async {
-    final js = '''
-      document.documentElement.style.fontSize = '${(appState.state.browserSettings.textScalingFactor * 100).toInt()}%';
-    ''';
-    try {
-      await _webViewController.runJavaScript(js);
-    } catch (e) {
-      debugPrint("$e");
-    }
-  }
-
-  void _applyContentBlockingSettings(AppState appState) {
-    final level = appState.state.browserSettings.contentBlocking;
-    String jsCode = '';
-
-    switch (level) {
-      case 1:
-        jsCode = '''
-          (function() {
-            const adSelectors = [
-              'iframe[src*="doubleclick.net"]',
-              'iframe[src*="googleadservices"]',
-              'div[id*="google_ads_"]',
-              'div[class*="ad-container"]',
-              'div[class*="advertisement"]'
-            ];
-            
-            adSelectors.forEach(selector => {
-              const elements = document.querySelectorAll(selector);
-              elements.forEach(el => el.style.display = 'none');
-            });
-          })();
-        ''';
-        break;
-      case 2:
-        jsCode = '''
-          (function() {
-            const blockSelectors = [
-              'iframe[src*="doubleclick.net"]',
-              'iframe[src*="googleadservices"]',
-              'iframe[src*="facebook"]',
-              'iframe[src*="twitter"]',
-              'iframe[src*="instagram"]',
-              'div[id*="google_ads_"]',
-              'div[class*="ad-"]',
-              'div[id*="ad-"]',
-              'div[class*="social-"]',
-              'div[class*="tracking"]',
-              'script[src*="analytics"]',
-              'script[src*="tracker"]',
-              'script[src*="pixel"]'
-            ];
-            
-            blockSelectors.forEach(selector => {
-              const elements = document.querySelectorAll(selector);
-              elements.forEach(el => el.style.display = 'none');
-            });
-           
-            window.ga = function() {};
-            window.fbq = function() {};
-          })();
-        ''';
-        break;
-      default:
-        break;
-    }
-
-    if (jsCode.isNotEmpty) {
-      try {
-        _webViewController.runJavaScript(jsCode);
-      } catch (e) {
-        debugPrint("$e");
-      }
-    }
-  }
-
-  Future<void> _initializeZilPayInjection(AppState appState) async {
-    try {
-      if (appState.chain?.slip44 == 313) {
-        String eip1193 = await rootBundle.loadString('assets/evm_inject.js');
-        String scilla =
-            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-        await _webViewController.runJavaScript('$scilla\n$eip1193');
-
-        _legacyHandler ??= ZilPayLegacyHandler(
-          webViewController: _webViewController,
-          initialUrl: _currentUrl,
-        );
-        await _legacyHandler!.sendData(appState);
-      } else if (appState.chain?.slip44 == 60) {
-        String jsCode = await rootBundle.loadString('assets/evm_inject.js');
-        await _webViewController.runJavaScript(jsCode);
-      }
-    } catch (e) {
-      debugPrint("$e");
-    }
-  }
-
-  void _refreshPage() {
-    _webViewController.reload();
-  }
-
-  Map<String, String> _splitDomain(String url) {
-    try {
-      final uri = Uri.parse(url);
-      final host = uri.host;
-      final parts = host.split('.');
-
-      if (parts.length <= 2) {
-        return {'subdomain': '', 'domain': host};
-      }
-
-      final subdomain = parts[0];
-      final domain = parts.sublist(1).join('.');
-      return {'subdomain': subdomain, 'domain': domain};
-    } catch (e) {
-      return {'subdomain': '', 'domain': url};
-    }
   }
 
   @override
@@ -483,17 +354,18 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
           ),
           actions: [
             IconButton(
-                icon: HoverSvgIcon(
-                  assetName: 'assets/icons/close.svg',
-                  width: 24,
-                  height: 24,
-                  onTap: () => Navigator.pop(context),
-                  color: theme.textPrimary,
-                ),
-                onPressed: () {
-                  stopBlockWorker();
-                  Navigator.pop(context);
-                }),
+              icon: HoverSvgIcon(
+                assetName: 'assets/icons/close.svg',
+                width: 24,
+                height: 24,
+                onTap: () => Navigator.pop(context),
+                color: theme.textPrimary,
+              ),
+              onPressed: () {
+                stopBlockWorker();
+                Navigator.pop(context);
+              },
+            ),
           ],
         ),
       ),
@@ -544,7 +416,106 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                 ],
               ),
             )
-          : WebViewWidget(controller: _webViewController),
+          : Stack(
+              children: [
+                InAppWebView(
+                  initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
+                  initialSettings: InAppWebViewSettings(
+                    mediaPlaybackRequiresUserGesture: false,
+                    javaScriptEnabled: true,
+                    userAgent: _baseUserAgent +
+                        (appState.state.browserSettings.doNotTrack
+                            ? ' DNT:1'
+                            : ' ZilPay/1.0'),
+                    useHybridComposition: true,
+                    supportZoom: true,
+                    useOnLoadResource: true,
+                    allowsInlineMediaPlayback: false,
+                    verticalScrollBarEnabled: false,
+                    horizontalScrollBarEnabled: false,
+                    disableVerticalScroll: false,
+                    disableHorizontalScroll: false,
+                    transparentBackground: false,
+                  ),
+                  onWebViewCreated: (controller) {
+                    _webViewController = controller;
+                    _setupJavaScriptHandlers();
+
+                    if (!appState.state.browserSettings.cookiesEnabled) {
+                      _cookieManager?.deleteAllCookies();
+                    }
+                  },
+                  onLoadStart: (controller, url) {
+                    setState(() {
+                      _isLoading = true;
+                      _hasError = false;
+                      _currentUrl = url.toString();
+                    });
+
+                    if (!appState.state.browserSettings.cacheEnabled) {
+                      InAppWebViewController.clearAllCache();
+                    }
+
+                    if (appState.state.browserSettings.incognitoMode) {
+                      InAppWebViewController.clearAllCache();
+                      controller.clearHistory();
+                      controller.clearFormData();
+                      controller.closeAllMediaPresentations();
+
+                      if (!appState.state.browserSettings.cookiesEnabled) {
+                        _cookieManager?.deleteAllCookies();
+                      }
+                    }
+                  },
+                  onLoadStop: (controller, url) {
+                    _initializeZilPayInjection(appState);
+
+                    setState(() {
+                      _isLoading = false;
+                      _currentUrl = url.toString();
+                    });
+
+                    _applyContentBlockingSettings(appState);
+
+                    if (_legacyHandler != null) {
+                      _legacyHandler!.handleStartBlockWorker(appState);
+                    }
+
+                    if (appState.state.browserSettings.textScalingFactor !=
+                        1.0) {
+                      _applyTextScalingFactor(appState);
+                    }
+                  },
+                  onProgressChanged: (controller, progress) {
+                    setState(() {
+                      _progress = progress / 100;
+                    });
+
+                    if (progress > 30) {
+                      // _initializeZilPayInjection(appState);
+                    }
+                  },
+                  onReceivedError: (controller, request, error) {
+                    if (_shouldIgnoreError(error)) return;
+
+                    setState(() {
+                      _isLoading = false;
+                      _hasError = true;
+                      _errorMessage = error.description;
+                    });
+                  },
+                  onConsoleMessage: (controller, consoleMessage) {
+                    // debugPrint("console message: ${consoleMessage.message}");
+                  },
+                ),
+                if (_isLoading && _progress < 1.0)
+                  LinearProgressIndicator(
+                    value: _progress,
+                    backgroundColor: Colors.transparent,
+                    color: theme.primaryPurple,
+                  ),
+              ],
+            ),
     );
   }
 }
