@@ -332,19 +332,29 @@ pub async fn zilliqa_get_bech32_base16_address(
                 WalletErrors::NoAccounts,
             ))?;
 
-        Ok((
-            account.addr.get_zil_bech32().unwrap_or_default(),
-            account.addr.get_zil_base16().unwrap_or_default(),
-        ))
+        match account.pub_key {
+            PubKey::Secp256k1Sha256(_) => Ok((
+                account.addr.get_zil_bech32().unwrap_or_default(),
+                account.addr.get_zil_base16().unwrap_or_default(),
+            )),
+            PubKey::Secp256k1Keccak256(pk) => {
+                let addr_result = PubKey::Secp256k1Sha256(pk)
+                    .get_addr()
+                    .map(|addr| {
+                        (
+                            addr.get_zil_bech32().unwrap_or_default(),
+                            addr.get_zil_base16().unwrap_or_default(),
+                        )
+                    })
+                    .map_err(|_| ServiceError::DecodePublicKey)?;
+
+                Ok(addr_result)
+            }
+            _ => Err(ServiceError::DecodePublicKey),
+        }
     })
     .await
     .map_err(Into::into)
-}
-
-pub async fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String> {
-    let addr = Address::from_zil_base16(&base16).map_err(|e| e.to_string())?;
-
-    Ok(addr.get_zil_bech32().unwrap_or_default())
 }
 
 pub async fn get_zil_eth_checksum_addresses(wallet_index: usize) -> Result<Vec<String>, String> {
@@ -369,4 +379,34 @@ pub async fn get_zil_eth_checksum_addresses(wallet_index: usize) -> Result<Vec<S
     })
     .await
     .map_err(Into::into)
+}
+
+pub async fn get_zil_bech32_addresses(wallet_index: usize) -> Result<Vec<String>, String> {
+    with_wallet(wallet_index, |wallet| {
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let addresses = data
+            .accounts
+            .into_iter()
+            .filter_map(|a| match a.pub_key {
+                PubKey::Secp256k1Sha256(_) => a.addr.get_zil_bech32().ok(),
+                PubKey::Secp256k1Keccak256(pk) => PubKey::Secp256k1Sha256(pk)
+                    .get_addr()
+                    .ok()
+                    .and_then(|addr| addr.get_zil_bech32().ok()),
+                _ => None,
+            })
+            .collect::<Vec<String>>();
+
+        Ok(addresses)
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String> {
+    let addr = Address::from_zil_base16(&base16).map_err(|e| e.to_string())?;
+
+    Ok(addr.get_zil_bech32().unwrap_or_default())
 }

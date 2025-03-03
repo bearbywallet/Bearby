@@ -180,6 +180,10 @@ class Web3EIP1193Handler {
           await _handleWalletWatchAsset(message, context, appState);
           break;
 
+        case Web3EIP1193Method.walletAddEthereumChain:
+          await _handleWalletAddEthereumChain(message, context, appState);
+          break;
+
         default:
           _returnError(
             message.uuid,
@@ -932,5 +936,37 @@ class Web3EIP1193Handler {
         'Error processing wallet_watchAsset: $e',
       );
     }
+  }
+
+  Future<void> _handleWalletAddEthereumChain(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final connection = Web3Utils.findConnected(
+      _currentDomain,
+      appState.connections,
+    );
+
+    if (connection == null) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.unauthorized,
+        'This domain is not connected. Please connect first.',
+      );
+    }
+
+    final params = message.payload['params'] as List<dynamic>?;
+    if (params == null ||
+        params.isEmpty ||
+        params[0] is! Map<String, dynamic>) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Invalid parameters for wallet_addEthereumChain',
+      );
+    }
+
+    final chainParams = params[0] as Map<String, dynamic>;
   }
 }

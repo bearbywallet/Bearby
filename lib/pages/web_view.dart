@@ -112,6 +112,12 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
   }
 
   void _setupJavaScriptChannels() {
+    _webViewController.platform.setOnConsoleMessage((text) {
+      debugPrint("console message: $text");
+    });
+
+    PlatformWebViewControllerCreationParams dd;
+
     _webViewController.addJavaScriptChannel(
       'ZilPayLegacy',
       onMessageReceived: (JavaScriptMessage message) {
@@ -134,6 +140,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     _webViewController.addJavaScriptChannel(
       'EIP1193Channel',
       onMessageReceived: (JavaScriptMessage message) {
+        debugPrint(message.message);
         try {
           final jsonData = jsonDecode(message.message) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);

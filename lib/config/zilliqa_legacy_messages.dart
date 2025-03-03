@@ -8,6 +8,8 @@ class ZilliqaLegacyMessages {
   static const String addressChanged = '@/$_appPrefix/address-changed';
   static const String networkChanged = '@/$_appPrefix/network-changed';
 
+  static const String watchBlock = '@/$_appPrefix/request-watch_block';
+
   // Content Proxy Messages
   static const String contentProxyMethod =
       '@/$_appPrefix/request-through-content';
