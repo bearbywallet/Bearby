@@ -13,9 +13,161 @@ import '../components/view_item.dart';
 class RestoreWalletOptionsPage extends StatelessWidget {
   const RestoreWalletOptionsPage({super.key});
 
+  void _handleBip39Restore(BuildContext context) {
+    Navigator.of(context).pushNamed('/restore_bip39');
+  }
+
+  void _handlePrivateKeyRestore(BuildContext context) {
+    // Implementation for private key restoration
+  }
+
+  void _handleQRCodeScanning(BuildContext context) {
+    showQRScannerModal(
+      context: context,
+      onScanned: (String qrData) async {
+        try {
+          final values = parseQRSecretData(qrData);
+          final String? shortName = values['chain'];
+          final String? seed = values['seed'];
+          final String? key = values['key'];
+
+          if (shortName == null || !context.mounted) {
+            if (context.mounted) Navigator.pop(context);
+            return;
+          }
+
+          final String mainnetJsonData =
+              await rootBundle.loadString('assets/chains/mainnet-chains.json');
+          final List<Chain> mainnetChains =
+              await ChainService.loadChains(mainnetJsonData);
+
+          if (!mainnetChains.any((chain) => chain.shortName == shortName) ||
+              !context.mounted) {
+            if (context.mounted) Navigator.pop(context);
+            return;
+          }
+
+          if (seed != null) {
+            if (context.mounted) {
+              await _processSeedFromQR(context, seed, shortName);
+            }
+          } else if (key != null) {
+            if (context.mounted) {
+              await _processKeyFromQR(context, key, shortName);
+            }
+          } else {
+            if (context.mounted) Navigator.pop(context);
+          }
+        } catch (e) {
+          debugPrint("QR scanning error: $e");
+          if (context.mounted) Navigator.pop(context);
+        }
+      },
+    );
+  }
+
+  Future<void> _processSeedFromQR(
+      BuildContext context, String seed, String shortName) async {
+    final nonEmptyWords =
+        seed.split(" ").where((word) => word.isNotEmpty).toList();
+
+    if (nonEmptyWords.isEmpty) {
+      if (context.mounted) Navigator.pop(context);
+      return;
+    }
+
+    final List<int> errorIndexes = (await checkNotExistsBip39Words(
+      words: nonEmptyWords,
+      lang: 'english',
+    ))
+        .map((e) => e.toInt())
+        .toList();
+
+    if (!context.mounted) return;
+
+    if (errorIndexes.isEmpty) {
+      Navigator.of(context).pushNamed(
+        '/net_setup',
+        arguments: {'bip39': nonEmptyWords, 'shortName': shortName},
+      );
+    } else {
+      Navigator.pop<void>(context);
+    }
+  }
+
+  Future<void> _processKeyFromQR(
+      BuildContext context, String key, String shortName) async {
+    try {
+      final KeyPairInfo keys = await keypairFromSk(sk: key);
+
+      // Check if the context is still valid after the async operation
+      if (!context.mounted) return;
+
+      Navigator.of(context).pushNamed(
+        '/net_setup',
+        arguments: {'keys': keys, 'shortName': shortName},
+      );
+    } catch (e) {
+      debugPrint("Private key processing error: $e");
+      if (context.mounted) Navigator.pop(context);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+
+    // Pre-construct icons to avoid rebuilding them on every frame
+    final backIcon = SvgPicture.asset(
+      'assets/icons/back.svg',
+      width: 24,
+      height: 24,
+      colorFilter: ColorFilter.mode(
+        theme.secondaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
+
+    final documentIcon = SvgPicture.asset(
+      'assets/icons/document.svg',
+      width: 35,
+      height: 35,
+      colorFilter: ColorFilter.mode(
+        theme.primaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
+
+    final puzzleIcon = SvgPicture.asset(
+      'assets/icons/puzzle.svg',
+      width: 35,
+      height: 35,
+      colorFilter: ColorFilter.mode(
+        theme.primaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
+
+    final bincodeIcon = SvgPicture.asset(
+      'assets/icons/bincode.svg',
+      width: 35,
+      height: 35,
+      colorFilter: ColorFilter.mode(
+        theme.primaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
+
+    final qrcodeIcon = SvgPicture.asset(
+      'assets/icons/qrcode.svg',
+      width: 35,
+      height: 35,
+      colorFilter: ColorFilter.mode(
+        theme.primaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -23,165 +175,44 @@ class RestoreWalletOptionsPage extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         leading: IconButton(
-          icon: SvgPicture.asset(
-            'assets/icons/back.svg',
-            width: 24,
-            height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.secondaryPurple,
-              BlendMode.srcIn,
-            ),
-          ),
+          icon: backIcon,
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title:
-            Text('Restore Wallet', style: TextStyle(color: theme.textPrimary)),
+        title: Text(
+          'Restore Wallet',
+          style: TextStyle(color: theme.textPrimary),
+        ),
       ),
-      body: SingleChildScrollView(
-        child: Padding(
+      body: SafeArea(
+        child: ListView(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              WalletListItem(
-                title: 'BIP39',
-                subtitle: 'Restore with Mnemonic phrase',
-                icon: SvgPicture.asset(
-                  'assets/icons/document.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.of(context).pushNamed('/restore_bip39');
-                },
-              ),
-              WalletListItem(
-                disabled: true,
-                title: 'SLIP-0039',
-                subtitle: 'Restore with Shared Mnemonic phrase',
-                icon: SvgPicture.asset(
-                  'assets/icons/puzzle.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {/* Handle SLIP-0039 restoration */},
-              ),
-              WalletListItem(
-                title: 'Private Key',
-                subtitle: 'Restore with private key',
-                icon: SvgPicture.asset(
-                  'assets/icons/bincode.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {/* Handle private key restoration */},
-              ),
-              WalletListItem(
-                title: 'QRcode',
-                subtitle: 'Restore wallet by QRcode scanning',
-                icon: SvgPicture.asset(
-                  'assets/icons/qrcode.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {
-                  showQRScannerModal(
-                    context: context,
-                    onScanned: (String qrData) async {
-                      final values = parseQRSecretData(qrData);
-                      String? shortName = values['chain'];
-                      String? seed = values['seed'];
-                      String? key = values['key'];
-
-                      if (shortName == null) {
-                        Navigator.pop(context);
-                        return;
-                      }
-
-                      final String mainnetJsonData = await rootBundle
-                          .loadString('assets/chains/mainnet-chains.json');
-                      final List<Chain> mainnetChains =
-                          await ChainService.loadChains(mainnetJsonData);
-
-                      if (!mainnetChains
-                          .any((chain) => chain.shortName == shortName)) {
-                        Navigator.pop(context);
-                        return;
-                      }
-
-                      if (seed != null) {
-                        try {
-                          final nonEmptyWords = seed
-                              .split(" ")
-                              .where((word) => word.isNotEmpty)
-                              .toList();
-
-                          if (nonEmptyWords.isEmpty) {
-                            Navigator.pop(context);
-
-                            return;
-                          }
-
-                          List<int> errorIndexes =
-                              (await checkNotExistsBip39Words(
-                            words: nonEmptyWords,
-                            lang: 'english',
-                          ))
-                                  .map((e) => e.toInt())
-                                  .toList();
-
-                          if (errorIndexes.isEmpty) {
-                            Navigator.of(context).pushNamed('/net_setup',
-                                arguments: {
-                                  'bip39': nonEmptyWords,
-                                  'shortName': shortName
-                                });
-                          } else {
-                            // TODO: maybe error hanlder.
-                            Navigator.pop<void>(context);
-                          }
-                        } catch (e) {
-                          debugPrint("error: $e");
-                        }
-                      } else if (key != null) {
-                        try {
-                          KeyPairInfo keys = await keypairFromSk(sk: key);
-                          Navigator.of(context).pushNamed('/net_setup',
-                              arguments: {
-                                'keys': keys,
-                                'shortName': shortName
-                              });
-                          return;
-                        } catch (e) {
-                          debugPrint("error: $e");
-                          Navigator.pop(context);
-                          return;
-                        }
-                      } else {
-                        Navigator.pop(context);
-                      }
-                    },
-                  );
-                },
-              ),
-            ],
-          ),
+          children: [
+            WalletListItem(
+              title: 'BIP39',
+              subtitle: 'Restore with Mnemonic phrase',
+              icon: documentIcon,
+              onTap: () => _handleBip39Restore(context),
+            ),
+            WalletListItem(
+              disabled: true,
+              title: 'SLIP-0039',
+              subtitle: 'Restore with Shared Mnemonic phrase',
+              icon: puzzleIcon,
+              onTap: null,
+            ),
+            WalletListItem(
+              title: 'Private Key',
+              subtitle: 'Restore with private key',
+              icon: bincodeIcon,
+              onTap: () => _handlePrivateKeyRestore(context),
+            ),
+            WalletListItem(
+              title: 'QRcode',
+              subtitle: 'Restore wallet by QRcode scanning',
+              icon: qrcodeIcon,
+              onTap: () => _handleQRCodeScanning(context),
+            ),
+          ],
         ),
       ),
     );

@@ -102,10 +102,10 @@ Future<String> zilliqaLegacyBase16ToBech32({required String base16}) =>
     RustLib.instance.api
         .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
 
-Future<List<String>> convertBech32AddressesToEthChecksum(
-        {required List<String> addresses}) =>
-    RustLib.instance.api.crateApiWalletConvertBech32AddressesToEthChecksum(
-        addresses: addresses);
+Future<List<String>> getZilEthChecksumAddresses(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiWalletGetZilEthChecksumAddresses(walletIndex: walletIndex);
 
 class AddNextBip39AccountParams {
   final BigInt walletIndex;

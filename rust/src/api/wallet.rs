@@ -272,7 +272,7 @@ pub async fn reveal_keypair(
     password: String,
     passphrase: Option<String>,
 ) -> Result<KeyPairInfo, String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let keypair = wallet
@@ -291,7 +291,7 @@ pub async fn reveal_bip39_phrase(
     password: String,
     _passphrase: Option<String>,
 ) -> Result<String, String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let m = wallet
@@ -347,15 +347,26 @@ pub async fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, S
     Ok(addr.get_zil_bech32().unwrap_or_default())
 }
 
-pub fn convert_bech32_addresses_to_eth_checksum(addresses: Vec<String>) -> Vec<String> {
-    let converted: Vec<String> = addresses
-        .iter()
-        .filter_map(|a: &String| {
-            Address::from_zil_bech32(a)
-                .ok()
-                .and_then(|v| v.to_eth_checksummed().ok())
-        })
-        .collect();
+pub async fn get_zil_eth_checksum_addresses(wallet_index: usize) -> Result<Vec<String>, String> {
+    with_wallet(wallet_index, |wallet| {
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let addresses = data
+            .accounts
+            .into_iter()
+            .filter_map(|a| match a.pub_key {
+                PubKey::Secp256k1Sha256(pk) => PubKey::Secp256k1Keccak256(pk)
+                    .get_addr()
+                    .ok()
+                    .and_then(|a| a.to_eth_checksummed().ok()),
+                PubKey::Secp256k1Keccak256(_) => a.addr.to_eth_checksummed().ok(),
+                _ => None,
+            })
+            .collect::<Vec<String>>();
 
-    converted
+        Ok(addresses)
+    })
+    .await
+    .map_err(Into::into)
 }

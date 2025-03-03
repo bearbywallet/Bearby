@@ -73,11 +73,27 @@ class Web3EIP1193Handler {
   }
 
   Future<List<String>> _getWalletAddresses(AppState appState) async {
-    final addresses =
-        (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
-    return appState.chain?.slip44 == 313
-        ? await convertBech32AddressesToEthChecksum(addresses: addresses)
-        : addresses;
+    List<String> addresses = [];
+
+    if (appState.chain?.slip44 == 313) {
+      addresses = await getZilEthChecksumAddresses(
+          walletIndex: BigInt.from(appState.selectedWallet));
+    } else {
+      addresses = (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
+    }
+
+    final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
+
+    if (selectedAccountIndex != null &&
+        selectedAccountIndex >= 0 &&
+        selectedAccountIndex < addresses.length) {
+      final selectedAddress = addresses[selectedAccountIndex];
+
+      addresses.removeAt(selectedAccountIndex);
+      addresses.insert(0, selectedAddress);
+    }
+
+    return addresses;
   }
 
   Future<void> handleWeb3EIP1193Message(
@@ -192,6 +208,7 @@ class Web3EIP1193Handler {
       _currentDomain,
       appState.connections,
     );
+
     final addresses = await _getWalletAddresses(appState);
 
     if (connection != null &&

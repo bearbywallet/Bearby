@@ -7,7 +7,7 @@ class WalletListItem extends StatefulWidget {
   final String title;
   final String subtitle;
   final dynamic icon;
-  final VoidCallback onTap;
+  final VoidCallback? onTap;
   final bool disabled;
 
   const WalletListItem({
@@ -15,7 +15,7 @@ class WalletListItem extends StatefulWidget {
     required this.title,
     required this.subtitle,
     required this.icon,
-    required this.onTap,
+    this.onTap,
     this.disabled = false,
   });
 
