@@ -1,7 +1,5 @@
 import 'dart:io';
 import 'dart:convert';
-import 'package:flutter/foundation.dart';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
@@ -110,11 +108,11 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     }
   }
 
-  void _applyContentBlockingSettings(AppState appState) {
+  Future<void> _applyEnhancedContentBlocking(AppState appState) async {
     final level = appState.state.browserSettings.contentBlocking;
     String jsCode = '';
 
-    if (level == 1) {
+    if (level >= 1) {
       jsCode = '''
         (function() {
           const adSelectors = [
@@ -122,14 +120,37 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
             'iframe[src*="googleadservices"]',
             'div[id*="google_ads_"]',
             'div[class*="ad-container"]',
-            'div[class*="advertisement"]'
+            'div[class*="advertisement"]',
+            'div[class*="banner"]',
+            'div[id*="banner-ad"]'
           ];
           adSelectors.forEach(selector => {
             document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
           });
+          
+          const blockAutoplay = function() {
+            const videoElements = document.querySelectorAll('video');
+            const audioElements = document.querySelectorAll('audio');
+            
+            for (const element of [...videoElements, ...audioElements]) {
+              element.autoplay = false;
+              element.pause();
+              
+              element.addEventListener('play', function(e) {
+                if (!e.isTrusted) {
+                  this.pause();
+                }
+              }, true);
+            }
+          };
+          
+          blockAutoplay();
+          setInterval(blockAutoplay, 2000);
         })();
       ''';
-    } else if (level == 2) {
+    }
+
+    if (level >= 2) {
       jsCode = '''
         (function() {
           const blockSelectors = [
@@ -145,20 +166,160 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
             'div[class*="tracking"]',
             'script[src*="analytics"]',
             'script[src*="tracker"]',
-            'script[src*="pixel"]'
+            'script[src*="pixel"]',
+            'div[class*="popup"]',
+            'div[id*="popup"]',
+            'div[class*="overlay"][class*="ad"]'
           ];
+          
           blockSelectors.forEach(selector => {
-            document.querySelectorAll(selector).forEach(el => el.style.display = 'none');
+            document.querySelectorAll(selector).forEach(el => {
+              el.style.display = 'none';
+              if (el.parentNode) {
+                el.parentNode.removeChild(el);
+              }
+            });
           });
+          
+          const blockAutoplay = function() {
+            const mediaElements = [...document.querySelectorAll('video'), ...document.querySelectorAll('audio')];
+            for (const element of mediaElements) {
+              element.autoplay = false;
+              element.pause();
+              
+              element.addEventListener('play', function(e) {
+                if (!e.isTrusted) {
+                  this.pause();
+                }
+              }, true);
+            }
+            
+            const oldPlay = HTMLMediaElement.prototype.play;
+            HTMLMediaElement.prototype.play = function() {
+              if (document.userActivated) {
+                return oldPlay.apply(this, arguments);
+              }
+              return Promise.reject('Autoplay blocked by ZilPay Browser');
+            };
+          };
+          
+          window.open = function() { return null; };
+          window.showModalDialog = function() { return null; };
+          
           window.ga = function() {};
           window.fbq = function() {};
+          window._gaq = { push: function() {} };
+          
+          if (window.Notification) {
+            window.Notification.requestPermission = function() {
+              return Promise.resolve('denied');
+            };
+            Object.defineProperty(window.Notification, 'permission', {
+              get: function() { return 'denied'; }
+            });
+          }
+          
+          blockAutoplay();
+          setInterval(function() {
+            blockSelectors.forEach(selector => {
+              document.querySelectorAll(selector).forEach(el => {
+                el.style.display = 'none';
+                if (el.parentNode) {
+                  el.parentNode.removeChild(el);
+                }
+              });
+            });
+            blockAutoplay();
+          }, 2000);
+          
+          const observer = new MutationObserver(function(mutations) {
+            let needsRecheck = false;
+            for (const mutation of mutations) {
+              if (mutation.addedNodes.length) {
+                needsRecheck = true;
+                break;
+              }
+            }
+            
+            if (needsRecheck) {
+              blockSelectors.forEach(selector => {
+                document.querySelectorAll(selector).forEach(el => {
+                  el.style.display = 'none';
+                  if (el.parentNode) {
+                    el.parentNode.removeChild(el);
+                  }
+                });
+              });
+              blockAutoplay();
+            }
+          });
+          
+          observer.observe(document.body, { 
+            childList: true, 
+            subtree: true 
+          });
         })();
       ''';
     }
 
     if (jsCode.isNotEmpty) {
       try {
-        _webViewController?.evaluateJavascript(source: jsCode);
+        await _webViewController?.evaluateJavascript(source: jsCode);
+      } catch (e) {
+        debugPrint("$e");
+      }
+    }
+  }
+
+  Future<void> _disableAutoplay(AppState appState) async {
+    if (!appState.state.browserSettings.allowAutoPlay) {
+      try {
+        await _webViewController?.evaluateJavascript(source: '''
+          (function() {
+            const disableAutoplay = function() {
+              const videoElements = document.querySelectorAll('video');
+              const audioElements = document.querySelectorAll('audio');
+              
+              for (const element of [...videoElements, ...audioElements]) {
+                element.autoplay = false;
+                element.pause();
+                
+                element.addEventListener('play', function(e) {
+                  if (!e.isTrusted) {
+                    this.pause();
+                  }
+                }, true);
+              }
+              
+              if (!window.oldPlayDefined) {
+                window.oldPlayDefined = true;
+                const oldPlay = HTMLMediaElement.prototype.play;
+                HTMLMediaElement.prototype.play = function() {
+                  if (document.userActivated) {
+                    return oldPlay.apply(this, arguments);
+                  }
+                  return Promise.reject('Autoplay blocked by browser settings');
+                };
+              }
+            };
+            
+            const frames = document.querySelectorAll('iframe');
+            frames.forEach(frame => {
+              try {
+                if (frame.contentDocument) {
+                  const videos = frame.contentDocument.querySelectorAll('video');
+                  videos.forEach(video => {
+                    video.autoplay = false;
+                    video.pause();
+                  });
+                }
+              } catch (e) {}
+            });
+            
+            disableAutoplay();
+            setInterval(disableAutoplay, 2000);
+          })();
+        ''');
       } catch (e) {
         debugPrint("$e");
       }
@@ -179,7 +340,6 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
         );
         await _legacyHandler!.sendData(appState);
       } else if (appState.chain?.slip44 == 60) {
-        // String jsCode = await rootBundle.loadString('assets/evm_inject.js');
         await _webViewController?.injectJavascriptFileFromAsset(
           assetFilePath: 'assets/evm_inject.js',
         );
@@ -234,6 +394,24 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       }
     }
     return false;
+  }
+
+  void _applyPrivacySettings(
+      AppState appState, InAppWebViewController controller) {
+    if (!appState.state.browserSettings.cookiesEnabled) {
+      _cookieManager?.deleteAllCookies();
+    }
+
+    if (appState.state.browserSettings.incognitoMode) {
+      InAppWebViewController.clearAllCache();
+      controller.clearHistory();
+      controller.clearFormData();
+      controller.closeAllMediaPresentations();
+
+      if (!appState.state.browserSettings.cookiesEnabled) {
+        _cookieManager?.deleteAllCookies();
+      }
+    }
   }
 
   @override
@@ -421,7 +599,6 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                 InAppWebView(
                   initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
                   initialSettings: InAppWebViewSettings(
-                    mediaPlaybackRequiresUserGesture: false,
                     javaScriptEnabled: true,
                     userAgent: _baseUserAgent +
                         (appState.state.browserSettings.doNotTrack
@@ -430,12 +607,22 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     useHybridComposition: true,
                     supportZoom: true,
                     useOnLoadResource: true,
-                    allowsInlineMediaPlayback: false,
                     verticalScrollBarEnabled: false,
                     horizontalScrollBarEnabled: false,
                     disableVerticalScroll: false,
                     disableHorizontalScroll: false,
                     transparentBackground: false,
+                    javaScriptCanOpenWindowsAutomatically: false,
+                    supportMultipleWindows: false,
+                    cacheEnabled: appState.state.browserSettings.cacheEnabled,
+                    clearCache: !appState.state.browserSettings.cacheEnabled,
+                    mediaPlaybackRequiresUserGesture:
+                        !appState.state.browserSettings.allowAutoPlay,
+                    allowsInlineMediaPlayback:
+                        appState.state.browserSettings.allowAutoPlay,
+                    forceDark: appState.currentTheme.value == "Dark"
+                        ? ForceDark.ON
+                        : ForceDark.OFF,
                   ),
                   onWebViewCreated: (controller) {
                     _webViewController = controller;
@@ -452,30 +639,21 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       _currentUrl = url.toString();
                     });
 
-                    if (!appState.state.browserSettings.cacheEnabled) {
-                      InAppWebViewController.clearAllCache();
-                    }
-
-                    if (appState.state.browserSettings.incognitoMode) {
-                      InAppWebViewController.clearAllCache();
-                      controller.clearHistory();
-                      controller.clearFormData();
-                      controller.closeAllMediaPresentations();
-
-                      if (!appState.state.browserSettings.cookiesEnabled) {
-                        _cookieManager?.deleteAllCookies();
-                      }
-                    }
+                    _applyPrivacySettings(appState, controller);
                   },
-                  onLoadStop: (controller, url) {
-                    _initializeZilPayInjection(appState);
+                  onLoadStop: (controller, url) async {
+                    await _initializeZilPayInjection(appState);
 
                     setState(() {
                       _isLoading = false;
                       _currentUrl = url.toString();
                     });
 
-                    _applyContentBlockingSettings(appState);
+                    await _applyEnhancedContentBlocking(appState);
+
+                    if (!appState.state.browserSettings.allowAutoPlay) {
+                      await _disableAutoplay(appState);
+                    }
 
                     if (_legacyHandler != null) {
                       _legacyHandler!.handleStartBlockWorker(appState);
@@ -483,17 +661,13 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
 
                     if (appState.state.browserSettings.textScalingFactor !=
                         1.0) {
-                      _applyTextScalingFactor(appState);
+                      await _applyTextScalingFactor(appState);
                     }
                   },
                   onProgressChanged: (controller, progress) {
                     setState(() {
                       _progress = progress / 100;
                     });
-
-                    if (progress > 30) {
-                      // _initializeZilPayInjection(appState);
-                    }
                   },
                   onReceivedError: (controller, request, error) {
                     if (_shouldIgnoreError(error)) return;
@@ -504,8 +678,31 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       _errorMessage = error.description;
                     });
                   },
-                  onConsoleMessage: (controller, consoleMessage) {
-                    // debugPrint("console message: ${consoleMessage.message}");
+                  shouldOverrideUrlLoading:
+                      (controller, navigationAction) async {
+                    final url =
+                        navigationAction.request.url.toString().toLowerCase();
+
+                    if (appState.state.browserSettings.contentBlocking > 0) {
+                      final adDomains = [
+                        'doubleclick.net',
+                        'googleadservices',
+                        'googlesyndication',
+                        'adform.net',
+                        'adnxs.com',
+                        'ad.doubleclick.net',
+                        'analytics',
+                        'facebook.com/tr',
+                      ];
+
+                      for (final domain in adDomains) {
+                        if (url.contains(domain)) {
+                          return NavigationActionPolicy.CANCEL;
+                        }
+                      }
+                    }
+
+                    return NavigationActionPolicy.ALLOW;
                   },
                 ),
                 if (_isLoading && _progress < 1.0)

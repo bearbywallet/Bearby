@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
+import 'package:zilpay/modals/add_chain.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
@@ -15,6 +16,7 @@ import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
 import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -983,5 +985,77 @@ class Web3EIP1193Handler {
     }
 
     final chainParams = params[0] as Map<String, dynamic>;
+
+    if (!chainParams.containsKey('chainId') ||
+        !chainParams.containsKey('chainName') ||
+        !chainParams.containsKey('nativeCurrency') ||
+        !chainParams.containsKey('rpcUrls') ||
+        !chainParams.containsKey('blockExplorerUrls')) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Missing required fields for wallet_addEthereumChain',
+      );
+    }
+
+    final rpcUrls = (chainParams['rpcUrls'] as List<dynamic>)
+        .where((url) => url is String && !url.startsWith('ws'))
+        .cast<String>()
+        .toList();
+
+    if (rpcUrls.isEmpty) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'No valid HTTP RPC URLs provided',
+      );
+    }
+
+    final nativeCurrency =
+        chainParams['nativeCurrency'] as Map<String, dynamic>;
+    final explorers = (chainParams['blockExplorerUrls'] as List<dynamic>)
+        .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
+        .toList();
+    String symbol = nativeCurrency['symbol'].toString();
+
+    final networkConfig = NetworkConfigInfo(
+      name: chainParams['chainName'] as String,
+      logo:
+          'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/${symbol.toLowerCase()}.svg',
+      chain: chainParams['chainName'] as String,
+      shortName: symbol,
+      rpc: rpcUrls,
+      features: Uint16List(0),
+      chainId: BigInt.parse(
+          chainParams['chainId'].toString().replaceFirst('0x', ''),
+          radix: 16),
+      chainIds: Uint64List(0),
+      slip44: 60, // DEFUAL ETH SLIP
+      diffBlockTime: BigInt.zero,
+      chainHash: BigInt.zero,
+      explorers: explorers,
+      fallbackEnabled: false,
+    );
+
+    showAddChainModal(
+      context: context,
+      title: message.title ?? "",
+      appIcon: message.icon ?? '',
+      chain: networkConfig,
+      onConfirm: () {
+        _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: null,
+        );
+      },
+      onReject: () {
+        _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.userRejectedRequest,
+          'User rejected the request',
+        );
+      },
+    );
   }
 }

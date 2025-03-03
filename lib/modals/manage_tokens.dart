@@ -1,6 +1,7 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -63,11 +64,10 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
     final tokens = appState.wallet?.tokens ?? [];
 
     final double headerHeight = 84.0;
-    final double searchBarHeight = 80.0; // Search bar + padding
-    final double tokenItemHeight = 56.0; // Height per token item
+    final double searchBarHeight = 80.0;
+    final double tokenItemHeight = 56.0;
     final double bottomPadding = MediaQuery.of(context).padding.bottom;
 
-    // Calculate total content height
     final double totalContentHeight = headerHeight +
         searchBarHeight +
         (tokens.length * tokenItemHeight) +
@@ -133,157 +133,52 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             token.name.toLowerCase().contains(_searchQuery.toLowerCase()) ||
             token.symbol.toLowerCase().contains(_searchQuery.toLowerCase()))
         .where((token) => token.addrType == appState.account?.addrType)
-        .map((token) => _TokenListItem(
-              symbol: token.symbol,
-              name: token.name,
-              addr: token.addr,
-              isDefault: token.default_,
-              iconUrl: processTokenLogo(
-                token,
-                theme.value,
-              ),
-              onToggle: (value) async {
-                if (!value) {
-                  final int index = appState.wallet!.tokens
-                      .indexWhere((t) => t.addr == token.addr);
-
-                  if (index == -1) {
-                    return;
-                  }
-
-                  try {
-                    await rmFtoken(
-                      walletIndex: BigInt.from(appState.selectedWallet),
-                      tokenIndex: BigInt.from(index),
-                    );
-                    await appState.syncData();
-                  } catch (e) {
-                    debugPrint("remove token error: $e");
-                  }
-                }
-              },
-              isEnabled: !token.default_,
-            ))
-        .toList();
-  }
-}
-
-class _TokenListItem extends StatelessWidget {
-  final String symbol;
-  final String name;
-  final String addr;
-  final String iconUrl;
-  final Function(bool)? onToggle;
-  final bool isEnabled;
-  final bool isDefault;
-
-  const _TokenListItem({
-    required this.symbol,
-    required this.name,
-    required this.addr,
-    required this.iconUrl,
-    required this.isEnabled,
-    required this.isDefault,
-    this.onToggle,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
-    const double iconSize = 32.0;
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          Container(
-            width: iconSize,
-            height: iconSize,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            child: ClipRRect(
-              borderRadius: BorderRadius.circular(16),
-              child: AsyncImage(
-                url: iconUrl,
-                width: iconSize,
-                height: iconSize,
-                fit: BoxFit.contain,
-                errorWidget: Blockies(
-                  seed: addr,
-                  color: theme.secondaryPurple,
-                  bgColor: theme.primaryPurple,
-                  spotColor: theme.background,
-                  size: 8,
-                ),
-                loadingWidget: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
-                ),
-              ),
+        .map((token) {
+      final isEnabled = !token.default_;
+      return EnableCard(
+        title: token.symbol,
+        name: token.name,
+        iconWidget: AsyncImage(
+          url: processTokenLogo(token, theme.value),
+          width: 32.0,
+          height: 32.0,
+          fit: BoxFit.contain,
+          errorWidget: Blockies(
+            seed: token.addr,
+            color: theme.secondaryPurple,
+            bgColor: theme.primaryPurple,
+            spotColor: theme.background,
+            size: 8,
+          ),
+          loadingWidget: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
             ),
           ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Text(
-                      symbol,
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                        height: 1.2,
-                      ),
-                    ),
-                    if (isDefault) ...[
-                      const SizedBox(width: 8),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 6,
-                          vertical: 2,
-                        ),
-                        decoration: BoxDecoration(
-                          color: theme.textSecondary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Text(
-                          'Default',
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 12,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  name,
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 14,
-                    height: 1.2,
-                  ),
-                ),
-              ],
-            ),
-          ),
-          Switch(
-            value: isDefault ? true : isEnabled,
-            onChanged: onToggle,
-            activeColor: isDefault ? theme.textSecondary : theme.success,
-          ),
-        ],
-      ),
-    );
+        ),
+        isDefault: token.default_,
+        isEnabled: isEnabled,
+        onToggle: (value) async {
+          if (!value) {
+            final int index =
+                appState.wallet!.tokens.indexWhere((t) => t.addr == token.addr);
+
+            if (index == -1) {
+              return;
+            }
+
+            try {
+              await rmFtoken(
+                walletIndex: BigInt.from(appState.selectedWallet),
+                tokenIndex: BigInt.from(index),
+              );
+              await appState.syncData();
+            } catch (e) {
+              debugPrint("remove token error: $e");
+            }
+          }
+        },
+      );
+    }).toList();
   }
 }
