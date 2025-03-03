@@ -249,8 +249,15 @@ class Web3EIP1193Handler {
       // colors: message.colors,
       uuid: message.uuid,
       iconUrl: message.icon ?? "",
-      onDecision: (accepted, selectedIndices) async {
-        if (!accepted) {
+      onReject: () {
+        _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: <void>[],
+        );
+      },
+      onConfirm: (selectedIndices) async {
+        if (selectedIndices.isEmpty) {
           return _sendResponse(
             type: 'ZILPAY_RESPONSE',
             uuid: message.uuid,
@@ -725,8 +732,15 @@ class Web3EIP1193Handler {
       title: message.title ?? "",
       uuid: message.uuid,
       iconUrl: message.icon ?? "",
-      onDecision: (accepted, selectedIndices) async {
-        if (!accepted) {
+      onReject: () {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.userRejectedRequest,
+          'User rejected the request',
+        );
+      },
+      onConfirm: (selectedIndices) async {
+        if (selectedIndices.isEmpty) {
           return _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,

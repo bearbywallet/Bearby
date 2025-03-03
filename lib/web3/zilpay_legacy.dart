@@ -67,12 +67,18 @@ class ZilPayLegacyHandler {
     required Map<String, Object?> payload,
     required String uuid,
   }) async {
-    final response =
-        ZilPayWeb3Message(type: type, payload: payload, uuid: uuid).toJson();
+    final response = ZilPayWeb3Message(
+      type: type,
+      payload: payload,
+      uuid: uuid,
+    ).toJson();
 
     final jsonString = jsonEncode(response);
-    await webViewController.evaluateJavascript(
-        source: 'window.postMessage($jsonString, "*")');
+    await webViewController.evaluateJavascript(source: '''
+    window.dispatchEvent(new MessageEvent('message', { 
+      data: $jsonString
+    }));
+    ''');
   }
 
   Future<Map<String, String>?> _getAccountIfConnected(AppState appState) async {
@@ -361,14 +367,14 @@ class ZilPayLegacyHandler {
       uuid: message.uuid,
       colors: message.colors,
       iconUrl: message.icon ?? "",
-      onDismiss: () {
+      onReject: () {
         _sendResponse(
           type: ZilliqaLegacyMessages.responseToDapp,
           payload: {'reject': 'Rejected by user'},
           uuid: message.uuid,
         );
       },
-      onDecision: (accepted, selectedIndices) async {
+      onConfirm: (selectedIndices) async {
         final walletIndexes = Uint64List.fromList(
             selectedIndices.map((index) => BigInt.from(index)).toList());
 
@@ -388,7 +394,7 @@ class ZilPayLegacyHandler {
 
         Map<String, String>? account;
 
-        if (accepted) {
+        if (selectedIndices.isNotEmpty) {
           await createUpdateConnection(
             walletIndex: BigInt.from(appState.selectedWallet),
             conn: connectionInfo,

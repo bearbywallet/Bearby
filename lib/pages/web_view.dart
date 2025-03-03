@@ -665,6 +665,10 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     }
                   },
                   onProgressChanged: (controller, progress) {
+                    if (progress > 20) {
+                      _initializeZilPayInjection(appState);
+                    }
+
                     setState(() {
                       _progress = progress / 100;
                     });

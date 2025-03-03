@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/components/enable_card.dart';
 
 void showAppConnectModal({
   required BuildContext context,
@@ -13,10 +15,10 @@ void showAppConnectModal({
   required String uuid,
   required String iconUrl,
   ColorsInfo? colors,
-  required Function(bool, List<int>) onDecision,
-  VoidCallback? onDismiss,
+  required Function(List<int>) onConfirm,
+  required VoidCallback onReject,
 }) {
-  showModalBottomSheet<void>(
+  showModalBottomSheet<bool>(
     context: context,
     backgroundColor: Colors.transparent,
     isScrollControlled: true,
@@ -25,20 +27,19 @@ void showAppConnectModal({
     useSafeArea: true,
     barrierColor: Colors.black54,
     builder: (BuildContext context) {
-      return Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-        ),
-        child: _AppConnectModalContent(
-          title: title,
-          uuid: uuid,
-          iconUrl: iconUrl,
-          colors: colors,
-          onDecision: onDecision,
-        ),
+      return _AppConnectModalContent(
+        title: title,
+        uuid: uuid,
+        iconUrl: iconUrl,
+        colors: colors,
+        onConfirm: onConfirm,
       );
     },
-  ).then((_) => onDismiss?.call());
+  ).then((result) {
+    if (result == null) {
+      onReject();
+    }
+  });
 }
 
 class _AppConnectModalContent extends StatefulWidget {
@@ -46,14 +47,14 @@ class _AppConnectModalContent extends StatefulWidget {
   final String uuid;
   final String iconUrl;
   final ColorsInfo? colors;
-  final Function(bool, List<int>) onDecision;
+  final Function(List<int>) onConfirm;
 
   const _AppConnectModalContent({
     required this.title,
     required this.uuid,
     required this.iconUrl,
     this.colors,
-    required this.onDecision,
+    required this.onConfirm,
   });
 
   @override
@@ -96,7 +97,6 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
     final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
-    final bottomPadding = MediaQuery.of(context).padding.bottom;
 
     return Container(
       decoration: BoxDecoration(
@@ -162,55 +162,30 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
           _buildAccountList(appState, theme),
           Padding(
             padding: EdgeInsets.all(16),
-            child: Row(
-              children: [
-                Expanded(
-                  child: CustomButton(
-                    text: 'Reject',
-                    onPressed: () {
-                      widget.onDecision(false, []);
-                      Navigator.pop(context);
-                    },
-                    backgroundColor: theme.danger.withValues(alpha: 0.1),
-                    textColor: theme.danger,
-                    height: 48,
-                  ),
-                ),
-                SizedBox(width: 16),
-                Expanded(
-                  child: CustomButton(
-                    text: 'Connect',
-                    onPressed: _selectedAccounts.values
-                            .any((selected) => selected)
-                        ? () {
-                            final selectedIndices = _selectedAccounts.entries
-                                .where((entry) => entry.value)
-                                .map((entry) => entry.key)
-                                .toList();
-                            widget.onDecision(true, selectedIndices);
-                            Navigator.pop(context);
-                          }
-                        : null,
-                    backgroundColor: primaryColor,
-                    textColor: textColor,
-                    height: 48,
-                  ),
-                ),
-              ],
+            child: SwipeButton(
+              text: 'Swipe to Connect',
+              disabled: !_selectedAccounts.values.any((selected) => selected),
+              backgroundColor: primaryColor,
+              textColor: textColor,
+              onSwipeComplete: () async {
+                final selectedIndices = _selectedAccounts.entries
+                    .where((entry) => entry.value)
+                    .map((entry) => entry.key)
+                    .toList();
+                widget.onConfirm(selectedIndices);
+                Navigator.pop(context, true);
+              },
             ),
           ),
-          SizedBox(height: bottomPadding + 16),
+          SizedBox(height: MediaQuery.of(context).padding.bottom),
         ],
       ),
     );
   }
 
   Widget _buildAccountList(AppState appState, AppTheme theme) {
-    final primaryColor =
-        _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
-    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
 
     if (appState.wallet == null || appState.wallet!.accounts.isEmpty) {
       return Padding(
@@ -233,20 +208,20 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
           final account = appState.wallet!.accounts[index];
           final isSelected = _selectedAccounts[index] ?? false;
 
-          return CheckboxListTile(
-            title: Text(account.name, style: TextStyle(color: textColor)),
-            subtitle: Text(account.addr,
-                style: TextStyle(color: secondaryColor, fontSize: 12),
-                overflow: TextOverflow.ellipsis),
-            value: isSelected,
-            onChanged: (bool? value) {
+          return EnableCard(
+            title: account.name,
+            name: account.addr,
+            iconWidget: AvatarAddress(
+              avatarSize: 32.0,
+              account: account,
+            ),
+            isDefault: false,
+            isEnabled: isSelected,
+            onToggle: (value) {
               setState(() {
-                _selectedAccounts[index] = value ?? false;
+                _selectedAccounts[index] = value;
               });
             },
-            activeColor: primaryColor,
-            checkColor: textColor,
-            controlAffinity: ListTileControlAffinity.leading,
           );
         },
       ),
