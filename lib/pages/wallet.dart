@@ -148,7 +148,7 @@ class _WalletPageState extends State<WalletPage> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        _buildRemoveWalletButton(theme),
+                        _buildRemoveWalletButton(appState),
                       ],
                     ),
                   ),
@@ -298,19 +298,11 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget _buildRemoveWalletButton(AppTheme theme) {
+  Widget _buildRemoveWalletButton(AppState appState) {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () async {
-        showModalBottomSheet(
-          context: context,
-          isScrollControlled: true,
-          backgroundColor: theme.cardBackground,
-          shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          builder: (context) => DeleteWalletModal(),
-        );
+        showDeleteWalletModal(context: context, state: appState);
       },
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
@@ -346,13 +338,6 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   void _handleBackup(AppTheme theme) {
-    showModalBottomSheet<void>(
-      context: context,
-      backgroundColor: theme.cardBackground,
-      isScrollControlled: true,
-      builder: (context) => SecretRecoveryModal(
-        theme: theme,
-      ),
-    );
+    showSecretRecoveryModal(context: context, theme: theme);
   }
 }

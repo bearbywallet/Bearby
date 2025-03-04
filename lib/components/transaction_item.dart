@@ -145,10 +145,10 @@ class _HistoryItemState extends State<HistoryItem>
       final formattedValue = intlNumberFormating(
         value: value,
         decimals: decimals,
-        localeStr: 'en',
+        localeStr: '',
         symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
         threshold: baseThreshold,
-        compact: true,
+        compact: false,
       );
       final price = 0.004;
       final usdAmount = 0 * price;
@@ -192,7 +192,7 @@ class _HistoryItemState extends State<HistoryItem>
     final formattedValue = intlNumberFormating(
       value: widget.transaction.fee.toString(),
       decimals: decimals,
-      localeStr: 'en',
+      localeStr: '',
       symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
       threshold: baseThreshold,
       compact: true,

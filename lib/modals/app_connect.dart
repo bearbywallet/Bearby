@@ -90,8 +90,6 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final backgroundColor =
-        _parseColor(widget.colors?.background) ?? theme.cardBackground;
     final primaryColor =
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
     final secondaryColor =
@@ -100,8 +98,9 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
 
     return Container(
       decoration: BoxDecoration(
-        color: backgroundColor,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        color: theme.cardBackground,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -111,7 +110,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
             height: 4,
             margin: EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: secondaryColor.withValues(alpha: 0.5),
+              color: theme.modalBorder,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

@@ -174,6 +174,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       decoration: BoxDecoration(
         color: backgroundColor,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withValues(alpha: 0.2),
@@ -195,7 +196,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                     height: 4,
                     margin: const EdgeInsets.symmetric(vertical: 16),
                     decoration: BoxDecoration(
-                      color: secondaryColor.withValues(alpha: 0.5),
+                      color: theme.modalBorder,
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),

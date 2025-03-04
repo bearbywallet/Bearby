@@ -76,9 +76,8 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
       height: containerHeight,
       decoration: BoxDecoration(
         color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -88,7 +87,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.5),
+              color: theme.modalBorder,
               borderRadius: BorderRadius.circular(2),
             ),
           ),

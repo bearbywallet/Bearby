@@ -33,7 +33,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                   child: CustomAppBar(
                     title: 'Address Book',
                     onBackPressed: () => Navigator.pop(context),
-                    actionWidget: SvgPicture.asset(
+                    actionIcon: SvgPicture.asset(
                       'assets/icons/plus.svg',
                       width: 24,
                       height: 24,
@@ -42,21 +42,10 @@ class _AddressBookPageState extends State<AddressBookPage> {
                         BlendMode.srcIn,
                       ),
                     ),
-                    onActionPressed: () {
-                      showModalBottomSheet(
-                        context: context,
-                        isScrollControlled: true,
-                        backgroundColor: theme.cardBackground,
-                        shape: const RoundedRectangleBorder(
-                          borderRadius:
-                              BorderRadius.vertical(top: Radius.circular(16)),
-                        ),
-                        builder: (context) => AddAddressModal(
-                          theme: theme,
-                          state: state,
-                        ),
-                      );
-                    },
+                    onActionPressed: () => showAddContactModal(
+                      context: context,
+                      state: state,
+                    ),
                   ),
                 ),
                 Expanded(
@@ -162,7 +151,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Netowrk ${address.net}",
+                        "Network ${address.net}",
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,

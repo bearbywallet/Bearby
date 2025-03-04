@@ -18,6 +18,8 @@ abstract class AppTheme {
   Color get gradientStart;
   Color get gradientMiddle;
   Color get gradientEnd;
+
+  Color get modalBorder;
 }
 
 class DarkTheme implements AppTheme {
@@ -53,6 +55,9 @@ class DarkTheme implements AppTheme {
   Color get gradientMiddle => const Color(0xFF220A23);
   @override
   Color get gradientEnd => Colors.black;
+
+  @override
+  Color get modalBorder => Colors.grey.withValues(alpha: 0.2);
 }
 
 class LightTheme implements AppTheme {
@@ -88,4 +93,7 @@ class LightTheme implements AppTheme {
   Color get gradientMiddle => const Color(0xFFD8BFD8);
   @override
   Color get gradientEnd => const Color(0xFFF0F8FF);
+
+  @override
+  Color get modalBorder => Colors.black12;
 }

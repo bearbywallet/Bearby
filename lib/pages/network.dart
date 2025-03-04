@@ -1,12 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/modals/custom_network_modal.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -286,31 +284,6 @@ class _NetworkPageState extends State<NetworkPage> {
                             ],
                           ),
                         ),
-                ),
-                Container(
-                  padding: EdgeInsets.all(adaptivePadding),
-                  width: double.infinity,
-                  child: CustomButton(
-                    text: 'Add a custom network',
-                    onPressed: () {
-                      showCustomNetworkModal(
-                        context: context,
-                        theme: theme,
-                        onSave: ({
-                          required String networkName,
-                          required String rpcUrl,
-                          required String chainId,
-                          required String symbol,
-                          required String explorerUrl,
-                        }) {
-                          debugPrint('New custom network: $networkName');
-                        },
-                      );
-                    },
-                    backgroundColor: theme.primaryPurple,
-                    borderRadius: 30.0,
-                    height: 50.0,
-                  ),
                 ),
               ],
             ),

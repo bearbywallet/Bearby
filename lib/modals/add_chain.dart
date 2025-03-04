@@ -79,6 +79,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
       ),
       child: Column(
         children: [
@@ -160,7 +161,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
         height: 4,
         margin: const EdgeInsets.symmetric(vertical: 8),
         decoration: BoxDecoration(
-          color: theme.textSecondary.withValues(alpha: 0.5),
+          color: theme.modalBorder,
           borderRadius: BorderRadius.circular(2),
         ),
       ),

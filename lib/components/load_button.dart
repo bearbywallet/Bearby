@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:zilpay/state/app_state.dart';
 
 enum ButtonState { idle, loading, success, error }
 
@@ -16,6 +14,7 @@ class RoundedLoadingButton extends StatefulWidget {
   final double borderRadius;
   final Widget? successIcon;
   final Widget? failedIcon;
+  final Color errorColor;
 
   const RoundedLoadingButton({
     super.key,
@@ -30,20 +29,20 @@ class RoundedLoadingButton extends StatefulWidget {
     this.borderRadius = 30.0,
     this.successIcon,
     this.failedIcon,
+    this.errorColor = Colors.red,
   });
 
   @override
-  State<StatefulWidget> createState() => RoundedLoadingButtonState();
+  State<RoundedLoadingButton> createState() => _RoundedLoadingButtonState();
 }
 
-class RoundedLoadingButtonState extends State<RoundedLoadingButton>
+class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
     with TickerProviderStateMixin {
   late AnimationController _buttonController;
-  late AnimationController _checkButtonController;
+  late AnimationController _resultIconController;
   late Animation<double> _bounceAnimation;
   late Animation<double> _squeezeAnimation;
-  late double _actualWidth;
-  late ValueNotifier<ButtonState> _stateNotifier;
+  late double _buttonWidth;
 
   @override
   void initState() {
@@ -54,37 +53,38 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
       vsync: this,
     );
 
-    _checkButtonController = AnimationController(
+    _resultIconController = AnimationController(
       duration: const Duration(milliseconds: 1000),
       vsync: this,
     );
 
     _bounceAnimation = Tween<double>(begin: 0, end: widget.height).animate(
       CurvedAnimation(
-        parent: _checkButtonController,
+        parent: _resultIconController,
         curve: Curves.elasticOut,
       ),
     )..addListener(() {
         setState(() {});
       });
 
-    _actualWidth = 0;
-    _stateNotifier = widget.controller._stateNotifier;
+    _buttonWidth = 0;
+
     widget.controller._addListeners(_start, _stop, _success, _error, _reset);
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final theme = Theme.of(context);
+    final primaryColor = widget.color ?? theme.primaryColor;
 
     return LayoutBuilder(
       builder: (context, constraints) {
-        _actualWidth = widget.width == double.infinity
+        _buttonWidth = widget.width == double.infinity
             ? constraints.maxWidth
             : widget.width;
 
         _squeezeAnimation = Tween<double>(
-          begin: _actualWidth,
+          begin: _buttonWidth,
           end: widget.height,
         ).animate(
           CurvedAnimation(
@@ -98,34 +98,27 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
         Widget successIcon = Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: theme.primaryPurple,
+            color: primaryColor,
             borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
           ),
           width: _bounceAnimation.value,
           height: _bounceAnimation.value,
           child: _bounceAnimation.value > 20
               ? widget.successIcon ??
-                  Icon(
-                    Icons.check,
-                    color: widget.valueColor,
-                  )
+                  Icon(Icons.check, color: widget.valueColor)
               : null,
         );
 
         Widget errorIcon = Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: Colors.red,
+            color: widget.errorColor,
             borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
           ),
           width: _bounceAnimation.value,
           height: _bounceAnimation.value,
           child: _bounceAnimation.value > 20
-              ? widget.failedIcon ??
-                  Icon(
-                    Icons.close,
-                    color: widget.valueColor,
-                  )
+              ? widget.failedIcon ?? Icon(Icons.close, color: widget.valueColor)
               : null,
         );
 
@@ -138,8 +131,8 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
           ),
         );
 
-        Widget childContent = ValueListenableBuilder<ButtonState>(
-          valueListenable: _stateNotifier,
+        Widget buttonContent = ValueListenableBuilder<ButtonState>(
+          valueListenable: widget.controller._stateNotifier,
           builder: (context, state, _) {
             return AnimatedSwitcher(
               duration: const Duration(milliseconds: 200),
@@ -154,77 +147,67 @@ class RoundedLoadingButtonState extends State<RoundedLoadingButton>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius),
             ),
-            backgroundColor: widget.color ?? theme.primaryPurple,
+            backgroundColor: primaryColor,
             elevation: 0,
-            padding: const EdgeInsets.all(0),
+            padding: EdgeInsets.zero,
           ),
           onPressed: widget.onPressed,
-          child: childContent,
+          child: buttonContent,
         );
 
-        return AnimatedBuilder(
-          animation: _buttonController,
-          builder: (context, child) {
-            return SizedBox(
-              height: widget.height,
-              child: ValueListenableBuilder<ButtonState>(
-                valueListenable: _stateNotifier,
-                builder: (context, state, _) {
-                  return Center(
-                    child: state == ButtonState.error
-                        ? errorIcon
-                        : state == ButtonState.success
-                            ? successIcon
-                            : SizedBox(
-                                width: _squeezeAnimation.value,
-                                child: button,
-                              ),
-                  );
-                },
-              ),
-            );
-          },
+        return SizedBox(
+          height: widget.height,
+          child: ValueListenableBuilder<ButtonState>(
+            valueListenable: widget.controller._stateNotifier,
+            builder: (context, state, _) {
+              return Center(
+                child: state == ButtonState.error
+                    ? errorIcon
+                    : state == ButtonState.success
+                        ? successIcon
+                        : SizedBox(
+                            width: _squeezeAnimation.value,
+                            child: button,
+                          ),
+              );
+            },
+          ),
         );
       },
     );
   }
 
-  @override
-  void dispose() {
-    _buttonController.dispose();
-    _checkButtonController.dispose();
-    super.dispose();
-  }
-
   void _start() {
     if (!mounted) return;
-    _stateNotifier.value = ButtonState.loading;
     _buttonController.forward();
   }
 
   void _stop() {
     if (!mounted) return;
-    _stateNotifier.value = ButtonState.idle;
     _buttonController.reverse();
   }
 
   void _success() {
     if (!mounted) return;
-    _stateNotifier.value = ButtonState.success;
-    _checkButtonController.forward();
+    _resultIconController.forward();
   }
 
   void _error() {
     if (!mounted) return;
-    _stateNotifier.value = ButtonState.error;
-    _checkButtonController.forward();
+    _resultIconController.forward();
   }
 
   void _reset() {
     if (!mounted) return;
-    _stateNotifier.value = ButtonState.idle;
     _buttonController.reverse();
-    _checkButtonController.reset();
+    _resultIconController.reset();
+  }
+
+  @override
+  void dispose() {
+    _buttonController.dispose();
+    _resultIconController.dispose();
+    super.dispose();
   }
 }
 
@@ -237,6 +220,8 @@ class RoundedLoadingButtonController {
 
   final ValueNotifier<ButtonState> _stateNotifier =
       ValueNotifier(ButtonState.idle);
+
+  ButtonState get currentState => _stateNotifier.value;
 
   void _addListeners(
     VoidCallback startListener,
@@ -252,25 +237,28 @@ class RoundedLoadingButtonController {
     _resetListener = resetListener;
   }
 
-  ButtonState get currentState => _stateNotifier.value;
-
   void start() {
+    _stateNotifier.value = ButtonState.loading;
     if (_startListener != null) _startListener!();
   }
 
   void stop() {
+    _stateNotifier.value = ButtonState.idle;
     if (_stopListener != null) _stopListener!();
   }
 
   void success() {
+    _stateNotifier.value = ButtonState.success;
     if (_successListener != null) _successListener!();
   }
 
   void error() {
+    _stateNotifier.value = ButtonState.error;
     if (_errorListener != null) _errorListener!();
   }
 
   void reset() {
+    _stateNotifier.value = ButtonState.idle;
     if (_resetListener != null) _resetListener!();
   }
 

@@ -5,80 +5,120 @@ import 'package:zilpay/state/app_state.dart';
 import '../../components/button.dart';
 import '../../theme/app_theme.dart';
 
-class SecretRecoveryModal extends StatelessWidget {
+void showSecretRecoveryModal({
+  required BuildContext context,
+  required AppTheme theme,
+}) {
+  showModalBottomSheet<void>(
+    context: context,
+    backgroundColor: Colors.transparent,
+    isScrollControlled: true,
+    enableDrag: true,
+    isDismissible: true,
+    useSafeArea: true,
+    barrierColor: Colors.black54,
+    builder: (context) => _SecretRecoveryModal(theme: theme),
+  );
+}
+
+class _SecretRecoveryModal extends StatelessWidget {
   final AppTheme theme;
 
-  const SecretRecoveryModal({
-    super.key,
-    required this.theme,
-  });
+  const _SecretRecoveryModal({required this.theme});
 
   @override
   Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    final walletType = appState.wallet!.walletType;
-
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Center(
-          child: Container(
-            width: 32,
-            height: 4,
-            margin: const EdgeInsets.only(top: 8, bottom: 16),
-            decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.3),
-              borderRadius: BorderRadius.circular(2),
+    return SafeArea(
+      child: Container(
+        constraints: BoxConstraints(
+          maxHeight: MediaQuery.sizeOf(context).height * 0.9,
+        ),
+        decoration: BoxDecoration(
+          color: theme.cardBackground,
+          borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+          border: Border.all(color: theme.modalBorder, width: 2),
+        ),
+        child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.viewInsetsOf(context).bottom + 16,
+          ),
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const SizedBox(height: 16),
+                _buildDragHandle(),
+                const SizedBox(height: 16),
+                _buildContent(context),
+              ],
             ),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.fromLTRB(
-            16,
-            0,
-            16,
-            MediaQuery.of(context).viewInsets.bottom + 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              if (walletType.contains(WalletType.SecretPhrase.name)) ...[
-                _buildOption(
-                  title: 'Reveal Secret Recovery Phrase',
-                  description: 'If you ever change browsers or move computers, '
-                      'you will need this Secret Recovery Phrase to access '
-                      'your accounts. Save them somewhere safe and secret.',
-                  onPressed: () => _onRevealPhrase(context),
-                  buttonText: 'Reveal',
-                ),
-                const SizedBox(height: 24)
-              ],
-              if (walletType.contains(WalletType.SecretKey.name) ||
-                  walletType.contains(WalletType.SecretPhrase.name)) ...[
-                _buildOption(
-                  title: 'Show Private Keys',
-                  description:
-                      'Warning: Never disclose this key. Anyone with your '
-                      'private keys can steal any assets held in your account.',
-                  onPressed: () => _onShowPrivateKeys(context),
-                  buttonText: 'Export',
-                ),
-                const SizedBox(height: 16),
-              ]
-            ],
-          ),
+      ),
+    );
+  }
+
+  Widget _buildDragHandle() {
+    return Center(
+      child: Container(
+        width: 36,
+        height: 4,
+        decoration: BoxDecoration(
+          color: theme.modalBorder,
+          borderRadius: BorderRadius.circular(2),
         ),
-      ],
+      ),
+    );
+  }
+
+  Widget _buildContent(BuildContext context) {
+    return Consumer<AppState>(
+      builder: (context, appState, _) {
+        final walletType = appState.wallet!.walletType;
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            if (walletType.contains(WalletType.SecretPhrase.name)) ...[
+              _buildOption(
+                context: context,
+                title: 'Reveal Secret Recovery Phrase',
+                description:
+                    'If you ever change browsers or move computers, you will need '
+                    'this Secret Recovery Phrase to access your accounts. Save '
+                    'them somewhere safe and secret.',
+                buttonText: 'Reveal',
+                onPressed: () => _onRevealPhrase(context),
+              ),
+              const SizedBox(height: 24),
+            ],
+            if (walletType.contains(WalletType.SecretKey.name) ||
+                walletType.contains(WalletType.SecretPhrase.name)) ...[
+              _buildOption(
+                context: context,
+                title: 'Show Private Keys',
+                description:
+                    'Warning: Never disclose this key. Anyone with your private '
+                    'keys can steal any assets held in your account.',
+                buttonText: 'Export',
+                onPressed: () => _onShowPrivateKeys(context),
+              ),
+              const SizedBox(height: 16),
+            ],
+          ],
+        );
+      },
     );
   }
 
   Widget _buildOption({
+    required BuildContext context,
     required String title,
     required String description,
-    required VoidCallback onPressed,
     required String buttonText,
+    required VoidCallback onPressed,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,

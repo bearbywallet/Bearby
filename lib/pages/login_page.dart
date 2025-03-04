@@ -24,17 +24,14 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  // Controllers
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
   final AuthService _authService = AuthService();
 
-  // Services
   late final AuthGuard _authGuard;
   late final AppState _appState;
 
-  // State
   bool _obscurePassword = true;
   bool _obscureButton = true;
   int _selectedWallet = -1;

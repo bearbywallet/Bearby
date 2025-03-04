@@ -55,7 +55,7 @@ class _ConnectedDappsModalContentState
 
   @override
   Widget build(BuildContext context) {
-    final appTheme = Provider.of<AppState>(context).currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
     final connectedDapps = appState.connections;
 
@@ -68,10 +68,16 @@ class _ConnectedDappsModalContentState
     return Container(
       height: MediaQuery.of(context).size.height * 0.7,
       decoration: BoxDecoration(
-        color: appTheme.cardBackground,
-        borderRadius: BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        color: theme.cardBackground,
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -81,7 +87,7 @@ class _ConnectedDappsModalContentState
             height: 4,
             margin: EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: appTheme.textSecondary.withValues(alpha: 0.5),
+              color: theme.modalBorder,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
@@ -91,8 +97,8 @@ class _ConnectedDappsModalContentState
               controller: _searchController,
               hint: 'Search DApps',
               onChanged: (value) => setState(() => _searchQuery = value),
-              borderColor: appTheme.textPrimary,
-              focusedBorderColor: appTheme.primaryPurple,
+              borderColor: theme.textPrimary,
+              focusedBorderColor: theme.primaryPurple,
               height: 48,
               fontSize: 16,
               padding: EdgeInsets.symmetric(horizontal: 16),
@@ -109,7 +115,7 @@ class _ConnectedDappsModalContentState
                     child: Text(
                       'No connected DApps',
                       style: TextStyle(
-                        color: appTheme.textSecondary,
+                        color: theme.textSecondary,
                         fontSize: 16,
                       ),
                     ),
@@ -132,8 +138,7 @@ class _ConnectedDappsModalContentState
                           if (index < filteredDapps.length - 1)
                             Divider(
                               height: 1,
-                              color:
-                                  appTheme.textSecondary.withValues(alpha: 0.1),
+                              color: theme.textSecondary.withValues(alpha: 0.1),
                             ),
                         ],
                       );

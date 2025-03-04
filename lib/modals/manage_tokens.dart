@@ -80,9 +80,15 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
       height: containerHeight,
       decoration: BoxDecoration(
         color: theme.cardBackground,
-        borderRadius: const BorderRadius.vertical(
-          top: Radius.circular(20),
-        ),
+        borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
+        border: Border.all(color: theme.modalBorder, width: 2),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 10,
+            offset: const Offset(0, -2),
+          ),
+        ],
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -92,7 +98,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             height: 4,
             margin: const EdgeInsets.symmetric(vertical: 16),
             decoration: BoxDecoration(
-              color: theme.textSecondary.withValues(alpha: 0.5),
+              color: theme.modalBorder,
               borderRadius: BorderRadius.circular(2),
             ),
           ),
