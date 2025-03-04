@@ -25,9 +25,9 @@ Future<void> main() async {
 
   try {
     String appDocPath = await getStoragePath();
-    String cahceDir = '$appDocPath/icons_cache';
+    final tempDir = await getTemporaryDirectory();
 
-    final directory = Directory(cahceDir);
+    final directory = Directory(tempDir.path);
 
     if (!await directory.exists()) {
       await directory.create(recursive: true);
@@ -37,7 +37,7 @@ Future<void> main() async {
 
     final appState = AppState(
       state: state,
-      cahceDir: cahceDir,
+      cahceDir: tempDir.path,
     );
     final authGuard = AuthGuard(state: appState);
 

@@ -199,8 +199,30 @@ class _HomePageState extends State<HomePage> {
           padding:
               EdgeInsets.symmetric(horizontal: adaptivePadding, vertical: 4),
           child: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            mainAxisAlignment: appState.chain?.testnet == true
+                ? MainAxisAlignment.spaceBetween
+                : MainAxisAlignment.end,
             children: [
+              if (appState.chain?.testnet == true)
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
+                  decoration: BoxDecoration(
+                    color: theme.warning,
+                    borderRadius: const BorderRadius.all(Radius.circular(8)),
+                    border: Border.all(color: theme.modalBorder, width: 2),
+                  ),
+                  child: Center(
+                    child: Text(
+                      'Testnet',
+                      style: TextStyle(
+                        color: theme.buttonText,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               HoverSvgIcon(
                 assetName: 'assets/icons/manage.svg',
                 width: 30,

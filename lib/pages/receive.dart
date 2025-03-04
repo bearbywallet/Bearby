@@ -1,7 +1,10 @@
+import 'dart:io';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:zilpay/components/async_qrcode.dart';
@@ -106,15 +109,20 @@ class _ReceivePageState extends State<ReceivePage> {
 
     try {
       final pngBytes = await genPngQrcode(data: data, config: config);
-      final xFile = XFile.fromData(
-        pngBytes,
-        mimeType: 'image/png',
-        name: 'qrcode.png',
-      );
+
+      final tempDir = await getTemporaryDirectory();
+      final tempFile = File('${tempDir.path}/qrcode.png');
+
+      await tempFile.writeAsBytes(pngBytes);
+
+      final xFile = XFile(tempFile.path, mimeType: 'image/png');
+
       await Share.shareXFiles(
         [xFile],
         text: '$addr, amount: $amount',
       );
+
+      await tempFile.delete();
     } catch (e) {
       debugPrint("error share: $e");
     }
