@@ -57,7 +57,6 @@ class _NetworkPageState extends State<NetworkPage> {
     final chainId = network.chainId.toString();
     final slip44 = network.slip44.toString();
     final name = network.name.toLowerCase();
-
     return '$slip44|$chainId|$name';
   }
 
@@ -73,7 +72,6 @@ class _NetworkPageState extends State<NetworkPage> {
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
-
       final List<Chain> mainnetChains =
           await ChainService.loadChains(mainnetJsonData);
       final List<Chain> testnetChains =
@@ -84,10 +82,8 @@ class _NetworkPageState extends State<NetworkPage> {
         potentialNetworks.clear();
 
         addedNetworks.addAll(
-          storedProviders.map((provider) => NetworkItem(
-                configInfo: provider,
-                isAdded: true,
-              )),
+          storedProviders.map(
+              (provider) => NetworkItem(configInfo: provider, isAdded: true)),
         );
 
         final Set<String> addedNetworkIds = {};
@@ -108,9 +104,8 @@ class _NetworkPageState extends State<NetworkPage> {
               !addedNetworkNamesLower.contains(nameLower)) {
             final updatedChain = chain..testnet = false;
             potentialMainnetItems.add(NetworkItem(
-              configInfo: updatedChain.toNetworkConfigInfo(),
-              isAdded: false,
-            ));
+                configInfo: updatedChain.toNetworkConfigInfo(),
+                isAdded: false));
           }
         }
 
@@ -124,31 +119,25 @@ class _NetworkPageState extends State<NetworkPage> {
               !addedNetworkNamesLower.contains(nameLower)) {
             final updatedChain = chain..testnet = true;
             potentialTestnetItems.add(NetworkItem(
-              configInfo: updatedChain.toNetworkConfigInfo(),
-              isAdded: false,
-            ));
+                configInfo: updatedChain.toNetworkConfigInfo(),
+                isAdded: false));
           }
         }
 
         potentialNetworks.clear();
         potentialNetworks.addAll([...potentialMainnetItems]);
-
         if (isTestnet) {
           potentialNetworks.addAll([...potentialTestnetItems]);
         }
 
         isLoading = false;
-
-        if (_shortName != null) {
-          _trySelectNetworkByShortName();
-        }
+        if (_shortName != null) _trySelectNetworkByShortName();
       });
     } catch (e) {
       setState(() {
         isLoading = false;
         errorMessage = 'Failed to load network chains: $e';
       });
-      debugPrint('Error loading chains: $e');
     }
   }
 
@@ -171,7 +160,6 @@ class _NetworkPageState extends State<NetworkPage> {
 
   List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks) {
     if (_searchQuery.isEmpty) return networks;
-
     return networks
         .where((network) => network.configInfo.name
             .toLowerCase()
@@ -179,14 +167,18 @@ class _NetworkPageState extends State<NetworkPage> {
         .toList();
   }
 
-  void _handleNetworkSelect(NetworkConfigInfo network) {
-    debugPrint('Selected network: ${network.name}');
+  void _handleNetworkSelect(NetworkConfigInfo network) async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    try {
+      await selectAccountsChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          chainHash: network.chainHash);
+      await appState.syncData();
+    } catch (_) {}
   }
 
   Future<void> _handleAddNetwork(
-    NetworkConfigInfo config,
-    AppState state,
-  ) async {
+      NetworkConfigInfo config, AppState state) async {
     try {
       await addProvider(providerConfig: config);
       await state.syncData();
@@ -195,31 +187,25 @@ class _NetworkPageState extends State<NetworkPage> {
       setState(() {
         errorMessage = 'Failed to add network: $e';
       });
-      debugPrint('Error adding network: $e');
     }
   }
 
   Widget _buildNetworkSection(
-    String title,
-    List<NetworkItem> networks,
-    AppTheme theme,
-    NetworkConfigInfo? chain,
-    WalletInfo? wallet,
-    bool isAvailableSection,
-  ) {
+      String title,
+      List<NetworkItem> networks,
+      AppTheme theme,
+      NetworkConfigInfo? chain,
+      WalletInfo? wallet,
+      bool isAvailableSection) {
     if (networks.isEmpty) return const SizedBox.shrink();
-
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title,
-          style: TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.w500,
-            color: theme.textSecondary.withValues(alpha: 0.7),
-          ),
-        ),
+        Text(title,
+            style: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                color: theme.textSecondary.withValues(alpha: 0.7))),
         const SizedBox(height: 16),
         ...networks.map((network) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
@@ -238,10 +224,8 @@ class _NetworkPageState extends State<NetworkPage> {
                     : () => _handleNetworkSelect(network.configInfo),
                 onAdd: network.isAdded
                     ? null
-                    : () => _handleAddNetwork(
-                          network.configInfo,
-                          Provider.of<AppState>(context, listen: false),
-                        ),
+                    : () => _handleAddNetwork(network.configInfo,
+                        Provider.of<AppState>(context, listen: false)),
                 onEdit: network.isAdded
                     ? () => debugPrint(
                         'Editing network: ${network.configInfo.name}')
@@ -259,116 +243,103 @@ class _NetworkPageState extends State<NetworkPage> {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-
     final filteredAddedNetworks = _getFilteredNetworks(addedNetworks);
     final filteredPotentialNetworks = _getFilteredNetworks(potentialNetworks);
 
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Center(
-          child: ConstrainedBox(
-            constraints: const BoxConstraints(maxWidth: 480),
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding,
-                    vertical: 16,
-                  ),
-                  child: CustomAppBar(
-                    title: '',
-                    onBackPressed: () => Navigator.pop(context),
-                    actionWidget: Row(
-                      children: [
-                        Text(
-                          'Show Testnet',
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 480),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Padding(
+                padding: EdgeInsets.symmetric(
+                    horizontal: adaptivePadding, vertical: 16),
+                child: CustomAppBar(
+                  title: '',
+                  onBackPressed: () => Navigator.pop(context),
+                  actionWidget: Row(
+                    children: [
+                      Text('Show Testnet',
                           style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                        const SizedBox(width: 8),
-                        Switch(
+                              color: theme.textSecondary, fontSize: 14)),
+                      const SizedBox(width: 8),
+                      Switch(
                           value: isTestnet,
-                          onChanged: (value) {
-                            setState(() {
-                              isTestnet = value;
-                              _loadNetworks();
-                            });
-                          },
-                          activeColor: theme.primaryPurple,
+                          onChanged: (value) => setState(() {
+                                isTestnet = value;
+                                _loadNetworks();
+                              }),
+                          activeColor: theme.primaryPurple),
+                    ],
+                  ),
+                ),
+              ),
+              Padding(
+                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                child: SmartInput(
+                  controller: _searchController,
+                  hint: 'Search',
+                  leftIconPath: 'assets/icons/search.svg',
+                  onChanged: (value) => setState(() => _searchQuery = value),
+                  borderColor: theme.textPrimary,
+                  focusedBorderColor: theme.primaryPurple,
+                  height: 48,
+                  fontSize: 16,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                ),
+              ),
+              if (errorMessage != null)
+                Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(errorMessage!,
+                        style: TextStyle(color: theme.danger, fontSize: 14))),
+              Expanded(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 24),
+                  child: Align(
+                    alignment: Alignment.topLeft,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildNetworkSection(
+                            'Added Networks',
+                            filteredAddedNetworks
+                                .where((network) =>
+                                    isTestnet ||
+                                    !(network.configInfo.testnet ?? false))
+                                .toList(),
+                            theme,
+                            chain,
+                            wallet,
+                            false),
+                        if (filteredAddedNetworks.isNotEmpty &&
+                            filteredPotentialNetworks.isNotEmpty)
+                          const SizedBox(height: 24),
+                        AnimatedCrossFade(
+                          duration: const Duration(milliseconds: 300),
+                          firstChild: _buildNetworkSection(
+                              'Available Networks',
+                              filteredPotentialNetworks,
+                              theme,
+                              chain,
+                              wallet,
+                              true),
+                          secondChild: const SizedBox.shrink(),
+                          crossFadeState: isTestnet
+                              ? CrossFadeState.showFirst
+                              : CrossFadeState.showSecond,
                         ),
                       ],
                     ),
                   ),
                 ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: SmartInput(
-                    controller: _searchController,
-                    hint: 'Search',
-                    leftIconPath: 'assets/icons/search.svg',
-                    onChanged: (value) => setState(() => _searchQuery = value),
-                    borderColor: theme.textPrimary,
-                    focusedBorderColor: theme.primaryPurple,
-                    height: 48,
-                    fontSize: 16,
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                  ),
-                ),
-                if (errorMessage != null)
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(
-                      errorMessage!,
-                      style: TextStyle(color: theme.danger, fontSize: 14),
-                    ),
-                  ),
-                Expanded(
-                  child: isLoading
-                      ? Center(
-                          child: CircularProgressIndicator(
-                          color: theme.primaryPurple,
-                        ))
-                      : SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: adaptivePadding,
-                            vertical: 24,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              _buildNetworkSection(
-                                'Added Networks',
-                                filteredAddedNetworks
-                                    .where((network) =>
-                                        isTestnet ||
-                                        !(network.configInfo.testnet ?? false))
-                                    .toList(),
-                                theme,
-                                chain,
-                                wallet,
-                                false,
-                              ),
-                              if (filteredAddedNetworks.isNotEmpty &&
-                                  filteredPotentialNetworks.isNotEmpty)
-                                const SizedBox(height: 24),
-                              _buildNetworkSection(
-                                'Available Networks',
-                                filteredPotentialNetworks,
-                                theme,
-                                chain,
-                                wallet,
-                                true,
-                              ),
-                            ],
-                          ),
-                        ),
-                ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
@@ -380,8 +351,5 @@ class NetworkItem {
   final NetworkConfigInfo configInfo;
   final bool isAdded;
 
-  NetworkItem({
-    required this.configInfo,
-    required this.isAdded,
-  });
+  NetworkItem({required this.configInfo, required this.isAdded});
 }

@@ -38,31 +38,29 @@ class NetworkTile extends StatelessWidget {
 
     final textColor =
         disabled ? theme.textPrimary.withValues(alpha: 0.5) : theme.textPrimary;
-
     final backgroundColor = disabled
         ? theme.textSecondary.withValues(alpha: 0.05)
         : isSelected
             ? theme.primaryPurple.withValues(alpha: 0.1)
             : theme.textSecondary.withValues(alpha: 0.02);
-
-    final borderColor = isSelected
-        ? theme.primaryPurple
-        : theme.textSecondary.withValues(alpha: 0.1);
+    final borderColor = isSelected ? theme.primaryPurple : Colors.transparent;
 
     return Opacity(
       opacity: disabled ? 0.2 : 1.0,
       child: GestureDetector(
         behavior: HitTestBehavior.opaque,
         onTap: isActive ? onTap : null,
-        child: Container(
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
               color: borderColor,
-              width: isSelected ? 2 : 1,
+              width: 1,
             ),
             color: backgroundColor,
           ),
+          margin: const EdgeInsets.all(0),
           child: ListTile(
             enabled: isActive,
             contentPadding:

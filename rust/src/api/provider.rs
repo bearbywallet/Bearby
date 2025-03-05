@@ -7,9 +7,12 @@ pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
-use zilpay::{background::bg_provider::ProvidersManagement, network::provider::NetworkProvider};
 pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
+};
+use zilpay::{
+    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+    network::provider::NetworkProvider,
 };
 
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
@@ -101,6 +104,28 @@ pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Resul
         }
 
         core.update_providers(providers)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Result<(), String> {
+    with_service(|core| {
+        let provider = core.get_provider(chain_hash)?;
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let mut data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        data.accounts.iter_mut().for_each(|a| {
+            a.chain_hash = provider.config.hash();
+        });
+
+        wallet
+            .save_wallet_data(data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
     })
