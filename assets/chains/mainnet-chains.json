@@ -34,6 +34,7 @@
       {
         "name": "Viewblock",
         "url": "https://viewblock.io/zilliqa",
+        "icon": "https://viewblock.io/apple-touch-icon.png",
         "standard": "EIP3091"
       }
     ]
@@ -70,6 +71,7 @@
       {
         "name": "Bscscan",
         "url": "https://bscscan.com/",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
         "standard": "EIP3091"
       }
     ]
@@ -108,23 +110,13 @@
       {
         "name": "etherscan",
         "url": "https://etherscan.io",
+        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
         "standard": "EIP3091"
       },
       {
         "name": "blockscout",
         "url": "https://eth.blockscout.com",
-        "icon": "blockscout",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "dexguru",
-        "url": "https://ethereum.dex.guru",
-        "icon": "dexguru",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Routescan",
-        "url": "https://ethereum.routescan.io",
+        "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
         "standard": "EIP3091"
       }
     ]

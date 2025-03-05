@@ -5,6 +5,7 @@ import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/modals/chain_config_edit.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
@@ -190,6 +191,10 @@ class _NetworkPageState extends State<NetworkPage> {
     }
   }
 
+  void _handleEditNetwork(NetworkConfigInfo config) {
+    showChainInfoModal(context: context, networkConfig: config);
+  }
+
   Widget _buildNetworkSection(
       String title,
       List<NetworkItem> networks,
@@ -227,8 +232,7 @@ class _NetworkPageState extends State<NetworkPage> {
                     : () => _handleAddNetwork(network.configInfo,
                         Provider.of<AppState>(context, listen: false)),
                 onEdit: network.isAdded
-                    ? () => debugPrint(
-                        'Editing network: ${network.configInfo.name}')
+                    ? () => _handleEditNetwork(network.configInfo)
                     : null,
               ),
             )),
