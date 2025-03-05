@@ -31,14 +31,15 @@
     "slip44": 313,
     "explorers": [
       {
-        "name": "Viewblock",
-        "url": "https://viewblock.io/zilliqa",
+        "name": "Otterscan",
+        "icon": "https://explorer.zq2-protomainnet.zilliqa.com/assets/otter-DYFeLtFi.png",
+        "url": "https://explorer.zq2-protomainnet.zilliqa.com",
         "standard": "EIP3091"
       }
     ]
   },
   {
-    "name": "Binance",
+    "name": "Binance testnet",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
     "rpc": [
@@ -70,6 +71,7 @@
       {
         "name": "BscScan",
         "url": "https://testnet.bscscan.com",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
         "standard": "EIP3091"
       }
     ]
@@ -106,6 +108,7 @@
       {
         "name": "Etherscan",
         "url": "https://sepolia.etherscan.io/",
+        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
         "standard": "EIP3091"
       }
     ]

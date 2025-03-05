@@ -118,13 +118,22 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let mut ftokens = wallet
+            .get_ftokens()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
+        ftokens.iter_mut().for_each(|t| {
+            t.chain_hash = provider.config.hash();
+        });
         data.accounts.iter_mut().for_each(|a| {
             a.chain_hash = provider.config.hash();
         });
 
         wallet
             .save_wallet_data(data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        wallet
+            .save_ftokens(&ftokens)
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         Ok(())
