@@ -1,9 +1,11 @@
 import 'dart:convert';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
+import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/add_chain.dart';
@@ -26,6 +28,44 @@ import 'package:zilpay/web3/message.dart';
 import 'dart:developer' as dev;
 
 import 'package:zilpay/web3/web3_utils.dart';
+
+extension NetworkConfigInfoExtension on NetworkConfigInfo {
+  NetworkConfigInfo copyWith({
+    String? name,
+    String? logo,
+    String? chain,
+    String? shortName,
+    List<String>? rpc,
+    Uint16List? features,
+    BigInt? chainId,
+    Uint64List? chainIds,
+    int? slip44,
+    BigInt? diffBlockTime,
+    BigInt? chainHash,
+    String? ens,
+    List<ExplorerInfo>? explorers,
+    bool? fallbackEnabled,
+    bool? testnet,
+  }) {
+    return NetworkConfigInfo(
+      name: name ?? this.name,
+      logo: logo ?? this.logo,
+      chain: chain ?? this.chain,
+      shortName: shortName ?? this.shortName,
+      rpc: rpc ?? this.rpc,
+      features: features ?? this.features,
+      chainId: chainId ?? this.chainId,
+      chainIds: chainIds ?? this.chainIds,
+      slip44: slip44 ?? this.slip44,
+      diffBlockTime: diffBlockTime ?? this.diffBlockTime,
+      chainHash: chainHash ?? this.chainHash,
+      ens: ens ?? this.ens,
+      explorers: explorers ?? this.explorers,
+      fallbackEnabled: fallbackEnabled ?? this.fallbackEnabled,
+      testnet: testnet ?? this.testnet,
+    );
+  }
+}
 
 class Web3EIP1193Handler {
   final InAppWebViewController webViewController;
@@ -1013,7 +1053,7 @@ class Web3EIP1193Handler {
     }
 
     final rpcUrls = (chainParams['rpcUrls'] as List<dynamic>)
-        .where((url) => url is String && !url.startsWith('ws'))
+        .where((url) => url is String && url.startsWith('https'))
         .cast<String>()
         .toList();
 
@@ -1027,12 +1067,40 @@ class Web3EIP1193Handler {
 
     final nativeCurrency =
         chainParams['nativeCurrency'] as Map<String, dynamic>;
+    final chainId = BigInt.parse(
+        chainParams['chainId'].toString().replaceFirst('0x', ''),
+        radix: 16);
     final explorers = (chainParams['blockExplorerUrls'] as List<dynamic>)
         .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
         .toList();
-    String symbol = nativeCurrency['symbol'].toString();
+    final symbol = nativeCurrency['symbol'].toString();
 
-    final networkConfig = NetworkConfigInfo(
+    NetworkConfigInfo? foundChain;
+
+    if (appState.state.providers.any((c) => c.chainId == chainId)) {
+      final chain =
+          appState.state.providers.firstWhere((c) => c.chainId == chainId);
+
+      chain.rpc.addAll(rpcUrls);
+
+      foundChain = chain;
+    } else {
+      final String mainnetJsonData =
+          await rootBundle.loadString('assets/chains/mainnet-chains.json');
+      final List<Chain> mainnetChains =
+          await ChainService.loadChains(mainnetJsonData);
+
+      if (mainnetChains.any((c) => c.chainId == chainId.toInt())) {
+        final chain =
+            mainnetChains.firstWhere((c) => c.chainId == chainId.toInt());
+
+        chain.rpc.addAll(rpcUrls.map((v) => Uri.parse(v)));
+
+        foundChain = chain.toNetworkConfigInfo();
+      }
+    }
+
+    foundChain ??= NetworkConfigInfo(
       name: chainParams['chainName'] as String,
       logo:
           'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/${symbol.toLowerCase()}.svg',
@@ -1040,22 +1108,26 @@ class Web3EIP1193Handler {
       shortName: symbol,
       rpc: rpcUrls,
       features: Uint16List(0),
-      chainId: BigInt.parse(
-          chainParams['chainId'].toString().replaceFirst('0x', ''),
-          radix: 16),
+      chainId: chainId,
       chainIds: Uint64List(0),
-      slip44: 60, // DEFUAL ETH SLIP
+      slip44: 60,
       diffBlockTime: BigInt.zero,
       chainHash: BigInt.zero,
       explorers: explorers,
       fallbackEnabled: false,
     );
 
+    foundChain = foundChain.copyWith(
+      rpc: foundChain.rpc.toSet().toList(),
+    );
+
+    if (!context.mounted) return;
+
     showAddChainModal(
       context: context,
       title: message.title ?? "",
       appIcon: message.icon ?? '',
-      chain: networkConfig,
+      chain: foundChain,
       onConfirm: () {
         _sendResponse(
           type: 'ZILPAY_RESPONSE',

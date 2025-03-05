@@ -1,13 +1,17 @@
 use crate::{
-    models::provider::NetworkConfigInfo,
+    models::{ftoken::FTokenInfo, provider::NetworkConfigInfo},
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::with_service},
 };
+use serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
-use zilpay::{background::bg_provider::ProvidersManagement, network::provider::NetworkProvider};
+use zilpay::{
+    background::bg_provider::ProvidersManagement, network::provider::NetworkProvider,
+    proto::address::Address,
+};
 pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };

@@ -280,6 +280,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         throw "Invalid Wallet gen method";
       }
 
+      await _appState.syncData();
+
+      _appState.setSelectedWallet(_appState.wallets.length - 1);
+
       if (_useDeviceAuth) {
         await _authGuard.setSession(session.$2, session.$1);
       }
