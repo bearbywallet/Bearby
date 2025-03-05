@@ -82,10 +82,8 @@ class _NetworkPageState extends State<NetworkPage> {
         addedNetworks.clear();
         potentialNetworks.clear();
 
-        addedNetworks.addAll(
-          storedProviders.map(
-              (provider) => NetworkItem(configInfo: provider, isAdded: true)),
-        );
+        addedNetworks.addAll(storedProviders.map(
+            (provider) => NetworkItem(configInfo: provider, isAdded: true)));
 
         final Set<String> addedNetworkIds = {};
         final Set<String> addedNetworkNamesLower = {};
@@ -126,10 +124,8 @@ class _NetworkPageState extends State<NetworkPage> {
         }
 
         potentialNetworks.clear();
-        potentialNetworks.addAll([...potentialMainnetItems]);
-        if (isTestnet) {
-          potentialNetworks.addAll([...potentialTestnetItems]);
-        }
+        potentialNetworks
+            .addAll([...potentialMainnetItems, ...potentialTestnetItems]);
 
         isLoading = false;
         if (_shortName != null) _trySelectNetworkByShortName();
@@ -248,7 +244,9 @@ class _NetworkPageState extends State<NetworkPage> {
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final filteredAddedNetworks = _getFilteredNetworks(addedNetworks);
-    final filteredPotentialNetworks = _getFilteredNetworks(potentialNetworks);
+    final filteredPotentialNetworks = _getFilteredNetworks(potentialNetworks)
+        .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
+        .toList();
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -310,34 +308,18 @@ class _NetworkPageState extends State<NetworkPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildNetworkSection(
-                            'Added Networks',
-                            filteredAddedNetworks
-                                .where((network) =>
-                                    isTestnet ||
-                                    !(network.configInfo.testnet ?? false))
-                                .toList(),
-                            theme,
-                            chain,
-                            wallet,
-                            false),
+                        _buildNetworkSection('Added Networks',
+                            filteredAddedNetworks, theme, chain, wallet, false),
                         if (filteredAddedNetworks.isNotEmpty &&
                             filteredPotentialNetworks.isNotEmpty)
                           const SizedBox(height: 24),
-                        AnimatedCrossFade(
-                          duration: const Duration(milliseconds: 300),
-                          firstChild: _buildNetworkSection(
-                              'Available Networks',
-                              filteredPotentialNetworks,
-                              theme,
-                              chain,
-                              wallet,
-                              true),
-                          secondChild: const SizedBox.shrink(),
-                          crossFadeState: isTestnet
-                              ? CrossFadeState.showFirst
-                              : CrossFadeState.showSecond,
-                        ),
+                        _buildNetworkSection(
+                            'Available Networks',
+                            filteredPotentialNetworks,
+                            theme,
+                            chain,
+                            wallet,
+                            true),
                       ],
                     ),
                   ),
