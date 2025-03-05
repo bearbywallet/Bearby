@@ -52,7 +52,11 @@
       "https://bsc-dataseed-public.bnbchain.org",
       "https://bnb.rpc.subquery.network/public"
     ],
-    "features": [],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
     "ftokens": [
       {
         "native": true,

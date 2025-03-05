@@ -97,13 +97,12 @@ pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Resul
         match existing_provider_index {
             Some(index) => {
                 providers[index].config = provider_config.try_into()?;
+                core.update_providers(providers)?;
             }
             None => {
                 core.add_provider(provider_config.try_into()?)?;
             }
         }
-
-        core.update_providers(providers)?;
 
         Ok(())
     })

@@ -1107,9 +1107,9 @@ class Web3EIP1193Handler {
       chain: chainParams['chainName'] as String,
       shortName: symbol,
       rpc: rpcUrls,
-      features: Uint16List(0),
+      features: Uint16List.fromList([155, 1559, 4844]),
       chainId: chainId,
-      chainIds: Uint64List(0),
+      chainIds: Uint64List.fromList([chainId, 0]),
       slip44: 60,
       diffBlockTime: BigInt.zero,
       chainHash: BigInt.zero,
@@ -1128,8 +1128,11 @@ class Web3EIP1193Handler {
       title: message.title ?? "",
       appIcon: message.icon ?? '',
       chain: foundChain,
-      onConfirm: () async {
+      onConfirm: (selectedRpc) async {
         try {
+          foundChain = foundChain!.copyWith(
+            rpc: selectedRpc,
+          );
           await createOrUpdateChain(providerConfig: foundChain!);
           _sendResponse(
             type: 'ZILPAY_RESPONSE',
@@ -1137,6 +1140,7 @@ class Web3EIP1193Handler {
             result: null,
           );
         } catch (e) {
+          debugPrint("add network error: $e");
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,

@@ -15,7 +15,7 @@ void showAddChainModal({
   required String title,
   required String appIcon,
   required NetworkConfigInfo chain,
-  required VoidCallback onConfirm,
+  required Function(List<String>) onConfirm,
   required VoidCallback onReject,
 }) {
   showModalBottomSheet<List<String>>(
@@ -32,14 +32,18 @@ void showAddChainModal({
       appIcon: appIcon,
       chain: chain,
     ),
-  ).then((selectedRpcs) => onReject());
+  ).then((selectedRpcs) {
+    if (selectedRpcs == null) {
+      onReject();
+    }
+  });
 }
 
 class _AddChainModalContent extends StatefulWidget {
   final String title;
   final String appIcon;
   final NetworkConfigInfo chain;
-  final VoidCallback onConfirm;
+  final Function(List<String>) onConfirm;
 
   const _AddChainModalContent({
     required this.title,
@@ -135,13 +139,13 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                     backgroundColor: theme.primaryPurple,
                     textColor: theme.textPrimary,
                     onSwipeComplete: () async {
-                      widget.onConfirm();
                       final selected = widget.chain.rpc
                           .asMap()
                           .entries
                           .where((entry) => rpcSelections[entry.key])
                           .map((entry) => entry.value)
                           .toList();
+                      widget.onConfirm(selected);
                       Navigator.pop(context, selected);
                     },
                   ),
