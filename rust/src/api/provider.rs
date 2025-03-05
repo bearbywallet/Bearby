@@ -1,17 +1,13 @@
 use crate::{
-    models::{ftoken::FTokenInfo, provider::NetworkConfigInfo},
+    models::provider::NetworkConfigInfo,
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::with_service},
 };
-use serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
-use zilpay::{
-    background::bg_provider::ProvidersManagement, network::provider::NetworkProvider,
-    proto::address::Address,
-};
+use zilpay::{background::bg_provider::ProvidersManagement, network::provider::NetworkProvider};
 pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
 };
@@ -78,6 +74,30 @@ pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Resu
             let new_provider = NetworkProvider::new(new_conf.try_into()?);
 
             providers.push(new_provider);
+        }
+
+        core.update_providers(providers)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Result<(), String> {
+    with_service(|core| {
+        let mut providers = core.get_providers();
+        let existing_provider_index = providers
+            .iter()
+            .position(|p| p.config.hash() == provider_config.chain_hash);
+
+        match existing_provider_index {
+            Some(index) => {
+                providers[index].config = provider_config.try_into()?;
+            }
+            None => {
+                core.add_provider(provider_config.try_into()?)?;
+            }
         }
 
         core.update_providers(providers)?;

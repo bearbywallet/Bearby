@@ -7,8 +7,10 @@ import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
+import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 
 class NetworkPage extends StatefulWidget {
@@ -21,9 +23,12 @@ class NetworkPage extends StatefulWidget {
 class _NetworkPageState extends State<NetworkPage> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-
-  final List<NetworkItem> addedNetworks = [];
-  final List<NetworkItem> potentialNetworks = [];
+  List<NetworkItem> addedNetworks = [];
+  List<NetworkItem> potentialNetworks = [];
+  bool isLoading = true;
+  String? errorMessage;
+  String? _shortName;
+  bool isTestnet = false;
 
   @override
   void initState() {
@@ -31,12 +36,37 @@ class _NetworkPageState extends State<NetworkPage> {
     _loadNetworks();
   }
 
-  bool isLoading = true;
-  String? errorMessage;
-  String? _shortName;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final AppState appState = Provider.of<AppState>(context, listen: false);
+    if (appState.chain != null && (appState.chain?.testnet ?? false)) {
+      setState(() {
+        isTestnet = true;
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  String _createNetworkIdentifier(NetworkConfigInfo network) {
+    final chainId = network.chainId.toString();
+    final slip44 = network.slip44.toString();
+    final name = network.name.toLowerCase();
+
+    return '$slip44|$chainId|$name';
+  }
 
   Future<void> _loadNetworks() async {
-    final appState = Provider.of<AppState>(context);
+    setState(() {
+      isLoading = true;
+      errorMessage = null;
+    });
+
     try {
       final storedProviders = await getProviders();
       final String mainnetJsonData =
@@ -50,64 +80,67 @@ class _NetworkPageState extends State<NetworkPage> {
           await ChainService.loadChains(testnetJsonData);
 
       setState(() {
-        potentialNetworks.clear();
         addedNetworks.clear();
+        potentialNetworks.clear();
 
         addedNetworks.addAll(
           storedProviders.map((provider) => NetworkItem(
                 configInfo: provider,
-                icon: preprocessUrl(provider.logo, appState.currentTheme.value),
-                isEnabled: true,
                 isAdded: true,
               )),
         );
 
-        final addedChainIds =
-            addedNetworks.map((network) => network.configInfo.chainId).toSet();
+        final Set<String> addedNetworkIds = {};
+        final Set<String> addedNetworkNamesLower = {};
 
-        // TODO: add check slip44 and make sure this is works right.
-        potentialNetworks.addAll([
-          ...mainnetChains
-              .where((chain) =>
-                  !addedChainIds.contains(BigInt.from(chain.chainId)))
-              .map((chain) {
-            chain.testnet = false;
-            return NetworkItem(
-              configInfo: chain.toNetworkConfigInfo(),
-              icon: preprocessUrl(chain.logo, appState.currentTheme.value),
-              isEnabled: true,
+        for (final network in addedNetworks) {
+          addedNetworkIds.add(_createNetworkIdentifier(network.configInfo));
+          addedNetworkNamesLower.add(network.configInfo.name.toLowerCase());
+        }
+
+        final List<NetworkItem> potentialMainnetItems = [];
+        for (final chain in mainnetChains) {
+          final networkConfigInfo = chain.toNetworkConfigInfo();
+          final networkId = _createNetworkIdentifier(networkConfigInfo);
+          final nameLower = chain.name.toLowerCase();
+
+          if (!addedNetworkIds.contains(networkId) &&
+              !addedNetworkNamesLower.contains(nameLower)) {
+            final updatedChain = chain..testnet = false;
+            potentialMainnetItems.add(NetworkItem(
+              configInfo: updatedChain.toNetworkConfigInfo(),
               isAdded: false,
-            );
-          }),
-          ...testnetChains
-              .where((chain) =>
-                  !addedChainIds.contains(BigInt.from(chain.chainId)))
-              .map((chain) {
-            chain.testnet = true;
-            return NetworkItem(
-              configInfo: chain.toNetworkConfigInfo(),
-              icon: preprocessUrl(chain.logo, appState.currentTheme.value),
-              isEnabled: true,
+            ));
+          }
+        }
+
+        final List<NetworkItem> potentialTestnetItems = [];
+        for (final chain in testnetChains) {
+          final networkConfigInfo = chain.toNetworkConfigInfo();
+          final networkId = _createNetworkIdentifier(networkConfigInfo);
+          final nameLower = chain.name.toLowerCase();
+
+          if (!addedNetworkIds.contains(networkId) &&
+              !addedNetworkNamesLower.contains(nameLower)) {
+            final updatedChain = chain..testnet = true;
+            potentialTestnetItems.add(NetworkItem(
+              configInfo: updatedChain.toNetworkConfigInfo(),
               isAdded: false,
-            );
-          }),
-        ]);
+            ));
+          }
+        }
+
+        potentialNetworks.clear();
+        potentialNetworks.addAll([...potentialMainnetItems]);
+
+        if (isTestnet) {
+          potentialNetworks.addAll([...potentialTestnetItems]);
+        }
 
         isLoading = false;
 
         if (_shortName != null) {
-          int addedIndex = addedNetworks
-              .indexWhere((network) => network.configInfo.name == _shortName);
-          if (addedIndex >= 0) {
-            _handleNetworkSelect(addedNetworks[addedIndex].configInfo);
-          } else {
-            int potentialIndex = potentialNetworks
-                .indexWhere((network) => network.configInfo.name == _shortName);
-            if (potentialIndex >= 0) {
-              _handleNetworkSelect(
-                  potentialNetworks[potentialIndex].configInfo);
-            }
-          }
+          _trySelectNetworkByShortName();
         }
       });
     } catch (e) {
@@ -119,8 +152,26 @@ class _NetworkPageState extends State<NetworkPage> {
     }
   }
 
+  void _trySelectNetworkByShortName() {
+    if (_shortName == null) return;
+
+    int addedIndex = addedNetworks
+        .indexWhere((network) => network.configInfo.name == _shortName);
+    if (addedIndex >= 0) {
+      _handleNetworkSelect(addedNetworks[addedIndex].configInfo);
+      return;
+    }
+
+    int potentialIndex = potentialNetworks
+        .indexWhere((network) => network.configInfo.name == _shortName);
+    if (potentialIndex >= 0) {
+      _handleNetworkSelect(potentialNetworks[potentialIndex].configInfo);
+    }
+  }
+
   List<NetworkItem> _getFilteredNetworks(List<NetworkItem> networks) {
     if (_searchQuery.isEmpty) return networks;
+
     return networks
         .where((network) => network.configInfo.name
             .toLowerCase()
@@ -128,24 +179,35 @@ class _NetworkPageState extends State<NetworkPage> {
         .toList();
   }
 
-  void _handleNetworkSelect(NetworkConfigInfo network) async {
+  void _handleNetworkSelect(NetworkConfigInfo network) {
     debugPrint('Selected network: ${network.name}');
   }
 
-  @override
-  void dispose() {
-    _searchController.dispose();
-    super.dispose();
+  Future<void> _handleAddNetwork(
+    NetworkConfigInfo config,
+    AppState state,
+  ) async {
+    try {
+      await addProvider(providerConfig: config);
+      await state.syncData();
+      await _loadNetworks();
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Failed to add network: $e';
+      });
+      debugPrint('Error adding network: $e');
+    }
   }
 
   Widget _buildNetworkSection(
     String title,
     List<NetworkItem> networks,
-    AppState state,
+    AppTheme theme,
+    NetworkConfigInfo? chain,
+    WalletInfo? wallet,
+    bool isAvailableSection,
   ) {
     if (networks.isEmpty) return const SizedBox.shrink();
-    final theme = state.currentTheme;
-    final provider = state.chain!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -162,30 +224,27 @@ class _NetworkPageState extends State<NetworkPage> {
         ...networks.map((network) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: NetworkTile(
-                iconUrl: network.icon ?? "",
+                iconUrl: preprocessUrl(network.configInfo.logo, theme.value),
                 title: network.configInfo.name,
-                isTestnet: network.configInfo.testnet,
-                isEnabled: network.isEnabled,
+                isTestnet: network.configInfo.testnet ?? false,
                 isAdded: network.isAdded,
-                isDefault: state.wallet?.defaultChainHash ==
-                    network.configInfo.chainHash,
-                isSelected:
-                    provider.chainHash == network.configInfo.chainHash &&
-                        provider.chainId == network.configInfo.chainId,
-                disabled: provider.slip44 != network.configInfo.slip44,
-                onTap: () => _handleNetworkSelect(network.configInfo),
+                isDefault:
+                    wallet?.defaultChainHash == network.configInfo.chainHash,
+                isSelected: chain?.chainId == network.configInfo.chainId &&
+                    chain?.slip44 == network.configInfo.slip44,
+                disabled: chain?.slip44 != network.configInfo.slip44,
+                onTap: isAvailableSection
+                    ? null
+                    : () => _handleNetworkSelect(network.configInfo),
                 onAdd: network.isAdded
                     ? null
-                    : () async {
-                        await addProvider(providerConfig: network.configInfo);
-                        await state.syncData();
-                        await _loadNetworks();
-                      },
+                    : () => _handleAddNetwork(
+                          network.configInfo,
+                          Provider.of<AppState>(context, listen: false),
+                        ),
                 onEdit: network.isAdded
-                    ? () {
-                        debugPrint(
-                            'Editing network: ${network.configInfo.name}');
-                      }
+                    ? () => debugPrint(
+                        'Editing network: ${network.configInfo.name}')
                     : null,
               ),
             )),
@@ -193,31 +252,12 @@ class _NetworkPageState extends State<NetworkPage> {
     );
   }
 
-  Widget _buildErrorMessage() {
-    if (errorMessage == null) return const SizedBox.shrink();
-
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Text(
-        errorMessage!,
-        style: const TextStyle(
-          color: Colors.red,
-          fontSize: 14,
-        ),
-      ),
-    );
-  }
-
-  Widget _buildLoadingIndicator() {
-    return const Center(
-      child: CircularProgressIndicator(),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
-    final theme = state.currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    final chain = appState.chain;
+    final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     final filteredAddedNetworks = _getFilteredNetworks(addedNetworks);
@@ -227,18 +267,40 @@ class _NetworkPageState extends State<NetworkPage> {
       backgroundColor: theme.background,
       body: SafeArea(
         child: Center(
-          child: Container(
+          child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                Container(
+                Padding(
                   padding: EdgeInsets.symmetric(
                     horizontal: adaptivePadding,
                     vertical: 16,
                   ),
                   child: CustomAppBar(
-                    title: 'Select a network',
+                    title: '',
                     onBackPressed: () => Navigator.pop(context),
+                    actionWidget: Row(
+                      children: [
+                        Text(
+                          'Show Testnet',
+                          style: TextStyle(
+                            color: theme.textSecondary,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Switch(
+                          value: isTestnet,
+                          onChanged: (value) {
+                            setState(() {
+                              isTestnet = value;
+                              _loadNetworks();
+                            });
+                          },
+                          activeColor: theme.primaryPurple,
+                        ),
+                      ],
+                    ),
                   ),
                 ),
                 Padding(
@@ -255,10 +317,20 @@ class _NetworkPageState extends State<NetworkPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
-                if (errorMessage != null) _buildErrorMessage(),
+                if (errorMessage != null)
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Text(
+                      errorMessage!,
+                      style: TextStyle(color: theme.danger, fontSize: 14),
+                    ),
+                  ),
                 Expanded(
                   child: isLoading
-                      ? _buildLoadingIndicator()
+                      ? Center(
+                          child: CircularProgressIndicator(
+                          color: theme.primaryPurple,
+                        ))
                       : SingleChildScrollView(
                           physics: const BouncingScrollPhysics(),
                           padding: EdgeInsets.symmetric(
@@ -270,8 +342,15 @@ class _NetworkPageState extends State<NetworkPage> {
                             children: [
                               _buildNetworkSection(
                                 'Added Networks',
-                                filteredAddedNetworks,
-                                state,
+                                filteredAddedNetworks
+                                    .where((network) =>
+                                        isTestnet ||
+                                        !(network.configInfo.testnet ?? false))
+                                    .toList(),
+                                theme,
+                                chain,
+                                wallet,
+                                false,
                               ),
                               if (filteredAddedNetworks.isNotEmpty &&
                                   filteredPotentialNetworks.isNotEmpty)
@@ -279,7 +358,10 @@ class _NetworkPageState extends State<NetworkPage> {
                               _buildNetworkSection(
                                 'Available Networks',
                                 filteredPotentialNetworks,
-                                state,
+                                theme,
+                                chain,
+                                wallet,
+                                true,
                               ),
                             ],
                           ),
@@ -296,14 +378,10 @@ class _NetworkPageState extends State<NetworkPage> {
 
 class NetworkItem {
   final NetworkConfigInfo configInfo;
-  final String? icon;
-  final bool isEnabled;
   final bool isAdded;
 
   NetworkItem({
     required this.configInfo,
-    required this.icon,
-    this.isEnabled = false,
-    this.isAdded = false,
+    required this.isAdded,
   });
 }

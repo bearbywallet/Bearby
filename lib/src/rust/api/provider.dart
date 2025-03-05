@@ -26,3 +26,7 @@ Future<void> addProvidersList(
         {required List<NetworkConfigInfo> providerConfig}) =>
     RustLib.instance.api
         .crateApiProviderAddProvidersList(providerConfig: providerConfig);
+
+Future<void> createOrUpdateChain({required NetworkConfigInfo providerConfig}) =>
+    RustLib.instance.api
+        .crateApiProviderCreateOrUpdateChain(providerConfig: providerConfig);

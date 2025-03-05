@@ -5,35 +5,9 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
-Widget networkLabel({
-  required String text,
-  required Color backgroundColor,
-  required Color textColor,
-}) {
-  return Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 8,
-      vertical: 2,
-    ),
-    decoration: BoxDecoration(
-      color: backgroundColor.withValues(alpha: 0.1),
-      borderRadius: BorderRadius.circular(4),
-    ),
-    child: Text(
-      text,
-      style: TextStyle(
-        fontSize: 12,
-        fontWeight: FontWeight.w500,
-        color: textColor,
-      ),
-    ),
-  );
-}
-
 class NetworkTile extends StatelessWidget {
   final String? iconUrl;
   final String title;
-  final bool isEnabled;
   final bool isAdded;
   final bool isSelected;
   final bool disabled;
@@ -47,7 +21,6 @@ class NetworkTile extends StatelessWidget {
     super.key,
     required this.title,
     this.iconUrl,
-    this.isEnabled = false,
     this.isAdded = false,
     this.isSelected = false,
     this.disabled = false,
@@ -61,24 +34,37 @@ class NetworkTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final isActive = !disabled;
+
+    final textColor =
+        disabled ? theme.textPrimary.withValues(alpha: 0.5) : theme.textPrimary;
+
+    final backgroundColor = disabled
+        ? theme.textSecondary.withValues(alpha: 0.05)
+        : isSelected
+            ? theme.primaryPurple.withValues(alpha: 0.1)
+            : theme.textSecondary.withValues(alpha: 0.02);
+
+    final borderColor = isSelected
+        ? theme.primaryPurple
+        : theme.textSecondary.withValues(alpha: 0.1);
 
     return Opacity(
-      opacity: disabled ? 0.5 : 1.0,
+      opacity: disabled ? 0.2 : 1.0,
       child: GestureDetector(
-        onTap: (isEnabled && !disabled) ? onTap : null,
+        behavior: HitTestBehavior.opaque,
+        onTap: isActive ? onTap : null,
         child: Container(
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(12),
             border: Border.all(
-              color: isSelected
-                  ? theme.primaryPurple
-                  : theme.textSecondary.withValues(alpha: 0.1),
+              color: borderColor,
               width: isSelected ? 2 : 1,
             ),
-            color: _getBackgroundColor(theme),
+            color: backgroundColor,
           ),
           child: ListTile(
-            enabled: isEnabled && !disabled,
+            enabled: isActive,
             contentPadding:
                 const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             leading: _buildLeadingIcon(),
@@ -86,37 +72,19 @@ class NetworkTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
               children: [
-                Row(
-                  children: [
-                    if (isTestnet != null)
-                      networkLabel(
-                        text: isTestnet! ? "Testnet" : "Mainnet",
-                        backgroundColor:
-                            isTestnet! ? theme.warning : theme.success,
-                        textColor: isTestnet! ? theme.warning : theme.success,
-                      ),
-                    if (isTestnet != null && isDefault == true)
-                      const SizedBox(width: 8),
-                    if (isDefault == true)
-                      networkLabel(
-                        text: "Default",
-                        backgroundColor: theme.primaryPurple,
-                        textColor: theme.primaryPurple,
-                      ),
-                  ],
-                ),
+                _buildLabels(theme),
                 const SizedBox(height: 4),
                 Text(
                   title,
                   style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
-                    color: _getTextColor(theme),
+                    color: textColor,
                   ),
                 ),
               ],
             ),
-            trailing: _buildTrailingButton(theme),
+            trailing: _buildTrailingIcon(isActive, textColor),
           ),
         ),
       ),
@@ -128,9 +96,7 @@ class NetworkTile extends StatelessWidget {
       return const SizedBox(
         width: 32,
         height: 32,
-        child: Placeholder(
-          color: Colors.grey,
-        ),
+        child: Placeholder(color: Colors.grey),
       );
     }
 
@@ -143,72 +109,76 @@ class NetworkTile extends StatelessWidget {
         height: 24,
         fit: BoxFit.contain,
         loadingWidget: const Center(
-          child: CircularProgressIndicator(
-            strokeWidth: 2,
-          ),
+          child: CircularProgressIndicator(strokeWidth: 2),
         ),
       ),
     );
   }
 
-  Widget? _buildTrailingButton(AppTheme theme) {
+  Widget _buildLabels(AppTheme theme) {
+    if (isTestnet == null && isDefault != true) {
+      return const SizedBox.shrink();
+    }
+
+    return Wrap(
+      spacing: 8,
+      children: [
+        if (isTestnet != null)
+          _buildNetworkLabel(
+            isTestnet! ? "Testnet" : "Mainnet",
+            isTestnet! ? theme.warning : theme.success,
+          ),
+        if (isDefault == true)
+          _buildNetworkLabel("Default", theme.primaryPurple),
+      ],
+    );
+  }
+
+  Widget _buildNetworkLabel(String text, Color color) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.w500,
+          color: color,
+        ),
+      ),
+    );
+  }
+
+  Widget? _buildTrailingIcon(bool isActive, Color iconColor) {
     if (isAdded) {
-      return onEdit != null
-          ? IconButton(
-              icon: SvgPicture.asset(
-                "assets/icons/edit.svg",
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(
-                  _getIconColor(theme),
-                  BlendMode.srcIn,
-                ),
-              ),
-              padding: const EdgeInsets.all(8),
-              onPressed:
-                  (isEnabled && !disabled && onEdit != null) ? onEdit : null,
-            )
-          : null;
+      if (onEdit == null) return null;
+
+      return IconButton(
+        icon: SvgPicture.asset(
+          "assets/icons/edit.svg",
+          width: 20,
+          height: 20,
+          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+        ),
+        padding: const EdgeInsets.all(8),
+        onPressed: isActive ? onEdit : null,
+      );
     }
 
-    return onAdd != null
-        ? IconButton(
-            icon: SvgPicture.asset(
-              "assets/icons/plus.svg",
-              width: 20,
-              height: 20,
-              colorFilter: ColorFilter.mode(
-                _getIconColor(theme),
-                BlendMode.srcIn,
-              ),
-            ),
-            padding: const EdgeInsets.all(8),
-            onPressed: (isEnabled && !disabled) ? onAdd : null,
-          )
-        : null;
-  }
+    if (onAdd == null) return null;
 
-  Color? _getBackgroundColor(AppTheme theme) {
-    if (!isEnabled) {
-      return theme.textSecondary.withValues(alpha: 0.05);
-    }
-    if (isSelected) {
-      return theme.primaryPurple.withValues(alpha: 0.1);
-    }
-    return theme.textSecondary.withValues(alpha: 0.02);
-  }
-
-  Color _getTextColor(AppTheme theme) {
-    if (!isEnabled) {
-      return theme.textSecondary.withValues(alpha: 0.5);
-    }
-    return theme.textSecondary;
-  }
-
-  Color _getIconColor(AppTheme theme) {
-    if (!isEnabled) {
-      return theme.textSecondary.withValues(alpha: 0.5);
-    }
-    return theme.textSecondary;
+    return IconButton(
+      icon: SvgPicture.asset(
+        "assets/icons/plus.svg",
+        width: 20,
+        height: 20,
+        colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
+      ),
+      padding: const EdgeInsets.all(8),
+      onPressed: isActive ? onAdd : null,
+    );
   }
 }

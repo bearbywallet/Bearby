@@ -1128,12 +1128,21 @@ class Web3EIP1193Handler {
       title: message.title ?? "",
       appIcon: message.icon ?? '',
       chain: foundChain,
-      onConfirm: () {
-        _sendResponse(
-          type: 'ZILPAY_RESPONSE',
-          uuid: message.uuid,
-          result: null,
-        );
+      onConfirm: () async {
+        try {
+          await createOrUpdateChain(providerConfig: foundChain!);
+          _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: null,
+          );
+        } catch (e) {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            e.toString(),
+          );
+        }
       },
       onReject: () {
         _returnError(
