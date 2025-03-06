@@ -123,7 +123,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // Authentication Flow
   Future<void> _handleAuthentication() async {
     if (_selectedWallet == -1) return;
 
@@ -163,30 +162,44 @@ class _LoginPageState extends State<LoginPage> {
           identifiers,
         );
       } else {
-        _btnController.reset();
+        if (mounted) {
+          _btnController.reset();
+        }
         return;
       }
 
       if (isAuthenticated) {
-        _btnController.reset();
+        if (mounted) {
+          _btnController.reset();
+        }
         _navigateToHome();
       } else {
-        _handleAuthenticationError();
+        if (mounted) {
+          _handleAuthenticationError();
+        }
       }
 
       await _appState.startTrackHistoryWorker();
     } catch (e) {
       debugPrint("unlock $e");
-      _handleAuthenticationError();
+      if (mounted) {
+        _handleAuthenticationError();
+      }
     }
   }
 
   void _handleAuthenticationError() {
-    _btnController.error();
-    if (_passwordController.text.isNotEmpty) {
-      _passwordInputKey.currentState?.shake();
+    if (mounted) {
+      _btnController.error();
+      if (_passwordController.text.isNotEmpty) {
+        _passwordInputKey.currentState?.shake();
+      }
+      Timer(const Duration(seconds: 1), () {
+        if (mounted) {
+          _btnController.reset();
+        }
+      });
     }
-    Timer(const Duration(seconds: 1), () => _btnController.reset());
   }
 
   // UI Components

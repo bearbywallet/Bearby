@@ -5,6 +5,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -40,7 +41,6 @@ class _ChainInfoModalContent extends StatefulWidget {
 
 class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   Map<String, String> _rpcStatus = {};
-  int _selectedExplorerIndex = 0;
 
   @override
   void initState() {
@@ -50,27 +50,32 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
 
   void _checkRpcStatus() async {}
 
-  void _removeRpc(String rpc) {
+  void _removeRpc(String rpc) async {
     if (widget.networkConfig.rpc.length > 5) {
       setState(() {
         widget.networkConfig.rpc.remove(rpc);
       });
     }
+
+    await createOrUpdateChain(providerConfig: widget.networkConfig);
   }
 
-  void _selectRpc(int index) {
+  void _selectRpc(int index) async {
     setState(() {
       final selectedRpc = widget.networkConfig.rpc.removeAt(index);
       widget.networkConfig.rpc.insert(0, selectedRpc);
     });
+
+    await createOrUpdateChain(providerConfig: widget.networkConfig);
   }
 
-  void _selectExplorer(int index) {
+  void _selectExplorer(int index) async {
     setState(() {
-      _selectedExplorerIndex = index;
       final selectedExplorer = widget.networkConfig.explorers.removeAt(index);
       widget.networkConfig.explorers.insert(0, selectedExplorer);
     });
+
+    await createOrUpdateChain(providerConfig: widget.networkConfig);
   }
 
   @override
@@ -241,6 +246,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               final canDelete = widget.networkConfig.rpc.length > 5;
 
               return GestureDetector(
+                behavior: HitTestBehavior.opaque,
                 onTap: () => _selectRpc(index),
                 child: Container(
                   margin: EdgeInsets.only(bottom: 6),
@@ -315,10 +321,11 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                 widget.networkConfig.explorers.asMap().entries.map((entry) {
               final index = entry.key;
               final explorer = entry.value;
-              final isSelected = index == _selectedExplorerIndex;
+              final isSelected = index == 0;
 
               return GestureDetector(
                 onTap: () => _selectExplorer(index),
+                behavior: HitTestBehavior.opaque,
                 child: Container(
                   margin: EdgeInsets.only(bottom: 6),
                   padding: EdgeInsets.all(10),

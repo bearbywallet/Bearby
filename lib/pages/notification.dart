@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/notification.dart';
@@ -59,14 +60,28 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        _buildPushNotificationsSection(state, adaptivePadding),
-                        const SizedBox(height: 24),
-                        _buildWalletsSection(theme, adaptivePadding),
-                        SizedBox(height: adaptivePadding),
-                      ],
+                    child: Padding(
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SwitchSettingItem(
+                            title: 'Push notifications',
+                            description:
+                                'Get notifications when tx sent and confirm, Notifications from connected apps.',
+                            value: state.state.notificationsGlobalEnabled,
+                            onChanged: (value) async {
+                              await setGlobalNotifications(
+                                  globalEnabled: value);
+                              await state.syncData();
+                            },
+                          ),
+                          SizedBox(height: adaptivePadding),
+                          _buildWalletsSection(theme, adaptivePadding),
+                          SizedBox(height: adaptivePadding),
+                        ],
+                      ),
                     ),
                   ),
                 ),
@@ -78,106 +93,54 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     );
   }
 
-  Widget _buildPushNotificationsSection(
-      AppState state, double adaptivePadding) {
-    final theme = state.currentTheme;
-
-    return Container(
-      margin: EdgeInsets.symmetric(horizontal: adaptivePadding),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Push notifications',
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              Switch(
-                value: state.state.notificationsGlobalEnabled,
-                onChanged: (value) async {
-                  await setGlobalNotifications(globalEnabled: value);
-                  await state.syncData();
-                },
-                activeColor: theme.primaryPurple,
-                activeTrackColor: theme.primaryPurple.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Get notifications when you receive ZIL, tokens and NFTs. Notifications from connected apps.',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildWalletsSection(AppTheme theme, double adaptivePadding) {
     return Consumer<AppState>(
       builder: (context, appState, _) {
         final isGlobalEnabled = appState.state.notificationsGlobalEnabled;
 
-        return Padding(
-          padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-          child: Opacity(
-            opacity: isGlobalEnabled ? 1.0 : 0.5,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Wallets',
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
+        return Opacity(
+          opacity: isGlobalEnabled ? 1.0 : 0.5,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Wallets',
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Notifications from wallets',
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 16,
-                  ),
+              ),
+              SizedBox(height: 8),
+              Text(
+                'Notifications from wallets',
+                style: TextStyle(
+                  color: theme.textSecondary,
+                  fontSize: 16,
                 ),
-                SizedBox(height: adaptivePadding),
-                Container(
-                  decoration: BoxDecoration(
-                    color: theme.cardBackground,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: AbsorbPointer(
-                    absorbing: !isGlobalEnabled,
-                    child: ListView.builder(
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemCount: appState.wallets.length,
-                      itemBuilder: (context, index) => _buildWalletItem(
-                        appState,
-                        appState.wallets[index],
-                        index,
-                        isLastItem: index == appState.wallets.length - 1,
-                      ),
+              ),
+              SizedBox(height: adaptivePadding),
+              Container(
+                decoration: BoxDecoration(
+                  color: theme.cardBackground,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: AbsorbPointer(
+                  absorbing: !isGlobalEnabled,
+                  child: ListView.builder(
+                    shrinkWrap: true,
+                    physics: const NeverScrollableScrollPhysics(),
+                    itemCount: appState.wallets.length,
+                    itemBuilder: (context, index) => _buildWalletItem(
+                      appState,
+                      appState.wallets[index],
+                      index,
+                      isLastItem: index == appState.wallets.length - 1,
                     ),
                   ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         );
       },
@@ -193,9 +156,10 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
     final theme = state.currentTheme;
     final BackgroundNotificationState? walletNotify =
         state.state.notificationsWalletStates[BigInt.from(index)];
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: EdgeInsets.symmetric(horizontal: adaptivePadding, vertical: 12),
       decoration: BoxDecoration(
         border: !isLastItem
             ? Border(
@@ -222,7 +186,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               ),
             ),
           ),
-          const SizedBox(width: 12),
+          SizedBox(width: 12),
           Expanded(
             child: Text(
               wallet.walletName.isEmpty
@@ -241,7 +205,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               await setWalletNotifications(
                 walletIndex: BigInt.from(index),
                 transactions: value,
-                price: false, // TODO: maybe set in future
+                price: false,
                 security: false,
                 balance: false,
               );
