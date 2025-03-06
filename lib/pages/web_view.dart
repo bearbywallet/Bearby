@@ -389,10 +389,11 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     ];
 
     for (final term in ignoredErrorContents) {
-      if (error.description.toLowerCase().contains(term)) {
+      if (error.description.toLowerCase().contains(term.toLowerCase())) {
         return true;
       }
     }
+
     return false;
   }
 
