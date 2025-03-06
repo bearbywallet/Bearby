@@ -176,8 +176,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> setAppearancesCode(int code) async {
-    await setTheme(appearancesCode: code);
+  Future<void> setAppearancesCode(int code, bool compactNumbers) async {
+    await setTheme(
+      appearancesCode: code,
+      compactNumbers: compactNumbers,
+    );
     _state = await getData();
     notifyListeners();
   }

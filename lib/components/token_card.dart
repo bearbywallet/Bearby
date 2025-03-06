@@ -117,10 +117,10 @@ class _TokenCardState extends State<TokenCard>
     final String amount = intlNumberFormating(
       value: widget.tokenAmount,
       decimals: widget.ftoken.decimals,
-      localeStr: '',
+      localeStr: state.state.locale,
       symbolStr: widget.ftoken.symbol,
       threshold: baseThreshold,
-      compact: true,
+      compact: state.state.abbreviatedNumber,
     );
 
     return Column(

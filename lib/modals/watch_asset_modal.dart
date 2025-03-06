@@ -149,10 +149,10 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
         ? intlNumberFormating(
             value: _ftoken!.balances[selectedAccount]!,
             decimals: _ftoken?.decimals ?? 1,
-            localeStr: '',
+            localeStr: appState.state.locale,
             symbolStr: _ftoken?.symbol ?? widget.tokenSymbol,
             threshold: baseThreshold,
-            compact: true,
+            compact: appState.state.abbreviatedNumber,
           )
         : "-";
 

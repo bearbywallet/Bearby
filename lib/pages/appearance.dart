@@ -4,6 +4,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/components/switch_setting_item.dart';
 
 class AppearanceSettingsPage extends StatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -14,7 +15,7 @@ class AppearanceSettingsPage extends StatefulWidget {
 
 class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   int selectedThemeIndex = 0;
-  bool optionsDisabled = false;
+  bool compactNumbers = false;
 
   final List<Map<String, String>> themeDescriptions = [
     {
@@ -38,34 +39,31 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   ];
 
   @override
-  void initState() {
-    super.initState();
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final themeProvider = Provider.of<AppState>(context, listen: false);
-
-      setState(() {
-        selectedThemeIndex = themeProvider.state.appearances;
-      });
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final themeProvider = Provider.of<AppState>(context, listen: false);
+    setState(() {
+      selectedThemeIndex = themeProvider.state.appearances;
+      compactNumbers = themeProvider.state.abbreviatedNumber;
     });
   }
 
-  // Handle theme selection
   Future<void> _handleThemeSelection(int index) async {
     final stateProvider = Provider.of<AppState>(context, listen: false);
-    await stateProvider.setAppearancesCode(index);
-
+    await stateProvider.setAppearancesCode(index, compactNumbers);
     setState(() {
       selectedThemeIndex = index;
     });
+    await stateProvider.syncData();
   }
 
-  @override
-  void reassemble() {
-    super.reassemble();
+  Future<void> _handleCompactNumbersChange(bool value) async {
+    final stateProvider = Provider.of<AppState>(context, listen: false);
+    await stateProvider.setAppearancesCode(selectedThemeIndex, value);
     setState(() {
-      optionsDisabled = false;
+      compactNumbers = value;
     });
+    await stateProvider.syncData();
   }
 
   @override
@@ -93,8 +91,15 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          SwitchSettingItem(
+                            title: 'Compact Numbers',
+                            description:
+                                'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).',
+                            value: compactNumbers,
+                            onChanged: _handleCompactNumbersChange,
+                          ),
+                          const SizedBox(height: 24),
                           OptionsList(
-                            disabled: optionsDisabled,
                             options: List.generate(
                               themeDescriptions.length,
                               (index) => OptionItem(

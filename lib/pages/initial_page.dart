@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -55,6 +56,34 @@ class _InitialPageState extends State<InitialPage> {
     }
   }
 
+  Widget _buildButton() {
+    if (_isLoading) {
+      return const CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
+      );
+    } else if (_isRestoreAvailable) {
+      return CustomButton(
+        text: "Restore ZilPay 1.0!",
+        onPressed: () {
+          Navigator.of(context).pushNamed(
+            '/rk_restore',
+            arguments: {
+              'vaultJson': _vaultJson,
+              'accountsJson': _accountsJson,
+            },
+          );
+        },
+      );
+    } else {
+      return CustomButton(
+        text: "Get Started",
+        onPressed: () {
+          Navigator.of(context).pushNamed('/new_wallet_options');
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -62,85 +91,73 @@ class _InitialPageState extends State<InitialPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Stack(
+        child: Column(
           children: [
-            Positioned(
-              top: 16.0,
-              left: 16.0,
-              child: IconButton(
-                icon: Icon(Icons.wb_sunny, color: theme.textPrimary),
-                onPressed: () {},
-              ),
-            ),
-            Positioned(
-              top: 16.0,
-              right: 16.0,
-              child: IconButton(
-                icon: Icon(Icons.language, color: theme.textPrimary),
-                onPressed: () => Navigator.of(context).pushNamed('/language'),
-              ),
-            ),
-            Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 16.0, vertical: 16.0),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  SvgPicture.asset(
-                    'assets/imgs/zilpay.svg',
-                    width: 120.0,
-                    height: 120.0,
-                    colorFilter:
-                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
-                  ),
-                  const Spacer(),
-                  if (_isLoading)
-                    CircularProgressIndicator(
-                        valueColor:
-                            AlwaysStoppedAnimation<Color>(theme.primaryPurple))
-                  else if (_isRestoreAvailable)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 32.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryPurple,
-                          foregroundColor: theme.textPrimary,
-                          minimumSize: const Size(double.infinity, 56.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            '/rk_restore',
-                            arguments: {
-                              'vaultJson': _vaultJson,
-                              'accountsJson': _accountsJson,
-                            },
-                          );
-                        },
-                        child: const Text("Restore ZilPay 1.0!",
-                            style: TextStyle(fontSize: 18.0)),
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/moon_sun.svg',
+                      colorFilter: ColorFilter.mode(
+                        theme.textPrimary,
+                        BlendMode.srcIn,
                       ),
-                    )
-                  else
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 32.0),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryPurple,
-                          foregroundColor: theme.textPrimary,
-                          minimumSize: const Size(double.infinity, 56.0),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(30.0)),
-                        ),
-                        onPressed: () {
-                          Navigator.of(context)
-                              .pushNamed('/new_wallet_options');
-                        },
-                        child: const Text("Let's Start",
-                            style: TextStyle(fontSize: 18.0)),
-                      ),
+                      width: 30.0,
+                      height: 30.0,
                     ),
+                    onPressed: () async {
+                      final appState =
+                          Provider.of<AppState>(context, listen: false);
+
+                      switch (appState.state.appearances) {
+                        case 0:
+                          await appState.setAppearancesCode(
+                              1, appState.state.abbreviatedNumber);
+                        case 1:
+                          await appState.setAppearancesCode(
+                              2, appState.state.abbreviatedNumber);
+                        case 2:
+                          await appState.setAppearancesCode(
+                              1, appState.state.abbreviatedNumber);
+                      }
+                    },
+                  ),
+                  IconButton(
+                    icon: SvgPicture.asset(
+                      'assets/icons/language.svg',
+                      colorFilter:
+                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+                      width: 34.0,
+                      height: 34.0,
+                    ),
+                    onPressed: () {},
+                    // onPressed: () =>
+                    //     Navigator.of(context).pushNamed('/language'),
+                  ),
                 ],
               ),
+            ),
+            Expanded(
+              child: Center(
+                child: SvgPicture.asset(
+                  'assets/icons/little_dragons.svg',
+                  width: 400.0,
+                  height: 400.0,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary,
+                    BlendMode.srcIn,
+                  ),
+                ),
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0),
+              child: _buildButton(),
             ),
           ],
         ),

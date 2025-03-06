@@ -7,8 +7,10 @@ import '../frb_generated.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> setTheme({required int appearancesCode}) => RustLib.instance.api
-    .crateApiSettingsSetTheme(appearancesCode: appearancesCode);
+Future<void> setTheme(
+        {required int appearancesCode, required bool compactNumbers}) =>
+    RustLib.instance.api.crateApiSettingsSetTheme(
+        appearancesCode: appearancesCode, compactNumbers: compactNumbers);
 
 Future<void> setWalletNotifications(
         {required BigInt walletIndex,

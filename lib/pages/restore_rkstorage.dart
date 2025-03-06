@@ -44,6 +44,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+    final appState = Provider.of<AppState>(context);
+
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, String?>?;
     if (args == null || args['vaultJson'] == null) {
@@ -54,6 +56,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
     try {
       final accountsJson = jsonDecode(args['accountsJson'] ?? '{}');
       final identities = (accountsJson['identities'] as List<dynamic>?) ?? [];
+
       setState(() {
         accounts = identities.map((identity) {
           final balanceMap = identity['balance'] as Map<String, dynamic>?;
@@ -62,10 +65,10 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
           final balance = intlNumberFormating(
             value: mainnetBalance?['ZIL'] ?? "0",
             decimals: 12,
-            localeStr: '',
+            localeStr: appState.state.locale,
             symbolStr: 'ZIL',
             threshold: baseThreshold,
-            compact: true,
+            compact: appState.state.abbreviatedNumber,
           );
           return Account(
             name: identity['name'] as String? ?? 'Unnamed',

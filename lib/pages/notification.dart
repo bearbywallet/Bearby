@@ -116,7 +116,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Get notifications when you receive TON, tokens and NFTs. Notifications from connected apps.',
+            'Get notifications when you receive ZIL, tokens and NFTs. Notifications from connected apps.',
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 14,

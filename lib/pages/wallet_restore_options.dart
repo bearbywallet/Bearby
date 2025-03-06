@@ -26,37 +26,45 @@ class RestoreWalletOptionsPage extends StatelessWidget {
       context: context,
       onScanned: (String qrData) async {
         try {
-          final values = parseQRSecretData(qrData);
-          final String? shortName = values['chain'];
-          final String? seed = values['seed'];
-          final String? key = values['key'];
-
-          if (shortName == null || !context.mounted) {
-            if (context.mounted) Navigator.pop(context);
-            return;
-          }
-
-          final String mainnetJsonData =
-              await rootBundle.loadString('assets/chains/mainnet-chains.json');
-          final List<Chain> mainnetChains =
-              await ChainService.loadChains(mainnetJsonData);
-
-          if (!mainnetChains.any((chain) => chain.shortName == shortName) ||
-              !context.mounted) {
-            if (context.mounted) Navigator.pop(context);
-            return;
-          }
-
-          if (seed != null) {
-            if (context.mounted) {
-              await _processSeedFromQR(context, seed, shortName);
-            }
-          } else if (key != null) {
-            if (context.mounted) {
-              await _processKeyFromQR(context, key, shortName);
+          final words =
+              qrData.split(' ').where((word) => word.isNotEmpty).toList();
+          final wordCount = words.length;
+          if ([12, 15, 18, 21, 24].contains(wordCount)) {
+            final errorIndexes =
+                (await checkNotExistsBip39Words(words: words, lang: 'english'))
+                    .map((e) => e.toInt())
+                    .toList();
+            if (errorIndexes.isEmpty && context.mounted) {
+              Navigator.of(context).pushNamed('/net_setup',
+                  arguments: {'bip39': words, 'shortName': null});
+            } else if (context.mounted) {
+              Navigator.pop(context);
             }
           } else {
-            if (context.mounted) Navigator.pop(context);
+            final values = parseQRSecretData(qrData);
+            final String? shortName = values['chain'];
+            final String? seed = values['seed'];
+            final String? key = values['key'];
+            if (shortName == null || !context.mounted) {
+              if (context.mounted) Navigator.pop(context);
+              return;
+            }
+            final mainnetJsonData = await rootBundle
+                .loadString('assets/chains/mainnet-chains.json');
+            final mainnetChains =
+                await ChainService.loadChains(mainnetJsonData);
+            if (!mainnetChains.any((chain) => chain.shortName == shortName) ||
+                !context.mounted) {
+              if (context.mounted) Navigator.pop(context);
+              return;
+            }
+            if (seed != null && context.mounted) {
+              await _processSeedFromQR(context, seed, shortName);
+            } else if (key != null && context.mounted) {
+              await _processKeyFromQR(context, key, shortName);
+            } else if (context.mounted) {
+              Navigator.pop(context);
+            }
           }
         } catch (e) {
           debugPrint("QR scanning error: $e");

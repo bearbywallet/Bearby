@@ -24,7 +24,8 @@ class TokenSelectItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
 
     return InkWell(
       onTap: onTap,
@@ -92,10 +93,10 @@ class TokenSelectItem extends StatelessWidget {
                   intlNumberFormating(
                     value: balance,
                     decimals: ftoken.decimals,
-                    localeStr: '',
+                    localeStr: appState.state.locale,
                     symbolStr: ftoken.symbol,
                     threshold: baseThreshold,
-                    compact: true,
+                    compact: appState.state.abbreviatedNumber,
                   ),
                   style: TextStyle(
                     color: theme.textPrimary,

@@ -136,7 +136,9 @@ class _HistoryItemState extends State<HistoryItem>
     return '$day.$month.$year $hour:$minute';
   }
 
-  Widget _buildAmountWithPrice(AppTheme theme) {
+  Widget _buildAmountWithPrice(AppState appState) {
+    final theme = appState.currentTheme;
+
     if (widget.transaction.tokenInfo != null) {
       final decimals = widget.transaction.tokenInfo!.decimals;
       final value =
@@ -145,10 +147,10 @@ class _HistoryItemState extends State<HistoryItem>
       final formattedValue = intlNumberFormating(
         value: value,
         decimals: decimals,
-        localeStr: '',
+        localeStr: appState.state.locale,
         symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
         threshold: baseThreshold,
-        compact: false,
+        compact: appState.state.abbreviatedNumber,
       );
       final price = 0.004;
       final usdAmount = 0 * price;
@@ -192,10 +194,10 @@ class _HistoryItemState extends State<HistoryItem>
     final formattedValue = intlNumberFormating(
       value: widget.transaction.fee.toString(),
       decimals: decimals,
-      localeStr: '',
+      localeStr: appState.state.locale,
       symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
       threshold: baseThreshold,
-      compact: true,
+      compact: appState.state.abbreviatedNumber,
     );
     final usdFee = 0 * price;
 
@@ -296,7 +298,7 @@ class _HistoryItemState extends State<HistoryItem>
                                 ],
                               ),
                               const SizedBox(height: 8),
-                              _buildAmountWithPrice(theme),
+                              _buildAmountWithPrice(state),
                             ],
                           ),
                         ),

@@ -14,9 +14,10 @@ use zilpay::{
     wallet::wallet_storage::StorageOperations,
 };
 
-pub async fn set_theme(appearances_code: u8) -> Result<(), String> {
+pub async fn set_theme(appearances_code: u8, compact_numbers: bool) -> Result<(), String> {
     with_service_mut(|core| {
         let new_theme = Theme {
+            compact_numbers,
             appearances: Appearances::from_code(appearances_code)
                 .map_err(ServiceError::SettingsError)?,
         };

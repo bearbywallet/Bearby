@@ -371,10 +371,10 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                 '≈ ${intlNumberFormating(
                                   value: totalGasFee.toString(),
                                   decimals: token.decimals,
-                                  localeStr: '',
+                                  localeStr: appState.state.locale,
                                   symbolStr: token.symbol,
                                   threshold: baseThreshold,
-                                  compact: true,
+                                  compact: appState.state.abbreviatedNumber,
                                 )}',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,

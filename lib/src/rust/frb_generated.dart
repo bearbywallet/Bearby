@@ -294,7 +294,8 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiSettingsSetRateFetcher(
       {required BigInt walletIndex, String? currency});
 
-  Future<void> crateApiSettingsSetTheme({required int appearancesCode});
+  Future<void> crateApiSettingsSetTheme(
+      {required int appearancesCode, required bool compactNumbers});
 
   Future<void> crateApiSettingsSetWalletEns(
       {required BigInt walletIndex, required bool ensEnabled});
@@ -1916,11 +1917,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiSettingsSetTheme({required int appearancesCode}) {
+  Future<void> crateApiSettingsSetTheme(
+      {required int appearancesCode, required bool compactNumbers}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_u_8(appearancesCode, serializer);
+        sse_encode_bool(compactNumbers, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 57, port: port_);
       },
@@ -1929,14 +1932,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiSettingsSetThemeConstMeta,
-      argValues: [appearancesCode],
+      argValues: [appearancesCode, compactNumbers],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta get kCrateApiSettingsSetThemeConstMeta => const TaskConstMeta(
         debugName: "set_theme",
-        argNames: ["appearancesCode"],
+        argNames: ["appearancesCode", "compactNumbers"],
       );
 
   @override
@@ -2735,8 +2738,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   BackgroundState dco_decode_background_state(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return BackgroundState(
       wallets: dco_decode_list_wallet_info(arr[0]),
       notificationsWalletStates:
@@ -2744,8 +2747,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notificationsGlobalEnabled: dco_decode_bool(arr[2]),
       locale: dco_decode_String(arr[3]),
       appearances: dco_decode_u_8(arr[4]),
-      browserSettings: dco_decode_browser_settings_info(arr[5]),
-      providers: dco_decode_list_network_config_info(arr[6]),
+      abbreviatedNumber: dco_decode_bool(arr[5]),
+      browserSettings: dco_decode_browser_settings_info(arr[6]),
+      providers: dco_decode_list_network_config_info(arr[7]),
     );
   }
 
@@ -3750,6 +3754,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
     var var_locale = sse_decode_String(deserializer);
     var var_appearances = sse_decode_u_8(deserializer);
+    var var_abbreviatedNumber = sse_decode_bool(deserializer);
     var var_browserSettings = sse_decode_browser_settings_info(deserializer);
     var var_providers = sse_decode_list_network_config_info(deserializer);
     return BackgroundState(
@@ -3758,6 +3763,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         notificationsGlobalEnabled: var_notificationsGlobalEnabled,
         locale: var_locale,
         appearances: var_appearances,
+        abbreviatedNumber: var_abbreviatedNumber,
         browserSettings: var_browserSettings,
         providers: var_providers);
   }
@@ -4959,6 +4965,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.notificationsGlobalEnabled, serializer);
     sse_encode_String(self.locale, serializer);
     sse_encode_u_8(self.appearances, serializer);
+    sse_encode_bool(self.abbreviatedNumber, serializer);
     sse_encode_browser_settings_info(self.browserSettings, serializer);
     sse_encode_list_network_config_info(self.providers, serializer);
   }

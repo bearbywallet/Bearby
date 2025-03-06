@@ -2212,12 +2212,16 @@ fn wire__crate__api__settings__set_theme_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_appearances_code = <u8>::sse_decode(&mut deserializer);
+            let api_compact_numbers = <bool>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::settings::set_theme(api_appearances_code).await?;
+                        let output_ok = crate::api::settings::set_theme(
+                            api_appearances_code,
+                            api_compact_numbers,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3272,6 +3276,7 @@ impl SseDecode for crate::models::background::BackgroundState {
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
         let mut var_locale = <String>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
+        let mut var_abbreviatedNumber = <bool>::sse_decode(deserializer);
         let mut var_browserSettings =
             <crate::models::settings::BrowserSettingsInfo>::sse_decode(deserializer);
         let mut var_providers =
@@ -3282,6 +3287,7 @@ impl SseDecode for crate::models::background::BackgroundState {
             notifications_global_enabled: var_notificationsGlobalEnabled,
             locale: var_locale,
             appearances: var_appearances,
+            abbreviated_number: var_abbreviatedNumber,
             browser_settings: var_browserSettings,
             providers: var_providers,
         };
@@ -4729,6 +4735,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::background::BackgroundStat
                 .into_dart(),
             self.locale.into_into_dart().into_dart(),
             self.appearances.into_into_dart().into_dart(),
+            self.abbreviated_number.into_into_dart().into_dart(),
             self.browser_settings.into_into_dart().into_dart(),
             self.providers.into_into_dart().into_dart(),
         ]
@@ -5549,6 +5556,7 @@ impl SseEncode for crate::models::background::BackgroundState {
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
         <String>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
+        <bool>::sse_encode(self.abbreviated_number, serializer);
         <crate::models::settings::BrowserSettingsInfo>::sse_encode(
             self.browser_settings,
             serializer,

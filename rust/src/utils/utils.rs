@@ -105,6 +105,7 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
         notifications_global_enabled: service.settings.notifications.global_enabled,
         locale: service.settings.locale.to_string(),
         appearances: service.settings.theme.appearances.code(),
+        abbreviated_number: service.settings.theme.compact_numbers,
         providers: providers.into_iter().map(|p| p.config.into()).collect(),
     })
 }

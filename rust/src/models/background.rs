@@ -10,6 +10,7 @@ pub struct BackgroundState {
     pub notifications_global_enabled: bool,
     pub locale: String,
     pub appearances: u8,
+    pub abbreviated_number: bool,
     pub browser_settings: BrowserSettingsInfo,
     pub providers: Vec<NetworkConfigInfo>,
 }

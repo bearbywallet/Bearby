@@ -413,10 +413,10 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     return intlNumberFormating(
       value: amount,
       decimals: decimals,
-      localeStr: '',
+      localeStr: appState.state.locale,
       symbolStr: symbol,
       threshold: baseThreshold,
-      compact: false,
+      compact: appState.state.abbreviatedNumber,
     );
   }
 
@@ -429,10 +429,10 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     return intlNumberFormating(
       value: transaction.fee.toString(),
       decimals: decimals,
-      localeStr: '',
+      localeStr: appState.state.locale,
       symbolStr: token.symbol,
       threshold: baseThreshold,
-      compact: true,
+      compact: appState.state.abbreviatedNumber,
     );
   }
 

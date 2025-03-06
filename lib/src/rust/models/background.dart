@@ -18,6 +18,7 @@ class BackgroundState {
   final bool notificationsGlobalEnabled;
   final String locale;
   final int appearances;
+  final bool abbreviatedNumber;
   final BrowserSettingsInfo browserSettings;
   final List<NetworkConfigInfo> providers;
 
@@ -27,6 +28,7 @@ class BackgroundState {
     required this.notificationsGlobalEnabled,
     required this.locale,
     required this.appearances,
+    required this.abbreviatedNumber,
     required this.browserSettings,
     required this.providers,
   });
@@ -38,6 +40,7 @@ class BackgroundState {
       notificationsGlobalEnabled.hashCode ^
       locale.hashCode ^
       appearances.hashCode ^
+      abbreviatedNumber.hashCode ^
       browserSettings.hashCode ^
       providers.hashCode;
 
@@ -51,6 +54,7 @@ class BackgroundState {
           notificationsGlobalEnabled == other.notificationsGlobalEnabled &&
           locale == other.locale &&
           appearances == other.appearances &&
+          abbreviatedNumber == other.abbreviatedNumber &&
           browserSettings == other.browserSettings &&
           providers == other.providers;
 }
