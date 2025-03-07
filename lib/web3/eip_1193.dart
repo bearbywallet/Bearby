@@ -1102,10 +1102,13 @@ class Web3EIP1193Handler {
         foundChain = chain;
       }
     }
+    String logo =
+        "https://static.cx.metamask.io/api/v1/tokenIcons/$chainId/$zeroEVM.png";
 
     foundChain ??= NetworkConfigInfo(
       ftokens: [
         FTokenInfo(
+          logo: logo,
           name: name,
           symbol: symbol,
           decimals: 18,
@@ -1118,8 +1121,7 @@ class Web3EIP1193Handler {
         )
       ],
       name: chainParams['chainName'] as String,
-      logo:
-          'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/${symbol.toLowerCase()}.svg',
+      logo: logo,
       chain: chainParams['chainName'] as String,
       shortName: symbol,
       rpc: rpcUrls,
@@ -1130,7 +1132,7 @@ class Web3EIP1193Handler {
       diffBlockTime: BigInt.zero,
       chainHash: BigInt.zero,
       explorers: explorers,
-      fallbackEnabled: false,
+      fallbackEnabled: true,
     );
 
     foundChain = foundChain.copyWith(

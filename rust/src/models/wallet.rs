@@ -20,7 +20,18 @@ impl TryFrom<&Wallet> for WalletInfo {
 
     fn try_from(w: &Wallet) -> Result<Self, Self::Error> {
         let data = w.get_wallet_data()?;
-        let ftokens = w.get_ftokens()?;
+        let account = data.get_selected_account()?;
+        let ftokens: Vec<FTokenInfo> = w
+            .get_ftokens()?
+            .into_iter()
+            .filter_map(|t| {
+                if t.chain_hash == account.chain_hash {
+                    Some(t.into())
+                } else {
+                    None
+                }
+            })
+            .collect();
 
         Ok(Self {
             default_chain_hash: data.default_chain_hash,
@@ -30,7 +41,7 @@ impl TryFrom<&Wallet> for WalletInfo {
             wallet_address: hex::encode(w.wallet_address),
             accounts: data.accounts.iter().map(|v| v.into()).collect(),
             selected_account: data.selected_account,
-            tokens: ftokens.into_iter().map(|v| v.into()).collect(),
+            tokens: ftokens,
             settings: data.settings.into(),
         })
     }

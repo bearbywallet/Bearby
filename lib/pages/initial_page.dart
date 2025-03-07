@@ -1,4 +1,5 @@
 import 'dart:io' show Platform;
+import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
@@ -115,14 +116,32 @@ class _InitialPageState extends State<InitialPage> {
 
                       switch (appState.state.appearances) {
                         case 0:
-                          await appState.setAppearancesCode(
-                              1, appState.state.abbreviatedNumber);
+                          final Brightness systemBrightness =
+                              PlatformDispatcher.instance.platformBrightness;
+                          if (systemBrightness == Brightness.dark) {
+                            await appState.setAppearancesCode(
+                              2,
+                              appState.state.abbreviatedNumber,
+                            );
+                          } else {
+                            await appState.setAppearancesCode(
+                              1,
+                              appState.state.abbreviatedNumber,
+                            );
+                          }
+                          break;
                         case 1:
                           await appState.setAppearancesCode(
-                              2, appState.state.abbreviatedNumber);
+                            2,
+                            appState.state.abbreviatedNumber,
+                          );
+                          break;
                         case 2:
                           await appState.setAppearancesCode(
-                              1, appState.state.abbreviatedNumber);
+                            1,
+                            appState.state.abbreviatedNumber,
+                          );
+                          break;
                       }
                     },
                   ),

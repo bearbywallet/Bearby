@@ -112,10 +112,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               borderRadius: BorderRadius.circular(2),
             ),
           ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-            child: _buildHeader(theme),
-          ),
           Expanded(
             child: SingleChildScrollView(
               physics: AlwaysScrollableScrollPhysics(),
@@ -145,50 +141,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
         ],
       ),
-    );
-  }
-
-  Widget _buildHeader(AppTheme theme) {
-    return Row(
-      children: [
-        Container(
-          width: 40,
-          height: 40,
-          decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-                color: theme.primaryPurple.withValues(alpha: 0.2), width: 2),
-          ),
-          child: ClipOval(
-            child: AsyncImage(
-              url: preprocessUrl(_config.logo, theme.value),
-              width: 40,
-              height: 40,
-              fit: BoxFit.cover,
-              errorWidget: SvgPicture.asset(
-                'assets/icons/warning.svg',
-                width: 20,
-                height: 20,
-                colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
-              ),
-              loadingWidget: CircularProgressIndicator(
-                  strokeWidth: 2, color: theme.primaryPurple),
-            ),
-          ),
-        ),
-        SizedBox(width: 12),
-        Expanded(
-          child: Text(
-            _config.name,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-            overflow: TextOverflow.ellipsis,
-          ),
-        ),
-      ],
     );
   }
 

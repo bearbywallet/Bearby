@@ -143,9 +143,6 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
             }
         }
 
-        ftokens.iter_mut().for_each(|t| {
-            t.chain_hash = chain_hash;
-        });
         data.accounts.iter_mut().for_each(|a| {
             a.chain_hash = chain_hash;
         });

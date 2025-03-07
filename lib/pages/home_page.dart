@@ -236,9 +236,6 @@ class _HomePageState extends State<HomePage> {
                     onAddToken: () {
                       Navigator.pushNamed(context, '/add_token');
                     },
-                    onTokenToggle: (String addr) async {
-                      debugPrint("contract address $addr");
-                    },
                   );
                 },
               ),

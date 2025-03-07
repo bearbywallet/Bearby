@@ -12,7 +12,6 @@ import '../theme/app_theme.dart' as theme;
 void showManageTokensModal({
   required BuildContext context,
   VoidCallback? onAddToken,
-  Function(String)? onTokenToggle,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -162,7 +161,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             ),
           ),
         ),
-        isDefault: token.default_,
+        isDefault: token.native,
         isEnabled: isEnabled,
         onToggle: (value) async {
           if (!value) {

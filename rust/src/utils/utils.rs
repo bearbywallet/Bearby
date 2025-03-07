@@ -82,13 +82,13 @@ pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceErr
 }
 
 pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
+    let providers = service.get_providers();
     let wallets = service
         .wallets
         .iter()
         .map(|w| w.try_into())
         .collect::<Result<Vec<WalletInfo>, WalletErrors>>()
         .map_err(BackgroundError::WalletError)?;
-    let providers = service.get_providers();
 
     let notifications_wallet_states = service
         .settings
