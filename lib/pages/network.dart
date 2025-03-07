@@ -3,7 +3,6 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/network_tile.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/chain_config_edit.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
@@ -73,10 +72,10 @@ class _NetworkPageState extends State<NetworkPage> {
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
-      final List<Chain> mainnetChains =
-          await ChainService.loadChains(mainnetJsonData);
-      final List<Chain> testnetChains =
-          await ChainService.loadChains(testnetJsonData);
+      final List<NetworkConfigInfo> mainnetChains =
+          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+      final List<NetworkConfigInfo> testnetChains =
+          await getChainsProvidersFromJson(jsonStr: testnetJsonData);
 
       setState(() {
         addedNetworks.clear();
@@ -95,31 +94,25 @@ class _NetworkPageState extends State<NetworkPage> {
 
         final List<NetworkItem> potentialMainnetItems = [];
         for (final chain in mainnetChains) {
-          final networkConfigInfo = chain.toNetworkConfigInfo();
-          final networkId = _createNetworkIdentifier(networkConfigInfo);
+          final networkId = _createNetworkIdentifier(chain);
           final nameLower = chain.name.toLowerCase();
 
           if (!addedNetworkIds.contains(networkId) &&
               !addedNetworkNamesLower.contains(nameLower)) {
-            final updatedChain = chain..testnet = false;
-            potentialMainnetItems.add(NetworkItem(
-                configInfo: updatedChain.toNetworkConfigInfo(),
-                isAdded: false));
+            potentialMainnetItems
+                .add(NetworkItem(configInfo: chain, isAdded: false));
           }
         }
 
         final List<NetworkItem> potentialTestnetItems = [];
         for (final chain in testnetChains) {
-          final networkConfigInfo = chain.toNetworkConfigInfo();
-          final networkId = _createNetworkIdentifier(networkConfigInfo);
+          final networkId = _createNetworkIdentifier(chain);
           final nameLower = chain.name.toLowerCase();
 
           if (!addedNetworkIds.contains(networkId) &&
               !addedNetworkNamesLower.contains(nameLower)) {
-            final updatedChain = chain..testnet = true;
-            potentialTestnetItems.add(NetworkItem(
-                configInfo: updatedChain.toNetworkConfigInfo(),
-                isAdded: false));
+            potentialTestnetItems
+                .add(NetworkItem(configInfo: chain, isAdded: false));
           }
         }
 

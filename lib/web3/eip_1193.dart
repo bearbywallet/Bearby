@@ -5,7 +5,6 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/add_chain.dart';
@@ -18,6 +17,7 @@ import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
 import 'package:zilpay/src/rust/models/transactions/evm.dart';
@@ -46,8 +46,10 @@ extension NetworkConfigInfoExtension on NetworkConfigInfo {
     List<ExplorerInfo>? explorers,
     bool? fallbackEnabled,
     bool? testnet,
+    List<FTokenInfo>? ftokens,
   }) {
     return NetworkConfigInfo(
+      ftokens: ftokens ?? this.ftokens,
       name: name ?? this.name,
       logo: logo ?? this.logo,
       chain: chain ?? this.chain,
@@ -1087,20 +1089,20 @@ class Web3EIP1193Handler {
     } else {
       final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final List<Chain> mainnetChains =
-          await ChainService.loadChains(mainnetJsonData);
+      final List<NetworkConfigInfo> mainnetChains =
+          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
 
-      if (mainnetChains.any((c) => c.chainId == chainId.toInt())) {
-        final chain =
-            mainnetChains.firstWhere((c) => c.chainId == chainId.toInt());
+      if (mainnetChains.any((c) => c.chainId == chainId)) {
+        final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
 
-        chain.rpc.addAll(rpcUrls.map((v) => Uri.parse(v)));
+        chain.rpc.addAll(rpcUrls.map((v) => v));
 
-        foundChain = chain.toNetworkConfigInfo();
+        foundChain = chain;
       }
     }
 
     foundChain ??= NetworkConfigInfo(
+      ftokens: [], // TODO: add native tokens
       name: chainParams['chainName'] as String,
       logo:
           'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/${symbol.toLowerCase()}.svg',

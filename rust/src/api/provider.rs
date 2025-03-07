@@ -3,6 +3,7 @@ use crate::{
     service::service::BACKGROUND_SERVICE,
     utils::{errors::ServiceError, utils::with_service},
 };
+use serde_json::Value;
 pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
@@ -139,4 +140,17 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
     })
     .await
     .map_err(Into::into)
+}
+
+pub fn get_chains_providers_from_json(json_str: String) -> Result<Vec<NetworkConfigInfo>, String> {
+    let json_value_list: Value = serde_json::from_str(&json_str).map_err(|e| e.to_string())?;
+
+    let chains = json_value_list
+        .as_array()
+        .ok_or(ServiceError::SerdeSerror("json shoud be array".to_string()))?
+        .into_iter()
+        .map(|chain| NetworkConfigInfo::from_json_value(chain))
+        .collect::<Result<Vec<NetworkConfigInfo>, ServiceError>>()?;
+
+    Ok(chains)
 }

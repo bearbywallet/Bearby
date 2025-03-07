@@ -6,10 +6,10 @@ import 'package:provider/provider.dart';
 
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/argon.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/argon2.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -24,7 +24,7 @@ class CipherSettingsPage extends StatefulWidget {
 
 class _CipherSettingsPageState extends State<CipherSettingsPage> {
   List<String>? _bip39List;
-  Chain? _chain;
+  NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
   bool _zilLegacy = false;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
@@ -79,7 +79,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
-    final chain = args?['chain'] as Chain?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
     final keys = args?['keys'] as KeyPairInfo?;
     final zilLegacy = args?['zilLegacy'] as bool?;
 

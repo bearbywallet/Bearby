@@ -27,6 +27,7 @@
     ],
     "chainIds": [2, 32770],
     "infoURL": "https://www.zilliqa.com/",
+    "testnet": true,
     "shortName": "zilliqa",
     "slip44": 313,
     "explorers": [
@@ -67,6 +68,7 @@
     ],
     "infoURL": "https://www.bnbchain.org",
     "shortName": "binance",
+    "testnet": true,
     "chainIds": [97, 0],
     "slip44": 60,
     "explorers": [
@@ -101,6 +103,7 @@
         "decimals": 18
       }
     ],
+    "testnet": true,
     "infoURL": "https://sepolia.dev/",
     "shortName": "sepolia",
     "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",

@@ -12,6 +12,9 @@ pub enum ServiceError {
     #[error("Parse {0} error: {1}")]
     ParseError(String, String),
 
+    #[error("Parse {0}")]
+    SerdeSerror(String),
+
     #[error("Failed to acquire lock")]
     MutexLock,
 

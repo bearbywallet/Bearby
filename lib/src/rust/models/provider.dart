@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class ExplorerInfo {
@@ -50,6 +51,7 @@ class NetworkConfigInfo {
   final List<ExplorerInfo> explorers;
   final bool fallbackEnabled;
   final bool? testnet;
+  final List<FTokenInfo> ftokens;
 
   const NetworkConfigInfo({
     required this.name,
@@ -67,6 +69,7 @@ class NetworkConfigInfo {
     required this.explorers,
     required this.fallbackEnabled,
     this.testnet,
+    required this.ftokens,
   });
 
   @override
@@ -85,7 +88,8 @@ class NetworkConfigInfo {
       ens.hashCode ^
       explorers.hashCode ^
       fallbackEnabled.hashCode ^
-      testnet.hashCode;
+      testnet.hashCode ^
+      ftokens.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -106,5 +110,6 @@ class NetworkConfigInfo {
           ens == other.ens &&
           explorers == other.explorers &&
           fallbackEnabled == other.fallbackEnabled &&
-          testnet == other.testnet;
+          testnet == other.testnet &&
+          ftokens == other.ftokens;
 }

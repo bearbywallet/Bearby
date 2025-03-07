@@ -7,8 +7,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/ftokens.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
@@ -30,7 +28,7 @@ class PasswordSetupPage extends StatefulWidget {
 
 class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<String>? _bip39List;
-  Chain? _chain;
+  NetworkConfigInfo? _chain;
   WalletArgonParamsInfo? _argon2;
   Uint8List? _cipher;
   KeyPairInfo? _keys;
@@ -65,7 +63,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final bip39 = args?['bip39'] as List<String>?;
-    final chain = args?['chain'] as Chain?;
+    final chain = args?['chain'] as NetworkConfigInfo?;
     final keys = args?['keys'] as KeyPairInfo?;
     final cipher = args?['cipher'] as Uint8List?;
     final zilLegacy = args?['zilLegacy'] as bool?;
@@ -175,16 +173,11 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       final BigInt? chainHash;
       List<NetworkConfigInfo> chains = await getProviders();
       final matches = chains
-          .where(
-            (chain) =>
-                chain.chainId == BigInt.from(_chain!.chainId) &&
-                chain.slip44 == _chain!.slip44,
-          )
+          .where((chain) => chain.chainHash == _chain!.chainHash)
           .toList();
 
       if (matches.isEmpty) {
-        NetworkConfigInfo networkInfo = _chain!.toNetworkConfigInfo();
-        chainHash = await addProvider(providerConfig: networkInfo);
+        chainHash = await addProvider(providerConfig: _chain!);
       } else {
         chainHash = matches.first.chainHash;
       }
@@ -227,21 +220,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         requestTimeoutSecs: 30,
       );
 
-      List<FTokenInfo> ftokens = _chain?.ftokens
-              .map((token) => FTokenInfo(
-                    name: token.name,
-                    symbol: token.symbol,
-                    logo: token.logo,
-                    decimals: token.decimals,
-                    addr: token.addr ?? zeroEVM,
-                    balances: {},
-                    default_: true,
-                    addrType: 0,
-                    native: token.native,
-                    chainHash: chainHash ?? BigInt.zero,
-                  ))
-              .toList() ??
-          [];
+      List<FTokenInfo> ftokens = [];
 
       if (_bip39List != null) {
         Bip39AddWalletParams params = Bip39AddWalletParams(

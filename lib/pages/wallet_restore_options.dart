@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
@@ -52,7 +52,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
             final mainnetJsonData = await rootBundle
                 .loadString('assets/chains/mainnet-chains.json');
             final mainnetChains =
-                await ChainService.loadChains(mainnetJsonData);
+                await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
             if (!mainnetChains.any((chain) => chain.shortName == shortName) ||
                 !context.mounted) {
               if (context.mounted) Navigator.pop(context);

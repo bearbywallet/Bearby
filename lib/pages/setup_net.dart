@@ -5,11 +5,12 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/config/providers.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -35,8 +36,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
 
   int selectedNetworkIndex = 0;
   bool optionsDisabled = false;
-  List<Chain> mainnetNetworks = [];
-  List<Chain> testnetNetworks = [];
+  List<NetworkConfigInfo> mainnetNetworks = [];
+  List<NetworkConfigInfo> testnetNetworks = [];
 
   @override
   void initState() {
@@ -74,7 +75,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     }
   }
 
-  List<Chain> get filteredNetworks {
+  List<NetworkConfigInfo> get filteredNetworks {
     final networks = isTestnet ? testnetNetworks : mainnetNetworks;
     if (_searchQuery.isEmpty) {
       return networks;
@@ -94,10 +95,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
 
-      final List<Chain> mainnetChains =
-          await ChainService.loadChains(mainnetJsonData);
-      final List<Chain> testnetChains =
-          await ChainService.loadChains(testnetJsonData);
+      final List<NetworkConfigInfo> mainnetChains =
+          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+      final List<NetworkConfigInfo> testnetChains =
+          await getChainsProvidersFromJson(jsonStr: testnetJsonData);
 
       setState(() {
         mainnetNetworks = mainnetChains;
@@ -122,7 +123,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     }
   }
 
-  OptionItem _buildNetworkItem(Chain chain, AppTheme theme, int index) {
+  OptionItem _buildNetworkItem(
+      NetworkConfigInfo chain, AppTheme theme, int index) {
     return OptionItem(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -178,7 +180,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Chain ID: ${chain.chainIds.where((id) => id != 0).toList().join(",")}',
+                      'Chain ID: ${chain.chainIds.where((id) => id != BigInt.zero).toList().join(",")}',
                       style: TextStyle(
                         color: theme.primaryPurple,
                         fontSize: 14,
@@ -335,10 +337,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             final chain = isTestnet
                                 ? testnetNetworks[selectedNetworkIndex]
                                 : mainnetNetworks[selectedNetworkIndex];
-
-                            if (isTestnet) {
-                              chain.testnet = true;
-                            }
 
                             Navigator.of(context).pushNamed(
                               '/cipher_setup',

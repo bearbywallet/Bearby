@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/ftoken.dart';
 import '../models/provider.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
@@ -35,3 +36,8 @@ Future<void> selectAccountsChain(
         {required BigInt walletIndex, required BigInt chainHash}) =>
     RustLib.instance.api.crateApiProviderSelectAccountsChain(
         walletIndex: walletIndex, chainHash: chainHash);
+
+Future<List<NetworkConfigInfo>> getChainsProvidersFromJson(
+        {required String jsonStr}) =>
+    RustLib.instance.api
+        .crateApiProviderGetChainsProvidersFromJson(jsonStr: jsonStr);
