@@ -40,42 +40,41 @@ class _ChainInfoModalContent extends StatefulWidget {
 }
 
 class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
+  late NetworkConfigInfo _config;
   Map<String, String> _rpcStatus = {};
 
   @override
   void initState() {
     super.initState();
+    _config = widget.networkConfig;
     _checkRpcStatus();
   }
 
   void _checkRpcStatus() async {}
 
   void _removeRpc(String rpc) async {
-    if (widget.networkConfig.rpc.length > 5) {
+    if (_config.rpc.length > 5) {
       setState(() {
-        widget.networkConfig.rpc.remove(rpc);
+        _config.rpc.remove(rpc);
       });
+      await createOrUpdateChain(providerConfig: _config);
     }
-
-    await createOrUpdateChain(providerConfig: widget.networkConfig);
   }
 
   void _selectRpc(int index) async {
     setState(() {
-      final selectedRpc = widget.networkConfig.rpc.removeAt(index);
-      widget.networkConfig.rpc.insert(0, selectedRpc);
+      final selectedRpc = _config.rpc.removeAt(index);
+      _config.rpc.insert(0, selectedRpc);
     });
-
-    await createOrUpdateChain(providerConfig: widget.networkConfig);
+    await createOrUpdateChain(providerConfig: _config);
   }
 
   void _selectExplorer(int index) async {
     setState(() {
-      final selectedExplorer = widget.networkConfig.explorers.removeAt(index);
-      widget.networkConfig.explorers.insert(0, selectedExplorer);
+      final selectedExplorer = _config.explorers.removeAt(index);
+      _config.explorers.insert(0, selectedExplorer);
     });
-
-    await createOrUpdateChain(providerConfig: widget.networkConfig);
+    await createOrUpdateChain(providerConfig: _config);
   }
 
   @override
@@ -117,23 +116,29 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             child: _buildHeader(theme),
           ),
           Expanded(
-            child: Column(
-              children: [
-                Padding(
-                  padding: EdgeInsets.all(adaptivePadding),
-                  child: _buildNetworkInfo(theme),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(adaptivePadding),
-                  child: _buildExplorers(theme),
-                ),
-                Expanded(
-                  child: Padding(
+            child: SingleChildScrollView(
+              physics: AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  if (_config.ftokens.isNotEmpty)
+                    Padding(
+                      padding: EdgeInsets.all(adaptivePadding),
+                      child: _buildFirstToken(theme),
+                    ),
+                  Padding(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: _buildNetworkInfo(theme),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: _buildExplorers(theme),
+                  ),
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     child: _buildRpcList(theme),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
           SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
@@ -155,7 +160,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
           child: ClipOval(
             child: AsyncImage(
-              url: preprocessUrl(widget.networkConfig.logo, theme.value),
+              url: preprocessUrl(_config.logo, theme.value),
               width: 40,
               height: 40,
               fit: BoxFit.cover,
@@ -173,7 +178,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
         SizedBox(width: 12),
         Expanded(
           child: Text(
-            widget.networkConfig.name,
+            _config.name,
             style: TextStyle(
               color: theme.textPrimary,
               fontSize: 18,
@@ -187,8 +192,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   }
 
   Widget _buildNetworkInfo(AppTheme theme) {
-    final chainIds =
-        widget.networkConfig.chainIds.map((id) => id.toString()).join(', ');
+    final chainIds = _config.chainIds.map((id) => id.toString()).join(', ');
 
     return Container(
       width: double.infinity,
@@ -210,13 +214,182 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             ),
           ),
           SizedBox(height: 8),
-          _buildInfoItem('Chain', widget.networkConfig.chain, theme),
-          _buildInfoItem('Short Name', widget.networkConfig.shortName, theme),
           _buildInfoItem(
-              'Chain ID', widget.networkConfig.chainId.toString(), theme),
+            'Chain',
+            Text(
+              _config.chain,
+              style: TextStyle(color: theme.textPrimary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            theme,
+            expandValue: true,
+          ),
           _buildInfoItem(
-              'Slip44', widget.networkConfig.slip44.toString(), theme),
-          _buildInfoItem('Chain IDs', chainIds, theme),
+            'Short Name',
+            Text(
+              _config.shortName,
+              style: TextStyle(color: theme.textPrimary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            theme,
+            expandValue: true,
+          ),
+          _buildInfoItem(
+            'Chain ID',
+            Text(
+              _config.chainId.toString(),
+              style: TextStyle(color: theme.textPrimary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            theme,
+            expandValue: true,
+          ),
+          _buildInfoItem(
+            'Slip44',
+            Text(
+              _config.slip44.toString(),
+              style: TextStyle(color: theme.textPrimary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            theme,
+            expandValue: true,
+          ),
+          _buildInfoItem(
+            'Chain IDs',
+            Text(
+              chainIds,
+              style: TextStyle(color: theme.textPrimary, fontSize: 12),
+              overflow: TextOverflow.ellipsis,
+            ),
+            theme,
+            expandValue: true,
+          ),
+          if (_config.testnet != null)
+            _buildInfoItem(
+              'Testnet',
+              Text(
+                _config.testnet! ? 'Yes' : 'No',
+                style: TextStyle(color: theme.textPrimary, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+              theme,
+              expandValue: true,
+            ),
+          if (_config.diffBlockTime != BigInt.zero)
+            _buildInfoItem(
+              'Diff Block Time',
+              Text(
+                _config.diffBlockTime.toString(),
+                style: TextStyle(color: theme.textPrimary, fontSize: 12),
+                overflow: TextOverflow.ellipsis,
+              ),
+              theme,
+              expandValue: true,
+            ),
+          _buildInfoItem(
+            'Fallback Enabled',
+            Switch(
+              value: _config.fallbackEnabled,
+              onChanged: (value) async {
+                setState(() {
+                  _config = NetworkConfigInfo(
+                    name: _config.name,
+                    logo: _config.logo,
+                    chain: _config.chain,
+                    shortName: _config.shortName,
+                    rpc: _config.rpc,
+                    features: _config.features,
+                    chainId: _config.chainId,
+                    chainIds: _config.chainIds,
+                    slip44: _config.slip44,
+                    diffBlockTime: _config.diffBlockTime,
+                    chainHash: _config.chainHash,
+                    ens: _config.ens,
+                    explorers: _config.explorers,
+                    fallbackEnabled: value,
+                    testnet: _config.testnet,
+                    ftokens: _config.ftokens,
+                  );
+                });
+                await createOrUpdateChain(providerConfig: _config);
+              },
+              activeColor: theme.primaryPurple,
+            ),
+            theme,
+            expandValue: false,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFirstToken(AppTheme theme) {
+    if (_config.ftokens.isEmpty) {
+      return const SizedBox.shrink();
+    }
+
+    final token = _config.ftokens.first;
+
+    return Container(
+      width: double.infinity,
+      padding: EdgeInsets.all(12),
+      decoration: BoxDecoration(
+        color: theme.background.withValues(alpha: 0.5),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: theme.textSecondary.withValues(alpha: 0.1)),
+      ),
+      child: Row(
+        children: [
+          if (token.logo != null)
+            ClipOval(
+              child: AsyncImage(
+                url: processTokenLogo(token, theme.value),
+                width: 40,
+                height: 40,
+                fit: BoxFit.cover,
+                errorWidget: SvgPicture.asset(
+                  'assets/icons/warning.svg',
+                  width: 20,
+                  height: 20,
+                  colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                ),
+                loadingWidget: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: theme.primaryPurple,
+                ),
+              ),
+            ),
+          SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  token.name,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                ),
+                Text(
+                  token.symbol,
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+                Text(
+                  'Decimals: ${token.decimals}',
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );
@@ -235,61 +408,59 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
         ),
         SizedBox(height: 8),
-        Expanded(
-          child: ListView.builder(
-            shrinkWrap: true,
-            padding: EdgeInsets.only(bottom: 8),
-            itemCount: widget.networkConfig.rpc.length,
-            itemBuilder: (context, index) {
-              final rpc = widget.networkConfig.rpc[index];
-              final isSelected = index == 0;
-              final canDelete = widget.networkConfig.rpc.length > 5;
+        ListView.builder(
+          shrinkWrap: true,
+          physics: NeverScrollableScrollPhysics(),
+          padding: EdgeInsets.only(bottom: 8),
+          itemCount: _config.rpc.length,
+          itemBuilder: (context, index) {
+            final rpc = _config.rpc[index];
+            final isSelected = index == 0;
+            final canDelete = _config.rpc.length > 5;
 
-              return GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTap: () => _selectRpc(index),
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 6),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                        color: isSelected
-                            ? theme.primaryPurple
-                            : theme.textSecondary.withValues(alpha: 0.2)),
-                    borderRadius: BorderRadius.circular(8),
-                    color: isSelected
-                        ? theme.primaryPurple.withValues(alpha: 0.1)
-                        : theme.background.withValues(alpha: 0.5),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          rpc,
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 12,
-                            fontWeight: isSelected
-                                ? FontWeight.bold
-                                : FontWeight.normal,
-                          ),
-                          overflow: TextOverflow.ellipsis,
-                        ),
-                      ),
-                      if (canDelete)
-                        HoverSvgIcon(
-                          assetName: 'assets/icons/minus.svg',
-                          width: 20,
-                          height: 20,
-                          color: theme.danger,
-                          onTap: () => _removeRpc(rpc),
-                        ),
-                    ],
-                  ),
+            return GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTap: () => _selectRpc(index),
+              child: Container(
+                margin: EdgeInsets.only(bottom: 6),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                      color: isSelected
+                          ? theme.primaryPurple
+                          : theme.textSecondary.withValues(alpha: 0.2)),
+                  borderRadius: BorderRadius.circular(8),
+                  color: isSelected
+                      ? theme.primaryPurple.withValues(alpha: 0.1)
+                      : theme.background.withValues(alpha: 0.5),
                 ),
-              );
-            },
-          ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        rpc,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 12,
+                          fontWeight:
+                              isSelected ? FontWeight.bold : FontWeight.normal,
+                        ),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    if (canDelete)
+                      HoverSvgIcon(
+                        assetName: 'assets/icons/minus.svg',
+                        width: 20,
+                        height: 20,
+                        color: theme.danger,
+                        onTap: () => _removeRpc(rpc),
+                      ),
+                  ],
+                ),
+              ),
+            );
+          },
         ),
       ],
     );
@@ -317,8 +488,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
           SizedBox(height: 8),
           Column(
-            children:
-                widget.networkConfig.explorers.asMap().entries.map((entry) {
+            children: _config.explorers.asMap().entries.map((entry) {
               final index = entry.key;
               final explorer = entry.value;
               final isSelected = index == 0;
@@ -394,10 +564,12 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     );
   }
 
-  Widget _buildInfoItem(String label, String value, AppTheme theme) {
+  Widget _buildInfoItem(String label, Widget valueWidget, AppTheme theme,
+      {bool expandValue = true}) {
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 4),
       child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
             '$label: ',
@@ -407,13 +579,15 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               fontWeight: FontWeight.w500,
             ),
           ),
-          Expanded(
-            child: Text(
-              value,
-              style: TextStyle(color: theme.textPrimary, fontSize: 12),
-              overflow: TextOverflow.ellipsis,
-            ),
-          ),
+          if (expandValue)
+            Expanded(
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: valueWidget,
+              ),
+            )
+          else
+            valueWidget,
         ],
       ),
     );
