@@ -137,7 +137,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
                   child: SwipeButton(
                     text: 'Approve',
                     backgroundColor: theme.primaryPurple,
-                    textColor: theme.textPrimary,
+                    textColor: theme.buttonText,
                     onSwipeComplete: () async {
                       final selected = widget.chain.rpc
                           .asMap()

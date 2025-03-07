@@ -166,7 +166,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
-    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.buttonText;
 
     return Container(
       constraints:

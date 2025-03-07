@@ -65,35 +65,35 @@ class LightTheme implements AppTheme {
   String value = "Light";
 
   @override
-  Color get primaryPurple => const Color(0xFF6A1B9A);
+  Color get primaryPurple => const Color(0xFFFC72FF);
   @override
-  Color get secondaryPurple => const Color(0xFF9C27B0);
+  Color get secondaryPurple => const Color(0xFFB0B0B0);
   @override
-  Color get background => const Color(0xFFF5F5F5);
+  Color get background => const Color(0xFFFFFFFF);
   @override
-  Color get cardBackground => Colors.white;
+  Color get cardBackground => const Color(0xFFF7F7F7);
   @override
-  Color get textPrimary => const Color(0xFF212121);
+  Color get textPrimary => const Color(0xFF000000);
   @override
-  Color get textSecondary => const Color(0xFF757575);
+  Color get textSecondary => const Color(0xFF6C6C6C);
   @override
-  Color get buttonBackground => const Color(0xFFE0E0E0);
+  Color get buttonBackground => const Color(0xFFFF007A);
   @override
-  Color get buttonText => Colors.white;
+  Color get buttonText => const Color(0xFFFFFFFF);
   @override
-  Color get danger => const Color(0xFFD32F2F);
+  Color get danger => const Color(0xFFFF4D4D);
   @override
-  Color get success => const Color(0xFF2E7D32);
+  Color get success => const Color(0xFF00D395);
   @override
-  Color get warning => const Color(0xFFFB8C00);
+  Color get warning => const Color(0xFFFFA500);
 
   @override
-  Color get gradientStart => const Color(0xFFE6E6FA);
+  Color get gradientStart => const Color(0xFFFF007A);
   @override
-  Color get gradientMiddle => const Color(0xFFD8BFD8);
+  Color get gradientMiddle => const Color(0xFFD500F9);
   @override
-  Color get gradientEnd => const Color(0xFFF0F8FF);
+  Color get gradientEnd => const Color(0xFFFF007A);
 
   @override
-  Color get modalBorder => Colors.black12;
+  Color get modalBorder => const Color(0xFFE0E0E0);
 }
