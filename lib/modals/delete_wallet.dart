@@ -74,6 +74,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
         password: _passwordController.text,
       );
       await widget.state.syncData();
+      widget.state.setSelectedWallet(0);
+
       if (!mounted) return;
       _btnController.success();
       await Navigator.of(context).pushNamed('/login');

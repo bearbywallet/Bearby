@@ -48,13 +48,21 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (_appState.wallets.isEmpty) {
+      Navigator.of(context).pushNamed('/initial');
+    }
+  }
+
+  @override
   void dispose() {
     _passwordController.dispose();
     _btnController.dispose();
     super.dispose();
   }
 
-  // Navigation
   void _navigateToHome() {
     _appState.setSelectedWallet(_selectedWallet);
     Navigator.of(context).pushNamed('/');
@@ -64,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushNamed(context, '/new_wallet_options');
   }
 
-  // Authentication Logic
   Future<bool> _authenticateWithSession(
     String session,
     int walletIndex,
@@ -202,7 +209,6 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
-  // UI Components
   Widget _buildBackground(Size screenSize) {
     return Positioned(
       child: SizedBox(
@@ -363,11 +369,22 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context);
+    final appState = Provider.of<AppState>(context);
     final screenSize = MediaQuery.of(context).size;
 
+    if (appState.wallets.isEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pushReplacementNamed('/initial');
+      });
+      return const Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
+
     return Scaffold(
-      backgroundColor: theme.currentTheme.background,
+      backgroundColor: appState.currentTheme.background,
       body: Stack(
         children: [
           _buildBackground(screenSize),
@@ -377,18 +394,18 @@ class _LoginPageState extends State<LoginPage> {
                 constraints: const BoxConstraints(maxWidth: 480),
                 child: Column(
                   children: [
-                    _buildHeader(theme),
+                    _buildHeader(appState),
                     Text(
                       'Welcome back',
                       style: TextStyle(
-                        color: theme.currentTheme.textPrimary,
+                        color: appState.currentTheme.textPrimary,
                         fontSize: 32,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),
-                    _buildWalletList(theme),
-                    _buildLoginForm(theme),
+                    _buildWalletList(appState),
+                    _buildLoginForm(appState),
                   ],
                 ),
               ),

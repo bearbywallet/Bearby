@@ -90,11 +90,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
 
   Future<void> _loadChains() async {
     try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final storedProviders = appState.state.providers;
+
       final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
       final String testnetJsonData =
           await rootBundle.loadString('assets/chains/testnet-chains.json');
-
       final List<NetworkConfigInfo> mainnetChains =
           await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
       final List<NetworkConfigInfo> testnetChains =
@@ -102,6 +104,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
 
       setState(() {
         mainnetNetworks = mainnetChains;
+        mainnetNetworks =
+            _appendUniqueMainnetNetworks(storedProviders, mainnetNetworks);
         testnetNetworks = testnetChains;
         isLoading = false;
 
@@ -121,6 +125,29 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       });
       debugPrint('Error loading chains: $e');
     }
+  }
+
+  List<NetworkConfigInfo> _appendUniqueMainnetNetworks(
+      List<NetworkConfigInfo> storedProviders,
+      List<NetworkConfigInfo> jsonChains) {
+    final Set<String> jsonNetworkIds =
+        jsonChains.map(_createNetworkIdentifier).toSet();
+    final List<NetworkConfigInfo> uniqueStoredNetworks = [];
+
+    for (final provider in storedProviders) {
+      if (!(provider.testnet ?? false)) {
+        final identifier = _createNetworkIdentifier(provider);
+        if (!jsonNetworkIds.contains(identifier)) {
+          uniqueStoredNetworks.add(provider);
+        }
+      }
+    }
+
+    return [...jsonChains, ...uniqueStoredNetworks];
+  }
+
+  String _createNetworkIdentifier(NetworkConfigInfo network) {
+    return '${network.slip44}|${network.chainId}';
   }
 
   OptionItem _buildNetworkItem(
@@ -315,10 +342,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                               options: List.generate(
                                 filteredNetworks.length,
                                 (index) => _buildNetworkItem(
-                                  filteredNetworks[index],
-                                  theme,
-                                  index,
-                                ),
+                                    filteredNetworks[index], theme, index),
                               ),
                               unselectedOpacity: 0.5,
                             ),
@@ -337,7 +361,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             final chain = isTestnet
                                 ? testnetNetworks[selectedNetworkIndex]
                                 : mainnetNetworks[selectedNetworkIndex];
-
                             Navigator.of(context).pushNamed(
                               '/cipher_setup',
                               arguments: {

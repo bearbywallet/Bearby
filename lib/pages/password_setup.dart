@@ -44,6 +44,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   String _errorMessage = '';
   bool _disabled = false;
   bool _focused = false;
+  bool _walletNameInitialized = false;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -84,7 +85,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       });
     }
 
-    _walletNameController.text = _generateWalletName();
+    if (!_walletNameInitialized) {
+      _walletNameController.text = _generateWalletName();
+      _walletNameInitialized = true;
+    }
   }
 
   @override
@@ -93,6 +97,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _appState = Provider.of<AppState>(context, listen: false);
+    _walletNameController.text = '';
 
     _checkAuthMethods();
   }
@@ -130,7 +135,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       return false;
     }
 
-    if (_walletNameController.text.length > 24) {
+    if (_walletNameController.text.length > 32) {
       setState(() {
         _errorMessage = 'Wallet name is too long';
         _disabled = false;
