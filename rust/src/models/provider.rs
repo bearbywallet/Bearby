@@ -303,10 +303,7 @@ impl NetworkConfigInfo {
                     chain_hash,
                     ens,
                     explorers,
-                    fallback_enabled: obj
-                        .get("fallback_enabled")
-                        .and_then(|v| v.as_bool())
-                        .unwrap_or(false),
+                    fallback_enabled: true,
                     testnet: obj.get("testnet").and_then(|v| v.as_bool()),
                     ftokens,
                 })

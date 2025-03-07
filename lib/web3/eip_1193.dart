@@ -5,6 +5,7 @@ import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/add_chain.dart';
@@ -1076,6 +1077,7 @@ class Web3EIP1193Handler {
         .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
         .toList();
     final symbol = nativeCurrency['symbol'].toString();
+    final name = nativeCurrency['name'].toString();
 
     NetworkConfigInfo? foundChain;
 
@@ -1102,7 +1104,19 @@ class Web3EIP1193Handler {
     }
 
     foundChain ??= NetworkConfigInfo(
-      ftokens: [], // TODO: add native tokens
+      ftokens: [
+        FTokenInfo(
+          name: name,
+          symbol: symbol,
+          decimals: 18,
+          addr: zeroEVM,
+          addrType: 1,
+          balances: {},
+          default_: false,
+          native: true,
+          chainHash: BigInt.zero,
+        )
+      ],
       name: chainParams['chainName'] as String,
       logo:
           'https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/${symbol.toLowerCase()}.svg',

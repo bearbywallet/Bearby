@@ -382,9 +382,8 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       'ga.js',
       'fbevents.js',
       'ERR_NAME_NOT_RESOLVED',
-      'net::ERR_NAME_NOT_RESOLVED',
-      'net::ERR_CLEARTEXT_NOT_PERMITTED',
       'CLEARTEXT_NOT_PERMITTED',
+      'ERR_CONNECTION_CLOSED',
       'DNS_PROBE_FINISHED'
     ];
 

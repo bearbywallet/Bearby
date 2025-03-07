@@ -9,6 +9,7 @@ import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/web3/eip_1193.dart';
 
 void showChainInfoModal({
   required BuildContext context,
@@ -292,24 +293,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               value: _config.fallbackEnabled,
               onChanged: (value) async {
                 setState(() {
-                  _config = NetworkConfigInfo(
-                    name: _config.name,
-                    logo: _config.logo,
-                    chain: _config.chain,
-                    shortName: _config.shortName,
-                    rpc: _config.rpc,
-                    features: _config.features,
-                    chainId: _config.chainId,
-                    chainIds: _config.chainIds,
-                    slip44: _config.slip44,
-                    diffBlockTime: _config.diffBlockTime,
-                    chainHash: _config.chainHash,
-                    ens: _config.ens,
-                    explorers: _config.explorers,
-                    fallbackEnabled: value,
-                    testnet: _config.testnet,
-                    ftokens: _config.ftokens,
-                  );
+                  _config = _config.copyWith(fallbackEnabled: value);
                 });
                 await createOrUpdateChain(providerConfig: _config);
               },
