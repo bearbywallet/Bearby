@@ -151,7 +151,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         constraints: const BoxConstraints(maxWidth: 480),
                         child: RoundedLoadingButton(
                           color: theme.primaryPurple,
-                          valueColor: theme.textPrimary,
+                          valueColor: theme.buttonText,
                           controller: _btnController,
                           onPressed: () => _onPasswordSubmit(
                             BigInt.from(state.selectedWallet),

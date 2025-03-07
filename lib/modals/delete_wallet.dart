@@ -191,7 +191,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                         width: double.infinity,
                         child: RoundedLoadingButton(
                           color: theme.danger,
-                          valueColor: theme.textPrimary,
+                          valueColor: theme.buttonText,
                           onPressed: _handleDeleteWallet,
                           controller: _btnController,
                           successIcon: SvgPicture.asset(

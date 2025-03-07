@@ -500,7 +500,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                       padding: EdgeInsets.only(bottom: adaptivePadding),
                       child: RoundedLoadingButton(
                         color: theme.primaryPurple,
-                        valueColor: theme.textPrimary,
+                        valueColor: theme.buttonText,
                         controller: _btnController,
                         onPressed: _createWallet,
                         successIcon: SvgPicture.asset(

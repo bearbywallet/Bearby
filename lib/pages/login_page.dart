@@ -346,7 +346,7 @@ class _LoginPageState extends State<LoginPage> {
       width: double.infinity,
       child: RoundedLoadingButton(
         color: theme.primaryPurple,
-        valueColor: theme.textPrimary,
+        valueColor: theme.buttonText,
         controller: _btnController,
         onPressed: _handleAuthentication,
         successIcon: SvgPicture.asset(
