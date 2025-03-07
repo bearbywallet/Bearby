@@ -1017,19 +1017,6 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    final connection = Web3Utils.findConnected(
-      _currentDomain,
-      appState.connections,
-    );
-
-    if (connection == null) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.unauthorized,
-        'This domain is not connected. Please connect first.',
-      );
-    }
-
     final params = message.payload['params'] as List<dynamic>?;
     if (params == null ||
         params.isEmpty ||
@@ -1133,6 +1120,7 @@ class Web3EIP1193Handler {
       chainHash: BigInt.zero,
       explorers: explorers,
       fallbackEnabled: true,
+      testnet: name.toLowerCase().contains("test"),
     );
 
     foundChain = foundChain.copyWith(
