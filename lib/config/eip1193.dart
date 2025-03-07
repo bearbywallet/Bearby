@@ -43,6 +43,7 @@ enum Web3EIP1193ErrorCode {
   disconnected(4900),
   chainDisconnected(4901),
   internalError(-32603),
+  chainNotAdded(4902),
   invalidInput(-32000);
 
   final int code;

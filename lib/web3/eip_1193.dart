@@ -11,6 +11,7 @@ import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/add_chain.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
+import 'package:zilpay/modals/swich_chain_modal.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/modals/watch_asset_modal.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -242,6 +243,10 @@ class Web3EIP1193Handler {
 
         case Web3EIP1193Method.walletAddEthereumChain:
           await _handleWalletAddEthereumChain(message, context, appState);
+          break;
+
+        case Web3EIP1193Method.walletSwitchEthereumChain:
+          await _handleWalletSwitchEthereumChain(message, context, appState);
           break;
 
         default:
@@ -1162,5 +1167,75 @@ class Web3EIP1193Handler {
         );
       },
     );
+  }
+
+  Future<void> _handleWalletSwitchEthereumChain(
+    ZilPayWeb3Message message,
+    BuildContext context,
+    AppState appState,
+  ) async {
+    final params = message.payload['params'] as List<dynamic>?;
+    if (params == null ||
+        params.isEmpty ||
+        params[0] is! Map<String, dynamic>) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Invalid parameters for wallet_switchEthereumChain',
+      );
+    }
+
+    final chainParams = params[0] as Map<String, dynamic>;
+    if (!chainParams.containsKey('chainId')) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.invalidInput,
+        'Missing required field: chainId',
+      );
+    }
+
+    final chainId = BigInt.parse(
+      chainParams['chainId'].toString().replaceFirst('0x', ''),
+      radix: 16,
+    );
+
+    try {
+      final providers = appState.state.providers;
+      final chainExists = providers.any((p) => p.chainId == chainId);
+
+      if (!chainExists) {
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.chainNotAdded,
+          'The requested chain has not been added. Use wallet_addEthereumChain first.',
+        );
+      }
+
+      showSwitchChainNetworkModal(
+        context: context,
+        selectedChainId: chainId,
+        onNetworkSelected: () {
+          _sendResponse(
+            type: 'ZILPAY_RESPONSE',
+            uuid: message.uuid,
+            result: null,
+          );
+        },
+        onReject: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected the request',
+          );
+        },
+      );
+    } catch (e) {
+      dev.log('Error in wallet_switchEthereumChain: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing wallet_switchEthereumChain: $e',
+      );
+    }
   }
 }
