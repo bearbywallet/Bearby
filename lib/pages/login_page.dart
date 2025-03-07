@@ -340,10 +340,13 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  Widget _buildUnlockButton(AppState theme) {
+  Widget _buildUnlockButton(AppState appState) {
+    final theme = appState.currentTheme;
     return SizedBox(
       width: double.infinity,
       child: RoundedLoadingButton(
+        color: theme.primaryPurple,
+        valueColor: theme.textPrimary,
         controller: _btnController,
         onPressed: _handleAuthentication,
         successIcon: SvgPicture.asset(
@@ -351,14 +354,14 @@ class _LoginPageState extends State<LoginPage> {
           width: 24,
           height: 24,
           colorFilter: ColorFilter.mode(
-            theme.currentTheme.textPrimary,
+            theme.textPrimary,
             BlendMode.srcIn,
           ),
         ),
         child: Text(
           'Unlock',
           style: TextStyle(
-            color: theme.currentTheme.textPrimary,
+            color: theme.buttonText,
             fontSize: 18,
             fontWeight: FontWeight.bold,
           ),

@@ -79,7 +79,7 @@ class LightTheme implements AppTheme {
   @override
   Color get buttonBackground => const Color(0xFFE0E0E0);
   @override
-  Color get buttonText => const Color(0xFF212121);
+  Color get buttonText => Colors.white;
   @override
   Color get danger => const Color(0xFFD32F2F);
   @override

@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -15,8 +14,6 @@ class LedgerConnectPage extends StatefulWidget {
 }
 
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
-  final _btnController = RoundedLoadingButtonController();
-
   @override
   void initState() {
     super.initState();
@@ -32,7 +29,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   @override
   void dispose() {
-    _btnController.dispose();
     super.dispose();
   }
 

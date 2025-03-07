@@ -180,6 +180,8 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                         SizedBox(
                           width: double.infinity,
                           child: RoundedLoadingButton(
+                            color: theme.primaryPurple,
+                            valueColor: theme.textPrimary,
                             controller: _btnController,
                             onPressed: _onConnect,
                             successIcon: SvgPicture.asset(
@@ -194,7 +196,7 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                             child: Text(
                               'Connect',
                               style: TextStyle(
-                                color: theme.textPrimary,
+                                color: theme.buttonText,
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
                               ),

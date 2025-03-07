@@ -499,6 +499,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                     Padding(
                       padding: EdgeInsets.only(bottom: adaptivePadding),
                       child: RoundedLoadingButton(
+                        color: theme.primaryPurple,
+                        valueColor: theme.textPrimary,
                         controller: _btnController,
                         onPressed: _createWallet,
                         successIcon: SvgPicture.asset(
@@ -513,7 +515,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                         child: Text(
                           'Create Password',
                           style: TextStyle(
-                            color: theme.textPrimary,
+                            color: theme.buttonText,
                             fontSize: 18,
                             fontWeight: FontWeight.bold,
                           ),

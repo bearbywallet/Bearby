@@ -191,6 +191,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                         width: double.infinity,
                         child: RoundedLoadingButton(
                           color: theme.danger,
+                          valueColor: theme.textPrimary,
                           onPressed: _handleDeleteWallet,
                           controller: _btnController,
                           successIcon: SvgPicture.asset(
@@ -203,7 +204,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                           child: Text(
                             'Submit',
                             style: TextStyle(
-                              color: theme.textPrimary,
+                              color: theme.buttonText,
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
