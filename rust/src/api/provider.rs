@@ -129,16 +129,13 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         for provider_ftoken in &provider.config.ftokens {
-            if let Some(existing_ftoken) = ftokens
-                .iter_mut()
-                .find(|t| t.symbol == provider_ftoken.symbol)
-            {
-                *existing_ftoken = provider_ftoken.clone();
+            if let Some(existing_ftoken) = ftokens.iter_mut().find(|t| {
+                t.symbol == provider_ftoken.symbol && t.decimals == provider_ftoken.decimals
+            }) {
                 existing_ftoken.chain_hash = chain_hash;
                 existing_ftoken.balances = Default::default();
             } else {
-                let mut new_ftoken = provider_ftoken.clone();
-                new_ftoken.chain_hash = chain_hash;
+                let new_ftoken = provider_ftoken.clone();
                 ftokens.insert(0, new_ftoken);
             }
         }

@@ -76,13 +76,12 @@ class _ArgonSettingsModalContentState
   @override
   void initState() {
     super.initState();
-    // Initialize with the provided argonParams
+
     selectedParamIndex = _getInitialParamIndex();
     _secretController.text = widget.argonParams.secret;
   }
 
   int _getInitialParamIndex() {
-    // Logic to determine initial index based on provided argonParams
     if (widget.argonParams ==
         Argon2DefaultParams.lowMemory(secret: widget.argonParams.secret)) {
       return 0;

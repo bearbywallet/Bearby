@@ -149,8 +149,10 @@ impl NetworkConfigInfo {
 
                 let mut hasher = DefaultHasher::new();
                 let slip_44 = obj.get("slip44").and_then(|v| v.as_u64()).unwrap_or(0) as u32;
+                let num = chain_ids[0] + chain_ids[1];
+
+                num.hash(&mut hasher);
                 slip_44.hash(&mut hasher);
-                chain_ids.hash(&mut hasher);
                 if let Some(chain) = obj.get("chain").and_then(|v| v.as_str()) {
                     chain.hash(&mut hasher);
                 }

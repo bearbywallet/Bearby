@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 enum ButtonState { idle, loading, success, error }
 
@@ -74,8 +76,7 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final primaryColor = widget.color ?? theme.primaryColor;
+    final theme = Provider.of<AppState>(context).currentTheme;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -98,7 +99,7 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
         Widget successIcon = Container(
           alignment: Alignment.center,
           decoration: BoxDecoration(
-            color: primaryColor,
+            color: theme.success,
             borderRadius: BorderRadius.circular(_bounceAnimation.value / 2),
           ),
           width: _bounceAnimation.value,
@@ -147,7 +148,8 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(widget.borderRadius),
             ),
-            backgroundColor: primaryColor,
+            backgroundColor: widget.color ?? theme.buttonBackground,
+            foregroundColor: theme.buttonText,
             elevation: 0,
             padding: EdgeInsets.zero,
           ),
