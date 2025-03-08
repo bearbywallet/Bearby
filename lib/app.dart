@@ -45,15 +45,56 @@ class ZilPayApp extends StatelessWidget {
                   );
                 },
                 theme: ThemeData(
+                  brightness: currentTheme.brightness,
                   primaryColor: currentTheme.primaryPurple,
+                  cardColor: currentTheme.cardBackground,
                   scaffoldBackgroundColor: currentTheme.background,
                   canvasColor: currentTheme.background,
+                  textTheme: TextTheme(
+                    bodyLarge: TextStyle(color: currentTheme.textPrimary),
+                    bodyMedium: TextStyle(color: currentTheme.textSecondary),
+                  ),
                   pageTransitionsTheme: const PageTransitionsTheme(
                     builders: {
                       TargetPlatform.android:
                           FadeUpwardsPageTransitionsBuilder(),
                       TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
                     },
+                  ),
+                  colorScheme: currentTheme.brightness == Brightness.light
+                      ? ColorScheme.light(
+                          primary: currentTheme.primaryPurple,
+                          secondary: currentTheme.secondaryPurple,
+                          error: currentTheme.danger,
+                          surface: currentTheme.cardBackground,
+                        )
+                      : ColorScheme.dark(
+                          primary: currentTheme.primaryPurple,
+                          secondary: currentTheme.secondaryPurple,
+                          error: currentTheme.danger,
+                          surface: currentTheme.cardBackground,
+                        ),
+                  switchTheme: SwitchThemeData(
+                    trackColor: WidgetStateProperty.resolveWith((states) {
+                      if (!states.contains(WidgetState.selected)) {
+                        return currentTheme.textSecondary
+                            .withValues(alpha: 0.3);
+                      }
+                      return null;
+                    }),
+                    thumbColor: WidgetStateProperty.resolveWith((states) {
+                      if (!states.contains(WidgetState.selected)) {
+                        return currentTheme.textSecondary;
+                      }
+                      return null;
+                    }),
+                    trackOutlineColor:
+                        WidgetStateProperty.resolveWith((states) {
+                      if (!states.contains(WidgetState.selected)) {
+                        return currentTheme.cardBackground;
+                      }
+                      return currentTheme.cardBackground;
+                    }),
                   ),
                 ),
                 initialRoute: '/',

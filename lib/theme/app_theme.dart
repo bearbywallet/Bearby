@@ -20,6 +20,8 @@ abstract class AppTheme {
   Color get gradientEnd;
 
   Color get modalBorder;
+
+  Brightness get brightness;
 }
 
 class DarkTheme implements AppTheme {
@@ -58,6 +60,9 @@ class DarkTheme implements AppTheme {
 
   @override
   Color get modalBorder => Colors.grey.withValues(alpha: 0.2);
+
+  @override
+  Brightness get brightness => Brightness.light;
 }
 
 class LightTheme implements AppTheme {
@@ -96,4 +101,7 @@ class LightTheme implements AppTheme {
 
   @override
   Color get modalBorder => const Color(0xFFE0E0E0);
+
+  @override
+  Brightness get brightness => Brightness.light;
 }
