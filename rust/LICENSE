@@ -1,0 +1,44 @@
+ZilPay Core Open Source License
+
+Copyright (c) 2024 Rinat.IP
+
+This is an open source software license for "zilpay-core" (the "Software").
+
+1. COPYRIGHT AND OWNERSHIP
+The Software is open source and protected by copyright laws. Rinat.IP maintains copyright ownership while granting the rights specified in this license.
+
+2. OPEN SOURCE RIGHTS
+Users are freely granted the following rights:
+   a) To view, examine, and fork the source code
+   b) To submit contributions, modifications, and improvements to the official repository
+   c) To use, modify, and distribute the Software for non-competing purposes
+   d) To create derivative works for non-competing purposes
+
+3. CONTRIBUTION TERMS
+The Software welcomes open source contributions:
+   a) Contributions must be submitted through official channels
+   b) Contributors retain their copyright but grant Rinat.IP perpetual license to use their contributions
+   c) All contributions are subject to review before inclusion
+
+4. COMPETITIVE USE RESTRICTION
+This open source license prohibits:
+   a) Using the Software in any product that competes with ZilPay wallet
+   b) Creating derivative works that provide similar functionality to ZilPay wallet
+   c) Redistributing the Software as part of a competing wallet or financial service
+
+5. TERMINATION
+This license automatically terminates if you breach any of its terms. Upon termination, you must cease all use of the Software.
+
+6. NO WARRANTY
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED.
+
+7. LIMITATION OF LIABILITY
+IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+8. GENERAL
+This License represents the complete agreement concerning the Software between users and Rinat.IP.
+
+For permissions regarding competitive use or other questions, please contact Rinat.IP directly.
+
+-------------------
+By using, viewing, or contributing to the Software, you accept and agree to be bound by the terms of this license.

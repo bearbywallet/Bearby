@@ -1,0 +1,126 @@
+[
+  {
+    "name": "Zilliqa",
+    "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
+    "rpc": [
+      "https://api.zilliqa.com",
+      "https://ssn.zilpay.io/api"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa",
+        "symbol": "ZIL",
+        "decimals": 18
+      },
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa Scilla",
+        "symbol": "ZIL",
+        "decimals": 12
+      }
+    ],
+    "chainIds": [1, 32769],
+    "infoURL": "https://www.zilliqa.com/",
+    "shortName": "zilliqa",
+    "slip44": 313,
+    "explorers": [
+      {
+        "name": "Viewblock",
+        "url": "https://viewblock.io/zilliqa",
+        "icon": "https://viewblock.io/apple-touch-icon.png",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Binance",
+    "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
+    "rpc": [
+      "https://bsc-dataseed.bnbchain.org",
+      "https://bsc-dataseed.nariox.org",
+      "https://bsc-dataseed.defibit.io",
+      "https://bsc-dataseed.ninicoin.io",
+      "https://bsc.nodereal.io",
+      "https://bsc-dataseed-public.bnbchain.org",
+      "https://bnb.rpc.subquery.network/public"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/56/%{contract_address}%.png",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Binance",
+        "symbol": "BNB",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [56, 0],
+    "infoURL": "https://bnbchain.org",
+    "shortName": "bnbchain",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Bscscan",
+        "url": "https://bscscan.com/",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Ethereum",
+    "chain": "ETH",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
+    "rpc": [
+      "https://singapore.rpc.blxrbdn.com"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/1/%{contract_address}%.png",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Ether",
+        "symbol": "ETH",
+        "decimals": 18
+      }
+    ],
+    "infoURL": "https://ethereum.org",
+    "shortName": "ethereum",
+    "chainIds": [1, 0],
+    "networkId": 1,
+    "slip44": 60,
+    "ens": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
+    "explorers": [
+      {
+        "name": "etherscan",
+        "url": "https://etherscan.io",
+        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "blockscout",
+        "url": "https://eth.blockscout.com",
+        "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      }
+    ]
+  }
+]

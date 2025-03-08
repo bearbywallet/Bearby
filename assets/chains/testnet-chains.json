@@ -1,0 +1,122 @@
+[
+  {
+    "name": "Zilliqa proto",
+    "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
+    "rpc": [
+      "https://api.zq2-protomainnet.zilliqa.com"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa",
+        "symbol": "ZIL",
+        "decimals": 18
+      },
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa Scilla",
+        "symbol": "ZIL",
+        "decimals": 12
+      }
+    ],
+    "chainIds": [2, 32770],
+    "infoURL": "https://www.zilliqa.com/",
+    "testnet": true,
+    "shortName": "zilliqa",
+    "slip44": 313,
+    "explorers": [
+      {
+        "name": "Otterscan",
+        "icon": "https://explorer.zq2-protomainnet.zilliqa.com/assets/otter-DYFeLtFi.png",
+        "url": "https://explorer.zq2-protomainnet.zilliqa.com",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Binance testnet",
+    "chain": "BNB",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
+    "rpc": [
+      "https://data-seed-prebsc-1-s1.binance.org:8545/",
+      "https://data-seed-prebsc-2-s1.binance.org:8545/",
+      "http://data-seed-prebsc-1-s2.binance.org:8545/",
+      "http://data-seed-prebsc-2-s2.binance.org:8545/",
+      "https://data-seed-prebsc-1-s3.binance.org:8545/",
+      "https://data-seed-prebsc-2-s3.binance.org:8545/"
+    ],
+    "features": [
+      "EIP1559",
+      "EIP155",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/bnb-chain/tokens-info/master/tokens/%{symbol}%/%{symbol}%.png",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Binance Chain",
+        "symbol": "tBNB",
+        "decimals": 18
+      }
+    ],
+    "infoURL": "https://www.bnbchain.org",
+    "shortName": "binance",
+    "testnet": true,
+    "chainIds": [97, 0],
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "BscScan",
+        "url": "https://testnet.bscscan.com",
+        "icon": "https://bscscan.com/assets/bsc/images/svg/brandassets/logo-symbol.svg",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Sepolia",
+    "chain": "ETH",
+    "rpc": [
+      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
+      "https://rpc-sepolia.rockx.com",
+      "https://rpc.sepolia.dev"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "tEther",
+        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "symbol": "tETH",
+        "decimals": 18
+      }
+    ],
+    "testnet": true,
+    "infoURL": "https://sepolia.dev/",
+    "shortName": "sepolia",
+    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
+    "chainIds": [11155111, 0],
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Etherscan",
+        "url": "https://sepolia.etherscan.io/",
+        "icon": "https://etherscan.io/images/brandassets/etherscan-logo-circle.svg",
+        "standard": "EIP3091"
+      }
+    ]
+  }
+]
+
