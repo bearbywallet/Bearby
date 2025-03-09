@@ -375,6 +375,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                   symbolStr: token.symbol,
                                   threshold: baseThreshold,
                                   compact: appState.state.abbreviatedNumber,
+                                  converted: 0,
                                 )}',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,

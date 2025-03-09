@@ -69,6 +69,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
             symbolStr: 'ZIL',
             threshold: baseThreshold,
             compact: appState.state.abbreviatedNumber,
+            converted: 0,
           );
           return Account(
             name: identity['name'] as String? ?? 'Unnamed',

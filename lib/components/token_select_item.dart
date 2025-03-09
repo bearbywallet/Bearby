@@ -97,6 +97,7 @@ class TokenSelectItem extends StatelessWidget {
                     symbolStr: ftoken.symbol,
                     threshold: baseThreshold,
                     compact: appState.state.abbreviatedNumber,
+                    converted: 0,
                   ),
                   style: TextStyle(
                     color: theme.textPrimary,

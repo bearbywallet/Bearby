@@ -417,6 +417,7 @@ class _TransactionDetailsModalContent extends StatelessWidget {
       symbolStr: symbol,
       threshold: baseThreshold,
       compact: appState.state.abbreviatedNumber,
+      converted: 0,
     );
   }
 
@@ -433,6 +434,7 @@ class _TransactionDetailsModalContent extends StatelessWidget {
       symbolStr: token.symbol,
       threshold: baseThreshold,
       compact: appState.state.abbreviatedNumber,
+      converted: 0,
     );
   }
 

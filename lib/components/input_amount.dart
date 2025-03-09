@@ -1,16 +1,19 @@
+import 'dart:math';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/select_token.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenAmountCard extends StatefulWidget {
   final String amount;
-  final String convertAmount;
   final int tokenIndex;
   final bool showMax;
   final Function(String) onMaxTap;
@@ -19,7 +22,6 @@ class TokenAmountCard extends StatefulWidget {
   const TokenAmountCard({
     super.key,
     this.amount = "0",
-    this.convertAmount = "0",
     this.tokenIndex = 0,
     this.showMax = true,
     required this.onMaxTap,
@@ -43,6 +45,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final token = appState.wallet!.tokens[widget.tokenIndex];
+    final BigInt bigAmount = toWei(widget.amount, token.decimals);
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
     double balance = adjustAmountToDouble(bigBalance, token.decimals);
@@ -84,20 +87,30 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                         ),
                       ),
                     ),
-                    SizedBox(
-                      height: convertHeight,
-                      child: Align(
-                        alignment: Alignment.centerLeft,
-                        child: Text(
-                          widget.convertAmount,
-                          style: TextStyle(
-                            color: theme.textPrimary.withValues(alpha: 0.7),
-                            fontSize: 16,
-                            fontWeight: FontWeight.w400,
+                    if (appState.wallet?.settings.currencyConvert != null)
+                      SizedBox(
+                        height: convertHeight,
+                        child: Align(
+                          alignment: Alignment.centerLeft,
+                          child: Text(
+                            intlNumberFormating(
+                              value: bigAmount.toString(),
+                              decimals: token.decimals,
+                              localeStr: appState.state.locale,
+                              symbolStr:
+                                  appState.wallet!.settings.currencyConvert!,
+                              threshold: baseThreshold,
+                              compact: appState.state.abbreviatedNumber,
+                              converted: token.rate,
+                            ),
+                            style: TextStyle(
+                              color: theme.textPrimary.withValues(alpha: 0.7),
+                              fontSize: 16,
+                              fontWeight: FontWeight.w400,
+                            ),
                           ),
                         ),
                       ),
-                    ),
                   ],
                 ),
               ),

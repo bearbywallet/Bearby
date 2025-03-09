@@ -115,7 +115,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
             addrType: meta.addrType,
             balances: meta.balances,
             default_: meta.default_,
-            rates: meta.rates,
+            rate: 0,
             native: false,
             chainHash: meta.chainHash,
             logo: widget.tokenIconUrl ?? appState.wallet?.tokens.first.logo,
@@ -154,6 +154,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
             symbolStr: _ftoken?.symbol ?? widget.tokenSymbol,
             threshold: baseThreshold,
             compact: appState.state.abbreviatedNumber,
+            converted: 0,
           )
         : "-";
 

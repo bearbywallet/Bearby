@@ -181,7 +181,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
         addr: tokens[tokenIndex].addr,
         addrType: tokens[tokenIndex].addrType,
         balances: tokens[tokenIndex].balances,
-        rates: tokens[tokenIndex].rates,
+        rate: tokens[tokenIndex].rate,
         default_: tokens[tokenIndex].default_,
         native: tokens[tokenIndex].native,
         chainHash: tokens[tokenIndex].chainHash,

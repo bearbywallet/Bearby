@@ -80,7 +80,7 @@ class _HistoryItemState extends State<HistoryItem>
         addr: '',
         addrType: appState.wallet!.tokens.first.addrType,
         balances: {},
-        rates: {},
+        rate: 0,
         default_: false,
         native: false,
         chainHash: BigInt.zero,
@@ -152,6 +152,7 @@ class _HistoryItemState extends State<HistoryItem>
         symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
         threshold: baseThreshold,
         compact: appState.state.abbreviatedNumber,
+        converted: 0,
       );
       final price = 0.004;
       final usdAmount = 0 * price;
@@ -199,6 +200,7 @@ class _HistoryItemState extends State<HistoryItem>
       symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
       threshold: baseThreshold,
       compact: appState.state.abbreviatedNumber,
+      converted: 0,
     );
     final usdFee = 0 * price;
 

@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -64,7 +62,7 @@ class _TokenCardState extends State<TokenCard>
       addr: widget.ftoken.addr,
       addrType: widget.ftoken.addrType,
       balances: {},
-      rates: {},
+      rate: 0,
       default_: widget.ftoken.default_,
       native: widget.ftoken.native,
       chainHash: widget.ftoken.chainHash,
@@ -99,37 +97,6 @@ class _TokenCardState extends State<TokenCard>
     );
   }
 
-  String _calculateRateAmount(AppState appState) {
-    String? currencyConvert =
-        appState.wallet?.settings.currencyConvert?.toLowerCase();
-
-    if (currencyConvert == null) return "-";
-
-    final double? exchangeRate = widget.ftoken.rates[currencyConvert];
-
-    if (exchangeRate == null || exchangeRate == -1) {
-      return "-";
-    }
-
-    final BigInt? amount = BigInt.tryParse(widget.tokenAmount);
-
-    if (amount == null || amount == BigInt.zero) {
-      return "-";
-    }
-
-    final BigInt bigExchangeRate = BigInt.from(exchangeRate * pow(10.0, 2));
-    final BigInt convertedAmount = amount * bigExchangeRate;
-
-    return intlNumberFormating(
-      value: convertedAmount.toString(),
-      decimals: widget.ftoken.decimals,
-      localeStr: appState.state.locale,
-      symbolStr: currencyConvert.toUpperCase(),
-      threshold: baseThreshold,
-      compact: appState.state.abbreviatedNumber,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
@@ -142,8 +109,17 @@ class _TokenCardState extends State<TokenCard>
       symbolStr: widget.ftoken.symbol,
       threshold: baseThreshold,
       compact: state.state.abbreviatedNumber,
+      converted: 0,
     );
-    final String convertedAmount = _calculateRateAmount(state);
+    final String convertedAmount = intlNumberFormating(
+      value: widget.tokenAmount,
+      decimals: widget.ftoken.decimals,
+      localeStr: state.state.locale,
+      symbolStr: state.wallet?.settings.currencyConvert ?? "btc",
+      threshold: baseThreshold,
+      compact: state.state.abbreviatedNumber,
+      converted: widget.ftoken.rate,
+    );
 
     return Column(
       children: [
