@@ -26,8 +26,39 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
       final state = Provider.of<AppState>(context, listen: false);
 
       setState(() {
-        currencies =
-            state.rates.keys.map((code) => Currency(code, '')).toList();
+        currencies = [
+          Currency("BTC", "Bitcoin ₿"),
+          Currency("BRL", "Brazilian Real R\$"),
+          Currency("RUB", "Russian Ruble ₽"),
+          Currency("INR", "Indian Rupee ₹"),
+          Currency("CNY", "Chinese Yuan ¥"),
+          Currency("ZAR", "South African Rand R"),
+          Currency("EGP", "Egyptian Pound £"),
+          Currency("ETB", "Ethiopian Birr Br"),
+          Currency("IRR", "Iranian Rial ﷼"),
+          Currency("SAR", "Saudi Riyal ﷼"),
+          Currency("AED", "United Arab Emirates Dirham د.إ"),
+          Currency("USD", "United States Dollar \$"),
+          Currency("EUR", "Euro €"),
+          Currency("JPY", "Japanese Yen ¥"),
+          Currency("GBP", "British Pound £"),
+          Currency("KRW", "South Korean Won ₩"),
+          Currency("CHF", "Swiss Franc ₣"),
+          Currency("AUD", "Australian Dollar A\$"),
+          Currency("CAD", "Canadian Dollar C\$"),
+          Currency("MXN", "Mexican Peso \$"),
+          Currency("ETH", "Ethereum Ξ"),
+          Currency("LTC", "Litecoin Ł"),
+          Currency("XRP", "Ripple ✕"),
+          Currency("BCH", "Bitcoin Cash Ƀ"),
+          Currency("ADA", "Cardano ₳"),
+          Currency("DOT", "Polkadot ●"),
+          Currency("SOL", "Solana ◎"),
+          Currency("USDT", "Tether ₮"),
+          Currency("DOGE", "Dogecoin Ð"),
+          Currency("GOLD", "Gold Au"),
+          Currency("SILVER", "Silver Ag"),
+        ];
       });
 
       if (state.wallet?.settings.currencyConvert != null) {

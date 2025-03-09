@@ -62,7 +62,7 @@
         "native": true,
         "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/56/%{contract_address}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Binance",
+        "name": "BinanceCoin",
         "symbol": "BNB",
         "decimals": 18
       }
@@ -97,7 +97,7 @@
         "native": true,
         "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/1/%{contract_address}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Ether",
+        "name": "Ethereum",
         "symbol": "ETH",
         "decimals": 18
       }

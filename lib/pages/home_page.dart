@@ -34,14 +34,21 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _refreshData(AppState appState) async {
+    BigInt index = BigInt.from(appState.selectedWallet);
+
     try {
-      BigInt index = BigInt.from(appState.selectedWallet);
       await syncBalances(walletIndex: index);
-      await appState.updateTokensRates();
-      await appState.syncData();
     } catch (e) {
       debugPrint("error sync balance: $e");
     }
+
+    try {
+      updateRates(walletIndex: index);
+    } catch (e) {
+      debugPrint("error sync rates: $e");
+    }
+
+    await appState.syncData();
   }
 
   @override

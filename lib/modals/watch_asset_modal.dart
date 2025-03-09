@@ -115,6 +115,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
             addrType: meta.addrType,
             balances: meta.balances,
             default_: meta.default_,
+            rates: meta.rates,
             native: false,
             chainHash: meta.chainHash,
             logo: widget.tokenIconUrl ?? appState.wallet?.tokens.first.logo,

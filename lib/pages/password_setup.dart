@@ -223,6 +223,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         nodeRankingEnabled: true,
         maxConnections: 5,
         requestTimeoutSecs: 30,
+        ratesApiOptions: 1, // CoinGecko
       );
 
       List<FTokenInfo> ftokens = [];

@@ -80,6 +80,7 @@ class _HistoryItemState extends State<HistoryItem>
         addr: '',
         addrType: appState.wallet!.tokens.first.addrType,
         balances: {},
+        rates: {},
         default_: false,
         native: false,
         chainHash: BigInt.zero,

@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -42,14 +44,9 @@ class _TokenCardState extends State<TokenCard>
       duration: const Duration(milliseconds: 150),
       vsync: this,
     );
-
-    _animation = Tween<double>(
-      begin: 1.0,
-      end: 0.95,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.easeInOut,
-    ));
+    _animation = Tween<double>(begin: 1.0, end: 0.95).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
+    );
   }
 
   @override
@@ -67,6 +64,7 @@ class _TokenCardState extends State<TokenCard>
       addr: widget.ftoken.addr,
       addrType: widget.ftoken.addrType,
       balances: {},
+      rates: {},
       default_: widget.ftoken.default_,
       native: widget.ftoken.native,
       chainHash: widget.ftoken.chainHash,
@@ -79,16 +77,11 @@ class _TokenCardState extends State<TokenCard>
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
+            color: theme.primaryPurple.withValues(alpha: 0.1), width: 2),
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: processTokenLogo(
-            token,
-            theme.value,
-          ),
+          url: processTokenLogo(token, theme.value),
           width: 32,
           height: 32,
           fit: BoxFit.contain,
@@ -99,13 +92,41 @@ class _TokenCardState extends State<TokenCard>
             spotColor: state.currentTheme.background,
             size: 8,
           ),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
-          ),
+          loadingWidget:
+              const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),
       ),
+    );
+  }
+
+  String _calculateRateAmount(AppState appState) {
+    String? currencyConvert =
+        appState.wallet?.settings.currencyConvert?.toLowerCase();
+
+    if (currencyConvert == null) return "-";
+
+    final double? exchangeRate = widget.ftoken.rates[currencyConvert];
+
+    if (exchangeRate == null || exchangeRate == -1) {
+      return "-";
+    }
+
+    final BigInt? amount = BigInt.tryParse(widget.tokenAmount);
+
+    if (amount == null || amount == BigInt.zero) {
+      return "-";
+    }
+
+    final BigInt bigExchangeRate = BigInt.from(exchangeRate * pow(10.0, 2));
+    final BigInt convertedAmount = amount * bigExchangeRate;
+
+    return intlNumberFormating(
+      value: convertedAmount.toString(),
+      decimals: widget.ftoken.decimals,
+      localeStr: appState.state.locale,
+      symbolStr: currencyConvert.toUpperCase(),
+      threshold: baseThreshold,
+      compact: appState.state.abbreviatedNumber,
     );
   }
 
@@ -122,6 +143,7 @@ class _TokenCardState extends State<TokenCard>
       threshold: baseThreshold,
       compact: state.state.abbreviatedNumber,
     );
+    final String convertedAmount = _calculateRateAmount(state);
 
     return Column(
       children: [
@@ -151,18 +173,13 @@ class _TokenCardState extends State<TokenCard>
             onTap: widget.onTap,
             child: AnimatedBuilder(
               animation: _animation,
-              builder: (context, child) => Transform.scale(
-                scale: _animation.value,
-                child: child,
-              ),
+              builder: (context, child) =>
+                  Transform.scale(scale: _animation.value, child: child),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
-                decoration: const BoxDecoration(),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding,
-                    vertical: adaptivePadding,
-                  ),
+                      horizontal: adaptivePadding, vertical: adaptivePadding),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -217,6 +234,12 @@ class _TokenCardState extends State<TokenCard>
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 4),
+                            Text(
+                              convertedAmount,
+                              style: TextStyle(
+                                  color: theme.textSecondary, fontSize: 14),
+                            ),
                           ],
                         ),
                       ),
@@ -237,10 +260,7 @@ class _TokenCardState extends State<TokenCard>
           ),
         ),
         if (widget.showDivider)
-          Container(
-            height: 1,
-            color: theme.textPrimary.withValues(alpha: 0.1),
-          ),
+          Container(height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
       ],
     );
   }

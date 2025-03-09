@@ -1107,6 +1107,7 @@ class Web3EIP1193Handler {
           addr: zeroEVM,
           addrType: 1,
           balances: {},
+          rates: {},
           default_: false,
           native: true,
           chainHash: BigInt.zero,

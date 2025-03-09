@@ -61,8 +61,8 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/bnb-chain/tokens-info/master/tokens/%{symbol}%/%{symbol}%.png",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Binance Chain",
-        "symbol": "tBNB",
+        "name": "BinanceCoin",
+        "symbol": "BNB",
         "decimals": 18
       }
     ],
@@ -97,9 +97,9 @@
       {
         "native": true,
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "tEther",
+        "name": "Ethereum",
         "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
-        "symbol": "tETH",
+        "symbol": "ETH",
         "decimals": 18
       }
     ],
