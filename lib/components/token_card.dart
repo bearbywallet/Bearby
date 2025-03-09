@@ -111,15 +111,6 @@ class _TokenCardState extends State<TokenCard>
       compact: state.state.abbreviatedNumber,
       converted: 0,
     );
-    final String convertedAmount = intlNumberFormating(
-      value: widget.tokenAmount,
-      decimals: widget.ftoken.decimals,
-      localeStr: state.state.locale,
-      symbolStr: state.wallet?.settings.currencyConvert ?? "btc",
-      threshold: baseThreshold,
-      compact: state.state.abbreviatedNumber,
-      converted: widget.ftoken.rate,
-    );
 
     return Column(
       children: [
@@ -211,11 +202,21 @@ class _TokenCardState extends State<TokenCard>
                               ],
                             ),
                             const SizedBox(height: 4),
-                            Text(
-                              convertedAmount,
-                              style: TextStyle(
-                                  color: theme.textSecondary, fontSize: 14),
-                            ),
+                            if (state.wallet?.settings.currencyConvert != null)
+                              Text(
+                                intlNumberFormating(
+                                  value: widget.tokenAmount,
+                                  decimals: widget.ftoken.decimals,
+                                  localeStr: state.state.locale,
+                                  symbolStr:
+                                      state.wallet!.settings.currencyConvert!,
+                                  threshold: baseThreshold,
+                                  compact: state.state.abbreviatedNumber,
+                                  converted: widget.ftoken.rate,
+                                ),
+                                style: TextStyle(
+                                    color: theme.textSecondary, fontSize: 14),
+                              ),
                           ],
                         ),
                       ),
