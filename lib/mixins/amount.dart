@@ -26,6 +26,14 @@ BigInt toWei(String amount, int decimals) {
   required AppState appState,
 }) {
   String? convertedSymbolStr = appState.wallet?.settings.currencyConvert;
+  double converted = 0;
+
+  if (appState.account != null) {
+    final account = appState.account;
+    final chain = appState.getChain(account!.chainHash);
+
+    converted = chain?.testnet == true ? 0 : rate;
+  }
 
   return intlNumberFormating(
     value: amount.toString(),
@@ -35,6 +43,6 @@ BigInt toWei(String amount, int decimals) {
     convertedSymbolStr: convertedSymbolStr ?? '',
     threshold: baseThreshold,
     compact: appState.state.abbreviatedNumber,
-    converted: rate,
+    converted: converted,
   );
 }
