@@ -255,8 +255,11 @@ class _HomePageState extends State<HomePage> {
           (context, index) {
             final token = filteredTokens[index];
             final isLast = index == filteredTokens.length - 1;
-            String tokenAmountValue =
-                token.balances[appState.wallet!.selectedAccount] ?? "0";
+            final tokenAmountValue = BigInt.tryParse(token
+                    .balances[appState.wallet!.selectedAccount]
+                    .toString()) ??
+                BigInt.zero;
+
             return TokenCard(
               ftoken: token,
               tokenAmount: tokenAmountValue,

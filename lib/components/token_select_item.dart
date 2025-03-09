@@ -2,15 +2,14 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenSelectItem extends StatelessWidget {
   final FTokenInfo ftoken;
-  final String balance;
+  final BigInt balance;
   final VoidCallback onTap;
   final double iconSize;
 
@@ -26,6 +25,13 @@ class TokenSelectItem extends StatelessWidget {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final (amount, converted) = formatingAmount(
+      amount: balance,
+      symbol: ftoken.symbol,
+      decimals: ftoken.decimals,
+      rate: ftoken.rate,
+      appState: appState,
+    );
 
     return InkWell(
       onTap: onTap,
@@ -90,19 +96,18 @@ class TokenSelectItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  intlNumberFormating(
-                    value: balance,
-                    decimals: ftoken.decimals,
-                    localeStr: appState.state.locale,
-                    symbolStr: ftoken.symbol,
-                    threshold: baseThreshold,
-                    compact: appState.state.abbreviatedNumber,
-                    converted: 0,
-                  ),
+                  amount,
                   style: TextStyle(
                     color: theme.textPrimary,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
+                  ),
+                ),
+                Text(
+                  converted,
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 14,
                   ),
                 ),
               ],

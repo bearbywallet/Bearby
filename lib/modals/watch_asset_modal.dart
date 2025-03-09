@@ -2,9 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/src/rust/api/token.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -146,17 +145,14 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
     final secondaryColor = theme.textSecondary;
     final textColor = theme.buttonText;
     final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
-    final balance = _ftoken?.balances[selectedAccount] != null
-        ? intlNumberFormating(
-            value: _ftoken!.balances[selectedAccount]!,
-            decimals: _ftoken?.decimals ?? 1,
-            localeStr: appState.state.locale,
-            symbolStr: _ftoken?.symbol ?? widget.tokenSymbol,
-            threshold: baseThreshold,
-            compact: appState.state.abbreviatedNumber,
-            converted: 0,
-          )
-        : "-";
+    final (balance, convertedBalance) = formatingAmount(
+      amount: BigInt.tryParse(_ftoken?.balances[selectedAccount] ?? '0') ??
+          BigInt.zero,
+      symbol: _ftoken?.symbol ?? '',
+      decimals: _ftoken?.decimals ?? 18,
+      rate: _ftoken?.rate ?? 0,
+      appState: appState,
+    );
 
     return SingleChildScrollView(
       child: Container(
@@ -192,9 +188,10 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                   Text(
                     'Add suggested token',
                     style: TextStyle(
-                        color: textColor,
-                        fontSize: 20,
-                        fontWeight: FontWeight.w600),
+                      color: textColor,
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                   const SizedBox(height: 8),
                   Text(
@@ -241,18 +238,24 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 height: 48,
                                 fit: BoxFit.cover,
                                 loadingWidget: CircularProgressIndicator(
-                                    strokeWidth: 2, color: secondaryColor),
-                                errorWidget: Icon(Icons.link,
-                                    color: secondaryColor, size: 24),
+                                  strokeWidth: 2,
+                                  color: secondaryColor,
+                                ),
+                                errorWidget: Icon(
+                                  Icons.link,
+                                  color: secondaryColor,
+                                  size: 24,
+                                ),
                               ),
                             ),
                           ),
                         Text(
                           widget.appTitle,
                           style: TextStyle(
-                              color: textColor,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500),
+                            color: textColor,
+                            fontSize: 18,
+                            fontWeight: FontWeight.w500,
+                          ),
                           textAlign: TextAlign.center,
                         ),
                       ],
@@ -277,12 +280,14 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                   Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
-                      Text('Token',
-                          style:
-                              TextStyle(color: secondaryColor, fontSize: 14)),
-                      Text('Balance',
-                          style:
-                              TextStyle(color: secondaryColor, fontSize: 14)),
+                      Text(
+                        'Token',
+                        style: TextStyle(color: secondaryColor, fontSize: 14),
+                      ),
+                      Text(
+                        'Balance',
+                        style: TextStyle(color: secondaryColor, fontSize: 14),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -340,16 +345,27 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                   Text(
                                     _ftoken?.name ?? widget.tokenName,
                                     style: TextStyle(
-                                        color: textColor,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w500),
+                                      color: textColor,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
+                                    ),
                                   ),
                                 ],
                               ),
-                              Text(
-                                balance,
-                                style:
-                                    TextStyle(color: textColor, fontSize: 16),
+                              Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Text(
+                                    balance,
+                                    style: TextStyle(
+                                        color: textColor, fontSize: 16),
+                                  ),
+                                  Text(
+                                    convertedBalance,
+                                    style: TextStyle(
+                                        color: secondaryColor, fontSize: 14),
+                                  ),
+                                ],
                               ),
                             ],
                           ),
@@ -370,15 +386,27 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 Text(
                                   widget.tokenName,
                                   style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500),
+                                    color: textColor,
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                  ),
                                 ),
                               ],
                             ),
-                            Text(
-                              balance,
-                              style: TextStyle(color: textColor, fontSize: 16),
+                            Column(
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  balance,
+                                  style:
+                                      TextStyle(color: textColor, fontSize: 16),
+                                ),
+                                Text(
+                                  convertedBalance,
+                                  style: TextStyle(
+                                      color: secondaryColor, fontSize: 14),
+                                ),
+                              ],
                             ),
                           ],
                         ),
@@ -398,7 +426,6 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                       if (_ftoken != null) {
                         widget.onConfirm(_ftoken!);
                       }
-
                       Navigator.pop(context);
                     },
                   ),

@@ -113,7 +113,6 @@ class _AddTokenPageState extends State<AddTokenPage> {
                 child: SmartInput(
                   controller: _tokenTextController,
                   onChanged: (value) async {
-                    // Clear error message when user starts typing
                     if (_errorMessage != null) {
                       setState(() {
                         _errorMessage = null;
@@ -150,8 +149,10 @@ class _AddTokenPageState extends State<AddTokenPage> {
           for (int i = 0; i < tokens.length; i++)
             TokenCard(
               ftoken: tokens[i],
-              tokenAmount:
-                  tokens[i].balances[appState.wallet?.selectedAccount] ?? "0",
+              tokenAmount: BigInt.tryParse(tokens[i]
+                      .balances[appState.wallet?.selectedAccount]
+                      .toString()) ??
+                  BigInt.zero,
               showDivider: i < tokens.length - 1,
               onTap: () => _onAddToken(
                 i,

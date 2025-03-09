@@ -6,11 +6,12 @@
 import '../frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-String intlNumberFormating(
+(String, String) intlNumberFormating(
         {required String value,
         required int decimals,
         required String localeStr,
-        required String symbolStr,
+        required String nativeSymbolStr,
+        required String convertedSymbolStr,
         required double threshold,
         required bool compact,
         required double converted}) =>
@@ -18,7 +19,8 @@ String intlNumberFormating(
         value: value,
         decimals: decimals,
         localeStr: localeStr,
-        symbolStr: symbolStr,
+        nativeSymbolStr: nativeSymbolStr,
+        convertedSymbolStr: convertedSymbolStr,
         threshold: threshold,
         compact: compact,
         converted: converted);

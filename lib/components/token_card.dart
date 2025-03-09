@@ -2,16 +2,15 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TokenCard extends StatefulWidget {
   final FTokenInfo ftoken;
-  final String tokenAmount;
+  final BigInt tokenAmount;
   final bool showDivider;
   final VoidCallback? onTap;
 
@@ -99,17 +98,15 @@ class _TokenCardState extends State<TokenCard>
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
-    final theme = state.currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final String amount = intlNumberFormating(
-      value: widget.tokenAmount,
+    final (amount, converted) = formatingAmount(
+      amount: widget.tokenAmount,
+      symbol: widget.ftoken.symbol,
       decimals: widget.ftoken.decimals,
-      localeStr: state.state.locale,
-      symbolStr: widget.ftoken.symbol,
-      threshold: baseThreshold,
-      compact: state.state.abbreviatedNumber,
-      converted: 0,
+      rate: widget.ftoken.rate,
+      appState: appState,
     );
 
     return Column(
@@ -202,18 +199,10 @@ class _TokenCardState extends State<TokenCard>
                               ],
                             ),
                             const SizedBox(height: 4),
-                            if (state.wallet?.settings.currencyConvert != null)
+                            if (appState.wallet?.settings.currencyConvert !=
+                                null)
                               Text(
-                                intlNumberFormating(
-                                  value: widget.tokenAmount,
-                                  decimals: widget.ftoken.decimals,
-                                  localeStr: state.state.locale,
-                                  symbolStr:
-                                      state.wallet!.settings.currencyConvert!,
-                                  threshold: baseThreshold,
-                                  compact: state.state.abbreviatedNumber,
-                                  converted: widget.ftoken.rate,
-                                ),
+                                converted,
                                 style: TextStyle(
                                     color: theme.textSecondary, fontSize: 14),
                               ),

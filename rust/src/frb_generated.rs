@@ -1527,7 +1527,8 @@ fn wire__crate__api__utils__intl_number_formating_impl(
             let api_value = <String>::sse_decode(&mut deserializer);
             let api_decimals = <u8>::sse_decode(&mut deserializer);
             let api_locale_str = <String>::sse_decode(&mut deserializer);
-            let api_symbol_str = <String>::sse_decode(&mut deserializer);
+            let api_native_symbol_str = <String>::sse_decode(&mut deserializer);
+            let api_converted_symbol_str = <String>::sse_decode(&mut deserializer);
             let api_threshold = <f64>::sse_decode(&mut deserializer);
             let api_compact = <bool>::sse_decode(&mut deserializer);
             let api_converted = <f64>::sse_decode(&mut deserializer);
@@ -1537,7 +1538,8 @@ fn wire__crate__api__utils__intl_number_formating_impl(
                     api_value,
                     api_decimals,
                     &api_locale_str,
-                    &api_symbol_str,
+                    &api_native_symbol_str,
+                    &api_converted_symbol_str,
                     api_threshold,
                     api_compact,
                     api_converted,

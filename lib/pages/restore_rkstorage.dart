@@ -2,9 +2,8 @@ import 'dart:convert';
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -62,15 +61,14 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
           final balanceMap = identity['balance'] as Map<String, dynamic>?;
           final mainnetBalance =
               balanceMap?['mainnet'] as Map<String, dynamic>?;
-          final balance = intlNumberFormating(
-            value: mainnetBalance?['ZIL'] ?? "0",
+          final (balance, _) = formatingAmount(
+            amount: mainnetBalance?['ZIL'] ?? "0",
+            symbol: "ZIL",
             decimals: 12,
-            localeStr: appState.state.locale,
-            symbolStr: 'ZIL',
-            threshold: baseThreshold,
-            compact: appState.state.abbreviatedNumber,
-            converted: 0,
+            rate: 0,
+            appState: appState,
           );
+
           return Account(
             name: identity['name'] as String? ?? 'Unnamed',
             address: identity['bech32'] as String? ?? '',

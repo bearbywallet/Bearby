@@ -3,10 +3,9 @@ import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -404,37 +403,36 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     }
   }
 
-  String _formatAmount(AppState appState) {
+  (String, String) _formatAmount(AppState appState) {
     final token = appState.wallet?.tokens.first;
-    final amount = transaction.tokenInfo?.value ?? transaction.amount;
+    final amount =
+        BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
+            BigInt.zero;
     final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
     final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
 
-    return intlNumberFormating(
-      value: amount,
+    return formatingAmount(
+      amount: amount,
+      symbol: symbol,
       decimals: decimals,
-      localeStr: appState.state.locale,
-      symbolStr: symbol,
-      threshold: baseThreshold,
-      compact: appState.state.abbreviatedNumber,
-      converted: 0,
+      rate: token?.rate ?? 0,
+      appState: appState,
     );
   }
 
-  String _formatFee(AppState appState) {
+  (String, String) _formatFee(AppState appState) {
     final token = appState.wallet!.tokens.first;
+    // TODO: need to check address type for tokens;
     final decimals = transaction.chainType == "EVM" && token.decimals < 18
         ? 18
         : token.decimals;
 
-    return intlNumberFormating(
-      value: transaction.fee.toString(),
+    return formatingAmount(
+      amount: transaction.fee,
+      symbol: token.symbol,
       decimals: decimals,
-      localeStr: appState.state.locale,
-      symbolStr: token.symbol,
-      threshold: baseThreshold,
-      compact: appState.state.abbreviatedNumber,
-      converted: 0,
+      rate: token.rate,
+      appState: appState,
     );
   }
 

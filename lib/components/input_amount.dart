@@ -3,11 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/select_token.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -116,15 +114,13 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                intlNumberFormating(
-                  value: bigAmount.toString(),
+                formatingAmount(
+                  amount: bigAmount,
+                  symbol: token.symbol,
                   decimals: token.decimals,
-                  localeStr: appState.state.locale,
-                  symbolStr: appState.wallet!.settings.currencyConvert!,
-                  threshold: baseThreshold,
-                  compact: appState.state.abbreviatedNumber,
-                  converted: token.rate,
-                ),
+                  rate: token.rate,
+                  appState: appState,
+                ).$2,
                 style: TextStyle(
                   color: theme.textPrimary.withValues(alpha: 0.7),
                   fontSize: 16,

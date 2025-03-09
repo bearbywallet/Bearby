@@ -2,10 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -142,17 +141,14 @@ class _HistoryItemState extends State<HistoryItem>
 
     if (widget.transaction.tokenInfo != null) {
       final decimals = widget.transaction.tokenInfo!.decimals;
-      final value =
-          widget.transaction.tokenInfo?.value ?? widget.transaction.amount;
-
-      final formattedValue = intlNumberFormating(
-        value: value,
+      final value = BigInt.parse(
+          widget.transaction.tokenInfo?.value ?? widget.transaction.amount);
+      final (formattedValue, convertedValue) = formatingAmount(
+        amount: value,
+        symbol: widget.transaction.tokenInfo?.symbol ?? '',
         decimals: decimals,
-        localeStr: appState.state.locale,
-        symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
-        threshold: baseThreshold,
-        compact: appState.state.abbreviatedNumber,
-        converted: 0,
+        rate: 0,
+        appState: appState,
       );
       final price = 0.004;
       final usdAmount = 0 * price;
@@ -193,14 +189,12 @@ class _HistoryItemState extends State<HistoryItem>
             ? 18
             : token.decimals;
     final price = 0;
-    final formattedValue = intlNumberFormating(
-      value: widget.transaction.fee.toString(),
+    final (formattedValue, converted) = formatingAmount(
+      amount: widget.transaction.fee,
+      symbol: widget.transaction.tokenInfo?.symbol ?? '',
       decimals: decimals,
-      localeStr: appState.state.locale,
-      symbolStr: widget.transaction.tokenInfo?.symbol ?? '',
-      threshold: baseThreshold,
-      compact: appState.state.abbreviatedNumber,
-      converted: 0,
+      rate: 0,
+      appState: appState,
     );
     final usdFee = 0 * price;
 

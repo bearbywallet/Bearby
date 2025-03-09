@@ -10,7 +10,6 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
-import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -27,7 +26,6 @@ class _SendTokenPageState extends State<SendTokenPage> {
   bool _initialized = false;
   int _tokenIndex = 0;
   String _amount = "0";
-  String _convertAmount = "0";
   bool _hasDecimalPoint = false;
   String? _address;
   String? _walletName;

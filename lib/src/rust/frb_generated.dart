@@ -234,11 +234,12 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiMethodsInitApp();
 
-  String crateApiUtilsIntlNumberFormating(
+  (String, String) crateApiUtilsIntlNumberFormating(
       {required String value,
       required int decimals,
       required String localeStr,
-      required String symbolStr,
+      required String nativeSymbolStr,
+      required String convertedSymbolStr,
       required double threshold,
       required bool compact,
       required double converted});
@@ -1420,11 +1421,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  String crateApiUtilsIntlNumberFormating(
+  (String, String) crateApiUtilsIntlNumberFormating(
       {required String value,
       required int decimals,
       required String localeStr,
-      required String symbolStr,
+      required String nativeSymbolStr,
+      required String convertedSymbolStr,
       required double threshold,
       required bool compact,
       required double converted}) {
@@ -1434,14 +1436,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(value, serializer);
         sse_encode_u_8(decimals, serializer);
         sse_encode_String(localeStr, serializer);
-        sse_encode_String(symbolStr, serializer);
+        sse_encode_String(nativeSymbolStr, serializer);
+        sse_encode_String(convertedSymbolStr, serializer);
         sse_encode_f_64(threshold, serializer);
         sse_encode_bool(compact, serializer);
         sse_encode_f_64(converted, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
+        decodeSuccessData: sse_decode_record_string_string,
         decodeErrorData: null,
       ),
       constMeta: kCrateApiUtilsIntlNumberFormatingConstMeta,
@@ -1449,7 +1452,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         value,
         decimals,
         localeStr,
-        symbolStr,
+        nativeSymbolStr,
+        convertedSymbolStr,
         threshold,
         compact,
         converted
@@ -1465,7 +1469,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "value",
           "decimals",
           "localeStr",
-          "symbolStr",
+          "nativeSymbolStr",
+          "convertedSymbolStr",
           "threshold",
           "compact",
           "converted"
