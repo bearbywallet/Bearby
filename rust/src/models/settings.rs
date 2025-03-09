@@ -9,6 +9,7 @@ use zilpay::{
         browser::{BrowserSettings, ContentBlockingLevel},
         wallet_settings::{NetworkSettings, WalletFeatures},
     },
+    token_quotes::TokenQuotesAPIOptions,
 };
 
 #[derive(Debug)]
@@ -61,6 +62,7 @@ pub struct WalletSettingsInfo {
     pub node_ranking_enabled: bool,
     pub max_connections: u8,
     pub request_timeout_secs: u32,
+    pub rates_api_options: u8,
 }
 
 impl From<WalletSettings> for WalletSettingsInfo {
@@ -75,6 +77,7 @@ impl From<WalletSettings> for WalletSettingsInfo {
             node_ranking_enabled: value.network.node_ranking_enabled,
             max_connections: value.network.max_connections,
             request_timeout_secs: value.network.request_timeout_secs,
+            rates_api_options: value.rates_api_options.code(),
         }
     }
 }
@@ -84,6 +87,7 @@ impl TryFrom<WalletSettingsInfo> for WalletSettings {
 
     fn try_from(value: WalletSettingsInfo) -> Result<Self, Self::Error> {
         Ok(Self {
+            rates_api_options: TokenQuotesAPIOptions::from_code(value.rates_api_options),
             cipher_orders: value
                 .cipher_orders
                 .iter()
@@ -121,6 +125,7 @@ pub struct BrowserSettingsInfo {
     pub allow_microphone: bool,
     pub allow_auto_play: bool,
 }
+
 impl From<BrowserSettings> for BrowserSettingsInfo {
     fn from(value: BrowserSettings) -> Self {
         BrowserSettingsInfo {

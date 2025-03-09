@@ -10,6 +10,7 @@ pub struct FTokenInfo {
     pub addr_type: u8,
     pub logo: Option<String>,
     pub balances: HashMap<usize, String>,
+    pub rates: HashMap<String, f64>,
     pub default: bool,
     pub native: bool,
     pub chain_hash: u64,
@@ -25,6 +26,7 @@ impl From<FToken> for FTokenInfo {
 
         FTokenInfo {
             balances,
+            rates: ft.rates,
             logo: ft.logo,
             addr: ft.addr.auto_format(),
             addr_type: ft.addr.prefix_type(),
@@ -47,6 +49,7 @@ impl TryFrom<FTokenInfo> for FToken {
             symbol: value.symbol,
             decimals: value.decimals,
             addr: Address::from_str_hex(&value.addr).map_err(TokenError::InvalidContractAddress)?,
+            rates: value.rates,
             logo: value.logo,
             balances: Default::default(),
             default: value.default,

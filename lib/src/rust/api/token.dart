@@ -10,9 +10,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<void> syncBalances({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenSyncBalances(walletIndex: walletIndex);
 
-Future<void> updateRates() => RustLib.instance.api.crateApiTokenUpdateRates();
-
-Future<String> getRates() => RustLib.instance.api.crateApiTokenGetRates();
+Future<void> updateRates({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
 
 Future<FTokenInfo> fetchTokenMeta(
         {required String addr, required BigInt walletIndex}) =>

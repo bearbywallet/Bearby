@@ -106,6 +106,7 @@ class WalletSettingsInfo {
   final bool nodeRankingEnabled;
   final int maxConnections;
   final int requestTimeoutSecs;
+  final int ratesApiOptions;
 
   const WalletSettingsInfo({
     required this.cipherOrders,
@@ -117,6 +118,7 @@ class WalletSettingsInfo {
     required this.nodeRankingEnabled,
     required this.maxConnections,
     required this.requestTimeoutSecs,
+    required this.ratesApiOptions,
   });
 
   @override
@@ -129,7 +131,8 @@ class WalletSettingsInfo {
       gasControlEnabled.hashCode ^
       nodeRankingEnabled.hashCode ^
       maxConnections.hashCode ^
-      requestTimeoutSecs.hashCode;
+      requestTimeoutSecs.hashCode ^
+      ratesApiOptions.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -144,5 +147,6 @@ class WalletSettingsInfo {
           gasControlEnabled == other.gasControlEnabled &&
           nodeRankingEnabled == other.nodeRankingEnabled &&
           maxConnections == other.maxConnections &&
-          requestTimeoutSecs == other.requestTimeoutSecs;
+          requestTimeoutSecs == other.requestTimeoutSecs &&
+          ratesApiOptions == other.ratesApiOptions;
 }

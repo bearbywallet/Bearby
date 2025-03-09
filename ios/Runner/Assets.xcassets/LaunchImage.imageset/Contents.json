@@ -1,7 +1,7 @@
 {
   "images" : [
     {
-      "filename" : "Vector 2.svg",
+      "filename" : "Vector.svg",
       "idiom" : "universal",
       "scale" : "1x"
     },
@@ -11,7 +11,7 @@
       "scale" : "2x"
     },
     {
-      "filename" : "Vector.svg",
+      "filename" : "Vector 2.svg",
       "idiom" : "universal",
       "scale" : "3x"
     }
@@ -19,5 +19,8 @@
   "info" : {
     "author" : "xcode",
     "version" : 1
+  },
+  "properties" : {
+    "localizable" : true
   }
 }

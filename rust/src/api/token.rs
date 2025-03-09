@@ -29,26 +29,15 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     }
 }
 
-pub async fn update_rates() -> Result<(), String> {
+pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
         let core = Arc::clone(&service.core);
 
-        core.update_rates()
+        core.update_rates(wallet_index)
             .await
             .map_err(ServiceError::BackgroundError)?;
 
         Ok(())
-    } else {
-        Err(ServiceError::NotRunning.to_string())
-    }
-}
-
-pub async fn get_rates() -> Result<String, String> {
-    if let Some(service) = BACKGROUND_SERVICE.write().await.as_mut() {
-        let core = Arc::get_mut(&mut service.core).ok_or(ServiceError::CoreAccess)?;
-        let value = core.get_rates();
-
-        Ok(value.to_string())
     } else {
         Err(ServiceError::NotRunning.to_string())
     }
