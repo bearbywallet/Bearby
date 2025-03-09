@@ -247,7 +247,7 @@ impl NetworkConfigInfo {
                                     addr_type,
                                     logo,
                                     balances: HashMap::new(),
-                                    rates: HashMap::new(),
+                                    rate: 0f64,
                                     default,
                                     native,
                                     chain_hash,

@@ -12,11 +12,13 @@ String intlNumberFormating(
         required String localeStr,
         required String symbolStr,
         required double threshold,
-        required bool compact}) =>
+        required bool compact,
+        required double converted}) =>
     RustLib.instance.api.crateApiUtilsIntlNumberFormating(
         value: value,
         decimals: decimals,
         localeStr: localeStr,
         symbolStr: symbolStr,
         threshold: threshold,
-        compact: compact);
+        compact: compact,
+        converted: converted);

@@ -240,7 +240,8 @@ abstract class RustLibApi extends BaseApi {
       required String localeStr,
       required String symbolStr,
       required double threshold,
-      required bool compact});
+      required bool compact,
+      required double converted});
 
   Future<bool> crateApiMethodsIsCryptoAddress({required String addr});
 
@@ -1425,7 +1426,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       required String localeStr,
       required String symbolStr,
       required double threshold,
-      required bool compact}) {
+      required bool compact,
+      required double converted}) {
     return handler.executeSync(SyncTask(
       callFfi: () {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -1435,6 +1437,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_String(symbolStr, serializer);
         sse_encode_f_64(threshold, serializer);
         sse_encode_bool(compact, serializer);
+        sse_encode_f_64(converted, serializer);
         return pdeCallFfi(generalizedFrbRustBinding, serializer, funcId: 39)!;
       },
       codec: SseCodec(
@@ -1442,7 +1445,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: null,
       ),
       constMeta: kCrateApiUtilsIntlNumberFormatingConstMeta,
-      argValues: [value, decimals, localeStr, symbolStr, threshold, compact],
+      argValues: [
+        value,
+        decimals,
+        localeStr,
+        symbolStr,
+        threshold,
+        compact,
+        converted
+      ],
       apiImpl: this,
     ));
   }
@@ -1456,7 +1467,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
           "localeStr",
           "symbolStr",
           "threshold",
-          "compact"
+          "compact",
+          "converted"
         ],
       );
 
@@ -2607,13 +2619,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  Map<String, double> dco_decode_Map_String_f_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return Map.fromEntries(dco_decode_list_record_string_f_64(raw)
-        .map((e) => MapEntry(e.$1, e.$2)));
-  }
-
-  @protected
   Map<BigInt, String> dco_decode_Map_usize_String(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return Map.fromEntries(dco_decode_list_record_usize_string(raw)
@@ -3032,7 +3037,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       addrType: dco_decode_u_8(arr[4]),
       logo: dco_decode_opt_String(arr[5]),
       balances: dco_decode_Map_usize_String(arr[6]),
-      rates: dco_decode_Map_String_f_64(arr[7]),
+      rate: dco_decode_f_64(arr[7]),
       default_: dco_decode_bool(arr[8]),
       native: dco_decode_bool(arr[9]),
       chainHash: dco_decode_u_64(arr[10]),
@@ -3208,12 +3213,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
-  List<(String, double)> dco_decode_list_record_string_f_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    return (raw as List<dynamic>).map(dco_decode_record_string_f_64).toList();
-  }
-
-  @protected
   List<(BigInt, BackgroundNotificationState)>
       dco_decode_list_record_usize_background_notification_state(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -3378,19 +3377,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (
       dco_decode_list_prim_u_8_strict(arr[0]),
       dco_decode_String(arr[1]),
-    );
-  }
-
-  @protected
-  (String, double) dco_decode_record_string_f_64(dynamic raw) {
-    // Codec=Dco (DartCObject based), see doc to use other codecs
-    final arr = raw as List<dynamic>;
-    if (arr.length != 2) {
-      throw Exception('Expected 2 elements, got ${arr.length}');
-    }
-    return (
-      dco_decode_String(arr[0]),
-      dco_decode_f_64(arr[1]),
     );
   }
 
@@ -3636,13 +3622,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_String(deserializer);
     return AnyhowException(inner);
-  }
-
-  @protected
-  Map<String, double> sse_decode_Map_String_f_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var inner = sse_decode_list_record_string_f_64(deserializer);
-    return Map.fromEntries(inner.map((e) => MapEntry(e.$1, e.$2)));
   }
 
   @protected
@@ -4091,7 +4070,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_addrType = sse_decode_u_8(deserializer);
     var var_logo = sse_decode_opt_String(deserializer);
     var var_balances = sse_decode_Map_usize_String(deserializer);
-    var var_rates = sse_decode_Map_String_f_64(deserializer);
+    var var_rate = sse_decode_f_64(deserializer);
     var var_default_ = sse_decode_bool(deserializer);
     var var_native = sse_decode_bool(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
@@ -4103,7 +4082,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         addrType: var_addrType,
         logo: var_logo,
         balances: var_balances,
-        rates: var_rates,
+        rate: var_rate,
         default_: var_default_,
         native: var_native,
         chainHash: var_chainHash);
@@ -4353,19 +4332,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
     return deserializer.buffer.getUint64List(len_);
-  }
-
-  @protected
-  List<(String, double)> sse_decode_list_record_string_f_64(
-      SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-
-    var len_ = sse_decode_i_32(deserializer);
-    var ans_ = <(String, double)>[];
-    for (var idx_ = 0; idx_ < len_; ++idx_) {
-      ans_.add(sse_decode_record_string_f_64(deserializer));
-    }
-    return ans_;
   }
 
   @protected
@@ -4622,14 +4588,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_list_prim_u_8_strict(deserializer);
     var var_field1 = sse_decode_String(deserializer);
-    return (var_field0, var_field1);
-  }
-
-  @protected
-  (String, double) sse_decode_record_string_f_64(SseDeserializer deserializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_field0 = sse_decode_String(deserializer);
-    var var_field1 = sse_decode_f_64(deserializer);
     return (var_field0, var_field1);
   }
 
@@ -4902,14 +4860,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       AnyhowException self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.message, serializer);
-  }
-
-  @protected
-  void sse_encode_Map_String_f_64(
-      Map<String, double> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_record_string_f_64(
-        self.entries.map((e) => (e.key, e.value)).toList(), serializer);
   }
 
   @protected
@@ -5287,7 +5237,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_8(self.addrType, serializer);
     sse_encode_opt_String(self.logo, serializer);
     sse_encode_Map_usize_String(self.balances, serializer);
-    sse_encode_Map_String_f_64(self.rates, serializer);
+    sse_encode_f_64(self.rate, serializer);
     sse_encode_bool(self.default_, serializer);
     sse_encode_bool(self.native, serializer);
     sse_encode_u_64(self.chainHash, serializer);
@@ -5478,16 +5428,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
     serializer.buffer.putUint64List(self);
-  }
-
-  @protected
-  void sse_encode_list_record_string_f_64(
-      List<(String, double)> self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_i_32(self.length, serializer);
-    for (final item in self) {
-      sse_encode_record_string_f_64(item, serializer);
-    }
   }
 
   @protected
@@ -5696,14 +5636,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(self.$1, serializer);
     sse_encode_String(self.$2, serializer);
-  }
-
-  @protected
-  void sse_encode_record_string_f_64(
-      (String, double) self, SseSerializer serializer) {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.$1, serializer);
-    sse_encode_f_64(self.$2, serializer);
   }
 
   @protected

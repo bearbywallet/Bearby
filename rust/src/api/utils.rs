@@ -10,10 +10,11 @@ pub fn intl_number_formating(
     symbol_str: &str,
     threshold: f64,
     compact: bool,
+    converted: f64,
 ) -> String {
     let u256_value: U256 = value.parse::<U256>().unwrap_or_default();
 
     format_u256(
-        u256_value, decimals, locale_str, symbol_str, threshold, compact,
+        u256_value, decimals, locale_str, symbol_str, threshold, compact, converted,
     )
 }

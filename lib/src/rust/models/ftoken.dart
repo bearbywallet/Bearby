@@ -14,7 +14,7 @@ class FTokenInfo {
   final int addrType;
   final String? logo;
   final Map<BigInt, String> balances;
-  final Map<String, double> rates;
+  final double rate;
   final bool default_;
   final bool native;
   final BigInt chainHash;
@@ -27,7 +27,7 @@ class FTokenInfo {
     required this.addrType,
     this.logo,
     required this.balances,
-    required this.rates,
+    required this.rate,
     required this.default_,
     required this.native,
     required this.chainHash,
@@ -42,7 +42,7 @@ class FTokenInfo {
       addrType.hashCode ^
       logo.hashCode ^
       balances.hashCode ^
-      rates.hashCode ^
+      rate.hashCode ^
       default_.hashCode ^
       native.hashCode ^
       chainHash.hashCode;
@@ -59,7 +59,7 @@ class FTokenInfo {
           addrType == other.addrType &&
           logo == other.logo &&
           balances == other.balances &&
-          rates == other.rates &&
+          rate == other.rate &&
           default_ == other.default_ &&
           native == other.native &&
           chainHash == other.chainHash;
