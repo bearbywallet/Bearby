@@ -67,7 +67,9 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SwitchSettingItem(
+                            iconPath: "assets/icons/manage.svg",
                             title: 'Push notifications',
+                            backgroundColor: theme.cardBackground,
                             description:
                                 'Get notifications when tx sent and confirm, Notifications from connected apps.',
                             value: state.state.notificationsGlobalEnabled,

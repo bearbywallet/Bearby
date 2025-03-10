@@ -248,6 +248,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Uint64List dco_decode_list_prim_usize_strict(dynamic raw);
 
   @protected
+  List<(String, String)> dco_decode_list_record_string_string(dynamic raw);
+
+  @protected
   List<(BigInt, BackgroundNotificationState)>
       dco_decode_list_record_usize_background_notification_state(dynamic raw);
 
@@ -585,6 +588,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint64List sse_decode_list_prim_usize_strict(SseDeserializer deserializer);
+
+  @protected
+  List<(String, String)> sse_decode_list_record_string_string(
+      SseDeserializer deserializer);
 
   @protected
   List<(BigInt, BackgroundNotificationState)>
@@ -954,6 +961,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_prim_usize_strict(
       Uint64List self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_record_string_string(
+      List<(String, String)> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_record_usize_background_notification_state(

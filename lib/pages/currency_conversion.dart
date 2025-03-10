@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/modals/list_selector.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 
@@ -14,51 +17,23 @@ class CurrencyConversionPage extends StatefulWidget {
 }
 
 class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
-  late List<Currency> currencies = [];
-
+  late List<Currency> _currencies = [];
   String selectedCurrency = 'btc';
+  int selectedEngine = 0;
 
   @override
   void initState() {
     super.initState();
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
       final state = Provider.of<AppState>(context, listen: false);
+      final currenciesTickets = await getCurrenciesTickets();
 
       setState(() {
-        currencies = [
-          Currency("BTC", "Bitcoin ₿"),
-          Currency("BRL", "Brazilian Real R\$"),
-          Currency("RUB", "Russian Ruble ₽"),
-          Currency("INR", "Indian Rupee ₹"),
-          Currency("CNY", "Chinese Yuan ¥"),
-          Currency("ZAR", "South African Rand R"),
-          Currency("EGP", "Egyptian Pound £"),
-          Currency("ETB", "Ethiopian Birr Br"),
-          Currency("IRR", "Iranian Rial ﷼"),
-          Currency("SAR", "Saudi Riyal ﷼"),
-          Currency("AED", "United Arab Emirates Dirham د.إ"),
-          Currency("USD", "United States Dollar \$"),
-          Currency("EUR", "Euro €"),
-          Currency("JPY", "Japanese Yen ¥"),
-          Currency("GBP", "British Pound £"),
-          Currency("KRW", "South Korean Won ₩"),
-          Currency("CHF", "Swiss Franc ₣"),
-          Currency("AUD", "Australian Dollar A\$"),
-          Currency("CAD", "Canadian Dollar C\$"),
-          Currency("MXN", "Mexican Peso \$"),
-          Currency("ETH", "Ethereum Ξ"),
-          Currency("LTC", "Litecoin Ł"),
-          Currency("XRP", "Ripple ✕"),
-          Currency("BCH", "Bitcoin Cash Ƀ"),
-          Currency("ADA", "Cardano ₳"),
-          Currency("DOT", "Polkadot ●"),
-          Currency("SOL", "Solana ◎"),
-          Currency("USDT", "Tether ₮"),
-          Currency("DOGE", "Dogecoin Ð"),
-          Currency("GOLD", "Gold Au"),
-          Currency("SILVER", "Silver Ag"),
-        ];
+        _currencies = currenciesTickets
+            .map((pair) =>
+                Currency(pair.$1, "${_getCurrencyName(pair.$1)} ${pair.$2}"))
+            .toList();
       });
 
       if (state.wallet?.settings.currencyConvert != null) {
@@ -66,7 +41,49 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
           selectedCurrency = state.wallet!.settings.currencyConvert!;
         });
       }
+
+      setState(() {
+        selectedEngine = state.wallet?.settings.ratesApiOptions ?? 0;
+      });
     });
+  }
+
+  String _getCurrencyName(String symbol) {
+    final Map<String, String> currencyNames = {
+      "BTC": "Bitcoin",
+      "BRL": "Brazilian Real",
+      "RUB": "Russian Ruble",
+      "INR": "Indian Rupee",
+      "CNY": "Chinese Yuan",
+      "ZAR": "South African Rand",
+      "EGP": "Egyptian Pound",
+      "ETB": "Ethiopian Birr",
+      "IRR": "Iranian Rial",
+      "SAR": "Saudi Riyal",
+      "AED": "United Arab Emirates Dirham",
+      "USD": "United States Dollar",
+      "EUR": "Euro",
+      "JPY": "Japanese Yen",
+      "GBP": "British Pound",
+      "KRW": "South Korean Won",
+      "CHF": "Swiss Franc",
+      "AUD": "Australian Dollar",
+      "CAD": "Canadian Dollar",
+      "MXN": "Mexican Peso",
+      "ETH": "Ethereum",
+      "LTC": "Litecoin",
+      "XRP": "Ripple",
+      "BCH": "Bitcoin Cash",
+      "ADA": "Cardano",
+      "DOT": "Polkadot",
+      "SOL": "Solana",
+      "USDT": "Tether",
+      "DOGE": "Dogecoin",
+      "GOLD": "Gold",
+      "SILVER": "Silver"
+    };
+
+    return currencyNames[symbol] ?? symbol;
   }
 
   @override
@@ -84,14 +101,11 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  child: CustomAppBar(
-                    title: 'Primary Currency',
-                    onBackPressed: () => Navigator.pop(context),
-                  ),
+                CustomAppBar(
+                  title: 'Primary Currency',
+                  onBackPressed: () => Navigator.pop(context),
                 ),
-                _buildRateFetchOption(state),
+                _buildEngineInfo(theme, state),
                 Expanded(
                   child: Opacity(
                     opacity: isRateFetchEnabled ? 1.0 : 0.5,
@@ -101,9 +115,9 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                         absorbing: !isRateFetchEnabled,
                         child: ListView.builder(
                           physics: const BouncingScrollPhysics(),
-                          itemCount: currencies.length,
+                          itemCount: _currencies.length,
                           itemBuilder: (context, index) {
-                            final currency = currencies[index];
+                            final currency = _currencies[index];
                             final isSelected = currency.code.toLowerCase() ==
                                 selectedCurrency.toLowerCase();
 
@@ -139,62 +153,44 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     );
   }
 
-  Widget _buildRateFetchOption(AppState state) {
-    final theme = state.currentTheme;
+  Widget _buildEngineInfo(AppTheme theme, AppState appState) {
+    final engineText = selectedEngine == 0 ? 'None' : 'Coingecko';
 
-    return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                'Enable rate fetcher',
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-              Switch(
-                value: state.wallet!.settings.currencyConvert != null,
-                onChanged: (value) async {
-                  if (value) {
-                    await setRateFetcher(
-                      walletIndex: BigInt.from(state.selectedWallet),
-                      currency: selectedCurrency,
-                    );
-                  } else {
-                    await setRateFetcher(
-                      walletIndex: BigInt.from(state.selectedWallet),
-                      currency: value ? selectedCurrency : null,
-                    );
-                  }
+    return ButtonItem(
+      theme: theme,
+      title: 'Currency Engine',
+      iconPath: 'assets/icons/currency.svg',
+      description: 'Engine for fetching currency rates',
+      subtitleText: engineText,
+      onTap: () {
+        _showEngineSelector(appState);
+      },
+    );
+  }
 
-                  await state.syncData();
-                },
-                activeColor: theme.primaryPurple,
-                activeTrackColor: theme.primaryPurple.withValues(alpha: 0.5),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'The wallet will fetch rates and makes request to ZilPay server',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
+  void _showEngineSelector(AppState appState) {
+    final engines = [
+      ListItem(title: 'None', subtitle: 'No engine selected'),
+      ListItem(title: 'Coingecko', subtitle: 'Fetch rates from Coingecko'),
+    ];
+
+    showListSelectorModal(
+      context: context,
+      title: 'Select Currency Engine',
+      items: engines,
+      selectedIndex: selectedEngine,
+      onItemSelected: (index) async {
+        setState(() {
+          selectedEngine = index;
+        });
+
+        // await setCurrencyEngine(
+        //   walletIndex: BigInt.from(appState.selectedWallet),
+        //   engine: index,
+        // );
+
+        await appState.syncData();
+      },
     );
   }
 

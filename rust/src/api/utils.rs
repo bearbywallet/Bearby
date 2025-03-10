@@ -1,5 +1,5 @@
 use flutter_rust_bridge::frb;
-pub use zilpay::intl::number::format_u256;
+pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
 use zilpay::proto::U256;
 
 #[frb(sync)]
@@ -25,4 +25,11 @@ pub fn intl_number_formating(
         compact,
         converted,
     )
+}
+
+pub fn get_currencies_tickets() -> Vec<(String, String)> {
+    CURRENCY_SYMBOLS
+        .iter()
+        .map(|(symbol, ticket)| (symbol.to_string(), ticket.to_string()))
+        .collect()
 }

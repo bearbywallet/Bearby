@@ -24,3 +24,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
         threshold: threshold,
         compact: compact,
         converted: converted);
+
+Future<List<(String, String)>> getCurrenciesTickets() =>
+    RustLib.instance.api.crateApiUtilsGetCurrenciesTickets();

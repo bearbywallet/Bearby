@@ -92,6 +92,8 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           SwitchSettingItem(
+                            backgroundColor: theme.cardBackground,
+                            iconPath: "assets/icons/pin.svg",
                             title: 'Compact Numbers',
                             description:
                                 'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).',

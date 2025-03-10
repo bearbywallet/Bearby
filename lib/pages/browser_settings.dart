@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/list_selector.dart';
@@ -9,36 +10,6 @@ import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
-
-extension BrowserSettingsInfoExtension on BrowserSettingsInfo {
-  BrowserSettingsInfo copyWith({
-    int? searchEngineIndex,
-    bool? cacheEnabled,
-    bool? cookiesEnabled,
-    int? contentBlocking,
-    bool? doNotTrack,
-    bool? incognitoMode,
-    double? textScalingFactor,
-    bool? allowGeolocation,
-    bool? allowCamera,
-    bool? allowMicrophone,
-    bool? allowAutoPlay,
-  }) {
-    return BrowserSettingsInfo(
-      searchEngineIndex: searchEngineIndex ?? this.searchEngineIndex,
-      cacheEnabled: cacheEnabled ?? this.cacheEnabled,
-      cookiesEnabled: cookiesEnabled ?? this.cookiesEnabled,
-      contentBlocking: contentBlocking ?? this.contentBlocking,
-      doNotTrack: doNotTrack ?? this.doNotTrack,
-      incognitoMode: incognitoMode ?? this.incognitoMode,
-      textScalingFactor: textScalingFactor ?? this.textScalingFactor,
-      allowGeolocation: allowGeolocation ?? this.allowGeolocation,
-      allowCamera: allowCamera ?? this.allowCamera,
-      allowMicrophone: allowMicrophone ?? this.allowMicrophone,
-      allowAutoPlay: allowAutoPlay ?? this.allowAutoPlay,
-    );
-  }
-}
 
 class BrowserSettingsPage extends StatefulWidget {
   const BrowserSettingsPage({super.key});
@@ -53,18 +24,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
       .toList();
 
   final List<ListItem> contentBlockingOptions = [
-    ListItem(
-      title: 'Off',
-      subtitle: 'No content blocking',
-    ),
-    ListItem(
-      title: 'Moderate',
-      subtitle: 'Blocks some trackers and ads',
-    ),
-    ListItem(
-      title: 'Strict',
-      subtitle: 'Blocks most trackers and ads',
-    ),
+    ListItem(title: 'Off', subtitle: 'No content blocking'),
+    ListItem(title: 'Moderate', subtitle: 'Blocks some trackers and ads'),
+    ListItem(title: 'Strict', subtitle: 'Blocks most trackers and ads'),
   ];
 
   @override
@@ -230,24 +192,24 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           ),
           child: Column(
             children: [
-              _buildButtonItem(
-                theme,
-                'Search Engine',
-                'assets/icons/search.svg',
-                'Configure your default search engine',
-                () => _showSearchEngineModal(appState),
+              ButtonItem(
+                theme: theme,
+                title: 'Search Engine',
+                iconPath: 'assets/icons/search.svg',
+                description: 'Configure your default search engine',
+                onTap: () => _showSearchEngineModal(appState),
                 subtitleText: searchEngines[
                         appState.state.browserSettings.searchEngineIndex]
                     .title,
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildButtonItem(
-                theme,
-                'Content Blocking',
-                'assets/icons/shield.svg',
-                'Configure content blocking settings',
-                () => _showContentBlockingModal(appState),
+              ButtonItem(
+                theme: theme,
+                title: 'Content Blocking',
+                iconPath: 'assets/icons/shield.svg',
+                description: 'Configure content blocking settings',
+                onTap: () => _showContentBlockingModal(appState),
                 subtitleText: contentBlockingOptions[
                         appState.state.browserSettings.contentBlocking]
                     .title,
@@ -282,36 +244,30 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           ),
           child: Column(
             children: [
-              _buildPreferenceItem(
-                theme,
-                'Cookies',
-                'assets/icons/cookie.svg',
-                'Allow websites to save and read cookies',
-                true,
-                settings.cookiesEnabled,
-                (value) => _toggleCookies(appState, value),
+              SwitchSettingItem(
+                title: 'Cookies',
+                iconPath: 'assets/icons/cookie.svg',
+                description: 'Allow websites to save and read cookies',
+                value: settings.cookiesEnabled,
+                onChanged: (value) => _toggleCookies(appState, value),
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Do Not Track',
-                'assets/icons/shield.svg',
-                'Request websites not to track your browsing',
-                true,
-                settings.doNotTrack,
-                (value) => _toggleDoNotTrack(appState, value),
+              SwitchSettingItem(
+                title: 'Do Not Track',
+                iconPath: 'assets/icons/shield.svg',
+                description: 'Request websites not to track your browsing',
+                value: settings.doNotTrack,
+                onChanged: (value) => _toggleDoNotTrack(appState, value),
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                theme,
-                'Incognito Mode',
-                'assets/icons/incognito.svg',
-                'Browse without saving history or cookies',
-                true,
-                settings.incognitoMode,
-                (value) => _toggleIncognitoMode(appState, value),
+              SwitchSettingItem(
+                title: 'Incognito Mode',
+                iconPath: 'assets/icons/incognito.svg',
+                description: 'Browse without saving history or cookies',
+                value: settings.incognitoMode,
+                onChanged: (value) => _toggleIncognitoMode(appState, value),
               ),
             ],
           ),
@@ -343,163 +299,17 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           ),
           child: Column(
             children: [
-              _buildPreferenceItem(
-                theme,
-                'Cache',
-                'assets/icons/cache.svg',
-                'Store website data for faster loading',
-                true,
-                settings.cacheEnabled,
-                (value) => _toggleCache(appState, value),
+              SwitchSettingItem(
+                title: 'Cache',
+                iconPath: 'assets/icons/cache.svg',
+                description: 'Store website data for faster loading',
+                value: settings.cacheEnabled,
+                onChanged: (value) => _toggleCache(appState, value),
               ),
             ],
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildButtonItem(
-    AppTheme theme,
-    String title,
-    String iconPath,
-    String description,
-    VoidCallback onTap, {
-    String? subtitleText,
-  }) {
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: onTap,
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                SvgPicture.asset(
-                  iconPath,
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textPrimary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        title,
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 16,
-                        ),
-                      ),
-                      if (subtitleText != null) ...[
-                        const SizedBox(height: 4),
-                        Text(
-                          subtitleText,
-                          style: TextStyle(
-                            color: theme.primaryPurple,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ],
-                    ],
-                  ),
-                ),
-                SvgPicture.asset(
-                  'assets/icons/chevron_right.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.textSecondary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ],
-            ),
-            if (description.isNotEmpty) ...[
-              const SizedBox(height: 4),
-              Padding(
-                padding: const EdgeInsets.only(left: 40),
-                child: Text(
-                  description,
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 14,
-                  ),
-                ),
-              ),
-            ],
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPreferenceItem(
-    AppTheme theme,
-    String title,
-    String iconPath,
-    String description,
-    bool hasSwitch,
-    bool value,
-    Function(bool)? onChanged,
-  ) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                iconPath,
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 16),
-              Expanded(
-                child: Text(
-                  title,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 16,
-                  ),
-                ),
-              ),
-              if (hasSwitch)
-                Switch(
-                  value: value,
-                  onChanged: onChanged,
-                  activeColor: theme.primaryPurple,
-                ),
-            ],
-          ),
-          if (description.isNotEmpty) ...[
-            const SizedBox(height: 4),
-            Padding(
-              padding: const EdgeInsets.only(left: 40),
-              child: Text(
-                description,
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ],
-        ],
-      ),
     );
   }
 }
