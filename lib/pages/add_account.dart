@@ -25,12 +25,14 @@ class _AddAccountState extends State<AddAccount> {
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _accountNameInputKey = GlobalKey<SmartInputState>();
+  final AuthService _authService = AuthService();
 
   bool _isCreating = false;
   bool _zilliqaLegacy = false;
   String? _errorMessage;
   int _bip39Index = 0;
   bool _obscurePassword = true;
+  bool _useBiometrics = false;
 
   late AuthGuard _authGuard;
 
@@ -41,6 +43,19 @@ class _AddAccountState extends State<AddAccount> {
     AppState appState = Provider.of<AppState>(context, listen: false);
     _bip39Index = appState.wallet!.accounts.length;
     _setAutoAccountName(appState);
+    _checkBiometricAvailability(appState);
+  }
+
+  void _checkBiometricAvailability(AppState appState) {
+    if (appState.wallet != null) {
+      final authType = appState.wallet!.authType;
+      setState(() {
+        _useBiometrics = authType == AuthMethod.faceId.name ||
+            authType == AuthMethod.fingerprint.name ||
+            authType == AuthMethod.biometric.name ||
+            authType == AuthMethod.pinCode.name;
+      });
+    }
   }
 
   @override
@@ -65,12 +80,26 @@ class _AddAccountState extends State<AddAccount> {
     return appState.chain?.slip44 == 313 && appState.wallet != null;
   }
 
+  Future<bool> _authenticateWithBiometrics() async {
+    try {
+      return await _authService.authenticate(
+        allowPinCode: true,
+        reason: 'Authenticate to create a new account',
+      );
+    } catch (e) {
+      debugPrint('Biometric authentication error: $e');
+      setState(() {
+        _errorMessage = 'Biometric authentication failed: $e';
+      });
+      return false;
+    }
+  }
+
   Future<void> _createAccount(AppState appState) async {
     if (_exists(appState)) {
       setState(() {
-        _errorMessage = "Account with inded $_bip39Index already exists";
+        _errorMessage = "Account with index $_bip39Index already exists";
       });
-
       return;
     }
 
@@ -80,9 +109,9 @@ class _AddAccountState extends State<AddAccount> {
     }
 
     if (_passwordController.text.isEmpty &&
-        appState.wallet!.authType == AuthMethod.none.name) {
+        appState.wallet!.authType == AuthMethod.none.name &&
+        !_useBiometrics) {
       _passwordInputKey.currentState?.shake();
-
       return;
     }
 
@@ -93,11 +122,23 @@ class _AddAccountState extends State<AddAccount> {
 
     String session = "";
 
+    // Handle biometric authentication if enabled
+    if (_useBiometrics && _passwordController.text.isEmpty) {
+      bool authenticated = await _authenticateWithBiometrics();
+      if (!authenticated) {
+        setState(() {
+          _isCreating = false;
+          _errorMessage = "Biometric authentication failed";
+        });
+        return;
+      }
+    }
+
     try {
       session = await _authGuard.getSession(
           sessionKey: appState.wallet!.walletAddress);
     } catch (e) {
-      debugPrint("gettting session error: $e");
+      debugPrint("getting session error: $e");
     }
 
     try {
@@ -261,6 +302,41 @@ class _AddAccountState extends State<AddAccount> {
                             ],
                           ),
                         ),
+                        if (_useBiometrics) ...[
+                          SizedBox(height: adaptivePadding),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                                horizontal: 16, vertical: 12),
+                            decoration: BoxDecoration(
+                              color: theme.cardBackground,
+                              borderRadius: BorderRadius.circular(16),
+                              border: Border.all(color: theme.secondaryPurple),
+                            ),
+                            child: Row(
+                              children: [
+                                SvgPicture.asset(
+                                  'assets/icons/biometric.svg',
+                                  width: 24,
+                                  height: 24,
+                                  colorFilter: ColorFilter.mode(
+                                    theme.textPrimary,
+                                    BlendMode.srcIn,
+                                  ),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    'Use Biometrics',
+                                    style: TextStyle(
+                                      color: theme.textPrimary,
+                                      fontSize: 16,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                         if (appState.wallet!.authType ==
                             AuthMethod.none.name) ...[
                           SizedBox(height: adaptivePadding),
