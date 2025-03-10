@@ -49,42 +49,8 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildIcon(AppState appState) {
     final theme = appState.currentTheme;
-    if (appState.wallet == null || appState.account == null) {
-      return Container(
-        width: 32,
-        height: 32,
-        decoration: BoxDecoration(
-            shape: BoxShape.circle,
-            border: Border.all(
-                color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
-        child: ClipOval(
-          child: Blockies(
-              seed: widget.transaction.transactionHash,
-              color: theme.secondaryPurple,
-              bgColor: theme.primaryPurple,
-              spotColor: theme.background,
-              size: 8),
-        ),
-      );
-    }
-    final token = appState.wallet!.tokens.firstWhere(
-      (t) =>
-          t.symbol == widget.transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType,
-      orElse: () => FTokenInfo(
-        name: '',
-        symbol: widget.transaction.tokenInfo?.symbol ?? '',
-        decimals: widget.transaction.tokenInfo?.decimals ??
-            appState.wallet!.tokens.first.decimals,
-        addr: '',
-        addrType: appState.wallet!.tokens.first.addrType,
-        balances: {},
-        rate: 0,
-        default_: false,
-        native: false,
-        chainHash: BigInt.zero,
-      ),
-    );
+    final token = _findMatchingToken(appState);
+
     return Container(
       width: 32,
       height: 32,
@@ -94,7 +60,8 @@ class _HistoryItemState extends State<HistoryItem>
               color: theme.primaryPurple.withValues(alpha: 0.1), width: 2)),
       child: ClipOval(
         child: AsyncImage(
-          url: widget.transaction.icon ?? processTokenLogo(token, theme.value),
+          url: widget.transaction.icon ??
+              (token != null ? processTokenLogo(token, theme.value) : null),
           width: 32,
           height: 32,
           fit: BoxFit.contain,
@@ -109,6 +76,22 @@ class _HistoryItemState extends State<HistoryItem>
         ),
       ),
     );
+  }
+
+  FTokenInfo? _findMatchingToken(AppState appState) {
+    if (appState.wallet == null ||
+        widget.transaction.tokenInfo == null ||
+        appState.account == null) {
+      return null;
+    }
+
+    try {
+      return appState.wallet!.tokens.firstWhere((t) =>
+          t.symbol == widget.transaction.tokenInfo?.symbol &&
+          t.addrType == appState.account?.addrType);
+    } catch (_) {
+      return null;
+    }
   }
 
   Color _getStatusColor(AppTheme theme) {
@@ -127,76 +110,85 @@ class _HistoryItemState extends State<HistoryItem>
       widget.transaction.timestamp.toInt() * 1000,
     );
 
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = dateTime.month.toString().padLeft(2, '0');
-    String year = dateTime.year.toString();
-    String hour = dateTime.hour.toString().padLeft(2, '0');
-    String minute = dateTime.minute.toString().padLeft(2, '0');
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final year = dateTime.year.toString();
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
 
     return '$day.$month.$year $hour:$minute';
   }
 
   Widget _buildAmountWithPrice(AppState appState) {
     final theme = appState.currentTheme;
+    final token = _findMatchingToken(appState);
+    final baseToken = appState.wallet?.tokens.first;
 
-    if (widget.transaction.tokenInfo != null) {
-      final decimals = widget.transaction.tokenInfo!.decimals;
-      final value = BigInt.parse(
-          widget.transaction.tokenInfo?.value ?? widget.transaction.amount);
-      final (formattedValue, convertedValue) = formatingAmount(
-        amount: value,
-        symbol: widget.transaction.tokenInfo?.symbol ?? '',
-        decimals: decimals,
-        rate: 0,
-        appState: appState,
-      );
-      final price = 0.004;
-      final usdAmount = 0 * price;
+    final amount = BigInt.tryParse(
+            widget.transaction.tokenInfo?.value ?? widget.transaction.amount) ??
+        BigInt.zero;
 
-      return Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(formattedValue,
-              style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                  letterSpacing: 0.5),
-              overflow: TextOverflow.ellipsis),
+    final decimals = (widget.transaction.tokenInfo?.decimals ??
+            token?.decimals ??
+            baseToken?.decimals) ??
+        1;
+
+    final symbol = (widget.transaction.tokenInfo?.symbol ??
+            token?.symbol ??
+            baseToken?.symbol) ??
+        "";
+
+    final rate = token?.rate ?? baseToken?.rate ?? 0;
+
+    final (formattedValue, convertedValue) = formatingAmount(
+      amount: amount,
+      symbol: symbol,
+      decimals: decimals,
+      rate: rate,
+      appState: appState,
+    );
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(formattedValue,
+            style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.5),
+            overflow: TextOverflow.ellipsis),
+        if (convertedValue.isNotEmpty && convertedValue != '0')
           const SizedBox(height: 2),
-          Text('(\$$usdAmount)',
-              style: TextStyle(
-                  color: theme.textSecondary.withValues(alpha: 0.7),
-                  fontSize: 14,
-                  fontWeight: FontWeight.w400)),
-        ],
-      );
-    }
-    return Text(widget.transaction.amount,
-        style: TextStyle(
-            color: theme.textPrimary,
-            fontSize: 16,
-            fontWeight: FontWeight.w600,
-            letterSpacing: 0.5),
-        overflow: TextOverflow.ellipsis);
+        Text(convertedValue,
+            style: TextStyle(
+                color: theme.textSecondary.withValues(alpha: 0.7),
+                fontSize: 14,
+                fontWeight: FontWeight.w400)),
+      ],
+    );
   }
 
   Widget _buildFeeWithPrice(AppState appState) {
     final theme = appState.currentTheme;
-    final token = appState.wallet!.tokens.first;
+    final token = appState.wallet?.tokens.first;
+
+    if (token == null) {
+      return const SizedBox.shrink();
+    }
+
     final decimals =
         widget.transaction.chainType == "EVM" && token.decimals < 18
             ? 18
             : token.decimals;
-    final price = 0;
-    final (formattedValue, converted) = formatingAmount(
+
+    final (formattedValue, convertedValue) = formatingAmount(
       amount: widget.transaction.fee,
-      symbol: widget.transaction.tokenInfo?.symbol ?? '',
+      symbol: token.symbol,
       decimals: decimals,
-      rate: 0,
+      rate: token.rate,
       appState: appState,
     );
-    final usdFee = 0 * price;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
@@ -209,9 +201,10 @@ class _HistoryItemState extends State<HistoryItem>
               fontWeight: FontWeight.w400),
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 2),
+        if (convertedValue.isNotEmpty && convertedValue != '0')
+          const SizedBox(height: 2),
         Text(
-          '(\$$usdFee)',
+          convertedValue,
           style: TextStyle(
             color: theme.textSecondary.withValues(alpha: 0.7),
             fontSize: 12,

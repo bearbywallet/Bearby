@@ -8,7 +8,6 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
@@ -705,17 +704,18 @@ class _ModalHeader extends StatelessWidget {
             borderRadius: BorderRadius.circular(2),
           ),
         ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: padding),
-          child: Text(
-            title,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+        if (title != '')
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: padding),
+            child: Text(
+              title,
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
-        ),
         SizedBox(height: padding),
       ],
     );
