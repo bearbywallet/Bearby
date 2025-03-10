@@ -70,14 +70,6 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     await createOrUpdateChain(providerConfig: _config);
   }
 
-  void _selectExplorer(int index) async {
-    setState(() {
-      final selectedExplorer = _config.explorers.removeAt(index);
-      _config.explorers.insert(0, selectedExplorer);
-    });
-    await createOrUpdateChain(providerConfig: _config);
-  }
-
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -424,73 +416,59 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
           SizedBox(height: 8),
           Column(
-            children: _config.explorers.asMap().entries.map((entry) {
-              final index = entry.key;
-              final explorer = entry.value;
-              final isSelected = index == 0;
-
-              return GestureDetector(
-                onTap: () => _selectExplorer(index),
-                behavior: HitTestBehavior.opaque,
-                child: Container(
-                  margin: EdgeInsets.only(bottom: 6),
-                  padding: EdgeInsets.all(10),
-                  decoration: BoxDecoration(
-                    border: Border.all(
-                      color: isSelected
-                          ? theme.primaryPurple
-                          : theme.textSecondary.withValues(alpha: 0.2),
-                    ),
-                    borderRadius: BorderRadius.circular(8),
-                    color: isSelected
-                        ? theme.primaryPurple.withValues(alpha: 0.1)
-                        : Colors.transparent,
+            children: _config.explorers.map((explorer) {
+              return Container(
+                margin: EdgeInsets.only(bottom: 6),
+                padding: EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: theme.textSecondary.withValues(alpha: 0.2),
                   ),
-                  child: Row(
-                    children: [
-                      if (explorer.icon != null)
-                        AsyncImage(
-                          url: explorer.icon!,
-                          width: 20,
-                          height: 20,
-                          fit: BoxFit.cover,
-                          errorWidget: SvgPicture.asset(
-                            'assets/icons/warning.svg',
-                            width: 16,
-                            height: 16,
-                            colorFilter: ColorFilter.mode(
-                                theme.warning, BlendMode.srcIn),
-                          ),
-                          loadingWidget: CircularProgressIndicator(
-                              strokeWidth: 2, color: theme.primaryPurple),
+                  borderRadius: BorderRadius.circular(8),
+                  color: Colors.transparent,
+                ),
+                child: Row(
+                  children: [
+                    if (explorer.icon != null)
+                      AsyncImage(
+                        url: explorer.icon!,
+                        width: 20,
+                        height: 20,
+                        fit: BoxFit.cover,
+                        errorWidget: SvgPicture.asset(
+                          'assets/icons/warning.svg',
+                          width: 16,
+                          height: 16,
+                          colorFilter:
+                              ColorFilter.mode(theme.warning, BlendMode.srcIn),
                         ),
-                      SizedBox(width: 8),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              explorer.name,
-                              style: TextStyle(
-                                color: theme.textPrimary,
-                                fontSize: 12,
-                                fontWeight: isSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                            Text(
-                              explorer.url,
-                              style: TextStyle(
-                                  color: theme.textSecondary, fontSize: 10),
-                              overflow: TextOverflow.ellipsis,
-                            ),
-                          ],
-                        ),
+                        loadingWidget: CircularProgressIndicator(
+                            strokeWidth: 2, color: theme.primaryPurple),
                       ),
-                    ],
-                  ),
+                    SizedBox(width: 8),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            explorer.name,
+                            style: TextStyle(
+                              color: theme.textPrimary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.normal,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            explorer.url,
+                            style: TextStyle(
+                                color: theme.textSecondary, fontSize: 10),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ),
               );
             }).toList(),
