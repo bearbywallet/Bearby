@@ -1,12 +1,16 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
-import 'package:zilpay/components/copy_content.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'package:zilpay/components/detail_group_card.dart';
+import 'package:zilpay/components/detail_item_group_card.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -28,18 +32,17 @@ void showTransactionDetailsModal({
         padding: EdgeInsets.only(
           bottom: MediaQuery.of(context).viewInsets.bottom,
         ),
-        child: _TransactionDetailsModalContent(
-          transaction: transaction,
-        ),
+        child: TransactionDetailsModal(transaction: transaction),
       );
     },
   );
 }
 
-class _TransactionDetailsModalContent extends StatelessWidget {
+class TransactionDetailsModal extends StatelessWidget {
   final HistoricalTransactionInfo transaction;
 
-  const _TransactionDetailsModalContent({
+  const TransactionDetailsModal({
+    super.key,
     required this.transaction,
   });
 
@@ -48,18 +51,11 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-
-    final double headerHeight = 84.0;
-    final double itemHeight = 60.0;
-    final double bottomPadding = MediaQuery.of(context).padding.bottom;
-    final int infoItemsCount = _getInfoItemsCount();
-    final double totalContentHeight =
-        headerHeight + (itemHeight * infoItemsCount) + bottomPadding;
-    final double maxHeight = MediaQuery.of(context).size.height * 0.9;
-    final double containerHeight = totalContentHeight.clamp(0.0, maxHeight);
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final maxHeight = MediaQuery.of(context).size.height * 0.9;
 
     return Container(
-      height: containerHeight,
+      height: _calculateModalHeight(context, bottomPadding, maxHeight),
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
@@ -75,7 +71,11 @@ class _TransactionDetailsModalContent extends StatelessWidget {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildHeader(theme, adaptivePadding),
+          _ModalHeader(
+            title: transaction.title ?? '',
+            theme: theme,
+            padding: adaptivePadding,
+          ),
           Expanded(
             child: SingleChildScrollView(
               padding: EdgeInsets.symmetric(
@@ -84,345 +84,360 @@ class _TransactionDetailsModalContent extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  _buildTokenIcon(appState),
-                  const SizedBox(height: 8),
-                  _buildDetailItem(
-                    context,
-                    'Status',
-                    _getStatusWidget(theme),
-                    theme,
+                  _AmountSection(
+                    transaction: transaction,
+                    appState: appState,
+                    theme: theme,
                   ),
-                  _buildDetailItem(
-                    context,
-                    'Transaction Hash',
-                    transaction.transactionHash,
-                    theme,
-                    isCopyable: true,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Amount',
-                    _formatAmount(appState),
-                    theme,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Sender',
-                    transaction.sender,
-                    theme,
-                    isCopyable: true,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Recipient',
-                    transaction.recipient,
-                    theme,
-                    isCopyable: true,
-                  ),
-                  if (transaction.contractAddress != null)
-                    _buildDetailItem(
-                      context,
-                      'Contract Address',
-                      transaction.contractAddress!,
-                      theme,
-                      isCopyable: true,
-                    ),
-                  _buildDetailItem(
-                    context,
-                    'Timestamp',
-                    _formatTimestamp(),
-                    theme,
-                  ),
-                  if (transaction.blockNumber != null)
-                    _buildDetailItem(
-                      context,
-                      'Block Number',
-                      transaction.blockNumber.toString(),
-                      theme,
-                    ),
-                  _buildDetailItem(
-                    context,
-                    'Fee',
-                    _formatFee(appState),
-                    theme,
-                  ),
-                  if (transaction.gasUsed != null)
-                    _buildDetailItem(
-                      context,
-                      'Gas Used',
-                      transaction.gasUsed.toString(),
-                      theme,
-                    ),
-                  if (transaction.gasLimit != null)
-                    _buildDetailItem(
-                      context,
-                      'Gas Limit',
-                      '${transaction.gasLimit} Wei',
-                      theme,
-                    ),
-                  if (transaction.gasPrice != null)
-                    _buildDetailItem(
-                      context,
-                      'Gas Price',
-                      _formatGasPrice(transaction.gasPrice!),
-                      theme,
-                    ),
-                  if (transaction.effectiveGasPrice != null)
-                    _buildDetailItem(
-                      context,
-                      'Effective Gas Price',
-                      _formatGasPrice(transaction.effectiveGasPrice!),
-                      theme,
-                    ),
-                  if (transaction.blobGasUsed != null)
-                    _buildDetailItem(
-                      context,
-                      'Blob Gas Used',
-                      transaction.blobGasUsed.toString(),
-                      theme,
-                    ),
-                  if (transaction.blobGasPrice != null)
-                    _buildDetailItem(
-                      context,
-                      'Blob Gas Price',
-                      _formatGasPrice(transaction.blobGasPrice!),
-                      theme,
-                    ),
-                  _buildDetailItem(
-                    context,
-                    'Nonce',
-                    transaction.nonce.toString(),
-                    theme,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Chain Type',
-                    transaction.chainType,
-                    theme,
-                  ),
-                  _buildDetailItem(
-                    context,
-                    'Network',
-                    _getNetworkName(appState, transaction.chainHash),
-                    theme,
-                  ),
-                  if (transaction.error != null)
-                    _buildDetailItem(
-                      context,
-                      'Error',
-                      transaction.error!,
-                      theme,
-                    ),
+                  const SizedBox(height: 16),
+                  _buildDetailsSection(context, appState, theme),
                 ],
               ),
             ),
           ),
-          SizedBox(height: bottomPadding),
+          _buildExplorerLinks(appState, adaptivePadding, bottomPadding),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(AppTheme theme, double padding) {
+  Widget _buildDetailsSection(
+    BuildContext context,
+    AppState appState,
+    AppTheme theme,
+  ) {
     return Column(
       children: [
-        Container(
-          width: 36,
-          height: 4,
-          margin: EdgeInsets.symmetric(vertical: padding),
-          decoration: BoxDecoration(
-            color: theme.modalBorder,
-            borderRadius: BorderRadius.circular(2),
-          ),
-        ),
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: padding),
-          child: Text(
-            transaction.title ?? 'Transaction Details',
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
+        DetailGroupCard(
+          title: 'Transaction',
+          theme: theme,
+          children: [
+            DetailItem(
+              label: 'Hash',
+              value: transaction.transactionHash,
+              theme: theme,
+              isCopyable: true,
             ),
-          ),
+            DetailItem(
+              label: 'Sig',
+              value: transaction.sig,
+              theme: theme,
+              isCopyable: true,
+            ),
+            DetailItem(
+              label: 'Timestamp',
+              value: _formatTimestamp(),
+              theme: theme,
+            ),
+            if (transaction.blockNumber != null)
+              DetailItem(
+                label: 'Block Number',
+                value: transaction.blockNumber.toString(),
+                theme: theme,
+              ),
+            DetailItem(
+              label: 'Nonce',
+              value: transaction.nonce.toString(),
+              theme: theme,
+            ),
+          ],
         ),
+        const SizedBox(height: 12),
+        DetailGroupCard(
+          title: 'Addresses',
+          theme: theme,
+          children: [
+            DetailItem(
+              label: 'Sender',
+              value: transaction.sender,
+              theme: theme,
+              isCopyable: true,
+            ),
+            DetailItem(
+              label: 'Recipient',
+              value: transaction.recipient,
+              theme: theme,
+              isCopyable: true,
+            ),
+            if (transaction.contractAddress != null)
+              DetailItem(
+                label: 'Contract Address',
+                value: transaction.contractAddress!,
+                theme: theme,
+                isCopyable: true,
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DetailGroupCard(
+          title: 'Network',
+          theme: theme,
+          children: [
+            DetailItem(
+              label: 'Chain Type',
+              value: transaction.chainType,
+              theme: theme,
+            ),
+            DetailItem(
+              label: 'Network',
+              value: _getNetworkName(appState, transaction.chainHash),
+              theme: theme,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DetailGroupCard(
+          title: 'Gas & Fees',
+          theme: theme,
+          children: [
+            DetailItem(
+              label: 'Fee',
+              value: _formatFeeWidget(appState, theme),
+              theme: theme,
+            ),
+            if (transaction.gasUsed != null)
+              DetailItem(
+                label: 'Gas Used',
+                value: transaction.gasUsed.toString(),
+                theme: theme,
+              ),
+            if (transaction.gasLimit != null)
+              DetailItem(
+                label: 'Gas Limit',
+                value: '${transaction.gasLimit} Wei',
+                theme: theme,
+              ),
+            if (transaction.gasPrice != null)
+              DetailItem(
+                label: 'Gas Price',
+                value: _formatGasPrice(transaction.gasPrice!),
+                theme: theme,
+              ),
+            if (transaction.effectiveGasPrice != null)
+              DetailItem(
+                label: 'Effective Gas Price',
+                value: _formatGasPrice(transaction.effectiveGasPrice!),
+                theme: theme,
+              ),
+            if (transaction.blobGasUsed != null)
+              DetailItem(
+                label: 'Blob Gas Used',
+                value: transaction.blobGasUsed.toString(),
+                theme: theme,
+              ),
+            if (transaction.blobGasPrice != null)
+              DetailItem(
+                label: 'Blob Gas Price',
+                value: _formatGasPrice(transaction.blobGasPrice!),
+                theme: theme,
+              ),
+          ],
+        ),
+        if (transaction.error != null) ...[
+          const SizedBox(height: 12),
+          DetailGroupCard(
+            title: 'Error',
+            theme: theme,
+            children: [
+              DetailItem(
+                label: 'Error Message',
+                value: transaction.error!,
+                theme: theme,
+              ),
+            ],
+          ),
+        ],
       ],
     );
   }
 
-  Widget _buildTokenIcon(AppState appState) {
+  Widget _buildExplorerLinks(
+    AppState appState,
+    double padding,
+    double bottomPadding,
+  ) {
     final theme = appState.currentTheme;
-    FTokenInfo? token;
-    try {
-      token = appState.wallet!.tokens.firstWhere((t) =>
-          t.symbol == transaction.tokenInfo?.symbol &&
-          t.addrType == appState.account?.addrType);
-    } catch (e) {
-      token = null;
-    }
+    final chain = appState.getChain(transaction.chainHash);
+    final explorers = chain?.explorers ?? [];
 
     return Container(
-      width: 50,
-      height: 50,
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(
+        horizontal: padding,
+        vertical: 16,
+      ),
+      decoration: BoxDecoration(
+        color: theme.background.withValues(alpha: 0.8),
+        border: Border(
+          top: BorderSide(color: theme.modalBorder, width: 1),
+        ),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: explorers.isEmpty
+            ? [
+                _buildDefaultExplorerButton(theme),
+              ]
+            : explorers
+                .map((explorer) => _buildExplorerButton(explorer, theme))
+                .toList(),
+      ),
+    );
+  }
+
+  Widget _buildExplorerButton(ExplorerInfo explorer, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () async {
+          final url = formExplorerUrl(explorer, transaction.transactionHash);
+
+          final Uri uri = Uri.parse(url);
+          if (await canLaunchUrl(uri)) {
+            await launchUrl(uri, mode: LaunchMode.externalApplication);
+          }
+        },
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryPurple.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.primaryPurple.withValues(alpha: 0.2),
+              width: 1,
+            ),
+          ),
+          child: _buildExplorerIcon(explorer, theme),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildExplorerIcon(ExplorerInfo explorer, AppTheme theme) {
+    if (explorer.icon != null) {
+      return AsyncImage(
+        url: preprocessUrl(explorer.icon!, theme.value),
+        width: 20,
+        height: 20,
+        fit: BoxFit.contain,
+        errorWidget: _buildFallbackIcon(explorer.name, theme),
+        loadingWidget: SizedBox(
+          width: 20,
+          height: 20,
+          child: CircularProgressIndicator(
+            strokeWidth: 2,
+            valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+          ),
+        ),
+      );
+    }
+
+    return _buildFallbackIcon(explorer.name, theme);
+  }
+
+  Widget _buildFallbackIcon(String explorerName, AppTheme theme) {
+    final firstLetter =
+        explorerName.isNotEmpty ? explorerName[0].toUpperCase() : 'E';
+
+    return Container(
+      width: 20,
+      height: 20,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.1),
-          width: 2,
-        ),
+        color: theme.secondaryPurple,
       ),
-      child: ClipOval(
-        child: AsyncImage(
-          url: transaction.icon ??
-              (token != null
-                  ? processTokenLogo(
-                      token,
-                      theme.value,
-                    )
-                  : null),
-          width: 50,
-          height: 50,
-          fit: BoxFit.contain,
-          errorWidget: Blockies(
-            seed: transaction.transactionHash,
-            color: theme.secondaryPurple,
-            bgColor: theme.primaryPurple,
-            spotColor: theme.background,
-            size: 8,
-          ),
-          loadingWidget: const Center(
-            child: CircularProgressIndicator(
-              strokeWidth: 2,
-            ),
+      child: Center(
+        child: Text(
+          firstLetter,
+          style: TextStyle(
+            color: theme.background,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
           ),
         ),
       ),
     );
   }
 
-  Widget _buildDetailItem(
-    BuildContext context,
-    String label,
-    dynamic value,
-    AppTheme theme, {
-    bool isCopyable = false,
-  }) {
+  Widget _buildDefaultExplorerButton(AppTheme theme) {
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            flex: 2,
-            child: Text(
-              label,
-              style: TextStyle(
-                color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
+      padding: const EdgeInsets.symmetric(horizontal: 8),
+      child: InkWell(
+        onTap: () {},
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: theme.primaryPurple.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: theme.primaryPurple.withValues(alpha: 0.2),
+              width: 1,
             ),
           ),
-          Expanded(
-            flex: 3,
-            child: Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-                if (isCopyable)
-                  CopyContent(
-                    address: value.toString(),
-                    isShort: true,
-                  )
-                else
-                  Expanded(
-                    child: value is Widget
-                        ? value
-                        : Text(
-                            value.toString(),
-                            style: TextStyle(
-                              color: theme.textPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
-                            ),
-                            textAlign: TextAlign.right,
-                            overflow: TextOverflow.ellipsis,
-                          ),
-                  ),
-              ],
-            ),
+          child: Icon(
+            Icons.open_in_new,
+            size: 20,
+            color: theme.primaryPurple,
           ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _getStatusWidget(AppTheme theme) {
-    switch (transaction.status) {
-      case TransactionStatusInfo.pending:
-        return Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const SizedBox(
-              width: 16,
-              height: 16,
-              child: CircularProgressIndicator(
-                strokeWidth: 2,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
-              ),
-            ),
-            const SizedBox(width: 8),
-            Text(
-              'Pending',
-              style: TextStyle(
-                color: Colors.orange,
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
-              ),
-            ),
-          ],
-        );
-      case TransactionStatusInfo.confirmed:
-        return Text(
-          'Confirmed',
+  Widget _formatFeeWidget(AppState appState, AppTheme theme) {
+    final (amount, converted) = _formatFee(appState);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          amount,
           style: TextStyle(
-            color: theme.success,
+            color: theme.textPrimary,
             fontSize: 14,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
           ),
-        );
-      case TransactionStatusInfo.rejected:
-        return Text(
-          'Rejected',
-          style: TextStyle(
-            color: theme.danger,
-            fontSize: 14,
-            fontWeight: FontWeight.w400,
+          textAlign: TextAlign.right,
+        ),
+        if (converted.isNotEmpty && converted != '0')
+          Text(
+            converted,
+            style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w400,
+            ),
+            textAlign: TextAlign.right,
           ),
-        );
-    }
+      ],
+    );
   }
 
-  (String, String) _formatAmount(AppState appState) {
-    final token = appState.wallet?.tokens.first;
-    final amount =
-        BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
-            BigInt.zero;
-    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
-    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
+  double _calculateModalHeight(
+      BuildContext context, double bottomPadding, double maxHeight) {
+    const double headerHeight = 84.0;
+    const double transferSectionHeight = 160.0;
+    const double detailGroupHeight = 70.0;
+    const double explorerLinksHeight = 60.0;
 
-    return formatingAmount(
-      amount: amount,
-      symbol: symbol,
-      decimals: decimals,
-      rate: token?.rate ?? 0,
-      appState: appState,
-    );
+    const int baseGroupsCount = 4;
+    int additionalGroups = transaction.error != null ? 1 : 0;
+
+    final totalContentHeight = headerHeight +
+        transferSectionHeight +
+        (detailGroupHeight * (baseGroupsCount + additionalGroups)) +
+        explorerLinksHeight +
+        bottomPadding;
+
+    return totalContentHeight.clamp(0.0, maxHeight);
   }
 
   (String, String) _formatFee(AppState appState) {
-    final token = appState.wallet!.tokens.first;
-    // TODO: need to check address type for tokens;
+    final token = appState.wallet?.tokens.first;
+    if (token == null) {
+      return ('0', '');
+    }
+
     final decimals = transaction.chainType == "EVM" && token.decimals < 18
         ? 18
         : token.decimals;
@@ -441,21 +456,21 @@ class _TransactionDetailsModalContent extends StatelessWidget {
       transaction.timestamp.toInt() * 1000,
     );
 
-    String day = dateTime.day.toString().padLeft(2, '0');
-    String month = dateTime.month.toString().padLeft(2, '0');
-    String year = dateTime.year.toString();
-    String hour = dateTime.hour.toString().padLeft(2, '0');
-    String minute = dateTime.minute.toString().padLeft(2, '0');
+    final day = dateTime.day.toString().padLeft(2, '0');
+    final month = dateTime.month.toString().padLeft(2, '0');
+    final year = dateTime.year.toString();
+    final hour = dateTime.hour.toString().padLeft(2, '0');
+    final minute = dateTime.minute.toString().padLeft(2, '0');
 
     return '$day.$month.$year $hour:$minute';
   }
 
   String _formatGasPrice(BigInt price) {
-    double gwei = price / BigInt.from(10).pow(9);
+    final gwei = price / BigInt.from(10).pow(9);
     if (gwei < 1) {
       return '$price Wei';
     } else {
-      return '${gwei.toString()} Gwei';
+      return '$gwei Gwei';
     }
   }
 
@@ -463,18 +478,246 @@ class _TransactionDetailsModalContent extends StatelessWidget {
     final chain = appState.getChain(chainHash)?.chain;
     return chain ?? 'Unknown Network ($chainHash)';
   }
+}
 
-  int _getInfoItemsCount() {
-    int count = 11; // Базовые обязательные поля + Network вместо ChainHash
-    if (transaction.contractAddress != null) count++;
-    if (transaction.blockNumber != null) count++;
-    if (transaction.gasUsed != null) count++;
-    if (transaction.gasLimit != null) count++;
-    if (transaction.gasPrice != null) count++;
-    if (transaction.effectiveGasPrice != null) count++;
-    if (transaction.blobGasUsed != null) count++;
-    if (transaction.blobGasPrice != null) count++;
-    if (transaction.error != null) count++;
-    return count;
+class _AmountSection extends StatelessWidget {
+  final HistoricalTransactionInfo transaction;
+  final AppState appState;
+  final AppTheme theme;
+
+  const _AmountSection({
+    required this.transaction,
+    required this.appState,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return DetailGroupCard(
+      title: 'Transfer',
+      theme: theme,
+      headerTrailing: _buildStatusWidget(theme),
+      children: [
+        _buildTokenTransferInfo(),
+      ],
+    );
+  }
+
+  Widget _buildStatusWidget(AppTheme theme) {
+    switch (transaction.status) {
+      case TransactionStatusInfo.pending:
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            color: Colors.orange.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const SizedBox(
+                width: 14,
+                height: 14,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                ),
+              ),
+              const SizedBox(width: 6),
+              Text(
+                'Pending',
+                style: TextStyle(
+                  color: Colors.orange,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ],
+          ),
+        );
+      case TransactionStatusInfo.confirmed:
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            color: theme.success.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            'Confirmed',
+            style: TextStyle(
+              color: theme.success,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+      case TransactionStatusInfo.rejected:
+        return Container(
+          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
+          decoration: BoxDecoration(
+            color: theme.danger.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(8),
+          ),
+          child: Text(
+            'Rejected',
+            style: TextStyle(
+              color: theme.danger,
+              fontSize: 14,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        );
+    }
+  }
+
+  Widget _buildTokenTransferInfo() {
+    final (amount, converted) = _formatAmount();
+
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          _buildTokenIcon(),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  amount,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (converted.isNotEmpty && converted != '0')
+                  Text(
+                    converted,
+                    style: TextStyle(
+                      color: theme.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTokenIcon() {
+    final theme = appState.currentTheme;
+    final token = _findMatchingToken();
+
+    return Container(
+      width: 45,
+      height: 45,
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        border: Border.all(
+          color: theme.primaryPurple.withValues(alpha: 0.1),
+          width: 2,
+        ),
+      ),
+      child: ClipOval(
+        child: AsyncImage(
+          url: transaction.icon ??
+              (token != null ? processTokenLogo(token, theme.value) : null),
+          width: 45,
+          height: 45,
+          fit: BoxFit.contain,
+          errorWidget: Blockies(
+            seed: transaction.transactionHash,
+            color: theme.secondaryPurple,
+            bgColor: theme.primaryPurple,
+            spotColor: theme.background,
+            size: 8,
+          ),
+          loadingWidget: const Center(
+            child: CircularProgressIndicator(
+              strokeWidth: 2,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  (String, String) _formatAmount() {
+    final token = appState.wallet?.tokens.first;
+    final amount =
+        BigInt.tryParse(transaction.tokenInfo?.value ?? transaction.amount) ??
+            BigInt.zero;
+    final decimals = (transaction.tokenInfo?.decimals ?? token?.decimals) ?? 1;
+    final symbol = (transaction.tokenInfo?.symbol ?? token?.symbol) ?? "";
+
+    return formatingAmount(
+      amount: amount,
+      symbol: symbol,
+      decimals: decimals,
+      rate: token?.rate ?? 0,
+      appState: appState,
+    );
+  }
+
+  FTokenInfo? _findMatchingToken() {
+    if (appState.wallet == null ||
+        transaction.tokenInfo == null ||
+        appState.account == null) {
+      return null;
+    }
+
+    try {
+      return appState.wallet!.tokens.firstWhere((t) =>
+          t.symbol == transaction.tokenInfo?.symbol &&
+          t.addrType == appState.account?.addrType);
+    } catch (_) {
+      return null;
+    }
+  }
+}
+
+class _ModalHeader extends StatelessWidget {
+  final String title;
+  final AppTheme theme;
+  final double padding;
+
+  const _ModalHeader({
+    required this.title,
+    required this.theme,
+    required this.padding,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Container(
+          width: 36,
+          height: 4,
+          margin: EdgeInsets.symmetric(vertical: padding),
+          decoration: BoxDecoration(
+            color: theme.modalBorder,
+            borderRadius: BorderRadius.circular(2),
+          ),
+        ),
+        Padding(
+          padding: EdgeInsets.symmetric(horizontal: padding),
+          child: Text(
+            title,
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 20,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ),
+        SizedBox(height: padding),
+      ],
+    );
   }
 }

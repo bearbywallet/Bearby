@@ -1,4 +1,5 @@
 import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 
 String selectVariant(String? theme, List<String> options) {
   if (options.isEmpty) return '';
@@ -30,4 +31,12 @@ String processTokenLogo(FTokenInfo token, String? theme) {
           token.symbol.replaceAll("t", "").replaceAll("p", "").toLowerCase())
       .replaceAll('%{contract_address}%', token.addr.toLowerCase())
       .replaceAll('%{name}%', token.name);
+}
+
+String formExplorerUrl(ExplorerInfo explorer, String transactionHash) {
+  final baseUrl = explorer.url.endsWith('/')
+      ? explorer.url.substring(0, explorer.url.length - 1)
+      : explorer.url;
+
+  return "$baseUrl/tx/$transactionHash";
 }

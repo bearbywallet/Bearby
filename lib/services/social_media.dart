@@ -3,7 +3,6 @@ import 'package:flutter/foundation.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class SocialMediaService {
-  // Telegram URL schemes
   static const String _telegramScheme = 'tg://';
   static const String _telegramWebUrl = 'https://telegram.org';
   static const String _telegramAndroidStore =
@@ -11,7 +10,6 @@ class SocialMediaService {
   static const String _telegramIosStore =
       'https://apps.apple.com/app/telegram-messenger/id686449807';
 
-  // X.com (Twitter) URL schemes
   static final String _xScheme =
       Platform.isIOS ? 'twitter://' : 'com.twitter.android';
   static const String _xWebUrl = 'https://x.com';
@@ -20,7 +18,6 @@ class SocialMediaService {
   static const String _xIosStore =
       'https://apps.apple.com/app/twitter/id333903271';
 
-  /// Opens Telegram app or store/web if not installed
   Future<void> openTelegram({String? username, String? message}) async {
     String url = _telegramScheme;
 
@@ -46,12 +43,11 @@ class SocialMediaService {
       }
     } catch (e) {
       debugPrint('Error launching Telegram: $e');
-      // Fallback to web version
+
       await _launchUrl(_telegramWebUrl);
     }
   }
 
-  /// Opens X.com (Twitter) app or store/web if not installed
   Future<void> openX({String? username, String? tweet}) async {
     String url = _xScheme;
 
@@ -81,7 +77,7 @@ class SocialMediaService {
       }
     } catch (e) {
       debugPrint('Error launching X: $e');
-      // Fallback to web version
+
       await _launchUrl(_xWebUrl);
     }
   }
@@ -91,7 +87,6 @@ class SocialMediaService {
     required String androidStore,
     required String iosStore,
   }) async {
-    // First try to open store
     final Uri storeUri = Uri.parse(
       Platform.isAndroid ? androidStore : iosStore,
     );
@@ -100,7 +95,6 @@ class SocialMediaService {
       if (await canLaunchUrl(storeUri)) {
         await launchUrl(storeUri);
       } else {
-        // If store fails, open web version
         await _launchUrl(webUrl);
       }
     } catch (e) {

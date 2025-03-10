@@ -36,6 +36,12 @@
         "url": "https://viewblock.io/zilliqa",
         "icon": "https://viewblock.io/apple-touch-icon.png",
         "standard": "EIP3091"
+      },
+      {
+        "name": "Otterscan",
+        "icon": "https://otterscan.zilliqa.com/assets/otter-DYFeLtFi.png",
+        "url": "https://otterscan.zilliqa.com/",
+        "standard": "EIP3091"
       }
     ]
   },
