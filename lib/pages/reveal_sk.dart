@@ -207,9 +207,10 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         constraints: const BoxConstraints(maxWidth: 480),
                         padding: EdgeInsets.only(bottom: adaptivePadding),
                         child: CustomButton(
+                          textColor: theme.buttonText,
+                          backgroundColor: theme.primaryPurple,
                           text: 'Done',
                           onPressed: () => Navigator.pop(context),
-                          backgroundColor: theme.primaryPurple,
                           borderRadius: 30.0,
                           height: 56.0,
                         ),

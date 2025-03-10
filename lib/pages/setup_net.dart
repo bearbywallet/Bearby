@@ -354,6 +354,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                 Padding(
                   padding: EdgeInsets.all(adaptivePadding),
                   child: CustomButton(
+                    textColor: theme.buttonText,
+                    backgroundColor: theme.primaryPurple,
                     text: 'Next',
                     onPressed: filteredNetworks.isEmpty
                         ? () {}
@@ -372,7 +374,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                               },
                             );
                           },
-                    backgroundColor: theme.primaryPurple,
                     borderRadius: 30.0,
                     height: 56.0,
                   ),

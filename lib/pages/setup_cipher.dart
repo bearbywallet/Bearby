@@ -221,6 +221,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                           ),
                         ),
                       CustomButton(
+                        textColor: theme.buttonText,
+                        backgroundColor: theme.primaryPurple,
                         text: 'Confirm',
                         onPressed: () {
                           Navigator.of(context).pushNamed(
@@ -235,7 +237,6 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                             },
                           );
                         },
-                        backgroundColor: theme.primaryPurple,
                         borderRadius: 30.0,
                         height: 50.0,
                       )

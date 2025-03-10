@@ -210,12 +210,13 @@ class _ArgonSettingsModalContentState
             child: SizedBox(
               width: double.infinity,
               child: CustomButton(
+                textColor: theme.buttonText,
+                backgroundColor: theme.primaryPurple,
                 text: 'Confirm',
                 onPressed: () {
                   widget.onParamsSelected(_getSelectedParams());
                   Navigator.pop(context);
                 },
-                backgroundColor: theme.primaryPurple,
                 borderRadius: 30.0,
                 height: 50.0,
               ),

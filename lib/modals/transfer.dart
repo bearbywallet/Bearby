@@ -263,9 +263,9 @@ class _ConfirmTransactionContentState
         _parseColor(widget.colors?.background) ?? theme.cardBackground;
     final primaryColor =
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
-    final secondaryColor =
-        _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
-    final textColor = _parseColor(widget.colors?.text) ?? theme.buttonText;
+    final secondaryColor = _parseColor(widget.colors?.secondary) ??
+        theme.textSecondary.withValues(alpha: 0.5);
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textSecondary;
 
     return Container(
       constraints:
@@ -388,8 +388,8 @@ class _ConfirmTransactionContentState
                             setState(() => _loading = false);
                           }
                         },
-                        backgroundColor: primaryColor,
-                        textColor: textColor,
+                        backgroundColor: theme.primaryPurple,
+                        textColor: theme.buttonText,
                       ),
                     ),
                     SizedBox(

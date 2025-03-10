@@ -142,6 +142,7 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
 
         data.accounts.iter_mut().for_each(|a| {
             a.chain_hash = chain_hash;
+            a.chain_id = provider.config.chain_id();
         });
 
         wallet

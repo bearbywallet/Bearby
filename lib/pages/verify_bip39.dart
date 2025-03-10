@@ -134,13 +134,14 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                                 padding:
                                     const EdgeInsets.symmetric(vertical: 16.0),
                                 child: CustomButton(
+                                  textColor: theme.buttonText,
+                                  backgroundColor: theme.primaryPurple,
                                   text: 'Next',
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                         '/net_setup',
                                         arguments: {'bip39': _bip39List});
                                   },
-                                  backgroundColor: theme.primaryPurple,
                                   borderRadius: 30.0,
                                   height: 56.0,
                                   disabled: !isVerified,

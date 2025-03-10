@@ -135,6 +135,8 @@ class _SendTokenPageState extends State<SendTokenPage> {
                               onDotPress: () => handleKeyPress("."),
                             ),
                             CustomButton(
+                              textColor: theme.buttonText,
+                              backgroundColor: theme.primaryPurple,
                               text: "Submit",
                               onPressed: () => handleSubmit(appState),
                               disabled: !_isFormValid,

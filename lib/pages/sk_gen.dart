@@ -143,6 +143,8 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                                   ),
                                 ),
                                 CustomButton(
+                                  textColor: theme.buttonText,
+                                  backgroundColor: theme.primaryPurple,
                                   text: 'Next',
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
@@ -150,7 +152,6 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                                       arguments: {'keys': _keyPair},
                                     );
                                   },
-                                  backgroundColor: theme.primaryPurple,
                                   borderRadius: 30.0,
                                   height: 56.0,
                                   disabled: !_hasBackupWords,

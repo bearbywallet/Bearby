@@ -192,10 +192,11 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                         SizedBox(
                           width: double.infinity,
                           child: CustomButton(
+                            textColor: theme.buttonText,
+                            backgroundColor: theme.primaryPurple,
                             text: 'Restore',
                             disabled: _isLoading,
                             onPressed: _handleRestore,
-                            backgroundColor: theme.primaryPurple,
                             borderRadius: 30.0,
                             height: 56.0,
                           ),

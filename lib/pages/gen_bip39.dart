@@ -124,12 +124,13 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: CustomButton(
+                            textColor: theme.buttonText,
+                            backgroundColor: theme.primaryPurple,
                             text: 'Next',
                             onPressed: () {
                               Navigator.of(context).pushNamed('/verify_bip39',
                                   arguments: {'bip39': _mnemonicWords});
                             },
-                            backgroundColor: theme.primaryPurple,
                             borderRadius: 30.0,
                             height: 56.0,
                             disabled: !_hasBackupWords,

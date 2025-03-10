@@ -192,12 +192,13 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: CustomButton(
+                            textColor: theme.buttonText,
+                            backgroundColor: theme.primaryPurple,
                             text: 'Restore',
                             onPressed: () {
                               Navigator.of(context).pushNamed('/net_setup',
                                   arguments: {'bip39': _words});
                             },
-                            backgroundColor: theme.primaryPurple,
                             borderRadius: 30.0,
                             height: 56.0,
                             disabled: !_isFormValid,

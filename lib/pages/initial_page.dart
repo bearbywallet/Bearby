@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 class InitialPage extends StatefulWidget {
   const InitialPage({super.key});
@@ -57,13 +58,15 @@ class _InitialPageState extends State<InitialPage> {
     }
   }
 
-  Widget _buildButton() {
+  Widget _buildButton(AppTheme theme) {
     if (_isLoading) {
       return const CircularProgressIndicator(
         valueColor: AlwaysStoppedAnimation<Color>(Colors.purple),
       );
     } else if (_isRestoreAvailable) {
       return CustomButton(
+        textColor: theme.buttonText,
+        backgroundColor: theme.primaryPurple,
         text: "Restore ZilPay 1.0!",
         onPressed: () {
           Navigator.of(context).pushNamed(
@@ -77,6 +80,8 @@ class _InitialPageState extends State<InitialPage> {
       );
     } else {
       return CustomButton(
+        textColor: theme.buttonText,
+        backgroundColor: theme.primaryPurple,
         text: "Get Started",
         onPressed: () {
           Navigator.of(context).pushNamed('/new_wallet_options');
@@ -176,7 +181,7 @@ class _InitialPageState extends State<InitialPage> {
             Padding(
               padding:
                   const EdgeInsets.only(left: 16.0, right: 16.0, bottom: 32.0),
-              child: _buildButton(),
+              child: _buildButton(theme),
             ),
           ],
         ),

@@ -151,7 +151,11 @@ class GasDetails extends StatelessWidget {
   }
 
   Widget _buildDetailRow(
-      String label, String value, Color textColor, Color secondaryColor) {
+    String label,
+    String value,
+    Color textColor,
+    Color secondaryColor,
+  ) {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 2),
       child: Row(
