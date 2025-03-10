@@ -28,7 +28,8 @@ BigInt toWei(String amount, int decimals) {
   String? convertedSymbolStr = appState.wallet?.settings.currencyConvert;
   double converted = 0;
 
-  if (appState.account != null) {
+  if (appState.account != null &&
+      appState.wallet?.settings.ratesApiOptions != 0) {
     final account = appState.account;
     final chain = appState.getChain(account!.chainHash);
 

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button_item.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -18,6 +19,8 @@ class CurrencyConversionPage extends StatefulWidget {
 
 class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
   late List<Currency> _currencies = [];
+  late List<Currency> _filteredCurrencies = [];
+  final TextEditingController _searchController = TextEditingController();
   String selectedCurrency = 'btc';
   int selectedEngine = 0;
 
@@ -29,11 +32,14 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
       final state = Provider.of<AppState>(context, listen: false);
       final currenciesTickets = await getCurrenciesTickets();
 
+      final currenciesList = currenciesTickets
+          .map((pair) =>
+              Currency(pair.$1, "${_getCurrencyName(pair.$1)} ${pair.$2}"))
+          .toList();
+
       setState(() {
-        _currencies = currenciesTickets
-            .map((pair) =>
-                Currency(pair.$1, "${_getCurrencyName(pair.$1)} ${pair.$2}"))
-            .toList();
+        _currencies = currenciesList;
+        _filteredCurrencies = currenciesList;
       });
 
       if (state.wallet?.settings.currencyConvert != null) {
@@ -45,6 +51,25 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
       setState(() {
         selectedEngine = state.wallet?.settings.ratesApiOptions ?? 0;
       });
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _filterCurrencies(String query) {
+    setState(() {
+      if (query.isEmpty) {
+        _filteredCurrencies = _currencies;
+      } else {
+        _filteredCurrencies = _currencies.where((currency) {
+          return currency.name.toLowerCase().contains(query.toLowerCase()) ||
+              currency.code.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      }
     });
   }
 
@@ -91,7 +116,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final bool isRateFetchEnabled =
-        appState.wallet!.settings.ratesApiOptions != 0; // None
+        appState.wallet!.settings.ratesApiOptions != 0;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -105,48 +130,107 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                   title: 'Primary Currency',
                   onBackPressed: () => Navigator.pop(context),
                 ),
-                _buildEngineInfo(theme, appState),
                 Expanded(
-                  child: Opacity(
-                    opacity: isRateFetchEnabled ? 1.0 : 0.5,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: AbsorbPointer(
-                        absorbing: !isRateFetchEnabled,
-                        child: ListView.builder(
-                          physics: const BouncingScrollPhysics(),
-                          itemCount: _currencies.length,
-                          itemBuilder: (context, index) {
-                            final currency = _currencies[index];
-                            final isSelected = currency.code.toLowerCase() ==
-                                selectedCurrency.toLowerCase();
-
-                            return _buildCurrencyItem(
-                              theme,
-                              currency,
-                              isSelected,
-                              onTap: () async {
-                                setState(() {
-                                  selectedCurrency = currency.code;
-                                });
-
-                                await setRateFetcher(
-                                  walletIndex:
-                                      BigInt.from(appState.selectedWallet),
-                                  currency: selectedCurrency,
-                                );
-
-                                await appState.syncRates(force: true);
-                                await appState.syncData();
-                              },
-                            );
-                          },
-                        ),
-                      ),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: Column(
+                      children: [
+                        _buildEngineBlock(theme, appState),
+                        const SizedBox(height: 16),
+                        _buildCurrenciesBlock(
+                            theme, appState, isRateFetchEnabled),
+                      ],
                     ),
                   ),
                 ),
               ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildEngineBlock(AppTheme theme, AppState appState) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: _buildEngineInfo(theme, appState),
+    );
+  }
+
+  Widget _buildCurrenciesBlock(
+      AppTheme theme, AppState appState, bool isRateFetchEnabled) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color: theme.cardBackground,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Opacity(
+          opacity: isRateFetchEnabled ? 1.0 : 0.5,
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: AbsorbPointer(
+              absorbing: !isRateFetchEnabled,
+              child: Column(
+                children: [
+                  SmartInput(
+                    controller: _searchController,
+                    hint: 'Search currencies...',
+                    leftIconPath: 'assets/icons/search.svg',
+                    rightIconPath: "assets/icons/close.svg",
+                    onChanged: (value) {
+                      _filterCurrencies(value);
+                    },
+                    onRightIconTap: () {
+                      _searchController.text = "";
+                      _filterCurrencies("");
+                    },
+                    onSubmitted: (value) {},
+                    borderColor: theme.textPrimary,
+                    focusedBorderColor: theme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    autofocus: false,
+                    keyboardType: TextInputType.text,
+                  ),
+                  const SizedBox(height: 16),
+                  Expanded(
+                    child: ListView.builder(
+                      physics: const BouncingScrollPhysics(),
+                      itemCount: _filteredCurrencies.length,
+                      itemBuilder: (context, index) {
+                        final currency = _filteredCurrencies[index];
+                        final isSelected = currency.code.toLowerCase() ==
+                            selectedCurrency.toLowerCase();
+
+                        return _buildCurrencyItem(
+                          theme,
+                          currency,
+                          isSelected,
+                          onTap: () async {
+                            setState(() {
+                              selectedCurrency = currency.code;
+                            });
+
+                            await setRateFetcher(
+                              walletIndex: BigInt.from(appState.selectedWallet),
+                              currency: selectedCurrency,
+                            );
+
+                            await appState.syncRates(force: true);
+                            await appState.syncData();
+                          },
+                        );
+                      },
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

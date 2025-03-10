@@ -251,7 +251,8 @@ class _NetworkPageState extends State<NetworkPage> {
             children: [
               Padding(
                 padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding, vertical: 16),
+                  horizontal: adaptivePadding,
+                ),
                 child: CustomAppBar(
                   title: '',
                   onBackPressed: () => Navigator.pop(context),

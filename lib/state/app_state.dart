@@ -130,7 +130,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   Future<void> syncRates({bool force = false}) async {
-    if (chain?.testnet == true) return;
+    if (chain?.testnet == true || wallet?.settings.ratesApiOptions == 0) return;
     final now = DateTime.now();
 
     if (!force && now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
