@@ -180,6 +180,14 @@ class _SettingsPageState extends State<SettingsPage> {
                                     username: 'pay_zil'),
                               ),
                               SettingsItem(
+                                title: 'GitHub',
+                                trailingSvgPath: 'assets/icons/github.svg',
+                                onTap: () => socialMediaService.openGitHub(
+                                  username: 'zilpay',
+                                  repository: 'zilpay-mobile',
+                                ),
+                              ),
+                              SettingsItem(
                                 isFirst: false,
                                 isLast: true,
                                 title: 'About',

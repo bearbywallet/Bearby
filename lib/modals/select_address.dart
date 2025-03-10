@@ -255,10 +255,13 @@ class _AddressSelectModalContentState
   }
 
   List<AddressItem> _getFilteredAddressBook(AppState appState) {
+    final slip44 = appState.chain?.slip44 ?? 0;
+
     return appState.book
         .where((account) =>
-            account.name.toLowerCase().contains(_searchQuery) ||
-            account.addr.toLowerCase().contains(_searchQuery))
+            account.slip44 == slip44 &&
+            (account.name.toLowerCase().contains(_searchQuery) ||
+                account.addr.toLowerCase().contains(_searchQuery)))
         .map(
             (account) => AddressItem(name: account.name, address: account.addr))
         .toList();

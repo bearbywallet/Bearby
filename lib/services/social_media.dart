@@ -18,6 +18,14 @@ class SocialMediaService {
   static const String _xIosStore =
       'https://apps.apple.com/app/twitter/id333903271';
 
+  static final String _githubScheme =
+      Platform.isIOS ? 'github://' : 'com.github.android';
+  static const String _githubWebUrl = 'https://github.com';
+  static const String _githubAndroidStore =
+      'market://details?id=com.github.android';
+  static const String _githubIosStore =
+      'https://apps.apple.com/app/github/id1477376905';
+
   Future<void> openTelegram({String? username, String? message}) async {
     String url = _telegramScheme;
 
@@ -79,6 +87,49 @@ class SocialMediaService {
       debugPrint('Error launching X: $e');
 
       await _launchUrl(_xWebUrl);
+    }
+  }
+
+  Future<void> openGitHub({String? username, String? repository}) async {
+    String url;
+
+    if (username != null && repository != null) {
+      url = Platform.isIOS
+          ? 'github://repo/$username/$repository'
+          : 'com.github.android://repo/$username/$repository';
+    } else if (username != null) {
+      url = Platform.isIOS
+          ? 'github://user/$username'
+          : 'com.github.android://user/$username';
+    } else {
+      url = _githubScheme;
+    }
+
+    String webUrl = _githubWebUrl;
+    if (username != null && repository != null) {
+      webUrl = '$_githubWebUrl/$username/$repository';
+    } else if (username != null) {
+      webUrl = '$_githubWebUrl/$username';
+    }
+
+    try {
+      final Uri uri = Uri.parse(url);
+      if (await canLaunchUrl(uri)) {
+        await launchUrl(
+          uri,
+          mode: LaunchMode.externalApplication,
+        );
+      } else {
+        await _handleAppNotInstalled(
+          webUrl: webUrl,
+          androidStore: _githubAndroidStore,
+          iosStore: _githubIosStore,
+        );
+      }
+    } catch (e) {
+      debugPrint('Error launching GitHub: $e');
+
+      await _launchUrl(webUrl);
     }
   }
 

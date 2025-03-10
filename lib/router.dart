@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/pages/about.dart';
 import 'package:zilpay/pages/add_account.dart';
 import 'package:zilpay/pages/add_token.dart';
 import 'package:zilpay/pages/address_book.dart';
@@ -94,6 +95,7 @@ class AppRouter {
       '/rk_restore',
       '/browser_settings',
       '/restore_sk',
+      '/about',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -115,6 +117,8 @@ class AppRouter {
         switch (settings.name) {
           case '/pass_setup':
             return wrapWithProviders(const PasswordSetupPage());
+          case '/about':
+            return wrapWithProviders(const AboutPage());
           case '/restore_sk':
             return wrapWithProviders(const SecretKeyRestorePage());
           case '/rk_restore':
@@ -155,6 +159,8 @@ class AppRouter {
 
       if (setupRoutes.contains(settings.name)) {
         switch (settings.name) {
+          case '/about':
+            return wrapWithProviders(const AboutPage());
           case '/restore_sk':
             return wrapWithProviders(const SecretKeyRestorePage());
           case '/pass_setup':
@@ -191,6 +197,8 @@ class AppRouter {
     }
 
     switch (settings.name) {
+      case '/about':
+        return wrapWithProviders(const AboutPage());
       case '/login':
         return wrapWithProviders(const LoginPage());
       case '/':
