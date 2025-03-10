@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/button.dart';
@@ -73,19 +74,20 @@ class _AddAddressModalState extends State<AddAddressModal> {
     return true;
   }
 
-  Future<void> _handleAddAddress() async {
+  Future<void> _handleAddAddress(AppState appState) async {
     setState(() {
       _errorMessage = '';
       _isDisabled = true;
     });
 
-    if (!_validateInputs()) return;
+    if (!_validateInputs() || appState.chain == null) return;
 
     try {
       await addNewBookAddress(
         name: _nameController.text,
         addr: _addressController.text,
         net: BigInt.zero,
+        slip44: appState.chain!.slip44,
       );
       await widget.state.syncBook();
       if (!mounted) return;
@@ -102,6 +104,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     final theme = widget.state.currentTheme;
 
     return Container(
@@ -198,7 +201,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                         width: double.infinity,
                         child: CustomButton(
                           text: 'Add Contact',
-                          onPressed: _handleAddAddress,
+                          onPressed: () => _handleAddAddress(appState),
                           backgroundColor: theme.primaryPurple,
                           textColor: theme.textPrimary,
                           height: 48,

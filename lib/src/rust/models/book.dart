@@ -10,15 +10,18 @@ class AddressBookEntryInfo {
   final String name;
   final String addr;
   final BigInt net;
+  final int slip44;
 
   const AddressBookEntryInfo({
     required this.name,
     required this.addr,
     required this.net,
+    required this.slip44,
   });
 
   @override
-  int get hashCode => name.hashCode ^ addr.hashCode ^ net.hashCode;
+  int get hashCode =>
+      name.hashCode ^ addr.hashCode ^ net.hashCode ^ slip44.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -27,5 +30,6 @@ class AddressBookEntryInfo {
           runtimeType == other.runtimeType &&
           name == other.name &&
           addr == other.addr &&
-          net == other.net;
+          net == other.net &&
+          slip44 == other.slip44;
 }

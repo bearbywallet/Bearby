@@ -248,13 +248,15 @@ fn wire__crate__api__book__add_new_book_address_impl(
             let api_name = <String>::sse_decode(&mut deserializer);
             let api_addr = <String>::sse_decode(&mut deserializer);
             let api_net = <usize>::sse_decode(&mut deserializer);
+            let api_slip44 = <u32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::book::add_new_book_address(api_name, api_addr, api_net)
-                                .await?;
+                        let output_ok = crate::api::book::add_new_book_address(
+                            api_name, api_addr, api_net, api_slip44,
+                        )
+                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -3319,10 +3321,12 @@ impl SseDecode for crate::models::book::AddressBookEntryInfo {
         let mut var_name = <String>::sse_decode(deserializer);
         let mut var_addr = <String>::sse_decode(deserializer);
         let mut var_net = <usize>::sse_decode(deserializer);
+        let mut var_slip44 = <u32>::sse_decode(deserializer);
         return crate::models::book::AddressBookEntryInfo {
             name: var_name,
             addr: var_addr,
             net: var_net,
+            slip44: var_slip44,
         };
     }
 }
@@ -4789,6 +4793,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::book::AddressBookEntryInfo
             self.name.into_into_dart().into_dart(),
             self.addr.into_into_dart().into_dart(),
             self.net.into_into_dart().into_dart(),
+            self.slip44.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5643,6 +5648,7 @@ impl SseEncode for crate::models::book::AddressBookEntryInfo {
         <String>::sse_encode(self.name, serializer);
         <String>::sse_encode(self.addr, serializer);
         <usize>::sse_encode(self.net, serializer);
+        <u32>::sse_encode(self.slip44, serializer);
     }
 }
 

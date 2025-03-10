@@ -131,7 +131,10 @@ abstract class RustLibApi extends BaseApi {
       required List<FTokenInfo> ftokens});
 
   Future<void> crateApiBookAddNewBookAddress(
-      {required String name, required String addr, required BigInt net});
+      {required String name,
+      required String addr,
+      required BigInt net,
+      required int slip44});
 
   Future<void> crateApiWalletAddNextBip39Account(
       {required AddNextBip39AccountParams params});
@@ -536,13 +539,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiBookAddNewBookAddress(
-      {required String name, required String addr, required BigInt net}) {
+      {required String name,
+      required String addr,
+      required BigInt net,
+      required int slip44}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(name, serializer);
         sse_encode_String(addr, serializer);
         sse_encode_usize(net, serializer);
+        sse_encode_u_32(slip44, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 5, port: port_);
       },
@@ -551,7 +558,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiBookAddNewBookAddressConstMeta,
-      argValues: [name, addr, net],
+      argValues: [name, addr, net, slip44],
       apiImpl: this,
     ));
   }
@@ -559,7 +566,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiBookAddNewBookAddressConstMeta =>
       const TaskConstMeta(
         debugName: "add_new_book_address",
-        argNames: ["name", "addr", "net"],
+        argNames: ["name", "addr", "net", "slip44"],
       );
 
   @override
@@ -2788,12 +2795,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AddressBookEntryInfo dco_decode_address_book_entry_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return AddressBookEntryInfo(
       name: dco_decode_String(arr[0]),
       addr: dco_decode_String(arr[1]),
       net: dco_decode_usize(arr[2]),
+      slip44: dco_decode_u_32(arr[3]),
     );
   }
 
@@ -3814,7 +3822,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_name = sse_decode_String(deserializer);
     var var_addr = sse_decode_String(deserializer);
     var var_net = sse_decode_usize(deserializer);
-    return AddressBookEntryInfo(name: var_name, addr: var_addr, net: var_net);
+    var var_slip44 = sse_decode_u_32(deserializer);
+    return AddressBookEntryInfo(
+        name: var_name, addr: var_addr, net: var_net, slip44: var_slip44);
   }
 
   @protected
@@ -5049,6 +5059,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.name, serializer);
     sse_encode_String(self.addr, serializer);
     sse_encode_usize(self.net, serializer);
+    sse_encode_u_32(self.slip44, serializer);
   }
 
   @protected

@@ -8,9 +8,12 @@ import '../models/book.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<void> addNewBookAddress(
-        {required String name, required String addr, required BigInt net}) =>
-    RustLib.instance.api
-        .crateApiBookAddNewBookAddress(name: name, addr: addr, net: net);
+        {required String name,
+        required String addr,
+        required BigInt net,
+        required int slip44}) =>
+    RustLib.instance.api.crateApiBookAddNewBookAddress(
+        name: name, addr: addr, net: net, slip44: slip44);
 
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();

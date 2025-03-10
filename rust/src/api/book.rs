@@ -12,10 +12,15 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 
-pub async fn add_new_book_address(name: String, addr: String, net: usize) -> Result<(), String> {
+pub async fn add_new_book_address(
+    name: String,
+    addr: String,
+    net: usize,
+    slip44: u32,
+) -> Result<(), String> {
     with_service_mut(|core| {
         let address = parse_address(addr)?;
-        let book = AddressBookEntry::add(name, address, net);
+        let book = AddressBookEntry::add(name, address, net, slip44);
 
         core.add_to_address_book(book)
             .map_err(ServiceError::BackgroundError)
