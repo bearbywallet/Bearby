@@ -55,7 +55,7 @@ impl TryFrom<WalletArgonParamsInfo> for ArgonParams {
 pub struct WalletSettingsInfo {
     pub cipher_orders: Vec<u8>,
     pub argon_params: WalletArgonParamsInfo,
-    pub currency_convert: Option<String>,
+    pub currency_convert: String,
     pub ipfs_node: Option<String>,
     pub ens_enabled: bool,
     pub gas_control_enabled: bool,

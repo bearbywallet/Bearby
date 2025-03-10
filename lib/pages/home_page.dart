@@ -42,12 +42,7 @@ class _HomePageState extends State<HomePage> {
       debugPrint("error sync balance: $e");
     }
 
-    try {
-      updateRates(walletIndex: index);
-    } catch (e) {
-      debugPrint("error sync rates: $e");
-    }
-
+    await appState.syncRates();
     await appState.syncData();
   }
 

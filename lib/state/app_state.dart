@@ -5,6 +5,7 @@ import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/account.dart';
@@ -18,6 +19,8 @@ import 'package:zilpay/theme/app_theme.dart';
 class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<AddressBookEntryInfo> _book = [];
   List<ConnectionInfo> _connections = [];
+  DateTime _lastRateUpdateTime = DateTime.fromMillisecondsSinceEpoch(0);
+  static const Duration _rateUpdateCooldown = Duration(minutes: 1);
 
   late BackgroundState _state;
   late String _cahceDir;
@@ -110,7 +113,6 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
-    // await syncTokenRates();
     notifyListeners();
   }
 
@@ -123,6 +125,23 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> syncConnections() async {
     _connections =
         await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
+
+    notifyListeners();
+  }
+
+  Future<void> syncRates({bool force = false}) async {
+    final now = DateTime.now();
+
+    if (!force && now.difference(_lastRateUpdateTime) < _rateUpdateCooldown) {
+      return;
+    }
+
+    try {
+      await updateRates(walletIndex: BigInt.from(_selectedWallet));
+      _lastRateUpdateTime = now;
+    } catch (e) {
+      debugPrint("error sync rates: $e");
+    }
 
     notifyListeners();
   }
@@ -152,7 +171,6 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
           startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
 
       stream.listen((event) async {
-        // TODO: update transactions.
         notifyListeners();
       });
     } catch (e) {

@@ -38,7 +38,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
       if (state.wallet?.settings.currencyConvert != null) {
         setState(() {
-          selectedCurrency = state.wallet!.settings.currencyConvert!;
+          selectedCurrency = state.wallet!.settings.currencyConvert;
         });
       }
 
@@ -88,10 +88,10 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
   @override
   Widget build(BuildContext context) {
-    final state = Provider.of<AppState>(context);
-    final theme = state.currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final bool isRateFetchEnabled =
-        state.wallet!.settings.currencyConvert != null;
+        appState.wallet!.settings.ratesApiOptions != 0; // None
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -105,7 +105,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                   title: 'Primary Currency',
                   onBackPressed: () => Navigator.pop(context),
                 ),
-                _buildEngineInfo(theme, state),
+                _buildEngineInfo(theme, appState),
                 Expanded(
                   child: Opacity(
                     opacity: isRateFetchEnabled ? 1.0 : 0.5,
@@ -132,11 +132,12 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
                                 await setRateFetcher(
                                   walletIndex:
-                                      BigInt.from(state.selectedWallet),
+                                      BigInt.from(appState.selectedWallet),
                                   currency: selectedCurrency,
                                 );
 
-                                await state.syncData();
+                                await appState.syncRates(force: true);
+                                await appState.syncData();
                               },
                             );
                           },
@@ -180,15 +181,18 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
       items: engines,
       selectedIndex: selectedEngine,
       onItemSelected: (index) async {
+        BigInt walletIndex = BigInt.from(appState.selectedWallet);
+
         setState(() {
           selectedEngine = index;
         });
 
-        // await setCurrencyEngine(
-        //   walletIndex: BigInt.from(appState.selectedWallet),
-        //   engine: index,
-        // );
+        await setRateEngine(
+          walletIndex: walletIndex,
+          engineCode: index,
+        );
 
+        await appState.syncRates(force: true);
         await appState.syncData();
       },
     );

@@ -99,7 +99,7 @@ class WalletArgonParamsInfo {
 class WalletSettingsInfo {
   final Uint8List cipherOrders;
   final WalletArgonParamsInfo argonParams;
-  final String? currencyConvert;
+  final String currencyConvert;
   final String? ipfsNode;
   final bool ensEnabled;
   final bool gasControlEnabled;
@@ -111,7 +111,7 @@ class WalletSettingsInfo {
   const WalletSettingsInfo({
     required this.cipherOrders,
     required this.argonParams,
-    this.currencyConvert,
+    required this.currencyConvert,
     this.ipfsNode,
     required this.ensEnabled,
     required this.gasControlEnabled,

@@ -29,9 +29,15 @@ Future<void> setGlobalNotifications({required bool globalEnabled}) =>
     RustLib.instance.api
         .crateApiSettingsSetGlobalNotifications(globalEnabled: globalEnabled);
 
-Future<void> setRateFetcher({required BigInt walletIndex, String? currency}) =>
+Future<void> setRateFetcher(
+        {required BigInt walletIndex, required String currency}) =>
     RustLib.instance.api.crateApiSettingsSetRateFetcher(
         walletIndex: walletIndex, currency: currency);
+
+Future<void> setRateEngine(
+        {required BigInt walletIndex, required int engineCode}) =>
+    RustLib.instance.api.crateApiSettingsSetRateEngine(
+        walletIndex: walletIndex, engineCode: engineCode);
 
 Future<void> setWalletEns(
         {required BigInt walletIndex, required bool ensEnabled}) =>
