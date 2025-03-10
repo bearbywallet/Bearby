@@ -1,6 +1,8 @@
 use flutter_rust_bridge::frb;
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
-use zilpay::proto::U256;
+use zilpay::proto::{keypair::KeyPair, U256};
+
+use crate::{models::keypair::KeyPairInfo, utils::utils::decode_secret_key};
 
 #[frb(sync)]
 pub fn intl_number_formating(

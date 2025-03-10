@@ -14,6 +14,7 @@ import 'package:zilpay/pages/password_setup.dart';
 import 'package:zilpay/pages/receive.dart';
 import 'package:zilpay/pages/restore_bip39.dart';
 import 'package:zilpay/pages/restore_rkstorage.dart';
+import 'package:zilpay/pages/restore_sk.dart';
 import 'package:zilpay/pages/reveal_bip39.dart';
 import 'package:zilpay/pages/reveal_sk.dart';
 import 'package:zilpay/pages/security.dart';
@@ -91,7 +92,8 @@ class AppRouter {
       '/add_account',
       '/web_view',
       '/rk_restore',
-      'browser_settings',
+      '/browser_settings',
+      '/restore_sk',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -113,6 +115,8 @@ class AppRouter {
         switch (settings.name) {
           case '/pass_setup':
             return wrapWithProviders(const PasswordSetupPage());
+          case '/restore_sk':
+            return wrapWithProviders(const SecretKeyRestorePage());
           case '/rk_restore':
             return wrapWithProviders(const RestoreRKStorage());
           case '/restore_bip39':
@@ -151,6 +155,8 @@ class AppRouter {
 
       if (setupRoutes.contains(settings.name)) {
         switch (settings.name) {
+          case '/restore_sk':
+            return wrapWithProviders(const SecretKeyRestorePage());
           case '/pass_setup':
             return wrapWithProviders(const PasswordSetupPage());
           case '/rk_restore':
@@ -245,6 +251,8 @@ class AppRouter {
         return wrapWithProviders(const AddWalletOptionsPage());
       case '/restore_bip39':
         return wrapWithProviders(const RestoreSecretPhrasePage());
+      case '/restore_sk':
+        return wrapWithProviders(const SecretKeyRestorePage());
       case '/initial':
         return wrapWithProviders(const InitialPage());
       case '/web_view':

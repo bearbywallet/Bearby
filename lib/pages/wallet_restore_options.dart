@@ -18,7 +18,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
   }
 
   void _handlePrivateKeyRestore(BuildContext context) {
-    // Implementation for private key restoration
+    Navigator.of(context).pushNamed('/restore_sk');
   }
 
   void _handleQRCodeScanning(BuildContext context) {
