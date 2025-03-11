@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/button.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -40,7 +41,6 @@ class _QRScannerModalContent extends StatefulWidget {
 class _QRScannerModalContentState extends State<_QRScannerModalContent>
     with WidgetsBindingObserver {
   MobileScannerController? controller;
-  StreamSubscription<BarcodeCapture>? _subscription;
   bool hasError = false;
   String errorMessage = '';
   bool isPermissionGranted = false;
@@ -54,7 +54,8 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   }
 
   Future<void> _requestCameraPermission() async {
-    final status = await Permission.camera.request();
+    PermissionStatus status = await Permission.camera.request();
+
     if (status.isGranted) {
       setState(() {
         isPermissionGranted = true;
@@ -71,23 +72,10 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   Future<void> _initializeScanner() async {
     try {
       controller = MobileScannerController(
-        facing: CameraFacing.back,
         detectionSpeed: DetectionSpeed.normal,
-        formats: [BarcodeFormat.qrCode],
-        autoStart: false,
+        facing: CameraFacing.back,
+        torchEnabled: false,
       );
-
-      await Future.delayed(const Duration(milliseconds: 300));
-
-      if (!mounted) return;
-
-      await controller!.start();
-
-      _subscription = controller!.barcodes.listen(_handleBarcode);
-
-      await Future.delayed(const Duration(milliseconds: 500));
-
-      if (!mounted) return;
 
       setState(() {
         isCameraInitialized = true;
@@ -102,22 +90,15 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     }
   }
 
-  void _handleBarcode(BarcodeCapture capture) {
-    if (!mounted) return;
-
-    final List<Barcode> barcodes = capture.barcodes;
-    if (barcodes.isNotEmpty) {
-      final String? code = barcodes.first.rawValue;
-      if (code != null) {
-        widget.onScanned(code);
-        Navigator.pop(context);
-      }
-    }
-  }
-
   Future<void> _toggleTorch() async {
-    await controller?.toggleTorch();
-    setState(() {});
+    try {
+      await controller?.toggleTorch();
+      setState(() {});
+    } catch (e) {
+      setState(() {
+        errorMessage = 'Failed to toggle torch: ${e.toString()}';
+      });
+    }
   }
 
   Future<void> _openAppSettings() async {
@@ -127,7 +108,6 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    _subscription?.cancel();
     controller?.dispose();
     super.dispose();
   }
@@ -138,46 +118,27 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
 
     switch (state) {
       case AppLifecycleState.resumed:
-        _reactivateCamera();
+        controller?.start();
         break;
       case AppLifecycleState.inactive:
       case AppLifecycleState.paused:
-        _deactivateCamera();
+        controller?.stop();
         break;
       default:
         break;
     }
   }
 
-  Future<void> _reactivateCamera() async {
-    try {
-      _subscription?.cancel();
+  void _onDetect(BarcodeCapture capture) {
+    if (!mounted) return;
 
-      await controller?.start();
-
-      if (!mounted) return;
-
-      _subscription = controller?.barcodes.listen(_handleBarcode);
-
-      setState(() {
-        isCameraInitialized = true;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        hasError = true;
-        errorMessage = 'Failed to restart camera: ${e.toString()}';
-      });
-    }
-  }
-
-  void _deactivateCamera() {
-    _subscription?.cancel();
-    controller?.stop();
-    if (mounted) {
-      setState(() {
-        isCameraInitialized = false;
-      });
+    final List<Barcode> barcodes = capture.barcodes;
+    if (barcodes.isNotEmpty) {
+      final String? code = barcodes.first.rawValue;
+      if (code != null) {
+        widget.onScanned(code);
+        Navigator.pop(context);
+      }
     }
   }
 
@@ -195,7 +156,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
         border: Border.all(color: theme.modalBorder, width: 2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.2),
+            color: theme.cardBackground.withValues(alpha: 0.2),
             blurRadius: 10,
             offset: const Offset(0, -2),
           ),
@@ -206,7 +167,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           _buildHeader(theme),
           const SizedBox(height: 20),
           !isPermissionGranted
-              ? _buildPermissionDeniedView()
+              ? _buildPermissionDeniedView(theme)
               : hasError
                   ? _buildErrorView()
                   : _buildScannerView(theme),
@@ -233,11 +194,14 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text('Scan',
-                  style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600)),
+              Text(
+                'Scan',
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
                 icon: SvgPicture.asset(
@@ -255,7 +219,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     );
   }
 
-  Widget _buildPermissionDeniedView() {
+  Widget _buildPermissionDeniedView(AppTheme theme) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -267,39 +231,43 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
               width: 64,
               height: 64,
               colorFilter:
-                  const ColorFilter.mode(Colors.white54, BlendMode.srcIn),
+                  ColorFilter.mode(theme.secondaryPurple, BlendMode.srcIn),
             ),
             const SizedBox(height: 24),
-            const Text('Camera Permission Required',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600)),
-            const SizedBox(height: 12),
-            const Text('Please grant camera permission to use the scanner.',
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.white70, fontSize: 16)),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _openAppSettings,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+            Text(
+              'Camera Permission Required',
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
               ),
-              child: const Text('Open Settings',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600)),
+            ),
+            const SizedBox(height: 12),
+            Text(
+              'Please grant camera permission to use the scanner.',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 16,
+              ),
+            ),
+            const SizedBox(height: 24),
+            CustomButton(
+              text: 'Open Settings',
+              textColor: theme.buttonText,
+              backgroundColor: theme.secondaryPurple,
+              onPressed: _openAppSettings,
             ),
             const SizedBox(height: 16),
             TextButton(
               onPressed: _requestCameraPermission,
-              child: const Text('Retry',
-                  style: TextStyle(color: Colors.white70, fontSize: 16)),
+              child: Text(
+                'Retry',
+                style: TextStyle(
+                  color: theme.secondaryPurple,
+                  fontSize: 16,
+                ),
+              ),
             ),
           ],
         ),
@@ -322,15 +290,23 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
                   const ColorFilter.mode(Colors.white54, BlendMode.srcIn),
             ),
             const SizedBox(height: 24),
-            const Text('Camera Error',
-                style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600)),
+            const Text(
+              'Camera Error',
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             const SizedBox(height: 12),
-            Text(errorMessage,
-                textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white70, fontSize: 16)),
+            Text(
+              errorMessage,
+              textAlign: TextAlign.center,
+              style: const TextStyle(
+                color: Colors.white70,
+                fontSize: 16,
+              ),
+            ),
             const SizedBox(height: 24),
             ElevatedButton(
               onPressed: _initializeScanner,
@@ -339,13 +315,17 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
                 padding:
                     const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                 shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12)),
+                  borderRadius: BorderRadius.circular(12),
+                ),
               ),
-              child: const Text('Retry',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 16,
-                      fontWeight: FontWeight.w600)),
+              child: const Text(
+                'Retry',
+                style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ),
           ],
         ),
@@ -370,6 +350,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
               child: controller != null && isCameraInitialized
                   ? MobileScanner(
                       controller: controller!,
+                      onDetect: _onDetect,
                       fit: BoxFit.cover,
                     )
                   : Container(

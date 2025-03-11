@@ -38,7 +38,7 @@
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
 	<key>NSCameraUsageDescription</key>
-	<string>ZIlPay uses camera for scan qrcodes</string>
+	<string>The ZilPay needs camera access to scan QR code</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZilPay biometric auth</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

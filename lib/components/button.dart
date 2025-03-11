@@ -30,26 +30,34 @@ class CustomButton extends StatefulWidget {
 
 class _CustomButtonState extends State<CustomButton> {
   bool _isHovered = false;
-  bool _isFocused = false;
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: widget.disabled ? null : widget.onPressed,
-      onTapDown: (_) => setState(() => _isHovered = true),
-      onTapUp: (_) => setState(() => _isHovered = false),
-      onTapCancel: () => setState(() => _isHovered = false),
+      onTapDown:
+          widget.disabled ? null : (_) => setState(() => _isHovered = true),
+      onTapUp:
+          widget.disabled ? null : (_) => setState(() => _isHovered = false),
+      onTapCancel:
+          widget.disabled ? null : () => setState(() => _isHovered = false),
       child: Focus(
-        onFocusChange: (hasFocus) => setState(() => _isFocused = hasFocus),
+        canRequestFocus: !widget.disabled,
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
           width: widget.width,
           height: widget.height,
           padding: widget.padding,
           decoration: BoxDecoration(
-            color: _getBackgroundColor(),
+            color: widget.disabled
+                ? widget.backgroundColor.withValues(alpha: 0.5)
+                : widget.backgroundColor,
             borderRadius: BorderRadius.circular(widget.borderRadius),
           ),
+          transform: _isHovered
+              ? Matrix4.diagonal3Values(0.9, 0.9, 1)
+              : Matrix4.identity(),
+          transformAlignment: Alignment.center,
           child: Center(
             child: Text(
               widget.text,
@@ -65,15 +73,5 @@ class _CustomButtonState extends State<CustomButton> {
         ),
       ),
     );
-  }
-
-  Color _getBackgroundColor() {
-    if (widget.disabled) {
-      return widget.backgroundColor.withValues(alpha: 0.5);
-    } else if (_isHovered || _isFocused) {
-      return widget.backgroundColor.withValues(alpha: 0.8);
-    } else {
-      return widget.backgroundColor;
-    }
   }
 }

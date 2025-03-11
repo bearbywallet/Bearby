@@ -21,7 +21,7 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa Scilla",
+        "name": "Zilliqa",
         "symbol": "ZIL",
         "decimals": 12
       }

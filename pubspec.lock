@@ -443,10 +443,10 @@ packages:
     dependency: "direct main"
     description:
       name: mobile_scanner
-      sha256: "16a892a9eeeff880125a3a2370e786db73ade73b5bbcf87b4fb5c5018e7ec1f8"
+      sha256: "9cb9e371ee9b5b548714f9ab5fd33b530d799745c83d5729ecd1e8ab2935dbd1"
       url: "https://pub.dev"
     source: hosted
-    version: "7.0.0-beta.6"
+    version: "6.0.7"
   nested:
     dependency: transitive
     description:
