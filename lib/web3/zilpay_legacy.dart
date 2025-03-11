@@ -168,7 +168,6 @@ class ZilPayLegacyHandler {
           appState.wallet!.tokens.indexWhere((t) => t.addrType == 0);
       if (tokenIndex == -1) throw Exception('Native token not found');
 
-      // Extract transaction parameters
       final amount = BigInt.parse(message.payload['amount'].toString());
       final gasPrice = BigInt.parse(message.payload['gasPrice'].toString());
       final gasLimit = BigInt.parse(message.payload['gasLimit'].toString());
@@ -176,12 +175,12 @@ class ZilPayLegacyHandler {
       final code = message.payload['code'] as String? ?? "";
       final data = message.payload['data'] as String? ?? "";
       final title = message.payload['title'] as String? ?? "";
+      final account = appState.account!;
 
       final chainHash = appState.chain?.chainHash ?? BigInt.zero;
       final chainId = appState.chain?.chainIds.first ?? BigInt.zero;
       final nonce = BigInt.zero;
 
-      // Create transaction request
       final scillaRequest = TransactionRequestScilla(
         chainId: chainId.toInt(),
         nonce: nonce,
@@ -193,7 +192,6 @@ class ZilPayLegacyHandler {
         data: data,
       );
 
-      // Setup token info
       final token = appState.wallet!.tokens[tokenIndex];
       var tokenInfo = BaseTokenInfo(
         value: amount.toString(),
@@ -204,7 +202,6 @@ class ZilPayLegacyHandler {
       var recipient = toAddr;
       var tokenAmount = adjustAmountToDouble(amount, token.decimals).toString();
 
-      // Fetch token meta for token transfers
       final (toAddress, ftAmount, ftMeta, teg) =
           await Web3Utils.fetchTokenMetaLegacyZilliqa(
         data: data,
@@ -224,7 +221,6 @@ class ZilPayLegacyHandler {
         );
       }
 
-      // Setup transaction metadata
       final metadata = TransactionMetadataInfo(
         chainHash: chainHash,
         hash: null,
@@ -241,7 +237,15 @@ class ZilPayLegacyHandler {
         evm: null,
       );
 
-      // Show transaction confirmation modal
+      if (account.addrType == 1) {
+        // evm enabled.
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
       if (!context.mounted) return;
 
       showConfirmTransactionModal(
@@ -299,6 +303,18 @@ class ZilPayLegacyHandler {
     final messageContent = message.payload['content'] as String? ?? '';
     final title = message.payload['title'] as String? ?? 'Sign Message';
     final icon = message.payload['icon'] as String? ?? '';
+
+    final appState = Provider.of<AppState>(context, listen: false);
+    final account = appState.account!;
+
+    if (account.addrType == 1) {
+      // evm disable.
+      await zilliqaSwapChain(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
+      await appState.syncData();
+    }
 
     if (!context.mounted) return;
 

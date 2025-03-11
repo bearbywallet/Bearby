@@ -166,6 +166,7 @@ class Web3EIP1193Handler {
 
     try {
       final method = message.payload['method'] as String?;
+
       if (method == null) {
         return _returnError(
           message.uuid,
@@ -289,6 +290,8 @@ class Web3EIP1193Handler {
       );
     }
 
+    String? title = await webViewController.getTitle();
+
     if (!context.mounted) return;
 
     showAppConnectModal(
@@ -318,7 +321,7 @@ class Web3EIP1193Handler {
           domain: _currentDomain,
           accountIndexes: accountIndexes,
           favicon: message.icon,
-          title: message.title ?? "",
+          title: title ?? "",
           // colors: message.colors,
           description: message.description,
           lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
@@ -463,6 +466,14 @@ class Web3EIP1193Handler {
       final messageContent =
           isPersonalSign ? decodePersonalSignMessage(dataToSign) : dataToSign;
 
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
       if (!context.mounted) return;
 
       showSignMessageModal(
@@ -549,6 +560,8 @@ class Web3EIP1193Handler {
         );
       }
 
+      String? title = await webViewController.getTitle();
+
       final BigInt? chainId = txParams['chainId'] != null
           ? BigInt.parse(txParams['chainId'].toString().replaceFirst('0x', ''),
               radix: 16)
@@ -623,7 +636,7 @@ class Web3EIP1193Handler {
         hash: null,
         info: null,
         icon: message.icon,
-        title: message.title ?? "EVM Transaction",
+        title: title ?? "EVM Transaction",
         signer: null,
         tokenInfo: tokenInfo,
       );
@@ -633,6 +646,14 @@ class Web3EIP1193Handler {
         scilla: null,
         evm: evmRequest,
       );
+
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
 
       if (!context.mounted) return;
 
@@ -773,11 +794,13 @@ class Web3EIP1193Handler {
       );
     }
 
+    String? title = await webViewController.getTitle();
+
     if (!context.mounted) return;
 
     showAppConnectModal(
       context: context,
-      title: message.title ?? "",
+      title: title ?? "",
       uuid: message.uuid,
       iconUrl: message.icon ?? "",
       onReject: () {
@@ -801,7 +824,7 @@ class Web3EIP1193Handler {
           domain: _currentDomain,
           accountIndexes: accountIndexes,
           favicon: message.icon,
-          title: message.title ?? "",
+          title: title ?? "",
           description: message.description,
           lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
           canReadAccounts: true,
@@ -894,6 +917,16 @@ class Web3EIP1193Handler {
         );
       }
 
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
+      String? title = await webViewController.getTitle();
+
       if (!context.mounted) return;
 
       showSignMessageModal(
@@ -911,7 +944,7 @@ class Web3EIP1193Handler {
           Web3EIP1193ErrorCode.userRejectedRequest,
           'User rejected',
         ),
-        appTitle: 'Sign Typed Data',
+        appTitle: title ?? 'Sign Typed Data',
         appIcon: message.icon ?? '',
       );
     } catch (e) {
@@ -977,11 +1010,13 @@ class Web3EIP1193Handler {
         );
       }
 
+      String? title = await webViewController.getTitle();
+
       if (!context.mounted) return;
 
       showWatchAssetModal(
         context: context,
-        appTitle: message.title ?? "",
+        appTitle: title ?? "",
         appIcon: message.icon ?? "",
         tokenAddress: tokenAddress,
         tokenName: tokenSymbol,
@@ -1132,12 +1167,13 @@ class Web3EIP1193Handler {
     foundChain = foundChain.copyWith(
       rpc: foundChain.rpc.toSet().toList(),
     );
+    String? title = await webViewController.getTitle();
 
     if (!context.mounted) return;
 
     showAddChainModal(
       context: context,
-      title: message.title ?? "",
+      title: title ?? "",
       appIcon: message.icon ?? '',
       chain: foundChain,
       onConfirm: (selectedRpc) async {
