@@ -61,11 +61,18 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
         isPermissionGranted = true;
       });
       _initializeScanner();
+    } else if (status.isPermanentlyDenied) {
+      setState(() {
+        hasError = true;
+        errorMessage = 'Camera permission permanently denied';
+      });
+      _initializeScanner();
     } else {
       setState(() {
         hasError = true;
         errorMessage = 'Camera permission denied';
       });
+      _initializeScanner();
     }
   }
 
@@ -103,6 +110,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
 
   Future<void> _openAppSettings() async {
     await openAppSettings();
+    _requestCameraPermission();
   }
 
   @override
@@ -114,7 +122,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (hasError || !isPermissionGranted || controller == null) return;
+    if (controller == null) return;
 
     switch (state) {
       case AppLifecycleState.resumed:
@@ -166,11 +174,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
         children: [
           _buildHeader(theme),
           const SizedBox(height: 20),
-          !isPermissionGranted
-              ? _buildPermissionDeniedView(theme)
-              : hasError
-                  ? _buildErrorView()
-                  : _buildScannerView(theme),
+          hasError ? _buildErrorView(theme) : _buildScannerView(theme),
           const SizedBox(height: 30),
         ],
       ),
@@ -219,7 +223,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     );
   }
 
-  Widget _buildPermissionDeniedView(AppTheme theme) {
+  Widget _buildErrorView(AppTheme theme) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24),
@@ -244,7 +248,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
             ),
             const SizedBox(height: 12),
             Text(
-              'Please grant camera permission to use the scanner.',
+              errorMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.textSecondary,
@@ -266,64 +270,6 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
                 style: TextStyle(
                   color: theme.secondaryPurple,
                   fontSize: 16,
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildErrorView() {
-    return Center(
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            SvgPicture.asset(
-              'assets/icons/error.svg',
-              width: 64,
-              height: 64,
-              colorFilter:
-                  const ColorFilter.mode(Colors.white54, BlendMode.srcIn),
-            ),
-            const SizedBox(height: 24),
-            const Text(
-              'Camera Error',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-            const SizedBox(height: 12),
-            Text(
-              errorMessage,
-              textAlign: TextAlign.center,
-              style: const TextStyle(
-                color: Colors.white70,
-                fontSize: 16,
-              ),
-            ),
-            const SizedBox(height: 24),
-            ElevatedButton(
-              onPressed: _initializeScanner,
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.white,
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              child: const Text(
-                'Retry',
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
