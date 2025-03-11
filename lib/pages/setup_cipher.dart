@@ -32,7 +32,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
       'title': 'Standard Encryption',
       'subtitle': 'AES-256 + KUZNECHIK-GOST',
       'description':
-          'Basic encryption with AES-256 and Russian GOST standard KUZNECHIK.',
+          'Basic encryption with AES-256 and GOST standard KUZNECHIK.',
     },
     {
       'title': 'Hybrid Encryption',

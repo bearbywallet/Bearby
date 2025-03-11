@@ -1,7 +1,9 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -45,6 +47,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   bool _disabled = false;
   bool _focused = false;
   bool _walletNameInitialized = false;
+  bool _needRemoveOldStorage = false;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -85,6 +88,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         if (zilLegacy != null) {
           _zilLegacy = zilLegacy;
         }
+
+        _needRemoveOldStorage = zilLegacy != null;
       });
     }
 
@@ -127,6 +132,26 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     String networkName = _chain?.name ?? "Universal";
     int walletNumber = _appState.wallets.length + 1;
     return "$networkName #$walletNumber ($type)";
+  }
+
+  void _removeOldStorage() async {
+    if (_needRemoveOldStorage) {
+      if (Platform.isAndroid) {
+        Directory path = Directory("/data/data/com.zilpaymobile/databases");
+
+        if (path.existsSync()) {
+          path.deleteSync();
+        }
+      } else if (Platform.isIOS) {
+        final appDocDir = await getApplicationSupportDirectory();
+        Directory path =
+            Directory("${appDocDir.path}/org.reactjs.native.zilpayMobile");
+
+        if (path.existsSync()) {
+          path.deleteSync();
+        }
+      }
+    }
   }
 
   bool _validatePasswords() {
@@ -288,6 +313,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       }
 
       await _appState.startTrackHistoryWorker();
+
+      try {
+        _removeOldStorage();
+      } catch (_) {}
 
       _appState.setSelectedWallet(_appState.wallets.length - 1);
       _btnController.success();
