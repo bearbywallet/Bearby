@@ -293,7 +293,7 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiProviderSelectAccountsChain(
       {required BigInt walletIndex, required BigInt chainHash});
 
-  Future<Uint8List?> crateApiWalletSetBiometric(
+  Future<String?> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
       required List<String> identifiers,
       required String password,
@@ -1901,7 +1901,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Uint8List?> crateApiWalletSetBiometric(
+  Future<String?> crateApiWalletSetBiometric(
       {required BigInt walletIndex,
       required List<String> identifiers,
       required String password,
@@ -1919,7 +1919,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 55, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_opt_list_prim_u_8_strict,
+        decodeSuccessData: sse_decode_opt_String,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletSetBiometricConstMeta,

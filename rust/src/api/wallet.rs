@@ -271,14 +271,14 @@ pub async fn set_biometric(
     password: String,
     session_cipher: Option<String>,
     new_biometric_type: String,
-) -> Result<Option<Vec<u8>>, String> {
+) -> Result<Option<String>, String> {
     with_service(|core| {
         let mb_session = if session_cipher.is_some() {
             Some(decode_session(session_cipher)?)
         } else {
             None
         };
-        core.set_biometric(
+        let session_bytes = core.set_biometric(
             &password,
             mb_session,
             &identifiers,
@@ -286,7 +286,7 @@ pub async fn set_biometric(
             new_biometric_type.into(),
         )?;
 
-        Ok(Some(Vec::new()))
+        Ok(session_bytes.map(|v| hex::encode(v)))
     })
     .await
     .map_err(Into::into)

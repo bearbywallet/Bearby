@@ -1,3 +1,4 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -8,6 +9,7 @@ class BiometricSwitch extends StatelessWidget {
   final AuthMethod biometricType;
   final bool value;
   final bool disabled;
+  final bool isLoading;
   final ValueChanged<bool>? onChanged;
 
   const BiometricSwitch({
@@ -15,6 +17,7 @@ class BiometricSwitch extends StatelessWidget {
     required this.biometricType,
     required this.value,
     this.disabled = false,
+    this.isLoading = false,
     this.onChanged,
   });
 
@@ -82,12 +85,20 @@ class BiometricSwitch extends StatelessWidget {
               ),
             ],
           ),
-          Switch(
-            value: value,
-            onChanged: disabled ? null : onChanged,
-            activeColor: theme.primaryPurple,
-            activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
-          ),
+          isLoading
+              ? SizedBox(
+                  width: 36,
+                  height: 36,
+                  child: CupertinoActivityIndicator(
+                    color: theme.primaryPurple,
+                  ),
+                )
+              : Switch(
+                  value: value,
+                  onChanged: disabled ? null : onChanged,
+                  activeColor: theme.primaryPurple,
+                  activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
+                ),
         ],
       ),
     );

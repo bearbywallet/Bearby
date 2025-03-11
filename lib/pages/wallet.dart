@@ -5,10 +5,15 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
+import 'package:zilpay/modals/confirm_password.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
 import 'package:zilpay/modals/manage_connections.dart';
 import 'package:zilpay/modals/secret_recovery_modal.dart';
+import 'package:zilpay/services/auth_guard.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -19,6 +24,7 @@ class WalletPreferenceItem {
   final String iconPath;
   final bool hasSwitch;
   final bool switchValue;
+  final bool switchEnabled;
   final Function(bool)? onChanged;
   final VoidCallback? onTap;
 
@@ -27,6 +33,7 @@ class WalletPreferenceItem {
     required this.iconPath,
     this.hasSwitch = false,
     this.switchValue = false,
+    this.switchEnabled = true,
     this.onChanged,
     this.onTap,
   });
@@ -40,24 +47,50 @@ class WalletPage extends StatefulWidget {
 }
 
 class _WalletPageState extends State<WalletPage> {
+  late final AuthGuard _authGuard;
+  final AuthService _authService = AuthService();
   final TextEditingController _walletNameController = TextEditingController();
   static const double _avatarSize = 80.0;
   static const double _borderRadius = 12.0;
   static const double _iconSize = 24.0;
   static const double _fontSize = 16.0;
 
+  List<AuthMethod> _authMethods = [AuthMethod.none];
+  bool _biometricsAvailable = false;
+  bool _isBiometricLoading = false;
+
   @override
   void initState() {
     super.initState();
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     final appState = Provider.of<AppState>(context, listen: false);
     _walletNameController.text = appState.wallet!.walletName;
     appState.syncConnections();
+    _checkAuthMethods();
   }
 
   @override
   void dispose() {
     _walletNameController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkAuthMethods() async {
+    try {
+      final methods = await _authService.getAvailableAuthMethods();
+
+      setState(() {
+        _authMethods = methods;
+        _biometricsAvailable =
+            methods.isNotEmpty && methods.first != AuthMethod.none;
+      });
+    } catch (e) {
+      debugPrint("Error checking auth methods: $e");
+      setState(() {
+        _authMethods = [AuthMethod.none];
+        _biometricsAvailable = false;
+      });
+    }
   }
 
   void _handleDappDisconnect(String url) async {
@@ -69,39 +102,146 @@ class _WalletPageState extends State<WalletPage> {
     await appState.syncConnections();
   }
 
-  List<WalletPreferenceItem> _getPreferenceItems(
-      BuildContext context, AppTheme theme) {
-    final appState = Provider.of<AppState>(context);
-    return [
-      WalletPreferenceItem(
-        title: 'Use Face ID',
-        iconPath: 'assets/icons/face_id.svg',
-        hasSwitch: true,
-        switchValue: true,
-        onChanged: (value) => debugPrint("enable face id $value"),
-      ),
-      WalletPreferenceItem(
-          title: 'Manage connections',
-          iconPath: 'assets/icons/globe.svg',
-          onTap: () {
-            if (appState.connections.isNotEmpty) {
-              showConnectedDappsModal(
-                context: context,
-                onDappDisconnect: _handleDappDisconnect,
-              );
+  Future<void> _handleToggleBiometric(bool enable, AppState appState) async {
+    if (_isBiometricLoading) return;
+
+    setState(() {
+      _isBiometricLoading = true;
+    });
+
+    try {
+      final wallet = appState.wallet;
+      if (wallet == null) {
+        setState(() {
+          _isBiometricLoading = false;
+        });
+        return;
+      }
+
+      final device = DeviceInfoService();
+      final identifiers = await device.getDeviceIdentifiers();
+
+      if (enable && mounted) {
+        showConfirmPasswordModal(
+          context: context,
+          theme: appState.currentTheme,
+          onDismiss: () {
+            if (mounted) {
+              setState(() {
+                _isBiometricLoading = false;
+              });
             }
-          }),
-      if (!appState.wallet!.walletType.contains(WalletType.ledger.name))
+          },
+          onConfirm: (password) async {
+            try {
+              final authenticated = await _authService.authenticate(
+                allowPinCode: true,
+                reason: 'Enable biometric authentication',
+              );
+
+              if (!authenticated) {
+                return false;
+              }
+
+              final biometricType = _authMethods.first.name;
+
+              final session = await setBiometric(
+                walletIndex: BigInt.from(appState.selectedWallet),
+                identifiers: identifiers,
+                password: password,
+                newBiometricType: biometricType,
+              );
+
+              if (session != null) {
+                await _authGuard.setSession(wallet.walletAddress, session);
+              }
+
+              await appState.syncData();
+
+              if (mounted) {
+                setState(() {
+                  _isBiometricLoading = false;
+                });
+              }
+
+              return true;
+            } catch (e) {
+              return false;
+            }
+          },
+        );
+      } else {
+        String sessionCipher = "";
+
+        try {
+          sessionCipher = await _authGuard.getSession(
+            sessionKey: wallet.walletAddress,
+            requireAuth: false,
+          );
+        } catch (e) {
+          debugPrint("No session available for disabling biometrics: $e");
+        }
+
+        await setBiometric(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          identifiers: identifiers,
+          password: "",
+          sessionCipher: sessionCipher,
+          newBiometricType: AuthMethod.none.name,
+        );
+        await _authGuard.setSession(wallet.walletAddress, "");
+
+        if (mounted) {
+          setState(() {
+            _isBiometricLoading = false;
+          });
+        }
+      }
+    } catch (e) {
+      debugPrint("Error changing biometric: $e");
+      if (mounted) {
+        setState(() {
+          _isBiometricLoading = false;
+        });
+      }
+    } finally {
+      await appState.syncData();
+    }
+  }
+
+  List<WalletPreferenceItem> _getPreferenceItems(AppState appState) {
+    final List<WalletPreferenceItem> items = [];
+
+    items.add(
+      WalletPreferenceItem(
+        title: 'Manage connections',
+        iconPath: 'assets/icons/globe.svg',
+        onTap: () {
+          if (appState.connections.isNotEmpty) {
+            showConnectedDappsModal(
+              context: context,
+              onDappDisconnect: _handleDappDisconnect,
+            );
+          }
+        },
+      ),
+    );
+
+    if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
+      items.add(
         WalletPreferenceItem(
           title: 'Backup',
           iconPath: 'assets/icons/key.svg',
           onTap: () {
             if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
-              _handleBackup(theme);
+              _handleBackup(appState.currentTheme);
             }
           },
         ),
-    ];
+      );
+    }
+
+    return items;
   }
 
   @override
@@ -132,7 +272,7 @@ class _WalletPageState extends State<WalletPage> {
                       const SizedBox(height: 16),
                       _buildWalletNameInput(theme, appState),
                       const SizedBox(height: 32),
-                      _buildPreferencesSection(theme),
+                      _buildPreferencesSection(appState),
                     ]),
                   ),
                 ),
@@ -209,7 +349,9 @@ class _WalletPageState extends State<WalletPage> {
     );
   }
 
-  Widget _buildPreferencesSection(AppTheme theme) {
+  Widget _buildPreferencesSection(AppState appState) {
+    final theme = appState.currentTheme;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -229,18 +371,42 @@ class _WalletPageState extends State<WalletPage> {
             borderRadius: BorderRadius.circular(_borderRadius),
           ),
           child: Column(
-            children: _buildPreferenceItems(theme),
+            children: _buildPreferenceItems(appState),
           ),
         ),
       ],
     );
   }
 
-  List<Widget> _buildPreferenceItems(AppTheme theme) {
-    final items = _getPreferenceItems(context, theme);
+  List<Widget> _buildPreferenceItems(AppState appState) {
+    final theme = appState.currentTheme;
+    final items = _getPreferenceItems(appState);
     final List<Widget> widgets = [];
+
+    if (_biometricsAvailable && _authMethods.first != AuthMethod.none) {
+      widgets.add(
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          child: BiometricSwitch(
+            biometricType: _authMethods.first,
+            value: AuthMethod.none.name != appState.wallet?.authType,
+            disabled: false,
+            isLoading: _isBiometricLoading,
+            onChanged: (value) => _handleToggleBiometric(value, appState),
+          ),
+        ),
+      );
+
+      if (items.isNotEmpty) {
+        widgets.add(Divider(
+          height: 1,
+          color: theme.textSecondary.withValues(alpha: 0.1),
+        ));
+      }
+    }
+
     for (var i = 0; i < items.length; i++) {
-      widgets.add(_buildPreferenceItem(theme, items[i]));
+      widgets.add(_buildPreferenceItem(theme, items[i], appState));
       if (i < items.length - 1) {
         widgets.add(Divider(
           height: 1,
@@ -248,11 +414,12 @@ class _WalletPageState extends State<WalletPage> {
         ));
       }
     }
+
     return widgets;
   }
 
-  Widget _buildPreferenceItem(AppTheme theme, WalletPreferenceItem item) {
-    final appState = Provider.of<AppState>(context);
+  Widget _buildPreferenceItem(
+      AppTheme theme, WalletPreferenceItem item, AppState appState) {
     return GestureDetector(
       onTap: item.onTap,
       child: Padding(
@@ -281,7 +448,7 @@ class _WalletPageState extends State<WalletPage> {
             if (item.hasSwitch)
               Switch(
                 value: item.switchValue,
-                onChanged: item.onChanged,
+                onChanged: item.switchEnabled ? item.onChanged : null,
                 activeColor: theme.primaryPurple,
               )
             else if (item.title == 'Manage connections')

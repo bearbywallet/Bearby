@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -117,6 +118,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
     final theme = appState.currentTheme;
     final bool isRateFetchEnabled =
         appState.wallet!.settings.ratesApiOptions != 0;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -132,7 +134,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                 ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     child: Column(
                       children: [
                         _buildEngineBlock(theme, appState),
