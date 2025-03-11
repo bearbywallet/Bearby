@@ -3572,7 +3572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return TokenTransferParamsInfo(
       walletIndex: dco_decode_usize(arr[0]),
       accountIndex: dco_decode_usize(arr[1]),
-      tokenIndex: dco_decode_usize(arr[2]),
+      token: dco_decode_f_token_info(arr[2]),
       amount: dco_decode_String(arr[3]),
       recipient: dco_decode_String(arr[4]),
     );
@@ -4786,13 +4786,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_walletIndex = sse_decode_usize(deserializer);
     var var_accountIndex = sse_decode_usize(deserializer);
-    var var_tokenIndex = sse_decode_usize(deserializer);
+    var var_token = sse_decode_f_token_info(deserializer);
     var var_amount = sse_decode_String(deserializer);
     var var_recipient = sse_decode_String(deserializer);
     return TokenTransferParamsInfo(
         walletIndex: var_walletIndex,
         accountIndex: var_accountIndex,
-        tokenIndex: var_tokenIndex,
+        token: var_token,
         amount: var_amount,
         recipient: var_recipient);
   }
@@ -5833,7 +5833,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_usize(self.walletIndex, serializer);
     sse_encode_usize(self.accountIndex, serializer);
-    sse_encode_usize(self.tokenIndex, serializer);
+    sse_encode_f_token_info(self.token, serializer);
     sse_encode_String(self.amount, serializer);
     sse_encode_String(self.recipient, serializer);
   }

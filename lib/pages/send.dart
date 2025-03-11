@@ -225,7 +225,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
     TokenTransferParamsInfo params = TokenTransferParamsInfo(
       walletIndex: BigInt.from(appState.selectedWallet),
       accountIndex: accountIndex,
-      tokenIndex: BigInt.from(_tokenIndex),
+      token: token,
       amount: toWei(_amount, token.decimals).toString(),
       recipient: _address ?? "",
     );

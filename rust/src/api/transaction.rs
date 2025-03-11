@@ -1,6 +1,7 @@
 use std::sync::Arc;
 
 use crate::frb_generated::StreamSink;
+use crate::models::ftoken::FTokenInfo;
 use crate::models::gas::RequiredTxParamsInfo;
 use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
@@ -22,6 +23,7 @@ use zilpay::proto::signature::Signature;
 pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
 pub use zilpay::proto::U256;
+use zilpay::token::ft::FToken;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
@@ -193,7 +195,7 @@ pub async fn clear_history(wallet_index: usize) -> Result<(), String> {
 pub struct TokenTransferParamsInfo {
     pub wallet_index: usize,
     pub account_index: usize,
-    pub token_index: usize,
+    pub token: FTokenInfo,
     pub amount: String,
     pub recipient: String,
 }
@@ -205,19 +207,10 @@ pub async fn create_token_transfer(
         let recipient = parse_address(params.recipient)?;
         let amount = U256::from_str_radix(&params.amount, 10)
             .map_err(|e| ServiceError::ParseError("amount".to_string(), e.to_string()))?;
-
         let wallet = core.get_wallet_by_index(params.wallet_index)?;
         let data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-        let tokens = wallet
-            .get_ftokens()
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-        let token = tokens
-            .get(params.token_index)
-            .ok_or(WalletErrors::TokenNotExists(params.token_index))
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-
         let sender_account =
             data.accounts
                 .get(params.account_index)
@@ -226,8 +219,8 @@ pub async fn create_token_transfer(
                     params.wallet_index,
                     zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(params.account_index),
                 ))?;
-
-        let tx = core.build_token_transfer(token, &sender_account, recipient, amount)?;
+        let token: FToken = params.token.try_into()?;
+        let tx = core.build_token_transfer(&token, &sender_account, recipient, amount)?;
 
         Ok(tx.into())
     })
