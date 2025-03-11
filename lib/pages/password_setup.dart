@@ -81,7 +81,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _keys = keys;
         _cipher = cipher;
         _argon2 = argon2;
-        _zilLegacy = zilLegacy ?? false;
+
+        if (zilLegacy != null) {
+          _zilLegacy = zilLegacy;
+        }
       });
     }
 

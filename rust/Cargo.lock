@@ -1706,11 +1706,14 @@ dependencies = [
  "config",
  "errors",
  "hex",
+ "kuznechik",
  "ntrulp",
+ "pqc_kyber",
  "rand",
  "rand_chacha",
  "rust-argon2",
  "serde",
+ "sha2",
  "tokio",
 ]
 
@@ -3348,6 +3351,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "kuznechik"
+version = "0.4.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "934fcb27b33ae9c1ee818b8d4338b1068059676e88f18dcd03e00d9e96b9d751"
+dependencies = [
+ "sha3",
+]
+
+[[package]]
 name = "lazy_static"
 version = "1.5.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4102,6 +4114,15 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "77957b295656769bb8ad2b6a6b09d897d94f05c41b069aede1fcdaa675eaea04"
 dependencies = [
  "zerocopy",
+]
+
+[[package]]
+name = "pqc_kyber"
+version = "0.7.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1b23e1823e8a78ad67990c5cb843d5eba75ab3b8a44d041f3814fde89463dc6f"
+dependencies = [
+ "rand_core",
 ]
 
 [[package]]

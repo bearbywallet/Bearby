@@ -3,7 +3,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
-
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -14,9 +13,7 @@ import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class CipherSettingsPage extends StatefulWidget {
-  const CipherSettingsPage({
-    super.key,
-  });
+  const CipherSettingsPage({super.key});
 
   @override
   State<CipherSettingsPage> createState() => _CipherSettingsPageState();
@@ -28,49 +25,34 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   KeyPairInfo? _keys;
   bool _zilLegacy = false;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
-
   int selectedCipherIndex = 2;
-  bool optionsDisabled = false;
 
   final List<Map<String, String>> cipherDescriptions = [
     {
       'title': 'Standard Encryption',
-      'subtitle': 'AES-256',
+      'subtitle': 'AES-256 + KUZNECHIK-GOST',
       'description':
-          'Basic level encryption suitable for most users. Uses AES-256 algorithm - current industry standard.',
+          'Basic encryption with AES-256 and Russian GOST standard KUZNECHIK.',
     },
     {
-      'title': 'Enhanced Security',
-      'subtitle': 'AES-256 + TwoFish',
+      'title': 'Hybrid Encryption',
+      'subtitle': 'CYBER + KUZNECHIK-GOST',
       'description':
-          'Recommended. Double layer encryption using AES-256 and TwoFish for enhanced security.',
+          'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.',
     },
     {
-      'title': 'Post-Quantum Protection',
-      'subtitle': 'AES-256 + NTRU-Prime',
-      'description':
-          'Highest security level with quantum resistance. Combines AES-256 with NTRU-Prime algorithm.',
+      'title': 'Quantum-Resistant',
+      'subtitle': 'CYBER + KUZNECHIK + NTRUP1277',
+      'description': 'Advanced quantum-resistant encryption with NTRUP1277.',
     },
   ];
 
   void _onAdvancedPressed() {
     showArgonSettingsModal(
       context: context,
-      onParamsSelected: (WalletArgonParamsInfo params) {
-        setState(() {
-          _argonParams = params;
-        });
-      },
+      onParamsSelected: (params) => setState(() => _argonParams = params),
       argonParams: _argonParams,
     );
-  }
-
-  @override
-  void reassemble() {
-    super.reassemble();
-    setState(() {
-      optionsDisabled = false;
-    });
   }
 
   @override
@@ -78,29 +60,24 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     super.didChangeDependencies();
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final bip39 = args?['bip39'] as List<String>?;
-    final chain = args?['chain'] as NetworkConfigInfo?;
-    final keys = args?['keys'] as KeyPairInfo?;
-    final zilLegacy = args?['zilLegacy'] as bool?;
-
-    if (bip39 == null && chain == null && keys == null) {
+    if (args == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         Navigator.of(context).pushReplacementNamed('/initial');
       });
-    } else {
-      setState(() {
-        _bip39List = bip39;
-        _chain = chain;
-        _keys = keys;
-        _zilLegacy = zilLegacy ?? false;
-      });
+      return;
     }
+    setState(() {
+      _bip39List = args['bip39'] as List<String>?;
+      _chain = args['chain'] as NetworkConfigInfo?;
+      _keys = args['keys'] as KeyPairInfo?;
+      _zilLegacy = args['zilLegacy'] as bool? ?? false;
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final padding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
       body: SafeArea(
@@ -110,139 +87,111 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Setup Encryption',
+                  title: 'Encryption Setup',
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
-                    child: Padding(
-                      padding:
-                          EdgeInsets.symmetric(horizontal: adaptivePadding),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: EdgeInsets.symmetric(vertical: 0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                TextButton(
-                                  onPressed: _onAdvancedPressed,
-                                  style: ButtonStyle(
-                                    overlayColor:
-                                        const WidgetStatePropertyAll<Color>(
-                                            Colors.transparent),
-                                    foregroundColor:
-                                        WidgetStateProperty.resolveWith<Color>(
-                                      (Set<WidgetState> states) {
-                                        if (states
-                                            .contains(WidgetState.pressed)) {
-                                          return theme.primaryPurple
-                                              .withValues(alpha: 0.7);
-                                        }
-                                        return theme.primaryPurple;
-                                      },
+                    padding: EdgeInsets.symmetric(horizontal: padding),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        TextButton(
+                          onPressed: _onAdvancedPressed,
+                          style: ButtonStyle(
+                            overlayColor: const WidgetStatePropertyAll(
+                                Colors.transparent),
+                            foregroundColor: WidgetStateProperty.resolveWith(
+                              (states) => states.contains(WidgetState.pressed)
+                                  ? theme.primaryPurple.withValues(alpha: 0.7)
+                                  : theme.primaryPurple,
+                            ),
+                          ),
+                          child: const Text(
+                            'Advanced',
+                            style: TextStyle(
+                                fontSize: 16, fontWeight: FontWeight.w500),
+                          ),
+                        ),
+                        OptionsList(
+                          options: List.generate(
+                            cipherDescriptions.length,
+                            (index) => OptionItem(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    cipherDescriptions[index]['title']!,
+                                    style: TextStyle(
+                                      color: theme.textPrimary,
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
-                                  child: Text(
-                                    'Advanced',
+                                  Text(
+                                    cipherDescriptions[index]['subtitle']!,
                                     style: TextStyle(
-                                      fontSize: 16,
+                                      color: theme.primaryPurple,
+                                      fontSize: 14,
                                       fontWeight: FontWeight.w500,
                                     ),
                                   ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          OptionsList(
-                            disabled: optionsDisabled,
-                            options: List.generate(
-                              cipherDescriptions.length,
-                              (index) => OptionItem(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      cipherDescriptions[index]['title']!,
-                                      style: TextStyle(
-                                        color: theme.textPrimary,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
+                                  Text(
+                                    cipherDescriptions[index]['description']!,
+                                    style: TextStyle(
+                                      color: theme.textSecondary,
+                                      fontSize: 14,
                                     ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      cipherDescriptions[index]['subtitle']!,
-                                      style: TextStyle(
-                                        color: theme.primaryPurple,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      cipherDescriptions[index]['description']!,
-                                      style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                isSelected: selectedCipherIndex == index,
-                                onSelect: () =>
-                                    setState(() => selectedCipherIndex = index),
+                                  ),
+                                ],
                               ),
+                              isSelected: selectedCipherIndex == index,
+                              onSelect: () =>
+                                  setState(() => selectedCipherIndex = index),
                             ),
-                            unselectedOpacity: 0.5,
                           ),
-                        ],
-                      ),
+                          unselectedOpacity: 0.5,
+                        ),
+                      ],
                     ),
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(adaptivePadding),
+                  padding: EdgeInsets.all(padding),
                   child: Column(
                     children: [
                       if (selectedCipherIndex == 2)
-                        Padding(
-                          padding: EdgeInsets.only(bottom: adaptivePadding),
-                          child: Text(
-                            'Post-quantum encryption might affect performance',
-                            style: TextStyle(
-                              color: theme.textSecondary,
-                              fontSize: 14,
-                              fontStyle: FontStyle.italic,
-                            ),
-                            textAlign: TextAlign.center,
+                        Text(
+                          'Quantum-resistant encryption may impact performance',
+                          style: TextStyle(
+                            color: theme.textSecondary,
+                            fontSize: 14,
+                            fontStyle: FontStyle.italic,
                           ),
+                          textAlign: TextAlign.center,
                         ),
                       CustomButton(
                         textColor: theme.buttonText,
                         backgroundColor: theme.primaryPurple,
                         text: 'Confirm',
-                        onPressed: () {
-                          Navigator.of(context).pushNamed(
-                            '/pass_setup',
-                            arguments: {
-                              'bip39': _bip39List,
-                              'chain': _chain,
-                              'keys': _keys,
-                              'cipher': _getCipherOrders(),
-                              'argon2': _argonParams,
-                              'zilLegacy': _zilLegacy,
-                            },
-                          );
-                        },
+                        onPressed: () => Navigator.of(context).pushNamed(
+                          '/pass_setup',
+                          arguments: {
+                            'bip39': _bip39List,
+                            'chain': _chain,
+                            'keys': _keys,
+                            'cipher': _getCipherOrders(),
+                            'argon2': _argonParams,
+                            'zilLegacy': _zilLegacy,
+                          },
+                        ),
                         borderRadius: 30.0,
                         height: 50.0,
-                      )
+                      ),
                     ],
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -252,18 +201,15 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   }
 
   Uint8List _getCipherOrders() {
-    // TODO: TwoFish is not supporting yet
-    //
     switch (selectedCipherIndex) {
       case 0:
-        return Uint8List.fromList([0]); // AESGCM256 only
+        return Uint8List.fromList([0, 1]); // AES-256 + KUZNECHIK-GOST
       case 1:
-        return Uint8List.fromList(
-            [0, 1]); // AESGCM256 + TwoFish // TODO: is not supporte yet
+        return Uint8List.fromList([1, 3]); // CYBER + KUZNECHIK-GOST
       case 2:
-        return Uint8List.fromList([0, 1]); // AESGCM256 + TwoFish + NTRUP1277
+        return Uint8List.fromList([3, 2, 1]); // CYBER + KUZNECHIK + NTRUP1277
       default:
-        return Uint8List.fromList([0, 1]); // AESGCM256 + TwoFish + NTRUP1277
+        return Uint8List.fromList([3, 2, 1]); // CYBER + KUZNECHIK + NTRUP1277
     }
   }
 }

@@ -513,12 +513,18 @@ class _SecurityPageState extends State<SecurityPage> {
         icon: 'assets/icons/lock.svg',
       ),
       1: const Algorithm(
+        name: 'KUZNECHIK-GOST',
+        protection: 0.70,
+        cpuLoad: 0.2,
+        icon: 'assets/icons/grasshopper.svg',
+      ),
+      2: const Algorithm(
         name: 'NTRUPrime',
         protection: 0.92,
         cpuLoad: 0.9,
         icon: 'assets/icons/atom.svg',
       ),
-      2: const Algorithm(
+      3: const Algorithm(
         name: 'Cyber',
         protection: 0.70,
         cpuLoad: 0.5,
