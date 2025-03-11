@@ -37,6 +37,8 @@ class _ReceivePageState extends State<ReceivePage> {
   int selectedToken = 0;
   String amount = "0";
   Key _imageKey = UniqueKey();
+  String? legacyAddress;
+  bool useLegacyAddress = false;
 
   final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _amountController = TextEditingController();
@@ -45,14 +47,27 @@ class _ReceivePageState extends State<ReceivePage> {
   void initState() {
     super.initState();
     final appState = Provider.of<AppState>(context, listen: false);
+    final chain = appState.chain!;
 
     _amountController.text = amount;
     _accountNameController.text = appState.account?.name ?? "";
+
+    if (chain.slip44 == 313) {
+      zilliqaLegacyNegativeBech32(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      ).then((addr) {
+        setState(() {
+          legacyAddress = addr;
+        });
+      });
+    }
   }
 
   @override
   void dispose() {
     _amountController.dispose();
+    _accountNameController.dispose();
     super.dispose();
   }
 
@@ -61,9 +76,7 @@ class _ReceivePageState extends State<ReceivePage> {
     setState(() {
       isCopied = true;
     });
-
-    await Future<void>.delayed(const Duration(seconds: 2));
-
+    await Future.delayed(const Duration(seconds: 2));
     setState(() {
       isCopied = false;
     });
@@ -109,19 +122,14 @@ class _ReceivePageState extends State<ReceivePage> {
 
     try {
       final pngBytes = await genPngQrcode(data: data, config: config);
-
       final tempDir = await getTemporaryDirectory();
       final tempFile = File('${tempDir.path}/qrcode.png');
-
       await tempFile.writeAsBytes(pngBytes);
-
       final xFile = XFile(tempFile.path, mimeType: 'image/png');
-
       await Share.shareXFiles(
         [xFile],
         text: '$addr, amount: $amount',
       );
-
       await tempFile.delete();
     } catch (e) {
       debugPrint("error share: $e");
@@ -134,7 +142,10 @@ class _ReceivePageState extends State<ReceivePage> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final chain = appState.chain!;
-    final token = appState.wallet?.tokens[selectedToken];
+    final token = appState.wallet!.tokens[selectedToken];
+    final currentAddress = useLegacyAddress && legacyAddress != null
+        ? legacyAddress!
+        : appState.account!.addr;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -188,7 +199,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          'Only send ${chain.name}(${token?.symbol}) assets to this address. Other assets will be lost forever.',
+                                          'Only send ${chain.name}(${token.symbol}) assets to this address. Other assets will be lost forever.',
                                           style: TextStyle(
                                             color: theme.warning,
                                             fontSize: 14,
@@ -210,14 +221,13 @@ class _ReceivePageState extends State<ReceivePage> {
                                     children: [
                                       _buildTokenSelector(theme, token),
                                       const SizedBox(height: 24),
-                                      if (token != null &&
-                                          appState.account != null)
+                                      if (appState.account != null)
                                         SizedBox(
                                           width: 220,
                                           height: 220,
                                           child: AsyncQRcode(
                                             data: generateCryptoUrl(
-                                              address: appState.account!.addr,
+                                              address: currentAddress,
                                               chain: chain.shortName,
                                               token: token.addr,
                                               amount: amount,
@@ -229,7 +239,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                         ),
                                       const SizedBox(height: 16),
                                       Text(
-                                        appState.account?.addr ?? "",
+                                        currentAddress,
                                         style: TextStyle(
                                           color: theme.textSecondary,
                                           fontSize: 12,
@@ -264,10 +274,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                 ),
                                 const SizedBox(height: 16),
                                 _buildActionButtons(
-                                  theme,
-                                  chain,
-                                  context,
-                                ),
+                                    theme, chain, context, currentAddress),
                               ],
                             ),
                           ),
@@ -284,7 +291,7 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Widget _buildTokenSelector(AppTheme theme, FTokenInfo? token) {
+  Widget _buildTokenSelector(AppTheme theme, FTokenInfo token) {
     return GestureDetector(
       onTapDown: (_) => handlePressedChanged(true),
       onTapUp: (_) => handlePressedChanged(false),
@@ -300,16 +307,11 @@ class _ReceivePageState extends State<ReceivePage> {
             Container(
               width: 32,
               height: 32,
-              decoration: const BoxDecoration(
-                shape: BoxShape.circle,
-              ),
+              decoration: const BoxDecoration(shape: BoxShape.circle),
               child: Center(
                 child: AsyncImage(
                   key: _imageKey,
-                  url: processTokenLogo(
-                    token!,
-                    theme.value,
-                  ),
+                  url: processTokenLogo(token, theme.value),
                   width: 32,
                   height: 32,
                   fit: BoxFit.contain,
@@ -321,9 +323,7 @@ class _ReceivePageState extends State<ReceivePage> {
                     size: 8,
                   ),
                   loadingWidget: const Center(
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                    ),
+                    child: CircularProgressIndicator(strokeWidth: 2),
                   ),
                 ),
               ),
@@ -357,9 +357,11 @@ class _ReceivePageState extends State<ReceivePage> {
     AppTheme theme,
     NetworkConfigInfo chain,
     BuildContext context,
+    String currentAddress,
   ) {
     final appState = Provider.of<AppState>(context);
     final token = appState.wallet!.tokens[selectedToken];
+    final account = appState.account;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -369,14 +371,11 @@ class _ReceivePageState extends State<ReceivePage> {
             isCopied ? "assets/icons/check.svg" : "assets/icons/copy.svg",
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
           ),
           disabled: false,
           onPressed: () async {
-            await handleCopy(appState.account!.addr);
+            await handleCopy(currentAddress);
           },
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
@@ -386,30 +385,31 @@ class _ReceivePageState extends State<ReceivePage> {
             "assets/icons/hash.svg",
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
           ),
           disabled: false,
           onPressed: _handleAmountDialog,
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
         ),
-        if (chain.chain == "ZIL") // TODO: only zil method
+        if (account != null && chain.slip44 == 313)
           TileButton(
             icon: SvgPicture.asset(
-              "assets/icons/swap.svg",
+              useLegacyAddress
+                  ? "assets/icons/scilla.svg"
+                  : "assets/icons/solidity.svg",
               width: 24,
               height: 24,
-              colorFilter: ColorFilter.mode(
-                theme.primaryPurple,
-                BlendMode.srcIn,
-              ),
+              colorFilter:
+                  ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
             ),
-            disabled: false,
+            disabled: legacyAddress == null,
             onPressed: () {
-              //TODO: if zilliqa we need change from bech32 to base16
+              if (legacyAddress != null) {
+                setState(() {
+                  useLegacyAddress = !useLegacyAddress;
+                });
+              }
             },
             backgroundColor: theme.cardBackground,
             textColor: theme.primaryPurple,
@@ -419,19 +419,11 @@ class _ReceivePageState extends State<ReceivePage> {
             "assets/icons/share.svg",
             width: 24,
             height: 24,
-            colorFilter: ColorFilter.mode(
-              theme.primaryPurple,
-              BlendMode.srcIn,
-            ),
+            colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
           ),
           disabled: false,
           onPressed: () async {
-            await handleShare(
-              token,
-              appState.account?.addr ?? "",
-              theme,
-              chain,
-            );
+            await handleShare(token, currentAddress, theme, chain);
           },
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
@@ -469,12 +461,8 @@ class _ReceivePageState extends State<ReceivePage> {
                 );
               }),
               TextInputFormatter.withFunction((oldValue, newValue) {
-                if (newValue.text.isEmpty) {
-                  return newValue;
-                }
-                if (newValue.text.split('.').length > 2) {
-                  return oldValue;
-                }
+                if (newValue.text.isEmpty) return newValue;
+                if (newValue.text.split('.').length > 2) return oldValue;
                 return newValue;
               }),
             ],

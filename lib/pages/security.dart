@@ -74,8 +74,7 @@ class _SecurityPageState extends State<SecurityPage> {
                             const SizedBox(height: 32),
                             if (!appState.wallet!.walletType
                                 .contains(WalletType.ledger.name)) ...[
-                              _buildSecuritySection(appState),
-                              const SizedBox(height: 32)
+                              // const SizedBox(height: 32)
                             ],
                             _buildEncryptionSection(appState),
                             const SizedBox(height: 32),
@@ -90,43 +89,6 @@ class _SecurityPageState extends State<SecurityPage> {
           ),
         ),
       ),
-    );
-  }
-
-  Widget _buildSecuritySection(AppState state) {
-    final theme = state.currentTheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Container(
-          decoration: BoxDecoration(
-            color: theme.cardBackground.withValues(alpha: 0.7),
-            borderRadius: BorderRadius.circular(16),
-          ),
-          child: Column(
-            children: [
-              _buildPreferenceItem(
-                state,
-                'Change wallet password',
-                'assets/icons/key.svg',
-                'Secure your wallet with a strong password',
-                false,
-                false,
-                null,
-                onTap: () {
-                  showModalBottomSheet<void>(
-                    context: context,
-                    backgroundColor: theme.cardBackground,
-                    isScrollControlled: true,
-                    builder: (context) => ChangePasswordModal(theme: theme),
-                  );
-                },
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 

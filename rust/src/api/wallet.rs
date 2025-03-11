@@ -437,3 +437,36 @@ pub fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String>
 
     Ok(addr.get_zil_bech32().unwrap_or_default())
 }
+
+pub async fn zilliqa_legacy_negative_bech32(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<String, String> {
+    with_wallet(wallet_index, |wallet| {
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .accounts
+            .get(account_index)
+            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .map_err(|e| ServiceError::AccountError(account_index, wallet_index, e))?;
+
+        let address = match account.pub_key {
+            PubKey::Secp256k1Sha256(pk) => PubKey::Secp256k1Keccak256(pk)
+                .get_addr()
+                .ok()
+                .and_then(|a| a.get_zil_bech32().ok()),
+            PubKey::Secp256k1Keccak256(pk) => PubKey::Secp256k1Sha256(pk)
+                .get_addr()
+                .ok()
+                .and_then(|a| a.get_zil_bech32().ok()),
+            _ => None,
+        }
+        .ok_or(ServiceError::AccountTypeNotValid)?;
+
+        Ok(address)
+    })
+    .await
+    .map_err(Into::into)
+}

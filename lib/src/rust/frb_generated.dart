@@ -98,7 +98,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.8.0';
 
   @override
-  int get rustContentHash => 413787699;
+  int get rustContentHash => 1826426624;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -395,6 +395,9 @@ abstract class RustLibApi extends BaseApi {
 
   Future<String> crateApiWalletZilliqaLegacyBase16ToBech32(
       {required String base16});
+
+  Future<String> crateApiWalletZilliqaLegacyNegativeBech32(
+      {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<void> crateApiWalletZilliqaSwapChain(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -2706,7 +2709,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<void> crateApiWalletZilliqaSwapChain(
+  Future<String> crateApiWalletZilliqaLegacyNegativeBech32(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -2715,6 +2718,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 81, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaLegacyNegativeBech32ConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaLegacyNegativeBech32ConstMeta =>
+      const TaskConstMeta(
+        debugName: "zilliqa_legacy_negative_bech32",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<void> crateApiWalletZilliqaSwapChain(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 82, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
