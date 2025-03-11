@@ -1,5 +1,5 @@
 use std::collections::HashMap;
-use zilpay::{errors::token::TokenError, proto::address::Address, token::ft::FToken};
+use zilpay::{errors::token::TokenError, proto::{address::Address, U256}, token::ft::FToken};
 
 #[derive(Debug)]
 pub struct FTokenInfo {
@@ -44,14 +44,18 @@ impl TryFrom<FTokenInfo> for FToken {
     type Error = TokenError;
 
     fn try_from(value: FTokenInfo) -> Result<Self, Self::Error> {
+        let balances = value.balances.into_iter().map(|(acount_index, balance_str)| {
+            (acount_index, balance_str.parse::<U256>().unwrap_or_default())
+        }).collect();
+
         Ok(Self {
+            balances,
             name: value.name,
             symbol: value.symbol,
             decimals: value.decimals,
             addr: Address::from_str_hex(&value.addr).map_err(TokenError::InvalidContractAddress)?,
             rate: value.rate,
             logo: value.logo,
-            balances: Default::default(),
             default: value.default,
             native: value.native,
             chain_hash: value.chain_hash,
