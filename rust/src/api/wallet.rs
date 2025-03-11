@@ -265,6 +265,33 @@ pub async fn delete_account(wallet_index: usize, account_index: usize) -> Result
     .map_err(Into::into)
 }
 
+pub async fn set_biometric(
+    wallet_index: usize,
+    identifiers: Vec<String>,
+    password: String,
+    session_cipher: Option<String>,
+    new_biometric_type: String,
+) -> Result<Option<Vec<u8>>, String> {
+    with_service(|core| {
+        let mb_session = if session_cipher.is_some() {
+            Some(decode_session(session_cipher)?)
+        } else {
+            None
+        };
+        core.set_biometric(
+            &password,
+            mb_session,
+            &identifiers,
+            wallet_index,
+            new_biometric_type.into(),
+        )?;
+
+        Ok(Some(Vec::new()))
+    })
+    .await
+    .map_err(Into::into)
+}
+
 pub async fn reveal_keypair(
     wallet_index: usize,
     account_index: usize,

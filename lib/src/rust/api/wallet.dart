@@ -64,6 +64,19 @@ Future<void> deleteAccount(
     RustLib.instance.api.crateApiWalletDeleteAccount(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<Uint8List?> setBiometric(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        required String password,
+        String? sessionCipher,
+        required String newBiometricType}) =>
+    RustLib.instance.api.crateApiWalletSetBiometric(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        sessionCipher: sessionCipher,
+        newBiometricType: newBiometricType);
+
 Future<KeyPairInfo> revealKeypair(
         {required BigInt walletIndex,
         required BigInt accountIndex,
