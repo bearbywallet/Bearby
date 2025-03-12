@@ -205,4 +205,93 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get networkPageAddError => 'Failed to add network: ';
+
+  @override
+  String get receivePageTitle => 'Receive';
+
+  @override
+  String receivePageWarning(Object chainName, Object tokenSymbol) {
+    return 'Only send $chainName($tokenSymbol) assets to this address. Other assets will be lost forever.';
+  }
+
+  @override
+  String get receivePageAccountNameHint => 'Account name';
+
+  @override
+  String get receivePageAmountDialogTitle => 'Enter Amount';
+
+  @override
+  String get receivePageAmountDialogHint => '0.0';
+
+  @override
+  String get receivePageAmountDialogCancel => 'Cancel';
+
+  @override
+  String get receivePageAmountDialogConfirm => 'Confirm';
+
+  @override
+  String get securityPageTitle => 'Security';
+
+  @override
+  String get securityPageNetworkPrivacy => 'Network Privacy';
+
+  @override
+  String get securityPageEnsDomains => 'Show ENS domains in address bar';
+
+  @override
+  String get securityPageEnsDescription => 'Keep in mind that using this feature exposes your IP address to IPFS third-party services.';
+
+  @override
+  String get securityPageIpfsGateway => 'IPFS gateway';
+
+  @override
+  String get securityPageIpfsDescription => 'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.';
+
+  @override
+  String get securityPageGasStation => 'Gas station';
+
+  @override
+  String get securityPageGasDescription => 'Use ZilPay server for optimize your gas usage';
+
+  @override
+  String get securityPageNodeRanking => 'Node ranking';
+
+  @override
+  String get securityPageNodeDescription => 'Make requests to ZilPay server for fetch best node';
+
+  @override
+  String get securityPageEncryptionLevel => 'Encryption Level';
+
+  @override
+  String get securityPageProtection => 'Protection';
+
+  @override
+  String get securityPageCpuLoad => 'CPU Load';
+
+  @override
+  String get securityPageAes256 => 'AES256';
+
+  @override
+  String get securityPageKuznechikGost => 'KUZNECHIK-GOST';
+
+  @override
+  String get securityPageNtruPrime => 'NTRUPrime';
+
+  @override
+  String get securityPageCyber => 'Cyber';
+
+  @override
+  String get securityPageUnknown => 'Unknown';
+
+  @override
+  String get webViewPageDntLabel => 'DNT';
+
+  @override
+  String get webViewPageIncognitoLabel => 'Incognito';
+
+  @override
+  String get webViewPageLoadError => 'Failed to load';
+
+  @override
+  String get webViewPageTryAgain => 'Try Again';
 }

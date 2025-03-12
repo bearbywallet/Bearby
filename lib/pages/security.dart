@@ -5,8 +5,8 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
-
 import '../components/custom_app_bar.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SecurityPage extends StatefulWidget {
   const SecurityPage({super.key});
@@ -44,6 +44,7 @@ class _SecurityPageState extends State<SecurityPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -56,7 +57,7 @@ class _SecurityPageState extends State<SecurityPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Security',
+                    title: l10n.securityPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -93,6 +94,7 @@ class _SecurityPageState extends State<SecurityPage> {
 
   Widget _buildNetworkSection(AppState state) {
     final theme = state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -100,7 +102,7 @@ class _SecurityPageState extends State<SecurityPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Network Privacy',
+            l10n.securityPageNetworkPrivacy,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,
@@ -116,9 +118,9 @@ class _SecurityPageState extends State<SecurityPage> {
             children: [
               _buildPreferenceItem(
                 state,
-                'Show ENS domains in address bar',
+                l10n.securityPageEnsDomains,
                 'assets/icons/graph.svg',
-                'Keep in mind that using this feature exposes your IP address to IPFS third-party services.',
+                l10n.securityPageEnsDescription,
                 true,
                 state.wallet!.settings.ensEnabled,
                 (value) async {
@@ -133,9 +135,9 @@ class _SecurityPageState extends State<SecurityPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
-                'IPFS gateway',
+                l10n.securityPageIpfsGateway,
                 'assets/icons/ipfs.svg',
-                'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.',
+                l10n.securityPageIpfsDescription,
                 true,
                 state.wallet!.settings.ipfsNode != null,
                 (value) async {
@@ -152,9 +154,9 @@ class _SecurityPageState extends State<SecurityPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
-                'Gas station',
+                l10n.securityPageGasStation,
                 'assets/icons/gas.svg',
-                'Use ZilPay server for optimize your gas usage',
+                l10n.securityPageGasDescription,
                 true,
                 state.wallet!.settings.gasControlEnabled,
                 (value) async {
@@ -169,9 +171,9 @@ class _SecurityPageState extends State<SecurityPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
-                'Node ranking',
+                l10n.securityPageNodeRanking,
                 'assets/icons/server.svg',
-                'Make requests to ZilPay server for fetch best node',
+                l10n.securityPageNodeDescription,
                 true,
                 state.wallet!.settings.nodeRankingEnabled,
                 (value) async {
@@ -295,6 +297,7 @@ class _SecurityPageState extends State<SecurityPage> {
   Widget _buildEncryptionSection(AppState state) {
     final theme = state.currentTheme;
     final algorithms = generateAlgorithms(state.wallet!.settings.cipherOrders);
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -302,7 +305,7 @@ class _SecurityPageState extends State<SecurityPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Encryption Level',
+            l10n.securityPageEncryptionLevel,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,
@@ -354,6 +357,7 @@ class _SecurityPageState extends State<SecurityPage> {
     final cardWidth = MediaQuery.of(context).size.width > 480
         ? 320.0
         : MediaQuery.of(context).size.width * 0.7;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       width: cardWidth,
@@ -398,14 +402,14 @@ class _SecurityPageState extends State<SecurityPage> {
           const SizedBox(height: 16),
           _buildProgressBar(
             state,
-            'Protection',
+            l10n.securityPageProtection,
             algorithm.protection,
             theme.primaryPurple,
           ),
           const SizedBox(height: 12),
           _buildProgressBar(
             state,
-            'CPU Load',
+            l10n.securityPageCpuLoad,
             algorithm.cpuLoad,
             theme.warning,
           ),
@@ -466,27 +470,28 @@ class _SecurityPageState extends State<SecurityPage> {
   }
 
   List<Algorithm> generateAlgorithms(List<int> algorithms) {
+    final l10n = AppLocalizations.of(context)!;
     final Map<int, Algorithm> algorithmData = {
-      0: const Algorithm(
-        name: 'AES256',
+      0: Algorithm(
+        name: l10n.securityPageAes256,
         protection: 0.60,
         cpuLoad: 0.3,
         icon: 'assets/icons/lock.svg',
       ),
-      1: const Algorithm(
-        name: 'KUZNECHIK-GOST',
+      1: Algorithm(
+        name: l10n.securityPageKuznechikGost,
         protection: 0.70,
         cpuLoad: 0.2,
         icon: 'assets/icons/grasshopper.svg',
       ),
-      2: const Algorithm(
-        name: 'NTRUPrime',
+      2: Algorithm(
+        name: l10n.securityPageNtruPrime,
         protection: 0.92,
         cpuLoad: 0.9,
         icon: 'assets/icons/atom.svg',
       ),
-      3: const Algorithm(
-        name: 'Cyber',
+      3: Algorithm(
+        name: l10n.securityPageCyber,
         protection: 0.70,
         cpuLoad: 0.5,
         icon: 'assets/icons/atom.svg',
@@ -496,7 +501,7 @@ class _SecurityPageState extends State<SecurityPage> {
     return algorithms.map((algo) {
       return algorithmData[algo] ??
           Algorithm(
-            name: 'Unknown',
+            name: l10n.securityPageUnknown,
             protection: 0.0,
             cpuLoad: 0.0,
             icon: 'assets/icons/lock.svg',

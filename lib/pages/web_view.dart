@@ -10,6 +10,7 @@ import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/web3/eip_1193.dart';
 import 'package:zilpay/web3/message.dart';
 import 'package:zilpay/web3/zilpay_legacy.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class WebViewPage extends StatefulWidget {
   final String initialUrl;
@@ -420,6 +421,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     final theme = appState.currentTheme;
     final domainParts =
         _splitDomain(_currentUrl.isEmpty ? widget.initialUrl : _currentUrl);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -500,7 +502,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'DNT',
+                        l10n.webViewPageDntLabel,
                         style: TextStyle(
                           color: theme.primaryPurple,
                           fontSize: 10,
@@ -518,7 +520,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                         borderRadius: BorderRadius.circular(4),
                       ),
                       child: Text(
-                        'Incognito',
+                        l10n.webViewPageIncognitoLabel,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 10,
@@ -561,7 +563,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                   ),
                   const SizedBox(height: 20),
                   Text(
-                    'Failed to load',
+                    l10n.webViewPageLoadError,
                     style: TextStyle(
                       color: theme.textPrimary,
                       fontSize: 20,
@@ -587,7 +589,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       backgroundColor: theme.primaryPurple,
                     ),
                     child: Text(
-                      'Try Again',
+                      l10n.webViewPageTryAgain,
                       style: TextStyle(color: theme.background),
                     ),
                   ),

@@ -488,6 +488,180 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to add network: '**
   String get networkPageAddError;
+
+  /// Title for the ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'Receive'**
+  String get receivePageTitle;
+
+  /// Warning message displayed on ReceivePage with chain name and token symbol placeholders
+  ///
+  /// In en, this message translates to:
+  /// **'Only send {chainName}({tokenSymbol}) assets to this address. Other assets will be lost forever.'**
+  String receivePageWarning(Object chainName, Object tokenSymbol);
+
+  /// Hint text for account name input on ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'Account name'**
+  String get receivePageAccountNameHint;
+
+  /// Title for the amount input dialog on ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Amount'**
+  String get receivePageAmountDialogTitle;
+
+  /// Hint text for the amount input field in dialog on ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'0.0'**
+  String get receivePageAmountDialogHint;
+
+  /// Cancel button text in amount dialog on ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get receivePageAmountDialogCancel;
+
+  /// Confirm button text in amount dialog on ReceivePage
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get receivePageAmountDialogConfirm;
+
+  /// Title for the SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Security'**
+  String get securityPageTitle;
+
+  /// Section title for network privacy settings on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Network Privacy'**
+  String get securityPageNetworkPrivacy;
+
+  /// Label for ENS domains toggle on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Show ENS domains in address bar'**
+  String get securityPageEnsDomains;
+
+  /// Description for ENS domains setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Keep in mind that using this feature exposes your IP address to IPFS third-party services.'**
+  String get securityPageEnsDescription;
+
+  /// Label for IPFS gateway setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'IPFS gateway'**
+  String get securityPageIpfsGateway;
+
+  /// Description for IPFS gateway setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.'**
+  String get securityPageIpfsDescription;
+
+  /// Label for gas station setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Gas station'**
+  String get securityPageGasStation;
+
+  /// Description for gas station setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Use ZilPay server for optimize your gas usage'**
+  String get securityPageGasDescription;
+
+  /// Label for node ranking setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Node ranking'**
+  String get securityPageNodeRanking;
+
+  /// Description for node ranking setting on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Make requests to ZilPay server for fetch best node'**
+  String get securityPageNodeDescription;
+
+  /// Section title for encryption level settings on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption Level'**
+  String get securityPageEncryptionLevel;
+
+  /// Label for protection progress bar in encryption card on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Protection'**
+  String get securityPageProtection;
+
+  /// Label for CPU load progress bar in encryption card on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'CPU Load'**
+  String get securityPageCpuLoad;
+
+  /// Name of AES256 encryption algorithm on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'AES256'**
+  String get securityPageAes256;
+
+  /// Name of KUZNECHIK-GOST encryption algorithm on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'KUZNECHIK-GOST'**
+  String get securityPageKuznechikGost;
+
+  /// Name of NTRUPrime encryption algorithm on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'NTRUPrime'**
+  String get securityPageNtruPrime;
+
+  /// Name of Cyber encryption algorithm on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Cyber'**
+  String get securityPageCyber;
+
+  /// Fallback name for unknown encryption algorithm on SecurityPage
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get securityPageUnknown;
+
+  /// Label indicating Do Not Track is enabled in the WebViewPage app bar
+  ///
+  /// In en, this message translates to:
+  /// **'DNT'**
+  String get webViewPageDntLabel;
+
+  /// Label indicating Incognito mode is enabled in the WebViewPage app bar
+  ///
+  /// In en, this message translates to:
+  /// **'Incognito'**
+  String get webViewPageIncognitoLabel;
+
+  /// Error message title when web page fails to load on WebViewPage
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load'**
+  String get webViewPageLoadError;
+
+  /// Button text to retry loading the web page on WebViewPage
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
+  String get webViewPageTryAgain;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

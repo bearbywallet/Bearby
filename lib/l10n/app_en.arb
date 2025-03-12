@@ -323,5 +323,154 @@
   "networkPageAddError": "Failed to add network: ",
   "@networkPageAddError": {
     "description": "Error message prefix when adding a network fails on NetworkPage"
+  },
+
+  "receivePageTitle": "Receive",
+  "@receivePageTitle": {
+    "description": "Title for the ReceivePage"
+  },
+  
+  "receivePageWarning": "Only send {chainName}({tokenSymbol}) assets to this address. Other assets will be lost forever.",
+  "@receivePageWarning": {
+    "description": "Warning message displayed on ReceivePage with chain name and token symbol placeholders",
+    "placeholders": {
+      "chainName": {},
+      "tokenSymbol": {}
+    }
+  },
+  
+  "receivePageAccountNameHint": "Account name",
+  "@receivePageAccountNameHint": {
+    "description": "Hint text for account name input on ReceivePage"
+  },
+  
+  "receivePageAmountDialogTitle": "Enter Amount",
+  "@receivePageAmountDialogTitle": {
+    "description": "Title for the amount input dialog on ReceivePage"
+  },
+  
+  "receivePageAmountDialogHint": "0.0",
+  "@receivePageAmountDialogHint": {
+    "description": "Hint text for the amount input field in dialog on ReceivePage"
+  },
+  
+  "receivePageAmountDialogCancel": "Cancel",
+  "@receivePageAmountDialogCancel": {
+    "description": "Cancel button text in amount dialog on ReceivePage"
+  },
+  
+  "receivePageAmountDialogConfirm": "Confirm",
+  "@receivePageAmountDialogConfirm": {
+    "description": "Confirm button text in amount dialog on ReceivePage"
+  },
+
+  "securityPageTitle": "Security",
+  "@securityPageTitle": {
+    "description": "Title for the SecurityPage"
+  },
+  
+  "securityPageNetworkPrivacy": "Network Privacy",
+  "@securityPageNetworkPrivacy": {
+    "description": "Section title for network privacy settings on SecurityPage"
+  },
+  
+  "securityPageEnsDomains": "Show ENS domains in address bar",
+  "@securityPageEnsDomains": {
+    "description": "Label for ENS domains toggle on SecurityPage"
+  },
+  
+  "securityPageEnsDescription": "Keep in mind that using this feature exposes your IP address to IPFS third-party services.",
+  "@securityPageEnsDescription": {
+    "description": "Description for ENS domains setting on SecurityPage"
+  },
+  
+  "securityPageIpfsGateway": "IPFS gateway",
+  "@securityPageIpfsGateway": {
+    "description": "Label for IPFS gateway setting on SecurityPage"
+  },
+  
+  "securityPageIpfsDescription": "ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser's address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you're using them.",
+  "@securityPageIpfsDescription": {
+    "description": "Description for IPFS gateway setting on SecurityPage"
+  },
+  
+  "securityPageGasStation": "Gas station",
+  "@securityPageGasStation": {
+    "description": "Label for gas station setting on SecurityPage"
+  },
+  
+  "securityPageGasDescription": "Use ZilPay server for optimize your gas usage",
+  "@securityPageGasDescription": {
+    "description": "Description for gas station setting on SecurityPage"
+  },
+  
+  "securityPageNodeRanking": "Node ranking",
+  "@securityPageNodeRanking": {
+    "description": "Label for node ranking setting on SecurityPage"
+  },
+  
+  "securityPageNodeDescription": "Make requests to ZilPay server for fetch best node",
+  "@securityPageNodeDescription": {
+    "description": "Description for node ranking setting on SecurityPage"
+  },
+  
+  "securityPageEncryptionLevel": "Encryption Level",
+  "@securityPageEncryptionLevel": {
+    "description": "Section title for encryption level settings on SecurityPage"
+  },
+  
+  "securityPageProtection": "Protection",
+  "@securityPageProtection": {
+    "description": "Label for protection progress bar in encryption card on SecurityPage"
+  },
+  
+  "securityPageCpuLoad": "CPU Load",
+  "@securityPageCpuLoad": {
+    "description": "Label for CPU load progress bar in encryption card on SecurityPage"
+  },
+  
+  "securityPageAes256": "AES256",
+  "@securityPageAes256": {
+    "description": "Name of AES256 encryption algorithm on SecurityPage"
+  },
+  
+  "securityPageKuznechikGost": "KUZNECHIK-GOST",
+  "@securityPageKuznechikGost": {
+    "description": "Name of KUZNECHIK-GOST encryption algorithm on SecurityPage"
+  },
+  
+  "securityPageNtruPrime": "NTRUPrime",
+  "@securityPageNtruPrime": {
+    "description": "Name of NTRUPrime encryption algorithm on SecurityPage"
+  },
+  
+  "securityPageCyber": "Cyber",
+  "@securityPageCyber": {
+    "description": "Name of Cyber encryption algorithm on SecurityPage"
+  },
+  
+  "securityPageUnknown": "Unknown",
+  "@securityPageUnknown": {
+    "description": "Fallback name for unknown encryption algorithm on SecurityPage"
+  },
+  "webViewPageDntLabel": "DNT",
+  "@webViewPageDntLabel": {
+    "description": "Label indicating Do Not Track is enabled in the WebViewPage app bar"
+  },
+  
+  "webViewPageIncognitoLabel": "Incognito",
+  "@webViewPageIncognitoLabel": {
+    "description": "Label indicating Incognito mode is enabled in the WebViewPage app bar"
+  },
+  
+  "webViewPageLoadError": "Failed to load",
+  "@webViewPageLoadError": {
+    "description": "Error message title when web page fails to load on WebViewPage"
+  },
+  
+  "webViewPageTryAgain": "Try Again",
+  "@webViewPageTryAgain": {
+    "description": "Button text to retry loading the web page on WebViewPage"
   }
+  
 }

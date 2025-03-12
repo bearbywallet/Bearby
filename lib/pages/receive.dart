@@ -23,6 +23,7 @@ import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class ReceivePage extends StatefulWidget {
   const ReceivePage({super.key});
@@ -146,6 +147,7 @@ class _ReceivePageState extends State<ReceivePage> {
     final currentAddress = useLegacyAddress && legacyAddress != null
         ? legacyAddress!
         : appState.account!.addr;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -158,7 +160,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Receive',
+                    title: l10n.receivePageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -199,7 +201,8 @@ class _ReceivePageState extends State<ReceivePage> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          'Only send ${chain.name}(${token.symbol}) assets to this address. Other assets will be lost forever.',
+                                          l10n.receivePageWarning(
+                                              chain.name, token.symbol),
                                           style: TextStyle(
                                             color: theme.warning,
                                             fontSize: 14,
@@ -252,7 +255,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                 const SizedBox(height: 16),
                                 SmartInput(
                                   controller: _accountNameController,
-                                  hint: 'Account name',
+                                  hint: l10n.receivePageAccountNameHint,
                                   onSubmitted: (_) async {
                                     if (_accountNameController
                                         .text.isNotEmpty) {
@@ -434,6 +437,7 @@ class _ReceivePageState extends State<ReceivePage> {
 
   Future<void> _handleAmountDialog() async {
     _amountController.text = amount;
+    final l10n = AppLocalizations.of(context)!;
 
     final result = await showDialog<String>(
       context: context,
@@ -443,7 +447,7 @@ class _ReceivePageState extends State<ReceivePage> {
         return AlertDialog(
           backgroundColor: theme.cardBackground,
           title: Text(
-            'Enter Amount',
+            l10n.receivePageAmountDialogTitle,
             style: TextStyle(
               color: theme.textPrimary,
               fontWeight: FontWeight.bold,
@@ -467,7 +471,7 @@ class _ReceivePageState extends State<ReceivePage> {
               }),
             ],
             decoration: InputDecoration(
-              hintText: '0.0',
+              hintText: l10n.receivePageAmountDialogHint,
               hintStyle: TextStyle(color: theme.textSecondary),
               enabledBorder: UnderlineInputBorder(
                 borderSide: BorderSide(color: theme.primaryPurple),
@@ -486,7 +490,7 @@ class _ReceivePageState extends State<ReceivePage> {
             TextButton(
               onPressed: () => Navigator.pop(context),
               child: Text(
-                'Cancel',
+                l10n.receivePageAmountDialogCancel,
                 style: TextStyle(color: theme.textSecondary),
               ),
             ),
@@ -498,7 +502,7 @@ class _ReceivePageState extends State<ReceivePage> {
                 Navigator.pop(context, _amountController.text);
               },
               child: Text(
-                'Confirm',
+                l10n.receivePageAmountDialogConfirm,
                 style: TextStyle(
                   color: theme.primaryPurple,
                   fontWeight: FontWeight.bold,
