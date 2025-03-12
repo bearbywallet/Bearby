@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showBackupConfirmationModal({
   required BuildContext context,
@@ -43,10 +44,10 @@ class _BackupConfirmationContent extends StatefulWidget {
 class _BackupConfirmationContentState
     extends State<_BackupConfirmationContent> {
   final Map<String, bool> _confirmations = {
-    'I have written down all': false,
-    'I have safely stored the backup': false,
-    'I am sure I won\'t lose the backup': false,
-    'I understand not to share these words with anyone': false,
+    'writtenDown': false,
+    'safelyStored': false,
+    'wontLose': false,
+    'notShare': false,
   };
 
   void _updateConfirmation(String key, bool value) {
@@ -63,6 +64,7 @@ class _BackupConfirmationContentState
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -92,7 +94,7 @@ class _BackupConfirmationContentState
           Padding(
             padding: const EdgeInsets.all(16),
             child: Text(
-              'Backup Confirmation',
+              l10n.backupConfirmationContentTitle,
               style: TextStyle(
                 color: theme.textPrimary,
                 fontSize: 20,
@@ -100,12 +102,30 @@ class _BackupConfirmationContentState
               ),
             ),
           ),
-          ..._confirmations.entries.map((entry) => _ConfirmationItem(
-                text: entry.key,
-                isConfirmed: entry.value,
-                onConfirmed: (value) => _updateConfirmation(entry.key, value),
-                theme: theme,
-              )),
+          _ConfirmationItem(
+            text: l10n.backupConfirmationContentWrittenDown,
+            isConfirmed: _confirmations['writtenDown']!,
+            onConfirmed: (value) => _updateConfirmation('writtenDown', value),
+            theme: theme,
+          ),
+          _ConfirmationItem(
+            text: l10n.backupConfirmationContentSafelyStored,
+            isConfirmed: _confirmations['safelyStored']!,
+            onConfirmed: (value) => _updateConfirmation('safelyStored', value),
+            theme: theme,
+          ),
+          _ConfirmationItem(
+            text: l10n.backupConfirmationContentWontLose,
+            isConfirmed: _confirmations['wontLose']!,
+            onConfirmed: (value) => _updateConfirmation('wontLose', value),
+            theme: theme,
+          ),
+          _ConfirmationItem(
+            text: l10n.backupConfirmationContentNotShare,
+            isConfirmed: _confirmations['notShare']!,
+            onConfirmed: (value) => _updateConfirmation('notShare', value),
+            theme: theme,
+          ),
           const SizedBox(height: 24),
         ],
       ),
@@ -145,6 +165,7 @@ class _ConfirmationItem extends StatelessWidget {
               fontSize: 16,
             ),
           ),
+          tileColor: theme.buttonText,
           value: isConfirmed,
           onChanged: (value) => onConfirmed(value!),
           controlAffinity: ListTileControlAffinity.leading,

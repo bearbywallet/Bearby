@@ -5,6 +5,7 @@ import '../../components/load_button.dart';
 import '../../components/smart_input.dart';
 import '../../theme/app_theme.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showConfirmPasswordModal({
   required BuildContext context,
@@ -61,7 +62,8 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
     if (_passwordController.text.isEmpty) {
       _passwordInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Password cannot be empty';
+        _errorMessage =
+            AppLocalizations.of(context)!.confirmPasswordModalEmptyError;
       });
       _btnController.reset();
       return false;
@@ -84,10 +86,8 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
       bool success = await widget.onConfirm(_passwordController.text);
 
       if (success && mounted) {
-        // Successful confirmation
         _btnController.success();
 
-        // Add small delay before closing modal
         Timer(const Duration(milliseconds: 300), () {
           if (mounted) {
             Navigator.pop(context);
@@ -95,12 +95,12 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
         });
       } else if (mounted) {
         setState(() {
-          _errorMessage = 'Incorrect password';
+          _errorMessage =
+              AppLocalizations.of(context)!.confirmPasswordModalIncorrectError;
         });
         _passwordInputKey.currentState?.shake();
         _btnController.error();
 
-        // Reset button after a short delay
         Timer(const Duration(seconds: 1), () {
           if (mounted) {
             _btnController.reset();
@@ -110,11 +110,11 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
     } catch (e) {
       if (mounted) {
         setState(() {
-          _errorMessage = 'Error: ${e.toString()}';
+          _errorMessage =
+              '${AppLocalizations.of(context)!.confirmPasswordModalGenericError} ${e.toString()}';
         });
         _btnController.error();
 
-        // Reset button after a short delay
         Timer(const Duration(seconds: 1), () {
           if (mounted) {
             _btnController.reset();
@@ -126,6 +126,8 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
@@ -159,7 +161,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Confirm Password',
+                        l10n.confirmPasswordModalTitle,
                         style: TextStyle(
                           color: widget.theme.textPrimary,
                           fontSize: 18,
@@ -168,7 +170,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter your password to continue.',
+                        l10n.confirmPasswordModalDescription,
                         style: TextStyle(
                           color: widget.theme.textSecondary,
                           fontSize: 14,
@@ -178,7 +180,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                       SmartInput(
                         key: _passwordInputKey,
                         controller: _passwordController,
-                        hint: 'Password',
+                        hint: l10n.confirmPasswordModalHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: false,
@@ -222,7 +224,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                             ),
                           ),
                           child: Text(
-                            'Confirm',
+                            l10n.confirmPasswordModalButton,
                             style: TextStyle(
                               color: widget.theme.buttonText,
                               fontSize: 18,

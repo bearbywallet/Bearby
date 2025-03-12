@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showQRScannerModal({
   required BuildContext context,
@@ -89,7 +90,8 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
       if (!mounted) return;
       setState(() {
         hasError = true;
-        errorMessage = 'Camera initialization error: ${e.toString()}';
+        errorMessage =
+            '${AppLocalizations.of(context)!.qrScannerModalContentCameraInitError} ${e.toString()}';
       });
     }
   }
@@ -100,7 +102,8 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
       setState(() {});
     } catch (e) {
       setState(() {
-        errorMessage = 'Failed to toggle torch: ${e.toString()}';
+        errorMessage =
+            '${AppLocalizations.of(context)!.qrScannerModalContentTorchError} ${e.toString()}';
       });
     }
   }
@@ -140,6 +143,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return AnimatedContainer(
       duration: const Duration(milliseconds: 300),
@@ -158,16 +162,16 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
       ),
       child: Column(
         children: [
-          _buildHeader(theme),
+          _buildHeader(theme, l10n),
           const SizedBox(height: 20),
-          Expanded(child: _buildScannerView(theme)),
+          Expanded(child: _buildScannerView(theme, l10n)),
           const SizedBox(height: 30),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(AppTheme theme) {
+  Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
     return Column(
       children: [
         Container(
@@ -185,7 +189,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text(
-                'Scan',
+                l10n.qrScannerModalContentTitle,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 20,
@@ -209,7 +213,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     );
   }
 
-  Widget _buildScannerView(AppTheme theme) {
+  Widget _buildScannerView(AppTheme theme, AppLocalizations l10n) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -267,7 +271,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 24),
             child: CustomButton(
-              text: 'Open Settings',
+              text: l10n.qrScannerModalContentOpenSettings,
               textColor: theme.buttonText,
               backgroundColor: theme.secondaryPurple,
               onPressed: _openAppSettings,

@@ -4,6 +4,7 @@ import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/button.dart';
 import '../../theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showSecretRecoveryModal({
   required BuildContext context,
@@ -84,12 +85,12 @@ class _SecretRecoveryModal extends StatelessWidget {
             if (walletType.contains(WalletType.SecretPhrase.name)) ...[
               _buildOption(
                 context: context,
-                title: 'Reveal Secret Recovery Phrase',
-                description:
-                    'If you ever change browsers or move computers, you will need '
-                    'this Secret Recovery Phrase to access your accounts. Save '
-                    'them somewhere safe and secret.',
-                buttonText: 'Reveal',
+                title: AppLocalizations.of(context)!
+                    .secretRecoveryModalRevealPhraseTitle,
+                description: AppLocalizations.of(context)!
+                    .secretRecoveryModalRevealPhraseDescription,
+                buttonText: AppLocalizations.of(context)!
+                    .secretRecoveryModalRevealPhraseButton,
                 onPressed: () => _onRevealPhrase(context),
               ),
               const SizedBox(height: 24),
@@ -98,11 +99,12 @@ class _SecretRecoveryModal extends StatelessWidget {
                 walletType.contains(WalletType.SecretPhrase.name)) ...[
               _buildOption(
                 context: context,
-                title: 'Show Private Keys',
-                description:
-                    'Warning: Never disclose this key. Anyone with your private '
-                    'keys can steal any assets held in your account.',
-                buttonText: 'Export',
+                title: AppLocalizations.of(context)!
+                    .secretRecoveryModalShowKeysTitle,
+                description: AppLocalizations.of(context)!
+                    .secretRecoveryModalShowKeysDescription,
+                buttonText: AppLocalizations.of(context)!
+                    .secretRecoveryModalShowKeysButton,
                 onPressed: () => _onShowPrivateKeys(context),
               ),
               const SizedBox(height: 16),

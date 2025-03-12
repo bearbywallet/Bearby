@@ -2192,6 +2192,330 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Change Password'**
   String get changePasswordModalButton;
+
+  /// Title text for the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPasswordModalTitle;
+
+  /// Description text explaining the purpose of the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your password to continue.'**
+  String get confirmPasswordModalDescription;
+
+  /// Hint text for the password input field in the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get confirmPasswordModalHint;
+
+  /// Error message displayed when the password field is empty in the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Password cannot be empty'**
+  String get confirmPasswordModalEmptyError;
+
+  /// Error message displayed when the entered password is incorrect in the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password'**
+  String get confirmPasswordModalIncorrectError;
+
+  /// Prefix for generic error messages followed by the specific error in the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Error:'**
+  String get confirmPasswordModalGenericError;
+
+  /// Text on the button to confirm the password in the ConfirmPasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmPasswordModalButton;
+
+  /// Title text for the QRScannerModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan'**
+  String get qrScannerModalContentTitle;
+
+  /// Prefix for error message when camera initialization fails in the QRScannerModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Camera initialization error:'**
+  String get qrScannerModalContentCameraInitError;
+
+  /// Prefix for error message when toggling the torch fails in the QRScannerModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to toggle torch:'**
+  String get qrScannerModalContentTorchError;
+
+  /// Text on the button to open app settings when camera permission is denied on iOS in the QRScannerModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Settings'**
+  String get qrScannerModalContentOpenSettings;
+
+  /// Title text for the network information section in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Information'**
+  String get chainInfoModalContentNetworkInfoTitle;
+
+  /// Label for the chain field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain'**
+  String get chainInfoModalContentChainLabel;
+
+  /// Label for the short name field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Short Name'**
+  String get chainInfoModalContentShortNameLabel;
+
+  /// Label for the chain ID field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID'**
+  String get chainInfoModalContentChainIdLabel;
+
+  /// Label for the Slip44 field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Slip44'**
+  String get chainInfoModalContentSlip44Label;
+
+  /// Label for the chain IDs field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain IDs'**
+  String get chainInfoModalContentChainIdsLabel;
+
+  /// Label for the testnet field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get chainInfoModalContentTestnetLabel;
+
+  /// Text displayed for a true testnet value in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes'**
+  String get chainInfoModalContentYes;
+
+  /// Text displayed for a false testnet value in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'No'**
+  String get chainInfoModalContentNo;
+
+  /// Label for the diff block time field in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Diff Block Time'**
+  String get chainInfoModalContentDiffBlockTimeLabel;
+
+  /// Label for the fallback enabled switch in the network information section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Fallback Enabled'**
+  String get chainInfoModalContentFallbackEnabledLabel;
+
+  /// Label for the decimals field in the first token section of the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Decimals'**
+  String get chainInfoModalContentDecimalsLabel;
+
+  /// Title text for the RPC nodes section in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'RPC Nodes'**
+  String get chainInfoModalContentRpcNodesTitle;
+
+  /// Title text for the explorers section in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Explorers'**
+  String get chainInfoModalContentExplorersTitle;
+
+  /// Title text for the SwitchChainNetworkContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Network'**
+  String get switchChainNetworkContentTitle;
+
+  /// Text on the swipe button to confirm network switch in the SwitchChainNetworkContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Switch Network'**
+  String get switchChainNetworkContentButton;
+
+  /// Label displayed next to a testnet network name in the SwitchChainNetworkContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get switchChainNetworkContentTestnetLabel;
+
+  /// Label prefix for the chain ID in the network details row of the SwitchChainNetworkContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'ID:'**
+  String get switchChainNetworkContentIdLabel;
+
+  /// Title text for the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add suggested token'**
+  String get watchAssetModalContentTitle;
+
+  /// Description text explaining the purpose of the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Review and add the following token suggested by the app.'**
+  String get watchAssetModalContentDescription;
+
+  /// Label for the token column in the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Token'**
+  String get watchAssetModalContentTokenLabel;
+
+  /// Label for the balance column in the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance'**
+  String get watchAssetModalContentBalanceLabel;
+
+  /// Text on the swipe button while loading balance in the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Balance...'**
+  String get watchAssetModalContentLoadingButton;
+
+  /// Text on the swipe button to confirm adding the token in the WatchAssetModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get watchAssetModalContentAddButton;
+
+  /// Hint text for the search input in the ConnectedDappsModalContent component
+  ///
+  /// In en, this message translates to:
+  /// **'Search DApps'**
+  String get connectedDappsModalSearchHint;
+
+  /// Text displayed when no DApps are connected in the ConnectedDappsModalContent component
+  ///
+  /// In en, this message translates to:
+  /// **'No connected DApps'**
+  String get connectedDappsModalNoDapps;
+
+  /// Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time
+  ///
+  /// In en, this message translates to:
+  /// **'Connected {time}'**
+  String dappListItemConnected(Object time);
+
+  /// Text indicating a DApp was connected very recently in the DappListItem component
+  ///
+  /// In en, this message translates to:
+  /// **'just now'**
+  String get dappListItemJustNow;
+
+  /// Hint text for the wallet name input field in the LedgerConnectDialog component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Name'**
+  String get ledgerConnectDialogWalletNameHint;
+
+  /// Error message displayed when the wallet name is empty in the LedgerConnectDialog component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name cannot be empty'**
+  String get ledgerConnectDialogEmptyWalletName;
+
+  /// Error message displayed when the wallet name exceeds the maximum length in the LedgerConnectDialog component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name is too long'**
+  String get ledgerConnectDialogWalletNameTooLong;
+
+  /// Text for the connect button in the LedgerConnectDialog component
+  ///
+  /// In en, this message translates to:
+  /// **'Connect'**
+  String get ledgerConnectDialogConnectButton;
+
+  /// Title for the secret recovery phrase option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal Secret Recovery Phrase'**
+  String get secretRecoveryModalRevealPhraseTitle;
+
+  /// Description text for the secret recovery phrase option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'If you ever change browsers or move computers, you will need this Secret Recovery Phrase to access your accounts. Save them somewhere safe and secret.'**
+  String get secretRecoveryModalRevealPhraseDescription;
+
+  /// Button text for revealing the secret recovery phrase in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal'**
+  String get secretRecoveryModalRevealPhraseButton;
+
+  /// Title for the private keys option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Show Private Keys'**
+  String get secretRecoveryModalShowKeysTitle;
+
+  /// Description text for the private keys option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.'**
+  String get secretRecoveryModalShowKeysDescription;
+
+  /// Button text for exporting private keys in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Export'**
+  String get secretRecoveryModalShowKeysButton;
+
+  /// Title for the backup confirmation modal in the BackupConfirmationContent component
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Confirmation'**
+  String get backupConfirmationContentTitle;
+
+  /// Confirmation item indicating the user has written down the backup in the BackupConfirmationContent component
+  ///
+  /// In en, this message translates to:
+  /// **'I have written down all'**
+  String get backupConfirmationContentWrittenDown;
+
+  /// Confirmation item indicating the user has safely stored the backup in the BackupConfirmationContent component
+  ///
+  /// In en, this message translates to:
+  /// **'I have safely stored the backup'**
+  String get backupConfirmationContentSafelyStored;
+
+  /// Confirmation item indicating the user is confident they won't lose the backup in the BackupConfirmationContent component
+  ///
+  /// In en, this message translates to:
+  /// **'I am sure I won\'t lose the backup'**
+  String get backupConfirmationContentWontLose;
+
+  /// Confirmation item indicating the user understands not to share the backup words in the BackupConfirmationContent component
+  ///
+  /// In en, this message translates to:
+  /// **'I understand not to share these words with anyone'**
+  String get backupConfirmationContentNotShare;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

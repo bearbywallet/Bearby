@@ -10,6 +10,7 @@ import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/web3/eip_1193.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showChainInfoModal({
   required BuildContext context,
@@ -42,7 +43,6 @@ class _ChainInfoModalContent extends StatefulWidget {
 
 class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
   late NetworkConfigInfo _config;
-  Map<String, String> _rpcStatus = {};
 
   @override
   void initState() {
@@ -75,6 +75,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 12);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints: BoxConstraints(
@@ -116,15 +117,15 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                     ),
                   Padding(
                     padding: EdgeInsets.all(adaptivePadding),
-                    child: _buildNetworkInfo(theme),
+                    child: _buildNetworkInfo(theme, l10n),
                   ),
                   Padding(
                     padding: EdgeInsets.all(adaptivePadding),
-                    child: _buildExplorers(theme),
+                    child: _buildExplorers(theme, l10n),
                   ),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    child: _buildRpcList(theme),
+                    child: _buildRpcList(theme, l10n),
                   ),
                 ],
               ),
@@ -136,7 +137,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     );
   }
 
-  Widget _buildNetworkInfo(AppTheme theme) {
+  Widget _buildNetworkInfo(AppTheme theme, AppLocalizations l10n) {
     final chainIds = _config.chainIds.map((id) => id.toString()).join(', ');
 
     return Container(
@@ -151,7 +152,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Network Information',
+            l10n.chainInfoModalContentNetworkInfoTitle,
             style: TextStyle(
               color: theme.textPrimary,
               fontSize: 14,
@@ -160,7 +161,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
           SizedBox(height: 8),
           _buildInfoItem(
-            'Chain',
+            l10n.chainInfoModalContentChainLabel,
             Text(
               _config.chain,
               style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -170,7 +171,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             expandValue: true,
           ),
           _buildInfoItem(
-            'Short Name',
+            l10n.chainInfoModalContentShortNameLabel,
             Text(
               _config.shortName,
               style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -180,7 +181,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             expandValue: true,
           ),
           _buildInfoItem(
-            'Chain ID',
+            l10n.chainInfoModalContentChainIdLabel,
             Text(
               _config.chainId.toString(),
               style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -190,7 +191,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             expandValue: true,
           ),
           _buildInfoItem(
-            'Slip44',
+            l10n.chainInfoModalContentSlip44Label,
             Text(
               _config.slip44.toString(),
               style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -200,7 +201,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             expandValue: true,
           ),
           _buildInfoItem(
-            'Chain IDs',
+            l10n.chainInfoModalContentChainIdsLabel,
             Text(
               chainIds,
               style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -211,9 +212,11 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           ),
           if (_config.testnet != null)
             _buildInfoItem(
-              'Testnet',
+              l10n.chainInfoModalContentTestnetLabel,
               Text(
-                _config.testnet! ? 'Yes' : 'No',
+                _config.testnet!
+                    ? l10n.chainInfoModalContentYes
+                    : l10n.chainInfoModalContentNo,
                 style: TextStyle(color: theme.textPrimary, fontSize: 12),
                 overflow: TextOverflow.ellipsis,
               ),
@@ -222,7 +225,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             ),
           if (_config.diffBlockTime != BigInt.zero)
             _buildInfoItem(
-              'Diff Block Time',
+              l10n.chainInfoModalContentDiffBlockTimeLabel,
               Text(
                 _config.diffBlockTime.toString(),
                 style: TextStyle(color: theme.textPrimary, fontSize: 12),
@@ -232,7 +235,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               expandValue: true,
             ),
           _buildInfoItem(
-            'Fallback Enabled',
+            l10n.chainInfoModalContentFallbackEnabledLabel,
             Switch(
               value: _config.fallbackEnabled,
               onChanged: (value) async {
@@ -309,7 +312,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   ),
                 ),
                 Text(
-                  'Decimals: ${token.decimals}',
+                  '${AppLocalizations.of(context)!.chainInfoModalContentDecimalsLabel} ${token.decimals}',
                   style: TextStyle(
                     color: theme.textSecondary,
                     fontSize: 12,
@@ -323,12 +326,12 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     );
   }
 
-  Widget _buildRpcList(AppTheme theme) {
+  Widget _buildRpcList(AppTheme theme, AppLocalizations l10n) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          'RPC Nodes',
+          l10n.chainInfoModalContentRpcNodesTitle,
           style: TextStyle(
             color: theme.textPrimary,
             fontSize: 14,
@@ -394,7 +397,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     );
   }
 
-  Widget _buildExplorers(AppTheme theme) {
+  Widget _buildExplorers(AppTheme theme, AppLocalizations l10n) {
     return Container(
       width: double.infinity,
       padding: EdgeInsets.all(12),
@@ -407,7 +410,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Explorers',
+            l10n.chainInfoModalContentExplorersTitle,
             style: TextStyle(
               color: theme.textPrimary,
               fontSize: 14,

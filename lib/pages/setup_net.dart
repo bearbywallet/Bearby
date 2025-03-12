@@ -26,7 +26,6 @@ class SetupNetworkSettingsPage extends StatefulWidget {
 class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
-  bool isLoading = true;
   String? errorMessage;
   String? _shortName;
   bool _zilLegacy = false;
@@ -90,8 +89,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   }
 
   Future<void> _loadChains() async {
-    final l10n = AppLocalizations.of(context)!;
-
     try {
       final appState = Provider.of<AppState>(context, listen: false);
       final storedProviders = appState.state.providers;
@@ -110,7 +107,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         mainnetNetworks =
             _appendUniqueMainnetNetworks(storedProviders, mainnetNetworks);
         testnetNetworks = testnetChains;
-        isLoading = false;
 
         if (_shortName != null) {
           final networks = isTestnet ? testnetNetworks : mainnetNetworks;
@@ -123,8 +119,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       });
     } catch (e) {
       setState(() {
-        isLoading = false;
-        errorMessage = '${l10n.setupNetworkSettingsPageLoadError} $e';
+        errorMessage = e.toString();
       });
       debugPrint('Error loading chains: $e');
     }
@@ -258,14 +253,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
-
-    if (isLoading) {
-      return const Scaffold(
-        body: Center(
-          child: CircularProgressIndicator(),
-        ),
-      );
-    }
 
     return Scaffold(
       body: SafeArea(

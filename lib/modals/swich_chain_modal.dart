@@ -10,6 +10,7 @@ import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showSwitchChainNetworkModal({
   required BuildContext context,
@@ -72,6 +73,7 @@ class _SwitchChainNetworkContentState
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final l10n = AppLocalizations.of(context)!;
 
     final sortedNetworks = _getSortedNetworks(appState);
 
@@ -94,15 +96,15 @@ class _SwitchChainNetworkContentState
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildHeader(theme, adaptivePadding),
-          _buildNetworkList(sortedNetworks, theme, adaptivePadding),
-          _buildSwipeButton(theme, bottomPadding),
+          _buildHeader(theme, adaptivePadding, l10n),
+          _buildNetworkList(sortedNetworks, theme, adaptivePadding, l10n),
+          _buildSwipeButton(theme, bottomPadding, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildHeader(AppTheme theme, double padding) {
+  Widget _buildHeader(AppTheme theme, double padding, AppLocalizations l10n) {
     return Column(
       children: [
         Container(
@@ -117,7 +119,7 @@ class _SwitchChainNetworkContentState
         Padding(
           padding: EdgeInsets.symmetric(horizontal: padding),
           child: Text(
-            'Select Network',
+            l10n.switchChainNetworkContentTitle,
             style: TextStyle(
               color: theme.textPrimary,
               fontSize: 20,
@@ -129,8 +131,8 @@ class _SwitchChainNetworkContentState
     );
   }
 
-  Widget _buildNetworkList(
-      List<NetworkConfigInfo> networks, AppTheme theme, double padding) {
+  Widget _buildNetworkList(List<NetworkConfigInfo> networks, AppTheme theme,
+      double padding, AppLocalizations l10n) {
     return Expanded(
       child: ListView.separated(
         padding: EdgeInsets.symmetric(
@@ -150,13 +152,15 @@ class _SwitchChainNetworkContentState
             network: network,
             isSelected: isSelected,
             theme: theme,
+            l10n: l10n,
           );
         },
       ),
     );
   }
 
-  Widget _buildSwipeButton(AppTheme theme, double bottomPadding) {
+  Widget _buildSwipeButton(
+      AppTheme theme, double bottomPadding, AppLocalizations l10n) {
     return ClipRect(
       child: BackdropFilter(
         filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
@@ -176,7 +180,7 @@ class _SwitchChainNetworkContentState
             children: [
               Center(
                 child: SwipeButton(
-                  text: 'Switch Network',
+                  text: l10n.switchChainNetworkContentButton,
                   backgroundColor: theme.primaryPurple,
                   textColor: theme.textPrimary,
                   disabled: _selectedNetwork == null,
@@ -234,6 +238,7 @@ class _SwitchChainNetworkContentState
     required NetworkConfigInfo network,
     required bool isSelected,
     required AppTheme theme,
+    required AppLocalizations l10n,
   }) {
     final isTestnet = network.testnet ?? false;
 
@@ -260,9 +265,10 @@ class _SwitchChainNetworkContentState
                 crossAxisAlignment: CrossAxisAlignment.start,
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  _buildNetworkNameRow(network, isSelected, isTestnet, theme),
+                  _buildNetworkNameRow(
+                      network, isSelected, isTestnet, theme, l10n),
                   const SizedBox(height: 4),
-                  _buildNetworkDetailsRow(network, theme),
+                  _buildNetworkDetailsRow(network, theme, l10n),
                 ],
               ),
             ),
@@ -318,7 +324,7 @@ class _SwitchChainNetworkContentState
   }
 
   Widget _buildNetworkNameRow(NetworkConfigInfo network, bool isSelected,
-      bool isTestnet, AppTheme theme) {
+      bool isTestnet, AppTheme theme, AppLocalizations l10n) {
     return Row(
       children: [
         Expanded(
@@ -341,7 +347,7 @@ class _SwitchChainNetworkContentState
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              'Testnet',
+              l10n.switchChainNetworkContentTestnetLabel,
               style: TextStyle(
                 color: theme.warning,
                 fontSize: 12,
@@ -353,7 +359,8 @@ class _SwitchChainNetworkContentState
     );
   }
 
-  Widget _buildNetworkDetailsRow(NetworkConfigInfo network, AppTheme theme) {
+  Widget _buildNetworkDetailsRow(
+      NetworkConfigInfo network, AppTheme theme, AppLocalizations l10n) {
     return Row(
       children: [
         Container(
@@ -373,7 +380,7 @@ class _SwitchChainNetworkContentState
         ),
         const SizedBox(width: 8),
         Text(
-          'ID: ${network.chainId}',
+          '${l10n.switchChainNetworkContentIdLabel} ${network.chainId}',
           style: TextStyle(
             color: theme.textSecondary,
             fontSize: 12,

@@ -7,6 +7,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class LedgerConnectDialog extends StatefulWidget {
   final String? walletName;
@@ -43,12 +44,14 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
 
   Future<void> _onConnect() async {
     if (_walletNameController.text.trim().isEmpty) {
-      setState(() => _errorMessage = 'Wallet name cannot be empty');
+      setState(() => _errorMessage =
+          AppLocalizations.of(context)!.ledgerConnectDialogEmptyWalletName);
       return;
     }
 
     if (_walletNameController.text.length > 24) {
-      setState(() => _errorMessage = 'Wallet name is too long');
+      setState(() => _errorMessage =
+          AppLocalizations.of(context)!.ledgerConnectDialogWalletNameTooLong);
       return;
     }
 
@@ -123,7 +126,8 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                         const SizedBox(height: 16),
                         SmartInput(
                           controller: _walletNameController,
-                          hint: "Wallet Name",
+                          hint: AppLocalizations.of(context)!
+                              .ledgerConnectDialogWalletNameHint,
                           fontSize: 18,
                           height: 50,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -194,7 +198,8 @@ class _LedgerConnectDialog extends State<LedgerConnectDialog> {
                               ),
                             ),
                             child: Text(
-                              'Connect',
+                              AppLocalizations.of(context)!
+                                  .ledgerConnectDialogConnectButton,
                               style: TextStyle(
                                 color: theme.buttonText,
                                 fontSize: 18,

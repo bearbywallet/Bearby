@@ -1546,5 +1546,224 @@
   "changePasswordModalButton": "Change Password",
   "@changePasswordModalButton": {
     "description": "Text on the button to confirm password change in the ChangePasswordModal modal."
+  },
+  "confirmPasswordModalTitle": "Confirm Password",
+  "@confirmPasswordModalTitle": {
+    "description": "Title text for the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalDescription": "Enter your password to continue.",
+  "@confirmPasswordModalDescription": {
+    "description": "Description text explaining the purpose of the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalHint": "Password",
+  "@confirmPasswordModalHint": {
+    "description": "Hint text for the password input field in the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalEmptyError": "Password cannot be empty",
+  "@confirmPasswordModalEmptyError": {
+    "description": "Error message displayed when the password field is empty in the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalIncorrectError": "Incorrect password",
+  "@confirmPasswordModalIncorrectError": {
+    "description": "Error message displayed when the entered password is incorrect in the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalGenericError": "Error:",
+  "@confirmPasswordModalGenericError": {
+    "description": "Prefix for generic error messages followed by the specific error in the ConfirmPasswordModal modal."
+  },
+  "confirmPasswordModalButton": "Confirm",
+  "@confirmPasswordModalButton": {
+    "description": "Text on the button to confirm the password in the ConfirmPasswordModal modal."
+  },
+  "qrScannerModalContentTitle": "Scan",
+  "@qrScannerModalContentTitle": {
+    "description": "Title text for the QRScannerModalContent modal."
+  },
+  "qrScannerModalContentCameraInitError": "Camera initialization error:",
+  "@qrScannerModalContentCameraInitError": {
+    "description": "Prefix for error message when camera initialization fails in the QRScannerModalContent modal."
+  },
+  "qrScannerModalContentTorchError": "Failed to toggle torch:",
+  "@qrScannerModalContentTorchError": {
+    "description": "Prefix for error message when toggling the torch fails in the QRScannerModalContent modal."
+  },
+  "qrScannerModalContentOpenSettings": "Open Settings",
+  "@qrScannerModalContentOpenSettings": {
+    "description": "Text on the button to open app settings when camera permission is denied on iOS in the QRScannerModalContent modal."
+  },
+  "chainInfoModalContentNetworkInfoTitle": "Network Information",
+  "@chainInfoModalContentNetworkInfoTitle": {
+    "description": "Title text for the network information section in the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentChainLabel": "Chain",
+  "@chainInfoModalContentChainLabel": {
+    "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentShortNameLabel": "Short Name",
+  "@chainInfoModalContentShortNameLabel": {
+    "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentChainIdLabel": "Chain ID",
+  "@chainInfoModalContentChainIdLabel": {
+    "description": "Label for the chain ID field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentSlip44Label": "Slip44",
+  "@chainInfoModalContentSlip44Label": {
+    "description": "Label for the Slip44 field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentChainIdsLabel": "Chain IDs",
+  "@chainInfoModalContentChainIdsLabel": {
+    "description": "Label for the chain IDs field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentTestnetLabel": "Testnet",
+  "@chainInfoModalContentTestnetLabel": {
+    "description": "Label for the testnet field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentYes": "Yes",
+  "@chainInfoModalContentYes": {
+    "description": "Text displayed for a true testnet value in the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentNo": "No",
+  "@chainInfoModalContentNo": {
+    "description": "Text displayed for a false testnet value in the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentDiffBlockTimeLabel": "Diff Block Time",
+  "@chainInfoModalContentDiffBlockTimeLabel": {
+    "description": "Label for the diff block time field in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentFallbackEnabledLabel": "Fallback Enabled",
+  "@chainInfoModalContentFallbackEnabledLabel": {
+    "description": "Label for the fallback enabled switch in the network information section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentDecimalsLabel": "Decimals",
+  "@chainInfoModalContentDecimalsLabel": {
+    "description": "Label for the decimals field in the first token section of the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentRpcNodesTitle": "RPC Nodes",
+  "@chainInfoModalContentRpcNodesTitle": {
+    "description": "Title text for the RPC nodes section in the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentExplorersTitle": "Explorers",
+  "@chainInfoModalContentExplorersTitle": {
+    "description": "Title text for the explorers section in the ChainInfoModalContent modal."
+  },
+  "switchChainNetworkContentTitle": "Select Network",
+  "@switchChainNetworkContentTitle": {
+    "description": "Title text for the SwitchChainNetworkContent modal."
+  },
+  "switchChainNetworkContentButton": "Switch Network",
+  "@switchChainNetworkContentButton": {
+    "description": "Text on the swipe button to confirm network switch in the SwitchChainNetworkContent modal."
+  },
+  "switchChainNetworkContentTestnetLabel": "Testnet",
+  "@switchChainNetworkContentTestnetLabel": {
+    "description": "Label displayed next to a testnet network name in the SwitchChainNetworkContent modal."
+  },
+  "switchChainNetworkContentIdLabel": "ID:",
+  "@switchChainNetworkContentIdLabel": {
+    "description": "Label prefix for the chain ID in the network details row of the SwitchChainNetworkContent modal."
+  },
+  "watchAssetModalContentTitle": "Add suggested token",
+  "@watchAssetModalContentTitle": {
+    "description": "Title text for the WatchAssetModalContent modal."
+  },
+  "watchAssetModalContentDescription": "Review and add the following token suggested by the app.",
+  "@watchAssetModalContentDescription": {
+    "description": "Description text explaining the purpose of the WatchAssetModalContent modal."
+  },
+  "watchAssetModalContentTokenLabel": "Token",
+  "@watchAssetModalContentTokenLabel": {
+    "description": "Label for the token column in the WatchAssetModalContent modal."
+  },
+  "watchAssetModalContentBalanceLabel": "Balance",
+  "@watchAssetModalContentBalanceLabel": {
+    "description": "Label for the balance column in the WatchAssetModalContent modal."
+  },
+  "watchAssetModalContentLoadingButton": "Balance...",
+  "@watchAssetModalContentLoadingButton": {
+    "description": "Text on the swipe button while loading balance in the WatchAssetModalContent modal."
+  },
+  "watchAssetModalContentAddButton": "Add",
+  "@watchAssetModalContentAddButton": {
+    "description": "Text on the swipe button to confirm adding the token in the WatchAssetModalContent modal."
+  },
+  "connectedDappsModalSearchHint": "Search DApps",
+  "@connectedDappsModalSearchHint": {
+    "description": "Hint text for the search input in the ConnectedDappsModalContent component"
+  },
+  "connectedDappsModalNoDapps": "No connected DApps",
+  "@connectedDappsModalNoDapps": {
+    "description": "Text displayed when no DApps are connected in the ConnectedDappsModalContent component"
+  },
+  "dappListItemConnected": "Connected {time}",
+  "@dappListItemConnected": {
+    "description": "Text showing when a DApp was last connected in the DappListItem component, where {time} is a placeholder for the formatted time",
+    "placeholders": {
+      "time": {}
+    }
+  },
+  "dappListItemJustNow": "just now",
+  "@dappListItemJustNow": {
+    "description": "Text indicating a DApp was connected very recently in the DappListItem component"
+  },
+  "ledgerConnectDialogWalletNameHint": "Wallet Name",
+  "@ledgerConnectDialogWalletNameHint": {
+    "description": "Hint text for the wallet name input field in the LedgerConnectDialog component"
+  },
+  "ledgerConnectDialogEmptyWalletName": "Wallet name cannot be empty",
+  "@ledgerConnectDialogEmptyWalletName": {
+    "description": "Error message displayed when the wallet name is empty in the LedgerConnectDialog component"
+  },
+  "ledgerConnectDialogWalletNameTooLong": "Wallet name is too long",
+  "@ledgerConnectDialogWalletNameTooLong": {
+    "description": "Error message displayed when the wallet name exceeds the maximum length in the LedgerConnectDialog component"
+  },
+  "ledgerConnectDialogConnectButton": "Connect",
+  "@ledgerConnectDialogConnectButton": {
+    "description": "Text for the connect button in the LedgerConnectDialog component"
+  },
+  "secretRecoveryModalRevealPhraseTitle": "Reveal Secret Recovery Phrase",
+  "@secretRecoveryModalRevealPhraseTitle": {
+    "description": "Title for the secret recovery phrase option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalRevealPhraseDescription": "If you ever change browsers or move computers, you will need this Secret Recovery Phrase to access your accounts. Save them somewhere safe and secret.",
+  "@secretRecoveryModalRevealPhraseDescription": {
+    "description": "Description text for the secret recovery phrase option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalRevealPhraseButton": "Reveal",
+  "@secretRecoveryModalRevealPhraseButton": {
+    "description": "Button text for revealing the secret recovery phrase in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalShowKeysTitle": "Show Private Keys",
+  "@secretRecoveryModalShowKeysTitle": {
+    "description": "Title for the private keys option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalShowKeysDescription": "Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.",
+  "@secretRecoveryModalShowKeysDescription": {
+    "description": "Description text for the private keys option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalShowKeysButton": "Export",
+  "@secretRecoveryModalShowKeysButton": {
+    "description": "Button text for exporting private keys in the SecretRecoveryModal component"
+  },
+  "backupConfirmationContentTitle": "Backup Confirmation",
+  "@backupConfirmationContentTitle": {
+    "description": "Title for the backup confirmation modal in the BackupConfirmationContent component"
+  },
+  "backupConfirmationContentWrittenDown": "I have written down all",
+  "@backupConfirmationContentWrittenDown": {
+    "description": "Confirmation item indicating the user has written down the backup in the BackupConfirmationContent component"
+  },
+  "backupConfirmationContentSafelyStored": "I have safely stored the backup",
+  "@backupConfirmationContentSafelyStored": {
+    "description": "Confirmation item indicating the user has safely stored the backup in the BackupConfirmationContent component"
+  },
+  "backupConfirmationContentWontLose": "I am sure I won't lose the backup",
+  "@backupConfirmationContentWontLose": {
+    "description": "Confirmation item indicating the user is confident they won't lose the backup in the BackupConfirmationContent component"
+  },
+  "backupConfirmationContentNotShare": "I understand not to share these words with anyone",
+  "@backupConfirmationContentNotShare": {
+    "description": "Confirmation item indicating the user understands not to share the backup words in the BackupConfirmationContent component"
   }
 }

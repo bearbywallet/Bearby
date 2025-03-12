@@ -1075,4 +1075,168 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get changePasswordModalButton => 'Change Password';
+
+  @override
+  String get confirmPasswordModalTitle => 'Confirm Password';
+
+  @override
+  String get confirmPasswordModalDescription => 'Enter your password to continue.';
+
+  @override
+  String get confirmPasswordModalHint => 'Password';
+
+  @override
+  String get confirmPasswordModalEmptyError => 'Password cannot be empty';
+
+  @override
+  String get confirmPasswordModalIncorrectError => 'Incorrect password';
+
+  @override
+  String get confirmPasswordModalGenericError => 'Error:';
+
+  @override
+  String get confirmPasswordModalButton => 'Confirm';
+
+  @override
+  String get qrScannerModalContentTitle => 'Scan';
+
+  @override
+  String get qrScannerModalContentCameraInitError => 'Camera initialization error:';
+
+  @override
+  String get qrScannerModalContentTorchError => 'Failed to toggle torch:';
+
+  @override
+  String get qrScannerModalContentOpenSettings => 'Open Settings';
+
+  @override
+  String get chainInfoModalContentNetworkInfoTitle => 'Network Information';
+
+  @override
+  String get chainInfoModalContentChainLabel => 'Chain';
+
+  @override
+  String get chainInfoModalContentShortNameLabel => 'Short Name';
+
+  @override
+  String get chainInfoModalContentChainIdLabel => 'Chain ID';
+
+  @override
+  String get chainInfoModalContentSlip44Label => 'Slip44';
+
+  @override
+  String get chainInfoModalContentChainIdsLabel => 'Chain IDs';
+
+  @override
+  String get chainInfoModalContentTestnetLabel => 'Testnet';
+
+  @override
+  String get chainInfoModalContentYes => 'Yes';
+
+  @override
+  String get chainInfoModalContentNo => 'No';
+
+  @override
+  String get chainInfoModalContentDiffBlockTimeLabel => 'Diff Block Time';
+
+  @override
+  String get chainInfoModalContentFallbackEnabledLabel => 'Fallback Enabled';
+
+  @override
+  String get chainInfoModalContentDecimalsLabel => 'Decimals';
+
+  @override
+  String get chainInfoModalContentRpcNodesTitle => 'RPC Nodes';
+
+  @override
+  String get chainInfoModalContentExplorersTitle => 'Explorers';
+
+  @override
+  String get switchChainNetworkContentTitle => 'Select Network';
+
+  @override
+  String get switchChainNetworkContentButton => 'Switch Network';
+
+  @override
+  String get switchChainNetworkContentTestnetLabel => 'Testnet';
+
+  @override
+  String get switchChainNetworkContentIdLabel => 'ID:';
+
+  @override
+  String get watchAssetModalContentTitle => 'Add suggested token';
+
+  @override
+  String get watchAssetModalContentDescription => 'Review and add the following token suggested by the app.';
+
+  @override
+  String get watchAssetModalContentTokenLabel => 'Token';
+
+  @override
+  String get watchAssetModalContentBalanceLabel => 'Balance';
+
+  @override
+  String get watchAssetModalContentLoadingButton => 'Balance...';
+
+  @override
+  String get watchAssetModalContentAddButton => 'Add';
+
+  @override
+  String get connectedDappsModalSearchHint => 'Search DApps';
+
+  @override
+  String get connectedDappsModalNoDapps => 'No connected DApps';
+
+  @override
+  String dappListItemConnected(Object time) {
+    return 'Connected $time';
+  }
+
+  @override
+  String get dappListItemJustNow => 'just now';
+
+  @override
+  String get ledgerConnectDialogWalletNameHint => 'Wallet Name';
+
+  @override
+  String get ledgerConnectDialogEmptyWalletName => 'Wallet name cannot be empty';
+
+  @override
+  String get ledgerConnectDialogWalletNameTooLong => 'Wallet name is too long';
+
+  @override
+  String get ledgerConnectDialogConnectButton => 'Connect';
+
+  @override
+  String get secretRecoveryModalRevealPhraseTitle => 'Reveal Secret Recovery Phrase';
+
+  @override
+  String get secretRecoveryModalRevealPhraseDescription => 'If you ever change browsers or move computers, you will need this Secret Recovery Phrase to access your accounts. Save them somewhere safe and secret.';
+
+  @override
+  String get secretRecoveryModalRevealPhraseButton => 'Reveal';
+
+  @override
+  String get secretRecoveryModalShowKeysTitle => 'Show Private Keys';
+
+  @override
+  String get secretRecoveryModalShowKeysDescription => 'Warning: Never disclose this key. Anyone with your private keys can steal any assets held in your account.';
+
+  @override
+  String get secretRecoveryModalShowKeysButton => 'Export';
+
+  @override
+  String get backupConfirmationContentTitle => 'Backup Confirmation';
+
+  @override
+  String get backupConfirmationContentWrittenDown => 'I have written down all';
+
+  @override
+  String get backupConfirmationContentSafelyStored => 'I have safely stored the backup';
+
+  @override
+  String get backupConfirmationContentWontLose => 'I am sure I won\'t lose the backup';
+
+  @override
+  String get backupConfirmationContentNotShare => 'I understand not to share these words with anyone';
 }

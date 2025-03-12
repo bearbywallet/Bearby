@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showConnectedDappsModal({
   required BuildContext context,
@@ -95,7 +96,7 @@ class _ConnectedDappsModalContentState
             padding: EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
-              hint: 'Search DApps',
+              hint: AppLocalizations.of(context)!.connectedDappsModalSearchHint,
               onChanged: (value) => setState(() => _searchQuery = value),
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,
@@ -113,7 +114,7 @@ class _ConnectedDappsModalContentState
             child: filteredDapps.isEmpty
                 ? Center(
                     child: Text(
-                      'No connected DApps',
+                      AppLocalizations.of(context)!.connectedDappsModalNoDapps,
                       style: TextStyle(
                         color: theme.textSecondary,
                         fontSize: 16,
@@ -247,7 +248,8 @@ class _DappListItem extends StatelessWidget {
                 ),
                 SizedBox(height: 2),
                 Text(
-                  'Connected ${_formatLastConnected(lastConnected)}',
+                  AppLocalizations.of(context)!.dappListItemConnected(
+                      _formatLastConnected(context, lastConnected)),
                   style: TextStyle(
                     color: appTheme.textSecondary,
                     fontSize: 12,
@@ -271,7 +273,7 @@ class _DappListItem extends StatelessWidget {
     );
   }
 
-  String _formatLastConnected(DateTime date) {
+  String _formatLastConnected(BuildContext context, DateTime date) {
     final now = DateTime.now();
     final difference = now.difference(date);
 
@@ -282,7 +284,7 @@ class _DappListItem extends StatelessWidget {
     } else if (difference.inMinutes > 0) {
       return '${difference.inMinutes}m ago';
     } else {
-      return 'just now';
+      return AppLocalizations.of(context)!.dappListItemJustNow;
     }
   }
 }
