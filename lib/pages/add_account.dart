@@ -9,6 +9,7 @@ import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -34,6 +35,7 @@ class _AddAccountState extends State<AddAccount> {
   int _bip39Index = 0;
   bool _obscurePassword = true;
   bool _useBiometrics = false;
+  bool _initialized = false;
 
   late AuthGuard _authGuard;
 
@@ -43,8 +45,18 @@ class _AddAccountState extends State<AddAccount> {
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     AppState appState = Provider.of<AppState>(context, listen: false);
     _bip39Index = appState.wallet!.accounts.length;
-    _setAutoAccountName(appState);
     _checkBiometricAvailability(appState);
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    if (!_initialized) {
+      AppState appState = Provider.of<AppState>(context, listen: false);
+      _setAutoAccountName(appState);
+      _initialized = true;
+    }
   }
 
   void _checkBiometricAvailability(AppState appState) {
@@ -67,8 +79,10 @@ class _AddAccountState extends State<AddAccount> {
   }
 
   void _setAutoAccountName(AppState appState) {
-    _accountNameController.text =
-        AppLocalizations.of(context)!.addAccountPageDefaultName(_bip39Index);
+    _accountNameController.text = AppLocalizations.of(
+      context,
+    )!
+        .addAccountPageDefaultName(_bip39Index);
   }
 
   bool _exists(AppState appState) {
@@ -100,6 +114,8 @@ class _AddAccountState extends State<AddAccount> {
 
   Future<void> _createAccount(AppState appState) async {
     final l10n = AppLocalizations.of(context)!;
+    BigInt walletIndex = BigInt.from(appState.selectedWallet);
+
     if (_exists(appState)) {
       setState(() {
         _errorMessage = l10n.addAccountPageIndexExists(_bip39Index);
@@ -152,7 +168,7 @@ class _AddAccountState extends State<AddAccount> {
 
       if (appState.wallet!.walletType.contains(WalletType.SecretPhrase.name)) {
         AddNextBip39AccountParams params = AddNextBip39AccountParams(
-          walletIndex: BigInt.from(appState.selectedWallet),
+          walletIndex: walletIndex,
           accountIndex: BigInt.from(_bip39Index),
           name: _accountNameController.text,
           passphrase: "",
@@ -170,12 +186,15 @@ class _AddAccountState extends State<AddAccount> {
       }
 
       if (!_zilliqaLegacy && _isZIL(appState)) {
-        BigInt walletIndex = BigInt.from(appState.selectedWallet);
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: BigInt.from(_bip39Index),
         );
       }
+
+      try {
+        await syncBalances(walletIndex: walletIndex);
+      } catch (_) {}
 
       await appState.syncData();
 

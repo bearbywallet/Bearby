@@ -1320,4 +1320,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get amountSection_rejected => 'Отклонено';
+
+  @override
+  String get appConnectModalContent_swipeToConnect => 'Проведите для подключения';
+
+  @override
+  String get appConnectModalContent_noAccounts => 'Нет доступных аккаунтов';
 }

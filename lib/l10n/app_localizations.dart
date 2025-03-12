@@ -2682,6 +2682,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rejected'**
   String get amountSection_rejected;
+
+  /// Text for the swipe button in _AppConnectModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Swipe to Connect'**
+  String get appConnectModalContent_swipeToConnect;
+
+  /// Text shown when no accounts are available in _AppConnectModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts available'**
+  String get appConnectModalContent_noAccounts;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

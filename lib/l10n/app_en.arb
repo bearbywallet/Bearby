@@ -1859,5 +1859,13 @@
   "amountSection_rejected": "Rejected",
   "@amountSection_rejected": {
     "description": "Status text for rejected transaction in _AmountSection"
+  },
+  "appConnectModalContent_swipeToConnect": "Swipe to Connect",
+  "@appConnectModalContent_swipeToConnect": {
+    "description": "Text for the swipe button in _AppConnectModalContent"
+  },
+  "appConnectModalContent_noAccounts": "No accounts available",
+  "@appConnectModalContent_noAccounts": {
+    "description": "Text shown when no accounts are available in _AppConnectModalContent"
   }
 }

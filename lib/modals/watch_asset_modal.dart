@@ -6,6 +6,7 @@ import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showWatchAssetModal({
   required BuildContext context,
@@ -153,6 +154,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
       rate: _ftoken?.rate ?? 0,
       appState: appState,
     );
+    final l10n = AppLocalizations.of(context)!;
 
     return SingleChildScrollView(
       child: Container(
@@ -186,7 +188,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
                   Text(
-                    'Add suggested token',
+                    l10n.watchAssetModalContentTitle,
                     style: TextStyle(
                       color: textColor,
                       fontSize: 20,
@@ -195,7 +197,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Review and add the following token suggested by the app.',
+                    l10n.watchAssetModalContentDescription,
                     style: TextStyle(color: secondaryColor, fontSize: 14),
                     textAlign: TextAlign.center,
                   ),
@@ -281,11 +283,11 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        'Token',
+                        l10n.watchAssetModalContentTokenLabel,
                         style: TextStyle(color: secondaryColor, fontSize: 14),
                       ),
                       Text(
-                        'Balance',
+                        l10n.watchAssetModalContentBalanceLabel,
                         style: TextStyle(color: secondaryColor, fontSize: 14),
                       ),
                     ],
@@ -418,7 +420,9 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
               child: Column(
                 children: [
                   SwipeButton(
-                    text: _isLoadingBalance ? 'Balance...' : 'Add',
+                    text: _isLoadingBalance
+                        ? l10n.watchAssetModalContentLoadingButton
+                        : l10n.watchAssetModalContentAddButton,
                     disabled: _isLoadingBalance || _errorMessage != null,
                     backgroundColor: primaryColor,
                     textColor: textColor,

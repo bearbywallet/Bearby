@@ -1320,4 +1320,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get amountSection_rejected => 'Rejected';
+
+  @override
+  String get appConnectModalContent_swipeToConnect => 'Swipe to Connect';
+
+  @override
+  String get appConnectModalContent_noAccounts => 'No accounts available';
 }

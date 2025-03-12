@@ -492,5 +492,7 @@
   "amountSection_transfer": "Перевод",
   "amountSection_pending": "В ожидании",
   "amountSection_confirmed": "Подтверждено",
-  "amountSection_rejected": "Отклонено"
+  "amountSection_rejected": "Отклонено",
+  "appConnectModalContent_swipeToConnect": "Проведите для подключения",
+  "appConnectModalContent_noAccounts": "Нет доступных аккаунтов"
 }

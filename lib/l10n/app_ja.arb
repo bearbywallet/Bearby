@@ -492,5 +492,7 @@
   "amountSection_transfer": "送金",
   "amountSection_pending": "保留中",
   "amountSection_confirmed": "確認済み",
-  "amountSection_rejected": "拒否済み"
+  "amountSection_rejected": "拒否済み",
+  "appConnectModalContent_swipeToConnect": "スワイプして接続",
+  "appConnectModalContent_noAccounts": "アカウントがありません"
 }

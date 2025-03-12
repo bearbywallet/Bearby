@@ -8,6 +8,7 @@ import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/enable_card.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showAppConnectModal({
   required BuildContext context,
@@ -95,6 +96,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
     final textColor = _parseColor(widget.colors?.text) ?? theme.buttonText;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       decoration: BoxDecoration(
@@ -162,7 +164,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
           Padding(
             padding: EdgeInsets.all(16),
             child: SwipeButton(
-              text: 'Swipe to Connect',
+              text: l10n.appConnectModalContent_swipeToConnect,
               disabled: !_selectedAccounts.values.any((selected) => selected),
               backgroundColor: primaryColor,
               textColor: textColor,
@@ -185,12 +187,13 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
   Widget _buildAccountList(AppState appState, AppTheme theme) {
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
+    final l10n = AppLocalizations.of(context)!;
 
     if (appState.wallet == null || appState.wallet!.accounts.isEmpty) {
       return Padding(
         padding: EdgeInsets.all(16),
         child: Text(
-          'No accounts available',
+          l10n.appConnectModalContent_noAccounts,
           style: TextStyle(color: secondaryColor, fontSize: 14),
         ),
       );

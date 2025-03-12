@@ -47,6 +47,19 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     WidgetsBinding.instance.removeObserver(this);
     _legacyHandler = null;
     _eip1193Handler = null;
+
+    if (_legacyHandler != null) {
+      _legacyHandler!.dispose();
+    }
+
+    // if (_eip1193Handler != null) {
+    //   _eip1193Handler!.dispose();
+    // }
+
+    if (_webViewController != null) {
+      _webViewController!.dispose();
+    }
+
     super.dispose();
   }
 
@@ -65,6 +78,8 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     _webViewController?.addJavaScriptHandler(
       handlerName: 'ZilPayLegacy',
       callback: (args) {
+        if (!mounted) return;
+
         try {
           final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
@@ -83,6 +98,8 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     _webViewController?.addJavaScriptHandler(
       handlerName: 'EIP1193Channel',
       callback: (args) {
+        if (!mounted) return;
+
         try {
           final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);

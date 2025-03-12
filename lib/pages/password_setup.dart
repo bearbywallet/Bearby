@@ -213,6 +213,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     }
 
     try {
+      final l10n = AppLocalizations.of(context)!;
       final BigInt? chainHash;
       List<NetworkConfigInfo> chains = await getProviders();
       final matches = chains
@@ -270,7 +271,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         Bip39AddWalletParams params = Bip39AddWalletParams(
           password: _passwordController.text,
           mnemonicStr: _bip39List!.join(' '),
-          accounts: [(BigInt.zero, "Account 0")],
+          accounts: [(BigInt.zero, l10n.addAccountPageDefaultName(0))],
           passphrase: "",
           walletName: _walletNameController.text,
           biometricType: biometricType.name,

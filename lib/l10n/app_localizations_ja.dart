@@ -1320,4 +1320,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get amountSection_rejected => '拒否済み';
+
+  @override
+  String get appConnectModalContent_swipeToConnect => 'スワイプして接続';
+
+  @override
+  String get appConnectModalContent_noAccounts => 'アカウントがありません';
 }

@@ -3,9 +3,9 @@ import 'package:zilpay/src/rust/models/provider.dart';
 
 String selectVariant(String? theme, List<String> options) {
   if (options.isEmpty) return '';
-  if (theme == 'light') return options[0];
-  if (theme == 'dark' && options.length >= 2) return options[1];
-  return options[0];
+  if (theme == 'Light') return options[1];
+  if (theme == 'Dark' && options.length >= 2) return options[0];
+  return options[1];
 }
 
 String preprocessUrl(String template, String? theme) {
