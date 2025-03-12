@@ -8,6 +8,7 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class Account {
   final String name;
@@ -94,7 +95,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
 
   void _handleRestore() async {
     if (_passwordController.text.isEmpty) {
-      setState(() => _errorMessage = 'Enter password');
+      setState(() => _errorMessage =
+          AppLocalizations.of(context)!.restoreRKStorageEnterPassword);
       return;
     }
     setState(() {
@@ -113,7 +115,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
         });
       }
     } catch (e) {
-      setState(() => _errorMessage = 'Error: ${e.toString()}');
+      setState(() => _errorMessage =
+          '${AppLocalizations.of(context)!.restoreRKStorageErrorPrefix} ${e.toString()}');
     } finally {
       setState(() => _isLoading = false);
     }
@@ -122,6 +125,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
@@ -132,7 +136,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
               slivers: [
                 SliverToBoxAdapter(
                   child: CustomAppBar(
-                    title: 'Migrate ZilPay 1.0 to 2.0',
+                    title: l10n.restoreRKStorageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -143,8 +147,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         if (accounts.isNotEmpty) ...[
-                          Text(
-                              'Accounts to migrate to ZilPay 2.0. Enter password.',
+                          Text(l10n.restoreRKStorageAccountsPrompt,
                               style: TextStyle(
                                   color: theme.textSecondary, fontSize: 14)),
                           const SizedBox(height: 16),
@@ -169,7 +172,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                         ],
                         SmartInput(
                           controller: _passwordController,
-                          hint: 'Password',
+                          hint: l10n.restoreRKStoragePasswordHint,
                           obscureText: _obscurePassword,
                           rightIconPath: _obscurePassword
                               ? 'assets/icons/close_eye.svg'
@@ -194,7 +197,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                           child: CustomButton(
                             textColor: theme.buttonText,
                             backgroundColor: theme.primaryPurple,
-                            text: 'Restore',
+                            text: l10n.restoreRKStorageRestoreButton,
                             disabled: _isLoading,
                             onPressed: _handleRestore,
                             borderRadius: 30.0,
@@ -208,7 +211,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
                             child: TextButton(
                               onPressed: () => Navigator.of(context)
                                   .pushNamed('/new_wallet_options'),
-                              child: Text('Skip',
+                              child: Text(l10n.restoreRKStorageSkipButton,
                                   style: TextStyle(
                                       color: theme.textSecondary,
                                       fontSize: 14)),
@@ -236,6 +239,7 @@ class AccountItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 8.0),
       child: Row(
@@ -268,7 +272,8 @@ class AccountItem extends StatelessWidget {
                 Text(account.address,
                     style: TextStyle(color: theme.textSecondary, fontSize: 14),
                     overflow: TextOverflow.ellipsis),
-                Text('Balance: ${account.balance ?? '0'} ZIL',
+                Text(
+                    '${l10n.accountItemBalanceLabel} ${account.balance ?? '0'} ZIL',
                     style: TextStyle(color: theme.textSecondary, fontSize: 14)),
               ],
             ),

@@ -18,6 +18,7 @@ import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class WalletPreferenceItem {
   final String title;
@@ -136,7 +137,7 @@ class _WalletPageState extends State<WalletPage> {
             try {
               final authenticated = await _authService.authenticate(
                 allowPinCode: true,
-                reason: 'Enable biometric authentication',
+                reason: AppLocalizations.of(context)!.walletPageBiometricReason,
               );
 
               if (!authenticated) {
@@ -210,11 +211,12 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   List<WalletPreferenceItem> _getPreferenceItems(AppState appState) {
+    final l10n = AppLocalizations.of(context)!;
     final List<WalletPreferenceItem> items = [];
 
     items.add(
       WalletPreferenceItem(
-        title: 'Manage connections',
+        title: l10n.walletPageManageConnections,
         iconPath: 'assets/icons/globe.svg',
         onTap: () {
           if (appState.connections.isNotEmpty) {
@@ -230,7 +232,7 @@ class _WalletPageState extends State<WalletPage> {
     if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
       items.add(
         WalletPreferenceItem(
-          title: 'Backup',
+          title: l10n.walletPageBackup,
           iconPath: 'assets/icons/key.svg',
           onTap: () {
             if (!appState.wallet!.walletType.contains(WalletType.ledger.name)) {
@@ -249,6 +251,7 @@ class _WalletPageState extends State<WalletPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -260,7 +263,7 @@ class _WalletPageState extends State<WalletPage> {
               slivers: [
                 SliverToBoxAdapter(
                   child: CustomAppBar(
-                    title: '',
+                    title: l10n.walletPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -331,7 +334,7 @@ class _WalletPageState extends State<WalletPage> {
   Widget _buildWalletNameInput(AppTheme theme, AppState state) {
     return SmartInput(
       controller: _walletNameController,
-      hint: 'Wallet name',
+      hint: AppLocalizations.of(context)!.walletPageWalletNameHint,
       onSubmitted: (_) async {
         if (_walletNameController.text.isNotEmpty) {
           await changeWalletName(
@@ -358,7 +361,7 @@ class _WalletPageState extends State<WalletPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Wallet preferences',
+            AppLocalizations.of(context)!.walletPagePreferencesTitle,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: _fontSize,
@@ -451,7 +454,8 @@ class _WalletPageState extends State<WalletPage> {
                 onChanged: item.switchEnabled ? item.onChanged : null,
                 activeColor: theme.primaryPurple,
               )
-            else if (item.title == 'Manage connections')
+            else if (item.title ==
+                AppLocalizations.of(context)!.walletPageManageConnections)
               Text(
                 '${appState.connections.length}',
                 style: TextStyle(
@@ -480,10 +484,10 @@ class _WalletPageState extends State<WalletPage> {
         child: Row(
           children: [
             const SizedBox(width: 16),
-            const Expanded(
+            Expanded(
               child: Text(
-                'Delete Wallet',
-                style: TextStyle(
+                AppLocalizations.of(context)!.walletPageDeleteWallet,
+                style: const TextStyle(
                   color: Colors.red,
                   fontSize: _fontSize,
                 ),

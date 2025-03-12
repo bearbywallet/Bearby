@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class Language {
   final String code;
@@ -21,16 +22,7 @@ class LanguagePage extends StatefulWidget {
 }
 
 class _LanguagePageState extends State<LanguagePage> {
-  final List<Language> languages = [
-    Language('system', 'System', 'English'),
-    Language('ru', 'Russian', 'Русский'),
-    Language('en', 'English', 'English'),
-    Language('tr', 'Turkish', 'Türkçe'),
-    Language('zh', 'Chinese', '简体中文'),
-    Language('uz', 'Uzbek', 'O\'zbekcha'),
-    Language('id', 'Indonesian', 'Bahasa Indonesia'),
-    Language('uk', 'Ukrainian', 'Українська'),
-  ];
+  final List<Language> languages = [];
 
   String selectedLanguage = 'system';
   bool vibrateEnabled = true;
@@ -38,6 +30,22 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    languages.clear();
+    languages.addAll([
+      Language(
+          'system', l10n.languagePageSystem, l10n.languagePageEnglishLocal),
+      Language('ru', l10n.languagePageRussian, l10n.languagePageRussianLocal),
+      Language('en', l10n.languagePageEnglish, l10n.languagePageEnglishLocal),
+      Language('tr', l10n.languagePageTurkish, l10n.languagePageTurkishLocal),
+      Language('zh', l10n.languagePageChinese, l10n.languagePageChineseLocal),
+      Language('uz', l10n.languagePageUzbek, l10n.languagePageUzbekLocal),
+      Language(
+          'id', l10n.languagePageIndonesian, l10n.languagePageIndonesianLocal),
+      Language(
+          'uk', l10n.languagePageUkrainian, l10n.languagePageUkrainianLocal),
+    ]);
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -50,7 +58,7 @@ class _LanguagePageState extends State<LanguagePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: CustomAppBar(
-                    title: 'Language',
+                    title: l10n.languagePageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),

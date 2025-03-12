@@ -14,6 +14,7 @@ import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SendTokenPage extends StatefulWidget {
   const SendTokenPage({super.key});
@@ -72,6 +73,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -84,7 +86,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: '',
+                    title: l10n.sendTokenPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -137,7 +139,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
                             CustomButton(
                               textColor: theme.buttonText,
                               backgroundColor: theme.primaryPurple,
-                              text: "Submit",
+                              text: l10n.sendTokenPageSubmitButton,
                               onPressed: () => handleSubmit(appState),
                               disabled: !_isFormValid,
                             ),

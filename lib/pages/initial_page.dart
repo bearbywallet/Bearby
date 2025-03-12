@@ -68,7 +68,7 @@ class _InitialPageState extends State<InitialPage> {
       return CustomButton(
         textColor: theme.buttonText,
         backgroundColor: theme.primaryPurple,
-        text: AppLocalizations.of(context)!.restoreZilPay,
+        text: AppLocalizations.of(context)!.initialPagerestoreZilPay,
         onPressed: () {
           Navigator.of(context).pushNamed(
             '/rk_restore',
@@ -83,7 +83,7 @@ class _InitialPageState extends State<InitialPage> {
       return CustomButton(
         textColor: theme.buttonText,
         backgroundColor: theme.primaryPurple,
-        text: AppLocalizations.of(context)?.getStarted ?? "",
+        text: AppLocalizations.of(context)?.initialPagegetStarted ?? "",
         onPressed: () {
           Navigator.of(context).pushNamed('/new_wallet_options');
         },

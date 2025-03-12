@@ -7,6 +7,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import '../state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -41,6 +42,7 @@ class _AboutPageState extends State<AboutPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -53,7 +55,7 @@ class _AboutPageState extends State<AboutPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'About',
+                    title: l10n.aboutPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -64,13 +66,13 @@ class _AboutPageState extends State<AboutPage> {
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          _buildLogoSection(theme),
+                          _buildLogoSection(theme, l10n),
                           const SizedBox(height: 32),
-                          _buildAppInfoSection(theme),
+                          _buildAppInfoSection(theme, l10n),
                           const SizedBox(height: 24),
-                          _buildDeveloperSection(theme),
+                          _buildDeveloperSection(theme, l10n),
                           const SizedBox(height: 24),
-                          _buildLegalSection(theme),
+                          _buildLegalSection(theme, l10n),
                         ],
                       ),
                     ),
@@ -84,7 +86,7 @@ class _AboutPageState extends State<AboutPage> {
     );
   }
 
-  Widget _buildLogoSection(AppTheme theme) {
+  Widget _buildLogoSection(AppTheme theme, AppLocalizations l10n) {
     return Column(
       children: [
         Container(
@@ -104,7 +106,7 @@ class _AboutPageState extends State<AboutPage> {
         ),
         const SizedBox(height: 16),
         Text(
-          'ZilPay',
+          l10n.aboutPageAppName,
           style: TextStyle(
             color: theme.textPrimary,
             fontSize: 28,
@@ -113,7 +115,7 @@ class _AboutPageState extends State<AboutPage> {
         ),
         const SizedBox(height: 8),
         Text(
-          'Your Secure Blockchain Wallet',
+          l10n.aboutPageAppDescription,
           style: TextStyle(
             color: theme.textSecondary,
             fontSize: 16,
@@ -124,64 +126,67 @@ class _AboutPageState extends State<AboutPage> {
     );
   }
 
-  Widget _buildAppInfoSection(AppTheme theme) {
+  Widget _buildAppInfoSection(AppTheme theme, AppLocalizations l10n) {
     return _buildSectionContainer(
       theme,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(theme, 'Application Info'),
+          _buildSectionTitle(theme, l10n.aboutPageAppInfoTitle),
           const SizedBox(height: 16),
-          _buildInfoRow(theme, 'Version',
+          _buildInfoRow(theme, l10n.aboutPageVersionLabel,
               '${_packageInfo.version} (${_packageInfo.buildNumber})'),
-          _buildInfoRow(theme, 'Build Date', 'March 10, 2025'),
-          _buildInfoRow(theme, 'Platform',
+          _buildInfoRow(theme, l10n.aboutPageBuildDateLabel,
+              l10n.aboutPageBuildDateValue),
+          _buildInfoRow(theme, l10n.aboutPagePlatformLabel,
               Theme.of(context).platform.toString().split('.').last),
         ],
       ),
     );
   }
 
-  Widget _buildDeveloperSection(AppTheme theme) {
+  Widget _buildDeveloperSection(AppTheme theme, AppLocalizations l10n) {
     return _buildSectionContainer(
       theme,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(theme, 'Developer'),
+          _buildSectionTitle(theme, l10n.aboutPageDeveloperTitle),
           const SizedBox(height: 16),
-          _buildInfoRow(theme, 'Author', 'Rinat (hicaru)'),
-          _buildInfoRow(theme, 'Website', 'https://zilpay.io'),
+          _buildInfoRow(
+              theme, l10n.aboutPageAuthorLabel, l10n.aboutPageAuthorValue),
+          _buildInfoRow(
+              theme, l10n.aboutPageWebsiteLabel, l10n.aboutPageWebsiteValue),
         ],
       ),
     );
   }
 
-  Widget _buildLegalSection(AppTheme theme) {
+  Widget _buildLegalSection(AppTheme theme, AppLocalizations l10n) {
     return _buildSectionContainer(
       theme,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildSectionTitle(theme, 'Legal'),
+          _buildSectionTitle(theme, l10n.aboutPageLegalTitle),
           const SizedBox(height: 16),
           _buildActionRow(
             theme,
-            'Privacy Policy',
+            l10n.aboutPagePrivacyPolicy,
             'assets/icons/shield.svg',
             false,
             () => _launchUrl('https://zilpay.io/policy'),
           ),
           _buildActionRow(
             theme,
-            'Terms of Service',
+            l10n.aboutPageTermsOfService,
             'assets/icons/document.svg',
             false,
             () => _launchUrl('https://zilpay.io/terms'),
           ),
           _buildActionRow(
             theme,
-            'Licenses',
+            l10n.aboutPageLicenses,
             'assets/icons/licenses.svg',
             true,
             () => showLicensePage(
@@ -190,7 +195,7 @@ class _AboutPageState extends State<AboutPage> {
               applicationVersion: _packageInfo.version,
               applicationIcon: SvgPicture.asset('assets/imgs/zilpay.svg',
                   width: 48, height: 48),
-              applicationLegalese: "© 2025 ZilPay. All rights reserved.",
+              applicationLegalese: l10n.aboutPageLegalese,
             ),
           ),
         ],

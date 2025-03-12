@@ -12,6 +12,7 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});
@@ -126,7 +127,8 @@ class _NetworkPageState extends State<NetworkPage> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = 'Failed to load network chains: $e';
+        errorMessage =
+            AppLocalizations.of(context)!.networkPageLoadError + '$e';
       });
     }
   }
@@ -175,7 +177,7 @@ class _NetworkPageState extends State<NetworkPage> {
       await _loadNetworks();
     } catch (e) {
       setState(() {
-        errorMessage = 'Failed to add network: $e';
+        errorMessage = AppLocalizations.of(context)!.networkPageAddError + '$e';
       });
     }
   }
@@ -240,6 +242,7 @@ class _NetworkPageState extends State<NetworkPage> {
     final filteredPotentialNetworks = _getFilteredNetworks(potentialNetworks)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
         .toList();
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -254,11 +257,11 @@ class _NetworkPageState extends State<NetworkPage> {
                   horizontal: adaptivePadding,
                 ),
                 child: CustomAppBar(
-                  title: '',
+                  title: l10n.networkPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                   actionWidget: Row(
                     children: [
-                      Text('Show Testnet',
+                      Text(l10n.networkPageShowTestnet,
                           style: TextStyle(
                               color: theme.textSecondary, fontSize: 14)),
                       const SizedBox(width: 8),
@@ -277,7 +280,7 @@ class _NetworkPageState extends State<NetworkPage> {
                 padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                 child: SmartInput(
                   controller: _searchController,
-                  hint: 'Search',
+                  hint: l10n.networkPageSearchHint,
                   leftIconPath: 'assets/icons/search.svg',
                   onChanged: (value) => setState(() => _searchQuery = value),
                   borderColor: theme.textPrimary,
@@ -302,13 +305,13 @@ class _NetworkPageState extends State<NetworkPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        _buildNetworkSection('Added Networks',
+                        _buildNetworkSection(l10n.networkPageAddedNetworks,
                             filteredAddedNetworks, theme, chain, wallet, false),
                         if (filteredAddedNetworks.isNotEmpty &&
                             filteredPotentialNetworks.isNotEmpty)
                           const SizedBox(height: 24),
                         _buildNetworkSection(
-                            'Available Networks',
+                            l10n.networkPageAvailableNetworks,
                             filteredPotentialNetworks,
                             theme,
                             chain,

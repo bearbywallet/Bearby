@@ -3,12 +3,325 @@
   "@appTitle": {
     "description": "The title of the application"
   },
-  "restoreZilPay": "Restore ZilPay 1.0!",
-  "@restoreZilPay": {
+
+  "initialPagerestoreZilPay": "Restore ZilPay 1.0!",
+  "@initialPagerestoreZilPay": {
     "description": "Button text to restore from ZilPay 1.0"
   },
-  "getStarted": "Get Started",
-  "@getStarted": {
+  "initialPagegetStarted": "Get Started",
+  "@initialPagegetStarted": {
     "description": "Button text to begin using the app"
+  },
+
+  "restoreRKStorageTitle": "Migrate ZilPay 1.0 to 2.0",
+  "@restoreRKStorageTitle": {
+    "description": "Title for the RestoreRKStorage page showing wallet migration"
+  },
+  
+  "restoreRKStorageAccountsPrompt": "Accounts to migrate to ZilPay 2.0. Enter password.",
+  "@restoreRKStorageAccountsPrompt": {
+    "description": "Prompt text instructing user to enter password for account migration on RestoreRKStorage page"
+  },
+  
+  "restoreRKStoragePasswordHint": "Password",
+  "@restoreRKStoragePasswordHint": {
+    "description": "Hint text for password input field on RestoreRKStorage page"
+  },
+  
+  "restoreRKStorageEnterPassword": "Enter password",
+  "@restoreRKStorageEnterPassword": {
+    "description": "Error message when password field is empty on RestoreRKStorage page"
+  },
+  
+  "restoreRKStorageErrorPrefix": "Error:",
+  "@restoreRKStorageErrorPrefix": {
+    "description": "Prefix for error messages on RestoreRKStorage page"
+  },
+  
+  "restoreRKStorageRestoreButton": "Restore",
+  "@restoreRKStorageRestoreButton": {
+    "description": "Text for restore button on RestoreRKStorage page"
+  },
+  
+  "restoreRKStorageSkipButton": "Skip",
+  "@restoreRKStorageSkipButton": {
+    "description": "Text for skip button on RestoreRKStorage page"
+  },
+  
+  "accountItemBalanceLabel": "Balance:",
+  "@accountItemBalanceLabel": {
+    "description": "Label for balance display in AccountItem widget"
+  },
+
+  "sendTokenPageTitle": "",
+  "@sendTokenPageTitle": {
+    "description": "Title for the SendTokenPage (currently empty as per original code)"
+  },
+  
+  "sendTokenPageSubmitButton": "Submit",
+  "@sendTokenPageSubmitButton": {
+    "description": "Text for the submit button on SendTokenPage"
+  },
+
+  "aboutPageTitle": "About",
+  "@aboutPageTitle": {
+    "description": "Title for the AboutPage"
+  },
+  
+  "aboutPageAppName": "ZilPay",
+  "@aboutPageAppName": {
+    "description": "Application name displayed in logo section on AboutPage"
+  },
+  
+  "aboutPageAppDescription": "Your Secure Blockchain Wallet",
+  "@aboutPageAppDescription": {
+    "description": "Description text below app name on AboutPage"
+  },
+  
+  "aboutPageAppInfoTitle": "Application Info",
+  "@aboutPageAppInfoTitle": {
+    "description": "Title for application info section on AboutPage"
+  },
+  
+  "aboutPageVersionLabel": "Version",
+  "@aboutPageVersionLabel": {
+    "description": "Label for version info on AboutPage"
+  },
+  
+  "aboutPageBuildDateLabel": "Build Date",
+  "@aboutPageBuildDateLabel": {
+    "description": "Label for build date on AboutPage"
+  },
+  
+  "aboutPageBuildDateValue": "March 10, 2025",
+  "@aboutPageBuildDateValue": {
+    "description": "Value for build date on AboutPage"
+  },
+  
+  "aboutPagePlatformLabel": "Platform",
+  "@aboutPagePlatformLabel": {
+    "description": "Label for platform info on AboutPage"
+  },
+  
+  "aboutPageDeveloperTitle": "Developer",
+  "@aboutPageDeveloperTitle": {
+    "description": "Title for developer section on AboutPage"
+  },
+  
+  "aboutPageAuthorLabel": "Author",
+  "@aboutPageAuthorLabel": {
+    "description": "Label for author info on AboutPage"
+  },
+  
+  "aboutPageAuthorValue": "Rinat (hicaru)",
+  "@aboutPageAuthorValue": {
+    "description": "Value for author info on AboutPage"
+  },
+  
+  "aboutPageWebsiteLabel": "Website",
+  "@aboutPageWebsiteLabel": {
+    "description": "Label for website info on AboutPage"
+  },
+  
+  "aboutPageWebsiteValue": "https://zilpay.io",
+  "@aboutPageWebsiteValue": {
+    "description": "Value for website info on AboutPage"
+  },
+  
+  "aboutPageLegalTitle": "Legal",
+  "@aboutPageLegalTitle": {
+    "description": "Title for legal section on AboutPage"
+  },
+  
+  "aboutPagePrivacyPolicy": "Privacy Policy",
+  "@aboutPagePrivacyPolicy": {
+    "description": "Text for privacy policy link on AboutPage"
+  },
+  
+  "aboutPageTermsOfService": "Terms of Service",
+  "@aboutPageTermsOfService": {
+    "description": "Text for terms of service link on AboutPage"
+  },
+  
+  "aboutPageLicenses": "Licenses",
+  "@aboutPageLicenses": {
+    "description": "Text for licenses link on AboutPage"
+  },
+  
+  "aboutPageLegalese": "© 2025 ZilPay. All rights reserved.",
+  "@aboutPageLegalese": {
+    "description": "Legal text for license page from AboutPage"
+  },
+  "languagePageTitle": "Language",
+  "@languagePageTitle": {
+    "description": "Title for the LanguagePage"
+  },
+  
+  "languagePageSystem": "System",
+  "@languagePageSystem": {
+    "description": "System language option name on LanguagePage"
+  },
+  
+  "languagePageRussian": "Russian",
+  "@languagePageRussian": {
+    "description": "Russian language option name on LanguagePage"
+  },
+  
+  "languagePageEnglish": "English",
+  "@languagePageEnglish": {
+    "description": "English language option name on LanguagePage"
+  },
+  
+  "languagePageTurkish": "Turkish",
+  "@languagePageTurkish": {
+    "description": "Turkish language option name on LanguagePage"
+  },
+  
+  "languagePageChinese": "Chinese",
+  "@languagePageChinese": {
+    "description": "Chinese language option name on LanguagePage"
+  },
+  
+  "languagePageUzbek": "Uzbek",
+  "@languagePageUzbek": {
+    "description": "Uzbek language option name on LanguagePage"
+  },
+  
+  "languagePageIndonesian": "Indonesian",
+  "@languagePageIndonesian": {
+    "description": "Indonesian language option name on LanguagePage"
+  },
+  
+  "languagePageUkrainian": "Ukrainian",
+  "@languagePageUkrainian": {
+    "description": "Ukrainian language option name on LanguagePage"
+  },
+  
+  "languagePageEnglishLocal": "English",
+  "@languagePageEnglishLocal": {
+    "description": "Local name for English and System languages on LanguagePage"
+  },
+  
+  "languagePageRussianLocal": "Русский",
+  "@languagePageRussianLocal": {
+    "description": "Local name for Russian language on LanguagePage"
+  },
+  
+  "languagePageTurkishLocal": "Türkçe",
+  "@languagePageTurkishLocal": {
+    "description": "Local name for Turkish language on LanguagePage"
+  },
+  
+  "languagePageChineseLocal": "简体中文",
+  "@languagePageChineseLocal": {
+    "description": "Local name for Chinese language on LanguagePage"
+  },
+  
+  "languagePageUzbekLocal": "O'zbekcha",
+  "@languagePageUzbekLocal": {
+    "description": "Local name for Uzbek language on LanguagePage"
+  },
+  
+  "languagePageIndonesianLocal": "Bahasa Indonesia",
+  "@languagePageIndonesianLocal": {
+    "description": "Local name for Indonesian language on LanguagePage"
+  },
+  
+  "languagePageUkrainianLocal": "Українська",
+  "@languagePageUkrainianLocal": {
+    "description": "Local name for Ukrainian language on LanguagePage"
+  },
+  "secretKeyGeneratorPageTitle": "Secret Key",
+  "@secretKeyGeneratorPageTitle": {
+    "description": "Title for the SecretKeyGeneratorPage"
+  },
+  
+  "secretKeyGeneratorPagePrivateKey": "Private Key",
+  "@secretKeyGeneratorPagePrivateKey": {
+    "description": "Label for private key display on SecretKeyGeneratorPage"
+  },
+  
+  "secretKeyGeneratorPagePublicKey": "Public Key",
+  "@secretKeyGeneratorPagePublicKey": {
+    "description": "Label for public key display on SecretKeyGeneratorPage"
+  },
+  
+  "secretKeyGeneratorPageBackupCheckbox": "I have backup secret key",
+  "@secretKeyGeneratorPageBackupCheckbox": {
+    "description": "Text for backup confirmation checkbox on SecretKeyGeneratorPage"
+  },
+  
+  "secretKeyGeneratorPageNextButton": "Next",
+  "@secretKeyGeneratorPageNextButton": {
+    "description": "Text for next button on SecretKeyGeneratorPage"
+  },
+  "walletPageTitle": "",
+  "@walletPageTitle": {
+    "description": "Title for the WalletPage (empty as per original implementation)"
+  },
+  
+  "walletPageWalletNameHint": "Wallet name",
+  "@walletPageWalletNameHint": {
+    "description": "Hint text for wallet name input on WalletPage"
+  },
+  
+  "walletPagePreferencesTitle": "Wallet preferences",
+  "@walletPagePreferencesTitle": {
+    "description": "Title for preferences section on WalletPage"
+  },
+  
+  "walletPageManageConnections": "Manage connections",
+  "@walletPageManageConnections": {
+    "description": "Label for manage connections preference item on WalletPage"
+  },
+  
+  "walletPageBackup": "Backup",
+  "@walletPageBackup": {
+    "description": "Label for backup preference item on WalletPage"
+  },
+  
+  "walletPageDeleteWallet": "Delete Wallet",
+  "@walletPageDeleteWallet": {
+    "description": "Text for delete wallet button on WalletPage"
+  },
+  
+  "walletPageBiometricReason": "Enable biometric authentication",
+  "@walletPageBiometricReason": {
+    "description": "Reason text for biometric authentication prompt on WalletPage"
+  },
+
+  "networkPageTitle": "",
+  "@networkPageTitle": {
+    "description": "Title for the NetworkPage (empty as per original implementation)"
+  },
+  
+  "networkPageShowTestnet": "Show Testnet",
+  "@networkPageShowTestnet": {
+    "description": "Label for testnet toggle switch on NetworkPage"
+  },
+  
+  "networkPageSearchHint": "Search",
+  "@networkPageSearchHint": {
+    "description": "Hint text for search input on NetworkPage"
+  },
+  
+  "networkPageAddedNetworks": "Added Networks",
+  "@networkPageAddedNetworks": {
+    "description": "Section title for added networks on NetworkPage"
+  },
+  
+  "networkPageAvailableNetworks": "Available Networks",
+  "@networkPageAvailableNetworks": {
+    "description": "Section title for available networks on NetworkPage"
+  },
+  
+  "networkPageLoadError": "Failed to load network chains: ",
+  "@networkPageLoadError": {
+    "description": "Error message prefix when loading networks fails on NetworkPage"
+  },
+  
+  "networkPageAddError": "Failed to add network: ",
+  "@networkPageAddError": {
+    "description": "Error message prefix when adding a network fails on NetworkPage"
   }
 }

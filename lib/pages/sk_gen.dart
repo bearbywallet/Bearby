@@ -11,6 +11,7 @@ import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SecretKeyGeneratorPage extends StatefulWidget {
   const SecretKeyGeneratorPage({super.key});
@@ -42,13 +43,14 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Secret Key',
+              title: l10n.secretKeyGeneratorPageTitle,
               onBackPressed: () => Navigator.pop(context),
               actionIcon: SvgPicture.asset(
                 'assets/icons/reload.svg',
@@ -73,12 +75,12 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                           children: [
                             HexKeyDisplay(
                               hexKey: _keyPair.sk,
-                              title: "Private Key",
+                              title: l10n.secretKeyGeneratorPagePrivateKey,
                             ),
                             const SizedBox(height: 16),
                             HexKeyDisplay(
                               hexKey: _keyPair.pk,
-                              title: "Public Key",
+                              title: l10n.secretKeyGeneratorPagePublicKey,
                             ),
                           ],
                         ),
@@ -120,7 +122,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                                   ),
                                   child: CheckboxListTile(
                                     title: Text(
-                                      'I have backup secret key',
+                                      l10n.secretKeyGeneratorPageBackupCheckbox,
                                       style:
                                           TextStyle(color: theme.textSecondary),
                                     ),
@@ -145,7 +147,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                                 CustomButton(
                                   textColor: theme.buttonText,
                                   backgroundColor: theme.primaryPurple,
-                                  text: 'Next',
+                                  text: l10n.secretKeyGeneratorPageNextButton,
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                       '/net_setup',
