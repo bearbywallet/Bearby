@@ -4,6 +4,7 @@ import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/config/search_engines.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/list_selector.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
@@ -86,7 +87,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   void _showSearchEngineModal(AppState appState) {
     showListSelectorModal(
       context: context,
-      title: 'Search Engine',
+      title: AppLocalizations.of(context)!.browserSettingsSearchEngineTitle,
       items: searchEngines,
       selectedIndex: appState.state.browserSettings.searchEngineIndex,
       onItemSelected: (index) async {
@@ -106,7 +107,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   void _showContentBlockingModal(AppState appState) {
     showListSelectorModal(
       context: context,
-      title: 'Content Blocking',
+      title: AppLocalizations.of(context)!.browserSettingsContentBlockingTitle,
       items: contentBlockingOptions,
       selectedIndex: appState.state.browserSettings.contentBlocking,
       onItemSelected: (index) async {
@@ -139,7 +140,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Browser Settings',
+                    title: AppLocalizations.of(context)!.browserSettingsTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -178,7 +179,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Browser Options',
+            AppLocalizations.of(context)!.browserSettingsBrowserOptions,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,
@@ -194,9 +195,11 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
             children: [
               ButtonItem(
                 theme: theme,
-                title: 'Search Engine',
+                title:
+                    AppLocalizations.of(context)!.browserSettingsSearchEngine,
                 iconPath: 'assets/icons/search.svg',
-                description: 'Configure your default search engine',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsSearchEngineDescription,
                 onTap: () => _showSearchEngineModal(appState),
                 subtitleText: searchEngines[
                         appState.state.browserSettings.searchEngineIndex]
@@ -206,9 +209,11 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               ButtonItem(
                 theme: theme,
-                title: 'Content Blocking',
+                title: AppLocalizations.of(context)!
+                    .browserSettingsContentBlocking,
                 iconPath: 'assets/icons/shield.svg',
-                description: 'Configure content blocking settings',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsContentBlockingDescription,
                 onTap: () => _showContentBlockingModal(appState),
                 subtitleText: contentBlockingOptions[
                         appState.state.browserSettings.contentBlocking]
@@ -230,7 +235,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Privacy & Security',
+            AppLocalizations.of(context)!.browserSettingsPrivacySecurity,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,
@@ -245,27 +250,31 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           child: Column(
             children: [
               SwitchSettingItem(
-                title: 'Cookies',
+                title: AppLocalizations.of(context)!.browserSettingsCookies,
                 iconPath: 'assets/icons/cookie.svg',
-                description: 'Allow websites to save and read cookies',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsCookiesDescription,
                 value: settings.cookiesEnabled,
                 onChanged: (value) => _toggleCookies(appState, value),
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               SwitchSettingItem(
-                title: 'Do Not Track',
+                title: AppLocalizations.of(context)!.browserSettingsDoNotTrack,
                 iconPath: 'assets/icons/shield.svg',
-                description: 'Request websites not to track your browsing',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsDoNotTrackDescription,
                 value: settings.doNotTrack,
                 onChanged: (value) => _toggleDoNotTrack(appState, value),
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               SwitchSettingItem(
-                title: 'Incognito Mode',
+                title:
+                    AppLocalizations.of(context)!.browserSettingsIncognitoMode,
                 iconPath: 'assets/icons/incognito.svg',
-                description: 'Browse without saving history or cookies',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsIncognitoModeDescription,
                 value: settings.incognitoMode,
                 onChanged: (value) => _toggleIncognitoMode(appState, value),
               ),
@@ -285,7 +294,7 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Performance',
+            AppLocalizations.of(context)!.browserSettingsPerformance,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,
@@ -300,9 +309,10 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           child: Column(
             children: [
               SwitchSettingItem(
-                title: 'Cache',
+                title: AppLocalizations.of(context)!.browserSettingsCache,
                 iconPath: 'assets/icons/cache.svg',
-                description: 'Store website data for faster loading',
+                description: AppLocalizations.of(context)!
+                    .browserSettingsCacheDescription,
                 value: settings.cacheEnabled,
                 onChanged: (value) => _toggleCache(appState, value),
               ),

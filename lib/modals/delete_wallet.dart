@@ -5,6 +5,7 @@ import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/smart_input.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showDeleteWalletModal({
   required BuildContext context,
@@ -97,6 +98,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
   @override
   Widget build(BuildContext context) {
     final theme = widget.state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints:
@@ -132,7 +134,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Delete Wallet',
+                        l10n.deleteWalletModalTitle,
                         style: TextStyle(
                           color: theme.danger,
                           fontSize: 18,
@@ -141,7 +143,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don\'t have access to it, you will permanently lose all funds associated with this account.',
+                        l10n.deleteWalletModalWarning,
                         style: TextStyle(
                           color: theme.warning,
                           fontSize: 14,
@@ -149,7 +151,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                       ),
                       const SizedBox(height: 16),
                       Text(
-                        'Please make sure you have access to your secret phrase before proceeding.',
+                        l10n.deleteWalletModalSecretPhraseWarning,
                         style: TextStyle(
                           color: theme.danger,
                           fontSize: 14,
@@ -160,7 +162,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                       SmartInput(
                         key: _passwordInputKey,
                         controller: _passwordController,
-                        hint: 'Enter Password',
+                        hint: l10n.deleteWalletModalPasswordHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _isDisabled,
@@ -202,7 +204,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                                 theme.textPrimary, BlendMode.srcIn),
                           ),
                           child: Text(
-                            'Submit',
+                            l10n.deleteWalletModalSubmit,
                             style: TextStyle(
                               color: theme.buttonText,
                               fontSize: 18,

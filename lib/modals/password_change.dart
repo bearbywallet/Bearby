@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../components/button.dart';
 import '../../components/smart_input.dart';
 import '../../theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showChangePasswordModal({
   required BuildContext context,
@@ -61,7 +62,8 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
     if (_currentPasswordController.text.isEmpty) {
       _currentPasswordInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Current password cannot be empty';
+        _errorMessage = AppLocalizations.of(context)!
+            .changePasswordModalCurrentPasswordEmptyError;
         _disabled = false;
       });
       return false;
@@ -70,7 +72,8 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
     if (_newPasswordController.text.length < 6) {
       _newPasswordInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Password must be at least 6 characters';
+        _errorMessage = AppLocalizations.of(context)!
+            .changePasswordModalPasswordLengthError;
         _disabled = false;
       });
       return false;
@@ -79,7 +82,8 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
     if (_newPasswordController.text != _confirmPasswordController.text) {
       _confirmPasswordInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Passwords do not match';
+        _errorMessage = AppLocalizations.of(context)!
+            .changePasswordModalPasswordsMismatchError;
         _disabled = false;
       });
       return false;
@@ -104,6 +108,8 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       constraints:
           BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.9),
@@ -137,7 +143,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Change Password',
+                        l10n.changePasswordModalTitle,
                         style: TextStyle(
                           color: widget.theme.textPrimary,
                           fontSize: 18,
@@ -146,7 +152,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter your current password and choose a new password to update your wallet security.',
+                        l10n.changePasswordModalDescription,
                         style: TextStyle(
                           color: widget.theme.textSecondary,
                           fontSize: 14,
@@ -156,7 +162,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                       SmartInput(
                         key: _currentPasswordInputKey,
                         controller: _currentPasswordController,
-                        hint: 'Current Password',
+                        hint: l10n.changePasswordModalCurrentPasswordHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _disabled,
@@ -175,7 +181,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                       SmartInput(
                         key: _newPasswordInputKey,
                         controller: _newPasswordController,
-                        hint: 'New Password',
+                        hint: l10n.changePasswordModalNewPasswordHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _disabled,
@@ -194,7 +200,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                       SmartInput(
                         key: _confirmPasswordInputKey,
                         controller: _confirmPasswordController,
-                        hint: 'Confirm New Password',
+                        hint: l10n.changePasswordModalConfirmPasswordHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _disabled,
@@ -224,7 +230,7 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                       SizedBox(
                         width: double.infinity,
                         child: CustomButton(
-                          text: 'Change Password',
+                          text: l10n.changePasswordModalButton,
                           onPressed: () => _handleChangePassword(context),
                           backgroundColor: widget.theme.primaryPurple,
                           textColor: widget.theme.textPrimary,

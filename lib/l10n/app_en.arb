@@ -1066,5 +1066,485 @@
   "passwordSetupPageUniversalNetwork": "Universal",
   "@passwordSetupPageUniversalNetwork": {
     "description": "Default network name used in wallet name generation when no specific network is provided in the PasswordSetupPage component"
+  },
+  "browserSettingsTitle": "Browser Settings",
+  "@browserSettingsTitle": {
+    "description": "Title for the Browser Settings page"
+  },
+  "browserSettingsBrowserOptions": "Browser Options",
+  "@browserSettingsBrowserOptions": {
+    "description": "Section title for browser options"
+  },
+  "browserSettingsSearchEngine": "Search Engine",
+  "@browserSettingsSearchEngine": {
+    "description": "Title for search engine setting"
+  },
+  "browserSettingsSearchEngineDescription": "Configure your default search engine",
+  "@browserSettingsSearchEngineDescription": {
+    "description": "Description for search engine setting"
+  },
+  "browserSettingsSearchEngineTitle": "Search Engine",
+  "@browserSettingsSearchEngineTitle": {
+    "description": "Title for search engine selection modal"
+  },
+  "browserSettingsContentBlocking": "Content Blocking",
+  "@browserSettingsContentBlocking": {
+    "description": "Title for content blocking setting"
+  },
+  "browserSettingsContentBlockingDescription": "Configure content blocking settings",
+  "@browserSettingsContentBlockingDescription": {
+    "description": "Description for content blocking setting"
+  },
+  "browserSettingsContentBlockingTitle": "Content Blocking",
+  "@browserSettingsContentBlockingTitle": {
+    "description": "Title for content blocking selection modal"
+  },
+  "browserSettingsPrivacySecurity": "Privacy & Security",
+  "@browserSettingsPrivacySecurity": {
+    "description": "Section title for privacy and security settings"
+  },
+  "browserSettingsCookies": "Cookies",
+  "@browserSettingsCookies": {
+    "description": "Title for cookies setting"
+  },
+  "browserSettingsCookiesDescription": "Allow websites to save and read cookies",
+  "@browserSettingsCookiesDescription": {
+    "description": "Description for cookies setting"
+  },
+  "browserSettingsDoNotTrack": "Do Not Track",
+  "@browserSettingsDoNotTrack": {
+    "description": "Title for do not track setting"
+  },
+  "browserSettingsDoNotTrackDescription": "Request websites not to track your browsing",
+  "@browserSettingsDoNotTrackDescription": {
+    "description": "Description for do not track setting"
+  },
+  "browserSettingsIncognitoMode": "Incognito Mode",
+  "@browserSettingsIncognitoMode": {
+    "description": "Title for incognito mode setting"
+  },
+  "browserSettingsIncognitoModeDescription": "Browse without saving history or cookies",
+  "@browserSettingsIncognitoModeDescription": {
+    "description": "Description for incognito mode setting"
+  },
+  "browserSettingsPerformance": "Performance",
+  "@browserSettingsPerformance": {
+    "description": "Section title for performance settings"
+  },
+  "browserSettingsCache": "Cache",
+  "@browserSettingsCache": {
+    "description": "Title for cache setting"
+  },
+  "browserSettingsCacheDescription": "Store website data for faster loading",
+  "@browserSettingsCacheDescription": {
+    "description": "Description for cache setting"
+  },
+  "genWalletOptionsTitle": "Generate Wallet",
+  "@genWalletOptionsTitle": {
+    "description": "Title for the Generate Wallet Options page"
+  },
+  "genWalletOptionsBIP39Title": "BIP39",
+  "@genWalletOptionsBIP39Title": {
+    "description": "Title for BIP39 wallet generation option"
+  },
+  "genWalletOptionsBIP39Subtitle": "Generate Mnemonic phrase",
+  "@genWalletOptionsBIP39Subtitle": {
+    "description": "Subtitle for BIP39 wallet generation option"
+  },
+  "genWalletOptionsSLIP0039Title": "SLIP-0039",
+  "@genWalletOptionsSLIP0039Title": {
+    "description": "Title for SLIP-0039 wallet generation option"
+  },
+  "genWalletOptionsSLIP0039Subtitle": "Generate Mnemonic phrase with share",
+  "@genWalletOptionsSLIP0039Subtitle": {
+    "description": "Subtitle for SLIP-0039 wallet generation option"
+  },
+  "genWalletOptionsPrivateKeyTitle": "Private Key",
+  "@genWalletOptionsPrivateKeyTitle": {
+    "description": "Title for Private Key wallet generation option"
+  },
+  "genWalletOptionsPrivateKeySubtitle": "Generate just one private key",
+  "@genWalletOptionsPrivateKeySubtitle": {
+    "description": "Subtitle for Private Key wallet generation option"
+  },
+  "addWalletOptionsTitle": "Add Wallet",
+  "@addWalletOptionsTitle": {
+    "description": "Title for the Add Wallet Options page"
+  },
+  "addWalletOptionsNewWalletTitle": "New Wallet",
+  "@addWalletOptionsNewWalletTitle": {
+    "description": "Title for new wallet option"
+  },
+  "addWalletOptionsNewWalletSubtitle": "Create new wallet",
+  "@addWalletOptionsNewWalletSubtitle": {
+    "description": "Subtitle for new wallet option"
+  },
+  "addWalletOptionsExistingWalletTitle": "Existing Wallet",
+  "@addWalletOptionsExistingWalletTitle": {
+    "description": "Title for existing wallet option"
+  },
+  "addWalletOptionsExistingWalletSubtitle": "Import wallet with a 24 secret recovery words",
+  "@addWalletOptionsExistingWalletSubtitle": {
+    "description": "Subtitle for existing wallet option"
+  },
+  "addWalletOptionsPairWithLedgerTitle": "Pair with Ledger",
+  "@addWalletOptionsPairWithLedgerTitle": {
+    "description": "Title for pair with Ledger option"
+  },
+  "addWalletOptionsPairWithLedgerSubtitle": "Hardware module, Bluetooth",
+  "@addWalletOptionsPairWithLedgerSubtitle": {
+    "description": "Subtitle for pair with Ledger option"
+  },
+  "addWalletOptionsOtherOptions": "Other options",
+  "@addWalletOptionsOtherOptions": {
+    "description": "Section title for other wallet options"
+  },
+  "addWalletOptionsWatchAccountTitle": "Watch Account",
+  "@addWalletOptionsWatchAccountTitle": {
+    "description": "Title for watch account option"
+  },
+  "addWalletOptionsWatchAccountSubtitle": "For monitor wallet activity without recovery phrase",
+  "@addWalletOptionsWatchAccountSubtitle": {
+    "description": "Subtitle for watch account option"
+  },
+  "currencyConversionTitle": "Primary Currency",
+  "@currencyConversionTitle": {
+    "description": "Title for the Currency Conversion page"
+  },
+  "currencyConversionSearchHint": "Search currencies...",
+  "@currencyConversionSearchHint": {
+    "description": "Hint text for the currency search input"
+  },
+  "currencyConversionEngineTitle": "Currency Engine",
+  "@currencyConversionEngineTitle": {
+    "description": "Title for the currency engine selection"
+  },
+  "currencyConversionEngineDescription": "Engine for fetching currency rates",
+  "@currencyConversionEngineDescription": {
+    "description": "Description for the currency engine selection"
+  },
+  "currencyConversionEngineSelectorTitle": "Select Currency Engine",
+  "@currencyConversionEngineSelectorTitle": {
+    "description": "Title for the currency engine selector modal"
+  },
+  "currencyConversionEngineNone": "None",
+  "@currencyConversionEngineNone": {
+    "description": "Title for the 'None' engine option"
+  },
+  "currencyConversionEngineNoneSubtitle": "No engine selected",
+  "@currencyConversionEngineNoneSubtitle": {
+    "description": "Subtitle for the 'None' engine option"
+  },
+  "currencyConversionEngineCoingecko": "Coingecko",
+  "@currencyConversionEngineCoingecko": {
+    "description": "Title for the 'Coingecko' engine option"
+  },
+  "currencyConversionEngineCoingeckoSubtitle": "Fetch rates from Coingecko",
+  "@currencyConversionEngineCoingeckoSubtitle": {
+    "description": "Subtitle for the 'Coingecko' engine option"
+  },
+  "restoreWalletOptionsTitle": "Restore Wallet",
+  "@restoreWalletOptionsTitle": {
+    "description": "Title for the Restore Wallet Options page"
+  },
+  "restoreWalletOptionsBIP39Title": "BIP39",
+  "@restoreWalletOptionsBIP39Title": {
+    "description": "Title for BIP39 restore option"
+  },
+  "restoreWalletOptionsBIP39Subtitle": "Restore with Mnemonic phrase",
+  "@restoreWalletOptionsBIP39Subtitle": {
+    "description": "Subtitle for BIP39 restore option"
+  },
+  "restoreWalletOptionsSLIP0039Title": "SLIP-0039",
+  "@restoreWalletOptionsSLIP0039Title": {
+    "description": "Title for SLIP-0039 restore option"
+  },
+  "restoreWalletOptionsSLIP0039Subtitle": "Restore with Shared Mnemonic phrase",
+  "@restoreWalletOptionsSLIP0039Subtitle": {
+    "description": "Subtitle for SLIP-0039 restore option"
+  },
+  "restoreWalletOptionsPrivateKeyTitle": "Private Key",
+  "@restoreWalletOptionsPrivateKeyTitle": {
+    "description": "Title for Private Key restore option"
+  },
+  "restoreWalletOptionsPrivateKeySubtitle": "Restore with private key",
+  "@restoreWalletOptionsPrivateKeySubtitle": {
+    "description": "Subtitle for Private Key restore option"
+  },
+  "restoreWalletOptionsQRCodeTitle": "QRcode",
+  "@restoreWalletOptionsQRCodeTitle": {
+    "description": "Title for QR code restore option"
+  },
+  "restoreWalletOptionsQRCodeSubtitle": "Restore wallet by QRcode scanning",
+  "@restoreWalletOptionsQRCodeSubtitle": {
+    "description": "Subtitle for QR code restore option"
+  },
+  "argonSettingsModalContentLowMemoryTitle": "Low Memory",
+  "@argonSettingsModalContentLowMemoryTitle": {
+    "description": "Title for low memory Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentLowMemorySubtitle": "64KB RAM, 3 iterations",
+  "@argonSettingsModalContentLowMemorySubtitle": {
+    "description": "Subtitle for low memory Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentLowMemoryDescription": "Minimal memory usage, suitable for low-end devices.",
+  "@argonSettingsModalContentLowMemoryDescription": {
+    "description": "Description for low memory Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  
+  "argonSettingsModalContentOwaspTitle": "OWASP Default",
+  "@argonSettingsModalContentOwaspTitle": {
+    "description": "Title for OWASP default Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentOwaspSubtitle": "6.5MB RAM, 2 iterations",
+  "@argonSettingsModalContentOwaspSubtitle": {
+    "description": "Subtitle for OWASP default Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentOwaspDescription": "Recommended by OWASP for general use.",
+  "@argonSettingsModalContentOwaspDescription": {
+    "description": "Description for OWASP default Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  
+  "argonSettingsModalContentSecureTitle": "Secure",
+  "@argonSettingsModalContentSecureTitle": {
+    "description": "Title for secure Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentSecureSubtitle": "256MB RAM, 4 iterations",
+  "@argonSettingsModalContentSecureSubtitle": {
+    "description": "Subtitle for secure Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  "argonSettingsModalContentSecureDescription": "High security with increased memory and iterations.",
+  "@argonSettingsModalContentSecureDescription": {
+    "description": "Description for secure Argon2 parameter option in ArgonSettingsModalContent"
+  },
+  
+  "argonSettingsModalContentSecretHint": "Enter secret (optional)",
+  "@argonSettingsModalContentSecretHint": {
+    "description": "Hint text for secret input field in ArgonSettingsModalContent"
+  },
+  
+  "argonSettingsModalContentConfirmButton": "Confirm",
+  "@argonSettingsModalContentConfirmButton": {
+    "description": "Text for confirm button in ArgonSettingsModalContent"
+  },
+  "confirmTransactionContentPasswordHint": "Password",
+  "@confirmTransactionContentPasswordHint": {
+    "description": "Hint text for the password input field in the ConfirmTransactionContent modal."
+  },
+  "confirmTransactionContentUnableToConfirm": "Unable to confirm",
+  "@confirmTransactionContentUnableToConfirm": {
+    "description": "Text displayed on the swipe button when confirmation is not possible in the ConfirmTransactionContent modal."
+  },
+  "confirmTransactionContentConfirm": "Confirm",
+  "@confirmTransactionContentConfirm": {
+    "description": "Text displayed on the swipe button to confirm the transaction in the ConfirmTransactionContent modal."
+  },
+  "confirmTransactionContentInsufficientBalance": "Insufficient balance",
+  "@confirmTransactionContentInsufficientBalance": {
+    "description": "Error message shown when the user has insufficient balance to complete the transaction in the ConfirmTransactionContent modal."
+  },
+  "confirmTransactionContentNoActiveAccount": "No active account",
+  "@confirmTransactionContentNoActiveAccount": {
+    "description": "Error message thrown when no active account is found in the ConfirmTransactionContent modal."
+  },
+  "confirmTransactionContentFailedLoadTransfer": "Failed to load transfer details",
+  "@confirmTransactionContentFailedLoadTransfer": {
+    "description": "Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal."
+  },
+  "authReason": "Please authenticate",
+  "@authReason": {
+    "description": "Reason text displayed during authentication prompt in the ConfirmTransactionContent modal."
+  },
+  "addChainModalContentWarning": "Beware of network scams and security risks.",
+  "@addChainModalContentWarning": {
+    "description": "Warning text displayed at the bottom of the AddChainModalContent modal to alert users about potential risks."
+  },
+  "addChainModalContentApprove": "Approve",
+  "@addChainModalContentApprove": {
+    "description": "Text on the swipe button to confirm adding the chain in the AddChainModalContent modal."
+  },
+  "addChainModalContentDetails": "Details",
+  "@addChainModalContentDetails": {
+    "description": "Title for the details section in the AddChainModalContent modal."
+  },
+  "addChainModalContentNetworkName": "Network Name:",
+  "@addChainModalContentNetworkName": {
+    "description": "Label for the network name field in the details section of the AddChainModalContent modal."
+  },
+  "addChainModalContentCurrencySymbol": "Currency Symbol:",
+  "@addChainModalContentCurrencySymbol": {
+    "description": "Label for the currency symbol field in the details section of the AddChainModalContent modal."
+  },
+  "addChainModalContentChainId": "Chain ID:",
+  "@addChainModalContentChainId": {
+    "description": "Label for the chain ID field in the details section of the AddChainModalContent modal."
+  },
+  "addChainModalContentBlockExplorer": "Block Explorer:",
+  "@addChainModalContentBlockExplorer": {
+    "description": "Label for the block explorer URL field in the details section of the AddChainModalContent modal."
+  },
+  "addAddressModalTitle": "Add Contact",
+  "@addAddressModalTitle": {
+    "description": "Title text for the AddAddressModal modal."
+  },
+  "addAddressModalDescription": "Enter the contact name and wallet address to add to your address book.",
+  "@addAddressModalDescription": {
+    "description": "Description text explaining the purpose of the AddAddressModal modal."
+  },
+  "addAddressModalNameHint": "Name",
+  "@addAddressModalNameHint": {
+    "description": "Hint text for the name input field in the AddAddressModal modal."
+  },
+  "addAddressModalAddressHint": "Wallet Address",
+  "@addAddressModalAddressHint": {
+    "description": "Hint text for the wallet address input field in the AddAddressModal modal."
+  },
+  "addAddressModalNameEmptyError": "Name cannot be empty",
+  "@addAddressModalNameEmptyError": {
+    "description": "Error message displayed when the name field is empty in the AddAddressModal modal."
+  },
+  "addAddressModalAddressEmptyError": "Address cannot be empty",
+  "@addAddressModalAddressEmptyError": {
+    "description": "Error message displayed when the address field is empty in the AddAddressModal modal."
+  },
+  "addAddressModalButton": "Add Contact",
+  "@addAddressModalButton": {
+    "description": "Text on the button to confirm adding a contact in the AddAddressModal modal."
+  },
+  "tokenSelectModalContentSearchHint": "Search",
+  "@tokenSelectModalContentSearchHint": {
+    "description": "Hint text for the search input field in the TokenSelectModalContent modal."
+  },
+  "signMessageModalContentAuthReason": "Please authenticate to sign the message",
+  "@signMessageModalContentAuthReason": {
+    "description": "Reason text for authentication prompt in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentFailedToSign": "Failed to sign:",
+  "@signMessageModalContentFailedToSign": {
+    "description": "Prefix for error message when signing fails in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentTitle": "Sign Message",
+  "@signMessageModalContentTitle": {
+    "description": "Title text for the SignMessageModalContent modal."
+  },
+  "signMessageModalContentDescription": "Review and sign the following message with your wallet.",
+  "@signMessageModalContentDescription": {
+    "description": "Description text explaining the purpose of the SignMessageModalContent modal."
+  },
+  "signMessageModalContentDomain": "Domain:",
+  "@signMessageModalContentDomain": {
+    "description": "Label for the domain field in the typed data section of the SignMessageModalContent modal."
+  },
+  "signMessageModalContentChainId": "Chain ID:",
+  "@signMessageModalContentChainId": {
+    "description": "Label for the chain ID field in the typed data section of the SignMessageModalContent modal."
+  },
+  "signMessageModalContentContract": "Contract:",
+  "@signMessageModalContentContract": {
+    "description": "Label for the verifying contract field in the typed data section of the SignMessageModalContent modal."
+  },
+  "signMessageModalContentType": "Type:",
+  "@signMessageModalContentType": {
+    "description": "Label for the primary type field in the typed data section of the SignMessageModalContent modal."
+  },
+  "signMessageModalContentNoData": "No data",
+  "@signMessageModalContentNoData": {
+    "description": "Text displayed when no message data is provided in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentPasswordHint": "Password",
+  "@signMessageModalContentPasswordHint": {
+    "description": "Hint text for the password input field in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentProcessing": "Processing...",
+  "@signMessageModalContentProcessing": {
+    "description": "Text displayed on the swipe button while processing in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentSign": "Sign Message",
+  "@signMessageModalContentSign": {
+    "description": "Text displayed on the swipe button to confirm signing in the SignMessageModalContent modal."
+  },
+  "deleteWalletModalTitle": "Delete Wallet",
+  "@deleteWalletModalTitle": {
+    "description": "Title text for the DeleteWalletModal modal."
+  },
+  "deleteWalletModalWarning": "Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don't have access to it, you will permanently lose all funds associated with this account.",
+  "@deleteWalletModalWarning": {
+    "description": "Warning text about the irreversible nature of deleting a wallet in the DeleteWalletModal modal."
+  },
+  "deleteWalletModalSecretPhraseWarning": "Please make sure you have access to your secret phrase before proceeding.",
+  "@deleteWalletModalSecretPhraseWarning": {
+    "description": "Additional warning text emphasizing the importance of the secret phrase in the DeleteWalletModal modal."
+  },
+  "deleteWalletModalPasswordHint": "Enter Password",
+  "@deleteWalletModalPasswordHint": {
+    "description": "Hint text for the password input field in the DeleteWalletModal modal."
+  },
+  "deleteWalletModalSubmit": "Submit",
+  "@deleteWalletModalSubmit": {
+    "description": "Text on the button to confirm wallet deletion in the DeleteWalletModal modal."
+  },
+  "manageTokensModalContentSearchHint": "Search",
+  "@manageTokensModalContentSearchHint": {
+    "description": "Hint text for the search input field in the ManageTokensModalContent modal."
+  },
+  "addressSelectModalContentTitle": "Select Address",
+  "@addressSelectModalContentTitle": {
+    "description": "Title text for the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentSearchHint": "Search / Address / ENS",
+  "@addressSelectModalContentSearchHint": {
+    "description": "Hint text for the search input field in the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentUnknown": "Unknown",
+  "@addressSelectModalContentUnknown": {
+    "description": "Default name used for an unknown address or QR code result in the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentMyAccounts": "My Accounts",
+  "@addressSelectModalContentMyAccounts": {
+    "description": "Section title for the 'My Accounts' list in the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentAddressBook": "Address Book",
+  "@addressSelectModalContentAddressBook": {
+    "description": "Section title for the 'Address Book' list in the AddressSelectModalContent modal."
+  },
+  "addressSelectModalContentHistory": "History",
+  "@addressSelectModalContentHistory": {
+    "description": "Section title for the 'History' list in the AddressSelectModalContent modal."
+  },
+  "changePasswordModalTitle": "Change Password",
+  "@changePasswordModalTitle": {
+    "description": "Title text for the ChangePasswordModal modal."
+  },
+  "changePasswordModalDescription": "Enter your current password and choose a new password to update your wallet security.",
+  "@changePasswordModalDescription": {
+    "description": "Description text explaining the purpose of the ChangePasswordModal modal."
+  },
+  "changePasswordModalCurrentPasswordHint": "Current Password",
+  "@changePasswordModalCurrentPasswordHint": {
+    "description": "Hint text for the current password input field in the ChangePasswordModal modal."
+  },
+  "changePasswordModalNewPasswordHint": "New Password",
+  "@changePasswordModalNewPasswordHint": {
+    "description": "Hint text for the new password input field in the ChangePasswordModal modal."
+  },
+  "changePasswordModalConfirmPasswordHint": "Confirm New Password",
+  "@changePasswordModalConfirmPasswordHint": {
+    "description": "Hint text for the confirm new password input field in the ChangePasswordModal modal."
+  },
+  "changePasswordModalCurrentPasswordEmptyError": "Current password cannot be empty",
+  "@changePasswordModalCurrentPasswordEmptyError": {
+    "description": "Error message displayed when the current password field is empty in the ChangePasswordModal modal."
+  },
+  "changePasswordModalPasswordLengthError": "Password must be at least 6 characters",
+  "@changePasswordModalPasswordLengthError": {
+    "description": "Error message displayed when the new password is less than 6 characters in the ChangePasswordModal modal."
+  },
+  "changePasswordModalPasswordsMismatchError": "Passwords do not match",
+  "@changePasswordModalPasswordsMismatchError": {
+    "description": "Error message displayed when the new password and confirmation do not match in the ChangePasswordModal modal."
+  },
+  "changePasswordModalButton": "Change Password",
+  "@changePasswordModalButton": {
+    "description": "Text on the button to confirm password change in the ChangePasswordModal modal."
   }
 }

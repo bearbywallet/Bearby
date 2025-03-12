@@ -6,6 +6,7 @@ import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showArgonSettingsModal({
   required BuildContext context,
@@ -55,24 +56,6 @@ class _ArgonSettingsModalContentState
 
   late int selectedParamIndex;
 
-  final List<Map<String, String>> argonDescriptions = [
-    {
-      'title': 'Low Memory',
-      'subtitle': '64KB RAM, 3 iterations',
-      'description': 'Minimal memory usage, suitable for low-end devices.',
-    },
-    {
-      'title': 'OWASP Default',
-      'subtitle': '6.5MB RAM, 2 iterations',
-      'description': 'Recommended by OWASP for general use.',
-    },
-    {
-      'title': 'Secure',
-      'subtitle': '256MB RAM, 4 iterations',
-      'description': 'High security with increased memory and iterations.',
-    },
-  ];
-
   @override
   void initState() {
     super.initState();
@@ -116,6 +99,26 @@ class _ArgonSettingsModalContentState
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final localizations = AppLocalizations.of(context)!;
+
+    final List<Map<String, String>> argonDescriptions = [
+      {
+        'title': localizations.argonSettingsModalContentLowMemoryTitle,
+        'subtitle': localizations.argonSettingsModalContentLowMemorySubtitle,
+        'description':
+            localizations.argonSettingsModalContentLowMemoryDescription,
+      },
+      {
+        'title': localizations.argonSettingsModalContentOwaspTitle,
+        'subtitle': localizations.argonSettingsModalContentOwaspSubtitle,
+        'description': localizations.argonSettingsModalContentOwaspDescription,
+      },
+      {
+        'title': localizations.argonSettingsModalContentSecureTitle,
+        'subtitle': localizations.argonSettingsModalContentSecureSubtitle,
+        'description': localizations.argonSettingsModalContentSecureDescription,
+      },
+    ];
 
     return Container(
       constraints: BoxConstraints(
@@ -192,7 +195,7 @@ class _ArgonSettingsModalContentState
               rightIconPath: _obscurePassword
                   ? "assets/icons/close_eye.svg"
                   : "assets/icons/open_eye.svg",
-              hint: 'Enter secret (optional)',
+              hint: localizations.argonSettingsModalContentSecretHint,
               borderColor: theme.textPrimary,
               focusedBorderColor: theme.primaryPurple,
               height: 48,
@@ -212,7 +215,7 @@ class _ArgonSettingsModalContentState
               child: CustomButton(
                 textColor: theme.buttonText,
                 backgroundColor: theme.primaryPurple,
-                text: 'Confirm',
+                text: localizations.argonSettingsModalContentConfirmButton,
                 onPressed: () {
                   widget.onParamsSelected(_getSelectedParams());
                   Navigator.pop(context);

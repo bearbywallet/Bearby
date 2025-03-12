@@ -718,4 +718,361 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordSetupPageUniversalNetwork => 'Universal';
+
+  @override
+  String get browserSettingsTitle => 'Browser Settings';
+
+  @override
+  String get browserSettingsBrowserOptions => 'Browser Options';
+
+  @override
+  String get browserSettingsSearchEngine => 'Search Engine';
+
+  @override
+  String get browserSettingsSearchEngineDescription => 'Configure your default search engine';
+
+  @override
+  String get browserSettingsSearchEngineTitle => 'Search Engine';
+
+  @override
+  String get browserSettingsContentBlocking => 'Content Blocking';
+
+  @override
+  String get browserSettingsContentBlockingDescription => 'Configure content blocking settings';
+
+  @override
+  String get browserSettingsContentBlockingTitle => 'Content Blocking';
+
+  @override
+  String get browserSettingsPrivacySecurity => 'Privacy & Security';
+
+  @override
+  String get browserSettingsCookies => 'Cookies';
+
+  @override
+  String get browserSettingsCookiesDescription => 'Allow websites to save and read cookies';
+
+  @override
+  String get browserSettingsDoNotTrack => 'Do Not Track';
+
+  @override
+  String get browserSettingsDoNotTrackDescription => 'Request websites not to track your browsing';
+
+  @override
+  String get browserSettingsIncognitoMode => 'Incognito Mode';
+
+  @override
+  String get browserSettingsIncognitoModeDescription => 'Browse without saving history or cookies';
+
+  @override
+  String get browserSettingsPerformance => 'Performance';
+
+  @override
+  String get browserSettingsCache => 'Cache';
+
+  @override
+  String get browserSettingsCacheDescription => 'Store website data for faster loading';
+
+  @override
+  String get genWalletOptionsTitle => 'Generate Wallet';
+
+  @override
+  String get genWalletOptionsBIP39Title => 'BIP39';
+
+  @override
+  String get genWalletOptionsBIP39Subtitle => 'Generate Mnemonic phrase';
+
+  @override
+  String get genWalletOptionsSLIP0039Title => 'SLIP-0039';
+
+  @override
+  String get genWalletOptionsSLIP0039Subtitle => 'Generate Mnemonic phrase with share';
+
+  @override
+  String get genWalletOptionsPrivateKeyTitle => 'Private Key';
+
+  @override
+  String get genWalletOptionsPrivateKeySubtitle => 'Generate just one private key';
+
+  @override
+  String get addWalletOptionsTitle => 'Add Wallet';
+
+  @override
+  String get addWalletOptionsNewWalletTitle => 'New Wallet';
+
+  @override
+  String get addWalletOptionsNewWalletSubtitle => 'Create new wallet';
+
+  @override
+  String get addWalletOptionsExistingWalletTitle => 'Existing Wallet';
+
+  @override
+  String get addWalletOptionsExistingWalletSubtitle => 'Import wallet with a 24 secret recovery words';
+
+  @override
+  String get addWalletOptionsPairWithLedgerTitle => 'Pair with Ledger';
+
+  @override
+  String get addWalletOptionsPairWithLedgerSubtitle => 'Hardware module, Bluetooth';
+
+  @override
+  String get addWalletOptionsOtherOptions => 'Other options';
+
+  @override
+  String get addWalletOptionsWatchAccountTitle => 'Watch Account';
+
+  @override
+  String get addWalletOptionsWatchAccountSubtitle => 'For monitor wallet activity without recovery phrase';
+
+  @override
+  String get currencyConversionTitle => 'Primary Currency';
+
+  @override
+  String get currencyConversionSearchHint => 'Search currencies...';
+
+  @override
+  String get currencyConversionEngineTitle => 'Currency Engine';
+
+  @override
+  String get currencyConversionEngineDescription => 'Engine for fetching currency rates';
+
+  @override
+  String get currencyConversionEngineSelectorTitle => 'Select Currency Engine';
+
+  @override
+  String get currencyConversionEngineNone => 'None';
+
+  @override
+  String get currencyConversionEngineNoneSubtitle => 'No engine selected';
+
+  @override
+  String get currencyConversionEngineCoingecko => 'Coingecko';
+
+  @override
+  String get currencyConversionEngineCoingeckoSubtitle => 'Fetch rates from Coingecko';
+
+  @override
+  String get restoreWalletOptionsTitle => 'Restore Wallet';
+
+  @override
+  String get restoreWalletOptionsBIP39Title => 'BIP39';
+
+  @override
+  String get restoreWalletOptionsBIP39Subtitle => 'Restore with Mnemonic phrase';
+
+  @override
+  String get restoreWalletOptionsSLIP0039Title => 'SLIP-0039';
+
+  @override
+  String get restoreWalletOptionsSLIP0039Subtitle => 'Restore with Shared Mnemonic phrase';
+
+  @override
+  String get restoreWalletOptionsPrivateKeyTitle => 'Private Key';
+
+  @override
+  String get restoreWalletOptionsPrivateKeySubtitle => 'Restore with private key';
+
+  @override
+  String get restoreWalletOptionsQRCodeTitle => 'QRcode';
+
+  @override
+  String get restoreWalletOptionsQRCodeSubtitle => 'Restore wallet by QRcode scanning';
+
+  @override
+  String get argonSettingsModalContentLowMemoryTitle => 'Low Memory';
+
+  @override
+  String get argonSettingsModalContentLowMemorySubtitle => '64KB RAM, 3 iterations';
+
+  @override
+  String get argonSettingsModalContentLowMemoryDescription => 'Minimal memory usage, suitable for low-end devices.';
+
+  @override
+  String get argonSettingsModalContentOwaspTitle => 'OWASP Default';
+
+  @override
+  String get argonSettingsModalContentOwaspSubtitle => '6.5MB RAM, 2 iterations';
+
+  @override
+  String get argonSettingsModalContentOwaspDescription => 'Recommended by OWASP for general use.';
+
+  @override
+  String get argonSettingsModalContentSecureTitle => 'Secure';
+
+  @override
+  String get argonSettingsModalContentSecureSubtitle => '256MB RAM, 4 iterations';
+
+  @override
+  String get argonSettingsModalContentSecureDescription => 'High security with increased memory and iterations.';
+
+  @override
+  String get argonSettingsModalContentSecretHint => 'Enter secret (optional)';
+
+  @override
+  String get argonSettingsModalContentConfirmButton => 'Confirm';
+
+  @override
+  String get confirmTransactionContentPasswordHint => 'Password';
+
+  @override
+  String get confirmTransactionContentUnableToConfirm => 'Unable to confirm';
+
+  @override
+  String get confirmTransactionContentConfirm => 'Confirm';
+
+  @override
+  String get confirmTransactionContentInsufficientBalance => 'Insufficient balance';
+
+  @override
+  String get confirmTransactionContentNoActiveAccount => 'No active account';
+
+  @override
+  String get confirmTransactionContentFailedLoadTransfer => 'Failed to load transfer details';
+
+  @override
+  String get authReason => 'Please authenticate';
+
+  @override
+  String get addChainModalContentWarning => 'Beware of network scams and security risks.';
+
+  @override
+  String get addChainModalContentApprove => 'Approve';
+
+  @override
+  String get addChainModalContentDetails => 'Details';
+
+  @override
+  String get addChainModalContentNetworkName => 'Network Name:';
+
+  @override
+  String get addChainModalContentCurrencySymbol => 'Currency Symbol:';
+
+  @override
+  String get addChainModalContentChainId => 'Chain ID:';
+
+  @override
+  String get addChainModalContentBlockExplorer => 'Block Explorer:';
+
+  @override
+  String get addAddressModalTitle => 'Add Contact';
+
+  @override
+  String get addAddressModalDescription => 'Enter the contact name and wallet address to add to your address book.';
+
+  @override
+  String get addAddressModalNameHint => 'Name';
+
+  @override
+  String get addAddressModalAddressHint => 'Wallet Address';
+
+  @override
+  String get addAddressModalNameEmptyError => 'Name cannot be empty';
+
+  @override
+  String get addAddressModalAddressEmptyError => 'Address cannot be empty';
+
+  @override
+  String get addAddressModalButton => 'Add Contact';
+
+  @override
+  String get tokenSelectModalContentSearchHint => 'Search';
+
+  @override
+  String get signMessageModalContentAuthReason => 'Please authenticate to sign the message';
+
+  @override
+  String get signMessageModalContentFailedToSign => 'Failed to sign:';
+
+  @override
+  String get signMessageModalContentTitle => 'Sign Message';
+
+  @override
+  String get signMessageModalContentDescription => 'Review and sign the following message with your wallet.';
+
+  @override
+  String get signMessageModalContentDomain => 'Domain:';
+
+  @override
+  String get signMessageModalContentChainId => 'Chain ID:';
+
+  @override
+  String get signMessageModalContentContract => 'Contract:';
+
+  @override
+  String get signMessageModalContentType => 'Type:';
+
+  @override
+  String get signMessageModalContentNoData => 'No data';
+
+  @override
+  String get signMessageModalContentPasswordHint => 'Password';
+
+  @override
+  String get signMessageModalContentProcessing => 'Processing...';
+
+  @override
+  String get signMessageModalContentSign => 'Sign Message';
+
+  @override
+  String get deleteWalletModalTitle => 'Delete Wallet';
+
+  @override
+  String get deleteWalletModalWarning => 'Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don\'t have access to it, you will permanently lose all funds associated with this account.';
+
+  @override
+  String get deleteWalletModalSecretPhraseWarning => 'Please make sure you have access to your secret phrase before proceeding.';
+
+  @override
+  String get deleteWalletModalPasswordHint => 'Enter Password';
+
+  @override
+  String get deleteWalletModalSubmit => 'Submit';
+
+  @override
+  String get manageTokensModalContentSearchHint => 'Search';
+
+  @override
+  String get addressSelectModalContentTitle => 'Select Address';
+
+  @override
+  String get addressSelectModalContentSearchHint => 'Search / Address / ENS';
+
+  @override
+  String get addressSelectModalContentUnknown => 'Unknown';
+
+  @override
+  String get addressSelectModalContentMyAccounts => 'My Accounts';
+
+  @override
+  String get addressSelectModalContentAddressBook => 'Address Book';
+
+  @override
+  String get addressSelectModalContentHistory => 'History';
+
+  @override
+  String get changePasswordModalTitle => 'Change Password';
+
+  @override
+  String get changePasswordModalDescription => 'Enter your current password and choose a new password to update your wallet security.';
+
+  @override
+  String get changePasswordModalCurrentPasswordHint => 'Current Password';
+
+  @override
+  String get changePasswordModalNewPasswordHint => 'New Password';
+
+  @override
+  String get changePasswordModalConfirmPasswordHint => 'Confirm New Password';
+
+  @override
+  String get changePasswordModalCurrentPasswordEmptyError => 'Current password cannot be empty';
+
+  @override
+  String get changePasswordModalPasswordLengthError => 'Password must be at least 6 characters';
+
+  @override
+  String get changePasswordModalPasswordsMismatchError => 'Passwords do not match';
+
+  @override
+  String get changePasswordModalButton => 'Change Password';
 }

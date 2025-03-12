@@ -4,6 +4,7 @@ import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../../components/button.dart';
 import '../../components/smart_input.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showAddContactModal({
   required BuildContext context,
@@ -58,7 +59,8 @@ class _AddAddressModalState extends State<AddAddressModal> {
     if (_nameController.text.isEmpty) {
       _nameInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Name cannot be empty';
+        _errorMessage =
+            AppLocalizations.of(context)!.addAddressModalNameEmptyError;
         _isDisabled = false;
       });
       return false;
@@ -66,7 +68,8 @@ class _AddAddressModalState extends State<AddAddressModal> {
     if (_addressController.text.isEmpty) {
       _addressInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Address cannot be empty';
+        _errorMessage =
+            AppLocalizations.of(context)!.addAddressModalAddressEmptyError;
         _isDisabled = false;
       });
       return false;
@@ -106,6 +109,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = widget.state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints:
@@ -140,7 +144,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Add Contact',
+                        l10n.addAddressModalTitle,
                         style: TextStyle(
                           color: theme.textPrimary,
                           fontSize: 18,
@@ -149,7 +153,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                       ),
                       const SizedBox(height: 8),
                       Text(
-                        'Enter the contact name and wallet address to add to your address book.',
+                        l10n.addAddressModalDescription,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
@@ -159,7 +163,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                       SmartInput(
                         key: _nameInputKey,
                         controller: _nameController,
-                        hint: 'Name',
+                        hint: l10n.addAddressModalNameHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _isDisabled,
@@ -174,7 +178,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                       SmartInput(
                         key: _addressInputKey,
                         controller: _addressController,
-                        hint: 'Wallet Address',
+                        hint: l10n.addAddressModalAddressHint,
                         height: _inputHeight,
                         fontSize: 18,
                         disabled: _isDisabled,
@@ -200,7 +204,7 @@ class _AddAddressModalState extends State<AddAddressModal> {
                       SizedBox(
                         width: double.infinity,
                         child: CustomButton(
-                          text: 'Add Contact',
+                          text: l10n.addAddressModalButton,
                           onPressed: () => _handleAddAddress(appState),
                           backgroundColor: theme.primaryPurple,
                           textColor: theme.textPrimary,

@@ -8,6 +8,7 @@ import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showAddressSelectModal({
   required BuildContext context,
@@ -54,6 +55,7 @@ class _AddressSelectModalContentState
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints:
@@ -79,7 +81,7 @@ class _AddressSelectModalContentState
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
-                'Select Address',
+                l10n.addressSelectModalContentTitle,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 20,
@@ -91,7 +93,7 @@ class _AddressSelectModalContentState
               padding: const EdgeInsets.all(16),
               child: SmartInput(
                 controller: _searchController,
-                hint: 'Search / Address / ENS',
+                hint: l10n.addressSelectModalContentSearchHint,
                 leftIconPath: 'assets/icons/qrcode.svg',
                 onChanged: (value) async {
                   try {
@@ -99,7 +101,8 @@ class _AddressSelectModalContentState
                     if (isAddress && mounted) {
                       QRcodeScanResultInfo params =
                           QRcodeScanResultInfo(recipient: value);
-                      widget.onAddressSelected(params, "Unknown");
+                      widget.onAddressSelected(
+                          params, l10n.addressSelectModalContentUnknown);
                       // ignore: use_build_context_synchronously
                       Navigator.pop(context);
                     } else {
@@ -124,12 +127,18 @@ class _AddressSelectModalContentState
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSection(appState, 'My Accounts',
+                    _buildSection(
+                        appState,
+                        l10n.addressSelectModalContentMyAccounts,
                         _getFilteredMyAccounts(appState)),
-                    _buildSection(appState, 'Address Book',
+                    _buildSection(
+                        appState,
+                        l10n.addressSelectModalContentAddressBook,
                         _getFilteredAddressBook(appState)),
                     _buildSection(
-                        appState, 'History', _getFilteredHistory(appState)),
+                        appState,
+                        l10n.addressSelectModalContentHistory,
+                        _getFilteredHistory(appState)),
                   ],
                 ),
               ),
@@ -237,7 +246,9 @@ class _AddressSelectModalContentState
   Future<void> _parseQrcodRes(String data) async {
     try {
       QRcodeScanResultInfo parsed = await parseQrcodeStr(data: data);
-      if (mounted) widget.onAddressSelected(parsed, "Unknown");
+      if (mounted)
+        widget.onAddressSelected(parsed,
+            AppLocalizations.of(context)!.addressSelectModalContentUnknown);
     } catch (e) {
       debugPrint("error parse qrcode: $e");
     }

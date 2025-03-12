@@ -5,6 +5,7 @@ import 'package:zilpay/components/token_select_item.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showTokenSelectModal({
   required BuildContext context,
@@ -58,6 +59,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
     final tokens = appState.wallet?.tokens ?? [];
+    final l10n = AppLocalizations.of(context)!;
 
     final double headerHeight = 84.0;
     final double searchBarHeight = 80.0;
@@ -95,7 +97,7 @@ class _TokenSelectModalContentState extends State<_TokenSelectModalContent> {
             padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
-              hint: 'Search',
+              hint: l10n.tokenSelectModalContentSearchHint,
               leftIconPath: 'assets/icons/search.svg',
               onChanged: (value) => setState(() => _searchQuery = value),
               borderColor: theme.textPrimary,

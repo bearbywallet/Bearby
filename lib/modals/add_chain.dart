@@ -9,6 +9,7 @@ import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showAddChainModal({
   required BuildContext context,
@@ -76,6 +77,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
     final theme = appState.currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints:
@@ -91,7 +93,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
             padding: EdgeInsets.all(adaptivePadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
-              children: children(theme),
+              children: children(theme, l10n),
             ),
           ),
           Expanded(
@@ -129,13 +131,13 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
             child: Column(
               children: [
                 Text(
-                  'Beware of network scams and security risks.',
+                  l10n.addChainModalContentWarning,
                   style: TextStyle(color: theme.danger, fontSize: 14),
                 ),
                 SizedBox(height: adaptivePadding),
                 Center(
                   child: SwipeButton(
-                    text: 'Approve',
+                    text: l10n.addChainModalContentApprove,
                     backgroundColor: theme.primaryPurple,
                     textColor: theme.buttonText,
                     onSwipeComplete: () async {
@@ -158,7 +160,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
     );
   }
 
-  List<Widget> children(AppTheme theme) {
+  List<Widget> children(AppTheme theme, AppLocalizations l10n) {
     return [
       Container(
         width: 36,
@@ -269,21 +271,23 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Details',
+              l10n.addChainModalContentDetails,
               style: TextStyle(
                 color: theme.textPrimary,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(height: 8),
-            Text('Network Name: ${widget.chain.name}',
+            Text('${l10n.addChainModalContentNetworkName} ${widget.chain.name}',
                 style: TextStyle(color: theme.textSecondary)),
-            Text('Currency Symbol: ${widget.chain.shortName}',
+            Text(
+                '${l10n.addChainModalContentCurrencySymbol} ${widget.chain.shortName}',
                 style: TextStyle(color: theme.textSecondary)),
-            Text('Chain ID: ${widget.chain.chainId}',
+            Text('${l10n.addChainModalContentChainId} ${widget.chain.chainId}',
                 style: TextStyle(color: theme.textSecondary)),
             if (widget.chain.explorers.isNotEmpty)
-              Text('Block Explorer: ${widget.chain.explorers.first.url}',
+              Text(
+                  '${l10n.addChainModalContentBlockExplorer} ${widget.chain.explorers.first.url}',
                   style: TextStyle(color: theme.textSecondary)),
           ],
         ),

@@ -10,6 +10,7 @@ import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'dart:convert';
 
 void showSignMessageModal({
@@ -89,7 +90,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   Future<bool> _authenticate() async => _authService.authenticate(
         allowPinCode: true,
-        reason: 'Please authenticate to sign the message',
+        reason: AppLocalizations.of(context)!.signMessageModalContentAuthReason,
       );
 
   Future<void> _signMessage(AppState appState) async {
@@ -137,7 +138,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
       if (mounted) Navigator.pop(context);
     } catch (e) {
-      if (mounted) setState(() => _error = 'Failed to sign: $e');
+      if (mounted)
+        setState(() => _error =
+            '${AppLocalizations.of(context)!.signMessageModalContentFailedToSign} $e');
     }
   }
 
@@ -160,6 +163,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
     final backgroundColor =
         _parseColor(widget.colors?.background) ?? theme.cardBackground;
     final primaryColor =
@@ -206,7 +210,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
                         Text(
-                          'Sign Message',
+                          l10n.signMessageModalContentTitle,
                           style: TextStyle(
                             color: textColor,
                             fontSize: 20,
@@ -215,7 +219,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          'Review and sign the following message with your wallet.',
+                          l10n.signMessageModalContentDescription,
                           style: TextStyle(color: secondaryColor, fontSize: 14),
                           textAlign: TextAlign.center,
                         ),
@@ -296,7 +300,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                         CrossAxisAlignment.start,
                                     children: [
                                       Text(
-                                        'Domain: ${widget.typedData!.domain.name}',
+                                        '${l10n.signMessageModalContentDomain} ${widget.typedData!.domain.name}',
                                         style: TextStyle(
                                           color: textColor,
                                           fontSize: 16,
@@ -305,14 +309,14 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        'Chain ID: ${widget.typedData!.domain.chainId}',
+                                        '${l10n.signMessageModalContentChainId} ${widget.typedData!.domain.chainId}',
                                         style: TextStyle(
                                           color: secondaryColor,
                                           fontSize: 14,
                                         ),
                                       ),
                                       Text(
-                                        'Contract: ${widget.typedData!.domain.verifyingContract}',
+                                        '${l10n.signMessageModalContentContract} ${widget.typedData!.domain.verifyingContract}',
                                         style: TextStyle(
                                           color: secondaryColor,
                                           fontSize: 14,
@@ -331,7 +335,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                           CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          'Type: ${widget.typedData!.primaryType}',
+                                          '${l10n.signMessageModalContentType} ${widget.typedData!.primaryType}',
                                           style: TextStyle(
                                             color: textColor,
                                             fontSize: 16,
@@ -381,7 +385,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                       const BoxConstraints(maxHeight: 200),
                                   child: SingleChildScrollView(
                                     child: Text(
-                                      widget.message ?? 'No data',
+                                      widget.message ??
+                                          l10n.signMessageModalContentNoData,
                                       style: TextStyle(
                                           color: textColor, fontSize: 16),
                                       textAlign: TextAlign.center,
@@ -428,7 +433,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                             child: SmartInput(
                               key: _passwordInputKey,
                               controller: _passwordController,
-                              hint: 'Password',
+                              hint: l10n.signMessageModalContentPasswordHint,
                               fontSize: 18,
                               height: 56,
                               padding:
@@ -461,7 +466,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                   padding: const EdgeInsets.all(16),
                   child: Center(
                     child: SwipeButton(
-                      text: _loading ? 'Processing...' : 'Sign Message',
+                      text: _loading
+                          ? l10n.signMessageModalContentProcessing
+                          : l10n.signMessageModalContentSign,
                       disabled: _loading,
                       backgroundColor: primaryColor,
                       textColor: textColor,

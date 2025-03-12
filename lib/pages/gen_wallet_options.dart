@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
@@ -28,8 +29,8 @@ class GenWalletOptionsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title:
-            Text('Generate Wallet', style: TextStyle(color: theme.textPrimary)),
+        title: Text(AppLocalizations.of(context)!.genWalletOptionsTitle,
+            style: TextStyle(color: theme.textPrimary)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -38,8 +39,9 @@ class GenWalletOptionsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               WalletListItem(
-                title: 'BIP39',
-                subtitle: 'Generate Mnemonic phrase',
+                title: AppLocalizations.of(context)!.genWalletOptionsBIP39Title,
+                subtitle:
+                    AppLocalizations.of(context)!.genWalletOptionsBIP39Subtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/document.svg',
                   width: 35,
@@ -55,8 +57,10 @@ class GenWalletOptionsPage extends StatelessWidget {
               ),
               WalletListItem(
                 disabled: true,
-                title: 'SLIP-0039',
-                subtitle: 'Generate Mnemonic phrase with share',
+                title:
+                    AppLocalizations.of(context)!.genWalletOptionsSLIP0039Title,
+                subtitle: AppLocalizations.of(context)!
+                    .genWalletOptionsSLIP0039Subtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/puzzle.svg',
                   width: 35,
@@ -66,11 +70,13 @@ class GenWalletOptionsPage extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                onTap: () {/* Handle SLIP-0039 generation */},
+                onTap: () {},
               ),
               WalletListItem(
-                title: 'Private Key',
-                subtitle: 'Generate just one private key',
+                title: AppLocalizations.of(context)!
+                    .genWalletOptionsPrivateKeyTitle,
+                subtitle: AppLocalizations.of(context)!
+                    .genWalletOptionsPrivateKeySubtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/bincode.svg',
                   width: 35,

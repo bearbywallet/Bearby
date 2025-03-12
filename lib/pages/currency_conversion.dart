@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
@@ -129,7 +130,7 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Primary Currency',
+                  title: AppLocalizations.of(context)!.currencyConversionTitle,
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -181,7 +182,8 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
                 children: [
                   SmartInput(
                     controller: _searchController,
-                    hint: 'Search currencies...',
+                    hint: AppLocalizations.of(context)!
+                        .currencyConversionSearchHint,
                     leftIconPath: 'assets/icons/search.svg',
                     rightIconPath: "assets/icons/close.svg",
                     onChanged: (value) {
@@ -245,9 +247,10 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
     return ButtonItem(
       theme: theme,
-      title: 'Currency Engine',
+      title: AppLocalizations.of(context)!.currencyConversionEngineTitle,
       iconPath: 'assets/icons/currency.svg',
-      description: 'Engine for fetching currency rates',
+      description:
+          AppLocalizations.of(context)!.currencyConversionEngineDescription,
       subtitleText: engineText,
       onTap: () {
         _showEngineSelector(appState);
@@ -257,13 +260,21 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
   void _showEngineSelector(AppState appState) {
     final engines = [
-      ListItem(title: 'None', subtitle: 'No engine selected'),
-      ListItem(title: 'Coingecko', subtitle: 'Fetch rates from Coingecko'),
+      ListItem(
+          title: AppLocalizations.of(context)!.currencyConversionEngineNone,
+          subtitle: AppLocalizations.of(context)!
+              .currencyConversionEngineNoneSubtitle),
+      ListItem(
+          title:
+              AppLocalizations.of(context)!.currencyConversionEngineCoingecko,
+          subtitle: AppLocalizations.of(context)!
+              .currencyConversionEngineCoingeckoSubtitle),
     ];
 
     showListSelectorModal(
       context: context,
-      title: 'Select Currency Engine',
+      title:
+          AppLocalizations.of(context)!.currencyConversionEngineSelectorTitle,
       items: engines,
       selectedIndex: selectedEngine,
       onItemSelected: (index) async {

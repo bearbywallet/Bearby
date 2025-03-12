@@ -8,6 +8,7 @@ import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart' as theme;
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showManageTokensModal({
   required BuildContext context,
@@ -61,6 +62,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final appState = Provider.of<AppState>(context);
     final tokens = appState.wallet?.tokens ?? [];
+    final l10n = AppLocalizations.of(context)!;
 
     final double headerHeight = 84.0;
     final double searchBarHeight = 80.0;
@@ -105,7 +107,7 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             padding: const EdgeInsets.all(16),
             child: SmartInput(
               controller: _searchController,
-              hint: 'Search',
+              hint: l10n.manageTokensModalContentSearchHint,
               leftIconPath: 'assets/icons/plus.svg',
               onLeftIconTap: widget.onAddToken,
               onChanged: (value) => setState(() => _searchQuery = value),

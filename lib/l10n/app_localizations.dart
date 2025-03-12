@@ -1478,6 +1478,720 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Universal'**
   String get passwordSetupPageUniversalNetwork;
+
+  /// Title for the Browser Settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Browser Settings'**
+  String get browserSettingsTitle;
+
+  /// Section title for browser options
+  ///
+  /// In en, this message translates to:
+  /// **'Browser Options'**
+  String get browserSettingsBrowserOptions;
+
+  /// Title for search engine setting
+  ///
+  /// In en, this message translates to:
+  /// **'Search Engine'**
+  String get browserSettingsSearchEngine;
+
+  /// Description for search engine setting
+  ///
+  /// In en, this message translates to:
+  /// **'Configure your default search engine'**
+  String get browserSettingsSearchEngineDescription;
+
+  /// Title for search engine selection modal
+  ///
+  /// In en, this message translates to:
+  /// **'Search Engine'**
+  String get browserSettingsSearchEngineTitle;
+
+  /// Title for content blocking setting
+  ///
+  /// In en, this message translates to:
+  /// **'Content Blocking'**
+  String get browserSettingsContentBlocking;
+
+  /// Description for content blocking setting
+  ///
+  /// In en, this message translates to:
+  /// **'Configure content blocking settings'**
+  String get browserSettingsContentBlockingDescription;
+
+  /// Title for content blocking selection modal
+  ///
+  /// In en, this message translates to:
+  /// **'Content Blocking'**
+  String get browserSettingsContentBlockingTitle;
+
+  /// Section title for privacy and security settings
+  ///
+  /// In en, this message translates to:
+  /// **'Privacy & Security'**
+  String get browserSettingsPrivacySecurity;
+
+  /// Title for cookies setting
+  ///
+  /// In en, this message translates to:
+  /// **'Cookies'**
+  String get browserSettingsCookies;
+
+  /// Description for cookies setting
+  ///
+  /// In en, this message translates to:
+  /// **'Allow websites to save and read cookies'**
+  String get browserSettingsCookiesDescription;
+
+  /// Title for do not track setting
+  ///
+  /// In en, this message translates to:
+  /// **'Do Not Track'**
+  String get browserSettingsDoNotTrack;
+
+  /// Description for do not track setting
+  ///
+  /// In en, this message translates to:
+  /// **'Request websites not to track your browsing'**
+  String get browserSettingsDoNotTrackDescription;
+
+  /// Title for incognito mode setting
+  ///
+  /// In en, this message translates to:
+  /// **'Incognito Mode'**
+  String get browserSettingsIncognitoMode;
+
+  /// Description for incognito mode setting
+  ///
+  /// In en, this message translates to:
+  /// **'Browse without saving history or cookies'**
+  String get browserSettingsIncognitoModeDescription;
+
+  /// Section title for performance settings
+  ///
+  /// In en, this message translates to:
+  /// **'Performance'**
+  String get browserSettingsPerformance;
+
+  /// Title for cache setting
+  ///
+  /// In en, this message translates to:
+  /// **'Cache'**
+  String get browserSettingsCache;
+
+  /// Description for cache setting
+  ///
+  /// In en, this message translates to:
+  /// **'Store website data for faster loading'**
+  String get browserSettingsCacheDescription;
+
+  /// Title for the Generate Wallet Options page
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Wallet'**
+  String get genWalletOptionsTitle;
+
+  /// Title for BIP39 wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'BIP39'**
+  String get genWalletOptionsBIP39Title;
+
+  /// Subtitle for BIP39 wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Mnemonic phrase'**
+  String get genWalletOptionsBIP39Subtitle;
+
+  /// Title for SLIP-0039 wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'SLIP-0039'**
+  String get genWalletOptionsSLIP0039Title;
+
+  /// Subtitle for SLIP-0039 wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'Generate Mnemonic phrase with share'**
+  String get genWalletOptionsSLIP0039Subtitle;
+
+  /// Title for Private Key wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'Private Key'**
+  String get genWalletOptionsPrivateKeyTitle;
+
+  /// Subtitle for Private Key wallet generation option
+  ///
+  /// In en, this message translates to:
+  /// **'Generate just one private key'**
+  String get genWalletOptionsPrivateKeySubtitle;
+
+  /// Title for the Add Wallet Options page
+  ///
+  /// In en, this message translates to:
+  /// **'Add Wallet'**
+  String get addWalletOptionsTitle;
+
+  /// Title for new wallet option
+  ///
+  /// In en, this message translates to:
+  /// **'New Wallet'**
+  String get addWalletOptionsNewWalletTitle;
+
+  /// Subtitle for new wallet option
+  ///
+  /// In en, this message translates to:
+  /// **'Create new wallet'**
+  String get addWalletOptionsNewWalletSubtitle;
+
+  /// Title for existing wallet option
+  ///
+  /// In en, this message translates to:
+  /// **'Existing Wallet'**
+  String get addWalletOptionsExistingWalletTitle;
+
+  /// Subtitle for existing wallet option
+  ///
+  /// In en, this message translates to:
+  /// **'Import wallet with a 24 secret recovery words'**
+  String get addWalletOptionsExistingWalletSubtitle;
+
+  /// Title for pair with Ledger option
+  ///
+  /// In en, this message translates to:
+  /// **'Pair with Ledger'**
+  String get addWalletOptionsPairWithLedgerTitle;
+
+  /// Subtitle for pair with Ledger option
+  ///
+  /// In en, this message translates to:
+  /// **'Hardware module, Bluetooth'**
+  String get addWalletOptionsPairWithLedgerSubtitle;
+
+  /// Section title for other wallet options
+  ///
+  /// In en, this message translates to:
+  /// **'Other options'**
+  String get addWalletOptionsOtherOptions;
+
+  /// Title for watch account option
+  ///
+  /// In en, this message translates to:
+  /// **'Watch Account'**
+  String get addWalletOptionsWatchAccountTitle;
+
+  /// Subtitle for watch account option
+  ///
+  /// In en, this message translates to:
+  /// **'For monitor wallet activity without recovery phrase'**
+  String get addWalletOptionsWatchAccountSubtitle;
+
+  /// Title for the Currency Conversion page
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Currency'**
+  String get currencyConversionTitle;
+
+  /// Hint text for the currency search input
+  ///
+  /// In en, this message translates to:
+  /// **'Search currencies...'**
+  String get currencyConversionSearchHint;
+
+  /// Title for the currency engine selection
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Engine'**
+  String get currencyConversionEngineTitle;
+
+  /// Description for the currency engine selection
+  ///
+  /// In en, this message translates to:
+  /// **'Engine for fetching currency rates'**
+  String get currencyConversionEngineDescription;
+
+  /// Title for the currency engine selector modal
+  ///
+  /// In en, this message translates to:
+  /// **'Select Currency Engine'**
+  String get currencyConversionEngineSelectorTitle;
+
+  /// Title for the 'None' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'None'**
+  String get currencyConversionEngineNone;
+
+  /// Subtitle for the 'None' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'No engine selected'**
+  String get currencyConversionEngineNoneSubtitle;
+
+  /// Title for the 'Coingecko' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'Coingecko'**
+  String get currencyConversionEngineCoingecko;
+
+  /// Subtitle for the 'Coingecko' engine option
+  ///
+  /// In en, this message translates to:
+  /// **'Fetch rates from Coingecko'**
+  String get currencyConversionEngineCoingeckoSubtitle;
+
+  /// Title for the Restore Wallet Options page
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Wallet'**
+  String get restoreWalletOptionsTitle;
+
+  /// Title for BIP39 restore option
+  ///
+  /// In en, this message translates to:
+  /// **'BIP39'**
+  String get restoreWalletOptionsBIP39Title;
+
+  /// Subtitle for BIP39 restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with Mnemonic phrase'**
+  String get restoreWalletOptionsBIP39Subtitle;
+
+  /// Title for SLIP-0039 restore option
+  ///
+  /// In en, this message translates to:
+  /// **'SLIP-0039'**
+  String get restoreWalletOptionsSLIP0039Title;
+
+  /// Subtitle for SLIP-0039 restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with Shared Mnemonic phrase'**
+  String get restoreWalletOptionsSLIP0039Subtitle;
+
+  /// Title for Private Key restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Private Key'**
+  String get restoreWalletOptionsPrivateKeyTitle;
+
+  /// Subtitle for Private Key restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Restore with private key'**
+  String get restoreWalletOptionsPrivateKeySubtitle;
+
+  /// Title for QR code restore option
+  ///
+  /// In en, this message translates to:
+  /// **'QRcode'**
+  String get restoreWalletOptionsQRCodeTitle;
+
+  /// Subtitle for QR code restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Restore wallet by QRcode scanning'**
+  String get restoreWalletOptionsQRCodeSubtitle;
+
+  /// Title for low memory Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Low Memory'**
+  String get argonSettingsModalContentLowMemoryTitle;
+
+  /// Subtitle for low memory Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'64KB RAM, 3 iterations'**
+  String get argonSettingsModalContentLowMemorySubtitle;
+
+  /// Description for low memory Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Minimal memory usage, suitable for low-end devices.'**
+  String get argonSettingsModalContentLowMemoryDescription;
+
+  /// Title for OWASP default Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'OWASP Default'**
+  String get argonSettingsModalContentOwaspTitle;
+
+  /// Subtitle for OWASP default Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'6.5MB RAM, 2 iterations'**
+  String get argonSettingsModalContentOwaspSubtitle;
+
+  /// Description for OWASP default Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Recommended by OWASP for general use.'**
+  String get argonSettingsModalContentOwaspDescription;
+
+  /// Title for secure Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Secure'**
+  String get argonSettingsModalContentSecureTitle;
+
+  /// Subtitle for secure Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'256MB RAM, 4 iterations'**
+  String get argonSettingsModalContentSecureSubtitle;
+
+  /// Description for secure Argon2 parameter option in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'High security with increased memory and iterations.'**
+  String get argonSettingsModalContentSecureDescription;
+
+  /// Hint text for secret input field in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Enter secret (optional)'**
+  String get argonSettingsModalContentSecretHint;
+
+  /// Text for confirm button in ArgonSettingsModalContent
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get argonSettingsModalContentConfirmButton;
+
+  /// Hint text for the password input field in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get confirmTransactionContentPasswordHint;
+
+  /// Text displayed on the swipe button when confirmation is not possible in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Unable to confirm'**
+  String get confirmTransactionContentUnableToConfirm;
+
+  /// Text displayed on the swipe button to confirm the transaction in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get confirmTransactionContentConfirm;
+
+  /// Error message shown when the user has insufficient balance to complete the transaction in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Insufficient balance'**
+  String get confirmTransactionContentInsufficientBalance;
+
+  /// Error message thrown when no active account is found in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'No active account'**
+  String get confirmTransactionContentNoActiveAccount;
+
+  /// Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load transfer details'**
+  String get confirmTransactionContentFailedLoadTransfer;
+
+  /// Reason text displayed during authentication prompt in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate'**
+  String get authReason;
+
+  /// Warning text displayed at the bottom of the AddChainModalContent modal to alert users about potential risks.
+  ///
+  /// In en, this message translates to:
+  /// **'Beware of network scams and security risks.'**
+  String get addChainModalContentWarning;
+
+  /// Text on the swipe button to confirm adding the chain in the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get addChainModalContentApprove;
+
+  /// Title for the details section in the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get addChainModalContentDetails;
+
+  /// Label for the network name field in the details section of the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Name:'**
+  String get addChainModalContentNetworkName;
+
+  /// Label for the currency symbol field in the details section of the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Currency Symbol:'**
+  String get addChainModalContentCurrencySymbol;
+
+  /// Label for the chain ID field in the details section of the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID:'**
+  String get addChainModalContentChainId;
+
+  /// Label for the block explorer URL field in the details section of the AddChainModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Block Explorer:'**
+  String get addChainModalContentBlockExplorer;
+
+  /// Title text for the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Contact'**
+  String get addAddressModalTitle;
+
+  /// Description text explaining the purpose of the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter the contact name and wallet address to add to your address book.'**
+  String get addAddressModalDescription;
+
+  /// Hint text for the name input field in the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get addAddressModalNameHint;
+
+  /// Hint text for the wallet address input field in the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Address'**
+  String get addAddressModalAddressHint;
+
+  /// Error message displayed when the name field is empty in the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Name cannot be empty'**
+  String get addAddressModalNameEmptyError;
+
+  /// Error message displayed when the address field is empty in the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Address cannot be empty'**
+  String get addAddressModalAddressEmptyError;
+
+  /// Text on the button to confirm adding a contact in the AddAddressModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Contact'**
+  String get addAddressModalButton;
+
+  /// Hint text for the search input field in the TokenSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get tokenSelectModalContentSearchHint;
+
+  /// Reason text for authentication prompt in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate to sign the message'**
+  String get signMessageModalContentAuthReason;
+
+  /// Prefix for error message when signing fails in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sign:'**
+  String get signMessageModalContentFailedToSign;
+
+  /// Title text for the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Message'**
+  String get signMessageModalContentTitle;
+
+  /// Description text explaining the purpose of the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Review and sign the following message with your wallet.'**
+  String get signMessageModalContentDescription;
+
+  /// Label for the domain field in the typed data section of the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Domain:'**
+  String get signMessageModalContentDomain;
+
+  /// Label for the chain ID field in the typed data section of the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID:'**
+  String get signMessageModalContentChainId;
+
+  /// Label for the verifying contract field in the typed data section of the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Contract:'**
+  String get signMessageModalContentContract;
+
+  /// Label for the primary type field in the typed data section of the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Type:'**
+  String get signMessageModalContentType;
+
+  /// Text displayed when no message data is provided in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get signMessageModalContentNoData;
+
+  /// Hint text for the password input field in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get signMessageModalContentPasswordHint;
+
+  /// Text displayed on the swipe button while processing in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing...'**
+  String get signMessageModalContentProcessing;
+
+  /// Text displayed on the swipe button to confirm signing in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Message'**
+  String get signMessageModalContentSign;
+
+  /// Title text for the DeleteWalletModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Wallet'**
+  String get deleteWalletModalTitle;
+
+  /// Warning text about the irreversible nature of deleting a wallet in the DeleteWalletModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Warning: This action cannot be undone. Your wallet can only be recovered using your secret phrase. If you don\'t have access to it, you will permanently lose all funds associated with this account.'**
+  String get deleteWalletModalWarning;
+
+  /// Additional warning text emphasizing the importance of the secret phrase in the DeleteWalletModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Please make sure you have access to your secret phrase before proceeding.'**
+  String get deleteWalletModalSecretPhraseWarning;
+
+  /// Hint text for the password input field in the DeleteWalletModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter Password'**
+  String get deleteWalletModalPasswordHint;
+
+  /// Text on the button to confirm wallet deletion in the DeleteWalletModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get deleteWalletModalSubmit;
+
+  /// Hint text for the search input field in the ManageTokensModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get manageTokensModalContentSearchHint;
+
+  /// Title text for the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Address'**
+  String get addressSelectModalContentTitle;
+
+  /// Hint text for the search input field in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Search / Address / ENS'**
+  String get addressSelectModalContentSearchHint;
+
+  /// Default name used for an unknown address or QR code result in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get addressSelectModalContentUnknown;
+
+  /// Section title for the 'My Accounts' list in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'My Accounts'**
+  String get addressSelectModalContentMyAccounts;
+
+  /// Section title for the 'Address Book' list in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Address Book'**
+  String get addressSelectModalContentAddressBook;
+
+  /// Section title for the 'History' list in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'History'**
+  String get addressSelectModalContentHistory;
+
+  /// Title text for the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePasswordModalTitle;
+
+  /// Description text explaining the purpose of the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your current password and choose a new password to update your wallet security.'**
+  String get changePasswordModalDescription;
+
+  /// Hint text for the current password input field in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Current Password'**
+  String get changePasswordModalCurrentPasswordHint;
+
+  /// Hint text for the new password input field in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get changePasswordModalNewPasswordHint;
+
+  /// Hint text for the confirm new password input field in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm New Password'**
+  String get changePasswordModalConfirmPasswordHint;
+
+  /// Error message displayed when the current password field is empty in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Current password cannot be empty'**
+  String get changePasswordModalCurrentPasswordEmptyError;
+
+  /// Error message displayed when the new password is less than 6 characters in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get changePasswordModalPasswordLengthError;
+
+  /// Error message displayed when the new password and confirmation do not match in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get changePasswordModalPasswordsMismatchError;
+
+  /// Text on the button to confirm password change in the ChangePasswordModal modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Change Password'**
+  String get changePasswordModalButton;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

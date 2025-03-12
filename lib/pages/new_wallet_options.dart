@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
@@ -28,7 +29,8 @@ class AddWalletOptionsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
-        title: Text('Add Wallet', style: TextStyle(color: theme.textPrimary)),
+        title: Text(AppLocalizations.of(context)!.addWalletOptionsTitle,
+            style: TextStyle(color: theme.textPrimary)),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -37,8 +39,10 @@ class AddWalletOptionsPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               WalletListItem(
-                title: 'New Wallet',
-                subtitle: 'Create new wallet',
+                title: AppLocalizations.of(context)!
+                    .addWalletOptionsNewWalletTitle,
+                subtitle: AppLocalizations.of(context)!
+                    .addWalletOptionsNewWalletSubtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/add.svg',
                   width: 35,
@@ -53,8 +57,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                 },
               ),
               WalletListItem(
-                title: 'Existing Wallet',
-                subtitle: 'Import wallet with a 24 secret recovery words',
+                title: AppLocalizations.of(context)!
+                    .addWalletOptionsExistingWalletTitle,
+                subtitle: AppLocalizations.of(context)!
+                    .addWalletOptionsExistingWalletSubtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/import.svg',
                   width: 35,
@@ -69,8 +75,10 @@ class AddWalletOptionsPage extends StatelessWidget {
                 },
               ),
               WalletListItem(
-                title: 'Pair with Ledger',
-                subtitle: 'Hardware module, Bluetooth',
+                title: AppLocalizations.of(context)!
+                    .addWalletOptionsPairWithLedgerTitle,
+                subtitle: AppLocalizations.of(context)!
+                    .addWalletOptionsPairWithLedgerSubtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/ledger.svg',
                   width: 25,
@@ -88,15 +96,17 @@ class AddWalletOptionsPage extends StatelessWidget {
               Padding(
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
-                  'Other options',
+                  AppLocalizations.of(context)!.addWalletOptionsOtherOptions,
                   style: TextStyle(color: theme.textSecondary, fontSize: 14),
                 ),
               ),
               const SizedBox(height: 16),
               WalletListItem(
                 disabled: true,
-                title: 'Watch Account',
-                subtitle: 'For monitor wallet activity without recovery phrase',
+                title: AppLocalizations.of(context)!
+                    .addWalletOptionsWatchAccountTitle,
+                subtitle: AppLocalizations.of(context)!
+                    .addWalletOptionsWatchAccountSubtitle,
                 icon: SvgPicture.asset(
                   'assets/icons/looking.svg',
                   width: 35,
@@ -106,7 +116,7 @@ class AddWalletOptionsPage extends StatelessWidget {
                     BlendMode.srcIn,
                   ),
                 ),
-                onTap: () {/* Handle watch account */},
+                onTap: () {},
               ),
             ],
           ),

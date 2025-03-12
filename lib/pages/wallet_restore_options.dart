@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -111,7 +112,6 @@ class RestoreWalletOptionsPage extends StatelessWidget {
     try {
       final KeyPairInfo keys = await keypairFromSk(sk: key);
 
-      // Check if the context is still valid after the async operation
       if (!context.mounted) return;
 
       Navigator.of(context).pushNamed(
@@ -129,7 +129,6 @@ class RestoreWalletOptionsPage extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
 
-    // Pre-construct icons to avoid rebuilding them on every frame
     final backIcon = SvgPicture.asset(
       'assets/icons/back.svg',
       width: 24,
@@ -190,7 +189,7 @@ class RestoreWalletOptionsPage extends StatelessWidget {
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Text(
-          'Restore Wallet',
+          AppLocalizations.of(context)!.restoreWalletOptionsTitle,
           style: TextStyle(color: theme.textPrimary),
         ),
       ),
@@ -199,27 +198,35 @@ class RestoreWalletOptionsPage extends StatelessWidget {
           padding: const EdgeInsets.all(16.0),
           children: [
             WalletListItem(
-              title: 'BIP39',
-              subtitle: 'Restore with Mnemonic phrase',
+              title:
+                  AppLocalizations.of(context)!.restoreWalletOptionsBIP39Title,
+              subtitle: AppLocalizations.of(context)!
+                  .restoreWalletOptionsBIP39Subtitle,
               icon: documentIcon,
               onTap: () => _handleBip39Restore(context),
             ),
             WalletListItem(
               disabled: true,
-              title: 'SLIP-0039',
-              subtitle: 'Restore with Shared Mnemonic phrase',
+              title: AppLocalizations.of(context)!
+                  .restoreWalletOptionsSLIP0039Title,
+              subtitle: AppLocalizations.of(context)!
+                  .restoreWalletOptionsSLIP0039Subtitle,
               icon: puzzleIcon,
               onTap: null,
             ),
             WalletListItem(
-              title: 'Private Key',
-              subtitle: 'Restore with private key',
+              title: AppLocalizations.of(context)!
+                  .restoreWalletOptionsPrivateKeyTitle,
+              subtitle: AppLocalizations.of(context)!
+                  .restoreWalletOptionsPrivateKeySubtitle,
               icon: bincodeIcon,
               onTap: () => _handlePrivateKeyRestore(context),
             ),
             WalletListItem(
-              title: 'QRcode',
-              subtitle: 'Restore wallet by QRcode scanning',
+              title:
+                  AppLocalizations.of(context)!.restoreWalletOptionsQRCodeTitle,
+              subtitle: AppLocalizations.of(context)!
+                  .restoreWalletOptionsQRCodeSubtitle,
               icon: qrcodeIcon,
               onTap: () => _handleQRCodeScanning(context),
             ),

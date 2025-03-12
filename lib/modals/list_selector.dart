@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class ListItem {
   final String title;
@@ -78,6 +79,7 @@ class _ListSelectorModalContentState extends State<_ListSelectorModalContent> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       constraints: BoxConstraints(

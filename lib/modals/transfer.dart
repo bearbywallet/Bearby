@@ -21,6 +21,7 @@ import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/src/rust/models/transactions/scilla.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showConfirmTransactionModal({
   required BuildContext context,
@@ -202,7 +203,7 @@ class _ConfirmTransactionContentState
         );
 
   Future<bool> _authenticate() async => _authService.authenticate(
-      allowPinCode: true, reason: 'Please authenticate');
+      allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
 
   Future<HistoricalTransactionInfo?> _signAndSend(
       AppState appState, TransactionRequestInfo tx) async {
@@ -258,6 +259,7 @@ class _ConfirmTransactionContentState
   Widget build(BuildContext context) {
     final appState = context.watch<AppState>();
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final backgroundColor =
         _parseColor(widget.colors?.background) ?? theme.cardBackground;
@@ -347,7 +349,7 @@ class _ConfirmTransactionContentState
                         child: SmartInput(
                           key: _passwordInputKey,
                           controller: _passwordController,
-                          hint: 'Password',
+                          hint: l10n.confirmTransactionContentPasswordHint,
                           fontSize: 18,
                           height: 56,
                           padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -367,13 +369,16 @@ class _ConfirmTransactionContentState
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
                       child: SwipeButton(
-                        text: _error != null ? 'Unable to confirm' : 'Confirm',
+                        text: _error != null
+                            ? l10n.confirmTransactionContentUnableToConfirm
+                            : l10n.confirmTransactionContentConfirm,
                         disabled: _isDisabled,
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
                             if (!_checkBalance(appState)) {
-                              throw Exception('Insufficient balance');
+                              throw Exception(l10n
+                                  .confirmTransactionContentInsufficientBalance);
                             }
                             final tx = _prepareTx();
                             HistoricalTransactionInfo? sendedTx =
@@ -462,7 +467,9 @@ class _ConfirmTransactionContentState
           BaseTokenInfo(
               value: '', symbol: ftoken.symbol, decimals: ftoken.decimals);
 
-      final signer = appState.account ?? (throw Exception('No active account'));
+      final signer = appState.account ??
+          (throw Exception(AppLocalizations.of(context)!
+              .confirmTransactionContentNoActiveAccount));
       return Padding(
         padding: const EdgeInsets.all(16),
         child: TokenTransferAmount(
@@ -476,7 +483,8 @@ class _ConfirmTransactionContentState
         ),
       );
     } catch (e) {
-      setState(() => _error = 'Failed to load transfer details');
+      setState(() => _error = AppLocalizations.of(context)!
+          .confirmTransactionContentFailedLoadTransfer);
       return const SizedBox.shrink();
     }
   }
