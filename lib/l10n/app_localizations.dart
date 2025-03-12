@@ -771,12 +771,6 @@ abstract class AppLocalizations {
   /// **'Search'**
   String get setupNetworkSettingsPageSearchHint;
 
-  /// Error message prefix when loading chains fails on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load network chains:'**
-  String get setupNetworkSettingsPageLoadError;
-
   /// Message when no networks are available on SetupNetworkSettingsPage
   ///
   /// In en, this message translates to:

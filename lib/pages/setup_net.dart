@@ -119,7 +119,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = e.toString();
+        errorMessage = '$e';
       });
       debugPrint('Error loading chains: $e');
     }

@@ -350,9 +350,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get setupNetworkSettingsPageSearchHint => 'Search';
 
   @override
-  String get setupNetworkSettingsPageLoadError => 'Failed to load network chains:';
-
-  @override
   String get setupNetworkSettingsPageNoNetworks => 'No networks available';
 
   @override

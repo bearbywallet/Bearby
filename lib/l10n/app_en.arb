@@ -561,11 +561,6 @@
     "description": "Hint text for search input on SetupNetworkSettingsPage"
   },
   
-  "setupNetworkSettingsPageLoadError": "Failed to load network chains:",
-  "@setupNetworkSettingsPageLoadError": {
-    "description": "Error message prefix when loading chains fails on SetupNetworkSettingsPage"
-  },
-  
   "setupNetworkSettingsPageNoNetworks": "No networks available",
   "@setupNetworkSettingsPageNoNetworks": {
     "description": "Message when no networks are available on SetupNetworkSettingsPage"
