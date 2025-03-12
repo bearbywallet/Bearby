@@ -11,6 +11,7 @@ import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class CipherSettingsPage extends StatefulWidget {
   const CipherSettingsPage({super.key});
@@ -29,21 +30,19 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
 
   final List<Map<String, String>> cipherDescriptions = [
     {
-      'title': 'Standard Encryption',
-      'subtitle': 'AES-256 + KUZNECHIK-GOST',
-      'description':
-          'Basic encryption with AES-256 and GOST standard KUZNECHIK.',
+      'title': '',
+      'subtitle': '',
+      'description': '',
     },
     {
-      'title': 'Hybrid Encryption',
-      'subtitle': 'CYBER + KUZNECHIK-GOST',
-      'description':
-          'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.',
+      'title': '',
+      'subtitle': '',
+      'description': '',
     },
     {
-      'title': 'Quantum-Resistant',
-      'subtitle': 'CYBER + KUZNECHIK + NTRUP1277',
-      'description': 'Advanced quantum-resistant encryption with NTRUP1277.',
+      'title': '',
+      'subtitle': '',
+      'description': '',
     },
   ];
 
@@ -72,6 +71,25 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
       _keys = args['keys'] as KeyPairInfo?;
       _zilLegacy = args['zilLegacy'] as bool? ?? false;
     });
+
+    cipherDescriptions[0]['title'] =
+        AppLocalizations.of(context)!.cipherSettingsPageStandardTitle;
+    cipherDescriptions[0]['subtitle'] =
+        AppLocalizations.of(context)!.cipherSettingsPageStandardSubtitle;
+    cipherDescriptions[0]['description'] =
+        AppLocalizations.of(context)!.cipherSettingsPageStandardDescription;
+    cipherDescriptions[1]['title'] =
+        AppLocalizations.of(context)!.cipherSettingsPageHybridTitle;
+    cipherDescriptions[1]['subtitle'] =
+        AppLocalizations.of(context)!.cipherSettingsPageHybridSubtitle;
+    cipherDescriptions[1]['description'] =
+        AppLocalizations.of(context)!.cipherSettingsPageHybridDescription;
+    cipherDescriptions[2]['title'] =
+        AppLocalizations.of(context)!.cipherSettingsPageQuantumTitle;
+    cipherDescriptions[2]['subtitle'] =
+        AppLocalizations.of(context)!.cipherSettingsPageQuantumSubtitle;
+    cipherDescriptions[2]['description'] =
+        AppLocalizations.of(context)!.cipherSettingsPageQuantumDescription;
   }
 
   @override
@@ -87,7 +105,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Encryption Setup',
+                  title: AppLocalizations.of(context)!.cipherSettingsPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -108,9 +126,10 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                                   : theme.primaryPurple,
                             ),
                           ),
-                          child: const Text(
-                            'Advanced',
-                            style: TextStyle(
+                          child: Text(
+                            AppLocalizations.of(context)!
+                                .cipherSettingsPageAdvancedButton,
+                            style: const TextStyle(
                                 fontSize: 16, fontWeight: FontWeight.w500),
                           ),
                         ),
@@ -163,7 +182,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                     children: [
                       if (selectedCipherIndex == 2)
                         Text(
-                          'Quantum-resistant encryption may impact performance',
+                          AppLocalizations.of(context)!
+                              .cipherSettingsPageQuantumWarning,
                           style: TextStyle(
                             color: theme.textSecondary,
                             fontSize: 14,
@@ -174,7 +194,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                       CustomButton(
                         textColor: theme.buttonText,
                         backgroundColor: theme.primaryPurple,
-                        text: 'Confirm',
+                        text: AppLocalizations.of(context)!
+                            .cipherSettingsPageConfirmButton,
                         onPressed: () => Navigator.of(context).pushNamed(
                           '/pass_setup',
                           arguments: {

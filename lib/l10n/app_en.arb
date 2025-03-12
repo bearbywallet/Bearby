@@ -870,5 +870,201 @@
   "revealSecretPhraseScamAlertDescription": "Never share your secret phrase with anyone. Never input it on any website.",
   "@revealSecretPhraseScamAlertDescription": {
     "description": "Description text in the scam alert section of the RevealSecretPhrase component"
+  },
+  "cipherSettingsPageTitle": "Encryption Setup",
+  "@cipherSettingsPageTitle": {
+    "description": "Title displayed in the app bar of the CipherSettingsPage component"
+  },
+  "cipherSettingsPageAdvancedButton": "Advanced",
+  "@cipherSettingsPageAdvancedButton": {
+    "description": "Text on the advanced settings button in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageStandardTitle": "Standard Encryption",
+  "@cipherSettingsPageStandardTitle": {
+    "description": "Title for the standard encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageStandardSubtitle": "AES-256 + KUZNECHIK-GOST",
+  "@cipherSettingsPageStandardSubtitle": {
+    "description": "Subtitle for the standard encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageStandardDescription": "Basic encryption with AES-256 and GOST standard KUZNECHIK.",
+  "@cipherSettingsPageStandardDescription": {
+    "description": "Description for the standard encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageHybridTitle": "Hybrid Encryption",
+  "@cipherSettingsPageHybridTitle": {
+    "description": "Title for the hybrid encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageHybridSubtitle": "CYBER + KUZNECHIK-GOST",
+  "@cipherSettingsPageHybridSubtitle": {
+    "description": "Subtitle for the hybrid encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageHybridDescription": "Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.",
+  "@cipherSettingsPageHybridDescription": {
+    "description": "Description for the hybrid encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageQuantumTitle": "Quantum-Resistant",
+  "@cipherSettingsPageQuantumTitle": {
+    "description": "Title for the quantum-resistant encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageQuantumSubtitle": "CYBER + KUZNECHIK + NTRUP1277",
+  "@cipherSettingsPageQuantumSubtitle": {
+    "description": "Subtitle for the quantum-resistant encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageQuantumDescription": "Advanced quantum-resistant encryption with NTRUP1277.",
+  "@cipherSettingsPageQuantumDescription": {
+    "description": "Description for the quantum-resistant encryption option in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageQuantumWarning": "Quantum-resistant encryption may impact performance",
+  "@cipherSettingsPageQuantumWarning": {
+    "description": "Warning text displayed when quantum-resistant encryption is selected in the CipherSettingsPage component"
+  },
+  "cipherSettingsPageConfirmButton": "Confirm",
+  "@cipherSettingsPageConfirmButton": {
+    "description": "Text on the confirm button in the CipherSettingsPage component"
+  },
+  "secretPhraseVerifyPageTitle": "Verify Secret",
+  "@secretPhraseVerifyPageTitle": {
+    "description": "Title displayed in the app bar of the SecretPhraseVerifyPage component"
+  },
+  "secretPhraseVerifyPageSkipButton": "Skip",
+  "@secretPhraseVerifyPageSkipButton": {
+    "description": "Text on the skip button in the SecretPhraseVerifyPage component"
+  },
+  "secretPhraseVerifyPageSubtitle": "Verify Bip39 Secret",
+  "@secretPhraseVerifyPageSubtitle": {
+    "description": "Subtitle text displayed below the app bar in the SecretPhraseVerifyPage component"
+  },
+  "secretPhraseVerifyPageNextButton": "Next",
+  "@secretPhraseVerifyPageNextButton": {
+    "description": "Text on the next button in the SecretPhraseVerifyPage component"
+  },
+  "restoreSecretPhrasePageTitle": "Restore Wallet",
+  "@restoreSecretPhrasePageTitle": {
+    "description": "Title displayed in the app bar of the RestoreSecretPhrasePage component"
+  },
+  "restoreSecretPhrasePageRestoreButton": "Restore",
+  "@restoreSecretPhrasePageRestoreButton": {
+    "description": "Text on the restore button in the RestoreSecretPhrasePage component"
+  },
+  "settingsPageTitle": "Settings",
+  "@settingsPageTitle": {
+    "description": "Title displayed in the app bar of the SettingsPage component"
+  },
+  "settingsPageZilliqaLegacy": "Zilliqa Legacy",
+  "@settingsPageZilliqaLegacy": {
+    "description": "Label for the Zilliqa Legacy switch in the SettingsPage component"
+  },
+  "settingsPageCurrency": "Currency",
+  "@settingsPageCurrency": {
+    "description": "Label for the Currency settings item in the SettingsPage component"
+  },
+  "settingsPageAppearance": "Appearance",
+  "@settingsPageAppearance": {
+    "description": "Label for the Appearance settings item in the SettingsPage component"
+  },
+  "settingsPageNotifications": "Notifications",
+  "@settingsPageNotifications": {
+    "description": "Label for the Notifications settings item in the SettingsPage component"
+  },
+  "settingsPageAddressBook": "Address book",
+  "@settingsPageAddressBook": {
+    "description": "Label for the Address Book settings item in the SettingsPage component"
+  },
+  "settingsPageSecurityPrivacy": "Security & privacy",
+  "@settingsPageSecurityPrivacy": {
+    "description": "Label for the Security & Privacy settings item in the SettingsPage component"
+  },
+  "settingsPageNetworks": "Networks",
+  "@settingsPageNetworks": {
+    "description": "Label for the Networks settings item in the SettingsPage component"
+  },
+  "settingsPageLanguage": "Language",
+  "@settingsPageLanguage": {
+    "description": "Label for the Language settings item in the SettingsPage component"
+  },
+  "settingsPageBrowser": "Browser",
+  "@settingsPageBrowser": {
+    "description": "Label for the Browser settings item in the SettingsPage component"
+  },
+  "settingsPageTelegram": "Telegram",
+  "@settingsPageTelegram": {
+    "description": "Label for the Telegram settings item in the SettingsPage component"
+  },
+  "settingsPageTwitter": "Twitter",
+  "@settingsPageTwitter": {
+    "description": "Label for the Twitter settings item in the SettingsPage component"
+  },
+  "settingsPageGitHub": "GitHub",
+  "@settingsPageGitHub": {
+    "description": "Label for the GitHub settings item in the SettingsPage component"
+  },
+  "settingsPageAbout": "About",
+  "@settingsPageAbout": {
+    "description": "Label for the About settings item in the SettingsPage component"
+  },
+  "ledgerConnectPageTitle": "Ledger Connect",
+  "@ledgerConnectPageTitle": {
+    "description": "Title displayed in the app bar of the LedgerConnectPage component"
+  },
+  "passwordSetupPageTitle": "Password Setup",
+  "@passwordSetupPageTitle": {
+    "description": "Title displayed in the app bar of the PasswordSetupPage component"
+  },
+  "passwordSetupPageSubtitle": "Create Password",
+  "@passwordSetupPageSubtitle": {
+    "description": "Subtitle text displayed at the top of the PasswordSetupPage component"
+  },
+  "passwordSetupPageWalletNameHint": "Wallet Name",
+  "@passwordSetupPageWalletNameHint": {
+    "description": "Hint text for the wallet name input field in the PasswordSetupPage component"
+  },
+  "passwordSetupPagePasswordHint": "Password",
+  "@passwordSetupPagePasswordHint": {
+    "description": "Hint text for the password input field in the PasswordSetupPage component"
+  },
+  "passwordSetupPageConfirmPasswordHint": "Confirm Password",
+  "@passwordSetupPageConfirmPasswordHint": {
+    "description": "Hint text for the confirm password input field in the PasswordSetupPage component"
+  },
+  "passwordSetupPageEmptyWalletNameError": "Wallet name cannot be empty",
+  "@passwordSetupPageEmptyWalletNameError": {
+    "description": "Error message displayed when wallet name is empty in the PasswordSetupPage component"
+  },
+  "passwordSetupPageLongWalletNameError": "Wallet name is too long",
+  "@passwordSetupPageLongWalletNameError": {
+    "description": "Error message displayed when wallet name exceeds length limit in the PasswordSetupPage component"
+  },
+  "passwordSetupPageShortPasswordError": "Password must be at least 8 characters",
+  "@passwordSetupPageShortPasswordError": {
+    "description": "Error message displayed when password is too short in the PasswordSetupPage component"
+  },
+  "passwordSetupPageMismatchPasswordError": "Passwords do not match",
+  "@passwordSetupPageMismatchPasswordError": {
+    "description": "Error message displayed when passwords do not match in the PasswordSetupPage component"
+  },
+  "passwordSetupPageLegacyLabel": "Legacy",
+  "@passwordSetupPageLegacyLabel": {
+    "description": "Label for the Zilliqa Legacy switch in the PasswordSetupPage component"
+  },
+  "passwordSetupPageCreateButton": "Create Password",
+  "@passwordSetupPageCreateButton": {
+    "description": "Text on the create password button in the PasswordSetupPage component"
+  },
+  "passwordSetupPageAuthReason": "Please authenticate to enable quick access",
+  "@passwordSetupPageAuthReason": {
+    "description": "Reason text displayed during biometric authentication in the PasswordSetupPage component"
+  },
+  "passwordSetupPageSeedType": "Seed",
+  "@passwordSetupPageSeedType": {
+    "description": "Type label used in wallet name generation for seed-based wallets in the PasswordSetupPage component"
+  },
+  "passwordSetupPageKeyType": "Key",
+  "@passwordSetupPageKeyType": {
+    "description": "Type label used in wallet name generation for key-based wallets in the PasswordSetupPage component"
+  },
+  "passwordSetupPageUniversalNetwork": "Universal",
+  "@passwordSetupPageUniversalNetwork": {
+    "description": "Default network name used in wallet name generation when no specific network is provided in the PasswordSetupPage component"
   }
 }

@@ -1184,6 +1184,300 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Never share your secret phrase with anyone. Never input it on any website.'**
   String get revealSecretPhraseScamAlertDescription;
+
+  /// Title displayed in the app bar of the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Encryption Setup'**
+  String get cipherSettingsPageTitle;
+
+  /// Text on the advanced settings button in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced'**
+  String get cipherSettingsPageAdvancedButton;
+
+  /// Title for the standard encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Standard Encryption'**
+  String get cipherSettingsPageStandardTitle;
+
+  /// Subtitle for the standard encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'AES-256 + KUZNECHIK-GOST'**
+  String get cipherSettingsPageStandardSubtitle;
+
+  /// Description for the standard encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Basic encryption with AES-256 and GOST standard KUZNECHIK.'**
+  String get cipherSettingsPageStandardDescription;
+
+  /// Title for the hybrid encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid Encryption'**
+  String get cipherSettingsPageHybridTitle;
+
+  /// Subtitle for the hybrid encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'CYBER + KUZNECHIK-GOST'**
+  String get cipherSettingsPageHybridSubtitle;
+
+  /// Description for the hybrid encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.'**
+  String get cipherSettingsPageHybridDescription;
+
+  /// Title for the quantum-resistant encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Quantum-Resistant'**
+  String get cipherSettingsPageQuantumTitle;
+
+  /// Subtitle for the quantum-resistant encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'CYBER + KUZNECHIK + NTRUP1277'**
+  String get cipherSettingsPageQuantumSubtitle;
+
+  /// Description for the quantum-resistant encryption option in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Advanced quantum-resistant encryption with NTRUP1277.'**
+  String get cipherSettingsPageQuantumDescription;
+
+  /// Warning text displayed when quantum-resistant encryption is selected in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Quantum-resistant encryption may impact performance'**
+  String get cipherSettingsPageQuantumWarning;
+
+  /// Text on the confirm button in the CipherSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm'**
+  String get cipherSettingsPageConfirmButton;
+
+  /// Title displayed in the app bar of the SecretPhraseVerifyPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Secret'**
+  String get secretPhraseVerifyPageTitle;
+
+  /// Text on the skip button in the SecretPhraseVerifyPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Skip'**
+  String get secretPhraseVerifyPageSkipButton;
+
+  /// Subtitle text displayed below the app bar in the SecretPhraseVerifyPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Verify Bip39 Secret'**
+  String get secretPhraseVerifyPageSubtitle;
+
+  /// Text on the next button in the SecretPhraseVerifyPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get secretPhraseVerifyPageNextButton;
+
+  /// Title displayed in the app bar of the RestoreSecretPhrasePage component
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Wallet'**
+  String get restoreSecretPhrasePageTitle;
+
+  /// Text on the restore button in the RestoreSecretPhrasePage component
+  ///
+  /// In en, this message translates to:
+  /// **'Restore'**
+  String get restoreSecretPhrasePageRestoreButton;
+
+  /// Title displayed in the app bar of the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Settings'**
+  String get settingsPageTitle;
+
+  /// Label for the Zilliqa Legacy switch in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Zilliqa Legacy'**
+  String get settingsPageZilliqaLegacy;
+
+  /// Label for the Currency settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Currency'**
+  String get settingsPageCurrency;
+
+  /// Label for the Appearance settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance'**
+  String get settingsPageAppearance;
+
+  /// Label for the Notifications settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get settingsPageNotifications;
+
+  /// Label for the Address Book settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Address book'**
+  String get settingsPageAddressBook;
+
+  /// Label for the Security & Privacy settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Security & privacy'**
+  String get settingsPageSecurityPrivacy;
+
+  /// Label for the Networks settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Networks'**
+  String get settingsPageNetworks;
+
+  /// Label for the Language settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Language'**
+  String get settingsPageLanguage;
+
+  /// Label for the Browser settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Browser'**
+  String get settingsPageBrowser;
+
+  /// Label for the Telegram settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Telegram'**
+  String get settingsPageTelegram;
+
+  /// Label for the Twitter settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Twitter'**
+  String get settingsPageTwitter;
+
+  /// Label for the GitHub settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'GitHub'**
+  String get settingsPageGitHub;
+
+  /// Label for the About settings item in the SettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'About'**
+  String get settingsPageAbout;
+
+  /// Title displayed in the app bar of the LedgerConnectPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger Connect'**
+  String get ledgerConnectPageTitle;
+
+  /// Title displayed in the app bar of the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Password Setup'**
+  String get passwordSetupPageTitle;
+
+  /// Subtitle text displayed at the top of the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Create Password'**
+  String get passwordSetupPageSubtitle;
+
+  /// Hint text for the wallet name input field in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Name'**
+  String get passwordSetupPageWalletNameHint;
+
+  /// Hint text for the password input field in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordSetupPagePasswordHint;
+
+  /// Hint text for the confirm password input field in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get passwordSetupPageConfirmPasswordHint;
+
+  /// Error message displayed when wallet name is empty in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name cannot be empty'**
+  String get passwordSetupPageEmptyWalletNameError;
+
+  /// Error message displayed when wallet name exceeds length limit in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name is too long'**
+  String get passwordSetupPageLongWalletNameError;
+
+  /// Error message displayed when password is too short in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get passwordSetupPageShortPasswordError;
+
+  /// Error message displayed when passwords do not match in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordSetupPageMismatchPasswordError;
+
+  /// Label for the Zilliqa Legacy switch in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Legacy'**
+  String get passwordSetupPageLegacyLabel;
+
+  /// Text on the create password button in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Create Password'**
+  String get passwordSetupPageCreateButton;
+
+  /// Reason text displayed during biometric authentication in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate to enable quick access'**
+  String get passwordSetupPageAuthReason;
+
+  /// Type label used in wallet name generation for seed-based wallets in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Seed'**
+  String get passwordSetupPageSeedType;
+
+  /// Type label used in wallet name generation for key-based wallets in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Key'**
+  String get passwordSetupPageKeyType;
+
+  /// Default network name used in wallet name generation when no specific network is provided in the PasswordSetupPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Universal'**
+  String get passwordSetupPageUniversalNetwork;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

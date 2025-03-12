@@ -10,6 +10,7 @@ import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import '../theme/app_theme.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -38,7 +39,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Settings',
+                    title: AppLocalizations.of(context)!.settingsPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -78,7 +79,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                       const SizedBox(width: 12),
                                       Expanded(
                                         child: Text(
-                                          'Zilliqa Legacy',
+                                          AppLocalizations.of(context)!
+                                              .settingsPageZilliqaLegacy,
                                           style: TextStyle(
                                             color: theme.textPrimary,
                                             fontSize: 16,
@@ -106,19 +108,22 @@ class _SettingsPageState extends State<SettingsPage> {
                                   ),
                                 ),
                               SettingsItem(
-                                title: 'Currency',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageCurrency,
                                 trailingSvgPath: 'assets/icons/currency.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/currency'),
                               ),
                               SettingsItem(
-                                title: 'Appearance',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageAppearance,
                                 trailingSvgPath: 'assets/icons/appearance.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/appearance'),
                               ),
                               SettingsItem(
-                                title: 'Notifications',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageNotifications,
                                 trailingSvgPath: 'assets/icons/bell.svg',
                                 onTap: () => Navigator.pushNamed(
                                     context, '/notifications'),
@@ -126,7 +131,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 isFirst: false,
                                 isLast: true,
-                                title: 'Address book',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageAddressBook,
                                 trailingSvgPath: 'assets/icons/book.svg',
                                 onTap: () => Navigator.pushNamed(
                                     context, '/address-book'),
@@ -137,13 +143,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 isFirst: true,
                                 isLast: false,
-                                title: 'Security & privacy',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageSecurityPrivacy,
                                 trailingSvgPath: 'assets/icons/shield.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/security'),
                               ),
                               SettingsItem(
-                                title: 'Networks',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageNetworks,
                                 trailingSvgPath: 'assets/icons/globe.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/networks'),
@@ -151,13 +159,15 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 isFirst: false,
                                 isLast: true,
-                                title: 'Language',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageLanguage,
                                 trailingSvgPath: 'assets/icons/language.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/language'),
                               ),
                               SettingsItem(
-                                title: 'Browser',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageBrowser,
                                 trailingSvgPath: 'assets/icons/browser.svg',
                                 onTap: () => Navigator.pushNamed(
                                     context, '/browser_settings'),
@@ -168,19 +178,22 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 isFirst: true,
                                 isLast: false,
-                                title: 'Telegram',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageTelegram,
                                 trailingSvgPath: 'assets/icons/telegram.svg',
                                 onTap: () => socialMediaService.openTelegram(
                                     username: 'zilpaychat'),
                               ),
                               SettingsItem(
-                                title: 'Twitter',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageTwitter,
                                 trailingSvgPath: 'assets/icons/x.svg',
                                 onTap: () => socialMediaService.openX(
                                     username: 'pay_zil'),
                               ),
                               SettingsItem(
-                                title: 'GitHub',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageGitHub,
                                 trailingSvgPath: 'assets/icons/github.svg',
                                 onTap: () => socialMediaService.openGitHub(
                                   username: 'zilpay',
@@ -190,7 +203,8 @@ class _SettingsPageState extends State<SettingsPage> {
                               SettingsItem(
                                 isFirst: false,
                                 isLast: true,
-                                title: 'About',
+                                title: AppLocalizations.of(context)!
+                                    .settingsPageAbout,
                                 trailingSvgPath: 'assets/icons/info.svg',
                                 onTap: () =>
                                     Navigator.pushNamed(context, '/about'),

@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class LedgerConnectPage extends StatefulWidget {
   const LedgerConnectPage({super.key});
@@ -51,7 +52,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: '',
+                  title: AppLocalizations.of(context)!.ledgerConnectPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',

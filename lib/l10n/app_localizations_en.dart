@@ -571,4 +571,151 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get revealSecretPhraseScamAlertDescription => 'Never share your secret phrase with anyone. Never input it on any website.';
+
+  @override
+  String get cipherSettingsPageTitle => 'Encryption Setup';
+
+  @override
+  String get cipherSettingsPageAdvancedButton => 'Advanced';
+
+  @override
+  String get cipherSettingsPageStandardTitle => 'Standard Encryption';
+
+  @override
+  String get cipherSettingsPageStandardSubtitle => 'AES-256 + KUZNECHIK-GOST';
+
+  @override
+  String get cipherSettingsPageStandardDescription => 'Basic encryption with AES-256 and GOST standard KUZNECHIK.';
+
+  @override
+  String get cipherSettingsPageHybridTitle => 'Hybrid Encryption';
+
+  @override
+  String get cipherSettingsPageHybridSubtitle => 'CYBER + KUZNECHIK-GOST';
+
+  @override
+  String get cipherSettingsPageHybridDescription => 'Hybrid encryption combining CYBER and KUZNECHIK-GOST algorithms.';
+
+  @override
+  String get cipherSettingsPageQuantumTitle => 'Quantum-Resistant';
+
+  @override
+  String get cipherSettingsPageQuantumSubtitle => 'CYBER + KUZNECHIK + NTRUP1277';
+
+  @override
+  String get cipherSettingsPageQuantumDescription => 'Advanced quantum-resistant encryption with NTRUP1277.';
+
+  @override
+  String get cipherSettingsPageQuantumWarning => 'Quantum-resistant encryption may impact performance';
+
+  @override
+  String get cipherSettingsPageConfirmButton => 'Confirm';
+
+  @override
+  String get secretPhraseVerifyPageTitle => 'Verify Secret';
+
+  @override
+  String get secretPhraseVerifyPageSkipButton => 'Skip';
+
+  @override
+  String get secretPhraseVerifyPageSubtitle => 'Verify Bip39 Secret';
+
+  @override
+  String get secretPhraseVerifyPageNextButton => 'Next';
+
+  @override
+  String get restoreSecretPhrasePageTitle => 'Restore Wallet';
+
+  @override
+  String get restoreSecretPhrasePageRestoreButton => 'Restore';
+
+  @override
+  String get settingsPageTitle => 'Settings';
+
+  @override
+  String get settingsPageZilliqaLegacy => 'Zilliqa Legacy';
+
+  @override
+  String get settingsPageCurrency => 'Currency';
+
+  @override
+  String get settingsPageAppearance => 'Appearance';
+
+  @override
+  String get settingsPageNotifications => 'Notifications';
+
+  @override
+  String get settingsPageAddressBook => 'Address book';
+
+  @override
+  String get settingsPageSecurityPrivacy => 'Security & privacy';
+
+  @override
+  String get settingsPageNetworks => 'Networks';
+
+  @override
+  String get settingsPageLanguage => 'Language';
+
+  @override
+  String get settingsPageBrowser => 'Browser';
+
+  @override
+  String get settingsPageTelegram => 'Telegram';
+
+  @override
+  String get settingsPageTwitter => 'Twitter';
+
+  @override
+  String get settingsPageGitHub => 'GitHub';
+
+  @override
+  String get settingsPageAbout => 'About';
+
+  @override
+  String get ledgerConnectPageTitle => 'Ledger Connect';
+
+  @override
+  String get passwordSetupPageTitle => 'Password Setup';
+
+  @override
+  String get passwordSetupPageSubtitle => 'Create Password';
+
+  @override
+  String get passwordSetupPageWalletNameHint => 'Wallet Name';
+
+  @override
+  String get passwordSetupPagePasswordHint => 'Password';
+
+  @override
+  String get passwordSetupPageConfirmPasswordHint => 'Confirm Password';
+
+  @override
+  String get passwordSetupPageEmptyWalletNameError => 'Wallet name cannot be empty';
+
+  @override
+  String get passwordSetupPageLongWalletNameError => 'Wallet name is too long';
+
+  @override
+  String get passwordSetupPageShortPasswordError => 'Password must be at least 8 characters';
+
+  @override
+  String get passwordSetupPageMismatchPasswordError => 'Passwords do not match';
+
+  @override
+  String get passwordSetupPageLegacyLabel => 'Legacy';
+
+  @override
+  String get passwordSetupPageCreateButton => 'Create Password';
+
+  @override
+  String get passwordSetupPageAuthReason => 'Please authenticate to enable quick access';
+
+  @override
+  String get passwordSetupPageSeedType => 'Seed';
+
+  @override
+  String get passwordSetupPageKeyType => 'Key';
+
+  @override
+  String get passwordSetupPageUniversalNetwork => 'Universal';
 }

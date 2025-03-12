@@ -20,6 +20,7 @@ import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart' show AppState;
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class PasswordSetupPage extends StatefulWidget {
   const PasswordSetupPage({super.key});
@@ -126,14 +127,15 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   String _generateWalletName() {
     String type;
     if (_bip39List != null) {
-      type = "Seed";
+      type = AppLocalizations.of(context)!.passwordSetupPageSeedType;
     } else if (_keys != null) {
-      type = "Key";
+      type = AppLocalizations.of(context)!.passwordSetupPageKeyType;
     } else {
       type = "";
     }
 
-    String networkName = _chain?.name ?? "Universal";
+    String networkName = _chain?.name ??
+        AppLocalizations.of(context)!.passwordSetupPageUniversalNetwork;
     int walletNumber = _appState.wallets.length + 1;
     return "$networkName #$walletNumber ($type)";
   }
@@ -161,7 +163,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   bool _validatePasswords() {
     if (_walletNameController.text.trim().isEmpty) {
       setState(() {
-        _errorMessage = 'Wallet name cannot be empty';
+        _errorMessage =
+            AppLocalizations.of(context)!.passwordSetupPageEmptyWalletNameError;
         _disabled = false;
       });
       return false;
@@ -169,7 +172,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
     if (_walletNameController.text.length > 32) {
       setState(() {
-        _errorMessage = 'Wallet name is too long';
+        _errorMessage =
+            AppLocalizations.of(context)!.passwordSetupPageLongWalletNameError;
         _disabled = false;
       });
       return false;
@@ -178,7 +182,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     if (_passwordController.text.length < 6) {
       _passwordInputKey.currentState?.shake();
       setState(() {
-        _errorMessage = 'Password must be at least 8 characters';
+        _errorMessage =
+            AppLocalizations.of(context)!.passwordSetupPageShortPasswordError;
         _disabled = false;
       });
       return false;
@@ -188,7 +193,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       _confirmPasswordInputKey.currentState?.shake();
       setState(() {
         _disabled = false;
-        _errorMessage = 'Passwords do not match';
+        _errorMessage = AppLocalizations.of(context)!
+            .passwordSetupPageMismatchPasswordError;
       });
       return false;
     }
@@ -222,7 +228,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       if (_useDeviceAuth) {
         final authenticated = await _authService.authenticate(
           allowPinCode: true,
-          reason: 'Please authenticate to enable quick access',
+          reason: AppLocalizations.of(context)!.passwordSetupPageAuthReason,
         );
         setState(() => _useDeviceAuth = authenticated);
         if (!authenticated) {
@@ -358,7 +364,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
               child: Column(
                 children: [
                   CustomAppBar(
-                    title: '',
+                    title: AppLocalizations.of(context)!.passwordSetupPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
@@ -369,7 +375,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text(
-                              'Create Password',
+                              AppLocalizations.of(context)!
+                                  .passwordSetupPageSubtitle,
                               style: TextStyle(
                                 color: theme.textPrimary,
                                 fontSize: 24,
@@ -379,7 +386,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             SizedBox(height: adaptivePadding),
                             SmartInput(
                               controller: _walletNameController,
-                              hint: "Wallet Name",
+                              hint: AppLocalizations.of(context)!
+                                  .passwordSetupPageWalletNameHint,
                               fontSize: 18,
                               height: inputHeight,
                               padding:
@@ -403,7 +411,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             SmartInput(
                               key: _passwordInputKey,
                               controller: _passwordController,
-                              hint: "Password",
+                              hint: AppLocalizations.of(context)!
+                                  .passwordSetupPagePasswordHint,
                               fontSize: 18,
                               height: inputHeight,
                               padding:
@@ -436,7 +445,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                             SmartInput(
                               key: _confirmPasswordInputKey,
                               controller: _confirmPasswordController,
-                              hint: "Confirm Password",
+                              hint: AppLocalizations.of(context)!
+                                  .passwordSetupPageConfirmPasswordHint,
                               height: inputHeight,
                               fontSize: 18,
                               disabled: _disabled,
@@ -495,7 +505,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                         ),
                                         const SizedBox(width: 4),
                                         Text(
-                                          "Legacy",
+                                          AppLocalizations.of(context)!
+                                              .passwordSetupPageLegacyLabel,
                                           style: TextStyle(
                                             color: theme.textPrimary,
                                             fontSize: 16,
@@ -550,7 +561,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                           ),
                         ),
                         child: Text(
-                          'Create Password',
+                          AppLocalizations.of(context)!
+                              .passwordSetupPageCreateButton,
                           style: TextStyle(
                             color: theme.buttonText,
                             fontSize: 18,

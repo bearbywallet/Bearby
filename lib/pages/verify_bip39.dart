@@ -5,6 +5,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 List<int> getRandomNumbers(int min, int max, int count) {
   final random = Random();
@@ -67,7 +68,8 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Verify Secret',
+                  title:
+                      AppLocalizations.of(context)!.secretPhraseVerifyPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                   actionWidget: TextButton(
                     onPressed: () {
@@ -75,7 +77,8 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                           arguments: {'bip39': _bip39List});
                     },
                     child: Text(
-                      'Skip',
+                      AppLocalizations.of(context)!
+                          .secretPhraseVerifyPageSkipButton,
                       style: TextStyle(
                         color: theme.textPrimary,
                         fontSize: 16,
@@ -93,7 +96,8 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Verify Bip39 Secret',
+                                AppLocalizations.of(context)!
+                                    .secretPhraseVerifyPageSubtitle,
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
@@ -136,7 +140,8 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                                 child: CustomButton(
                                   textColor: theme.buttonText,
                                   backgroundColor: theme.primaryPurple,
-                                  text: 'Next',
+                                  text: AppLocalizations.of(context)!
+                                      .secretPhraseVerifyPageNextButton,
                                   onPressed: () {
                                     Navigator.of(context).pushNamed(
                                         '/net_setup',

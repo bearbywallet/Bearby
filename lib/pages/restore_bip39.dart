@@ -8,6 +8,7 @@ import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class RestoreSecretPhrasePage extends StatefulWidget {
   const RestoreSecretPhrasePage({super.key});
@@ -150,7 +151,8 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Restore Wallet',
+                  title: AppLocalizations.of(context)!
+                      .restoreSecretPhrasePageTitle,
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -194,7 +196,8 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                           child: CustomButton(
                             textColor: theme.buttonText,
                             backgroundColor: theme.primaryPurple,
-                            text: 'Restore',
+                            text: AppLocalizations.of(context)!
+                                .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
                               Navigator.of(context).pushNamed('/net_setup',
                                   arguments: {'bip39': _words});
