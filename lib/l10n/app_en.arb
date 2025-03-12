@@ -471,6 +471,189 @@
   "webViewPageTryAgain": "Try Again",
   "@webViewPageTryAgain": {
     "description": "Button text to retry loading the web page on WebViewPage"
-  }
+  },
   
+  "addTokenPageTitle": "Add Token",
+  "@addTokenPageTitle": {
+    "description": "Title for the AddTokenPage"
+  },
+  
+  "addTokenPageTokenInfo": "Token Information",
+  "@addTokenPageTokenInfo": {
+    "description": "Section title for token information input on AddTokenPage"
+  },
+  
+  "addTokenPageHint": "Address, name, symbol",
+  "@addTokenPageHint": {
+    "description": "Hint text for token input field on AddTokenPage"
+  },
+  
+  "addTokenPageAddError": "Failed to add token:",
+  "@addTokenPageAddError": {
+    "description": "Error message prefix when adding token fails on AddTokenPage"
+  },
+  
+  "addTokenPageInvalidAddressError": "Invalid token address or network error",
+  "@addTokenPageInvalidAddressError": {
+    "description": "Error message for invalid token address or network issues on AddTokenPage"
+  },
+
+  "secretPhraseGeneratorPageTitle": "New Wallet",
+  "@secretPhraseGeneratorPageTitle": {
+    "description": "Title for the SecretPhraseGeneratorPage"
+  },
+  
+  "secretPhraseGeneratorPageBackupCheckbox": "I have backup words",
+  "@secretPhraseGeneratorPageBackupCheckbox": {
+    "description": "Text for backup confirmation checkbox on SecretPhraseGeneratorPage"
+  },
+  
+  "secretPhraseGeneratorPageNextButton": "Next",
+  "@secretPhraseGeneratorPageNextButton": {
+    "description": "Text for next button on SecretPhraseGeneratorPage"
+  },
+  "homePageTestnetLabel": "Testnet",
+  "@homePageTestnetLabel": {
+    "description": "Label displayed when using a testnet on HomePage"
+  },
+
+  "revealSecretKeyTitle": "Reveal Secret Key",
+  "@revealSecretKeyTitle": {
+    "description": "Title for the RevealSecretKey page"
+  },
+  
+  "revealSecretKeyPasswordHint": "Password",
+  "@revealSecretKeyPasswordHint": {
+    "description": "Hint text for password input on RevealSecretKey page"
+  },
+  
+  "revealSecretKeyInvalidPassword": "invalid password, error:",
+  "@revealSecretKeyInvalidPassword": {
+    "description": "Error message prefix for invalid password on RevealSecretKey page"
+  },
+  
+  "revealSecretKeySubmitButton": "Submit",
+  "@revealSecretKeySubmitButton": {
+    "description": "Text for submit button on RevealSecretKey page"
+  },
+  
+  "revealSecretKeyDoneButton": "Done",
+  "@revealSecretKeyDoneButton": {
+    "description": "Text for done button after revealing secret key on RevealSecretKey page"
+  },
+  
+  "revealSecretKeyScamAlertTitle": "SCAM ALERT",
+  "@revealSecretKeyScamAlertTitle": {
+    "description": "Title for scam alert section on RevealSecretKey page"
+  },
+  
+  "revealSecretKeyScamAlertMessage": "Never share your secret key with anyone. Never input it on any website.",
+  "@revealSecretKeyScamAlertMessage": {
+    "description": "Message content for scam alert section on RevealSecretKey page"
+  },
+  "setupNetworkSettingsPageTestnetSwitch": "Testnet",
+  "@setupNetworkSettingsPageTestnetSwitch": {
+    "description": "Label for Testnet switch on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageSearchHint": "Search",
+  "@setupNetworkSettingsPageSearchHint": {
+    "description": "Hint text for search input on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageLoadError": "Failed to load network chains:",
+  "@setupNetworkSettingsPageLoadError": {
+    "description": "Error message prefix when loading chains fails on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageNoNetworks": "No networks available",
+  "@setupNetworkSettingsPageNoNetworks": {
+    "description": "Message when no networks are available on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageNoResults": "No networks found for \"{searchQuery}\"",
+  "@setupNetworkSettingsPageNoResults": {
+    "description": "Message when no networks match search query on SetupNetworkSettingsPage",
+    "placeholders": {
+      "searchQuery": {}
+    }
+  },
+  
+  "setupNetworkSettingsPageNextButton": "Next",
+  "@setupNetworkSettingsPageNextButton": {
+    "description": "Text for Next button on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageTestnetLabel": "Testnet",
+  "@setupNetworkSettingsPageTestnetLabel": {
+    "description": "Label indicating Testnet in network item on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageMainnetLabel": "Mainnet",
+  "@setupNetworkSettingsPageMainnetLabel": {
+    "description": "Label indicating Mainnet in network item on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageChainIdLabel": "Chain ID:",
+  "@setupNetworkSettingsPageChainIdLabel": {
+    "description": "Label prefix for Chain ID in network item on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageTokenLabel": "Token:",
+  "@setupNetworkSettingsPageTokenLabel": {
+    "description": "Label prefix for Token in network item on SetupNetworkSettingsPage"
+  },
+  
+  "setupNetworkSettingsPageExplorerLabel": "Explorer:",
+  "@setupNetworkSettingsPageExplorerLabel": {
+    "description": "Label prefix for Explorer in network item on SetupNetworkSettingsPage"
+  },
+  "appearanceSettingsPageTitle": "Appearance Settings",
+  "@appearanceSettingsPageTitle": {
+    "description": "Title for the Appearance Settings page"
+  },
+  "appearanceSettingsPageCompactNumbersTitle": "Compact Numbers",
+  "@appearanceSettingsPageCompactNumbersTitle": {
+    "description": "Title for the Compact Numbers switch setting"
+  },
+  "appearanceSettingsPageCompactNumbersDescription": "Enable to display abbreviated numbers (e.g., 20K instead of 20,000).",
+  "@appearanceSettingsPageCompactNumbersDescription": {
+    "description": "Description for the Compact Numbers switch setting"
+  },
+  "appearanceSettingsPageDeviceSettingsTitle": "Device settings",
+  "@appearanceSettingsPageDeviceSettingsTitle": {
+    "description": "Title for the Device Settings theme option"
+  },
+  "appearanceSettingsPageDeviceSettingsSubtitle": "System default",
+  "@appearanceSettingsPageDeviceSettingsSubtitle": {
+    "description": "Subtitle for the Device Settings theme option"
+  },
+  "appearanceSettingsPageDeviceSettingsDescription": "Default to your device's appearance. Your wallet theme will automatically adjust based on your system settings.",
+  "@appearanceSettingsPageDeviceSettingsDescription": {
+    "description": "Description for the Device Settings theme option"
+  },
+  "appearanceSettingsPageDarkModeTitle": "Dark Mode",
+  "@appearanceSettingsPageDarkModeTitle": {
+    "description": "Title for the Dark Mode theme option"
+  },
+  "appearanceSettingsPageDarkModeSubtitle": "Always dark",
+  "@appearanceSettingsPageDarkModeSubtitle": {
+    "description": "Subtitle for the Dark Mode theme option"
+  },
+  "appearanceSettingsPageDarkModeDescription": "Keep the dark theme enabled at all times, regardless of your device settings.",
+  "@appearanceSettingsPageDarkModeDescription": {
+    "description": "Description for the Dark Mode theme option"
+  },
+  "appearanceSettingsPageLightModeTitle": "Light mode",
+  "@appearanceSettingsPageLightModeTitle": {
+    "description": "Title for the Light Mode theme option"
+  },
+  "appearanceSettingsPageLightModeSubtitle": "Always light",
+  "@appearanceSettingsPageLightModeSubtitle": {
+    "description": "Subtitle for the Light Mode theme option"
+  },
+  "appearanceSettingsPageLightModeDescription": "Keep the light theme enabled at all times, regardless of your device settings.",
+  "@appearanceSettingsPageLightModeDescription": {
+    "description": "Description for the Light Mode theme option"
+  }
 }

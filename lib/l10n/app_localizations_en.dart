@@ -294,4 +294,123 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get webViewPageTryAgain => 'Try Again';
+
+  @override
+  String get addTokenPageTitle => 'Add Token';
+
+  @override
+  String get addTokenPageTokenInfo => 'Token Information';
+
+  @override
+  String get addTokenPageHint => 'Address, name, symbol';
+
+  @override
+  String get addTokenPageAddError => 'Failed to add token:';
+
+  @override
+  String get addTokenPageInvalidAddressError => 'Invalid token address or network error';
+
+  @override
+  String get secretPhraseGeneratorPageTitle => 'New Wallet';
+
+  @override
+  String get secretPhraseGeneratorPageBackupCheckbox => 'I have backup words';
+
+  @override
+  String get secretPhraseGeneratorPageNextButton => 'Next';
+
+  @override
+  String get homePageTestnetLabel => 'Testnet';
+
+  @override
+  String get revealSecretKeyTitle => 'Reveal Secret Key';
+
+  @override
+  String get revealSecretKeyPasswordHint => 'Password';
+
+  @override
+  String get revealSecretKeyInvalidPassword => 'invalid password, error:';
+
+  @override
+  String get revealSecretKeySubmitButton => 'Submit';
+
+  @override
+  String get revealSecretKeyDoneButton => 'Done';
+
+  @override
+  String get revealSecretKeyScamAlertTitle => 'SCAM ALERT';
+
+  @override
+  String get revealSecretKeyScamAlertMessage => 'Never share your secret key with anyone. Never input it on any website.';
+
+  @override
+  String get setupNetworkSettingsPageTestnetSwitch => 'Testnet';
+
+  @override
+  String get setupNetworkSettingsPageSearchHint => 'Search';
+
+  @override
+  String get setupNetworkSettingsPageLoadError => 'Failed to load network chains:';
+
+  @override
+  String get setupNetworkSettingsPageNoNetworks => 'No networks available';
+
+  @override
+  String setupNetworkSettingsPageNoResults(Object searchQuery) {
+    return 'No networks found for \"$searchQuery\"';
+  }
+
+  @override
+  String get setupNetworkSettingsPageNextButton => 'Next';
+
+  @override
+  String get setupNetworkSettingsPageTestnetLabel => 'Testnet';
+
+  @override
+  String get setupNetworkSettingsPageMainnetLabel => 'Mainnet';
+
+  @override
+  String get setupNetworkSettingsPageChainIdLabel => 'Chain ID:';
+
+  @override
+  String get setupNetworkSettingsPageTokenLabel => 'Token:';
+
+  @override
+  String get setupNetworkSettingsPageExplorerLabel => 'Explorer:';
+
+  @override
+  String get appearanceSettingsPageTitle => 'Appearance Settings';
+
+  @override
+  String get appearanceSettingsPageCompactNumbersTitle => 'Compact Numbers';
+
+  @override
+  String get appearanceSettingsPageCompactNumbersDescription => 'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).';
+
+  @override
+  String get appearanceSettingsPageDeviceSettingsTitle => 'Device settings';
+
+  @override
+  String get appearanceSettingsPageDeviceSettingsSubtitle => 'System default';
+
+  @override
+  String get appearanceSettingsPageDeviceSettingsDescription => 'Default to your device\'s appearance. Your wallet theme will automatically adjust based on your system settings.';
+
+  @override
+  String get appearanceSettingsPageDarkModeTitle => 'Dark Mode';
+
+  @override
+  String get appearanceSettingsPageDarkModeSubtitle => 'Always dark';
+
+  @override
+  String get appearanceSettingsPageDarkModeDescription => 'Keep the dark theme enabled at all times, regardless of your device settings.';
+
+  @override
+  String get appearanceSettingsPageLightModeTitle => 'Light mode';
+
+  @override
+  String get appearanceSettingsPageLightModeSubtitle => 'Always light';
+
+  @override
+  String get appearanceSettingsPageLightModeDescription => 'Keep the light theme enabled at all times, regardless of your device settings.';
 }

@@ -13,6 +13,7 @@ import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SetupNetworkSettingsPage extends StatefulWidget {
   const SetupNetworkSettingsPage({super.key});
@@ -89,6 +90,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   }
 
   Future<void> _loadChains() async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       final appState = Provider.of<AppState>(context, listen: false);
       final storedProviders = appState.state.providers;
@@ -121,7 +124,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage = 'Failed to load network chains: $e';
+        errorMessage = '${l10n.setupNetworkSettingsPageLoadError} $e';
       });
       debugPrint('Error loading chains: $e');
     }
@@ -152,6 +155,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
 
   OptionItem _buildNetworkItem(
       NetworkConfigInfo chain, AppTheme theme, int index) {
+    final l10n = AppLocalizations.of(context)!;
+
     return OptionItem(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -195,7 +200,9 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            isTestnet ? 'Testnet' : 'Mainnet',
+                            isTestnet
+                                ? l10n.setupNetworkSettingsPageTestnetLabel
+                                : l10n.setupNetworkSettingsPageMainnetLabel,
                             style: TextStyle(
                               color: isTestnet ? theme.warning : theme.success,
                               fontSize: 12,
@@ -207,7 +214,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Chain ID: ${chain.chainIds.where((id) => id != BigInt.zero).toList().join(",")}',
+                      '${l10n.setupNetworkSettingsPageChainIdLabel} ${chain.chainIds.where((id) => id != BigInt.zero).toList().join(",")}',
                       style: TextStyle(
                         color: theme.primaryPurple,
                         fontSize: 14,
@@ -216,7 +223,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Token: ${chain.chain}',
+                      '${l10n.setupNetworkSettingsPageTokenLabel} ${chain.chain}',
                       style: TextStyle(
                         color: theme.textSecondary,
                         fontSize: 14,
@@ -225,7 +232,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     if (chain.explorers.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
-                        'Explorer: ${chain.explorers.first.name}',
+                        '${l10n.setupNetworkSettingsPageExplorerLabel} ${chain.explorers.first.name}',
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 12,
@@ -250,6 +257,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     if (isLoading) {
       return const Scaffold(
@@ -270,7 +278,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                   actionWidget: Row(
                     children: [
                       Text(
-                        'Testnet',
+                        l10n.setupNetworkSettingsPageTestnetSwitch,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
@@ -295,7 +303,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                   padding: EdgeInsets.all(adaptivePadding),
                   child: SmartInput(
                     controller: _searchController,
-                    hint: 'Search',
+                    hint: l10n.setupNetworkSettingsPageSearchHint,
                     leftIconPath: 'assets/icons/search.svg',
                     onChanged: (value) => setState(() => _searchQuery = value),
                     borderColor: theme.textPrimary,
@@ -322,8 +330,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     child: Center(
                       child: Text(
                         mainnetNetworks.isEmpty && testnetNetworks.isEmpty
-                            ? 'No networks available'
-                            : 'No networks found for "$_searchQuery"',
+                            ? l10n.setupNetworkSettingsPageNoNetworks
+                            : l10n.setupNetworkSettingsPageNoResults(
+                                _searchQuery),
+                        style: TextStyle(
+                          color: theme.textSecondary,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   )
@@ -356,7 +369,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                   child: CustomButton(
                     textColor: theme.buttonText,
                     backgroundColor: theme.primaryPurple,
-                    text: 'Next',
+                    text: l10n.setupNetworkSettingsPageNextButton,
                     onPressed: filteredNetworks.isEmpty
                         ? () {}
                         : () {

@@ -9,6 +9,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SecretPhraseGeneratorPage extends StatefulWidget {
   const SecretPhraseGeneratorPage({
@@ -35,6 +36,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -44,7 +46,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'New Wallet',
+                  title: l10n.secretPhraseGeneratorPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                   actionIcon: SvgPicture.asset(
                     'assets/icons/reload.svg',
@@ -100,7 +102,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                           ),
                           child: CheckboxListTile(
                             title: Text(
-                              'I have backup words',
+                              l10n.secretPhraseGeneratorPageBackupCheckbox,
                               style: TextStyle(color: theme.textSecondary),
                             ),
                             value: _hasBackupWords,
@@ -126,7 +128,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                           child: CustomButton(
                             textColor: theme.buttonText,
                             backgroundColor: theme.primaryPurple,
-                            text: 'Next',
+                            text: l10n.secretPhraseGeneratorPageNextButton,
                             onPressed: () {
                               Navigator.of(context).pushNamed('/verify_bip39',
                                   arguments: {'bip39': _mnemonicWords});

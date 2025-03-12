@@ -12,6 +12,7 @@ import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -53,6 +54,7 @@ class _HomePageState extends State<HomePage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final l10n = AppLocalizations.of(context)!;
 
     final filteredTokens = appState.wallet!.tokens
         .where((t) => t.addrType == appState.account?.addrType)
@@ -216,7 +218,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                   child: Center(
                     child: Text(
-                      'Testnet',
+                      l10n.homePageTestnetLabel,
                       style: TextStyle(
                         color: theme.buttonText,
                         fontSize: 16,

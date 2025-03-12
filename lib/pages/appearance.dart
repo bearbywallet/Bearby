@@ -5,6 +5,7 @@ import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/switch_setting_item.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class AppearanceSettingsPage extends StatefulWidget {
   const AppearanceSettingsPage({super.key});
@@ -16,27 +17,6 @@ class AppearanceSettingsPage extends StatefulWidget {
 class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   int selectedThemeIndex = 0;
   bool compactNumbers = false;
-
-  final List<Map<String, String>> themeDescriptions = [
-    {
-      'title': 'Device settings',
-      'subtitle': 'System default',
-      'description':
-          "Default to your device's appearance. Your wallet theme will automatically adjust based on your system settings.",
-    },
-    {
-      'title': 'Dark Mode',
-      'subtitle': 'Always dark',
-      'description':
-          'Keep the dark theme enabled at all times, regardless of your device settings.',
-    },
-    {
-      'title': 'Light mode',
-      'subtitle': 'Always light',
-      'description':
-          'Keep the light theme enabled at all times, regardless of your device settings.',
-    },
-  ];
 
   @override
   void didChangeDependencies() {
@@ -70,6 +50,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
@@ -79,7 +60,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: 'Appearance Settings',
+                  title: l10n.appearanceSettingsPageTitle,
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 Expanded(
@@ -94,22 +75,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                           SwitchSettingItem(
                             backgroundColor: theme.cardBackground,
                             iconPath: "assets/icons/pin.svg",
-                            title: 'Compact Numbers',
-                            description:
-                                'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).',
+                            title:
+                                l10n.appearanceSettingsPageCompactNumbersTitle,
+                            description: l10n
+                                .appearanceSettingsPageCompactNumbersDescription,
                             value: compactNumbers,
                             onChanged: _handleCompactNumbersChange,
                           ),
                           const SizedBox(height: 24),
                           OptionsList(
-                            options: List.generate(
-                              themeDescriptions.length,
-                              (index) => OptionItem(
+                            options: [
+                              OptionItem(
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     Text(
-                                      themeDescriptions[index]['title']!,
+                                      l10n.appearanceSettingsPageDeviceSettingsTitle,
                                       style: TextStyle(
                                         color: theme.textPrimary,
                                         fontSize: 16,
@@ -118,7 +99,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
-                                      themeDescriptions[index]['subtitle']!,
+                                      l10n.appearanceSettingsPageDeviceSettingsSubtitle,
                                       style: TextStyle(
                                         color: theme.primaryPurple,
                                         fontSize: 14,
@@ -127,7 +108,7 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      themeDescriptions[index]['description']!,
+                                      l10n.appearanceSettingsPageDeviceSettingsDescription,
                                       style: TextStyle(
                                         color: theme.textSecondary,
                                         fontSize: 14,
@@ -135,10 +116,78 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                     ),
                                   ],
                                 ),
-                                isSelected: selectedThemeIndex == index,
-                                onSelect: () => _handleThemeSelection(index),
+                                isSelected: selectedThemeIndex == 0,
+                                onSelect: () => _handleThemeSelection(0),
                               ),
-                            ),
+                              OptionItem(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.appearanceSettingsPageDarkModeTitle,
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      l10n.appearanceSettingsPageDarkModeSubtitle,
+                                      style: TextStyle(
+                                        color: theme.primaryPurple,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      l10n.appearanceSettingsPageDarkModeDescription,
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                isSelected: selectedThemeIndex == 1,
+                                onSelect: () => _handleThemeSelection(1),
+                              ),
+                              OptionItem(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l10n.appearanceSettingsPageLightModeTitle,
+                                      style: TextStyle(
+                                        color: theme.textPrimary,
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      l10n.appearanceSettingsPageLightModeSubtitle,
+                                      style: TextStyle(
+                                        color: theme.primaryPurple,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      l10n.appearanceSettingsPageLightModeDescription,
+                                      style: TextStyle(
+                                        color: theme.textSecondary,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                isSelected: selectedThemeIndex == 2,
+                                onSelect: () => _handleThemeSelection(2),
+                              ),
+                            ],
                             unselectedOpacity: 0.5,
                           ),
                         ],

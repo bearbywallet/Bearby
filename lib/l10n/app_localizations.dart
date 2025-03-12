@@ -662,6 +662,240 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Try Again'**
   String get webViewPageTryAgain;
+
+  /// Title for the AddTokenPage
+  ///
+  /// In en, this message translates to:
+  /// **'Add Token'**
+  String get addTokenPageTitle;
+
+  /// Section title for token information input on AddTokenPage
+  ///
+  /// In en, this message translates to:
+  /// **'Token Information'**
+  String get addTokenPageTokenInfo;
+
+  /// Hint text for token input field on AddTokenPage
+  ///
+  /// In en, this message translates to:
+  /// **'Address, name, symbol'**
+  String get addTokenPageHint;
+
+  /// Error message prefix when adding token fails on AddTokenPage
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add token:'**
+  String get addTokenPageAddError;
+
+  /// Error message for invalid token address or network issues on AddTokenPage
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid token address or network error'**
+  String get addTokenPageInvalidAddressError;
+
+  /// Title for the SecretPhraseGeneratorPage
+  ///
+  /// In en, this message translates to:
+  /// **'New Wallet'**
+  String get secretPhraseGeneratorPageTitle;
+
+  /// Text for backup confirmation checkbox on SecretPhraseGeneratorPage
+  ///
+  /// In en, this message translates to:
+  /// **'I have backup words'**
+  String get secretPhraseGeneratorPageBackupCheckbox;
+
+  /// Text for next button on SecretPhraseGeneratorPage
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get secretPhraseGeneratorPageNextButton;
+
+  /// Label displayed when using a testnet on HomePage
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get homePageTestnetLabel;
+
+  /// Title for the RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal Secret Key'**
+  String get revealSecretKeyTitle;
+
+  /// Hint text for password input on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get revealSecretKeyPasswordHint;
+
+  /// Error message prefix for invalid password on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'invalid password, error:'**
+  String get revealSecretKeyInvalidPassword;
+
+  /// Text for submit button on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get revealSecretKeySubmitButton;
+
+  /// Text for done button after revealing secret key on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get revealSecretKeyDoneButton;
+
+  /// Title for scam alert section on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'SCAM ALERT'**
+  String get revealSecretKeyScamAlertTitle;
+
+  /// Message content for scam alert section on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Never share your secret key with anyone. Never input it on any website.'**
+  String get revealSecretKeyScamAlertMessage;
+
+  /// Label for Testnet switch on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get setupNetworkSettingsPageTestnetSwitch;
+
+  /// Hint text for search input on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Search'**
+  String get setupNetworkSettingsPageSearchHint;
+
+  /// Error message prefix when loading chains fails on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load network chains:'**
+  String get setupNetworkSettingsPageLoadError;
+
+  /// Message when no networks are available on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'No networks available'**
+  String get setupNetworkSettingsPageNoNetworks;
+
+  /// Message when no networks match search query on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'No networks found for \"{searchQuery}\"'**
+  String setupNetworkSettingsPageNoResults(Object searchQuery);
+
+  /// Text for Next button on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get setupNetworkSettingsPageNextButton;
+
+  /// Label indicating Testnet in network item on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Testnet'**
+  String get setupNetworkSettingsPageTestnetLabel;
+
+  /// Label indicating Mainnet in network item on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Mainnet'**
+  String get setupNetworkSettingsPageMainnetLabel;
+
+  /// Label prefix for Chain ID in network item on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID:'**
+  String get setupNetworkSettingsPageChainIdLabel;
+
+  /// Label prefix for Token in network item on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Token:'**
+  String get setupNetworkSettingsPageTokenLabel;
+
+  /// Label prefix for Explorer in network item on SetupNetworkSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Explorer:'**
+  String get setupNetworkSettingsPageExplorerLabel;
+
+  /// Title for the Appearance Settings page
+  ///
+  /// In en, this message translates to:
+  /// **'Appearance Settings'**
+  String get appearanceSettingsPageTitle;
+
+  /// Title for the Compact Numbers switch setting
+  ///
+  /// In en, this message translates to:
+  /// **'Compact Numbers'**
+  String get appearanceSettingsPageCompactNumbersTitle;
+
+  /// Description for the Compact Numbers switch setting
+  ///
+  /// In en, this message translates to:
+  /// **'Enable to display abbreviated numbers (e.g., 20K instead of 20,000).'**
+  String get appearanceSettingsPageCompactNumbersDescription;
+
+  /// Title for the Device Settings theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Device settings'**
+  String get appearanceSettingsPageDeviceSettingsTitle;
+
+  /// Subtitle for the Device Settings theme option
+  ///
+  /// In en, this message translates to:
+  /// **'System default'**
+  String get appearanceSettingsPageDeviceSettingsSubtitle;
+
+  /// Description for the Device Settings theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Default to your device\'s appearance. Your wallet theme will automatically adjust based on your system settings.'**
+  String get appearanceSettingsPageDeviceSettingsDescription;
+
+  /// Title for the Dark Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Dark Mode'**
+  String get appearanceSettingsPageDarkModeTitle;
+
+  /// Subtitle for the Dark Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Always dark'**
+  String get appearanceSettingsPageDarkModeSubtitle;
+
+  /// Description for the Dark Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the dark theme enabled at all times, regardless of your device settings.'**
+  String get appearanceSettingsPageDarkModeDescription;
+
+  /// Title for the Light Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Light mode'**
+  String get appearanceSettingsPageLightModeTitle;
+
+  /// Subtitle for the Light Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Always light'**
+  String get appearanceSettingsPageLightModeSubtitle;
+
+  /// Description for the Light Mode theme option
+  ///
+  /// In en, this message translates to:
+  /// **'Keep the light theme enabled at all times, regardless of your device settings.'**
+  String get appearanceSettingsPageLightModeDescription;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

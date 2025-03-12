@@ -18,6 +18,7 @@ import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class RevealSecretKey extends StatefulWidget {
   const RevealSecretKey({super.key});
@@ -59,6 +60,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   }
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {
+    final l10n = AppLocalizations.of(context)!;
+
     _btnController.start();
     try {
       final device = DeviceInfoService();
@@ -87,7 +90,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
       setState(() {
         isAuthenticated = false;
         hasError = true;
-        errorMessage = "invalid password, error: $e";
+        errorMessage = "${l10n.revealSecretKeyInvalidPassword} $e";
       });
       _btnController.error();
       await Future.delayed(const Duration(seconds: 1));
@@ -100,13 +103,14 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
     final state = Provider.of<AppState>(context);
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Reveal Secret Key',
+              title: l10n.revealSecretKeyTitle,
               onBackPressed: () => Navigator.pop(context),
             ),
             Expanded(
@@ -119,7 +123,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                       SmartInput(
                         key: _passwordInputKey,
                         controller: _passwordController,
-                        hint: "Password",
+                        hint: l10n.revealSecretKeyPasswordHint,
                         fontSize: 18,
                         height: 50,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -167,7 +171,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                             ),
                           ),
                           child: Text(
-                            'Submit',
+                            l10n.revealSecretKeySubmitButton,
                             style: TextStyle(
                               color: theme.buttonText,
                               fontSize: 18,
@@ -209,7 +213,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                         child: CustomButton(
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
-                          text: 'Done',
+                          text: l10n.revealSecretKeyDoneButton,
                           onPressed: () => Navigator.pop(context),
                           borderRadius: 30.0,
                           height: 56.0,
@@ -227,6 +231,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   }
 
   Widget _buildScamAlert(AppTheme theme) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
       padding: const EdgeInsets.all(16),
@@ -246,7 +252,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
               ),
               const SizedBox(width: 8),
               Text(
-                'SCAM ALERT',
+                l10n.revealSecretKeyScamAlertTitle,
                 style: TextStyle(
                   color: theme.danger,
                   fontWeight: FontWeight.bold,
@@ -257,7 +263,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Never share your secret key with anyone. Never input it on any website.',
+            l10n.revealSecretKeyScamAlertMessage,
             style: TextStyle(
               color: theme.danger,
               fontSize: 14,

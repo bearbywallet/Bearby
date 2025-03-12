@@ -8,6 +8,7 @@ import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class AddTokenPage extends StatefulWidget {
   const AddTokenPage({super.key});
@@ -37,6 +38,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -44,7 +46,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Add Token',
+              title: l10n.addTokenPageTitle,
               onBackPressed: () => Navigator.pop(context),
             ),
             Expanded(
@@ -87,13 +89,15 @@ class _AddTokenPageState extends State<AddTokenPage> {
   }
 
   Widget _buildInputSection(AppTheme theme, AppState appState) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
-            'Token Information',
+            l10n.addTokenPageTokenInfo,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: _fontSize,
@@ -120,7 +124,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
                     }
                     await _onChange(value, appState.selectedWallet);
                   },
-                  hint: "Address, name, symbol",
+                  hint: l10n.addTokenPageHint,
                   height: _inputHeight,
                   borderColor: Colors.transparent,
                   focusedBorderColor: Colors.transparent,
@@ -170,6 +174,8 @@ class _AddTokenPageState extends State<AddTokenPage> {
     int walletIndex,
     AppState appState,
   ) async {
+    final l10n = AppLocalizations.of(context)!;
+
     try {
       setState(() {
         _errorMessage = null;
@@ -198,13 +204,15 @@ class _AddTokenPageState extends State<AddTokenPage> {
       Navigator.pop(context);
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to add token: ${e.toString()}';
+        _errorMessage = '${l10n.addTokenPageAddError} ${e.toString()}';
       });
       debugPrint("error: $e");
     }
   }
 
   Future<void> _onChange(String value, int walletIndex) async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (value.length >= 42) {
       setState(() {
         _isLoading = true;
@@ -224,7 +232,7 @@ class _AddTokenPageState extends State<AddTokenPage> {
         });
       } catch (e) {
         setState(() {
-          _errorMessage = 'Invalid token address or network error';
+          _errorMessage = l10n.addTokenPageInvalidAddressError;
         });
         debugPrint("error: $e");
       } finally {
