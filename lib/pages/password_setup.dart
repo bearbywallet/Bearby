@@ -48,6 +48,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   bool _focused = false;
   bool _walletNameInitialized = false;
   bool _needRemoveOldStorage = false;
+  bool _updatedArgs = false;
 
   final _btnController = RoundedLoadingButtonController();
 
@@ -63,6 +64,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
+
+    if (_updatedArgs) return;
 
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
@@ -90,6 +93,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         }
 
         _needRemoveOldStorage = zilLegacy != null;
+        _updatedArgs = true;
       });
     }
 
