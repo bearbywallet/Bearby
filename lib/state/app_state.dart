@@ -50,6 +50,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return _state.wallets;
   }
 
+  Locale? get locale {
+    return state.locale != null ? Locale(state.locale!) : null;
+  }
+
   List<ConnectionInfo> get connections {
     return _connections;
   }

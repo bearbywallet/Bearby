@@ -16,7 +16,7 @@ class BackgroundState {
   final List<WalletInfo> wallets;
   final Map<BigInt, BackgroundNotificationState> notificationsWalletStates;
   final bool notificationsGlobalEnabled;
-  final String locale;
+  final String? locale;
   final int appearances;
   final bool abbreviatedNumber;
   final BrowserSettingsInfo browserSettings;
@@ -26,7 +26,7 @@ class BackgroundState {
     required this.wallets,
     required this.notificationsWalletStates,
     required this.notificationsGlobalEnabled,
-    required this.locale,
+    this.locale,
     required this.appearances,
     required this.abbreviatedNumber,
     required this.browserSettings,

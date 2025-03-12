@@ -2913,7 +2913,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       notificationsWalletStates:
           dco_decode_Map_usize_background_notification_state(arr[1]),
       notificationsGlobalEnabled: dco_decode_bool(arr[2]),
-      locale: dco_decode_String(arr[3]),
+      locale: dco_decode_opt_String(arr[3]),
       appearances: dco_decode_u_8(arr[4]),
       abbreviatedNumber: dco_decode_bool(arr[5]),
       browserSettings: dco_decode_browser_settings_info(arr[6]),
@@ -3931,7 +3931,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_notificationsWalletStates =
         sse_decode_Map_usize_background_notification_state(deserializer);
     var var_notificationsGlobalEnabled = sse_decode_bool(deserializer);
-    var var_locale = sse_decode_String(deserializer);
+    var var_locale = sse_decode_opt_String(deserializer);
     var var_appearances = sse_decode_u_8(deserializer);
     var var_abbreviatedNumber = sse_decode_bool(deserializer);
     var var_browserSettings = sse_decode_browser_settings_info(deserializer);
@@ -5162,7 +5162,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_Map_usize_background_notification_state(
         self.notificationsWalletStates, serializer);
     sse_encode_bool(self.notificationsGlobalEnabled, serializer);
-    sse_encode_String(self.locale, serializer);
+    sse_encode_opt_String(self.locale, serializer);
     sse_encode_u_8(self.appearances, serializer);
     sse_encode_bool(self.abbreviatedNumber, serializer);
     sse_encode_browser_settings_info(self.browserSettings, serializer);

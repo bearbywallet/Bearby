@@ -37,7 +37,7 @@ class ZilPayApp extends StatelessWidget {
                 supportedLocales: const [
                   Locale('en'),
                 ],
-                locale: const Locale('en'),
+                locale: appState.locale,
                 builder: (context, child) {
                   final mediaQuery = MediaQuery.of(context);
                   final screenWidth = mediaQuery.size.width;

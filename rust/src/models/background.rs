@@ -8,7 +8,7 @@ pub struct BackgroundState {
     pub wallets: Vec<WalletInfo>,
     pub notifications_wallet_states: HashMap<usize, BackgroundNotificationState>,
     pub notifications_global_enabled: bool,
-    pub locale: String,
+    pub locale: Option<String>,
     pub appearances: u8,
     pub abbreviated_number: bool,
     pub browser_settings: BrowserSettingsInfo,

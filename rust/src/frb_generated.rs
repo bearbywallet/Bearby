@@ -3444,7 +3444,7 @@ impl SseDecode for crate::models::background::BackgroundState {
             crate::models::notification::BackgroundNotificationState,
         >>::sse_decode(deserializer);
         let mut var_notificationsGlobalEnabled = <bool>::sse_decode(deserializer);
-        let mut var_locale = <String>::sse_decode(deserializer);
+        let mut var_locale = <Option<String>>::sse_decode(deserializer);
         let mut var_appearances = <u8>::sse_decode(deserializer);
         let mut var_abbreviatedNumber = <bool>::sse_decode(deserializer);
         let mut var_browserSettings =
@@ -5763,7 +5763,7 @@ impl SseEncode for crate::models::background::BackgroundState {
         <Vec<crate::models::wallet::WalletInfo>>::sse_encode(self.wallets, serializer);
         <std::collections::HashMap<usize, crate::models::notification::BackgroundNotificationState>>::sse_encode(self.notifications_wallet_states, serializer);
         <bool>::sse_encode(self.notifications_global_enabled, serializer);
-        <String>::sse_encode(self.locale, serializer);
+        <Option<String>>::sse_encode(self.locale, serializer);
         <u8>::sse_encode(self.appearances, serializer);
         <bool>::sse_encode(self.abbreviated_number, serializer);
         <crate::models::settings::BrowserSettingsInfo>::sse_encode(

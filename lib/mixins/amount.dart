@@ -39,7 +39,7 @@ BigInt toWei(String amount, int decimals) {
   return intlNumberFormating(
     value: amount.toString(),
     decimals: decimals,
-    localeStr: appState.state.locale,
+    localeStr: appState.state.locale ?? "",
     nativeSymbolStr: symbol,
     convertedSymbolStr: convertedSymbolStr ?? '',
     threshold: baseThreshold,
