@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'router.dart';
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -24,7 +26,18 @@ class ZilPayApp extends StatelessWidget {
               final currentTheme = appState.currentTheme;
 
               return MaterialApp(
-                title: 'ZilPay Wallet',
+                title:
+                    AppLocalizations.of(context)?.appTitle ?? 'ZilPay Wallet',
+                localizationsDelegates: const [
+                  AppLocalizations.delegate,
+                  GlobalMaterialLocalizations.delegate,
+                  GlobalWidgetsLocalizations.delegate,
+                  GlobalCupertinoLocalizations.delegate,
+                ],
+                supportedLocales: const [
+                  Locale('en'),
+                ],
+                locale: const Locale('en'),
                 builder: (context, child) {
                   final mediaQuery = MediaQuery.of(context);
                   final screenWidth = mediaQuery.size.width;

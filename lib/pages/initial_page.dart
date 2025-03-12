@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -67,7 +68,7 @@ class _InitialPageState extends State<InitialPage> {
       return CustomButton(
         textColor: theme.buttonText,
         backgroundColor: theme.primaryPurple,
-        text: "Restore ZilPay 1.0!",
+        text: AppLocalizations.of(context)!.restoreZilPay,
         onPressed: () {
           Navigator.of(context).pushNamed(
             '/rk_restore',
@@ -82,7 +83,7 @@ class _InitialPageState extends State<InitialPage> {
       return CustomButton(
         textColor: theme.buttonText,
         backgroundColor: theme.primaryPurple,
-        text: "Get Started",
+        text: AppLocalizations.of(context)?.getStarted ?? "",
         onPressed: () {
           Navigator.of(context).pushNamed('/new_wallet_options');
         },
@@ -159,8 +160,6 @@ class _InitialPageState extends State<InitialPage> {
                       height: 34.0,
                     ),
                     onPressed: () {},
-                    // onPressed: () =>
-                    //     Navigator.of(context).pushNamed('/language'),
                   ),
                 ],
               ),

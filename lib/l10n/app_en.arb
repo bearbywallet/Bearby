@@ -1,0 +1,14 @@
+{
+  "appTitle": "ZilPay Wallet",
+  "@appTitle": {
+    "description": "The title of the application"
+  },
+  "restoreZilPay": "Restore ZilPay 1.0!",
+  "@restoreZilPay": {
+    "description": "Button text to restore from ZilPay 1.0"
+  },
+  "getStarted": "Get Started",
+  "@getStarted": {
+    "description": "Button text to begin using the app"
+  }
+}
