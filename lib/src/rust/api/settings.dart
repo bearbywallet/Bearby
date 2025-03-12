@@ -29,6 +29,9 @@ Future<void> setGlobalNotifications({required bool globalEnabled}) =>
     RustLib.instance.api
         .crateApiSettingsSetGlobalNotifications(globalEnabled: globalEnabled);
 
+Future<void> setDefaultLocale({String? locale}) =>
+    RustLib.instance.api.crateApiSettingsSetDefaultLocale(locale: locale);
+
 Future<void> setRateFetcher(
         {required BigInt walletIndex, required String currency}) =>
     RustLib.instance.api.crateApiSettingsSetRateFetcher(

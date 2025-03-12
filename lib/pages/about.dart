@@ -32,9 +32,11 @@ class _AboutPageState extends State<AboutPage> {
 
   Future<void> _initPackageInfo() async {
     final info = await PackageInfo.fromPlatform();
-    setState(() {
-      _packageInfo = info;
-    });
+    if (mounted) {
+      setState(() {
+        _packageInfo = info;
+      });
+    }
   }
 
   @override
@@ -63,15 +65,15 @@ class _AboutPageState extends State<AboutPage> {
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
                     child: Padding(
-                      padding: const EdgeInsets.all(16),
+                      padding: EdgeInsets.all(adaptivePadding),
                       child: Column(
                         children: [
                           _buildLogoSection(theme, l10n),
-                          const SizedBox(height: 32),
+                          SizedBox(height: adaptivePadding * 2),
                           _buildAppInfoSection(theme, l10n),
-                          const SizedBox(height: 24),
+                          SizedBox(height: adaptivePadding * 1.5),
                           _buildDeveloperSection(theme, l10n),
-                          const SizedBox(height: 24),
+                          SizedBox(height: adaptivePadding * 1.5),
                           _buildLegalSection(theme, l10n),
                         ],
                       ),
@@ -111,6 +113,7 @@ class _AboutPageState extends State<AboutPage> {
             color: theme.textPrimary,
             fontSize: 28,
             fontWeight: FontWeight.bold,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(height: 8),
@@ -134,12 +137,21 @@ class _AboutPageState extends State<AboutPage> {
         children: [
           _buildSectionTitle(theme, l10n.aboutPageAppInfoTitle),
           const SizedBox(height: 16),
-          _buildInfoRow(theme, l10n.aboutPageVersionLabel,
-              '${_packageInfo.version} (${_packageInfo.buildNumber})'),
-          _buildInfoRow(theme, l10n.aboutPageBuildDateLabel,
-              l10n.aboutPageBuildDateValue),
-          _buildInfoRow(theme, l10n.aboutPagePlatformLabel,
-              Theme.of(context).platform.toString().split('.').last),
+          _buildInfoRow(
+            theme,
+            l10n.aboutPageVersionLabel,
+            '${_packageInfo.version} (${_packageInfo.buildNumber})',
+          ),
+          _buildInfoRow(
+            theme,
+            l10n.aboutPageBuildDateLabel,
+            l10n.aboutPageBuildDateValue,
+          ),
+          _buildInfoRow(
+            theme,
+            l10n.aboutPagePlatformLabel,
+            Theme.of(context).platform.toString().split('.').last,
+          ),
         ],
       ),
     );
@@ -154,9 +166,15 @@ class _AboutPageState extends State<AboutPage> {
           _buildSectionTitle(theme, l10n.aboutPageDeveloperTitle),
           const SizedBox(height: 16),
           _buildInfoRow(
-              theme, l10n.aboutPageAuthorLabel, l10n.aboutPageAuthorValue),
+            theme,
+            l10n.aboutPageAuthorLabel,
+            l10n.aboutPageAuthorValue,
+          ),
           _buildInfoRow(
-              theme, l10n.aboutPageWebsiteLabel, l10n.aboutPageWebsiteValue),
+            theme,
+            l10n.aboutPageWebsiteLabel,
+            l10n.aboutPageWebsiteValue,
+          ),
         ],
       ),
     );
@@ -189,17 +207,27 @@ class _AboutPageState extends State<AboutPage> {
             l10n.aboutPageLicenses,
             'assets/icons/licenses.svg',
             true,
-            () => showLicensePage(
-              context: context,
-              applicationName: _packageInfo.appName,
-              applicationVersion: _packageInfo.version,
-              applicationIcon: SvgPicture.asset('assets/imgs/zilpay.svg',
-                  width: 48, height: 48),
-              applicationLegalese: l10n.aboutPageLegalese,
-            ),
+            () => _showLicensePage(context, l10n),
           ),
         ],
       ),
+    );
+  }
+
+  Future<void> _showLicensePage(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) async {
+    return showLicensePage(
+      context: context,
+      applicationName: _packageInfo.appName,
+      applicationVersion: _packageInfo.version,
+      applicationIcon: SvgPicture.asset(
+        'assets/imgs/zilpay.svg',
+        width: 48,
+        height: 48,
+      ),
+      applicationLegalese: l10n.aboutPageLegalese,
     );
   }
 
@@ -222,6 +250,7 @@ class _AboutPageState extends State<AboutPage> {
         color: theme.textPrimary,
         fontSize: 18,
         fontWeight: FontWeight.bold,
+        overflow: TextOverflow.ellipsis,
       ),
     );
   }
@@ -232,19 +261,28 @@ class _AboutPageState extends State<AboutPage> {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
+          Expanded(
+            flex: 3,
+            child: Text(
+              label,
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 16,
+                overflow: TextOverflow.ellipsis,
+              ),
             ),
           ),
-          Text(
-            value,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+          Expanded(
+            flex: 4,
+            child: Text(
+              value,
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.w500,
+                overflow: TextOverflow.ellipsis,
+              ),
+              textAlign: TextAlign.end,
             ),
           ),
         ],
@@ -261,12 +299,15 @@ class _AboutPageState extends State<AboutPage> {
   ) {
     return GestureDetector(
       onTap: onTap,
+      behavior: HitTestBehavior.opaque,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 12),
         decoration: BoxDecoration(
           border: Border(
             bottom: BorderSide(
-              color: theme.textSecondary.withValues(alpha: last ? 0 : 0.1),
+              color: last
+                  ? Colors.transparent
+                  : theme.textSecondary.withOpacity(0.1),
               width: 1,
             ),
           ),
@@ -283,14 +324,16 @@ class _AboutPageState extends State<AboutPage> {
               ),
             ),
             const SizedBox(width: 16),
-            Text(
-              title,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 16,
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 16,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
             ),
-            const Spacer(),
             SvgPicture.asset(
               'assets/icons/right_arrow.svg',
               width: 16,
@@ -308,8 +351,12 @@ class _AboutPageState extends State<AboutPage> {
 
   Future<void> _launchUrl(String urlString) async {
     final Uri url = Uri.parse(urlString);
-    if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
-      throw Exception('Could not launch $url');
+    try {
+      if (!await launchUrl(url, mode: LaunchMode.externalApplication)) {
+        throw Exception('Could not launch $url');
+      }
+    } catch (e) {
+      debugPrint('Error launching URL: $e');
     }
   }
 }

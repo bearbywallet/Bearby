@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
@@ -28,8 +29,21 @@ class _LanguagePageState extends State<LanguagePage> {
   bool vibrateEnabled = true;
 
   @override
+  void initState() {
+    super.initState();
+    final _appState = Provider.of<AppState>(context, listen: false);
+
+    if (_appState.state.locale != null) {
+      setState(() {
+        selectedLanguage = _appState.state.locale!;
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
     languages.clear();
@@ -76,10 +90,13 @@ class _LanguagePageState extends State<LanguagePage> {
                         language,
                         isSelected,
                         isLastItem,
-                        onTap: () {
+                        onTap: () async {
+                          await setDefaultLocale(locale: language.code);
                           setState(() {
                             selectedLanguage = language.code;
                           });
+
+                          await appState.syncData();
                         },
                       );
                     },

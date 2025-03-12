@@ -61,6 +61,16 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
     .map_err(Into::into)
 }
 
+pub async fn set_default_locale(locale: Option<String>) -> Result<(), String> {
+    with_service_mut(|core| {
+        core.set_locale(locale)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
 pub async fn set_rate_fetcher(wallet_index: usize, currency: String) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         let mut data = wallet

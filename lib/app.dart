@@ -36,6 +36,7 @@ class ZilPayApp extends StatelessWidget {
                 ],
                 supportedLocales: const [
                   Locale('en'),
+                  Locale('ru'),
                 ],
                 locale: appState.locale,
                 builder: (context, child) {
