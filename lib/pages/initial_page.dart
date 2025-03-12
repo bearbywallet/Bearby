@@ -159,7 +159,9 @@ class _InitialPageState extends State<InitialPage> {
                       width: 34.0,
                       height: 34.0,
                     ),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/language');
+                    },
                   ),
                 ],
               ),

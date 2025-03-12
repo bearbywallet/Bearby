@@ -2,10 +2,12 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/biometric_switch.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/confirm_password.dart';
 import 'package:zilpay/modals/delete_wallet.dart';
@@ -318,12 +320,23 @@ class _WalletPageState extends State<WalletPage> {
           borderRadius: BorderRadius.circular(_avatarSize / 2),
           child: Transform.scale(
             scale: 1.0,
-            child: Blockies(
-              seed: appState.account!.addr,
-              color: theme.secondaryPurple,
-              bgColor: theme.primaryPurple,
-              spotColor: theme.background,
-              size: 8,
+            child: AsyncImage(
+              url: preprocessUrl(appState.chain?.logo ?? "", theme.value),
+              width: 32,
+              height: 32,
+              fit: BoxFit.contain,
+              errorWidget: Blockies(
+                seed: appState.wallet!.walletAddress,
+                color: theme.secondaryPurple,
+                bgColor: theme.primaryPurple,
+                spotColor: theme.background,
+                size: 8,
+              ),
+              loadingWidget: const Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                ),
+              ),
             ),
           ),
         ),

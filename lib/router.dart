@@ -143,8 +143,8 @@ class AppRouter {
             return wrapWithProviders(const AddWalletOptionsPage());
           case '/initial':
             return wrapWithProviders(const InitialPage());
-          case '/web_view':
-            return wrapWithProviders(const WebViewPage(initialUrl: ''));
+          case '/language':
+            return wrapWithProviders(const LanguagePage());
           default:
             return wrapWithProviders(const InitialPage());
         }
