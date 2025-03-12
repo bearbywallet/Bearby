@@ -1239,4 +1239,85 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get tokenTransferAmountUnknown => 'Неизвестно';
+
+  @override
+  String get transactionDetailsModal_transaction => 'Транзакция';
+
+  @override
+  String get transactionDetailsModal_hash => 'Хэш';
+
+  @override
+  String get transactionDetailsModal_sig => 'Подпись';
+
+  @override
+  String get transactionDetailsModal_timestamp => 'Временная метка';
+
+  @override
+  String get transactionDetailsModal_blockNumber => 'Номер блока';
+
+  @override
+  String get transactionDetailsModal_nonce => 'Нонс';
+
+  @override
+  String get transactionDetailsModal_addresses => 'Адреса';
+
+  @override
+  String get transactionDetailsModal_sender => 'Отправитель';
+
+  @override
+  String get transactionDetailsModal_recipient => 'Получатель';
+
+  @override
+  String get transactionDetailsModal_contractAddress => 'Адрес контракта';
+
+  @override
+  String get transactionDetailsModal_network => 'Сеть';
+
+  @override
+  String get transactionDetailsModal_chainType => 'Тип цепи';
+
+  @override
+  String get transactionDetailsModal_networkName => 'Сеть';
+
+  @override
+  String get transactionDetailsModal_gasFees => 'Газ и комиссии';
+
+  @override
+  String get transactionDetailsModal_fee => 'Комиссия';
+
+  @override
+  String get transactionDetailsModal_gasUsed => 'Использованный газ';
+
+  @override
+  String get transactionDetailsModal_gasLimit => 'Лимит газа';
+
+  @override
+  String get transactionDetailsModal_gasPrice => 'Цена газа';
+
+  @override
+  String get transactionDetailsModal_effectiveGasPrice => 'Эффективная цена газа';
+
+  @override
+  String get transactionDetailsModal_blobGasUsed => 'Использованный блоб-газ';
+
+  @override
+  String get transactionDetailsModal_blobGasPrice => 'Цена блоб-газа';
+
+  @override
+  String get transactionDetailsModal_error => 'Ошибка';
+
+  @override
+  String get transactionDetailsModal_errorMessage => 'Сообщение об ошибке';
+
+  @override
+  String get amountSection_transfer => 'Перевод';
+
+  @override
+  String get amountSection_pending => 'В ожидании';
+
+  @override
+  String get amountSection_confirmed => 'Подтверждено';
+
+  @override
+  String get amountSection_rejected => 'Отклонено';
 }

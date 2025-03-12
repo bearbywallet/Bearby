@@ -1751,5 +1751,113 @@
   "tokenTransferAmountUnknown": "Unknown",
   "@tokenTransferAmountUnknown": {
     "description": "Text displayed when the sender or recipient name is not provided in the TokenTransferAmount widget"
+  },
+  "transactionDetailsModal_transaction": "Transaction",
+  "@transactionDetailsModal_transaction": {
+    "description": "Title for the transaction details section in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_hash": "Hash",
+  "@transactionDetailsModal_hash": {
+    "description": "Label for transaction hash in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_sig": "Sig",
+  "@transactionDetailsModal_sig": {
+    "description": "Label for transaction signature in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_timestamp": "Timestamp",
+  "@transactionDetailsModal_timestamp": {
+    "description": "Label for transaction timestamp in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_blockNumber": "Block Number",
+  "@transactionDetailsModal_blockNumber": {
+    "description": "Label for block number in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_nonce": "Nonce",
+  "@transactionDetailsModal_nonce": {
+    "description": "Label for transaction nonce in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_addresses": "Addresses",
+  "@transactionDetailsModal_addresses": {
+    "description": "Title for addresses section in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_sender": "Sender",
+  "@transactionDetailsModal_sender": {
+    "description": "Label for sender address in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_recipient": "Recipient",
+  "@transactionDetailsModal_recipient": {
+    "description": "Label for recipient address in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_contractAddress": "Contract Address",
+  "@transactionDetailsModal_contractAddress": {
+    "description": "Label for contract address in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_network": "Network",
+  "@transactionDetailsModal_network": {
+    "description": "Title for network section in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_chainType": "Chain Type",
+  "@transactionDetailsModal_chainType": {
+    "description": "Label for chain type in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_networkName": "Network",
+  "@transactionDetailsModal_networkName": {
+    "description": "Label for network name in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_gasFees": "Gas & Fees",
+  "@transactionDetailsModal_gasFees": {
+    "description": "Title for gas and fees section in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_fee": "Fee",
+  "@transactionDetailsModal_fee": {
+    "description": "Label for transaction fee in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_gasUsed": "Gas Used",
+  "@transactionDetailsModal_gasUsed": {
+    "description": "Label for gas used in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_gasLimit": "Gas Limit",
+  "@transactionDetailsModal_gasLimit": {
+    "description": "Label for gas limit in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_gasPrice": "Gas Price",
+  "@transactionDetailsModal_gasPrice": {
+    "description": "Label for gas price in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_effectiveGasPrice": "Effective Gas Price",
+  "@transactionDetailsModal_effectiveGasPrice": {
+    "description": "Label for effective gas price in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_blobGasUsed": "Blob Gas Used",
+  "@transactionDetailsModal_blobGasUsed": {
+    "description": "Label for blob gas used in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_blobGasPrice": "Blob Gas Price",
+  "@transactionDetailsModal_blobGasPrice": {
+    "description": "Label for blob gas price in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_error": "Error",
+  "@transactionDetailsModal_error": {
+    "description": "Title for error section in TransactionDetailsModal"
+  },
+  "transactionDetailsModal_errorMessage": "Error Message",
+  "@transactionDetailsModal_errorMessage": {
+    "description": "Label for error message in TransactionDetailsModal"
+  },
+  "amountSection_transfer": "Transfer",
+  "@amountSection_transfer": {
+    "description": "Title for transfer section in _AmountSection"
+  },
+  "amountSection_pending": "Pending",
+  "@amountSection_pending": {
+    "description": "Status text for pending transaction in _AmountSection"
+  },
+  "amountSection_confirmed": "Confirmed",
+  "@amountSection_confirmed": {
+    "description": "Status text for confirmed transaction in _AmountSection"
+  },
+  "amountSection_rejected": "Rejected",
+  "@amountSection_rejected": {
+    "description": "Status text for rejected transaction in _AmountSection"
   }
 }

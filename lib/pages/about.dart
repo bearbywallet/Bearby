@@ -307,7 +307,7 @@ class _AboutPageState extends State<AboutPage> {
             bottom: BorderSide(
               color: last
                   ? Colors.transparent
-                  : theme.textSecondary.withOpacity(0.1),
+                  : theme.textSecondary.withValues(alpha: 0.1),
               width: 1,
             ),
           ),

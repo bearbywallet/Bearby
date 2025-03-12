@@ -1239,4 +1239,85 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get tokenTransferAmountUnknown => '不明';
+
+  @override
+  String get transactionDetailsModal_transaction => '取引';
+
+  @override
+  String get transactionDetailsModal_hash => 'ハッシュ';
+
+  @override
+  String get transactionDetailsModal_sig => '署名';
+
+  @override
+  String get transactionDetailsModal_timestamp => 'タイムスタンプ';
+
+  @override
+  String get transactionDetailsModal_blockNumber => 'ブロック番号';
+
+  @override
+  String get transactionDetailsModal_nonce => 'ナンス';
+
+  @override
+  String get transactionDetailsModal_addresses => 'アドレス';
+
+  @override
+  String get transactionDetailsModal_sender => '送信者';
+
+  @override
+  String get transactionDetailsModal_recipient => '受信者';
+
+  @override
+  String get transactionDetailsModal_contractAddress => 'コントラクトアドレス';
+
+  @override
+  String get transactionDetailsModal_network => 'ネットワーク';
+
+  @override
+  String get transactionDetailsModal_chainType => 'チェーンタイプ';
+
+  @override
+  String get transactionDetailsModal_networkName => 'ネットワーク';
+
+  @override
+  String get transactionDetailsModal_gasFees => 'ガスと手数料';
+
+  @override
+  String get transactionDetailsModal_fee => '手数料';
+
+  @override
+  String get transactionDetailsModal_gasUsed => '使用ガス';
+
+  @override
+  String get transactionDetailsModal_gasLimit => 'ガス制限';
+
+  @override
+  String get transactionDetailsModal_gasPrice => 'ガス価格';
+
+  @override
+  String get transactionDetailsModal_effectiveGasPrice => '有効ガス価格';
+
+  @override
+  String get transactionDetailsModal_blobGasUsed => 'ブロブガス使用量';
+
+  @override
+  String get transactionDetailsModal_blobGasPrice => 'ブロブガス価格';
+
+  @override
+  String get transactionDetailsModal_error => 'エラー';
+
+  @override
+  String get transactionDetailsModal_errorMessage => 'エラーメッセージ';
+
+  @override
+  String get amountSection_transfer => '送金';
+
+  @override
+  String get amountSection_pending => '保留中';
+
+  @override
+  String get amountSection_confirmed => '確認済み';
+
+  @override
+  String get amountSection_rejected => '拒否済み';
 }

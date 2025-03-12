@@ -2520,6 +2520,168 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Unknown'**
   String get tokenTransferAmountUnknown;
+
+  /// Title for the transaction details section in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction'**
+  String get transactionDetailsModal_transaction;
+
+  /// Label for transaction hash in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Hash'**
+  String get transactionDetailsModal_hash;
+
+  /// Label for transaction signature in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Sig'**
+  String get transactionDetailsModal_sig;
+
+  /// Label for transaction timestamp in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Timestamp'**
+  String get transactionDetailsModal_timestamp;
+
+  /// Label for block number in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Block Number'**
+  String get transactionDetailsModal_blockNumber;
+
+  /// Label for transaction nonce in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Nonce'**
+  String get transactionDetailsModal_nonce;
+
+  /// Title for addresses section in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Addresses'**
+  String get transactionDetailsModal_addresses;
+
+  /// Label for sender address in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Sender'**
+  String get transactionDetailsModal_sender;
+
+  /// Label for recipient address in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Recipient'**
+  String get transactionDetailsModal_recipient;
+
+  /// Label for contract address in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Contract Address'**
+  String get transactionDetailsModal_contractAddress;
+
+  /// Title for network section in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get transactionDetailsModal_network;
+
+  /// Label for chain type in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Chain Type'**
+  String get transactionDetailsModal_chainType;
+
+  /// Label for network name in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Network'**
+  String get transactionDetailsModal_networkName;
+
+  /// Title for gas and fees section in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Gas & Fees'**
+  String get transactionDetailsModal_gasFees;
+
+  /// Label for transaction fee in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Fee'**
+  String get transactionDetailsModal_fee;
+
+  /// Label for gas used in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Used'**
+  String get transactionDetailsModal_gasUsed;
+
+  /// Label for gas limit in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Limit'**
+  String get transactionDetailsModal_gasLimit;
+
+  /// Label for gas price in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Price'**
+  String get transactionDetailsModal_gasPrice;
+
+  /// Label for effective gas price in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Effective Gas Price'**
+  String get transactionDetailsModal_effectiveGasPrice;
+
+  /// Label for blob gas used in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Blob Gas Used'**
+  String get transactionDetailsModal_blobGasUsed;
+
+  /// Label for blob gas price in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Blob Gas Price'**
+  String get transactionDetailsModal_blobGasPrice;
+
+  /// Title for error section in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Error'**
+  String get transactionDetailsModal_error;
+
+  /// Label for error message in TransactionDetailsModal
+  ///
+  /// In en, this message translates to:
+  /// **'Error Message'**
+  String get transactionDetailsModal_errorMessage;
+
+  /// Title for transfer section in _AmountSection
+  ///
+  /// In en, this message translates to:
+  /// **'Transfer'**
+  String get amountSection_transfer;
+
+  /// Status text for pending transaction in _AmountSection
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get amountSection_pending;
+
+  /// Status text for confirmed transaction in _AmountSection
+  ///
+  /// In en, this message translates to:
+  /// **'Confirmed'**
+  String get amountSection_confirmed;
+
+  /// Status text for rejected transaction in _AmountSection
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get amountSection_rejected;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

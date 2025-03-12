@@ -1239,4 +1239,85 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get tokenTransferAmountUnknown => 'Unknown';
+
+  @override
+  String get transactionDetailsModal_transaction => 'Transaction';
+
+  @override
+  String get transactionDetailsModal_hash => 'Hash';
+
+  @override
+  String get transactionDetailsModal_sig => 'Sig';
+
+  @override
+  String get transactionDetailsModal_timestamp => 'Timestamp';
+
+  @override
+  String get transactionDetailsModal_blockNumber => 'Block Number';
+
+  @override
+  String get transactionDetailsModal_nonce => 'Nonce';
+
+  @override
+  String get transactionDetailsModal_addresses => 'Addresses';
+
+  @override
+  String get transactionDetailsModal_sender => 'Sender';
+
+  @override
+  String get transactionDetailsModal_recipient => 'Recipient';
+
+  @override
+  String get transactionDetailsModal_contractAddress => 'Contract Address';
+
+  @override
+  String get transactionDetailsModal_network => 'Network';
+
+  @override
+  String get transactionDetailsModal_chainType => 'Chain Type';
+
+  @override
+  String get transactionDetailsModal_networkName => 'Network';
+
+  @override
+  String get transactionDetailsModal_gasFees => 'Gas & Fees';
+
+  @override
+  String get transactionDetailsModal_fee => 'Fee';
+
+  @override
+  String get transactionDetailsModal_gasUsed => 'Gas Used';
+
+  @override
+  String get transactionDetailsModal_gasLimit => 'Gas Limit';
+
+  @override
+  String get transactionDetailsModal_gasPrice => 'Gas Price';
+
+  @override
+  String get transactionDetailsModal_effectiveGasPrice => 'Effective Gas Price';
+
+  @override
+  String get transactionDetailsModal_blobGasUsed => 'Blob Gas Used';
+
+  @override
+  String get transactionDetailsModal_blobGasPrice => 'Blob Gas Price';
+
+  @override
+  String get transactionDetailsModal_error => 'Error';
+
+  @override
+  String get transactionDetailsModal_errorMessage => 'Error Message';
+
+  @override
+  String get amountSection_transfer => 'Transfer';
+
+  @override
+  String get amountSection_pending => 'Pending';
+
+  @override
+  String get amountSection_confirmed => 'Confirmed';
+
+  @override
+  String get amountSection_rejected => 'Rejected';
 }

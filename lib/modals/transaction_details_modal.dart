@@ -13,6 +13,7 @@ import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 void showTransactionDetailsModal({
   required BuildContext context,
@@ -105,37 +106,38 @@ class TransactionDetailsModal extends StatelessWidget {
     AppState appState,
     AppTheme theme,
   ) {
+    final l10n = AppLocalizations.of(context)!;
     return Column(
       children: [
         DetailGroupCard(
-          title: 'Transaction',
+          title: l10n.transactionDetailsModal_transaction,
           theme: theme,
           children: [
             DetailItem(
-              label: 'Hash',
+              label: l10n.transactionDetailsModal_hash,
               value: transaction.transactionHash,
               theme: theme,
               isCopyable: true,
             ),
             DetailItem(
-              label: 'Sig',
+              label: l10n.transactionDetailsModal_sig,
               value: transaction.sig,
               theme: theme,
               isCopyable: true,
             ),
             DetailItem(
-              label: 'Timestamp',
+              label: l10n.transactionDetailsModal_timestamp,
               value: _formatTimestamp(),
               theme: theme,
             ),
             if (transaction.blockNumber != null)
               DetailItem(
-                label: 'Block Number',
+                label: l10n.transactionDetailsModal_blockNumber,
                 value: transaction.blockNumber.toString(),
                 theme: theme,
               ),
             DetailItem(
-              label: 'Nonce',
+              label: l10n.transactionDetailsModal_nonce,
               value: transaction.nonce.toString(),
               theme: theme,
             ),
@@ -143,24 +145,24 @@ class TransactionDetailsModal extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DetailGroupCard(
-          title: 'Addresses',
+          title: l10n.transactionDetailsModal_addresses,
           theme: theme,
           children: [
             DetailItem(
-              label: 'Sender',
+              label: l10n.transactionDetailsModal_sender,
               value: transaction.sender,
               theme: theme,
               isCopyable: true,
             ),
             DetailItem(
-              label: 'Recipient',
+              label: l10n.transactionDetailsModal_recipient,
               value: transaction.recipient,
               theme: theme,
               isCopyable: true,
             ),
             if (transaction.contractAddress != null)
               DetailItem(
-                label: 'Contract Address',
+                label: l10n.transactionDetailsModal_contractAddress,
                 value: transaction.contractAddress!,
                 theme: theme,
                 isCopyable: true,
@@ -169,16 +171,16 @@ class TransactionDetailsModal extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DetailGroupCard(
-          title: 'Network',
+          title: l10n.transactionDetailsModal_network,
           theme: theme,
           children: [
             DetailItem(
-              label: 'Chain Type',
+              label: l10n.transactionDetailsModal_chainType,
               value: transaction.chainType,
               theme: theme,
             ),
             DetailItem(
-              label: 'Network',
+              label: l10n.transactionDetailsModal_networkName,
               value: _getNetworkName(appState, transaction.chainHash),
               theme: theme,
             ),
@@ -186,47 +188,47 @@ class TransactionDetailsModal extends StatelessWidget {
         ),
         const SizedBox(height: 12),
         DetailGroupCard(
-          title: 'Gas & Fees',
+          title: l10n.transactionDetailsModal_gasFees,
           theme: theme,
           children: [
             DetailItem(
-              label: 'Fee',
+              label: l10n.transactionDetailsModal_fee,
               value: _formatFeeWidget(appState, theme),
               theme: theme,
             ),
             if (transaction.gasUsed != null)
               DetailItem(
-                label: 'Gas Used',
+                label: l10n.transactionDetailsModal_gasUsed,
                 value: transaction.gasUsed.toString(),
                 theme: theme,
               ),
             if (transaction.gasLimit != null)
               DetailItem(
-                label: 'Gas Limit',
+                label: l10n.transactionDetailsModal_gasLimit,
                 value: '${transaction.gasLimit} Wei',
                 theme: theme,
               ),
             if (transaction.gasPrice != null)
               DetailItem(
-                label: 'Gas Price',
+                label: l10n.transactionDetailsModal_gasPrice,
                 value: _formatGasPrice(transaction.gasPrice!),
                 theme: theme,
               ),
             if (transaction.effectiveGasPrice != null)
               DetailItem(
-                label: 'Effective Gas Price',
+                label: l10n.transactionDetailsModal_effectiveGasPrice,
                 value: _formatGasPrice(transaction.effectiveGasPrice!),
                 theme: theme,
               ),
             if (transaction.blobGasUsed != null)
               DetailItem(
-                label: 'Blob Gas Used',
+                label: l10n.transactionDetailsModal_blobGasUsed,
                 value: transaction.blobGasUsed.toString(),
                 theme: theme,
               ),
             if (transaction.blobGasPrice != null)
               DetailItem(
-                label: 'Blob Gas Price',
+                label: l10n.transactionDetailsModal_blobGasPrice,
                 value: _formatGasPrice(transaction.blobGasPrice!),
                 theme: theme,
               ),
@@ -235,11 +237,11 @@ class TransactionDetailsModal extends StatelessWidget {
         if (transaction.error != null) ...[
           const SizedBox(height: 12),
           DetailGroupCard(
-            title: 'Error',
+            title: l10n.transactionDetailsModal_error,
             theme: theme,
             children: [
               DetailItem(
-                label: 'Error Message',
+                label: l10n.transactionDetailsModal_errorMessage,
                 value: transaction.error!,
                 theme: theme,
               ),
@@ -492,17 +494,19 @@ class _AmountSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return DetailGroupCard(
-      title: 'Transfer',
+      title: l10n.amountSection_transfer,
       theme: theme,
-      headerTrailing: _buildStatusWidget(theme),
+      headerTrailing: _buildStatusWidget(context, theme),
       children: [
         _buildTokenTransferInfo(),
       ],
     );
   }
 
-  Widget _buildStatusWidget(AppTheme theme) {
+  Widget _buildStatusWidget(BuildContext context, AppTheme theme) {
+    final l10n = AppLocalizations.of(context)!;
     switch (transaction.status) {
       case TransactionStatusInfo.pending:
         return Container(
@@ -525,7 +529,7 @@ class _AmountSection extends StatelessWidget {
               ),
               const SizedBox(width: 6),
               Text(
-                'Pending',
+                l10n.amountSection_pending,
                 style: TextStyle(
                   color: Colors.orange,
                   fontSize: 14,
@@ -543,7 +547,7 @@ class _AmountSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            'Confirmed',
+            l10n.amountSection_confirmed,
             style: TextStyle(
               color: theme.success,
               fontSize: 14,
@@ -559,7 +563,7 @@ class _AmountSection extends StatelessWidget {
             borderRadius: BorderRadius.circular(8),
           ),
           child: Text(
-            'Rejected',
+            l10n.amountSection_rejected,
             style: TextStyle(
               color: theme.danger,
               fontSize: 14,

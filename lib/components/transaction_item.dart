@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -217,6 +218,7 @@ class _HistoryItemState extends State<HistoryItem>
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
@@ -277,7 +279,8 @@ class _HistoryItemState extends State<HistoryItem>
                                   Flexible(
                                     child: Text(
                                         widget.transaction.title ??
-                                            'Transaction',
+                                            l10n
+                                                .transactionDetailsModal_transaction,
                                         style: TextStyle(
                                             color: theme.textPrimary
                                                 .withValues(alpha: 0.7),
