@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -9,14 +10,14 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 extension GasFeeOptionX on GasFeeOption {
-  String get title {
+  String title(BuildContext context) {
     switch (this) {
       case GasFeeOption.low:
-        return 'Low';
+        return AppLocalizations.of(context)!.gasFeeOptionLow;
       case GasFeeOption.market:
-        return 'Market';
+        return AppLocalizations.of(context)!.gasFeeOptionMarket;
       case GasFeeOption.aggressive:
-        return 'Aggressive';
+        return AppLocalizations.of(context)!.gasFeeOptionAggressive;
     }
   }
 
@@ -91,13 +92,13 @@ class GasDetails extends StatelessWidget {
             children: [
               if (txParamsInfo.txEstimateGas != BigInt.zero)
                 _buildDetailRow(
-                  'Estimated Gas:',
+                  AppLocalizations.of(context)!.gasDetailsEstimatedGas,
                   '${txParamsInfo.txEstimateGas}',
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
               _buildDetailRow(
-                'Gas Price:',
+                AppLocalizations.of(context)!.gasDetailsGasPrice,
                 formatGasPriceDetail(
                   calculateGasPrice(selectedOption, txParamsInfo.gasPrice),
                   token,
@@ -107,7 +108,7 @@ class GasDetails extends StatelessWidget {
               ),
               if (txParamsInfo.feeHistory.baseFee != BigInt.zero)
                 _buildDetailRow(
-                  'Base Fee:',
+                  AppLocalizations.of(context)!.gasDetailsBaseFee,
                   formatGasPriceDetail(
                     txParamsInfo.feeHistory.baseFee,
                     token,
@@ -117,7 +118,7 @@ class GasDetails extends StatelessWidget {
                 ),
               if (txParamsInfo.feeHistory.priorityFee != BigInt.zero)
                 _buildDetailRow(
-                  'Priority Fee:',
+                  AppLocalizations.of(context)!.gasDetailsPriorityFee,
                   formatGasPriceDetail(
                     calculateMaxPriorityFee(
                       selectedOption,
@@ -131,7 +132,7 @@ class GasDetails extends StatelessWidget {
               if (txParamsInfo.feeHistory.baseFee != BigInt.zero &&
                   txParamsInfo.feeHistory.priorityFee != BigInt.zero)
                 _buildDetailRow(
-                  'Max Fee:',
+                  AppLocalizations.of(context)!.gasDetailsMaxFee,
                   formatGasPriceDetail(
                     calculateFeeForOption(
                       selectedOption,
@@ -321,7 +322,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
           opacity: widget.disabled ? 0.5 : 1.0,
           child: Semantics(
             button: true,
-            label: '${option.title} gas fee option',
+            label: '${option.title(context)} gas fee option',
             child: GestureDetector(
               onTap: widget.disabled ? null : () => _handleOptionTap(option),
               child: Container(
@@ -346,7 +347,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              option.title,
+                              option.title(context),
                               style: TextStyle(
                                 color: effectiveTextColor,
                                 fontWeight: FontWeight.w600,
@@ -419,7 +420,6 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     final token = appState.wallet!.tokens
         .firstWhere((t) => t.addrType == appState.account?.addrType);
 
-    // Get the option-specific colors, using custom colors or falling back to theme
     final warningColor = theme.warning;
     final textColor = widget.textColor ?? theme.textPrimary;
     final dangerColor = theme.danger;

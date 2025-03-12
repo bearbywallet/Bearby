@@ -2510,6 +2510,96 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'I understand not to share these words with anyone'**
   String get backupConfirmationContentNotShare;
+
+  /// Error message displayed when the Counter widget reaches its maximum value
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum value reached'**
+  String get counterMaxValueError;
+
+  /// Error message displayed when the Counter widget reaches its minimum value
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum value reached'**
+  String get counterMinValueError;
+
+  /// Text displayed for enabling Face ID in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Face ID'**
+  String get biometricSwitchFaceId;
+
+  /// Text displayed for enabling Fingerprint in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Fingerprint'**
+  String get biometricSwitchFingerprint;
+
+  /// Text displayed for enabling Biometric Login in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Biometric Login'**
+  String get biometricSwitchBiometric;
+
+  /// Text displayed for enabling Device PIN in the BiometricSwitch widget
+  ///
+  /// In en, this message translates to:
+  /// **'Enable Device PIN'**
+  String get biometricSwitchPinCode;
+
+  /// Title for the low gas fee option in GasEIP1559 widget
+  ///
+  /// In en, this message translates to:
+  /// **'Low'**
+  String get gasFeeOptionLow;
+
+  /// Title for the market gas fee option in GasEIP1559 widget
+  ///
+  /// In en, this message translates to:
+  /// **'Market'**
+  String get gasFeeOptionMarket;
+
+  /// Title for the aggressive gas fee option in GasEIP1559 widget
+  ///
+  /// In en, this message translates to:
+  /// **'Aggressive'**
+  String get gasFeeOptionAggressive;
+
+  /// Label for estimated gas in GasDetails widget
+  ///
+  /// In en, this message translates to:
+  /// **'Estimated Gas:'**
+  String get gasDetailsEstimatedGas;
+
+  /// Label for gas price in GasDetails widget
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Price:'**
+  String get gasDetailsGasPrice;
+
+  /// Label for base fee in GasDetails widget
+  ///
+  /// In en, this message translates to:
+  /// **'Base Fee:'**
+  String get gasDetailsBaseFee;
+
+  /// Label for priority fee in GasDetails widget
+  ///
+  /// In en, this message translates to:
+  /// **'Priority Fee:'**
+  String get gasDetailsPriorityFee;
+
+  /// Label for max fee in GasDetails widget
+  ///
+  /// In en, this message translates to:
+  /// **'Max Fee:'**
+  String get gasDetailsMaxFee;
+
+  /// Text displayed when the sender or recipient name is not provided in the TokenTransferAmount widget
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get tokenTransferAmountUnknown;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1760,5 +1760,65 @@
   "backupConfirmationContentNotShare": "I understand not to share these words with anyone",
   "@backupConfirmationContentNotShare": {
     "description": "Confirmation item indicating the user understands not to share the backup words in the BackupConfirmationContent component"
+  },
+  "counterMaxValueError": "Maximum value reached",
+  "@counterMaxValueError": {
+    "description": "Error message displayed when the Counter widget reaches its maximum value"
+  },
+  "counterMinValueError": "Minimum value reached",
+  "@counterMinValueError": {
+    "description": "Error message displayed when the Counter widget reaches its minimum value"
+  },
+  "biometricSwitchFaceId": "Enable Face ID",
+  "@biometricSwitchFaceId": {
+    "description": "Text displayed for enabling Face ID in the BiometricSwitch widget"
+  },
+  "biometricSwitchFingerprint": "Enable Fingerprint",
+  "@biometricSwitchFingerprint": {
+    "description": "Text displayed for enabling Fingerprint in the BiometricSwitch widget"
+  },
+  "biometricSwitchBiometric": "Enable Biometric Login",
+  "@biometricSwitchBiometric": {
+    "description": "Text displayed for enabling Biometric Login in the BiometricSwitch widget"
+  },
+  "biometricSwitchPinCode": "Enable Device PIN",
+  "@biometricSwitchPinCode": {
+    "description": "Text displayed for enabling Device PIN in the BiometricSwitch widget"
+  },
+  "gasFeeOptionLow": "Low",
+  "@gasFeeOptionLow": {
+    "description": "Title for the low gas fee option in GasEIP1559 widget"
+  },
+  "gasFeeOptionMarket": "Market",
+  "@gasFeeOptionMarket": {
+    "description": "Title for the market gas fee option in GasEIP1559 widget"
+  },
+  "gasFeeOptionAggressive": "Aggressive",
+  "@gasFeeOptionAggressive": {
+    "description": "Title for the aggressive gas fee option in GasEIP1559 widget"
+  },
+  "gasDetailsEstimatedGas": "Estimated Gas:",
+  "@gasDetailsEstimatedGas": {
+    "description": "Label for estimated gas in GasDetails widget"
+  },
+  "gasDetailsGasPrice": "Gas Price:",
+  "@gasDetailsGasPrice": {
+    "description": "Label for gas price in GasDetails widget"
+  },
+  "gasDetailsBaseFee": "Base Fee:",
+  "@gasDetailsBaseFee": {
+    "description": "Label for base fee in GasDetails widget"
+  },
+  "gasDetailsPriorityFee": "Priority Fee:",
+  "@gasDetailsPriorityFee": {
+    "description": "Label for priority fee in GasDetails widget"
+  },
+  "gasDetailsMaxFee": "Max Fee:",
+  "@gasDetailsMaxFee": {
+    "description": "Label for max fee in GasDetails widget"
+  },
+  "tokenTransferAmountUnknown": "Unknown",
+  "@tokenTransferAmountUnknown": {
+    "description": "Text displayed when the sender or recipient name is not provided in the TokenTransferAmount widget"
   }
 }

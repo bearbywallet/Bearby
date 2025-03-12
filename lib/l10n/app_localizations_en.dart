@@ -1236,4 +1236,49 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get backupConfirmationContentNotShare => 'I understand not to share these words with anyone';
+
+  @override
+  String get counterMaxValueError => 'Maximum value reached';
+
+  @override
+  String get counterMinValueError => 'Minimum value reached';
+
+  @override
+  String get biometricSwitchFaceId => 'Enable Face ID';
+
+  @override
+  String get biometricSwitchFingerprint => 'Enable Fingerprint';
+
+  @override
+  String get biometricSwitchBiometric => 'Enable Biometric Login';
+
+  @override
+  String get biometricSwitchPinCode => 'Enable Device PIN';
+
+  @override
+  String get gasFeeOptionLow => 'Low';
+
+  @override
+  String get gasFeeOptionMarket => 'Market';
+
+  @override
+  String get gasFeeOptionAggressive => 'Aggressive';
+
+  @override
+  String get gasDetailsEstimatedGas => 'Estimated Gas:';
+
+  @override
+  String get gasDetailsGasPrice => 'Gas Price:';
+
+  @override
+  String get gasDetailsBaseFee => 'Base Fee:';
+
+  @override
+  String get gasDetailsPriorityFee => 'Priority Fee:';
+
+  @override
+  String get gasDetailsMaxFee => 'Max Fee:';
+
+  @override
+  String get tokenTransferAmountUnknown => 'Unknown';
 }

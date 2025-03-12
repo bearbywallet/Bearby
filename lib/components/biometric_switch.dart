@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -21,16 +22,16 @@ class BiometricSwitch extends StatelessWidget {
     this.onChanged,
   });
 
-  String get _authMethodText {
+  String _authMethodText(BuildContext context) {
     switch (biometricType) {
       case AuthMethod.faceId:
-        return 'Enable Face ID';
+        return AppLocalizations.of(context)!.biometricSwitchFaceId;
       case AuthMethod.fingerprint:
-        return 'Enable Fingerprint';
+        return AppLocalizations.of(context)!.biometricSwitchFingerprint;
       case AuthMethod.biometric:
-        return 'Enable Biometric Login';
+        return AppLocalizations.of(context)!.biometricSwitchBiometric;
       case AuthMethod.pinCode:
-        return 'Enable Device PIN';
+        return AppLocalizations.of(context)!.biometricSwitchPinCode;
       case AuthMethod.none:
         return '';
     }
@@ -77,7 +78,7 @@ class BiometricSwitch extends StatelessWidget {
               ),
               const SizedBox(width: 4),
               Text(
-                _authMethodText,
+                _authMethodText(context),
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 16,
