@@ -655,5 +655,220 @@
   "appearanceSettingsPageLightModeDescription": "Keep the light theme enabled at all times, regardless of your device settings.",
   "@appearanceSettingsPageLightModeDescription": {
     "description": "Description for the Light Mode theme option"
+  },
+
+  "loginPageBiometricReason": "Please authenticate",
+  "@loginPageBiometricReason": {
+    "description": "Reason text for biometric authentication prompt on the Login page"
+  },
+  "loginPageWalletTitle": "Wallet {index}",
+  "@loginPageWalletTitle": {
+    "description": "Default title for a wallet item when no custom name is provided on the Login page",
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "loginPagePasswordHint": "Password",
+  "@loginPagePasswordHint": {
+    "description": "Hint text for the password input field on the Login page"
+  },
+  "loginPageUnlockButton": "Unlock",
+  "@loginPageUnlockButton": {
+    "description": "Text for the unlock button on the Login page"
+  },
+  "loginPageWelcomeBack": "Welcome back",
+  "@loginPageWelcomeBack": {
+    "description": "Welcome message displayed on the Login page"
+  },
+
+  "secretKeyRestorePageTitle": "Restore Secret Key",
+  "@secretKeyRestorePageTitle": {
+    "description": "Title for the Secret Key Restore page"
+  },
+  "secretKeyRestorePageHint": "Private Key",
+  "@secretKeyRestorePageHint": {
+    "description": "Hint text for the private key input field on the Secret Key Restore page"
+  },
+  "secretKeyRestorePageInvalidFormat": "Invalid private key format",
+  "@secretKeyRestorePageInvalidFormat": {
+    "description": "Error message displayed when the private key format is invalid on the Secret Key Restore page"
+  },
+  "secretKeyRestorePageKeyTitle": "Private Key",
+  "@secretKeyRestorePageKeyTitle": {
+    "description": "Title for the private key display section on the Secret Key Restore page"
+  },
+  "secretKeyRestorePageBackupLabel": "I have backed up my secret key",
+  "@secretKeyRestorePageBackupLabel": {
+    "description": "Label for the backup confirmation checkbox on the Secret Key Restore page"
+  },
+  "secretKeyRestorePageNextButton": "Next",
+  "@secretKeyRestorePageNextButton": {
+    "description": "Text for the Next button on the Secret Key Restore page"
+  },
+  "addAccountPageTitle": "Add New Account",
+  "@addAccountPageTitle": {
+    "description": "Title for the Add Account page"
+  },
+  "addAccountPageSubtitle": "Create BIP39 Account",
+  "@addAccountPageSubtitle": {
+    "description": "Subtitle for the Add Account page"
+  },
+  "addAccountPageDefaultName": "Account {index}",
+  "@addAccountPageDefaultName": {
+    "description": "Default account name format for the Add Account page",
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "addAccountPageNameHint": "Account name",
+  "@addAccountPageNameHint": {
+    "description": "Hint text for the account name input field on the Add Account page"
+  },
+  "addAccountPageBip39Index": "BIP39 Index",
+  "@addAccountPageBip39Index": {
+    "description": "Label for the BIP39 index counter on the Add Account page"
+  },
+  "addAccountPageUseBiometrics": "Use Biometrics",
+  "@addAccountPageUseBiometrics": {
+    "description": "Label for the biometrics option on the Add Account page"
+  },
+  "addAccountPagePasswordHint": "Password",
+  "@addAccountPagePasswordHint": {
+    "description": "Hint text for the password input field on the Add Account page"
+  },
+  "addAccountPageZilliqaLegacy": "Zilliqa Legacy",
+  "@addAccountPageZilliqaLegacy": {
+    "description": "Label for the Zilliqa Legacy switch on the Add Account page"
+  },
+  "addAccountPageBiometricReason": "Authenticate to create a new account",
+  "@addAccountPageBiometricReason": {
+    "description": "Reason text for biometric authentication prompt on the Add Account page"
+  },
+  "addAccountPageBiometricError": "Biometric authentication failed: {error}",
+  "@addAccountPageBiometricError": {
+    "description": "Error message for biometric authentication failure on the Add Account page",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "addAccountPageIndexExists": "Account with index {index} already exists",
+  "@addAccountPageIndexExists": {
+    "description": "Error message when an account with the given index already exists on the Add Account page",
+    "placeholders": {
+      "index": {}
+    }
+  },
+  "addAccountPageBiometricFailed": "Biometric authentication failed",
+  "@addAccountPageBiometricFailed": {
+    "description": "Error message when biometric authentication fails on the Add Account page"
+  },
+  "addAccountPageCreateFailed": "Failed to create account: {error}",
+  "@addAccountPageCreateFailed": {
+    "description": "Error message when account creation fails on the Add Account page",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "addressBookPageTitle": "Address Book",
+  "@addressBookPageTitle": {
+    "description": "Title for the Address Book page"
+  },
+  "addressBookPageEmptyMessage": "Your contacts and their wallet address will\nappear here.",
+  "@addressBookPageEmptyMessage": {
+    "description": "Message displayed when the address book is empty on the Address Book page"
+  },
+  "addressBookPageNetwork": "Network {network}",
+  "@addressBookPageNetwork": {
+    "description": "Network label format for each address entry on the Address Book page",
+    "placeholders": {
+      "network": {}
+    }
+  },
+  "browserPageConnectedTab": "Connected",
+  "@browserPageConnectedTab": {
+    "description": "Label for the Connected tab on the Browser page"
+  },
+  "browserPageExploreTab": "Explore",
+  "@browserPageExploreTab": {
+    "description": "Label for the Explore tab on the Browser page"
+  },
+  "browserPageNoExploreApps": "No apps to explore yet",
+  "@browserPageNoExploreApps": {
+    "description": "Message displayed when there are no apps to explore on the Browser page"
+  },
+  "browserPageSearchHint": "Search with {engine} or enter address",
+  "@browserPageSearchHint": {
+    "description": "Hint text for the search bar on the Browser page",
+    "placeholders": {
+      "engine": {}
+    }
+  },
+  "browserPageNoConnectedApps": "No connected apps",
+  "@browserPageNoConnectedApps": {
+    "description": "Message displayed when there are no connected apps on the Browser page"
+  },
+  "historyPageTitle": "Transaction History",
+  "@historyPageTitle": {
+    "description": "Title displayed at the top of the HistoryPage component"
+  },
+  "historyPageNoTransactions": "No transactions yet",
+  "@historyPageNoTransactions": {
+    "description": "Message shown in the HistoryPage when there are no transactions to display"
+  },
+  "historyPageSearchHint": "Search transactions...",
+  "@historyPageSearchHint": {
+    "description": "Hint text displayed in the search input field on the HistoryPage"
+  },
+  "notificationsSettingsPageTitle": "Notifications",
+  "@notificationsSettingsPageTitle": {
+    "description": "Title displayed in the app bar of the NotificationsSettingsPage component"
+  },
+  "notificationsSettingsPagePushTitle": "Push notifications",
+  "@notificationsSettingsPagePushTitle": {
+    "description": "Title for the push notifications switch setting in the NotificationsSettingsPage"
+  },
+  "notificationsSettingsPagePushDescription": "Get notifications when tx sent and confirm, Notifications from connected apps.",
+  "@notificationsSettingsPagePushDescription": {
+    "description": "Description text for the push notifications switch setting in the NotificationsSettingsPage"
+  },
+  "notificationsSettingsPageWalletsTitle": "Wallets",
+  "@notificationsSettingsPageWalletsTitle": {
+    "description": "Title for the wallets section in the NotificationsSettingsPage"
+  },
+  "notificationsSettingsPageWalletsDescription": "Notifications from wallets",
+  "@notificationsSettingsPageWalletsDescription": {
+    "description": "Description text for the wallets section in the NotificationsSettingsPage"
+  },
+  "notificationsSettingsPageWalletPrefix": "Wallet",
+  "@notificationsSettingsPageWalletPrefix": {
+    "description": "Prefix used for unnamed wallets in the NotificationsSettingsPage, followed by wallet number"
+  },
+  "revealSecretPhraseTitle": "Reveal Secret Phrase",
+  "@revealSecretPhraseTitle": {
+    "description": "Title displayed in the app bar of the RevealSecretPhrase component"
+  },
+  "revealSecretPhrasePasswordHint": "Password",
+  "@revealSecretPhrasePasswordHint": {
+    "description": "Hint text displayed in the password input field of the RevealSecretPhrase component"
+  },
+  "revealSecretPhraseInvalidPassword": "invalid password, error:",
+  "@revealSecretPhraseInvalidPassword": {
+    "description": "Error message prefix shown when password validation fails in the RevealSecretPhrase component"
+  },
+  "revealSecretPhraseSubmitButton": "Submit",
+  "@revealSecretPhraseSubmitButton": {
+    "description": "Text on the submit button in the RevealSecretPhrase component"
+  },
+  "revealSecretPhraseDoneButton": "Done",
+  "@revealSecretPhraseDoneButton": {
+    "description": "Text on the done button displayed after revealing the secret phrase in the RevealSecretPhrase component"
+  },
+  "revealSecretPhraseScamAlertTitle": "SCAM ALERT",
+  "@revealSecretPhraseScamAlertTitle": {
+    "description": "Title of the scam alert section in the RevealSecretPhrase component"
+  },
+  "revealSecretPhraseScamAlertDescription": "Never share your secret phrase with anyone. Never input it on any website.",
+  "@revealSecretPhraseScamAlertDescription": {
+    "description": "Description text in the scam alert section of the RevealSecretPhrase component"
   }
 }

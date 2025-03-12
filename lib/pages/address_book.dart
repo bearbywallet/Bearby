@@ -6,6 +6,7 @@ import 'package:zilpay/modals/add_contect.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class AddressBookPage extends StatefulWidget {
   const AddressBookPage({super.key});
@@ -19,6 +20,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -31,7 +33,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   child: CustomAppBar(
-                    title: 'Address Book',
+                    title: l10n.addressBookPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                     actionIcon: SvgPicture.asset(
                       'assets/icons/plus.svg',
@@ -62,6 +64,8 @@ class _AddressBookPageState extends State<AddressBookPage> {
   }
 
   Widget _buildEmptyState(AppTheme theme) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -79,7 +83,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Your contacts and their wallet address will\nappear here.',
+              l10n.addressBookPageEmptyMessage,
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: theme.textSecondary,
@@ -94,6 +98,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
   Widget _buildAddressList(AppState state) {
     final theme = state.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return ListView.builder(
       itemCount: state.book.length,
@@ -105,9 +110,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () {
-            // Handle address selection
-          },
+          onTap: () {},
           child: Container(
             height: 72,
             decoration: BoxDecoration(
@@ -151,7 +154,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        "Network ${address.net}",
+                        l10n.addressBookPageNetwork(address.net),
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,

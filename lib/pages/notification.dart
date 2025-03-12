@@ -7,6 +7,7 @@ import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/notification.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import '../components/custom_app_bar.dart';
 import '../state/app_state.dart';
 
@@ -53,7 +54,8 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Notifications',
+                    title: AppLocalizations.of(context)!
+                        .notificationsSettingsPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -68,10 +70,11 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
                         children: [
                           SwitchSettingItem(
                             iconPath: "assets/icons/manage.svg",
-                            title: 'Push notifications',
+                            title: AppLocalizations.of(context)!
+                                .notificationsSettingsPagePushTitle,
                             backgroundColor: theme.cardBackground,
-                            description:
-                                'Get notifications when tx sent and confirm, Notifications from connected apps.',
+                            description: AppLocalizations.of(context)!
+                                .notificationsSettingsPagePushDescription,
                             value: state.state.notificationsGlobalEnabled,
                             onChanged: (value) async {
                               await setGlobalNotifications(
@@ -106,7 +109,8 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                'Wallets',
+                AppLocalizations.of(context)!
+                    .notificationsSettingsPageWalletsTitle,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 20,
@@ -115,7 +119,8 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               ),
               SizedBox(height: 8),
               Text(
-                'Notifications from wallets',
+                AppLocalizations.of(context)!
+                    .notificationsSettingsPageWalletsDescription,
                 style: TextStyle(
                   color: theme.textSecondary,
                   fontSize: 16,
@@ -192,7 +197,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
           Expanded(
             child: Text(
               wallet.walletName.isEmpty
-                  ? "Wallet ${index + 1}"
+                  ? "${AppLocalizations.of(context)!.notificationsSettingsPageWalletPrefix} ${index + 1}"
                   : wallet.walletName,
               style: TextStyle(
                 color: theme.textPrimary,

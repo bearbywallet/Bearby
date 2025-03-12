@@ -413,4 +413,162 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appearanceSettingsPageLightModeDescription => 'Keep the light theme enabled at all times, regardless of your device settings.';
+
+  @override
+  String get loginPageBiometricReason => 'Please authenticate';
+
+  @override
+  String loginPageWalletTitle(Object index) {
+    return 'Wallet $index';
+  }
+
+  @override
+  String get loginPagePasswordHint => 'Password';
+
+  @override
+  String get loginPageUnlockButton => 'Unlock';
+
+  @override
+  String get loginPageWelcomeBack => 'Welcome back';
+
+  @override
+  String get secretKeyRestorePageTitle => 'Restore Secret Key';
+
+  @override
+  String get secretKeyRestorePageHint => 'Private Key';
+
+  @override
+  String get secretKeyRestorePageInvalidFormat => 'Invalid private key format';
+
+  @override
+  String get secretKeyRestorePageKeyTitle => 'Private Key';
+
+  @override
+  String get secretKeyRestorePageBackupLabel => 'I have backed up my secret key';
+
+  @override
+  String get secretKeyRestorePageNextButton => 'Next';
+
+  @override
+  String get addAccountPageTitle => 'Add New Account';
+
+  @override
+  String get addAccountPageSubtitle => 'Create BIP39 Account';
+
+  @override
+  String addAccountPageDefaultName(Object index) {
+    return 'Account $index';
+  }
+
+  @override
+  String get addAccountPageNameHint => 'Account name';
+
+  @override
+  String get addAccountPageBip39Index => 'BIP39 Index';
+
+  @override
+  String get addAccountPageUseBiometrics => 'Use Biometrics';
+
+  @override
+  String get addAccountPagePasswordHint => 'Password';
+
+  @override
+  String get addAccountPageZilliqaLegacy => 'Zilliqa Legacy';
+
+  @override
+  String get addAccountPageBiometricReason => 'Authenticate to create a new account';
+
+  @override
+  String addAccountPageBiometricError(Object error) {
+    return 'Biometric authentication failed: $error';
+  }
+
+  @override
+  String addAccountPageIndexExists(Object index) {
+    return 'Account with index $index already exists';
+  }
+
+  @override
+  String get addAccountPageBiometricFailed => 'Biometric authentication failed';
+
+  @override
+  String addAccountPageCreateFailed(Object error) {
+    return 'Failed to create account: $error';
+  }
+
+  @override
+  String get addressBookPageTitle => 'Address Book';
+
+  @override
+  String get addressBookPageEmptyMessage => 'Your contacts and their wallet address will\nappear here.';
+
+  @override
+  String addressBookPageNetwork(Object network) {
+    return 'Network $network';
+  }
+
+  @override
+  String get browserPageConnectedTab => 'Connected';
+
+  @override
+  String get browserPageExploreTab => 'Explore';
+
+  @override
+  String get browserPageNoExploreApps => 'No apps to explore yet';
+
+  @override
+  String browserPageSearchHint(Object engine) {
+    return 'Search with $engine or enter address';
+  }
+
+  @override
+  String get browserPageNoConnectedApps => 'No connected apps';
+
+  @override
+  String get historyPageTitle => 'Transaction History';
+
+  @override
+  String get historyPageNoTransactions => 'No transactions yet';
+
+  @override
+  String get historyPageSearchHint => 'Search transactions...';
+
+  @override
+  String get notificationsSettingsPageTitle => 'Notifications';
+
+  @override
+  String get notificationsSettingsPagePushTitle => 'Push notifications';
+
+  @override
+  String get notificationsSettingsPagePushDescription => 'Get notifications when tx sent and confirm, Notifications from connected apps.';
+
+  @override
+  String get notificationsSettingsPageWalletsTitle => 'Wallets';
+
+  @override
+  String get notificationsSettingsPageWalletsDescription => 'Notifications from wallets';
+
+  @override
+  String get notificationsSettingsPageWalletPrefix => 'Wallet';
+
+  @override
+  String get revealSecretPhraseTitle => 'Reveal Secret Phrase';
+
+  @override
+  String get revealSecretPhrasePasswordHint => 'Password';
+
+  @override
+  String get revealSecretPhraseInvalidPassword => 'invalid password, error:';
+
+  @override
+  String get revealSecretPhraseSubmitButton => 'Submit';
+
+  @override
+  String get revealSecretPhraseDoneButton => 'Done';
+
+  @override
+  String get revealSecretPhraseScamAlertTitle => 'SCAM ALERT';
+
+  @override
+  String get revealSecretPhraseScamAlertDescription => 'Never share your secret phrase with anyone. Never input it on any website.';
 }

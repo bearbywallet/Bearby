@@ -11,6 +11,7 @@ import 'package:zilpay/modals/transaction_details_modal.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 enum SortType { date, status }
 
@@ -126,7 +127,7 @@ class _HistoryPageState extends State<HistoryPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Transaction History',
+            AppLocalizations.of(context)!.historyPageTitle,
             style: TextStyle(
               color: appState.currentTheme.textPrimary,
               fontSize: 20,
@@ -179,7 +180,7 @@ class _HistoryPageState extends State<HistoryPage> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              'No transactions yet',
+              AppLocalizations.of(context)!.historyPageNoTransactions,
               style: TextStyle(
                 color: appState.currentTheme.textPrimary,
                 fontSize: 16,
@@ -270,7 +271,7 @@ class _HistoryPageState extends State<HistoryPage> {
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: SmartInput(
                     controller: _searchController,
-                    hint: 'Search transactions...',
+                    hint: AppLocalizations.of(context)!.historyPageSearchHint,
                     leftIconPath: 'assets/icons/search.svg',
                     rightIconPath: "assets/icons/close.svg",
                     onChanged: (value) {

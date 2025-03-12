@@ -9,6 +9,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class SecretKeyRestorePage extends StatefulWidget {
   const SecretKeyRestorePage({super.key});
@@ -31,6 +32,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
   }
 
   void _validatePrivateKey(String input) async {
+    final l10n = AppLocalizations.of(context)!;
     setState(() {
       _isValidating = true;
       _errorMessage = null;
@@ -52,7 +54,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
       });
     } catch (e) {
       setState(() {
-        _errorMessage = 'Invalid private key format';
+        _errorMessage = l10n.secretKeyRestorePageInvalidFormat;
         _keyPair = KeyPairInfo(sk: "", pk: "");
       });
     } finally {
@@ -64,13 +66,14 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Restore Secret Key',
+              title: l10n.secretKeyRestorePageTitle,
               onBackPressed: () => Navigator.pop(context),
               actionIcon: SvgPicture.asset(
                 'assets/icons/paste.svg',
@@ -94,7 +97,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
                           children: [
                             SmartInput(
                               controller: _privateKeyController,
-                              hint: 'Private Key',
+                              hint: l10n.secretKeyRestorePageHint,
                               onChanged: _validatePrivateKey,
                               keyboardType: TextInputType.text,
                               leftIconPath: 'assets/icons/key.svg',
@@ -129,7 +132,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
                                 hexKey: _keyPair.sk.isNotEmpty
                                     ? _keyPair.sk
                                     : '0000000000000000000000000000000000000000000000000000000000000000',
-                                title: "Private Key",
+                                title: l10n.secretKeyRestorePageKeyTitle,
                               ),
                             ),
                           ],
@@ -149,7 +152,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
                               ),
                               child: CheckboxListTile(
                                 title: Text(
-                                  'I have backed up my secret key',
+                                  l10n.secretKeyRestorePageBackupLabel,
                                   style: TextStyle(color: theme.textSecondary),
                                 ),
                                 value: _hasBackup,
@@ -173,7 +176,7 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
                             CustomButton(
                               textColor: theme.buttonText,
                               backgroundColor: theme.primaryPurple,
-                              text: 'Next',
+                              text: l10n.secretKeyRestorePageNextButton,
                               onPressed: _keyPair.sk.isNotEmpty && _hasBackup
                                   ? () {
                                       Navigator.of(context).pushNamed(

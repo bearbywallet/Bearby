@@ -12,6 +12,7 @@ import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class AddAccount extends StatefulWidget {
   const AddAccount({super.key});
@@ -66,7 +67,8 @@ class _AddAccountState extends State<AddAccount> {
   }
 
   void _setAutoAccountName(AppState appState) {
-    _accountNameController.text = 'Account $_bip39Index';
+    _accountNameController.text =
+        AppLocalizations.of(context)!.addAccountPageDefaultName(_bip39Index);
   }
 
   bool _exists(AppState appState) {
@@ -84,21 +86,23 @@ class _AddAccountState extends State<AddAccount> {
     try {
       return await _authService.authenticate(
         allowPinCode: true,
-        reason: 'Authenticate to create a new account',
+        reason: AppLocalizations.of(context)!.addAccountPageBiometricReason,
       );
     } catch (e) {
       debugPrint('Biometric authentication error: $e');
       setState(() {
-        _errorMessage = 'Biometric authentication failed: $e';
+        _errorMessage =
+            AppLocalizations.of(context)!.addAccountPageBiometricError(e);
       });
       return false;
     }
   }
 
   Future<void> _createAccount(AppState appState) async {
+    final l10n = AppLocalizations.of(context)!;
     if (_exists(appState)) {
       setState(() {
-        _errorMessage = "Account with index $_bip39Index already exists";
+        _errorMessage = l10n.addAccountPageIndexExists(_bip39Index);
       });
       return;
     }
@@ -122,13 +126,12 @@ class _AddAccountState extends State<AddAccount> {
 
     String session = "";
 
-    // Handle biometric authentication if enabled
     if (_useBiometrics && _passwordController.text.isEmpty) {
       bool authenticated = await _authenticateWithBiometrics();
       if (!authenticated) {
         setState(() {
           _isCreating = false;
-          _errorMessage = "Biometric authentication failed";
+          _errorMessage = l10n.addAccountPageBiometricFailed;
         });
         return;
       }
@@ -181,7 +184,7 @@ class _AddAccountState extends State<AddAccount> {
       }
     } catch (e) {
       setState(() {
-        _errorMessage = 'Failed to create account: $e';
+        _errorMessage = l10n.addAccountPageCreateFailed(e);
         _isCreating = false;
       });
     }
@@ -193,6 +196,7 @@ class _AddAccountState extends State<AddAccount> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final keyboardHeight = MediaQuery.of(context).viewInsets.bottom;
+    final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -202,7 +206,7 @@ class _AddAccountState extends State<AddAccount> {
             Padding(
               padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
               child: CustomAppBar(
-                title: 'Add New Account',
+                title: l10n.addAccountPageTitle,
                 onBackPressed: () => Navigator.pop(context),
                 actionIcon: _isCreating
                     ? SizedBox(
@@ -243,7 +247,7 @@ class _AddAccountState extends State<AddAccount> {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         Text(
-                          'Create BIP39 Account',
+                          l10n.addAccountPageSubtitle,
                           style: TextStyle(
                             color: theme.textPrimary,
                             fontSize: 24,
@@ -254,7 +258,7 @@ class _AddAccountState extends State<AddAccount> {
                         SmartInput(
                           key: _accountNameInputKey,
                           controller: _accountNameController,
-                          hint: "Account name",
+                          hint: l10n.addAccountPageNameHint,
                           fontSize: 18,
                           height: 56,
                           disabled: _isCreating,
@@ -273,7 +277,7 @@ class _AddAccountState extends State<AddAccount> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'BIP39 Index',
+                                l10n.addAccountPageBip39Index,
                                 style: TextStyle(
                                   color: theme.textPrimary,
                                   fontSize: 16,
@@ -326,7 +330,7 @@ class _AddAccountState extends State<AddAccount> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    'Use Biometrics',
+                                    l10n.addAccountPageUseBiometrics,
                                     style: TextStyle(
                                       color: theme.textPrimary,
                                       fontSize: 16,
@@ -343,7 +347,7 @@ class _AddAccountState extends State<AddAccount> {
                           SmartInput(
                             key: _passwordInputKey,
                             controller: _passwordController,
-                            hint: "Password",
+                            hint: l10n.addAccountPagePasswordHint,
                             fontSize: 18,
                             height: 56,
                             disabled: _isCreating,
@@ -379,7 +383,7 @@ class _AddAccountState extends State<AddAccount> {
                                 const SizedBox(width: 12),
                                 Expanded(
                                   child: Text(
-                                    'Zilliqa Legacy',
+                                    l10n.addAccountPageZilliqaLegacy,
                                     style: TextStyle(
                                       color: theme.textPrimary,
                                       fontSize: 16,

@@ -16,6 +16,7 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/theme/app_theme.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class RevealSecretPhrase extends StatefulWidget {
   const RevealSecretPhrase({super.key});
@@ -85,7 +86,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
       setState(() {
         isAuthenticated = false;
         hasError = true;
-        errorMessage = "invalid password, error: $e";
+        errorMessage =
+            "${AppLocalizations.of(context)!.revealSecretPhraseInvalidPassword} $e";
       });
       _btnController.error();
       await Future.delayed(const Duration(seconds: 1));
@@ -104,7 +106,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
         child: Column(
           children: [
             CustomAppBar(
-              title: 'Reveal Secret Phrase',
+              title: AppLocalizations.of(context)!.revealSecretPhraseTitle,
               onBackPressed: () => Navigator.pop(context),
             ),
             Expanded(
@@ -117,7 +119,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                       SmartInput(
                         key: _passwordInputKey,
                         controller: _passwordController,
-                        hint: "Password",
+                        hint: AppLocalizations.of(context)!
+                            .revealSecretPhrasePasswordHint,
                         fontSize: 18,
                         height: 50,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
@@ -163,7 +166,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                             ),
                           ),
                           child: Text(
-                            'Submit',
+                            AppLocalizations.of(context)!
+                                .revealSecretPhraseSubmitButton,
                             style: TextStyle(
                               color: theme.buttonText,
                               fontSize: 18,
@@ -200,7 +204,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                         child: CustomButton(
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
-                          text: 'Done',
+                          text: AppLocalizations.of(context)!
+                              .revealSecretPhraseDoneButton,
                           onPressed: () => Navigator.pop(context),
                           borderRadius: 30.0,
                           height: 56.0,
@@ -237,7 +242,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
               ),
               const SizedBox(width: 8),
               Text(
-                'SCAM ALERT',
+                AppLocalizations.of(context)!.revealSecretPhraseScamAlertTitle,
                 style: TextStyle(
                   color: theme.danger,
                   fontWeight: FontWeight.bold,
@@ -248,7 +253,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
           ),
           const SizedBox(height: 8),
           Text(
-            'Never share your secret phrase with anyone. Never input it on any website.',
+            AppLocalizations.of(context)!
+                .revealSecretPhraseScamAlertDescription,
             style: TextStyle(
               color: theme.danger,
               fontSize: 14,

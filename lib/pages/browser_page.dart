@@ -10,6 +10,7 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/pages/web_view.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});
@@ -97,6 +98,7 @@ class _BrowserPageState extends State<BrowserPage>
         horizontal: AdaptiveSize.getAdaptivePadding(context, 16));
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final connections = appState.connections;
+    final l10n = AppLocalizations.of(context)!;
 
     return SafeArea(
       child: Center(
@@ -108,9 +110,9 @@ class _BrowserPageState extends State<BrowserPage>
               children: [
                 TabBar(
                   controller: _tabController,
-                  tabs: const [
-                    Tab(text: 'Connected'),
-                    Tab(text: 'Explore'),
+                  tabs: [
+                    Tab(text: l10n.browserPageConnectedTab),
+                    Tab(text: l10n.browserPageExploreTab),
                   ],
                   labelStyle: TextStyle(
                       color: theme.textPrimary,
@@ -136,7 +138,7 @@ class _BrowserPageState extends State<BrowserPage>
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text('No apps to explore yet',
+                            Text(l10n.browserPageNoExploreApps,
                                 style: TextStyle(
                                     color: theme.textSecondary,
                                     fontSize: 16,
@@ -164,13 +166,14 @@ class _BrowserPageState extends State<BrowserPage>
     final appState = Provider.of<AppState>(context);
     final searchEngineIndex = appState.state.browserSettings.searchEngineIndex;
     final searchEngine = baseSearchEngines[searchEngineIndex];
+    final l10n = AppLocalizations.of(context)!;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         SmartInput(
           controller: _searchController,
-          hint: 'Search with ${searchEngine.name} or enter address',
+          hint: l10n.browserPageSearchHint(searchEngine.name),
           leftIconPath: 'assets/icons/search.svg',
           rightIconPath: "assets/icons/close.svg",
           onChanged: (value) {},
@@ -192,10 +195,12 @@ class _BrowserPageState extends State<BrowserPage>
 
   Widget _buildConnectedTab(
       List<ConnectionInfo> connections, AppTheme theme, EdgeInsets padding) {
+    final l10n = AppLocalizations.of(context)!;
+
     if (connections.isEmpty) {
       return Center(
         child: Text(
-          'No connected apps',
+          l10n.browserPageNoConnectedApps,
           style: TextStyle(
               color: theme.textSecondary,
               fontSize: 16,

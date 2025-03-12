@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 
 import '../components/load_button.dart';
 import '../components/smart_input.dart';
@@ -122,7 +123,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       return await _authService.authenticate(
         allowPinCode: true,
-        reason: 'Please authenticate',
+        reason: AppLocalizations.of(context)!.loginPageBiometricReason,
       );
     } catch (e) {
       debugPrint('Biometric authentication error: $e');
@@ -265,6 +266,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildWalletItem(int index, AppState theme) {
     final wallet = _appState.wallets[index];
+    final l10n = AppLocalizations.of(context)!;
 
     if (!_obscureButton && _selectedWallet != index) {
       return const SizedBox.shrink();
@@ -274,7 +276,7 @@ class _LoginPageState extends State<LoginPage> {
       padding: EdgeInsets.only(top: index > 0 ? 4 : 0),
       child: WalletOption(
         title: wallet.walletName.isEmpty
-            ? "Wallet ${index + 1}"
+            ? l10n.loginPageWalletTitle(index + 1)
             : wallet.walletName,
         walletIndex: index,
         address: wallet.walletAddress,
@@ -309,6 +311,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget _buildLoginForm(AppState theme) {
     final isLedgerWallet = _selectedWallet != -1 &&
         _appState.wallets[_selectedWallet].walletType == WalletType.ledger.name;
+    final l10n = AppLocalizations.of(context)!;
 
     return Padding(
       padding: EdgeInsets.all(AdaptiveSize.getAdaptivePadding(context, 16)),
@@ -318,7 +321,7 @@ class _LoginPageState extends State<LoginPage> {
           SmartInput(
             key: _passwordInputKey,
             controller: _passwordController,
-            hint: "Password",
+            hint: l10n.loginPagePasswordHint,
             fontSize: 18,
             height: 50,
             disabled: _selectedWallet == -1 || isLedgerWallet,
@@ -342,6 +345,8 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildUnlockButton(AppState appState) {
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+
     return SizedBox(
       width: double.infinity,
       child: RoundedLoadingButton(
@@ -359,7 +364,7 @@ class _LoginPageState extends State<LoginPage> {
           ),
         ),
         child: Text(
-          'Unlock',
+          l10n.loginPageUnlockButton,
           style: TextStyle(
             color: theme.buttonText,
             fontSize: 18,
@@ -374,6 +379,7 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final screenSize = MediaQuery.of(context).size;
+    final l10n = AppLocalizations.of(context)!;
 
     if (appState.wallets.isEmpty) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -399,7 +405,7 @@ class _LoginPageState extends State<LoginPage> {
                   children: [
                     _buildHeader(appState),
                     Text(
-                      'Welcome back',
+                      l10n.loginPageWelcomeBack,
                       style: TextStyle(
                         color: appState.currentTheme.textPrimary,
                         fontSize: 32,

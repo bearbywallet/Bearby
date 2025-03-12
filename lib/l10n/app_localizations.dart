@@ -896,6 +896,294 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keep the light theme enabled at all times, regardless of your device settings.'**
   String get appearanceSettingsPageLightModeDescription;
+
+  /// Reason text for biometric authentication prompt on the Login page
+  ///
+  /// In en, this message translates to:
+  /// **'Please authenticate'**
+  String get loginPageBiometricReason;
+
+  /// Default title for a wallet item when no custom name is provided on the Login page
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet {index}'**
+  String loginPageWalletTitle(Object index);
+
+  /// Hint text for the password input field on the Login page
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get loginPagePasswordHint;
+
+  /// Text for the unlock button on the Login page
+  ///
+  /// In en, this message translates to:
+  /// **'Unlock'**
+  String get loginPageUnlockButton;
+
+  /// Welcome message displayed on the Login page
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome back'**
+  String get loginPageWelcomeBack;
+
+  /// Title for the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Secret Key'**
+  String get secretKeyRestorePageTitle;
+
+  /// Hint text for the private key input field on the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'Private Key'**
+  String get secretKeyRestorePageHint;
+
+  /// Error message displayed when the private key format is invalid on the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid private key format'**
+  String get secretKeyRestorePageInvalidFormat;
+
+  /// Title for the private key display section on the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'Private Key'**
+  String get secretKeyRestorePageKeyTitle;
+
+  /// Label for the backup confirmation checkbox on the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'I have backed up my secret key'**
+  String get secretKeyRestorePageBackupLabel;
+
+  /// Text for the Next button on the Secret Key Restore page
+  ///
+  /// In en, this message translates to:
+  /// **'Next'**
+  String get secretKeyRestorePageNextButton;
+
+  /// Title for the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Add New Account'**
+  String get addAccountPageTitle;
+
+  /// Subtitle for the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Create BIP39 Account'**
+  String get addAccountPageSubtitle;
+
+  /// Default account name format for the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Account {index}'**
+  String addAccountPageDefaultName(Object index);
+
+  /// Hint text for the account name input field on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Account name'**
+  String get addAccountPageNameHint;
+
+  /// Label for the BIP39 index counter on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'BIP39 Index'**
+  String get addAccountPageBip39Index;
+
+  /// Label for the biometrics option on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Use Biometrics'**
+  String get addAccountPageUseBiometrics;
+
+  /// Hint text for the password input field on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get addAccountPagePasswordHint;
+
+  /// Label for the Zilliqa Legacy switch on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Zilliqa Legacy'**
+  String get addAccountPageZilliqaLegacy;
+
+  /// Reason text for biometric authentication prompt on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Authenticate to create a new account'**
+  String get addAccountPageBiometricReason;
+
+  /// Error message for biometric authentication failure on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric authentication failed: {error}'**
+  String addAccountPageBiometricError(Object error);
+
+  /// Error message when an account with the given index already exists on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Account with index {index} already exists'**
+  String addAccountPageIndexExists(Object index);
+
+  /// Error message when biometric authentication fails on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Biometric authentication failed'**
+  String get addAccountPageBiometricFailed;
+
+  /// Error message when account creation fails on the Add Account page
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create account: {error}'**
+  String addAccountPageCreateFailed(Object error);
+
+  /// Title for the Address Book page
+  ///
+  /// In en, this message translates to:
+  /// **'Address Book'**
+  String get addressBookPageTitle;
+
+  /// Message displayed when the address book is empty on the Address Book page
+  ///
+  /// In en, this message translates to:
+  /// **'Your contacts and their wallet address will\nappear here.'**
+  String get addressBookPageEmptyMessage;
+
+  /// Network label format for each address entry on the Address Book page
+  ///
+  /// In en, this message translates to:
+  /// **'Network {network}'**
+  String addressBookPageNetwork(Object network);
+
+  /// Label for the Connected tab on the Browser page
+  ///
+  /// In en, this message translates to:
+  /// **'Connected'**
+  String get browserPageConnectedTab;
+
+  /// Label for the Explore tab on the Browser page
+  ///
+  /// In en, this message translates to:
+  /// **'Explore'**
+  String get browserPageExploreTab;
+
+  /// Message displayed when there are no apps to explore on the Browser page
+  ///
+  /// In en, this message translates to:
+  /// **'No apps to explore yet'**
+  String get browserPageNoExploreApps;
+
+  /// Hint text for the search bar on the Browser page
+  ///
+  /// In en, this message translates to:
+  /// **'Search with {engine} or enter address'**
+  String browserPageSearchHint(Object engine);
+
+  /// Message displayed when there are no connected apps on the Browser page
+  ///
+  /// In en, this message translates to:
+  /// **'No connected apps'**
+  String get browserPageNoConnectedApps;
+
+  /// Title displayed at the top of the HistoryPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction History'**
+  String get historyPageTitle;
+
+  /// Message shown in the HistoryPage when there are no transactions to display
+  ///
+  /// In en, this message translates to:
+  /// **'No transactions yet'**
+  String get historyPageNoTransactions;
+
+  /// Hint text displayed in the search input field on the HistoryPage
+  ///
+  /// In en, this message translates to:
+  /// **'Search transactions...'**
+  String get historyPageSearchHint;
+
+  /// Title displayed in the app bar of the NotificationsSettingsPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notificationsSettingsPageTitle;
+
+  /// Title for the push notifications switch setting in the NotificationsSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Push notifications'**
+  String get notificationsSettingsPagePushTitle;
+
+  /// Description text for the push notifications switch setting in the NotificationsSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Get notifications when tx sent and confirm, Notifications from connected apps.'**
+  String get notificationsSettingsPagePushDescription;
+
+  /// Title for the wallets section in the NotificationsSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Wallets'**
+  String get notificationsSettingsPageWalletsTitle;
+
+  /// Description text for the wallets section in the NotificationsSettingsPage
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications from wallets'**
+  String get notificationsSettingsPageWalletsDescription;
+
+  /// Prefix used for unnamed wallets in the NotificationsSettingsPage, followed by wallet number
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet'**
+  String get notificationsSettingsPageWalletPrefix;
+
+  /// Title displayed in the app bar of the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'Reveal Secret Phrase'**
+  String get revealSecretPhraseTitle;
+
+  /// Hint text displayed in the password input field of the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get revealSecretPhrasePasswordHint;
+
+  /// Error message prefix shown when password validation fails in the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'invalid password, error:'**
+  String get revealSecretPhraseInvalidPassword;
+
+  /// Text on the submit button in the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'Submit'**
+  String get revealSecretPhraseSubmitButton;
+
+  /// Text on the done button displayed after revealing the secret phrase in the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get revealSecretPhraseDoneButton;
+
+  /// Title of the scam alert section in the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'SCAM ALERT'**
+  String get revealSecretPhraseScamAlertTitle;
+
+  /// Description text in the scam alert section of the RevealSecretPhrase component
+  ///
+  /// In en, this message translates to:
+  /// **'Never share your secret phrase with anyone. Never input it on any website.'**
+  String get revealSecretPhraseScamAlertDescription;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
