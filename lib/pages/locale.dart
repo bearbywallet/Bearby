@@ -48,17 +48,10 @@ class _LanguagePageState extends State<LanguagePage> {
 
     languages.clear();
     languages.addAll([
-      Language(
-          'system', l10n.languagePageSystem, l10n.languagePageEnglishLocal),
-      Language('ru', l10n.languagePageRussian, l10n.languagePageRussianLocal),
-      Language('en', l10n.languagePageEnglish, l10n.languagePageEnglishLocal),
-      Language('tr', l10n.languagePageTurkish, l10n.languagePageTurkishLocal),
-      Language('zh', l10n.languagePageChinese, l10n.languagePageChineseLocal),
-      Language('uz', l10n.languagePageUzbek, l10n.languagePageUzbekLocal),
-      Language(
-          'id', l10n.languagePageIndonesian, l10n.languagePageIndonesianLocal),
-      Language(
-          'uk', l10n.languagePageUkrainian, l10n.languagePageUkrainianLocal),
+      Language('system', 'System', ""),
+      Language('ru', 'Russian', "Русский"),
+      Language('en', 'English', "English"),
+      Language('ja', 'Japanese', "日本語"),
     ]);
 
     return Scaffold(

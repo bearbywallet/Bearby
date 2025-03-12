@@ -161,76 +161,7 @@
   "@languagePageSystem": {
     "description": "System language option name on LanguagePage"
   },
-  
-  "languagePageRussian": "Russian",
-  "@languagePageRussian": {
-    "description": "Russian language option name on LanguagePage"
-  },
-  
-  "languagePageEnglish": "English",
-  "@languagePageEnglish": {
-    "description": "English language option name on LanguagePage"
-  },
-  
-  "languagePageTurkish": "Turkish",
-  "@languagePageTurkish": {
-    "description": "Turkish language option name on LanguagePage"
-  },
-  
-  "languagePageChinese": "Chinese",
-  "@languagePageChinese": {
-    "description": "Chinese language option name on LanguagePage"
-  },
-  
-  "languagePageUzbek": "Uzbek",
-  "@languagePageUzbek": {
-    "description": "Uzbek language option name on LanguagePage"
-  },
-  
-  "languagePageIndonesian": "Indonesian",
-  "@languagePageIndonesian": {
-    "description": "Indonesian language option name on LanguagePage"
-  },
-  
-  "languagePageUkrainian": "Ukrainian",
-  "@languagePageUkrainian": {
-    "description": "Ukrainian language option name on LanguagePage"
-  },
-  
-  "languagePageEnglishLocal": "English",
-  "@languagePageEnglishLocal": {
-    "description": "Local name for English and System languages on LanguagePage"
-  },
-  
-  "languagePageRussianLocal": "Русский",
-  "@languagePageRussianLocal": {
-    "description": "Local name for Russian language on LanguagePage"
-  },
-  
-  "languagePageTurkishLocal": "Türkçe",
-  "@languagePageTurkishLocal": {
-    "description": "Local name for Turkish language on LanguagePage"
-  },
-  
-  "languagePageChineseLocal": "简体中文",
-  "@languagePageChineseLocal": {
-    "description": "Local name for Chinese language on LanguagePage"
-  },
-  
-  "languagePageUzbekLocal": "O'zbekcha",
-  "@languagePageUzbekLocal": {
-    "description": "Local name for Uzbek language on LanguagePage"
-  },
-  
-  "languagePageIndonesianLocal": "Bahasa Indonesia",
-  "@languagePageIndonesianLocal": {
-    "description": "Local name for Indonesian language on LanguagePage"
-  },
-  
-  "languagePageUkrainianLocal": "Українська",
-  "@languagePageUkrainianLocal": {
-    "description": "Local name for Ukrainian language on LanguagePage"
-  },
+
   "secretKeyGeneratorPageTitle": "Secret Key",
   "@secretKeyGeneratorPageTitle": {
     "description": "Title for the SecretKeyGeneratorPage"

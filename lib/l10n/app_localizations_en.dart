@@ -108,48 +108,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languagePageSystem => 'System';
 
   @override
-  String get languagePageRussian => 'Russian';
-
-  @override
-  String get languagePageEnglish => 'English';
-
-  @override
-  String get languagePageTurkish => 'Turkish';
-
-  @override
-  String get languagePageChinese => 'Chinese';
-
-  @override
-  String get languagePageUzbek => 'Uzbek';
-
-  @override
-  String get languagePageIndonesian => 'Indonesian';
-
-  @override
-  String get languagePageUkrainian => 'Ukrainian';
-
-  @override
-  String get languagePageEnglishLocal => 'English';
-
-  @override
-  String get languagePageRussianLocal => 'Русский';
-
-  @override
-  String get languagePageTurkishLocal => 'Türkçe';
-
-  @override
-  String get languagePageChineseLocal => '简体中文';
-
-  @override
-  String get languagePageUzbekLocal => 'O\'zbekcha';
-
-  @override
-  String get languagePageIndonesianLocal => 'Bahasa Indonesia';
-
-  @override
-  String get languagePageUkrainianLocal => 'Українська';
-
-  @override
   String get secretKeyGeneratorPageTitle => 'Secret Key';
 
   @override

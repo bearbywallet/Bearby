@@ -6,6 +6,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:intl/intl.dart' as intl;
 
 import 'app_localizations_en.dart';
+import 'app_localizations_ja.dart';
 import 'app_localizations_ru.dart';
 
 // ignore_for_file: type=lint
@@ -92,6 +93,7 @@ abstract class AppLocalizations {
   /// A list of this localizations delegate's supported locales.
   static const List<Locale> supportedLocales = <Locale>[
     Locale('en'),
+    Locale('ja'),
     Locale('ru')
   ];
 
@@ -292,90 +294,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'System'**
   String get languagePageSystem;
-
-  /// Russian language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Russian'**
-  String get languagePageRussian;
-
-  /// English language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get languagePageEnglish;
-
-  /// Turkish language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Turkish'**
-  String get languagePageTurkish;
-
-  /// Chinese language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Chinese'**
-  String get languagePageChinese;
-
-  /// Uzbek language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Uzbek'**
-  String get languagePageUzbek;
-
-  /// Indonesian language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Indonesian'**
-  String get languagePageIndonesian;
-
-  /// Ukrainian language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Ukrainian'**
-  String get languagePageUkrainian;
-
-  /// Local name for English and System languages on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'English'**
-  String get languagePageEnglishLocal;
-
-  /// Local name for Russian language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Русский'**
-  String get languagePageRussianLocal;
-
-  /// Local name for Turkish language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Türkçe'**
-  String get languagePageTurkishLocal;
-
-  /// Local name for Chinese language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'简体中文'**
-  String get languagePageChineseLocal;
-
-  /// Local name for Uzbek language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'O\'zbekcha'**
-  String get languagePageUzbekLocal;
-
-  /// Local name for Indonesian language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Bahasa Indonesia'**
-  String get languagePageIndonesianLocal;
-
-  /// Local name for Ukrainian language on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'Українська'**
-  String get languagePageUkrainianLocal;
 
   /// Title for the SecretKeyGeneratorPage
   ///
@@ -2613,7 +2531,7 @@ class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> 
   }
 
   @override
-  bool isSupported(Locale locale) => <String>['en', 'ru'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['en', 'ja', 'ru'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
@@ -2625,6 +2543,7 @@ AppLocalizations lookupAppLocalizations(Locale locale) {
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
     case 'en': return AppLocalizationsEn();
+    case 'ja': return AppLocalizationsJa();
     case 'ru': return AppLocalizationsRu();
   }
 
