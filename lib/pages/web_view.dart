@@ -402,6 +402,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       'ERR_NAME_NOT_RESOLVED',
       'CLEARTEXT_NOT_PERMITTED',
       'ERR_CONNECTION_CLOSED',
+      'ERR_BLOCKED_BY_ORB',
       'DNS_PROBE_FINISHED'
     ];
 
@@ -619,6 +620,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                   initialUrlRequest: URLRequest(url: WebUri(widget.initialUrl)),
                   initialSettings: InAppWebViewSettings(
                     javaScriptEnabled: true,
+                    safeBrowsingEnabled: false,
                     userAgent: _baseUserAgent +
                         (appState.state.browserSettings.doNotTrack
                             ? ' DNT:1'
