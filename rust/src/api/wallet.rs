@@ -362,7 +362,7 @@ pub async fn zilliqa_get_bech32_base16_address(
         match account.pub_key {
             PubKey::Secp256k1Sha256(_) => Ok((
                 account.addr.get_zil_bech32().unwrap_or_default(),
-                account.addr.get_zil_base16().unwrap_or_default(),
+                account.addr.get_zil_check_sum_addr().unwrap_or_default(),
             )),
             PubKey::Secp256k1Keccak256(pk) => {
                 let addr_result = PubKey::Secp256k1Sha256(pk)
@@ -370,7 +370,7 @@ pub async fn zilliqa_get_bech32_base16_address(
                     .map(|addr| {
                         (
                             addr.get_zil_bech32().unwrap_or_default(),
-                            addr.get_zil_base16().unwrap_or_default(),
+                            addr.get_zil_check_sum_addr().unwrap_or_default(),
                         )
                     })
                     .map_err(|_| ServiceError::DecodePublicKey)?;
