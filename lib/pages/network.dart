@@ -206,7 +206,8 @@ class _NetworkPageState extends State<NetworkPage> {
         ...networks.map((network) => Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: NetworkTile(
-                iconUrl: viewChain(network.configInfo, theme.value),
+                iconUrl:
+                    viewChain(network: network.configInfo, theme: theme.value),
                 title: network.configInfo.name,
                 isTestnet: network.configInfo.testnet ?? false,
                 isAdded: network.isAdded,

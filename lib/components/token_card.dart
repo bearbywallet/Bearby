@@ -78,7 +78,11 @@ class _TokenCardState extends State<TokenCard>
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: processTokenLogo(token, theme.value),
+          url: processTokenLogo(
+            token: token,
+            shortName: state.chain?.shortName ?? '',
+            theme: theme.value,
+          ),
           width: 32,
           height: 32,
           fit: BoxFit.contain,

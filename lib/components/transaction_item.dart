@@ -62,7 +62,13 @@ class _HistoryItemState extends State<HistoryItem>
       child: ClipOval(
         child: AsyncImage(
           url: widget.transaction.icon ??
-              (token != null ? processTokenLogo(token, theme.value) : null),
+              (token != null
+                  ? processTokenLogo(
+                      token: token,
+                      shortName: appState.chain?.shortName ?? "",
+                      theme: theme.value,
+                    )
+                  : null),
           width: 32,
           height: 32,
           fit: BoxFit.contain,

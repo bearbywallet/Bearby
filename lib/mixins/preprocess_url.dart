@@ -17,24 +17,58 @@ String processUrl(String template, String? theme) {
   });
 }
 
-String processTokenLogo(
-  FTokenInfo token,
-  NetworkConfigInfo network,
-  String? theme,
-) {
+String processUrlTemplate({
+  required String template,
+  required String theme,
+  Map<String, String> replacements = const {},
+}) {
+  if (!template.contains('%{')) return template;
+
+  String processed = template;
+
+  final funcRegex = RegExp(r'%\{(\w+)\(([^)]+)\)\}%');
+  processed = processed.replaceAllMapped(funcRegex, (match) {
+    String optionsStr = match.group(2)!;
+    List<String> options = optionsStr.split(',').map((s) => s.trim()).toList();
+
+    if (options.isEmpty) return '';
+    if (theme == 'Light') return options[0];
+    if (theme == 'Dark' && options.length >= 2) return options[1];
+    return options[0];
+  });
+
+  if (processed.contains('%{dark,light}%')) {
+    processed = processed.replaceAll(
+        '%{dark,light}%', theme == 'Dark' ? 'light' : 'dark');
+  }
+
+  for (final entry in replacements.entries) {
+    processed = processed.replaceAll('%{${entry.key}}%', entry.value);
+  }
+
+  return processed;
+}
+
+String processTokenLogo({
+  required FTokenInfo token,
+  required String shortName,
+  required String theme,
+}) {
   if (token.logo == null) return 'assets/icons/warning.svg';
 
-  String logo = token.logo!;
+  final replacements = <String, String>{
+    'symbol':
+        token.symbol.replaceAll("t", "").replaceAll("p", "").toLowerCase(),
+    'contract_address': token.addr.toLowerCase(),
+    'name': token.name,
+    'shortName': shortName,
+  };
 
-  if (!logo.contains('%{')) return logo;
-
-  String processed = processUrl(logo, theme);
-
-  return processed
-      .replaceAll('%{symbol}%',
-          token.symbol.replaceAll("t", "").replaceAll("p", "").toLowerCase())
-      .replaceAll('%{contract_address}%', token.addr.toLowerCase())
-      .replaceAll('%{name}%', token.name);
+  return processUrlTemplate(
+    template: token.logo!,
+    theme: theme,
+    replacements: replacements,
+  );
 }
 
 String formExplorerUrl(ExplorerInfo explorer, String transactionHash) {
@@ -45,26 +79,21 @@ String formExplorerUrl(ExplorerInfo explorer, String transactionHash) {
   return "$baseUrl/tx/$transactionHash";
 }
 
-String viewChain(NetworkConfigInfo network, String? theme) {
+String viewChain({
+  required NetworkConfigInfo network,
+  required String theme,
+}) {
   const defaultIcon = 'assets/icons/default_chain.svg';
 
   if (network.logo.isEmpty) return defaultIcon;
 
-  if (!network.logo.contains('%{')) return network.logo;
+  final replacements = <String, String>{
+    'shortName': network.shortName.toLowerCase(),
+  };
 
-  String processed = network.logo;
-
-  if (processed.contains('%{dark,light}%')) {
-    processed = processed.replaceAll(
-        '%{dark,light}%', theme == 'Dark' ? 'light' : 'dark');
-  }
-
-  if (processed.contains('%{shortName}%')) {
-    processed =
-        processed.replaceAll('%{shortName}%', network.shortName.toLowerCase());
-  }
-
-  processed = processUrl(processed, theme);
-
-  return processed;
+  return processUrlTemplate(
+    template: network.logo,
+    theme: theme,
+    replacements: replacements,
+  );
 }

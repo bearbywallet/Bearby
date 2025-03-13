@@ -447,7 +447,11 @@ class _ConfirmTransactionContentState
         ),
         child: ClipOval(
           child: AsyncImage(
-            url: processTokenLogo(token, theme.value),
+            url: processTokenLogo(
+              token: token,
+              shortName: state.chain?.shortName ?? "",
+              theme: theme.value,
+            ),
             width: imageSize,
             height: imageSize,
             fit: BoxFit.contain,

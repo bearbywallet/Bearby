@@ -76,7 +76,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         Expanded(
           child: _buildAmountInfo(context, theme, token, bigAmount, appState),
         ),
-        _buildTokenSelector(context, theme, token),
+        _buildTokenSelector(context, appState, token),
       ],
     );
   }
@@ -134,7 +134,12 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
   }
 
   Widget _buildTokenSelector(
-      BuildContext context, AppTheme theme, FTokenInfo token) {
+    BuildContext context,
+    AppState appState,
+    FTokenInfo token,
+  ) {
+    final theme = appState.currentTheme;
+
     return GestureDetector(
       onTap: () {
         showTokenSelectModal(
@@ -159,7 +164,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            _buildTokenIcon(theme, token),
+            _buildTokenIcon(appState, token),
             const SizedBox(width: 8),
             Text(
               token.symbol,
@@ -175,7 +180,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     );
   }
 
-  Widget _buildTokenIcon(AppTheme theme, FTokenInfo token) {
+  Widget _buildTokenIcon(AppState appState, FTokenInfo token) {
+    final theme = appState.currentTheme;
+
     return Container(
         width: 24,
         height: 24,
@@ -189,7 +196,11 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         child: ClipOval(
           child: AsyncImage(
             key: _imageKey,
-            url: processTokenLogo(token, theme.value),
+            url: processTokenLogo(
+              token: token,
+              shortName: appState.chain?.shortName ?? "",
+              theme: theme.value,
+            ),
             width: 24,
             height: 24,
             fit: BoxFit.cover,

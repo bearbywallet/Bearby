@@ -113,7 +113,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   if (_config.ftokens.isNotEmpty)
                     Padding(
                       padding: EdgeInsets.all(adaptivePadding),
-                      child: _buildFirstToken(theme),
+                      child: _buildFirstToken(appState),
                     ),
                   Padding(
                     padding: EdgeInsets.all(adaptivePadding),
@@ -254,7 +254,9 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
     );
   }
 
-  Widget _buildFirstToken(AppTheme theme) {
+  Widget _buildFirstToken(AppState appState) {
+    final theme = appState.currentTheme;
+
     if (_config.ftokens.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -274,7 +276,11 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
           if (token.logo != null)
             ClipOval(
               child: AsyncImage(
-                url: processTokenLogo(token, theme.value),
+                url: processTokenLogo(
+                  token: token,
+                  shortName: appState.chain?.shortName ?? "",
+                  theme: theme.value,
+                ),
                 width: 40,
                 height: 40,
                 fit: BoxFit.cover,

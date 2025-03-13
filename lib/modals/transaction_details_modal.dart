@@ -629,7 +629,13 @@ class _AmountSection extends StatelessWidget {
       child: ClipOval(
         child: AsyncImage(
           url: transaction.icon ??
-              (token != null ? processTokenLogo(token, theme.value) : null),
+              (token != null
+                  ? processTokenLogo(
+                      token: token,
+                      shortName: appState.chain?.shortName ?? "",
+                      theme: theme.value,
+                    )
+                  : null),
           width: 45,
           height: 45,
           fit: BoxFit.contain,

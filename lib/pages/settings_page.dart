@@ -247,7 +247,7 @@ class _SettingsPageState extends State<SettingsPage> {
                 borderRadius: BorderRadius.circular(20),
               ),
               child: AsyncImage(
-                url: viewChain(chain, theme.value),
+                url: viewChain(network: chain, theme: theme.value),
                 width: 32,
                 height: 32,
                 fit: BoxFit.contain,

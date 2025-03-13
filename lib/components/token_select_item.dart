@@ -49,7 +49,11 @@ class TokenSelectItem extends StatelessWidget {
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(iconSize / 2),
                 child: AsyncImage(
-                  url: processTokenLogo(ftoken, theme.value),
+                  url: processTokenLogo(
+                    token: ftoken,
+                    shortName: appState.chain?.shortName ?? "",
+                    theme: theme.value,
+                  ),
                   width: iconSize,
                   height: iconSize,
                   fit: BoxFit.contain,

@@ -146,7 +146,11 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
         title: token.symbol,
         name: token.name,
         iconWidget: AsyncImage(
-          url: processTokenLogo(token, theme.value),
+          url: processTokenLogo(
+            token: token,
+            shortName: appState.chain?.shortName ?? "",
+            theme: theme.value,
+          ),
           width: 32.0,
           height: 32.0,
           fit: BoxFit.contain,

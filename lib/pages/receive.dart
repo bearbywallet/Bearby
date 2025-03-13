@@ -222,7 +222,7 @@ class _ReceivePageState extends State<ReceivePage> {
                                   child: Column(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      _buildTokenSelector(theme, token),
+                                      _buildTokenSelector(appState, token),
                                       const SizedBox(height: 24),
                                       if (appState.account != null)
                                         SizedBox(
@@ -294,7 +294,9 @@ class _ReceivePageState extends State<ReceivePage> {
     );
   }
 
-  Widget _buildTokenSelector(AppTheme theme, FTokenInfo token) {
+  Widget _buildTokenSelector(AppState appState, FTokenInfo token) {
+    final theme = appState.currentTheme;
+
     return GestureDetector(
       onTapDown: (_) => handlePressedChanged(true),
       onTapUp: (_) => handlePressedChanged(false),
@@ -314,7 +316,11 @@ class _ReceivePageState extends State<ReceivePage> {
               child: Center(
                 child: AsyncImage(
                   key: _imageKey,
-                  url: processTokenLogo(token, theme.value),
+                  url: processTokenLogo(
+                    token: token,
+                    shortName: appState.chain?.shortName ?? "",
+                    theme: theme.value,
+                  ),
                   width: 32,
                   height: 32,
                   fit: BoxFit.contain,
