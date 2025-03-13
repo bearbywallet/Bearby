@@ -2,7 +2,7 @@
   {
     "name": "Zilliqa",
     "chain": "ZIL",
-    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/zil.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://api.zilliqa.com",
       "https://ssn.zilpay.io/api"
@@ -11,7 +11,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Zilliqa",
         "symbol": "ZIL",
@@ -19,7 +19,7 @@
       },
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/%{symbol}%.svg",
+        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
         "name": "Zilliqa",
         "symbol": "ZIL",
@@ -48,7 +48,7 @@
   {
     "name": "Binance",
     "chain": "BNB",
-    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/bnb.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://bsc-dataseed.bnbchain.org",
       "https://bsc-dataseed.nariox.org",
@@ -66,7 +66,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/56/%{contract_address}%.png",
+        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "BinanceCoin",
         "symbol": "BNB",
@@ -89,7 +89,7 @@
   {
     "name": "Ethereum",
     "chain": "ETH",
-    "logo": "https://raw.githubusercontent.com/spothq/cryptocurrency-icons/master/svg/%{color(white,black)}%/eth.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://singapore.rpc.blxrbdn.com"
     ],
@@ -101,7 +101,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://static.cx.metamask.io/api/v1/tokenIcons/1/%{contract_address}%.png",
+        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ethereum",
         "symbol": "ETH",
