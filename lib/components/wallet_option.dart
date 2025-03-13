@@ -62,7 +62,7 @@ class WalletOption extends StatelessWidget {
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: AsyncImage(
-                      url: preprocessUrl(chain!.logo, theme.value),
+                      url: viewChain(chain!, theme.value),
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,

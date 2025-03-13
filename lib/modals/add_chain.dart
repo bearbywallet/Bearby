@@ -226,7 +226,7 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
             ),
             child: ClipOval(
               child: AsyncImage(
-                url: preprocessUrl(widget.chain.logo, theme.value),
+                url: viewChain(widget.chain, theme.value),
                 width: 64,
                 height: 64,
                 fit: BoxFit.cover,

@@ -96,7 +96,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                         width: 2),
                   ),
                   child: AsyncImage(
-                    url: preprocessUrl(appState.chain!.logo, theme.value),
+                    url: viewChain(appState.chain!, theme.value),
                     width: 32,
                     height: 32,
                     fit: BoxFit.contain,

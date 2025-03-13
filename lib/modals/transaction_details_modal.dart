@@ -317,7 +317,7 @@ class TransactionDetailsModal extends StatelessWidget {
   Widget _buildExplorerIcon(ExplorerInfo explorer, AppTheme theme) {
     if (explorer.icon != null) {
       return AsyncImage(
-        url: preprocessUrl(explorer.icon!, theme.value),
+        url: processUrl(explorer.icon!, theme.value),
         width: 20,
         height: 20,
         fit: BoxFit.contain,

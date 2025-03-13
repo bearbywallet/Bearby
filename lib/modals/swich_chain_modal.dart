@@ -302,7 +302,7 @@ class _SwitchChainNetworkContentState
       ),
       child: ClipOval(
         child: AsyncImage(
-          url: preprocessUrl(network.logo, theme.value),
+          url: viewChain(network, theme.value),
           width: 48,
           height: 48,
           fit: BoxFit.cover,

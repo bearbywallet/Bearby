@@ -321,7 +321,7 @@ class _WalletPageState extends State<WalletPage> {
           child: Transform.scale(
             scale: 1.0,
             child: AsyncImage(
-              url: preprocessUrl(appState.chain?.logo ?? "", theme.value),
+              url: viewChain(appState.chain!, theme.value),
               width: 32,
               height: 32,
               fit: BoxFit.contain,

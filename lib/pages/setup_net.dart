@@ -162,7 +162,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                 width: 40,
                 height: 40,
                 child: AsyncImage(
-                  url: preprocessUrl(chain.logo, theme.value),
+                  url: viewChain(chain, theme.value),
                   fit: BoxFit.contain,
                   errorWidget: const Icon(Icons.error),
                 ),
