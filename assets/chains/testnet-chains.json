@@ -105,7 +105,7 @@
     ],
     "testnet": true,
     "infoURL": "https://sepolia.dev/",
-    "shortName": "sepolia",
+    "shortName": "ethereum",
     "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "chainIds": [11155111, 0],
     "slip44": 60,

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/network_tile.dart';
+import 'package:zilpay/components/network_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/chain_config_edit.dart';
@@ -161,12 +161,15 @@ class _NetworkPageState extends State<NetworkPage> {
 
   void _handleNetworkSelect(NetworkConfigInfo network) async {
     final appState = Provider.of<AppState>(context, listen: false);
+
     try {
       await selectAccountsChain(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          chainHash: network.chainHash);
-      await appState.syncData();
+        walletIndex: BigInt.from(appState.selectedWallet),
+        chainHash: network.chainHash,
+      );
     } catch (_) {}
+
+    await appState.syncData();
   }
 
   Future<void> _handleAddNetwork(
@@ -203,30 +206,21 @@ class _NetworkPageState extends State<NetworkPage> {
                 fontWeight: FontWeight.w500,
                 color: theme.textSecondary.withValues(alpha: 0.7))),
         const SizedBox(height: 16),
-        ...networks.map((network) => Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: NetworkTile(
-                iconUrl:
-                    viewChain(network: network.configInfo, theme: theme.value),
-                title: network.configInfo.name,
-                isTestnet: network.configInfo.testnet ?? false,
-                isAdded: network.isAdded,
-                isDefault:
-                    wallet?.defaultChainHash == network.configInfo.chainHash,
-                isSelected: chain?.chainId == network.configInfo.chainId &&
-                    chain?.slip44 == network.configInfo.slip44,
-                disabled: chain?.slip44 != network.configInfo.slip44,
-                onTap: isAvailableSection
-                    ? null
-                    : () => _handleNetworkSelect(network.configInfo),
-                onAdd: network.isAdded
-                    ? null
-                    : () => _handleAddNetwork(network.configInfo,
-                        Provider.of<AppState>(context, listen: false)),
-                onEdit: network.isAdded
-                    ? () => _handleEditNetwork(network.configInfo)
-                    : null,
-              ),
+        ...networks.map((network) => NetworkCard(
+              configInfo: network.configInfo,
+              isAdded: network.isAdded,
+              isDefault:
+                  wallet?.defaultChainHash == network.configInfo.chainHash,
+              isSelected: chain?.chainId == network.configInfo.chainId &&
+                  chain?.slip44 == network.configInfo.slip44,
+              // disabled: chain?.slip44 != network.configInfo.slip44,
+              isTestnet: network.configInfo.testnet ?? false,
+              iconUrl:
+                  viewChain(network: network.configInfo, theme: theme.value),
+              onNetworkSelect: _handleNetworkSelect,
+              onNetworkEdit: _handleEditNetwork,
+              onNetworkAdd: (config) => _handleAddNetwork(
+                  config, Provider.of<AppState>(context, listen: false)),
             )),
       ],
     );

@@ -14,6 +14,7 @@ pub use zilpay::{
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     network::provider::NetworkProvider,
+    proto::pubkey::PubKey,
 };
 
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
@@ -143,6 +144,21 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
         data.accounts.iter_mut().for_each(|a| {
             a.chain_hash = chain_hash;
             a.chain_id = provider.config.chain_id();
+
+            match a.pub_key {
+                PubKey::Secp256k1Sha256(pub_key)
+                    if provider.config.slip_44 == 60 || provider.config.slip_44 == 313 =>
+                {
+                    a.pub_key = PubKey::Secp256k1Keccak256(pub_key);
+                }
+                _ => {}
+            }
+
+            if let Some(addr) = a.pub_key.get_addr().ok() {
+                a.addr = addr;
+            }
+
+            a.slip_44 = provider.config.slip_44;
         });
 
         wallet
