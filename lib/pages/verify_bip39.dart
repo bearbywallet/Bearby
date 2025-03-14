@@ -10,8 +10,9 @@ import 'package:zilpay/l10n/app_localizations.dart';
 List<int> getRandomNumbers(int min, int max, int count) {
   final random = Random();
   Set<int> numbers = {};
+
   while (numbers.length < count) {
-    int randomNumber = min + random.nextInt(max - min + 1);
+    int randomNumber = min + random.nextInt(max - min);
     numbers.add(randomNumber);
   }
 
@@ -31,9 +32,17 @@ class SecretPhraseVerifyPage extends StatefulWidget {
 
 class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
   List<String>? _bip39List;
-  List<int> _indexes = getRandomNumbers(1, 12, maxNumbers);
+  List<int> _indexes = [];
   final List<String> _verifyWords =
       List<String>.filled(maxNumbers, '', growable: false);
+
+  void _generateIndexes() {
+    if (_bip39List != null && _bip39List!.isNotEmpty) {
+      setState(() {
+        _indexes = getRandomNumbers(0, _bip39List!.length, maxNumbers);
+      });
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -48,10 +57,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
     } else {
       setState(() {
         _bip39List = args['bip39'];
-
-        if (_bip39List != null) {
-          _indexes = getRandomNumbers(1, _bip39List!.length + 1, maxNumbers);
-        }
+        _generateIndexes();
       });
     }
   }
@@ -110,17 +116,19 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                                   physics: const BouncingScrollPhysics(),
                                   itemCount: maxNumbers,
                                   itemBuilder: (context, index) {
+                                    final wordIndex = _indexes[index];
+                                    final displayIndex = wordIndex + 1;
+
                                     return Padding(
                                       padding: const EdgeInsets.symmetric(
                                           vertical: 8.0),
                                       child: MnemonicWordInput(
-                                        index: _indexes[index],
+                                        index: displayIndex,
                                         word: _verifyWords[index],
                                         isEditable: true,
                                         borderColor: _verifyWords[index] == ''
                                             ? theme.textSecondary
-                                            : _bip39List![
-                                                        _indexes[index] - 1] ==
+                                            : _bip39List![wordIndex] ==
                                                     _verifyWords[index]
                                                 ? Colors.green
                                                 : Colors.red,
@@ -172,7 +180,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
     }
 
     for (int i = 0; i < maxNumbers; i++) {
-      int bip39Index = _indexes[i] - 1;
+      int bip39Index = _indexes[i];
 
       if (bip39Index < 0 || bip39Index >= _bip39List!.length) {
         return false;
