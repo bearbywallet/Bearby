@@ -144,7 +144,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     final primaryColor = theme.primaryPurple;
     final secondaryColor = theme.textSecondary;
-    final textColor = theme.buttonText;
+    final textColor = theme.textPrimary;
     final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
     final (balance, convertedBalance) = formatingAmount(
       amount: BigInt.tryParse(_ftoken?.balances[selectedAccount] ?? '0') ??

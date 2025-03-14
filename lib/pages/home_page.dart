@@ -22,16 +22,24 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  bool _isFirstLoad = true;
+
   @override
   void initState() {
     super.initState();
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (_isFirstLoad) {
+        _isFirstLoad = false;
+        final appState = Provider.of<AppState>(context, listen: false);
+        _refreshData(appState);
+      }
+    });
   }
 
   @override
   void dispose() {
     super.dispose();
-    final appState = Provider.of<AppState>(context);
-    _refreshData(appState);
   }
 
   Future<void> _refreshData(AppState appState) async {
