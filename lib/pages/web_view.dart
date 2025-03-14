@@ -346,18 +346,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
 
   Future<void> _initializeZilPayInjection(AppState appState) async {
     try {
-      if (appState.chain?.slip44 == 313) {
-        String eip1193 = await rootBundle.loadString('assets/evm_inject.js');
-        String scilla =
-            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
-        await _webViewController?.evaluateJavascript(
-            source: '$scilla\n$eip1193');
-        _legacyHandler ??= ZilPayLegacyHandler(
-          webViewController: _webViewController!,
-          initialUrl: _currentUrl,
-        );
-        await _legacyHandler!.sendData(appState);
-      } else if (appState.chain?.slip44 == 60) {
+      if (appState.chain?.slip44 == 60 || appState.chain?.slip44 == 313) {
         await _webViewController?.injectJavascriptFileFromAsset(
           assetFilePath: 'assets/evm_inject.js',
         );
@@ -403,6 +392,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       'CLEARTEXT_NOT_PERMITTED',
       'ERR_CONNECTION_CLOSED',
       'ERR_BLOCKED_BY_ORB',
+      'ERR_UNKNOWN_URL_SCHEME',
       'DNS_PROBE_FINISHED'
     ];
 
@@ -685,9 +675,13 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       await _applyTextScalingFactor(appState);
                     }
                   },
-                  onProgressChanged: (controller, progress) {
-                    if (progress > 20) {
-                      _initializeZilPayInjection(appState);
+                  onProgressChanged: (controller, progress) async {
+                    if (progress > 20 && appState.chain?.slip44 == 313) {
+                      String scilla = await rootBundle
+                          .loadString('assets/zilpay_legacy_inject.js');
+                      await _webViewController?.evaluateJavascript(
+                          source: scilla);
+                      await _legacyHandler!.sendData(appState);
                     }
 
                     setState(() {
