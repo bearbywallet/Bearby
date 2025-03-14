@@ -375,6 +375,14 @@ class ZilPayLegacyHandler {
       return;
     }
 
+    if (appState.account?.addrType == 1) {
+      await zilliqaSwapChain(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
+      await appState.syncData();
+    }
+
     if (!context.mounted) return;
 
     showAppConnectModal(

@@ -292,6 +292,14 @@ class Web3EIP1193Handler {
 
     String? title = await webViewController.getTitle();
 
+    if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      await zilliqaSwapChain(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
+      await appState.syncData();
+    }
+
     if (!context.mounted) return;
 
     showAppConnectModal(
@@ -796,6 +804,14 @@ class Web3EIP1193Handler {
 
     String? title = await webViewController.getTitle();
 
+    if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      await zilliqaSwapChain(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+      );
+      await appState.syncData();
+    }
+
     if (!context.mounted) return;
 
     showAppConnectModal(
@@ -1011,6 +1027,14 @@ class Web3EIP1193Handler {
       }
 
       String? title = await webViewController.getTitle();
+
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
 
       if (!context.mounted) return;
 
