@@ -217,7 +217,7 @@ class _SwitchChainNetworkContentState
     final filteredNetworks = <NetworkConfigInfo>[];
 
     for (final network in networks) {
-      if (network.chainId == widget.selectedChainId) {
+      if (network.chainIds.contains(widget.selectedChainId)) {
         selectedNetwork = network;
         setState(() {
           _selectedNetwork = network;
@@ -323,8 +323,13 @@ class _SwitchChainNetworkContentState
     );
   }
 
-  Widget _buildNetworkNameRow(NetworkConfigInfo network, bool isSelected,
-      bool isTestnet, AppTheme theme, AppLocalizations l10n) {
+  Widget _buildNetworkNameRow(
+    NetworkConfigInfo network,
+    bool isSelected,
+    bool isTestnet,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
     return Row(
       children: [
         Expanded(
@@ -380,7 +385,7 @@ class _SwitchChainNetworkContentState
         ),
         const SizedBox(width: 8),
         Text(
-          '${l10n.switchChainNetworkContentIdLabel} ${network.chainId}',
+          '${l10n.switchChainNetworkContentIdLabel} ${network.chainIds.join(", ")}',
           style: TextStyle(
             color: theme.textSecondary,
             fontSize: 12,

@@ -1261,8 +1261,16 @@ class Web3EIP1193Handler {
     );
 
     try {
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
       final providers = appState.state.providers;
-      final chainExists = providers.any((p) => p.chainId == chainId);
+      final chainExists = providers.any((p) => p.chainIds.contains(chainId));
 
       if (!chainExists) {
         return _returnError(
