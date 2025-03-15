@@ -186,7 +186,14 @@ class _NetworkPageState extends State<NetworkPage> {
   }
 
   void _handleEditNetwork(NetworkConfigInfo config) {
-    showChainInfoModal(context: context, networkConfig: config);
+    showChainInfoModal(
+      context: context,
+      networkConfig: config,
+      onRemoved: () async {
+        Navigator.of(context).pop();
+        await _loadNetworks();
+      },
+    );
   }
 
   Widget _buildNetworkSection(

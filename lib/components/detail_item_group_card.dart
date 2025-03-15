@@ -7,13 +7,15 @@ class DetailItem extends StatelessWidget {
   final dynamic value;
   final AppTheme theme;
   final bool isCopyable;
+  final Widget? valueWidget;
 
   const DetailItem({
     super.key,
     required this.label,
-    required this.value,
+    this.value,
     required this.theme,
     this.isCopyable = false,
+    this.valueWidget,
   });
 
   @override
@@ -40,7 +42,14 @@ class DetailItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.end,
               children: [
-                if (isCopyable)
+                if (valueWidget != null)
+                  Expanded(
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: valueWidget!,
+                    ),
+                  )
+                else if (isCopyable)
                   CopyContent(
                     address: value.toString(),
                     isShort: true,
@@ -50,7 +59,7 @@ class DetailItem extends StatelessWidget {
                     child: value is Widget
                         ? value
                         : Text(
-                            value.toString(),
+                            value?.toString() ?? '',
                             style: TextStyle(
                               color: theme.textPrimary,
                               fontSize: 14,

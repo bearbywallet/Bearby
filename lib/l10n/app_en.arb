@@ -1517,18 +1517,26 @@
   "@qrScannerModalContentOpenSettings": {
     "description": "Text on the button to open app settings when camera permission is denied on iOS in the QRScannerModalContent modal."
   },
+  "chainInfoModalContentTokenTitle": "Network Token",
+  "@chainInfoModalContentTokenTitle": {
+    "description": "Title text for the network token section in the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentNetworkInfoTitle": "Network Information",
   "@chainInfoModalContentNetworkInfoTitle": {
     "description": "Title text for the network information section in the ChainInfoModalContent modal."
   },
+  
   "chainInfoModalContentChainLabel": "Chain",
   "@chainInfoModalContentChainLabel": {
     "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
   },
+  
   "chainInfoModalContentShortNameLabel": "Short Name",
   "@chainInfoModalContentShortNameLabel": {
     "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
   },
+  
   "chainInfoModalContentChainIdLabel": "Chain ID",
   "@chainInfoModalContentChainIdLabel": {
     "description": "Label for the chain ID field in the network information section of the ChainInfoModalContent modal."
@@ -1573,6 +1581,15 @@
   "@chainInfoModalContentExplorersTitle": {
     "description": "Title text for the explorers section in the ChainInfoModalContent modal."
   },
+  "chainInfoModalContentDeleteProviderTitle": "Delete Network",
+  "@chainInfoModalContentDeleteProviderTitle": {
+    "description": "Title text for the delete network section in the ChainInfoModalContent modal."
+  },
+  "chainInfoModalContentSwipeToDelete": "Delete network",
+  "@chainInfoModalContentSwipeToDelete": {
+    "description": "Text displayed on the swipe button for deleting a network in the ChainInfoModalContent modal."
+  },
+
   "switchChainNetworkContentTitle": "Select Network",
   "@switchChainNetworkContentTitle": {
     "description": "Title text for the SwitchChainNetworkContent modal."

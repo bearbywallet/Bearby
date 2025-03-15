@@ -1065,22 +1065,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get qrScannerModalContentOpenSettings => 'Открыть настройки';
 
   @override
+  String get chainInfoModalContentTokenTitle => 'Токен сети';
+
+  @override
   String get chainInfoModalContentNetworkInfoTitle => 'Информация о сети';
 
   @override
-  String get chainInfoModalContentChainLabel => 'Цепь';
+  String get chainInfoModalContentChainLabel => 'Цепочка';
 
   @override
-  String get chainInfoModalContentShortNameLabel => 'Короткое название';
+  String get chainInfoModalContentShortNameLabel => 'Краткое название';
 
   @override
-  String get chainInfoModalContentChainIdLabel => 'ID цепи';
+  String get chainInfoModalContentChainIdLabel => 'ID цепочки';
 
   @override
   String get chainInfoModalContentSlip44Label => 'Slip44';
 
   @override
-  String get chainInfoModalContentChainIdsLabel => 'ID цепей';
+  String get chainInfoModalContentChainIdsLabel => 'ID цепочек';
 
   @override
   String get chainInfoModalContentTestnetLabel => 'Тестовая сеть';
@@ -1092,19 +1095,25 @@ class AppLocalizationsRu extends AppLocalizations {
   String get chainInfoModalContentNo => 'Нет';
 
   @override
-  String get chainInfoModalContentDiffBlockTimeLabel => 'Время блока Diff';
+  String get chainInfoModalContentDiffBlockTimeLabel => 'Время блока';
 
   @override
-  String get chainInfoModalContentFallbackEnabledLabel => 'Резервный режим включен';
+  String get chainInfoModalContentFallbackEnabledLabel => 'Включен резервный режим';
 
   @override
   String get chainInfoModalContentDecimalsLabel => 'Десятичные знаки';
 
   @override
-  String get chainInfoModalContentRpcNodesTitle => 'RPC узлы';
+  String get chainInfoModalContentRpcNodesTitle => 'RPC-узлы';
 
   @override
   String get chainInfoModalContentExplorersTitle => 'Обозреватели';
+
+  @override
+  String get chainInfoModalContentDeleteProviderTitle => 'Удалить сеть';
+
+  @override
+  String get chainInfoModalContentSwipeToDelete => 'Удалить сеть';
 
   @override
   String get switchChainNetworkContentTitle => 'Выбрать сеть';

@@ -395,12 +395,33 @@
   "qrScannerModalContentTorchError": "トーチの切り替えに失敗:",
   "qrScannerModalContentOpenSettings": "設定を開く",
 
+  "chainInfoModalContentTokenTitle": "ネットワークトークン",
+  "@chainInfoModalContentTokenTitle": {
+    "description": "Title text for the network token section in the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentNetworkInfoTitle": "ネットワーク情報",
+  "@chainInfoModalContentNetworkInfoTitle": {
+    "description": "Title text for the network information section in the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentChainLabel": "チェーン",
+  "@chainInfoModalContentChainLabel": {
+    "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentShortNameLabel": "略称",
+  "@chainInfoModalContentShortNameLabel": {
+    "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentChainIdLabel": "チェーンID",
+  "@chainInfoModalContentChainIdLabel": {
+    "description": "Label for the chain ID field in the network information section of the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentSlip44Label": "Slip44",
-  "chainInfoModalContentChainIdsLabel": "チェーンID",
+  "chainInfoModalContentChainIdsLabel": "チェーンID群",
   "chainInfoModalContentTestnetLabel": "テストネット",
   "chainInfoModalContentYes": "はい",
   "chainInfoModalContentNo": "いいえ",
@@ -409,6 +430,8 @@
   "chainInfoModalContentDecimalsLabel": "小数点",
   "chainInfoModalContentRpcNodesTitle": "RPCノード",
   "chainInfoModalContentExplorersTitle": "エクスプローラー",
+  "chainInfoModalContentDeleteProviderTitle": "ネットワークを削除",
+  "chainInfoModalContentSwipeToDelete": "削除",
 
   "switchChainNetworkContentTitle": "ネットワークを選択",
   "switchChainNetworkContentButton": "ネットワークを切り替え",

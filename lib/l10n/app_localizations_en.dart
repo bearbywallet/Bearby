@@ -1065,6 +1065,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get qrScannerModalContentOpenSettings => 'Open Settings';
 
   @override
+  String get chainInfoModalContentTokenTitle => 'Network Token';
+
+  @override
   String get chainInfoModalContentNetworkInfoTitle => 'Network Information';
 
   @override
@@ -1105,6 +1108,12 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chainInfoModalContentExplorersTitle => 'Explorers';
+
+  @override
+  String get chainInfoModalContentDeleteProviderTitle => 'Delete Network';
+
+  @override
+  String get chainInfoModalContentSwipeToDelete => 'Delete network';
 
   @override
   String get switchChainNetworkContentTitle => 'Select Network';

@@ -395,20 +395,39 @@
   "qrScannerModalContentTorchError": "Не удалось переключить вспышку:",
   "qrScannerModalContentOpenSettings": "Открыть настройки",
 
+  "chainInfoModalContentTokenTitle": "Токен сети",
+  "@chainInfoModalContentTokenTitle": {
+    "description": "Title text for the network token section in the ChainInfoModalContent modal."
+  },
+  
   "chainInfoModalContentNetworkInfoTitle": "Информация о сети",
-  "chainInfoModalContentChainLabel": "Цепь",
-  "chainInfoModalContentShortNameLabel": "Короткое название",
-  "chainInfoModalContentChainIdLabel": "ID цепи",
+  "@chainInfoModalContentNetworkInfoTitle": {
+    "description": "Title text for the network information section in the ChainInfoModalContent modal."
+  },
+  
+  "chainInfoModalContentChainLabel": "Цепочка",
+  "@chainInfoModalContentChainLabel": {
+    "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
+  },
+  
+  "chainInfoModalContentShortNameLabel": "Краткое название",
+  "@chainInfoModalContentShortNameLabel": {
+    "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
+  },
+  
+  "chainInfoModalContentChainIdLabel": "ID цепочки",
   "chainInfoModalContentSlip44Label": "Slip44",
-  "chainInfoModalContentChainIdsLabel": "ID цепей",
+  "chainInfoModalContentChainIdsLabel": "ID цепочек",
   "chainInfoModalContentTestnetLabel": "Тестовая сеть",
   "chainInfoModalContentYes": "Да",
   "chainInfoModalContentNo": "Нет",
-  "chainInfoModalContentDiffBlockTimeLabel": "Время блока Diff",
-  "chainInfoModalContentFallbackEnabledLabel": "Резервный режим включен",
+  "chainInfoModalContentDiffBlockTimeLabel": "Время блока",
+  "chainInfoModalContentFallbackEnabledLabel": "Включен резервный режим",
   "chainInfoModalContentDecimalsLabel": "Десятичные знаки",
-  "chainInfoModalContentRpcNodesTitle": "RPC узлы",
+  "chainInfoModalContentRpcNodesTitle": "RPC-узлы",
   "chainInfoModalContentExplorersTitle": "Обозреватели",
+  "chainInfoModalContentDeleteProviderTitle": "Удалить сеть",
+  "chainInfoModalContentSwipeToDelete": "Удалить сеть",
 
   "switchChainNetworkContentTitle": "Выбрать сеть",
   "switchChainNetworkContentButton": "Переключить сеть",

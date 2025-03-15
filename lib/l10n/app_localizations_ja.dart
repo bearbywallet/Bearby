@@ -1065,6 +1065,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get qrScannerModalContentOpenSettings => '設定を開く';
 
   @override
+  String get chainInfoModalContentTokenTitle => 'ネットワークトークン';
+
+  @override
   String get chainInfoModalContentNetworkInfoTitle => 'ネットワーク情報';
 
   @override
@@ -1080,7 +1083,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get chainInfoModalContentSlip44Label => 'Slip44';
 
   @override
-  String get chainInfoModalContentChainIdsLabel => 'チェーンID';
+  String get chainInfoModalContentChainIdsLabel => 'チェーンID群';
 
   @override
   String get chainInfoModalContentTestnetLabel => 'テストネット';
@@ -1105,6 +1108,12 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get chainInfoModalContentExplorersTitle => 'エクスプローラー';
+
+  @override
+  String get chainInfoModalContentDeleteProviderTitle => 'ネットワークを削除';
+
+  @override
+  String get chainInfoModalContentSwipeToDelete => '削除';
 
   @override
   String get switchChainNetworkContentTitle => 'ネットワークを選択';

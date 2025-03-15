@@ -67,6 +67,16 @@ pub async fn add_provider(provider_config: NetworkConfigInfo) -> Result<u64, Str
     .map_err(Into::into)
 }
 
+pub async fn remove_provider(provider_index: u16) -> Result<(), String> {
+    with_service(|core| {
+        core.remvoe_provider(provider_index as usize)?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
+}
+
 pub async fn add_providers_list(provider_config: Vec<NetworkConfigInfo>) -> Result<(), String> {
     with_service(|core| {
         let mut providers = core.get_providers();

@@ -2173,6 +2173,12 @@ abstract class AppLocalizations {
   /// **'Open Settings'**
   String get qrScannerModalContentOpenSettings;
 
+  /// Title text for the network token section in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Network Token'**
+  String get chainInfoModalContentTokenTitle;
+
   /// Title text for the network information section in the ChainInfoModalContent modal.
   ///
   /// In en, this message translates to:
@@ -2256,6 +2262,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Explorers'**
   String get chainInfoModalContentExplorersTitle;
+
+  /// Title text for the delete network section in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Network'**
+  String get chainInfoModalContentDeleteProviderTitle;
+
+  /// Text displayed on the swipe button for deleting a network in the ChainInfoModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete network'**
+  String get chainInfoModalContentSwipeToDelete;
 
   /// Title text for the SwitchChainNetworkContent modal.
   ///
