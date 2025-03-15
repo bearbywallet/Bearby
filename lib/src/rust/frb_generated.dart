@@ -285,7 +285,7 @@ abstract class RustLibApi extends BaseApi {
       String? passphrase});
 
   Future<void> crateApiTokenRmFtoken(
-      {required BigInt walletIndex, required BigInt tokenIndex});
+      {required BigInt walletIndex, required String tokenAddress});
 
   Future<void> crateApiWalletSelectAccount(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -1827,12 +1827,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<void> crateApiTokenRmFtoken(
-      {required BigInt walletIndex, required BigInt tokenIndex}) {
+      {required BigInt walletIndex, required String tokenAddress}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(tokenIndex, serializer);
+        sse_encode_String(tokenAddress, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 52, port: port_);
       },
@@ -1841,14 +1841,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTokenRmFtokenConstMeta,
-      argValues: [walletIndex, tokenIndex],
+      argValues: [walletIndex, tokenAddress],
       apiImpl: this,
     ));
   }
 
   TaskConstMeta get kCrateApiTokenRmFtokenConstMeta => const TaskConstMeta(
         debugName: "rm_ftoken",
-        argNames: ["walletIndex", "tokenIndex"],
+        argNames: ["walletIndex", "tokenAddress"],
       );
 
   @override

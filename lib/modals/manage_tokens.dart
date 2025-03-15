@@ -171,17 +171,10 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
         isEnabled: isEnabled,
         onToggle: (value) async {
           if (!value) {
-            final int index =
-                appState.wallet!.tokens.indexWhere((t) => t.addr == token.addr);
-
-            if (index == -1) {
-              return;
-            }
-
             try {
               await rmFtoken(
                 walletIndex: BigInt.from(appState.selectedWallet),
-                tokenIndex: BigInt.from(index),
+                tokenAddress: token.addr,
               );
               await appState.syncData();
             } catch (e) {

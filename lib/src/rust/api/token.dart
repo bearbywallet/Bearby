@@ -24,6 +24,6 @@ Future<List<FTokenInfo>> addFtoken(
         .crateApiTokenAddFtoken(meta: meta, walletIndex: walletIndex);
 
 Future<void> rmFtoken(
-        {required BigInt walletIndex, required BigInt tokenIndex}) =>
+        {required BigInt walletIndex, required String tokenAddress}) =>
     RustLib.instance.api.crateApiTokenRmFtoken(
-        walletIndex: walletIndex, tokenIndex: tokenIndex);
+        walletIndex: walletIndex, tokenAddress: tokenAddress);

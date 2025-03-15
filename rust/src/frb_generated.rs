@@ -2016,13 +2016,14 @@ fn wire__crate__api__token__rm_ftoken_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_token_index = <usize>::sse_decode(&mut deserializer);
+            let api_token_address = <String>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
                         let output_ok =
-                            crate::api::token::rm_ftoken(api_wallet_index, api_token_index).await?;
+                            crate::api::token::rm_ftoken(api_wallet_index, api_token_address)
+                                .await?;
                         Ok(output_ok)
                     })()
                     .await,
