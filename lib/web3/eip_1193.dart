@@ -74,11 +74,24 @@ extension NetworkConfigInfoExtension on NetworkConfigInfo {
 class Web3EIP1193Handler {
   final InAppWebViewController webViewController;
   final String _currentDomain;
+  final Set<String> _activeRequests = {};
 
   Web3EIP1193Handler({
     required this.webViewController,
     required String initialUrl,
   }) : _currentDomain = Uri.parse(initialUrl).host;
+
+  bool _isRequestActive(String method) {
+    return _activeRequests.contains(method);
+  }
+
+  void _addActiveRequest(String method) {
+    _activeRequests.add(method);
+  }
+
+  void _removeActiveRequest(String method) {
+    _activeRequests.remove(method);
+  }
 
   Future<void> _sendResponse({
     required String type,
@@ -273,86 +286,115 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    await appState.syncConnections();
-    final connection = Web3Utils.findConnected(
-      _currentDomain,
-      appState.connections,
-    );
+    final method = message.payload['method'] as String;
 
-    final addresses = await _getWalletAddresses(appState);
-
-    if (connection != null &&
-        appState.wallet?.accounts.length == connection.accountIndexes.length) {
-      return _sendResponse(
-        type: 'ZILPAY_RESPONSE',
-        uuid: message.uuid,
-        result: addresses,
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
       );
     }
 
-    String? title = await webViewController.getTitle();
+    _addActiveRequest(method);
 
-    if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
-      await zilliqaSwapChain(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
+    try {
+      await appState.syncConnections();
+      final connection = Web3Utils.findConnected(
+        _currentDomain,
+        appState.connections,
       );
-      await appState.syncData();
-    }
 
-    if (!context.mounted) return;
+      final addresses = await _getWalletAddresses(appState);
 
-    showAppConnectModal(
-      context: context,
-      title: message.title ?? "",
-      // colors: message.colors,
-      uuid: message.uuid,
-      iconUrl: message.icon ?? "",
-      onReject: () {
-        _sendResponse(
+      if (connection != null &&
+          appState.wallet?.accounts.length ==
+              connection.accountIndexes.length) {
+        _removeActiveRequest(method);
+        return _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: message.uuid,
-          result: <void>[],
+          result: addresses,
         );
-      },
-      onConfirm: (selectedIndices) async {
-        if (selectedIndices.isEmpty) {
-          return _sendResponse(
+      }
+
+      String? title = await webViewController.getTitle();
+
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showAppConnectModal(
+        context: context,
+        title: message.title ?? "",
+        uuid: message.uuid,
+        iconUrl: message.icon ?? "",
+        onReject: () {
+          _sendResponse(
             type: 'ZILPAY_RESPONSE',
             uuid: message.uuid,
             result: <void>[],
           );
-        }
+          _removeActiveRequest(method);
+        },
+        onConfirm: (selectedIndices) async {
+          try {
+            if (selectedIndices.isEmpty) {
+              return _sendResponse(
+                type: 'ZILPAY_RESPONSE',
+                uuid: message.uuid,
+                result: <void>[],
+              );
+            }
 
-        final accountIndexes = Uint64List.fromList(selectedIndices);
-        final connectionInfo = ConnectionInfo(
-          domain: _currentDomain,
-          accountIndexes: accountIndexes,
-          favicon: message.icon,
-          title: title ?? "",
-          // colors: message.colors,
-          description: message.description,
-          lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
-          canReadAccounts: true,
-          canRequestSignatures: true,
-          canSuggestTokens: false,
-          canSuggestTransactions: true,
-        );
+            final accountIndexes = Uint64List.fromList(selectedIndices);
+            final connectionInfo = ConnectionInfo(
+              domain: _currentDomain,
+              accountIndexes: accountIndexes,
+              favicon: message.icon,
+              title: title ?? "",
+              description: message.description,
+              lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+              canReadAccounts: true,
+              canRequestSignatures: true,
+              canSuggestTokens: false,
+              canSuggestTransactions: true,
+            );
 
-        await createUpdateConnection(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          conn: connectionInfo,
-        );
-        await appState.syncConnections();
+            await createUpdateConnection(
+              walletIndex: BigInt.from(appState.selectedWallet),
+              conn: connectionInfo,
+            );
+            await appState.syncConnections();
 
-        final connectedAddr = filterByIndexes(addresses, accountIndexes);
-        _sendResponse(
-          type: 'ZILPAY_RESPONSE',
-          uuid: message.uuid,
-          result: connectedAddr,
-        );
-      },
-    );
+            final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            _sendResponse(
+              type: 'ZILPAY_RESPONSE',
+              uuid: message.uuid,
+              result: connectedAddr,
+            );
+          } finally {
+            _removeActiveRequest(method);
+          }
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing request: $e',
+      );
+    }
   }
 
   Future<void> _handleEthAccounts(
@@ -428,11 +470,24 @@ class Web3EIP1193Handler {
     required AppState appState,
     required bool isPersonalSign,
   }) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
+      );
+    }
+
+    _addActiveRequest(method);
+
     try {
       final connection =
           Web3Utils.findConnected(_currentDomain, appState.connections);
 
       if (connection == null) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -442,6 +497,7 @@ class Web3EIP1193Handler {
 
       final params = message.payload['params'] as List<dynamic>?;
       if (params == null || params.length < 2) {
+        _removeActiveRequest(method);
         final methodName = isPersonalSign ? 'personal_sign' : 'eth_sign';
         final paramOrder =
             isPersonalSign ? '[message, address]' : '[address, message]';
@@ -464,6 +520,7 @@ class Web3EIP1193Handler {
       if (!connectedAddresses
           .map((a) => a.toLowerCase())
           .contains(address.toLowerCase())) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -482,7 +539,10 @@ class Web3EIP1193Handler {
         await appState.syncData();
       }
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
 
       showSignMessageModal(
         context: context,
@@ -493,22 +553,27 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             result: sig,
           );
+          _removeActiveRequest(method);
         },
-        onDismiss: () => _returnError(
-          message.uuid,
-          Web3EIP1193ErrorCode.userRejectedRequest,
-          'User rejected',
-        ),
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected',
+          );
+          _removeActiveRequest(method);
+        },
         appTitle: isPersonalSign ? 'Sign Message' : 'Sign Ethereum Message',
         appIcon: message.icon ?? '',
       );
     } catch (e) {
-      final method = isPersonalSign ? 'personal_sign' : 'eth_sign';
-      dev.log('Error in $method: $e', name: 'web3_handler');
+      _removeActiveRequest(method);
+      final methodName = isPersonalSign ? 'personal_sign' : 'eth_sign';
+      dev.log('Error in $methodName: $e', name: 'web3_handler');
       _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.internalError,
-        'Error processing $method: $e',
+        'Error processing $methodName: $e',
       );
     }
   }
@@ -518,6 +583,18 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
+      );
+    }
+
+    _addActiveRequest(method);
+
     try {
       final connection = Web3Utils.findConnected(
         _currentDomain,
@@ -525,6 +602,7 @@ class Web3EIP1193Handler {
       );
 
       if (connection == null) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -536,6 +614,7 @@ class Web3EIP1193Handler {
       if (params == null ||
           params.isEmpty ||
           params[0] is! Map<String, dynamic>) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -547,6 +626,7 @@ class Web3EIP1193Handler {
       final from = txParams['from'] as String?;
 
       if (from == null) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -561,6 +641,7 @@ class Web3EIP1193Handler {
               .toList();
 
       if (!connectedAddresses.contains(from.toLowerCase())) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -622,6 +703,7 @@ class Web3EIP1193Handler {
       final tokenIndex =
           appState.wallet!.tokens.indexWhere((t) => t.addrType == 1);
       if (tokenIndex == -1) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.internalError,
@@ -663,7 +745,10 @@ class Web3EIP1193Handler {
         await appState.syncData();
       }
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
 
       showConfirmTransactionModal(
         context: context,
@@ -683,6 +768,7 @@ class Web3EIP1193Handler {
           if (context.mounted) {
             Navigator.pop(context);
           }
+          _removeActiveRequest(method);
         },
         onDismiss: () {
           _returnError(
@@ -690,9 +776,11 @@ class Web3EIP1193Handler {
             Web3EIP1193ErrorCode.userRejectedRequest,
             'User rejected the request',
           );
+          _removeActiveRequest(method);
         },
       );
     } catch (e) {
+      _removeActiveRequest(method);
       dev.log('Error in eth_sendTransaction: $e', name: 'web3_handler');
       _returnError(
         message.uuid,
@@ -753,110 +841,54 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    final params = message.payload['params'] as List<dynamic>?;
-    if (params == null ||
-        params.isEmpty ||
-        params[0] is! Map<String, dynamic>) {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
       return _returnError(
         message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Invalid parameters for wallet_requestPermissions',
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
       );
     }
 
-    final requestParams = params[0] as Map<String, dynamic>;
+    _addActiveRequest(method);
 
-    if (!requestParams.containsKey('eth_accounts')) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Only eth_accounts permission is supported',
-      );
-    }
-
-    await appState.syncConnections();
-    final connection = Web3Utils.findConnected(
-      _currentDomain,
-      appState.connections,
-    );
-    final addresses = await _getWalletAddresses(appState);
-
-    if (connection != null &&
-        appState.wallet?.accounts.length == connection.accountIndexes.length) {
-      return _sendResponse(
-        type: 'ZILPAY_RESPONSE',
-        uuid: message.uuid,
-        result: {
-          'permissions': [
-            {
-              'parentCapability': 'eth_accounts',
-              'caveats': [
-                {
-                  'type': 'filterResponse',
-                  'value': addresses,
-                }
-              ],
-            }
-          ]
-        },
-      );
-    }
-
-    String? title = await webViewController.getTitle();
-
-    if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
-      await zilliqaSwapChain(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
-      );
-      await appState.syncData();
-    }
-
-    if (!context.mounted) return;
-
-    showAppConnectModal(
-      context: context,
-      title: title ?? "",
-      uuid: message.uuid,
-      iconUrl: message.icon ?? "",
-      onReject: () {
+    try {
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null ||
+          params.isEmpty ||
+          params[0] is! Map<String, dynamic>) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
-          Web3EIP1193ErrorCode.userRejectedRequest,
-          'User rejected the request',
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for wallet_requestPermissions',
         );
-      },
-      onConfirm: (selectedIndices) async {
-        if (selectedIndices.isEmpty) {
-          return _returnError(
-            message.uuid,
-            Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected the request',
-          );
-        }
+      }
 
-        final accountIndexes = Uint64List.fromList(selectedIndices);
-        final connectionInfo = ConnectionInfo(
-          domain: _currentDomain,
-          accountIndexes: accountIndexes,
-          favicon: message.icon,
-          title: title ?? "",
-          description: message.description,
-          lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
-          canReadAccounts: true,
-          canRequestSignatures: true,
-          canSuggestTokens: false,
-          canSuggestTransactions: true,
+      final requestParams = params[0] as Map<String, dynamic>;
+
+      if (!requestParams.containsKey('eth_accounts')) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Only eth_accounts permission is supported',
         );
+      }
 
-        await createUpdateConnection(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          conn: connectionInfo,
-        );
-        await appState.syncConnections();
+      await appState.syncConnections();
+      final connection = Web3Utils.findConnected(
+        _currentDomain,
+        appState.connections,
+      );
+      final addresses = await _getWalletAddresses(appState);
 
-        final connectedAddr = filterByIndexes(addresses, accountIndexes);
-        _sendResponse(
+      if (connection != null &&
+          appState.wallet?.accounts.length ==
+              connection.accountIndexes.length) {
+        _removeActiveRequest(method);
+        return _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: message.uuid,
           result: {
@@ -866,15 +898,105 @@ class Web3EIP1193Handler {
                 'caveats': [
                   {
                     'type': 'filterResponse',
-                    'value': connectedAddr,
+                    'value': addresses,
                   }
                 ],
               }
             ]
           },
         );
-      },
-    );
+      }
+
+      String? title = await webViewController.getTitle();
+
+      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
+
+      showAppConnectModal(
+        context: context,
+        title: title ?? "",
+        uuid: message.uuid,
+        iconUrl: message.icon ?? "",
+        onReject: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected the request',
+          );
+          _removeActiveRequest(method);
+        },
+        onConfirm: (selectedIndices) async {
+          try {
+            if (selectedIndices.isEmpty) {
+              return _returnError(
+                message.uuid,
+                Web3EIP1193ErrorCode.userRejectedRequest,
+                'User rejected the request',
+              );
+            }
+
+            final accountIndexes = Uint64List.fromList(selectedIndices);
+            final connectionInfo = ConnectionInfo(
+              domain: _currentDomain,
+              accountIndexes: accountIndexes,
+              favicon: message.icon,
+              title: title ?? "",
+              description: message.description,
+              lastConnected: BigInt.from(DateTime.now().millisecondsSinceEpoch),
+              canReadAccounts: true,
+              canRequestSignatures: true,
+              canSuggestTokens: false,
+              canSuggestTransactions: true,
+            );
+
+            await createUpdateConnection(
+              walletIndex: BigInt.from(appState.selectedWallet),
+              conn: connectionInfo,
+            );
+            await appState.syncConnections();
+
+            final connectedAddr = filterByIndexes(addresses, accountIndexes);
+            _sendResponse(
+              type: 'ZILPAY_RESPONSE',
+              uuid: message.uuid,
+              result: {
+                'permissions': [
+                  {
+                    'parentCapability': 'eth_accounts',
+                    'caveats': [
+                      {
+                        'type': 'filterResponse',
+                        'value': connectedAddr,
+                      }
+                    ],
+                  }
+                ]
+              },
+            );
+          } finally {
+            _removeActiveRequest(method);
+          }
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      dev.log('Error in wallet_requestPermissions: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing wallet_requestPermissions: $e',
+      );
+    }
   }
 
   Future<void> _handleEthSignTypedDataV4(
@@ -882,10 +1004,23 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
+      return _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
+      );
+    }
+
+    _addActiveRequest(method);
+
     try {
       final connection =
           Web3Utils.findConnected(_currentDomain, appState.connections);
       if (connection == null) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -895,6 +1030,7 @@ class Web3EIP1193Handler {
 
       final params = message.payload['params'] as List<dynamic>?;
       if (params == null || params.length < 2) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -910,6 +1046,7 @@ class Web3EIP1193Handler {
       try {
         typedDataeip712 = TypedDataEip712.fromJsonString(rawTypedData);
       } catch (e) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -926,6 +1063,7 @@ class Web3EIP1193Handler {
           .any((a) => a.toLowerCase() == normalizedAddress.toLowerCase());
 
       if (!isAuthorized) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
@@ -943,7 +1081,10 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
 
       showSignMessageModal(
         context: context,
@@ -954,16 +1095,21 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             result: sig,
           );
+          _removeActiveRequest(method);
         },
-        onDismiss: () => _returnError(
-          message.uuid,
-          Web3EIP1193ErrorCode.userRejectedRequest,
-          'User rejected',
-        ),
+        onDismiss: () {
+          _returnError(
+            message.uuid,
+            Web3EIP1193ErrorCode.userRejectedRequest,
+            'User rejected',
+          );
+          _removeActiveRequest(method);
+        },
         appTitle: title ?? 'Sign Typed Data',
         appIcon: message.icon ?? '',
       );
     } catch (e) {
+      _removeActiveRequest(method);
       dev.log('Error in eth_signTypedData_v4: $e', name: 'web3_handler');
       _returnError(
         message.uuid,
@@ -978,38 +1124,53 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    final connection =
-        Web3Utils.findConnected(_currentDomain, appState.connections);
-    if (connection == null) {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
       return _returnError(
         message.uuid,
-        Web3EIP1193ErrorCode.unauthorized,
-        'This domain is not authorized to suggest tokens.',
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
       );
     }
 
-    final params = message.payload['params'] as Map<String, dynamic>?;
-    if (params == null || params['type'] != 'ERC20') {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.',
-      );
-    }
-
-    final options = params['options'] as Map<String, dynamic>?;
-    if (options == null ||
-        !options.containsKey('address') ||
-        !options.containsKey('symbol') ||
-        !options.containsKey('decimals')) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Missing required fields: address, symbol, or decimals.',
-      );
-    }
+    _addActiveRequest(method);
 
     try {
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+      if (connection == null) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.unauthorized,
+          'This domain is not authorized to suggest tokens.',
+        );
+      }
+
+      final params = message.payload['params'] as Map<String, dynamic>?;
+      if (params == null || params['type'] != 'ERC20') {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.',
+        );
+      }
+
+      final options = params['options'] as Map<String, dynamic>?;
+      if (options == null ||
+          !options.containsKey('address') ||
+          !options.containsKey('symbol') ||
+          !options.containsKey('decimals')) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Missing required fields: address, symbol, or decimals.',
+        );
+      }
+
       final tokenAddress = options['address'] as String;
       final tokenSymbol = options['symbol'] as String;
       final tokenImage = options['image'] as String?;
@@ -1019,6 +1180,7 @@ class Web3EIP1193Handler {
           t.addrType == 1);
 
       if (tokenExists == true) {
+        _removeActiveRequest(method);
         return _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: message.uuid,
@@ -1036,7 +1198,10 @@ class Web3EIP1193Handler {
         await appState.syncData();
       }
 
-      if (!context.mounted) return;
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
 
       showWatchAssetModal(
         context: context,
@@ -1057,6 +1222,7 @@ class Web3EIP1193Handler {
             result: true,
           );
           await appState.syncData();
+          _removeActiveRequest(method);
         },
         onCancel: () {
           _sendResponse(
@@ -1064,9 +1230,11 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             result: false,
           );
+          _removeActiveRequest(method);
         },
       );
     } catch (e) {
+      _removeActiveRequest(method);
       dev.log('Error in wallet_watchAsset: $e', name: 'web3_handler');
       _returnError(
         message.uuid,
@@ -1081,153 +1249,184 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    final params = message.payload['params'] as List<dynamic>?;
-    if (params == null ||
-        params.isEmpty ||
-        params[0] is! Map<String, dynamic>) {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
       return _returnError(
         message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Invalid parameters for wallet_addEthereumChain',
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
       );
     }
 
-    final chainParams = params[0] as Map<String, dynamic>;
+    _addActiveRequest(method);
 
-    if (!chainParams.containsKey('chainId') ||
-        !chainParams.containsKey('chainName') ||
-        !chainParams.containsKey('nativeCurrency') ||
-        !chainParams.containsKey('rpcUrls') ||
-        !chainParams.containsKey('blockExplorerUrls')) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Missing required fields for wallet_addEthereumChain',
-      );
-    }
+    try {
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null ||
+          params.isEmpty ||
+          params[0] is! Map<String, dynamic>) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for wallet_addEthereumChain',
+        );
+      }
 
-    final rpcUrls = (chainParams['rpcUrls'] as List<dynamic>)
-        .where((url) => url is String && url.startsWith('https'))
-        .cast<String>()
-        .toList();
+      final chainParams = params[0] as Map<String, dynamic>;
 
-    if (rpcUrls.isEmpty) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'No valid HTTP RPC URLs provided',
-      );
-    }
+      if (!chainParams.containsKey('chainId') ||
+          !chainParams.containsKey('chainName') ||
+          !chainParams.containsKey('nativeCurrency') ||
+          !chainParams.containsKey('rpcUrls') ||
+          !chainParams.containsKey('blockExplorerUrls')) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Missing required fields for wallet_addEthereumChain',
+        );
+      }
 
-    final nativeCurrency =
-        chainParams['nativeCurrency'] as Map<String, dynamic>;
-    final chainId = BigInt.parse(
-        chainParams['chainId'].toString().replaceFirst('0x', ''),
-        radix: 16);
-    final explorers = (chainParams['blockExplorerUrls'] as List<dynamic>)
-        .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
-        .toList();
-    final symbol = nativeCurrency['symbol'].toString();
-    final name = nativeCurrency['name'].toString();
+      final rpcUrls = (chainParams['rpcUrls'] as List<dynamic>)
+          .where((url) => url is String && url.startsWith('https'))
+          .cast<String>()
+          .toList();
 
-    NetworkConfigInfo? foundChain;
+      if (rpcUrls.isEmpty) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'No valid HTTP RPC URLs provided',
+        );
+      }
 
-    if (appState.state.providers.any((c) => c.chainId == chainId)) {
-      final chain =
-          appState.state.providers.firstWhere((c) => c.chainId == chainId);
+      final nativeCurrency =
+          chainParams['nativeCurrency'] as Map<String, dynamic>;
+      final chainId = BigInt.parse(
+          chainParams['chainId'].toString().replaceFirst('0x', ''),
+          radix: 16);
+      final explorers = (chainParams['blockExplorerUrls'] as List<dynamic>)
+          .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
+          .toList();
+      final symbol = nativeCurrency['symbol'].toString();
+      final name = nativeCurrency['name'].toString();
 
-      chain.rpc.addAll(rpcUrls);
+      NetworkConfigInfo? foundChain;
 
-      foundChain = chain;
-    } else {
-      final String mainnetJsonData =
-          await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final List<NetworkConfigInfo> mainnetChains =
-          await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+      if (appState.state.providers.any((c) => c.chainId == chainId)) {
+        final chain =
+            appState.state.providers.firstWhere((c) => c.chainId == chainId);
 
-      if (mainnetChains.any((c) => c.chainId == chainId)) {
-        final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
-
-        chain.rpc.addAll(rpcUrls.map((v) => v));
+        chain.rpc.addAll(rpcUrls);
 
         foundChain = chain;
+      } else {
+        final String mainnetJsonData =
+            await rootBundle.loadString('assets/chains/mainnet-chains.json');
+        final List<NetworkConfigInfo> mainnetChains =
+            await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+
+        if (mainnetChains.any((c) => c.chainId == chainId)) {
+          final chain = mainnetChains.firstWhere((c) => c.chainId == chainId);
+
+          chain.rpc.addAll(rpcUrls.map((v) => v));
+
+          foundChain = chain;
+        }
       }
-    }
-    String logo =
-        "https://static.cx.metamask.io/api/v1/tokenIcons/$chainId/$zeroEVM.png";
+      String logo =
+          "https://static.cx.metamask.io/api/v1/tokenIcons/$chainId/$zeroEVM.png";
 
-    foundChain ??= NetworkConfigInfo(
-      ftokens: [
-        FTokenInfo(
-          logo: logo,
-          name: name,
-          symbol: symbol,
-          decimals: 18,
-          addr: zeroEVM,
-          addrType: 1,
-          balances: {},
-          rate: 0,
-          default_: false,
-          native: true,
-          chainHash: BigInt.zero,
-        )
-      ],
-      name: chainParams['chainName'] as String,
-      logo: logo,
-      chain: chainParams['chainName'] as String,
-      shortName: symbol,
-      rpc: rpcUrls,
-      features: Uint16List.fromList([155, 1559, 4844]),
-      chainId: chainId,
-      chainIds: Uint64List.fromList([chainId, 0]),
-      slip44: 60,
-      diffBlockTime: BigInt.zero,
-      chainHash: BigInt.zero,
-      explorers: explorers,
-      fallbackEnabled: true,
-      testnet: name.toLowerCase().contains("test"),
-    );
+      foundChain ??= NetworkConfigInfo(
+        ftokens: [
+          FTokenInfo(
+            logo: logo,
+            name: name,
+            symbol: symbol,
+            decimals: 18,
+            addr: zeroEVM,
+            addrType: 1,
+            balances: {},
+            rate: 0,
+            default_: false,
+            native: true,
+            chainHash: BigInt.zero,
+          )
+        ],
+        name: chainParams['chainName'] as String,
+        logo: logo,
+        chain: chainParams['chainName'] as String,
+        shortName: symbol,
+        rpc: rpcUrls,
+        features: Uint16List.fromList([155, 1559, 4844]),
+        chainId: chainId,
+        chainIds: Uint64List.fromList([chainId, 0]),
+        slip44: 60,
+        diffBlockTime: BigInt.zero,
+        chainHash: BigInt.zero,
+        explorers: explorers,
+        fallbackEnabled: true,
+        testnet: name.toLowerCase().contains("test"),
+      );
 
-    foundChain = foundChain.copyWith(
-      rpc: foundChain.rpc.toSet().toList(),
-    );
-    String? title = await webViewController.getTitle();
+      foundChain = foundChain.copyWith(
+        rpc: foundChain.rpc.toSet().toList(),
+      );
+      String? title = await webViewController.getTitle();
 
-    if (!context.mounted) return;
+      if (!context.mounted) {
+        _removeActiveRequest(method);
+        return;
+      }
 
-    showAddChainModal(
-      context: context,
-      title: title ?? "",
-      appIcon: message.icon ?? '',
-      chain: foundChain,
-      onConfirm: (selectedRpc) async {
-        try {
-          foundChain = foundChain!.copyWith(
-            rpc: selectedRpc,
-          );
-          await createOrUpdateChain(providerConfig: foundChain!);
-          _sendResponse(
-            type: 'ZILPAY_RESPONSE',
-            uuid: message.uuid,
-            result: null,
-          );
-        } catch (e) {
-          debugPrint("add network error: $e");
+      showAddChainModal(
+        context: context,
+        title: title ?? "",
+        appIcon: message.icon ?? '',
+        chain: foundChain,
+        onConfirm: (selectedRpc) async {
+          try {
+            foundChain = foundChain!.copyWith(
+              rpc: selectedRpc,
+            );
+            await createOrUpdateChain(providerConfig: foundChain!);
+            _sendResponse(
+              type: 'ZILPAY_RESPONSE',
+              uuid: message.uuid,
+              result: null,
+            );
+          } catch (e) {
+            debugPrint("add network error: $e");
+            _returnError(
+              message.uuid,
+              Web3EIP1193ErrorCode.userRejectedRequest,
+              e.toString(),
+            );
+          } finally {
+            _removeActiveRequest(method);
+          }
+        },
+        onReject: () {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            e.toString(),
+            'User rejected the request',
           );
-        }
-      },
-      onReject: () {
-        _returnError(
-          message.uuid,
-          Web3EIP1193ErrorCode.userRejectedRequest,
-          'User rejected the request',
-        );
-      },
-    );
+          _removeActiveRequest(method);
+        },
+      );
+    } catch (e) {
+      _removeActiveRequest(method);
+      dev.log('Error in wallet_addEthereumChain: $e', name: 'web3_handler');
+      _returnError(
+        message.uuid,
+        Web3EIP1193ErrorCode.internalError,
+        'Error processing wallet_addEthereumChain: $e',
+      );
+    }
   }
 
   Future<void> _handleWalletSwitchEthereumChain(
@@ -1235,32 +1434,46 @@ class Web3EIP1193Handler {
     BuildContext context,
     AppState appState,
   ) async {
-    final params = message.payload['params'] as List<dynamic>?;
-    if (params == null ||
-        params.isEmpty ||
-        params[0] is! Map<String, dynamic>) {
+    final method = message.payload['method'] as String;
+
+    if (_isRequestActive(method)) {
       return _returnError(
         message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Invalid parameters for wallet_switchEthereumChain',
+        Web3EIP1193ErrorCode.resourceUnavailable,
+        'A similar request is already being processed',
       );
     }
 
-    final chainParams = params[0] as Map<String, dynamic>;
-    if (!chainParams.containsKey('chainId')) {
-      return _returnError(
-        message.uuid,
-        Web3EIP1193ErrorCode.invalidInput,
-        'Missing required field: chainId',
-      );
-    }
-
-    final chainId = BigInt.parse(
-      chainParams['chainId'].toString().replaceFirst('0x', ''),
-      radix: 16,
-    );
+    _addActiveRequest(method);
 
     try {
+      final params = message.payload['params'] as List<dynamic>?;
+      if (params == null ||
+          params.isEmpty ||
+          params[0] is! Map<String, dynamic>) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Invalid parameters for wallet_switchEthereumChain',
+        );
+      }
+
+      final chainParams = params[0] as Map<String, dynamic>;
+      if (!chainParams.containsKey('chainId')) {
+        _removeActiveRequest(method);
+        return _returnError(
+          message.uuid,
+          Web3EIP1193ErrorCode.invalidInput,
+          'Missing required field: chainId',
+        );
+      }
+
+      final chainId = BigInt.parse(
+        chainParams['chainId'].toString().replaceFirst('0x', ''),
+        radix: 16,
+      );
+
       if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
@@ -1273,6 +1486,7 @@ class Web3EIP1193Handler {
       final chainExists = providers.any((p) => p.chainIds.contains(chainId));
 
       if (!chainExists) {
+        _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.chainNotAdded,
@@ -1289,6 +1503,7 @@ class Web3EIP1193Handler {
             uuid: message.uuid,
             result: null,
           );
+          _removeActiveRequest(method);
         },
         onReject: () {
           _returnError(
@@ -1296,9 +1511,11 @@ class Web3EIP1193Handler {
             Web3EIP1193ErrorCode.userRejectedRequest,
             'User rejected the request',
           );
+          _removeActiveRequest(method);
         },
       );
     } catch (e) {
+      _removeActiveRequest(method);
       dev.log('Error in wallet_switchEthereumChain: $e', name: 'web3_handler');
       _returnError(
         message.uuid,

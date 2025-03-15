@@ -44,7 +44,8 @@ enum Web3EIP1193ErrorCode {
   chainDisconnected(4901),
   internalError(-32603),
   chainNotAdded(4902),
-  invalidInput(-32000);
+  invalidInput(-32000),
+  resourceUnavailable(-32002);
 
   final int code;
   const Web3EIP1193ErrorCode(this.code);

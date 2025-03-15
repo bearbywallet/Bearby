@@ -391,6 +391,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       'ERR_NAME_NOT_RESOLVED',
       'CLEARTEXT_NOT_PERMITTED',
       'ERR_CONNECTION_CLOSED',
+      'ERR_CONNECTION_REFUSED',
       'ERR_BLOCKED_BY_ORB',
       'ERR_UNKNOWN_URL_SCHEME',
       'DNS_PROBE_FINISHED'
