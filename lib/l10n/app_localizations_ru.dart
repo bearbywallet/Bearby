@@ -281,6 +281,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homePageTestnetLabel => 'Тестовая сеть';
 
   @override
+  String get homePageErrorTitle => 'Нет сигнала';
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

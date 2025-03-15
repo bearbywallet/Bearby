@@ -281,6 +281,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageTestnetLabel => 'Testnet';
 
   @override
+  String get homePageErrorTitle => 'No signal';
+
+  @override
   String get revealSecretKeyTitle => 'Reveal Secret Key';
 
   @override

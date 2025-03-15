@@ -443,10 +443,16 @@
   "@secretPhraseGeneratorPageNextButton": {
     "description": "Text for next button on SecretPhraseGeneratorPage"
   },
+
   "homePageTestnetLabel": "Testnet",
   "@homePageTestnetLabel": {
     "description": "Label displayed when using a testnet on HomePage"
   },
+  "homePageErrorTitle": "No signal",
+  "@homePageErrorTitle": {
+    "description": "Label displayed when shows error on home page"
+  },
+
 
   "revealSecretKeyTitle": "Reveal Secret Key",
   "@revealSecretKeyTitle": {

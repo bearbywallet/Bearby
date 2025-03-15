@@ -104,6 +104,7 @@
   "secretPhraseGeneratorPageNextButton": "Далее",
 
   "homePageTestnetLabel": "Тестовая сеть",
+  "homePageErrorTitle": "Нет сигнала",
 
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",

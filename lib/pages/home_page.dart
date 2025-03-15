@@ -23,6 +23,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   bool _isFirstLoad = true;
+  String? _errorMessage;
 
   @override
   void initState() {
@@ -47,12 +48,25 @@ class _HomePageState extends State<HomePage> {
 
     try {
       await syncBalances(walletIndex: index);
+      if (_errorMessage != null) {
+        setState(() {
+          _errorMessage = null;
+        });
+      }
     } catch (e) {
-      debugPrint("error sync balance: $e");
+      setState(() {
+        _errorMessage = e.toString();
+      });
     }
 
     await appState.syncRates();
     await appState.syncData();
+  }
+
+  void _dismissError() {
+    setState(() {
+      _errorMessage = null;
+    });
   }
 
   @override
@@ -85,6 +99,56 @@ class _HomePageState extends State<HomePage> {
               refreshIndicatorExtent: refreshIndicatorExtent,
             );
           },
+        ),
+      if (_errorMessage != null)
+        SliverToBoxAdapter(
+          child: Container(
+            margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
+            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+            decoration: BoxDecoration(
+              color: theme.danger,
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        l10n.homePageErrorTitle,
+                        style: TextStyle(
+                          color: theme.buttonText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      SizedBox(height: 4),
+                      Text(
+                        _errorMessage!,
+                        style: TextStyle(
+                          color: theme.buttonText,
+                          fontSize: 16,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: SvgPicture.asset(
+                    'assets/icons/close.svg',
+                    width: 24,
+                    height: 24,
+                    colorFilter: ColorFilter.mode(
+                      theme.textPrimary,
+                      BlendMode.srcIn,
+                    ),
+                  ),
+                  onPressed: _dismissError,
+                ),
+              ],
+            ),
+          ),
         ),
       SliverToBoxAdapter(
         child: Padding(

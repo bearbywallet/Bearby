@@ -281,6 +281,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homePageTestnetLabel => 'テストネット';
 
   @override
+  String get homePageErrorTitle => '信号なし';
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override

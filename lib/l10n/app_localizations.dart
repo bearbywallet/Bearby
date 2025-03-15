@@ -637,6 +637,12 @@ abstract class AppLocalizations {
   /// **'Testnet'**
   String get homePageTestnetLabel;
 
+  /// Label displayed when shows error on home page
+  ///
+  /// In en, this message translates to:
+  /// **'No signal'**
+  String get homePageErrorTitle;
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:

@@ -104,6 +104,7 @@
   "secretPhraseGeneratorPageNextButton": "次へ",
 
   "homePageTestnetLabel": "テストネット",
+  "homePageErrorTitle": "信号なし",
 
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
