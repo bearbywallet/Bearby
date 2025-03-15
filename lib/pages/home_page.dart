@@ -21,13 +21,36 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   bool _isFirstLoad = true;
   String? _errorMessage;
+  late AnimationController _animationController;
+  late Animation<double> _heightAnimation;
+  late Animation<double> _opacityAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    _animationController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 400),
+    );
+
+    _heightAnimation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeOutCubic,
+    );
+
+    _opacityAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: const Interval(0.3, 1.0, curve: Curves.easeOut),
+      ),
+    );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (_isFirstLoad) {
@@ -40,6 +63,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   void dispose() {
+    _animationController.dispose();
     super.dispose();
   }
 
@@ -52,11 +76,13 @@ class _HomePageState extends State<HomePage> {
         setState(() {
           _errorMessage = null;
         });
+        _animationController.reverse();
       }
     } catch (e) {
       setState(() {
         _errorMessage = e.toString();
       });
+      _animationController.forward();
     }
 
     await appState.syncRates();
@@ -64,8 +90,10 @@ class _HomePageState extends State<HomePage> {
   }
 
   void _dismissError() {
-    setState(() {
-      _errorMessage = null;
+    _animationController.reverse().then((_) {
+      setState(() {
+        _errorMessage = null;
+      });
     });
   }
 
@@ -102,57 +130,65 @@ class _HomePageState extends State<HomePage> {
         ),
       if (_errorMessage != null)
         SliverToBoxAdapter(
-          child: Container(
-            margin: EdgeInsets.fromLTRB(16, 16, 16, 0),
-            padding: EdgeInsets.symmetric(vertical: 12, horizontal: 16),
-            decoration: BoxDecoration(
-              color: theme.danger,
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: Row(
-              children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.homePageErrorTitle,
-                        style: TextStyle(
-                          color: theme.buttonText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 4),
-                      Text(
-                        _errorMessage!,
-                        style: TextStyle(
-                          color: theme.buttonText,
-                          fontSize: 16,
-                        ),
-                      ),
-                    ],
-                  ),
+          child: SizeTransition(
+            axisAlignment: -1,
+            sizeFactor: _heightAnimation,
+            child: FadeTransition(
+              opacity: _opacityAnimation,
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                padding:
+                    const EdgeInsets.symmetric(vertical: 12, horizontal: 16),
+                decoration: BoxDecoration(
+                  color: theme.danger,
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                IconButton(
-                  icon: SvgPicture.asset(
-                    'assets/icons/close.svg',
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      theme.textPrimary,
-                      BlendMode.srcIn,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            l10n.homePageErrorTitle,
+                            style: TextStyle(
+                              color: theme.buttonText,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _errorMessage!,
+                            style: TextStyle(
+                              color: theme.buttonText,
+                              fontSize: 16,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                  onPressed: _dismissError,
+                    IconButton(
+                      icon: SvgPicture.asset(
+                        'assets/icons/close.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          theme.buttonText,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      onPressed: _dismissError,
+                    ),
+                  ],
                 ),
-              ],
+              ),
             ),
           ),
         ),
       SliverToBoxAdapter(
         child: Padding(
-          padding: EdgeInsets.symmetric(
+          padding: const EdgeInsets.symmetric(
             horizontal: 16,
             vertical: 12,
           ),
@@ -169,7 +205,7 @@ class _HomePageState extends State<HomePage> {
                 assetName: 'assets/icons/gear.svg',
                 width: 30,
                 height: 30,
-                padding: EdgeInsets.fromLTRB(16, 0, 0, 0),
+                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
                 color: theme.textSecondary,
                 onTap: () {
                   Navigator.pushNamed(context, '/settings');
