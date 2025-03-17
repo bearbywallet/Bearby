@@ -1067,6 +1067,39 @@
   "@browserSettingsCache": {
     "description": "Title for cache setting"
   },
+
+  "browserSettingsClearData": "Clear Data",
+  "@browserSettingsClearData": {
+    "description": "Section title for clear data options in browser settings"
+  },
+  "browserSettingsClear": "Clear",
+  "@browserSettingsClear": {
+    "description": "Button text for clearing browser data"
+  },
+  "browserSettingsClearCookies": "Clear Cookies",
+  "@browserSettingsClearCookies": {
+    "description": "Title for the clear cookies option"
+  },
+  "browserSettingsClearCookiesDescription": "Delete all cookies stored by websites",
+  "@browserSettingsClearCookiesDescription": {
+    "description": "Description explaining what clearing cookies does"
+  },
+  "browserSettingsClearCache": "Clear Cache",
+  "@browserSettingsClearCache": {
+    "description": "Title for the clear cache option"
+  },
+  "browserSettingsClearCacheDescription": "Delete temporary files and images stored during browsing",
+  "@browserSettingsClearCacheDescription": {
+    "description": "Description explaining what clearing cache does"
+  },
+  "browserSettingsClearLocalStorage": "Clear Local Storage",
+  "@browserSettingsClearLocalStorage": {
+    "description": "Title for the clear local storage option"
+  },
+  "browserSettingsClearLocalStorageDescription": "Delete website data stored locally on your device",
+  "@browserSettingsClearLocalStorageDescription": {
+    "description": "Description explaining what clearing local storage does"
+  },
   "browserSettingsCacheDescription": "Store website data for faster loading",
   "@browserSettingsCacheDescription": {
     "description": "Description for cache setting"

@@ -729,7 +729,31 @@ class AppLocalizationsRu extends AppLocalizations {
   String get browserSettingsCache => 'Кэш';
 
   @override
-  String get browserSettingsCacheDescription => 'Хранить данные сайтов для быстрой загрузки';
+  String get browserSettingsClearData => 'Очистить данные';
+
+  @override
+  String get browserSettingsClear => 'Очистить';
+
+  @override
+  String get browserSettingsClearCookies => 'Очистить куки';
+
+  @override
+  String get browserSettingsClearCookiesDescription => 'Удалить все куки, сохраненные веб-сайтами';
+
+  @override
+  String get browserSettingsClearCache => 'Очистить кэш';
+
+  @override
+  String get browserSettingsClearCacheDescription => 'Удалить временные файлы и изображения, сохраненные во время просмотра';
+
+  @override
+  String get browserSettingsClearLocalStorage => 'Очистить локальное хранилище';
+
+  @override
+  String get browserSettingsClearLocalStorageDescription => 'Удалить данные веб-сайтов, хранящиеся локально на вашем устройстве';
+
+  @override
+  String get browserSettingsCacheDescription => 'Хранить данные веб-сайтов для более быстрой загрузки';
 
   @override
   String get genWalletOptionsTitle => 'Создать кошелек';

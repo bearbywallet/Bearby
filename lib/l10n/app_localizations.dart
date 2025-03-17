@@ -1501,6 +1501,54 @@ abstract class AppLocalizations {
   /// **'Cache'**
   String get browserSettingsCache;
 
+  /// Section title for clear data options in browser settings
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Data'**
+  String get browserSettingsClearData;
+
+  /// Button text for clearing browser data
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get browserSettingsClear;
+
+  /// Title for the clear cookies option
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Cookies'**
+  String get browserSettingsClearCookies;
+
+  /// Description explaining what clearing cookies does
+  ///
+  /// In en, this message translates to:
+  /// **'Delete all cookies stored by websites'**
+  String get browserSettingsClearCookiesDescription;
+
+  /// Title for the clear cache option
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Cache'**
+  String get browserSettingsClearCache;
+
+  /// Description explaining what clearing cache does
+  ///
+  /// In en, this message translates to:
+  /// **'Delete temporary files and images stored during browsing'**
+  String get browserSettingsClearCacheDescription;
+
+  /// Title for the clear local storage option
+  ///
+  /// In en, this message translates to:
+  /// **'Clear Local Storage'**
+  String get browserSettingsClearLocalStorage;
+
+  /// Description explaining what clearing local storage does
+  ///
+  /// In en, this message translates to:
+  /// **'Delete website data stored locally on your device'**
+  String get browserSettingsClearLocalStorageDescription;
+
   /// Description for cache setting
   ///
   /// In en, this message translates to:

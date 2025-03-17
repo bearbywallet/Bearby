@@ -729,6 +729,30 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserSettingsCache => 'Cache';
 
   @override
+  String get browserSettingsClearData => 'Clear Data';
+
+  @override
+  String get browserSettingsClear => 'Clear';
+
+  @override
+  String get browserSettingsClearCookies => 'Clear Cookies';
+
+  @override
+  String get browserSettingsClearCookiesDescription => 'Delete all cookies stored by websites';
+
+  @override
+  String get browserSettingsClearCache => 'Clear Cache';
+
+  @override
+  String get browserSettingsClearCacheDescription => 'Delete temporary files and images stored during browsing';
+
+  @override
+  String get browserSettingsClearLocalStorage => 'Clear Local Storage';
+
+  @override
+  String get browserSettingsClearLocalStorageDescription => 'Delete website data stored locally on your device';
+
+  @override
   String get browserSettingsCacheDescription => 'Store website data for faster loading';
 
   @override

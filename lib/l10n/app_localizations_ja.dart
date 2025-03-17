@@ -729,7 +729,31 @@ class AppLocalizationsJa extends AppLocalizations {
   String get browserSettingsCache => 'キャッシュ';
 
   @override
-  String get browserSettingsCacheDescription => '高速読み込みのためのウェブサイトデータの保存';
+  String get browserSettingsClearData => 'データを消去';
+
+  @override
+  String get browserSettingsClear => '消去';
+
+  @override
+  String get browserSettingsClearCookies => 'Cookieを消去';
+
+  @override
+  String get browserSettingsClearCookiesDescription => 'ウェブサイトによって保存されたすべてのCookieを削除';
+
+  @override
+  String get browserSettingsClearCache => 'キャッシュを消去';
+
+  @override
+  String get browserSettingsClearCacheDescription => 'ブラウジング中に保存された一時ファイルや画像を削除';
+
+  @override
+  String get browserSettingsClearLocalStorage => 'ローカルストレージを消去';
+
+  @override
+  String get browserSettingsClearLocalStorageDescription => 'デバイスに保存されているウェブサイトのデータを削除';
+
+  @override
+  String get browserSettingsCacheDescription => 'より速い読み込みのためにウェブサイトのデータを保存';
 
   @override
   String get genWalletOptionsTitle => 'ウォレットを生成';

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/switch_setting_item.dart';
@@ -30,6 +32,9 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     ListItem(title: 'Strict', subtitle: 'Blocks most trackers and ads'),
   ];
 
+  // Track which clear operations are currently loading
+  final Set<String> _loading = {};
+
   @override
   void initState() {
     super.initState();
@@ -38,6 +43,17 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
   @override
   void dispose() {
     super.dispose();
+  }
+
+  // Helper method to set loading state
+  void _setLoading(String operation, bool isLoading) {
+    setState(() {
+      if (isLoading) {
+        _loading.add(operation);
+      } else {
+        _loading.remove(operation);
+      }
+    });
   }
 
   Future<void> _toggleCache(AppState appState, bool enabled) async {
@@ -81,6 +97,68 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
       await appState.syncData();
     } catch (e) {
       debugPrint("Error toggling incognito mode: $e");
+    }
+  }
+
+  Future<void> _clearCookies(AppState appState) async {
+    final String operation = 'cookies';
+    try {
+      _setLoading(operation, true);
+      await CookieManager.instance().deleteAllCookies();
+      await CookieManager.instance().removeSessionCookies();
+      await appState.syncData();
+    } catch (e) {
+      debugPrint("Error clearing cookies: $e");
+    } finally {
+      _setLoading(operation, false);
+    }
+  }
+
+  Future<void> _clearCache(AppState appState) async {
+    final String operation = 'cache';
+    try {
+      _setLoading(operation, true);
+      await InAppWebViewController.clearAllCache();
+      await appState.syncData();
+    } catch (e) {
+      debugPrint("Error clearing cache: $e");
+    } finally {
+      _setLoading(operation, false);
+    }
+  }
+
+  Future<void> _clearLocalStorage(AppState appState) async {
+    final String operation = 'localStorage';
+    try {
+      _setLoading(operation, true);
+      final headlessWebView = HeadlessInAppWebView(
+        initialUrlRequest: URLRequest(url: WebUri("about:blank")),
+        onLoadStop: (controller, url) async {
+          try {
+            await controller.evaluateJavascript(
+                source: "localStorage.clear();");
+            await controller.evaluateJavascript(
+                source: "sessionStorage.clear();");
+            await controller.evaluateJavascript(source: """
+            if (window.indexedDB) {
+              window.indexedDB.deleteDatabase('all');
+            }
+          """);
+
+            await controller.clearHistory();
+          } catch (e) {
+            debugPrint("Error in JavaScript execution: $e");
+          }
+        },
+      );
+
+      await headlessWebView.run();
+      await Future<void>.delayed(const Duration(milliseconds: 800));
+      await appState.syncData();
+    } catch (e) {
+      debugPrint("Error clearing localStorage: $e");
+    } finally {
+      _setLoading(operation, false);
     }
   }
 
@@ -158,6 +236,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
                           _buildPrivacySection(theme, appState),
                           const SizedBox(height: 24),
                           _buildPerformanceSection(theme, appState),
+                          const SizedBox(height: 24),
+                          _buildClearDataSection(theme, appState),
                           const SizedBox(height: 24),
                         ],
                       ),
@@ -320,6 +400,138 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildClearDataSection(AppTheme theme, AppState appState) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(left: 16, bottom: 16),
+          child: Text(
+            AppLocalizations.of(context)!.browserSettingsClearData,
+            style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 16,
+            ),
+          ),
+        ),
+        Container(
+          decoration: BoxDecoration(
+            color: theme.cardBackground,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            children: [
+              _buildClearDataItem(
+                theme,
+                AppLocalizations.of(context)!.browserSettingsClearCookies,
+                'assets/icons/cookie.svg',
+                AppLocalizations.of(context)!
+                    .browserSettingsClearCookiesDescription,
+                () => _clearCookies(appState),
+                _loading.contains('cookies'),
+              ),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
+              _buildClearDataItem(
+                theme,
+                AppLocalizations.of(context)!.browserSettingsClearCache,
+                'assets/icons/cache.svg',
+                AppLocalizations.of(context)!
+                    .browserSettingsClearCacheDescription,
+                () => _clearCache(appState),
+                _loading.contains('cache'),
+              ),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
+              _buildClearDataItem(
+                theme,
+                AppLocalizations.of(context)!.browserSettingsClearLocalStorage,
+                'assets/icons/data.svg',
+                AppLocalizations.of(context)!
+                    .browserSettingsClearLocalStorageDescription,
+                () => _clearLocalStorage(appState),
+                _loading.contains('localStorage'),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildClearDataItem(
+    AppTheme theme,
+    String title,
+    String iconPath,
+    String description,
+    VoidCallback onTap,
+    bool isLoading,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SvgPicture.asset(
+            iconPath,
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(
+              theme.textPrimary,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 16,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  description,
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 14,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          TextButton(
+            onPressed: isLoading ? null : onTap,
+            style: TextButton.styleFrom(
+              foregroundColor: theme.primaryPurple,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: isLoading
+                ? SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      valueColor:
+                          AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                    ),
+                  )
+                : Text(AppLocalizations.of(context)!.browserSettingsClear),
+          ),
+        ],
+      ),
     );
   }
 }
