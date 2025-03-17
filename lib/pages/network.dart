@@ -249,82 +249,89 @@ class _NetworkPageState extends State<NetworkPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding,
-                ),
-                child: CustomAppBar(
-                  title: l10n.networkPageTitle,
-                  onBackPressed: () => Navigator.pop(context),
-                  actionWidget: Row(
-                    children: [
-                      Text(l10n.networkPageShowTestnet,
-                          style: TextStyle(
-                              color: theme.textSecondary, fontSize: 14)),
-                      const SizedBox(width: 8),
-                      Switch(
-                          value: isTestnet,
-                          onChanged: (value) => setState(() {
-                                isTestnet = value;
-                                _loadNetworks();
-                              }),
-                          activeColor: theme.primaryPurple),
-                    ],
-                  ),
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                child: SmartInput(
-                  controller: _searchController,
-                  hint: l10n.networkPageSearchHint,
-                  leftIconPath: 'assets/icons/search.svg',
-                  onChanged: (value) => setState(() => _searchQuery = value),
-                  borderColor: theme.textPrimary,
-                  focusedBorderColor: theme.primaryPurple,
-                  height: 48,
-                  fontSize: 16,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                ),
-              ),
-              if (errorMessage != null)
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Text(errorMessage!,
-                        style: TextStyle(color: theme.danger, fontSize: 14))),
-              Expanded(
-                child: SingleChildScrollView(
-                  physics: const BouncingScrollPhysics(),
                   padding: EdgeInsets.symmetric(
-                      horizontal: adaptivePadding, vertical: 24),
-                  child: Align(
-                    alignment: Alignment.topLeft,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                    horizontal: adaptivePadding,
+                  ),
+                  child: CustomAppBar(
+                    title: l10n.networkPageTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                    actionWidget: Row(
                       children: [
-                        _buildNetworkSection(l10n.networkPageAddedNetworks,
-                            filteredAddedNetworks, theme, chain, wallet, false),
-                        if (filteredAddedNetworks.isNotEmpty &&
-                            filteredPotentialNetworks.isNotEmpty)
-                          const SizedBox(height: 24),
-                        _buildNetworkSection(
-                            l10n.networkPageAvailableNetworks,
-                            filteredPotentialNetworks,
-                            theme,
-                            chain,
-                            wallet,
-                            true),
+                        Text(l10n.networkPageShowTestnet,
+                            style: TextStyle(
+                                color: theme.textSecondary, fontSize: 14)),
+                        const SizedBox(width: 8),
+                        Switch(
+                            value: isTestnet,
+                            onChanged: (value) => setState(() {
+                                  isTestnet = value;
+                                  _loadNetworks();
+                                }),
+                            activeColor: theme.primaryPurple),
                       ],
                     ),
                   ),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: SmartInput(
+                    controller: _searchController,
+                    hint: l10n.networkPageSearchHint,
+                    leftIconPath: 'assets/icons/search.svg',
+                    onChanged: (value) => setState(() => _searchQuery = value),
+                    borderColor: theme.textPrimary,
+                    focusedBorderColor: theme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                  ),
+                ),
+                if (errorMessage != null)
+                  Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Text(errorMessage!,
+                          style: TextStyle(color: theme.danger, fontSize: 14))),
+                Expanded(
+                  child: SingleChildScrollView(
+                    physics: const BouncingScrollPhysics(),
+                    padding: EdgeInsets.symmetric(
+                        horizontal: adaptivePadding, vertical: 24),
+                    child: Align(
+                      alignment: Alignment.topLeft,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          _buildNetworkSection(
+                              l10n.networkPageAddedNetworks,
+                              filteredAddedNetworks,
+                              theme,
+                              chain,
+                              wallet,
+                              false),
+                          if (filteredAddedNetworks.isNotEmpty &&
+                              filteredPotentialNetworks.isNotEmpty)
+                            const SizedBox(height: 24),
+                          _buildNetworkSection(
+                              l10n.networkPageAvailableNetworks,
+                              filteredPotentialNetworks,
+                              theme,
+                              chain,
+                              wallet,
+                              true),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),
