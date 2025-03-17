@@ -7,8 +7,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{decode_session, parse_address, with_service, with_service_mut};
-
+use crate::utils::utils::{decode_session, parse_address, with_service};
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_tx::TransactionsManagement;
@@ -180,7 +179,7 @@ pub async fn get_history(wallet_index: usize) -> Result<Vec<HistoricalTransactio
 }
 
 pub async fn clear_history(wallet_index: usize) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
         wallet
             .clear_history()

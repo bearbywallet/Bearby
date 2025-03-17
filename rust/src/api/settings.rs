@@ -2,7 +2,7 @@ use crate::{
     models::settings::BrowserSettingsInfo,
     utils::{
         errors::ServiceError,
-        utils::{with_service, with_service_mut, with_wallet, with_wallet_mut},
+        utils::{with_service, with_wallet},
     },
 };
 pub use zilpay::settings::{
@@ -10,8 +10,7 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 use zilpay::{
-    background::{bg_settings::SettingsManagement, bg_storage::StorageManagement},
-    token_quotes::TokenQuotesAPIOptions,
+    background::bg_settings::SettingsManagement, token_quotes::TokenQuotesAPIOptions,
     wallet::wallet_storage::StorageOperations,
 };
 
@@ -169,8 +168,7 @@ pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Resu
 
 pub async fn set_browser_settings(browser_settings: BrowserSettingsInfo) -> Result<(), String> {
     with_service(|core| {
-        core.settings.browser = browser_settings.into();
-        core.save_settings()?;
+        core.set_browser_settings(browser_settings.into())?;
 
         Ok(())
     })

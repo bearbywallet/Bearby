@@ -1,5 +1,5 @@
 use std::sync::Arc;
-use zilpay::crypto::slip44;
+use zilpay::{background::bg_settings::SettingsManagement, crypto::slip44};
 pub use zilpay::{
     background::Background,
     config::key::{PUB_KEY_SIZE, SECRET_KEY_SIZE},
@@ -83,6 +83,7 @@ pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceErr
 
 pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
     let providers = service.get_providers();
+    let settings = service.get_global_settings();
     let wallets = service
         .wallets
         .iter()
@@ -90,8 +91,7 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
         .collect::<Result<Vec<WalletInfo>, WalletErrors>>()
         .map_err(BackgroundError::WalletError)?;
 
-    let notifications_wallet_states = service
-        .settings
+    let notifications_wallet_states = settings
         .notifications
         .wallet_states
         .iter()
@@ -101,11 +101,11 @@ pub fn get_background_state(service: &Background) -> Result<BackgroundState, Ser
     Ok(BackgroundState {
         wallets,
         notifications_wallet_states,
-        browser_settings: service.settings.browser.clone().into(),
-        notifications_global_enabled: service.settings.notifications.global_enabled,
-        locale: service.settings.locale.clone(),
-        appearances: service.settings.theme.appearances.code(),
-        abbreviated_number: service.settings.theme.compact_numbers,
+        browser_settings: settings.browser.clone().into(),
+        notifications_global_enabled: settings.notifications.global_enabled,
+        locale: settings.locale.clone(),
+        appearances: settings.theme.appearances.code(),
+        abbreviated_number: settings.theme.compact_numbers,
         providers: providers.into_iter().map(|p| p.config.into()).collect(),
     })
 }
