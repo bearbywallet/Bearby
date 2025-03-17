@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -24,6 +25,13 @@ class ZilPayApp extends StatelessWidget {
           return Consumer<AppState>(
             builder: (context, appState, _) {
               final currentTheme = appState.currentTheme;
+
+              SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+                statusBarColor: Colors.transparent,
+                statusBarIconBrightness: currentTheme.brightness,
+                systemNavigationBarColor: currentTheme.background,
+                systemNavigationBarIconBrightness: currentTheme.brightness,
+              ));
 
               return MaterialApp(
                 title:

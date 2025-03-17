@@ -95,7 +95,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
-    final textColor = _parseColor(widget.colors?.text) ?? theme.buttonText;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -167,7 +167,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
               text: l10n.appConnectModalContent_swipeToConnect,
               disabled: !_selectedAccounts.values.any((selected) => selected),
               backgroundColor: primaryColor,
-              textColor: textColor,
+              textColor: theme.buttonText,
               onSwipeComplete: () async {
                 final selectedIndices = _selectedAccounts.entries
                     .where((entry) => entry.value)

@@ -1338,4 +1338,13 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get appConnectModalContent_noAccounts => 'Нет доступных аккаунтов';
+
+  @override
+  String get browserActionMenuShare => 'Поделиться';
+
+  @override
+  String get browserActionMenuCopyLink => 'Копировать ссылку';
+
+  @override
+  String get browserActionMenuClose => 'Закрыть';
 }

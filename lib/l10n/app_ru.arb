@@ -514,5 +514,9 @@
   "amountSection_confirmed": "Подтверждено",
   "amountSection_rejected": "Отклонено",
   "appConnectModalContent_swipeToConnect": "Проведите для подключения",
-  "appConnectModalContent_noAccounts": "Нет доступных аккаунтов"
+  "appConnectModalContent_noAccounts": "Нет доступных аккаунтов",
+
+  "browserActionMenuShare": "Поделиться",
+  "browserActionMenuCopyLink": "Копировать ссылку",
+  "browserActionMenuClose": "Закрыть"
 }

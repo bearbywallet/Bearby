@@ -1890,5 +1890,18 @@
   "appConnectModalContent_noAccounts": "No accounts available",
   "@appConnectModalContent_noAccounts": {
     "description": "Text shown when no accounts are available in _AppConnectModalContent"
+  },
+
+  "browserActionMenuShare": "Share",
+  "@browserActionMenuShare": {
+    "description": "Menu item text for sharing the current page"
+  },
+  "browserActionMenuCopyLink": "Copy Link",
+  "@browserActionMenuCopyLink": {
+    "description": "Menu item text for copying the current page link"
+  },
+  "browserActionMenuClose": "Close",
+  "@browserActionMenuClose": {
+    "description": "Menu item text for closing the current page or tab"
   }
 }

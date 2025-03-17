@@ -518,5 +518,9 @@
   "amountSection_confirmed": "確認済み",
   "amountSection_rejected": "拒否済み",
   "appConnectModalContent_swipeToConnect": "スワイプして接続",
-  "appConnectModalContent_noAccounts": "アカウントがありません"
+  "appConnectModalContent_noAccounts": "アカウントがありません",
+
+  "browserActionMenuShare": "共有",
+  "browserActionMenuCopyLink": "リンクをコピー",
+  "browserActionMenuClose": "閉じる"
 }

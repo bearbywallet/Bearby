@@ -1,6 +1,7 @@
 import 'dart:ui';
 
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -167,6 +168,14 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       compactNumbers: compactNumbers,
     );
     _state = await getData();
+
+    SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: currentTheme.brightness,
+      systemNavigationBarColor: currentTheme.background,
+      systemNavigationBarIconBrightness: currentTheme.brightness,
+    ));
+
     notifyListeners();
   }
 

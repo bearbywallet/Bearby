@@ -1338,4 +1338,13 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get appConnectModalContent_noAccounts => 'アカウントがありません';
+
+  @override
+  String get browserActionMenuShare => '共有';
+
+  @override
+  String get browserActionMenuCopyLink => 'リンクをコピー';
+
+  @override
+  String get browserActionMenuClose => '閉じる';
 }

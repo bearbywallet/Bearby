@@ -4,6 +4,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:share_plus/share_plus.dart';
+import 'package:zilpay/components/browser_action_menu.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
@@ -376,36 +378,6 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     }
   }
 
-  bool _shouldIgnoreError(WebResourceError error) {
-    final ignoredErrorContents = [
-      'favicon.ico',
-      'robots.txt',
-      'analytics',
-      'ads',
-      'tracking',
-      'facebook',
-      'twitter',
-      'google-analytics',
-      'ga.js',
-      'fbevents.js',
-      'ERR_NAME_NOT_RESOLVED',
-      'CLEARTEXT_NOT_PERMITTED',
-      'ERR_CONNECTION_CLOSED',
-      'ERR_CONNECTION_REFUSED',
-      'ERR_BLOCKED_BY_ORB',
-      'ERR_UNKNOWN_URL_SCHEME',
-      'DNS_PROBE_FINISHED'
-    ];
-
-    for (final term in ignoredErrorContents) {
-      if (error.description.toLowerCase().contains(term.toLowerCase())) {
-        return true;
-      }
-    }
-
-    return false;
-  }
-
   void _applyPrivacySettings(
       AppState appState, InAppWebViewController controller) {
     if (!appState.state.browserSettings.cookiesEnabled) {
@@ -542,17 +514,23 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
             ],
           ),
           actions: [
-            IconButton(
-              icon: HoverSvgIcon(
-                assetName: 'assets/icons/close.svg',
-                width: 24,
-                height: 24,
-                onTap: () => Navigator.pop(context),
-                color: theme.textPrimary,
-              ),
-              onPressed: () {
+            BrowserActionMenu(
+              parentContext: context,
+              onShare: () {
+                Share.share(_currentUrl);
+              },
+              onCopyLink: () {
+                Clipboard.setData(ClipboardData(text: _currentUrl));
+              },
+              onClose: () {
                 stopBlockWorker();
                 Navigator.pop(context);
+              },
+              onBack: () {
+                _webViewController?.goBack();
+              },
+              onForward: () {
+                _webViewController?.goForward();
               },
             ),
           ],
@@ -689,15 +667,13 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       _progress = progress / 100;
                     });
                   },
-                  onReceivedError: (controller, request, error) {
-                    if (_shouldIgnoreError(error)) return;
-
-                    setState(() {
-                      _isLoading = false;
-                      _hasError = true;
-                      _errorMessage = error.description;
-                    });
-                  },
+                  // onReceivedError: (controller, request, error) {
+                  //   setState(() {
+                  //     _isLoading = false;
+                  //     _hasError = true;
+                  //     _errorMessage = error.description;
+                  //   });
+                  // },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
                     final url =

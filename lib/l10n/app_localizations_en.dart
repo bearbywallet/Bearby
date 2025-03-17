@@ -1338,4 +1338,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get appConnectModalContent_noAccounts => 'No accounts available';
+
+  @override
+  String get browserActionMenuShare => 'Share';
+
+  @override
+  String get browserActionMenuCopyLink => 'Copy Link';
+
+  @override
+  String get browserActionMenuClose => 'Close';
 }

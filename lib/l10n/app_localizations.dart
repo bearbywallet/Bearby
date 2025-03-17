@@ -2718,6 +2718,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No accounts available'**
   String get appConnectModalContent_noAccounts;
+
+  /// Menu item text for sharing the current page
+  ///
+  /// In en, this message translates to:
+  /// **'Share'**
+  String get browserActionMenuShare;
+
+  /// Menu item text for copying the current page link
+  ///
+  /// In en, this message translates to:
+  /// **'Copy Link'**
+  String get browserActionMenuCopyLink;
+
+  /// Menu item text for closing the current page or tab
+  ///
+  /// In en, this message translates to:
+  /// **'Close'**
+  String get browserActionMenuClose;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
