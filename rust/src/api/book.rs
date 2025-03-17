@@ -2,7 +2,7 @@ use crate::{
     models::book::AddressBookEntryInfo,
     utils::{
         errors::ServiceError,
-        utils::{parse_address, with_service, with_service_mut},
+        utils::{parse_address, with_service},
     },
 };
 pub use zilpay::background::bg_book::AddressBookManagement;
@@ -18,7 +18,7 @@ pub async fn add_new_book_address(
     net: usize,
     slip44: u32,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let address = parse_address(addr)?;
         let book = AddressBookEntry::add(name, address, net, slip44);
 

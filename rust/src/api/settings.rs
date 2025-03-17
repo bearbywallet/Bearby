@@ -2,7 +2,7 @@ use crate::{
     models::settings::BrowserSettingsInfo,
     utils::{
         errors::ServiceError,
-        utils::{with_service_mut, with_wallet, with_wallet_mut},
+        utils::{with_service, with_service_mut, with_wallet, with_wallet_mut},
     },
 };
 pub use zilpay::settings::{
@@ -16,7 +16,7 @@ use zilpay::{
 };
 
 pub async fn set_theme(appearances_code: u8, compact_numbers: bool) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let new_theme = Theme {
             compact_numbers,
             appearances: Appearances::from_code(appearances_code)
@@ -36,7 +36,7 @@ pub async fn set_wallet_notifications(
     security: bool,
     balance: bool,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         core.set_wallet_notifications(
             wallet_index,
             NotificationState {
@@ -53,7 +53,7 @@ pub async fn set_wallet_notifications(
 }
 
 pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         core.set_global_notifications(global_enabled)
             .map_err(ServiceError::BackgroundError)
     })
@@ -62,7 +62,7 @@ pub async fn set_global_notifications(global_enabled: bool) -> Result<(), String
 }
 
 pub async fn set_default_locale(locale: Option<String>) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         core.set_locale(locale)?;
 
         Ok(())
@@ -104,7 +104,7 @@ pub async fn set_rate_engine(wallet_index: usize, engine_code: u8) -> Result<(),
 }
 
 pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
+    with_wallet(wallet_index, |wallet| {
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -120,7 +120,7 @@ pub async fn set_wallet_ens(wallet_index: usize, ens_enabled: bool) -> Result<()
 }
 
 pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
+    with_wallet(wallet_index, |wallet| {
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -136,7 +136,7 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
 }
 
 pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
+    with_wallet(wallet_index, |wallet| {
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -152,7 +152,7 @@ pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Resul
 }
 
 pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Result<(), String> {
-    with_wallet_mut(wallet_index, |wallet| {
+    with_wallet(wallet_index, |wallet| {
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
@@ -168,7 +168,7 @@ pub async fn set_wallet_node_ranking(wallet_index: usize, enabled: bool) -> Resu
 }
 
 pub async fn set_browser_settings(browser_settings: BrowserSettingsInfo) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         core.settings.browser = browser_settings.into();
         core.save_settings()?;
 

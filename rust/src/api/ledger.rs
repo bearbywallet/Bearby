@@ -13,7 +13,9 @@ use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
     utils::{
         errors::ServiceError,
-        utils::{decode_session, get_last_wallet, pubkey_from_provider, with_service_mut},
+        utils::{
+            decode_session, get_last_wallet, pubkey_from_provider, with_service, with_service_mut,
+        },
     },
 };
 
@@ -73,7 +75,7 @@ pub async fn add_ledger_account(
     identifiers: &[String],
     session_cipher: Option<String>,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let session = decode_session(session_cipher)?;
 
         core.unlock_wallet_with_session(session, identifiers, wallet_index)?;

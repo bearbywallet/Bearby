@@ -1,9 +1,6 @@
 use crate::{
     models::connection::ConnectionInfo,
-    utils::{
-        errors::ServiceError,
-        utils::{with_service, with_service_mut},
-    },
+    utils::{errors::ServiceError, utils::with_service},
 };
 pub use zilpay::background::bg_connections::ConnectionManagement;
 pub use zilpay::background::book::AddressBookEntry;
@@ -16,7 +13,7 @@ pub async fn create_update_connection(
     wallet_index: usize,
     conn: ConnectionInfo,
 ) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         let mut connections = core.get_connections(wallet_index);
 
         if let Some(existing_conn) = connections.iter_mut().find(|c| c.domain == conn.domain) {
@@ -34,7 +31,7 @@ pub async fn create_update_connection(
 }
 
 pub async fn remove_connections(wallet_index: usize, domain: String) -> Result<(), String> {
-    with_service_mut(|core| {
+    with_service(|core| {
         core.remove_connection(wallet_index, &domain)
             .map_err(ServiceError::BackgroundError)
     })
