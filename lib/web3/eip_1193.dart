@@ -311,6 +311,7 @@ class Web3EIP1193Handler {
           appState.wallet?.accounts.length ==
               connection.accountIndexes.length) {
         _removeActiveRequest(method);
+
         return _sendResponse(
           type: 'ZILPAY_RESPONSE',
           uuid: message.uuid,

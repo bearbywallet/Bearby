@@ -667,6 +667,9 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                       _progress = progress / 100;
                     });
                   },
+                  onConsoleMessage: (_, value) {
+                    // print(value);
+                  },
                   // onReceivedError: (controller, request, error) {
                   //   setState(() {
                   //     _isLoading = false;

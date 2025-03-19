@@ -91,7 +91,12 @@
     "chain": "ETH",
     "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
-      "https://singapore.rpc.blxrbdn.com"
+      "https://eth.merkle.io",
+      "https://singapore.rpc.blxrbdn.com",
+      "https://1rpc.io/eth",
+      "https://rpc.payload.de",
+      "https://eth.drpc.org",
+      "https://eth.llamarpc.com"
     ],
     "features": [
       "EIP155",
