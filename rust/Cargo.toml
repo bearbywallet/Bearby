@@ -20,3 +20,4 @@ pbkdf2 = { version = "0.12", features = ["simple"] }
 sha2 = "0.10.8"
 aes = "0.8"
 base64 = "0.22"
+openssl = { version = "0.10.71", features = ["vendored"] }
