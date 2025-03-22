@@ -266,6 +266,8 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
       _walletName = name;
     });
+
+    Navigator.pop(context);
   }
 
   void updateAmount(String value) {

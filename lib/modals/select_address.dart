@@ -96,15 +96,17 @@ class _AddressSelectModalContentState
                 hint: l10n.addressSelectModalContentSearchHint,
                 leftIconPath: 'assets/icons/qrcode.svg',
                 onChanged: (value) async {
+                  Navigator.pop(context);
+
                   try {
                     bool isAddress = await isCryptoAddress(addr: value);
                     if (isAddress && mounted) {
                       QRcodeScanResultInfo params =
                           QRcodeScanResultInfo(recipient: value);
                       widget.onAddressSelected(
-                          params, l10n.addressSelectModalContentUnknown);
-                      // ignore: use_build_context_synchronously
-                      Navigator.pop(context);
+                        params,
+                        l10n.addressSelectModalContentUnknown,
+                      );
                     } else {
                       setState(() => _searchQuery = value.toLowerCase());
                     }
