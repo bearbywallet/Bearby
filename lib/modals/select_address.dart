@@ -196,7 +196,6 @@ class _AddressSelectModalContentState
         QRcodeScanResultInfo params =
             QRcodeScanResultInfo(recipient: item.address);
         widget.onAddressSelected(params, item.name);
-        Navigator.pop(context);
       },
       child: Container(
         height: 72,
@@ -248,9 +247,11 @@ class _AddressSelectModalContentState
   Future<void> _parseQrcodRes(String data) async {
     try {
       QRcodeScanResultInfo parsed = await parseQrcodeStr(data: data);
-      if (mounted)
+      if (mounted) {
         widget.onAddressSelected(parsed,
             AppLocalizations.of(context)!.addressSelectModalContentUnknown);
+        Navigator.pop(context);
+      }
     } catch (e) {
       debugPrint("error parse qrcode: $e");
     }
