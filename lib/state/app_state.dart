@@ -169,14 +169,17 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     );
     _state = await getData();
 
+    notifyListeners();
+
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: currentTheme.brightness,
+      statusBarBrightness: currentTheme.brightness == Brightness.light
+          ? Brightness.dark
+          : Brightness.light,
       systemNavigationBarColor: currentTheme.background,
       systemNavigationBarIconBrightness: currentTheme.brightness,
     ));
-
-    notifyListeners();
   }
 
   Future<void> startTrackHistoryWorker() async {

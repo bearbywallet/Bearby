@@ -29,6 +29,9 @@ class ZilPayApp extends StatelessWidget {
               SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
                 statusBarColor: Colors.transparent,
                 statusBarIconBrightness: currentTheme.brightness,
+                statusBarBrightness: currentTheme.brightness == Brightness.light
+                    ? Brightness.dark
+                    : Brightness.light,
                 systemNavigationBarColor: currentTheme.background,
                 systemNavigationBarIconBrightness: currentTheme.brightness,
               ));
@@ -72,7 +75,7 @@ class ZilPayApp extends StatelessWidget {
                   primaryColor: currentTheme.primaryPurple,
                   cardColor: currentTheme.cardBackground,
                   scaffoldBackgroundColor: currentTheme.background,
-                  canvasColor: currentTheme.background,
+                  canvasColor: currentTheme.danger,
                   textTheme: TextTheme(
                     bodyLarge: TextStyle(color: currentTheme.textPrimary),
                     bodyMedium: TextStyle(color: currentTheme.textSecondary),
@@ -89,13 +92,13 @@ class ZilPayApp extends StatelessWidget {
                           primary: currentTheme.primaryPurple,
                           secondary: currentTheme.secondaryPurple,
                           error: currentTheme.danger,
-                          surface: currentTheme.cardBackground,
+                          surface: currentTheme.buttonText,
                         )
                       : ColorScheme.dark(
                           primary: currentTheme.primaryPurple,
                           secondary: currentTheme.secondaryPurple,
                           error: currentTheme.danger,
-                          surface: currentTheme.cardBackground,
+                          surface: currentTheme.buttonText,
                         ),
                   switchTheme: SwitchThemeData(
                     trackColor: WidgetStateProperty.resolveWith((states) {
@@ -103,13 +106,13 @@ class ZilPayApp extends StatelessWidget {
                         return currentTheme.textSecondary
                             .withValues(alpha: 0.3);
                       }
-                      return null;
+                      return currentTheme.primaryPurple.withValues(alpha: 0.5);
                     }),
                     thumbColor: WidgetStateProperty.resolveWith((states) {
                       if (!states.contains(WidgetState.selected)) {
                         return currentTheme.textSecondary;
                       }
-                      return null;
+                      return currentTheme.primaryPurple;
                     }),
                     trackOutlineColor:
                         WidgetStateProperty.resolveWith((states) {
