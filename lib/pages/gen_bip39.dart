@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
+import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
@@ -24,6 +26,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
   List<String> _mnemonicWords = [];
   var _count = 12;
   bool _hasBackupWords = false;
+  bool _isCopied = false;
   // final String _selectedLanguage = 'English';
 
   @override
@@ -95,32 +98,59 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Theme(
-                          data: Theme.of(context).copyWith(
-                            splashFactory: NoSplash.splashFactory,
-                            highlightColor: Colors.transparent,
-                          ),
-                          child: CheckboxListTile(
-                            title: Text(
-                              l10n.secretPhraseGeneratorPageBackupCheckbox,
-                              style: TextStyle(color: theme.textSecondary),
-                            ),
-                            value: _hasBackupWords,
-                            onChanged: (_) {
-                              if (!_hasBackupWords) {
-                                showBackupConfirmationModal(
-                                  context: context,
-                                  onConfirmed: (confirmed) {
-                                    setState(() {
-                                      _hasBackupWords = confirmed;
-                                    });
+                        Row(
+                          children: [
+                            Expanded(
+                              child: Theme(
+                                data: Theme.of(context).copyWith(
+                                  splashFactory: NoSplash.splashFactory,
+                                  highlightColor: Colors.transparent,
+                                ),
+                                child: CheckboxListTile(
+                                  title: Text(
+                                    l10n.secretPhraseGeneratorPageBackupCheckbox,
+                                    style:
+                                        TextStyle(color: theme.textSecondary),
+                                  ),
+                                  value: _hasBackupWords,
+                                  onChanged: (_) {
+                                    if (!_hasBackupWords) {
+                                      showBackupConfirmationModal(
+                                        context: context,
+                                        onConfirmed: (confirmed) {
+                                          setState(() {
+                                            _hasBackupWords = confirmed;
+                                          });
+                                        },
+                                      );
+                                    }
                                   },
-                                );
-                              }
-                            },
-                            controlAffinity: ListTileControlAffinity.leading,
-                            activeColor: theme.primaryPurple,
-                          ),
+                                  controlAffinity:
+                                      ListTileControlAffinity.leading,
+                                  activeColor: theme.primaryPurple,
+                                ),
+                              ),
+                            ),
+                            TileButton(
+                              icon: SvgPicture.asset(
+                                _isCopied
+                                    ? "assets/icons/check.svg"
+                                    : "assets/icons/copy.svg",
+                                width: 24,
+                                height: 24,
+                                colorFilter: ColorFilter.mode(
+                                  theme.primaryPurple,
+                                  BlendMode.srcIn,
+                                ),
+                              ),
+                              disabled: false,
+                              onPressed: () async {
+                                await _handleCopy(_mnemonicWords.join(" "));
+                              },
+                              backgroundColor: theme.cardBackground,
+                              textColor: theme.primaryPurple,
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 16),
                         Padding(
@@ -150,12 +180,28 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
     );
   }
 
+  Future<void> _handleCopy(String text) async {
+    await Clipboard.setData(ClipboardData(text: text));
+    setState(() {
+      _isCopied = true;
+    });
+
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted) {
+        setState(() {
+          _isCopied = false;
+        });
+      }
+    });
+  }
+
   void _regenerateMnemonicWords() async {
     String words = await genBip39Words(count: _count);
 
     setState(() {
       _mnemonicWords = words.split(" ");
       _hasBackupWords = false;
+      _isCopied = false;
     });
   }
 }
