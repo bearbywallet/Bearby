@@ -197,6 +197,7 @@ pub struct TokenTransferParamsInfo {
     pub token: FTokenInfo,
     pub amount: String,
     pub recipient: String,
+    pub icon: String,
 }
 
 pub async fn create_token_transfer(
@@ -219,7 +220,9 @@ pub async fn create_token_transfer(
                     zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(params.account_index),
                 ))?;
         let token: FToken = params.token.try_into()?;
-        let tx = core.build_token_transfer(&token, &sender_account, recipient, amount)?;
+        let mut tx = core.build_token_transfer(&token, &sender_account, recipient, amount)?;
+
+        tx.set_icon(params.icon);
 
         Ok(tx.into())
     })

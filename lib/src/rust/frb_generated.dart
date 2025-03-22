@@ -3651,14 +3651,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TokenTransferParamsInfo dco_decode_token_transfer_params_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 5)
-      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
     return TokenTransferParamsInfo(
       walletIndex: dco_decode_usize(arr[0]),
       accountIndex: dco_decode_usize(arr[1]),
       token: dco_decode_f_token_info(arr[2]),
       amount: dco_decode_String(arr[3]),
       recipient: dco_decode_String(arr[4]),
+      icon: dco_decode_String(arr[5]),
     );
   }
 
@@ -4873,12 +4874,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_token = sse_decode_f_token_info(deserializer);
     var var_amount = sse_decode_String(deserializer);
     var var_recipient = sse_decode_String(deserializer);
+    var var_icon = sse_decode_String(deserializer);
     return TokenTransferParamsInfo(
         walletIndex: var_walletIndex,
         accountIndex: var_accountIndex,
         token: var_token,
         amount: var_amount,
-        recipient: var_recipient);
+        recipient: var_recipient,
+        icon: var_icon);
   }
 
   @protected
@@ -5920,6 +5923,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_f_token_info(self.token, serializer);
     sse_encode_String(self.amount, serializer);
     sse_encode_String(self.recipient, serializer);
+    sse_encode_String(self.icon, serializer);
   }
 
   @protected

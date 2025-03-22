@@ -103,6 +103,7 @@ class TokenTransferParamsInfo {
   final FTokenInfo token;
   final String amount;
   final String recipient;
+  final String icon;
 
   const TokenTransferParamsInfo({
     required this.walletIndex,
@@ -110,6 +111,7 @@ class TokenTransferParamsInfo {
     required this.token,
     required this.amount,
     required this.recipient,
+    required this.icon,
   });
 
   @override
@@ -118,7 +120,8 @@ class TokenTransferParamsInfo {
       accountIndex.hashCode ^
       token.hashCode ^
       amount.hashCode ^
-      recipient.hashCode;
+      recipient.hashCode ^
+      icon.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -129,5 +132,6 @@ class TokenTransferParamsInfo {
           accountIndex == other.accountIndex &&
           token == other.token &&
           amount == other.amount &&
-          recipient == other.recipient;
+          recipient == other.recipient &&
+          icon == other.icon;
 }

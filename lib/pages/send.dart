@@ -8,6 +8,7 @@ import 'package:zilpay/components/number_keyboard.dart';
 import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -230,6 +231,11 @@ class _SendTokenPageState extends State<SendTokenPage> {
       token: token,
       amount: toWei(_amount, token.decimals).toString(),
       recipient: _address ?? "",
+      icon: processTokenLogo(
+        token: token,
+        shortName: appState.chain?.shortName ?? '',
+        theme: appState.currentTheme.value,
+      ),
     );
 
     TransactionRequestInfo tx = await createTokenTransfer(params: params);

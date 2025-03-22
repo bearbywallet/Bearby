@@ -4375,12 +4375,14 @@ impl SseDecode for crate::api::transaction::TokenTransferParamsInfo {
         let mut var_token = <crate::models::ftoken::FTokenInfo>::sse_decode(deserializer);
         let mut var_amount = <String>::sse_decode(deserializer);
         let mut var_recipient = <String>::sse_decode(deserializer);
+        let mut var_icon = <String>::sse_decode(deserializer);
         return crate::api::transaction::TokenTransferParamsInfo {
             wallet_index: var_walletIndex,
             account_index: var_accountIndex,
             token: var_token,
             amount: var_amount,
             recipient: var_recipient,
+            icon: var_icon,
         };
     }
 }
@@ -5477,6 +5479,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::transaction::TokenTransferPar
             self.token.into_into_dart().into_dart(),
             self.amount.into_into_dart().into_dart(),
             self.recipient.into_into_dart().into_dart(),
+            self.icon.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6459,6 +6462,7 @@ impl SseEncode for crate::api::transaction::TokenTransferParamsInfo {
         <crate::models::ftoken::FTokenInfo>::sse_encode(self.token, serializer);
         <String>::sse_encode(self.amount, serializer);
         <String>::sse_encode(self.recipient, serializer);
+        <String>::sse_encode(self.icon, serializer);
     }
 }
 
