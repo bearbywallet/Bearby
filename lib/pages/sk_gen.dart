@@ -91,58 +91,68 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          TileButton(
-                            icon: SvgPicture.asset(
-                              isCopied
-                                  ? "assets/icons/check.svg"
-                                  : "assets/icons/copy.svg",
-                              width: 24,
-                              height: 24,
-                              colorFilter: ColorFilter.mode(
-                                theme.primaryPurple,
-                                BlendMode.srcIn,
-                              ),
-                            ),
-                            disabled: false,
-                            onPressed: () async {
-                              await _handleCopy(_keyPair.sk);
-                            },
-                            backgroundColor: theme.cardBackground,
-                            textColor: theme.primaryPurple,
-                          ),
                           Container(
                             constraints: const BoxConstraints(maxWidth: 480),
                             child: Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
-                                Theme(
-                                  data: Theme.of(context).copyWith(
-                                    splashFactory: NoSplash.splashFactory,
-                                    highlightColor: Colors.transparent,
-                                  ),
-                                  child: CheckboxListTile(
-                                    title: Text(
-                                      l10n.secretKeyGeneratorPageBackupCheckbox,
-                                      style:
-                                          TextStyle(color: theme.textSecondary),
-                                    ),
-                                    value: _hasBackupWords,
-                                    onChanged: (_) {
-                                      if (!_hasBackupWords) {
-                                        showBackupConfirmationModal(
-                                          context: context,
-                                          onConfirmed: (confirmed) {
-                                            setState(() {
-                                              _hasBackupWords = confirmed;
-                                            });
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Theme(
+                                        data: Theme.of(context).copyWith(
+                                          splashFactory: NoSplash.splashFactory,
+                                          highlightColor: Colors.transparent,
+                                        ),
+                                        child: CheckboxListTile(
+                                          title: Text(
+                                            l10n.secretKeyGeneratorPageBackupCheckbox,
+                                            style: TextStyle(
+                                              color: theme.textSecondary,
+                                            ),
+                                          ),
+                                          value: _hasBackupWords,
+                                          onChanged: (_) {
+                                            if (!_hasBackupWords) {
+                                              showBackupConfirmationModal(
+                                                context: context,
+                                                onConfirmed: (confirmed) {
+                                                  setState(() {
+                                                    _hasBackupWords = confirmed;
+                                                  });
+                                                },
+                                              );
+                                            }
                                           },
-                                        );
-                                      }
-                                    },
-                                    controlAffinity:
-                                        ListTileControlAffinity.leading,
-                                    activeColor: theme.primaryPurple,
-                                  ),
+                                          controlAffinity:
+                                              ListTileControlAffinity.leading,
+                                          activeColor: theme.primaryPurple,
+                                        ),
+                                      ),
+                                    ),
+                                    TileButton(
+                                      icon: SvgPicture.asset(
+                                        isCopied
+                                            ? "assets/icons/check.svg"
+                                            : "assets/icons/copy.svg",
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.primaryPurple,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      disabled: false,
+                                      onPressed: () async {
+                                        await _handleCopy(_keyPair.sk);
+                                      },
+                                      backgroundColor: theme.cardBackground,
+                                      textColor: theme.primaryPurple,
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(
+                                  height: 16,
                                 ),
                                 CustomButton(
                                   textColor: theme.buttonText,

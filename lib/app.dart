@@ -87,6 +87,15 @@ class ZilPayApp extends StatelessWidget {
                       TargetPlatform.iOS: CupertinoPageTransitionsBuilder(),
                     },
                   ),
+                  checkboxTheme: CheckboxThemeData(
+                    side: BorderSide(
+                      color: currentTheme.primaryPurple,
+                      width: 1.5,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(3.0),
+                    ),
+                  ),
                   colorScheme: currentTheme.brightness == Brightness.light
                       ? ColorScheme.light(
                           primary: currentTheme.primaryPurple,
