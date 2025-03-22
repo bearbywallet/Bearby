@@ -256,7 +256,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   child: AsyncImage(
                     url: processTokenLogo(
                       token: token,
-                      shortName: appState.chain?.shortName ?? "",
+                      shortName: widget.networkConfig.shortName,
                       theme: theme.value,
                     ),
                     width: 40,

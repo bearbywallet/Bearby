@@ -1483,41 +1483,98 @@ class Web3EIP1193Handler {
         await appState.syncData();
       }
 
-      final providers = appState.state.providers;
-      final chainExists = providers.any((p) => p.chainIds.contains(chainId));
+      NetworkConfigInfo? targetNetwork;
+      final List<NetworkConfigInfo> providers = appState.state.providers;
 
-      if (!chainExists) {
-        _removeActiveRequest(method);
-        return _returnError(
-          message.uuid,
-          Web3EIP1193ErrorCode.chainNotAdded,
-          'The requested chain has not been added. Use wallet_addEthereumChain first.',
-        );
+      for (final provider in providers) {
+        if (provider.chainId == chainId &&
+            !(provider.slip44 == 313 && provider.chainId == BigInt.one)) {
+          targetNetwork = provider;
+          break;
+        }
       }
 
-      showSwitchChainNetworkModal(
-        context: context,
-        selectedChainId: chainId,
-        onNetworkSelected: () {
-          _sendResponse(
-            type: 'ZILPAY_RESPONSE',
-            uuid: message.uuid,
-            result: null,
-          );
+      if (targetNetwork == null) {
+        final String mainnetJsonData =
+            await rootBundle.loadString('assets/chains/mainnet-chains.json');
+        final String testnetJsonData =
+            await rootBundle.loadString('assets/chains/testnet-chains.json');
+        final List<NetworkConfigInfo> mainnetChains =
+            await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
+        final List<NetworkConfigInfo> testnetChains =
+            await getChainsProvidersFromJson(jsonStr: testnetJsonData);
+
+        for (final chain in mainnetChains) {
+          if (chain.chainId == chainId &&
+              !(chain.slip44 == 313 && chain.chainId == BigInt.one)) {
+            targetNetwork = chain;
+            break;
+          }
+        }
+
+        if (targetNetwork == null) {
+          for (final chain in testnetChains) {
+            if (chain.chainId == chainId &&
+                !(chain.slip44 == 313 && chain.chainId == BigInt.one)) {
+              targetNetwork = chain;
+              break;
+            }
+          }
+        }
+
+        if (targetNetwork != null) {
+          await addProvider(providerConfig: targetNetwork);
+          await appState.syncData();
+        } else {
           _removeActiveRequest(method);
-        },
-        onReject: () {
-          _returnError(
+          return _returnError(
             message.uuid,
-            Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected the request',
+            Web3EIP1193ErrorCode.chainNotAdded,
+            'The requested chain has not been added. Use wallet_addEthereumChain first.',
           );
-          _removeActiveRequest(method);
-        },
-      );
+        }
+      }
+
+      final connection =
+          Web3Utils.findConnected(_currentDomain, appState.connections);
+
+      if (connection != null) {
+        await selectAccountsChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          chainHash: targetNetwork.chainHash,
+        );
+        await appState.syncData();
+
+        _sendResponse(
+          type: 'ZILPAY_RESPONSE',
+          uuid: message.uuid,
+          result: null,
+        );
+        _removeActiveRequest(method);
+      } else {
+        showSwitchChainNetworkModal(
+          context: context,
+          selectedChainId: chainId,
+          onNetworkSelected: () {
+            _sendResponse(
+              type: 'ZILPAY_RESPONSE',
+              uuid: message.uuid,
+              result: null,
+            );
+            _removeActiveRequest(method);
+          },
+          onReject: () {
+            _returnError(
+              message.uuid,
+              Web3EIP1193ErrorCode.userRejectedRequest,
+              'User rejected the request',
+            );
+            _removeActiveRequest(method);
+          },
+        );
+      }
     } catch (e) {
       _removeActiveRequest(method);
-      dev.log('Error in wallet_switchEthereumChain: $e', name: 'web3_handler');
       _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.internalError,
