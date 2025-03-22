@@ -360,10 +360,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           (context, index) {
             final token = filteredTokens[index];
             final isLast = index == filteredTokens.length - 1;
-            final tokenAmountValue = BigInt.tryParse(token
-                    .balances[appState.wallet!.selectedAccount]
-                    .toString()) ??
-                BigInt.zero;
+            final tokenAmountValue = token.balances.isNotEmpty &&
+                    token.balances.keys
+                        .contains(appState.wallet!.selectedAccount)
+                ? BigInt.tryParse(token
+                        .balances[appState.wallet!.selectedAccount]
+                        .toString()) ??
+                    BigInt.zero
+                : BigInt.zero;
 
             return TokenCard(
               ftoken: token,

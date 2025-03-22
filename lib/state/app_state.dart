@@ -112,8 +112,6 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return _selectedWallet;
   }
 
-  get appDocument => null;
-
   Future<void> syncData() async {
     _state = await getData();
     await syncBook();

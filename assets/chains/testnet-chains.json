@@ -25,7 +25,7 @@
         "decimals": 12
       }
     ],
-    "chainIds": [2, 32770],
+    "chainIds": [32770, 2],
     "infoURL": "https://www.zilliqa.com/",
     "testnet": true,
     "shortName": "zilliqa",
