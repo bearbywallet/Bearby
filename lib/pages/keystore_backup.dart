@@ -78,20 +78,11 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
-      // Simulate processing with 1-second delay
-      await Future.delayed(const Duration(seconds: 1));
-
       await tryUnlockWithPassword(
         password: _confirmPasswordController.text,
         walletIndex: walletIndex,
         identifiers: identifiers,
       );
-
-      // final keystore = await createKeystoreBackup(
-      //   walletIndex: walletIndex,
-      //   identifiers: identifiers,
-      //   password: _confirmPasswordController.text,
-      // );
 
       final path = await _saveKeystoreToFile("");
 
@@ -156,64 +147,66 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                 child: Column(
                   children: [
                     _buildWarningAlert(theme),
-                    SmartInput(
-                      key: _confirmPasswordInputKey,
-                      controller: _confirmPasswordController,
-                      hint: l10n.keystoreBackupConfirmPasswordHint,
-                      fontSize: 18,
-                      height: 50,
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      focusedBorderColor: theme.primaryPurple,
-                      obscureText: _obscureConfirmPassword,
-                      onSubmitted: (_) => _onCreateBackup(
-                        BigInt.from(state.selectedWallet),
-                      ),
-                      rightIconPath: _obscureConfirmPassword
-                          ? "assets/icons/close_eye.svg"
-                          : "assets/icons/open_eye.svg",
-                      onRightIconTap: () => setState(() =>
-                          _obscureConfirmPassword = !_obscureConfirmPassword),
-                    ),
-                    if (hasError && errorMessage != null)
-                      Container(
-                        margin: const EdgeInsets.only(top: 8),
-                        child: Text(
-                          errorMessage!,
-                          style: TextStyle(
-                            color: theme.danger,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    Container(
-                      constraints: const BoxConstraints(maxWidth: 480),
-                      child: RoundedLoadingButton(
-                        color: theme.primaryPurple,
-                        valueColor: theme.buttonText,
-                        controller: _btnController,
-                        onPressed: () => _onCreateBackup(
+                    if (!isBackupCreated) ...[
+                      SmartInput(
+                        key: _confirmPasswordInputKey,
+                        controller: _confirmPasswordController,
+                        hint: l10n.keystoreBackupConfirmPasswordHint,
+                        fontSize: 18,
+                        height: 50,
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        focusedBorderColor: theme.primaryPurple,
+                        obscureText: _obscureConfirmPassword,
+                        onSubmitted: (_) => _onCreateBackup(
                           BigInt.from(state.selectedWallet),
                         ),
-                        successIcon: SvgPicture.asset(
-                          'assets/icons/ok.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.textPrimary,
-                            BlendMode.srcIn,
+                        rightIconPath: _obscureConfirmPassword
+                            ? "assets/icons/close_eye.svg"
+                            : "assets/icons/open_eye.svg",
+                        onRightIconTap: () => setState(() =>
+                            _obscureConfirmPassword = !_obscureConfirmPassword),
+                      ),
+                      if (hasError && errorMessage != null)
+                        Container(
+                          margin: const EdgeInsets.only(top: 8),
+                          child: Text(
+                            errorMessage!,
+                            style: TextStyle(
+                              color: theme.danger,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
-                        child: Text(
-                          l10n.keystoreBackupCreateButton,
-                          style: TextStyle(
-                            color: theme.buttonText,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
+                      const SizedBox(height: 16),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: RoundedLoadingButton(
+                          color: theme.primaryPurple,
+                          valueColor: theme.buttonText,
+                          controller: _btnController,
+                          onPressed: () => _onCreateBackup(
+                            BigInt.from(state.selectedWallet),
+                          ),
+                          successIcon: SvgPicture.asset(
+                            'assets/icons/ok.svg',
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              theme.textPrimary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                          child: Text(
+                            l10n.keystoreBackupCreateButton,
+                            style: TextStyle(
+                              color: theme.buttonText,
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
                         ),
                       ),
-                    ),
+                    ],
                     if (isBackupCreated) ...[
                       _buildSuccessMessage(theme),
                       SizedBox(height: adaptivePadding),
