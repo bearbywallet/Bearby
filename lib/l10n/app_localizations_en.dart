@@ -1226,6 +1226,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get backupConfirmationContentTitle => 'Backup Confirmation';
 
   @override
+  String get backupConfirmationWarning => 'WARNING: If you lose or forget your seed phrase in the exact order, you will lose your funds permanently. Never share your seed phrase with anyone or they may steal your funds. BIP39 recovery is strict - any mistake in the words during recovery will result in loss of funds.';
+
+  @override
   String get backupConfirmationContentWrittenDown => 'I have written down all';
 
   @override

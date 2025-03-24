@@ -102,6 +102,25 @@ class _BackupConfirmationContentState
               ),
             ),
           ),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.danger.withOpacity(0.1),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: theme.danger, width: 1),
+              ),
+              child: Text(
+                l10n.backupConfirmationWarning,
+                style: TextStyle(
+                  color: theme.danger,
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ),
           _ConfirmationItem(
             text: l10n.backupConfirmationContentWrittenDown,
             isConfirmed: _confirmations['writtenDown']!,

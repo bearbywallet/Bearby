@@ -472,6 +472,7 @@
   "secretRecoveryModalShowKeysButton": "Экспорт",
 
   "backupConfirmationContentTitle": "Подтверждение резервного копирования",
+  "backupConfirmationWarning": "ВНИМАНИЕ: Если вы потеряете или забудете вашу seed-фразу в точном порядке, вы навсегда потеряете ваши средства. Никогда не делитесь вашей seed-фразой с кем-либо, иначе ваши средства могут быть украдены. Восстановление BIP39 очень строгое - любая ошибка в словах при восстановлении приведет к потере средств.",
   "backupConfirmationContentWrittenDown": "Я записал всё",
   "backupConfirmationContentSafelyStored": "Я надежно сохранил резервную копию",
   "backupConfirmationContentWontLose": "Я уверен, что не потеряю резервную копию",

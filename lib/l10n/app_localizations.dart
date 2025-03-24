@@ -2491,6 +2491,12 @@ abstract class AppLocalizations {
   /// **'Backup Confirmation'**
   String get backupConfirmationContentTitle;
 
+  /// Warning message about the importance of keeping seed phrases safe and in correct order
+  ///
+  /// In en, this message translates to:
+  /// **'WARNING: If you lose or forget your seed phrase in the exact order, you will lose your funds permanently. Never share your seed phrase with anyone or they may steal your funds. BIP39 recovery is strict - any mistake in the words during recovery will result in loss of funds.'**
+  String get backupConfirmationWarning;
+
   /// Confirmation item indicating the user has written down the backup in the BackupConfirmationContent component
   ///
   /// In en, this message translates to:

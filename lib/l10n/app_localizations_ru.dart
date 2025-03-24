@@ -1226,6 +1226,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get backupConfirmationContentTitle => 'Подтверждение резервного копирования';
 
   @override
+  String get backupConfirmationWarning => 'ВНИМАНИЕ: Если вы потеряете или забудете вашу seed-фразу в точном порядке, вы навсегда потеряете ваши средства. Никогда не делитесь вашей seed-фразой с кем-либо, иначе ваши средства могут быть украдены. Восстановление BIP39 очень строгое - любая ошибка в словах при восстановлении приведет к потере средств.';
+
+  @override
   String get backupConfirmationContentWrittenDown => 'Я записал всё';
 
   @override

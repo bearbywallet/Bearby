@@ -476,6 +476,7 @@
   "secretRecoveryModalShowKeysButton": "エクスポート",
 
   "backupConfirmationContentTitle": "バックアップ確認",
+  "backupConfirmationWarning": "警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。",
   "backupConfirmationContentWrittenDown": "すべてを書き留めました",
   "backupConfirmationContentSafelyStored": "バックアップを安全に保管しました",
   "backupConfirmationContentWontLose": "バックアップを失わないよう注意します",

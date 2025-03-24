@@ -1226,6 +1226,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get backupConfirmationContentTitle => 'バックアップ確認';
 
   @override
+  String get backupConfirmationWarning => '警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。';
+
+  @override
   String get backupConfirmationContentWrittenDown => 'すべてを書き留めました';
 
   @override
