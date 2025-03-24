@@ -2485,6 +2485,24 @@ abstract class AppLocalizations {
   /// **'Export'**
   String get secretRecoveryModalShowKeysButton;
 
+  /// Title text for the keystore backup option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Keystore Backup'**
+  String get secretRecoveryModalKeystoreBackupTitle;
+
+  /// Description text for the keystore backup option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Save your private keys in a password-protected encrypted keystore file. This provides an additional layer of security for your wallet.'**
+  String get secretRecoveryModalKeystoreBackupDescription;
+
+  /// Button text for the keystore backup option in the SecretRecoveryModal component
+  ///
+  /// In en, this message translates to:
+  /// **'Create Keystore Backup'**
+  String get secretRecoveryModalKeystoreBackupButton;
+
   /// Title for the backup confirmation modal in the BackupConfirmationContent component
   ///
   /// In en, this message translates to:
@@ -2802,6 +2820,84 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Close'**
   String get browserActionMenuClose;
+
+  /// Title for the Keystore Backup screen
+  ///
+  /// In en, this message translates to:
+  /// **'Keystore Backup'**
+  String get keystoreBackupTitle;
+
+  /// Title for the warning alert on the Keystore Backup screen
+  ///
+  /// In en, this message translates to:
+  /// **'Secure Your Keystore File'**
+  String get keystoreBackupWarningTitle;
+
+  /// Warning message explaining the importance of securing the keystore file
+  ///
+  /// In en, this message translates to:
+  /// **'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.'**
+  String get keystoreBackupWarningMessage;
+
+  /// Placeholder text for the password creation field
+  ///
+  /// In en, this message translates to:
+  /// **'Create Password'**
+  String get keystoreBackupPasswordHint;
+
+  /// Placeholder text for the password confirmation field
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get keystoreBackupConfirmPasswordHint;
+
+  /// Text for the button to create a keystore backup
+  ///
+  /// In en, this message translates to:
+  /// **'Create Backup'**
+  String get keystoreBackupCreateButton;
+
+  /// Error message shown when the entered passwords don't match
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get keystoreBackupPasswordsDoNotMatch;
+
+  /// Error message shown when the password is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get keystoreBackupPasswordTooShort;
+
+  /// Prefix for error messages when backup creation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Error creating backup:'**
+  String get keystoreBackupError;
+
+  /// Text for the button to share the created keystore file
+  ///
+  /// In en, this message translates to:
+  /// **'Share Keystore File'**
+  String get keystoreBackupShareButton;
+
+  /// Text for the button to dismiss the screen after backup is complete
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
+  String get keystoreBackupDoneButton;
+
+  /// Title for the success message when backup is created
+  ///
+  /// In en, this message translates to:
+  /// **'Backup Created Successfully'**
+  String get keystoreBackupSuccessTitle;
+
+  /// Message explaining that backup creation was successful and reminding about security
+  ///
+  /// In en, this message translates to:
+  /// **'Your keystore file has been created. Remember to keep both the file and your password safe.'**
+  String get keystoreBackupSuccessMessage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

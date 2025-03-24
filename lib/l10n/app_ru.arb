@@ -470,6 +470,9 @@
   "secretRecoveryModalShowKeysTitle": "Показать приватные ключи",
   "secretRecoveryModalShowKeysDescription": "Внимание: Никогда не раскрывайте этот ключ. Любой, кто имеет ваши приватные ключи, может украсть любые активы, хранящиеся на вашем аккаунте.",
   "secretRecoveryModalShowKeysButton": "Экспорт",
+  "secretRecoveryModalKeystoreBackupTitle": "Резервное копирование Keystore",
+  "secretRecoveryModalKeystoreBackupDescription": "Сохраните ваши приватные ключи в зашифрованном файле keystore, защищенном паролем. Это обеспечивает дополнительный уровень безопасности для вашего кошелька.",
+  "secretRecoveryModalKeystoreBackupButton": "Создать Keystore",
 
   "backupConfirmationContentTitle": "Подтверждение резервного копирования",
   "backupConfirmationWarning": "ВНИМАНИЕ: Если вы потеряете или забудете вашу seed-фразу в точном порядке, вы навсегда потеряете ваши средства. Никогда не делитесь вашей seed-фразой с кем-либо, иначе ваши средства могут быть украдены. Восстановление BIP39 очень строгое - любая ошибка в словах при восстановлении приведет к потере средств.",
@@ -530,5 +533,19 @@
 
   "browserActionMenuShare": "Поделиться",
   "browserActionMenuCopyLink": "Копировать ссылку",
-  "browserActionMenuClose": "Закрыть"
+  "browserActionMenuClose": "Закрыть",
+
+  "keystoreBackupTitle": "Резервное копирование Keystore",
+  "keystoreBackupWarningTitle": "Защитите Ваш Keystore Файл",
+  "keystoreBackupWarningMessage": "Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.",
+  "keystoreBackupPasswordHint": "Создать Пароль",
+  "keystoreBackupConfirmPasswordHint": "Подтвердить Пароль",
+  "keystoreBackupCreateButton": "Создать Резервную Копию",
+  "keystoreBackupPasswordsDoNotMatch": "Пароли не совпадают",
+  "keystoreBackupPasswordTooShort": "Пароль должен содержать не менее 8 символов",
+  "keystoreBackupError": "Ошибка создания резервной копии:",
+  "keystoreBackupShareButton": "Поделиться Файлом Keystore",
+  "keystoreBackupDoneButton": "Готово",
+  "keystoreBackupSuccessTitle": "Резервная Копия Успешно Создана",
+  "keystoreBackupSuccessMessage": "Ваш файл keystore был создан. Обязательно храните в безопасности как файл, так и ваш пароль."
 }

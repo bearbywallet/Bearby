@@ -474,6 +474,9 @@
   "secretRecoveryModalShowKeysTitle": "プライベートキーを表示",
   "secretRecoveryModalShowKeysDescription": "警告：このキーを誰にも公開しないでください。プライベートキーを持つ人は、あなたのアカウントにある資産を盗むことができます。",
   "secretRecoveryModalShowKeysButton": "エクスポート",
+  "secretRecoveryModalKeystoreBackupTitle": "キーストアバックアップ",
+  "secretRecoveryModalKeystoreBackupDescription": "パスワードで保護された暗号化されたキーストアファイルに秘密鍵を保存します。これにより、ウォレットにさらなるセキュリティ層が提供されます。",
+  "secretRecoveryModalKeystoreBackupButton": "キーストアバックアップを作成",
 
   "backupConfirmationContentTitle": "バックアップ確認",
   "backupConfirmationWarning": "警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。",
@@ -534,5 +537,19 @@
 
   "browserActionMenuShare": "共有",
   "browserActionMenuCopyLink": "リンクをコピー",
-  "browserActionMenuClose": "閉じる"
+  "browserActionMenuClose": "閉じる",
+
+  "keystoreBackupTitle": "キーストアバックアップ",
+  "keystoreBackupWarningTitle": "キーストアファイルを安全に保管",
+  "keystoreBackupWarningMessage": "キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。",
+  "keystoreBackupPasswordHint": "パスワードを作成",
+  "keystoreBackupConfirmPasswordHint": "パスワードを確認",
+  "keystoreBackupCreateButton": "バックアップを作成",
+  "keystoreBackupPasswordsDoNotMatch": "パスワードが一致しません",
+  "keystoreBackupPasswordTooShort": "パスワードは8文字以上である必要があります",
+  "keystoreBackupError": "バックアップ作成エラー：",
+  "keystoreBackupShareButton": "キーストアファイルを共有",
+  "keystoreBackupDoneButton": "完了",
+  "keystoreBackupSuccessTitle": "バックアップの作成に成功",
+  "keystoreBackupSuccessMessage": "キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。"
 }

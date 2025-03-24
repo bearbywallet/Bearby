@@ -1223,6 +1223,15 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretRecoveryModalShowKeysButton => 'エクスポート';
 
   @override
+  String get secretRecoveryModalKeystoreBackupTitle => 'キーストアバックアップ';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupDescription => 'パスワードで保護された暗号化されたキーストアファイルに秘密鍵を保存します。これにより、ウォレットにさらなるセキュリティ層が提供されます。';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupButton => 'キーストアバックアップを作成';
+
+  @override
   String get backupConfirmationContentTitle => 'バックアップ確認';
 
   @override
@@ -1380,4 +1389,43 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get browserActionMenuClose => '閉じる';
+
+  @override
+  String get keystoreBackupTitle => 'キーストアバックアップ';
+
+  @override
+  String get keystoreBackupWarningTitle => 'キーストアファイルを安全に保管';
+
+  @override
+  String get keystoreBackupWarningMessage => 'キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。';
+
+  @override
+  String get keystoreBackupPasswordHint => 'パスワードを作成';
+
+  @override
+  String get keystoreBackupConfirmPasswordHint => 'パスワードを確認';
+
+  @override
+  String get keystoreBackupCreateButton => 'バックアップを作成';
+
+  @override
+  String get keystoreBackupPasswordsDoNotMatch => 'パスワードが一致しません';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'パスワードは8文字以上である必要があります';
+
+  @override
+  String get keystoreBackupError => 'バックアップ作成エラー：';
+
+  @override
+  String get keystoreBackupShareButton => 'キーストアファイルを共有';
+
+  @override
+  String get keystoreBackupDoneButton => '完了';
+
+  @override
+  String get keystoreBackupSuccessTitle => 'バックアップの作成に成功';
+
+  @override
+  String get keystoreBackupSuccessMessage => 'キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。';
 }

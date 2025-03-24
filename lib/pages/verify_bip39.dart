@@ -77,21 +77,21 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
                   title:
                       AppLocalizations.of(context)!.secretPhraseVerifyPageTitle,
                   onBackPressed: () => Navigator.pop(context),
-                  actionWidget: TextButton(
-                    onPressed: () {
-                      Navigator.of(context).pushNamed('/net_setup',
-                          arguments: {'bip39': _bip39List});
-                    },
-                    child: Text(
-                      AppLocalizations.of(context)!
-                          .secretPhraseVerifyPageSkipButton,
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
+                  // actionWidget: TextButton(
+                  //   onPressed: () {
+                  //     Navigator.of(context).pushNamed('/net_setup',
+                  //         arguments: {'bip39': _bip39List});
+                  //   },
+                  //   child: Text(
+                  //     AppLocalizations.of(context)!
+                  //         .secretPhraseVerifyPageSkipButton,
+                  //     style: TextStyle(
+                  //       color: theme.textPrimary,
+                  //       fontSize: 16,
+                  //       fontWeight: FontWeight.w500,
+                  //     ),
+                  //   ),
+                  // ),
                 ),
                 Expanded(
                   child: _bip39List == null

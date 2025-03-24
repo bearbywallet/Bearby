@@ -107,7 +107,7 @@ class _BackupConfirmationContentState
             child: Container(
               padding: const EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: theme.danger.withOpacity(0.1),
+                color: theme.danger.withValues(alpha: 0.1),
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(color: theme.danger, width: 1),
               ),

@@ -1223,6 +1223,15 @@ class AppLocalizationsRu extends AppLocalizations {
   String get secretRecoveryModalShowKeysButton => 'Экспорт';
 
   @override
+  String get secretRecoveryModalKeystoreBackupTitle => 'Резервное копирование Keystore';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupDescription => 'Сохраните ваши приватные ключи в зашифрованном файле keystore, защищенном паролем. Это обеспечивает дополнительный уровень безопасности для вашего кошелька.';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupButton => 'Создать Keystore';
+
+  @override
   String get backupConfirmationContentTitle => 'Подтверждение резервного копирования';
 
   @override
@@ -1380,4 +1389,43 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get browserActionMenuClose => 'Закрыть';
+
+  @override
+  String get keystoreBackupTitle => 'Резервное копирование Keystore';
+
+  @override
+  String get keystoreBackupWarningTitle => 'Защитите Ваш Keystore Файл';
+
+  @override
+  String get keystoreBackupWarningMessage => 'Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.';
+
+  @override
+  String get keystoreBackupPasswordHint => 'Создать Пароль';
+
+  @override
+  String get keystoreBackupConfirmPasswordHint => 'Подтвердить Пароль';
+
+  @override
+  String get keystoreBackupCreateButton => 'Создать Резервную Копию';
+
+  @override
+  String get keystoreBackupPasswordsDoNotMatch => 'Пароли не совпадают';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'Пароль должен содержать не менее 8 символов';
+
+  @override
+  String get keystoreBackupError => 'Ошибка создания резервной копии:';
+
+  @override
+  String get keystoreBackupShareButton => 'Поделиться Файлом Keystore';
+
+  @override
+  String get keystoreBackupDoneButton => 'Готово';
+
+  @override
+  String get keystoreBackupSuccessTitle => 'Резервная Копия Успешно Создана';
+
+  @override
+  String get keystoreBackupSuccessMessage => 'Ваш файл keystore был создан. Обязательно храните в безопасности как файл, так и ваш пароль.';
 }

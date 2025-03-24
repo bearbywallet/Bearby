@@ -1736,6 +1736,18 @@
   "@secretRecoveryModalShowKeysButton": {
     "description": "Button text for exporting private keys in the SecretRecoveryModal component"
   },
+  "secretRecoveryModalKeystoreBackupTitle": "Keystore Backup",
+  "@secretRecoveryModalKeystoreBackupTitle": {
+    "description": "Title text for the keystore backup option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalKeystoreBackupDescription": "Save your private keys in a password-protected encrypted keystore file. This provides an additional layer of security for your wallet.",
+  "@secretRecoveryModalKeystoreBackupDescription": {
+    "description": "Description text for the keystore backup option in the SecretRecoveryModal component"
+  },
+  "secretRecoveryModalKeystoreBackupButton": "Create Keystore Backup",
+  "@secretRecoveryModalKeystoreBackupButton": {
+    "description": "Button text for the keystore backup option in the SecretRecoveryModal component"
+  },
   "backupConfirmationContentTitle": "Backup Confirmation",
   "@backupConfirmationContentTitle": {
     "description": "Title for the backup confirmation modal in the BackupConfirmationContent component"
@@ -1948,5 +1960,58 @@
   "browserActionMenuClose": "Close",
   "@browserActionMenuClose": {
     "description": "Menu item text for closing the current page or tab"
+  },
+
+  "keystoreBackupTitle": "Keystore Backup",
+  "@keystoreBackupTitle": {
+    "description": "Title for the Keystore Backup screen"
+  },
+  "keystoreBackupWarningTitle": "Secure Your Keystore File",
+  "@keystoreBackupWarningTitle": {
+    "description": "Title for the warning alert on the Keystore Backup screen"
+  },
+  "keystoreBackupWarningMessage": "The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.",
+  "@keystoreBackupWarningMessage": {
+    "description": "Warning message explaining the importance of securing the keystore file"
+  },
+  "keystoreBackupPasswordHint": "Create Password",
+  "@keystoreBackupPasswordHint": {
+    "description": "Placeholder text for the password creation field"
+  },
+  "keystoreBackupConfirmPasswordHint": "Confirm Password",
+  "@keystoreBackupConfirmPasswordHint": {
+    "description": "Placeholder text for the password confirmation field"
+  },
+  "keystoreBackupCreateButton": "Create Backup",
+  "@keystoreBackupCreateButton": {
+    "description": "Text for the button to create a keystore backup"
+  },
+  "keystoreBackupPasswordsDoNotMatch": "Passwords do not match",
+  "@keystoreBackupPasswordsDoNotMatch": {
+    "description": "Error message shown when the entered passwords don't match"
+  },
+  "keystoreBackupPasswordTooShort": "Password must be at least 8 characters",
+  "@keystoreBackupPasswordTooShort": {
+    "description": "Error message shown when the password is too short"
+  },
+  "keystoreBackupError": "Error creating backup:",
+  "@keystoreBackupError": {
+    "description": "Prefix for error messages when backup creation fails"
+  },
+  "keystoreBackupShareButton": "Share Keystore File",
+  "@keystoreBackupShareButton": {
+    "description": "Text for the button to share the created keystore file"
+  },
+  "keystoreBackupDoneButton": "Done",
+  "@keystoreBackupDoneButton": {
+    "description": "Text for the button to dismiss the screen after backup is complete"
+  },
+  "keystoreBackupSuccessTitle": "Backup Created Successfully",
+  "@keystoreBackupSuccessTitle": {
+    "description": "Title for the success message when backup is created"
+  },
+  "keystoreBackupSuccessMessage": "Your keystore file has been created. Remember to keep both the file and your password safe.",
+  "@keystoreBackupSuccessMessage": {
+    "description": "Message explaining that backup creation was successful and reminding about security"
   }
 }

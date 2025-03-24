@@ -7,6 +7,7 @@ import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/browser_settings.dart';
 import 'package:zilpay/pages/currency_conversion.dart';
+import 'package:zilpay/pages/keystore_backup.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/locale.dart';
 import 'package:zilpay/pages/network.dart';
@@ -96,6 +97,7 @@ class AppRouter {
       '/browser_settings',
       '/restore_sk',
       '/about',
+      '/keystore_backup',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -251,6 +253,8 @@ class AppRouter {
         return wrapWithProviders(const SecretPhraseVerifyPage());
       case '/browser_settings':
         return wrapWithProviders(const BrowserSettingsPage());
+      case '/keystore_backup':
+        return wrapWithProviders(const KeystoreBackup());
       case '/restore_options':
         return wrapWithProviders(const RestoreWalletOptionsPage());
       case '/gen_options':

@@ -107,6 +107,17 @@ class _SecretRecoveryModal extends StatelessWidget {
                     .secretRecoveryModalShowKeysButton,
                 onPressed: () => _onShowPrivateKeys(context),
               ),
+              const SizedBox(height: 24),
+              _buildOption(
+                context: context,
+                title: AppLocalizations.of(context)!
+                    .secretRecoveryModalKeystoreBackupTitle,
+                description: AppLocalizations.of(context)!
+                    .secretRecoveryModalKeystoreBackupDescription,
+                buttonText: AppLocalizations.of(context)!
+                    .secretRecoveryModalKeystoreBackupButton,
+                onPressed: () => _onCreateKeystoreBackup(context),
+              ),
               const SizedBox(height: 16),
             ],
           ],
@@ -162,5 +173,9 @@ class _SecretRecoveryModal extends StatelessWidget {
 
   void _onShowPrivateKeys(BuildContext context) {
     Navigator.of(context).pushNamed('/reveal_sk');
+  }
+
+  void _onCreateKeystoreBackup(BuildContext context) {
+    Navigator.of(context).pushNamed('/keystore_backup');
   }
 }

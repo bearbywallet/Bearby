@@ -1223,6 +1223,15 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretRecoveryModalShowKeysButton => 'Export';
 
   @override
+  String get secretRecoveryModalKeystoreBackupTitle => 'Keystore Backup';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupDescription => 'Save your private keys in a password-protected encrypted keystore file. This provides an additional layer of security for your wallet.';
+
+  @override
+  String get secretRecoveryModalKeystoreBackupButton => 'Create Keystore Backup';
+
+  @override
   String get backupConfirmationContentTitle => 'Backup Confirmation';
 
   @override
@@ -1380,4 +1389,43 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get browserActionMenuClose => 'Close';
+
+  @override
+  String get keystoreBackupTitle => 'Keystore Backup';
+
+  @override
+  String get keystoreBackupWarningTitle => 'Secure Your Keystore File';
+
+  @override
+  String get keystoreBackupWarningMessage => 'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.';
+
+  @override
+  String get keystoreBackupPasswordHint => 'Create Password';
+
+  @override
+  String get keystoreBackupConfirmPasswordHint => 'Confirm Password';
+
+  @override
+  String get keystoreBackupCreateButton => 'Create Backup';
+
+  @override
+  String get keystoreBackupPasswordsDoNotMatch => 'Passwords do not match';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'Password must be at least 8 characters';
+
+  @override
+  String get keystoreBackupError => 'Error creating backup:';
+
+  @override
+  String get keystoreBackupShareButton => 'Share Keystore File';
+
+  @override
+  String get keystoreBackupDoneButton => 'Done';
+
+  @override
+  String get keystoreBackupSuccessTitle => 'Backup Created Successfully';
+
+  @override
+  String get keystoreBackupSuccessMessage => 'Your keystore file has been created. Remember to keep both the file and your password safe.';
 }
