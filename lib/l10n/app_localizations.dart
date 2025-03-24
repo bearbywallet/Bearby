@@ -2839,12 +2839,6 @@ abstract class AppLocalizations {
   /// **'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.'**
   String get keystoreBackupWarningMessage;
 
-  /// Placeholder text for the password creation field
-  ///
-  /// In en, this message translates to:
-  /// **'Create Password'**
-  String get keystoreBackupPasswordHint;
-
   /// Placeholder text for the password confirmation field
   ///
   /// In en, this message translates to:

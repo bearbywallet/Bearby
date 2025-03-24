@@ -1400,9 +1400,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get keystoreBackupWarningMessage => 'Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.';
 
   @override
-  String get keystoreBackupPasswordHint => 'Создать Пароль';
-
-  @override
   String get keystoreBackupConfirmPasswordHint => 'Подтвердить Пароль';
 
   @override

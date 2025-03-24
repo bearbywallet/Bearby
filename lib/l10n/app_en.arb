@@ -1974,10 +1974,6 @@
   "@keystoreBackupWarningMessage": {
     "description": "Warning message explaining the importance of securing the keystore file"
   },
-  "keystoreBackupPasswordHint": "Create Password",
-  "@keystoreBackupPasswordHint": {
-    "description": "Placeholder text for the password creation field"
-  },
   "keystoreBackupConfirmPasswordHint": "Confirm Password",
   "@keystoreBackupConfirmPasswordHint": {
     "description": "Placeholder text for the password confirmation field"

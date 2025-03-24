@@ -1400,9 +1400,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get keystoreBackupWarningMessage => 'キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。';
 
   @override
-  String get keystoreBackupPasswordHint => 'パスワードを作成';
-
-  @override
   String get keystoreBackupConfirmPasswordHint => 'パスワードを確認';
 
   @override

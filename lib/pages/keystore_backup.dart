@@ -27,14 +27,11 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
   bool isProcessing = false;
   bool hasError = false;
   String? errorMessage;
-  bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
   bool isBackupCreated = false;
   String? backupFilePath;
 
-  final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
-  final _passwordInputKey = GlobalKey<SmartInputState>();
   final _confirmPasswordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
@@ -46,7 +43,6 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
 
   @override
   void dispose() {
-    _passwordController.dispose();
     _confirmPasswordController.dispose();
     ScreenProtector.preventScreenshotOff();
     ScreenProtector.protectDataLeakageOff();
@@ -63,15 +59,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
   void _onCreateBackup(BigInt walletIndex) async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (_passwordController.text != _confirmPasswordController.text) {
-      setState(() {
-        hasError = true;
-        errorMessage = l10n.keystoreBackupPasswordsDoNotMatch;
-      });
-      return;
-    }
-
-    if (_passwordController.text.length < 8) {
+    if (_confirmPasswordController.text.isEmpty) {
       setState(() {
         hasError = true;
         errorMessage = l10n.keystoreBackupPasswordTooShort;
@@ -90,8 +78,11 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
+      // Simulate processing with 1-second delay
+      await Future.delayed(const Duration(seconds: 1));
+
       await tryUnlockWithPassword(
-        password: _passwordController.text,
+        password: _confirmPasswordController.text,
         walletIndex: walletIndex,
         identifiers: identifiers,
       );
@@ -99,16 +90,16 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       // final keystore = await createKeystoreBackup(
       //   walletIndex: walletIndex,
       //   identifiers: identifiers,
-      //   password: _passwordController.text,
+      //   password: _confirmPasswordController.text,
       // );
 
-      // final path = await _saveKeystoreToFile(keystore);
+      final path = await _saveKeystoreToFile("");
 
-      // setState(() {
-      //   isBackupCreated = true;
-      //   backupFilePath = path;
-      //   isProcessing = false;
-      // });
+      setState(() {
+        isBackupCreated = true;
+        backupFilePath = path;
+        isProcessing = false;
+      });
 
       _btnController.success();
     } catch (e) {
@@ -165,83 +156,64 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                 child: Column(
                   children: [
                     _buildWarningAlert(theme),
-                    if (!isBackupCreated) ...[
-                      SmartInput(
-                        key: _passwordInputKey,
-                        controller: _passwordController,
-                        hint: l10n.keystoreBackupPasswordHint,
-                        fontSize: 18,
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        focusedBorderColor: theme.primaryPurple,
-                        obscureText: _obscurePassword,
-                        onSubmitted: (_) {},
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
-                        onRightIconTap: () => setState(
-                            () => _obscurePassword = !_obscurePassword),
+                    SmartInput(
+                      key: _confirmPasswordInputKey,
+                      controller: _confirmPasswordController,
+                      hint: l10n.keystoreBackupConfirmPasswordHint,
+                      fontSize: 18,
+                      height: 50,
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      focusedBorderColor: theme.primaryPurple,
+                      obscureText: _obscureConfirmPassword,
+                      onSubmitted: (_) => _onCreateBackup(
+                        BigInt.from(state.selectedWallet),
                       ),
-                      const SizedBox(height: 16),
-                      SmartInput(
-                        key: _confirmPasswordInputKey,
-                        controller: _confirmPasswordController,
-                        hint: l10n.keystoreBackupConfirmPasswordHint,
-                        fontSize: 18,
-                        height: 50,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        focusedBorderColor: theme.primaryPurple,
-                        obscureText: _obscureConfirmPassword,
-                        onSubmitted: (_) => _onCreateBackup(
+                      rightIconPath: _obscureConfirmPassword
+                          ? "assets/icons/close_eye.svg"
+                          : "assets/icons/open_eye.svg",
+                      onRightIconTap: () => setState(() =>
+                          _obscureConfirmPassword = !_obscureConfirmPassword),
+                    ),
+                    if (hasError && errorMessage != null)
+                      Container(
+                        margin: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          errorMessage!,
+                          style: TextStyle(
+                            color: theme.danger,
+                            fontSize: 14,
+                          ),
+                        ),
+                      ),
+                    const SizedBox(height: 16),
+                    Container(
+                      constraints: const BoxConstraints(maxWidth: 480),
+                      child: RoundedLoadingButton(
+                        color: theme.primaryPurple,
+                        valueColor: theme.buttonText,
+                        controller: _btnController,
+                        onPressed: () => _onCreateBackup(
                           BigInt.from(state.selectedWallet),
                         ),
-                        rightIconPath: _obscureConfirmPassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
-                        onRightIconTap: () => setState(() =>
-                            _obscureConfirmPassword = !_obscureConfirmPassword),
-                      ),
-                      if (hasError && errorMessage != null)
-                        Container(
-                          margin: const EdgeInsets.only(top: 8),
-                          child: Text(
-                            errorMessage!,
-                            style: TextStyle(
-                              color: theme.danger,
-                              fontSize: 14,
-                            ),
+                        successIcon: SvgPicture.asset(
+                          'assets/icons/ok.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.textPrimary,
+                            BlendMode.srcIn,
                           ),
                         ),
-                      const SizedBox(height: 16),
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: RoundedLoadingButton(
-                          color: theme.primaryPurple,
-                          valueColor: theme.buttonText,
-                          controller: _btnController,
-                          onPressed: () => _onCreateBackup(
-                            BigInt.from(state.selectedWallet),
-                          ),
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
-                          child: Text(
-                            l10n.keystoreBackupCreateButton,
-                            style: TextStyle(
-                              color: theme.buttonText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
+                        child: Text(
+                          l10n.keystoreBackupCreateButton,
+                          style: TextStyle(
+                            color: theme.buttonText,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
                           ),
                         ),
                       ),
-                    ],
+                    ),
                     if (isBackupCreated) ...[
                       _buildSuccessMessage(theme),
                       SizedBox(height: adaptivePadding),
@@ -259,7 +231,6 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                       SizedBox(height: adaptivePadding),
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
-                        padding: EdgeInsets.only(bottom: adaptivePadding),
                         child: CustomButton(
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
@@ -295,10 +266,14 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: theme.warning,
-                size: 24,
+              SvgPicture.asset(
+                "assets/icons/warning.svg",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.warning,
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 8),
               Text(
@@ -339,12 +314,6 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.check_circle_outline,
-                color: theme.success,
-                size: 24,
-              ),
-              const SizedBox(width: 8),
               Text(
                 l10n.keystoreBackupSuccessTitle,
                 style: TextStyle(
@@ -367,13 +336,4 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       ),
     );
   }
-}
-
-Future<String> createKeystoreBackup({
-  required BigInt walletIndex,
-  required Map<String, String> identifiers,
-  required String password,
-}) async {
-  await Future.delayed(const Duration(milliseconds: 500));
-  return '{"version":3,"id":"keystore-id","address":"wallet-address","crypto":{"cipher":"aes-128-ctr","ciphertext":"encrypted-data","cipherparams":{"iv":"iv-param"},"kdf":"pbkdf2","kdfparams":{"dklen":32,"c":262144,"prf":"hmac-sha256","salt":"salt-param"},"mac":"mac-value"}}';
 }

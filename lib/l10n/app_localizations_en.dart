@@ -1400,9 +1400,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupWarningMessage => 'The keystore file contains your encrypted private keys. Keep this file in a secure location and never share it with anyone. You will need the password you create to decrypt this file.';
 
   @override
-  String get keystoreBackupPasswordHint => 'Create Password';
-
-  @override
   String get keystoreBackupConfirmPasswordHint => 'Confirm Password';
 
   @override

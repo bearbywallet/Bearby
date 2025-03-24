@@ -538,7 +538,6 @@
   "keystoreBackupTitle": "Резервное копирование Keystore",
   "keystoreBackupWarningTitle": "Защитите Ваш Keystore Файл",
   "keystoreBackupWarningMessage": "Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.",
-  "keystoreBackupPasswordHint": "Создать Пароль",
   "keystoreBackupConfirmPasswordHint": "Подтвердить Пароль",
   "keystoreBackupCreateButton": "Создать Резервную Копию",
   "keystoreBackupPasswordsDoNotMatch": "Пароли не совпадают",
