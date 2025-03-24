@@ -96,8 +96,6 @@ class _AddressSelectModalContentState
                 hint: l10n.addressSelectModalContentSearchHint,
                 leftIconPath: 'assets/icons/qrcode.svg',
                 onChanged: (value) async {
-                  Navigator.pop(context);
-
                   try {
                     bool isAddress = await isCryptoAddress(addr: value);
                     if (isAddress && mounted) {
