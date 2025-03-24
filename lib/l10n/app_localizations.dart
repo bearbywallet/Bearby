@@ -1219,6 +1219,18 @@ abstract class AppLocalizations {
   /// **'Restore'**
   String get restoreSecretPhrasePageRestoreButton;
 
+  /// Text displayed when BIP39 checksum validation fails
+  ///
+  /// In en, this message translates to:
+  /// **'Checksum validation failed'**
+  String get checksumValidationFailed;
+
+  /// Text for the checkbox to proceed despite invalid checksum
+  ///
+  /// In en, this message translates to:
+  /// **'Continue despite checksum error?'**
+  String get proceedDespiteInvalidChecksum;
+
   /// Title displayed in the app bar of the SettingsPage component
   ///
   /// In en, this message translates to:

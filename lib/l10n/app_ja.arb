@@ -215,6 +215,8 @@
 
   "restoreSecretPhrasePageTitle": "ウォレットを復元",
   "restoreSecretPhrasePageRestoreButton": "復元",
+  "checksumValidationFailed": "チェックサム検証に失敗しました",
+  "proceedDespiteInvalidChecksum": "チェックサムエラーがありますが続行しますか？",
 
   "settingsPageTitle": "設定",
   "settingsPageZilliqaLegacy": "Zilliqaレガシー",

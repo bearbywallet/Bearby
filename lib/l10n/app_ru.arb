@@ -215,6 +215,8 @@
 
   "restoreSecretPhrasePageTitle": "Восстановить кошелек",
   "restoreSecretPhrasePageRestoreButton": "Восстановить",
+  "checksumValidationFailed": "Проверка контрольной суммы не пройдена",
+  "proceedDespiteInvalidChecksum": "Продолжить, несмотря на ошибку контрольной суммы?",
 
   "settingsPageTitle": "Настройки",
   "settingsPageZilliqaLegacy": "Zilliqa Legacy",

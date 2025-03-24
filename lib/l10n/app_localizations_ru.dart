@@ -588,6 +588,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreSecretPhrasePageRestoreButton => 'Восстановить';
 
   @override
+  String get checksumValidationFailed => 'Проверка контрольной суммы не пройдена';
+
+  @override
+  String get proceedDespiteInvalidChecksum => 'Продолжить, несмотря на ошибку контрольной суммы?';
+
+  @override
   String get settingsPageTitle => 'Настройки';
 
   @override

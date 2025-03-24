@@ -7,6 +7,7 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -21,9 +22,12 @@ class RestoreSecretPhrasePage extends StatefulWidget {
 class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
   late List<String> _words;
   List<int> _wordsErrorIndexes = [];
-  bool _isFormValid = false;
   int _count = 12;
   final List<int> _allowedCounts = const [12, 15, 18, 21, 24];
+  bool _isChecksumValid = true;
+  bool _bypassChecksumValidation = false;
+  bool _showChecksumWarning = false;
+  bool _allWordsEntered = false;
 
   @override
   void initState() {
@@ -66,6 +70,36 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
     }
   }
 
+  Future<void> _validateForm() async {
+    bool areAllWordsValid =
+        _words.every((word) => word.isNotEmpty) && _wordsErrorIndexes.isEmpty;
+
+    setState(() {
+      _allWordsEntered = areAllWordsValid;
+    });
+
+    if (areAllWordsValid) {
+      if (!_showChecksumWarning) {
+        String phrase = _words.join(' ');
+        bool checksumValid = await bip39ChecksumValid(words: phrase);
+
+        if (mounted) {
+          setState(() {
+            _isChecksumValid = checksumValid;
+            _showChecksumWarning = !checksumValid;
+          });
+        }
+      }
+    } else {
+      if (mounted) {
+        setState(() {
+          _showChecksumWarning = false;
+          _bypassChecksumValidation = false;
+        });
+      }
+    }
+  }
+
   void _handleWordChange(int index, String word) {
     final trimmedWord = word.trim().toLowerCase();
     final currentIndex = index - 1;
@@ -79,6 +113,14 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
     if (_wordsErrorIndexes.contains(currentIndex)) {
       _wordsErrorIndexes.remove(currentIndex);
     }
+
+    if (_showChecksumWarning) {
+      setState(() {
+        _showChecksumWarning = false;
+        _bypassChecksumValidation = false;
+      });
+    }
+
     _validateForm();
 
     if (trimmedWord.isNotEmpty) {
@@ -106,20 +148,15 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
       _words[i] = words[i].toLowerCase();
     }
 
+    setState(() {
+      _showChecksumWarning = false;
+      _bypassChecksumValidation = false;
+    });
+
     _validateForm();
 
     if (words.isNotEmpty) {
       Future.microtask(() => _handleCheckWords());
-    }
-  }
-
-  void _validateForm() {
-    final isValid =
-        _words.every((word) => word.isNotEmpty) && _wordsErrorIndexes.isEmpty;
-    if (isValid != _isFormValid) {
-      setState(() {
-        _isFormValid = isValid;
-      });
     }
   }
 
@@ -133,9 +170,63 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
         }
         _words = newWords;
         _wordsErrorIndexes = [];
-        _validateForm();
+        _showChecksumWarning = false;
+        _bypassChecksumValidation = false;
+        _allWordsEntered = false;
       });
+
+      _validateForm();
     }
+  }
+
+  Widget _buildChecksumWarning() {
+    if (!_showChecksumWarning) return const SizedBox.shrink();
+
+    final theme = Provider.of<AppState>(context).currentTheme;
+
+    return Container(
+      padding: const EdgeInsets.all(8),
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: theme.danger.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: theme.danger),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            AppLocalizations.of(context)!.checksumValidationFailed,
+            style: TextStyle(color: theme.danger, fontWeight: FontWeight.bold),
+          ),
+          Row(
+            children: [
+              Checkbox(
+                value: _bypassChecksumValidation,
+                onChanged: (value) {
+                  setState(() {
+                    _bypassChecksumValidation = value ?? false;
+                  });
+                },
+                activeColor: theme.primaryPurple,
+              ),
+              Expanded(
+                child: Text(
+                  AppLocalizations.of(context)!.proceedDespiteInvalidChecksum,
+                  style: TextStyle(color: theme.textPrimary),
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool get _isButtonEnabled {
+    if (!_allWordsEntered) return false;
+    if (_isChecksumValid) return true;
+    return _bypassChecksumValidation;
   }
 
   @override
@@ -191,6 +282,7 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                           ),
                         ),
                         const SizedBox(height: 16),
+                        _buildChecksumWarning(),
                         Padding(
                           padding: const EdgeInsets.only(bottom: 16),
                           child: CustomButton(
@@ -199,12 +291,15 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
                             text: AppLocalizations.of(context)!
                                 .restoreSecretPhrasePageRestoreButton,
                             onPressed: () {
-                              Navigator.of(context).pushNamed('/net_setup',
-                                  arguments: {'bip39': _words});
+                              Navigator.of(context)
+                                  .pushNamed('/net_setup', arguments: {
+                                'bip39': _words,
+                                'ignore_checksum': _bypassChecksumValidation,
+                              });
                             },
                             borderRadius: 30.0,
                             height: 56.0,
-                            disabled: !_isFormValid,
+                            disabled: !_isButtonEnabled,
                           ),
                         ),
                       ],

@@ -879,6 +879,14 @@
   "@restoreSecretPhrasePageRestoreButton": {
     "description": "Text on the restore button in the RestoreSecretPhrasePage component"
   },
+   "checksumValidationFailed": "Checksum validation failed",
+  "@checksumValidationFailed": {
+    "description": "Text displayed when BIP39 checksum validation fails"
+  },
+  "proceedDespiteInvalidChecksum": "Continue despite checksum error?",
+  "@proceedDespiteInvalidChecksum": {
+    "description": "Text for the checkbox to proceed despite invalid checksum"
+  },
   "settingsPageTitle": "Settings",
   "@settingsPageTitle": {
     "description": "Title displayed in the app bar of the SettingsPage component"

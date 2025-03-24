@@ -26,10 +26,11 @@ class SetupNetworkSettingsPage extends StatefulWidget {
 class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
-  String? errorMessage;
+  String? _errorMessage;
   String? _shortName;
   bool _zilLegacy = false;
-  bool isTestnet = false;
+  bool _bypassChecksumValidation = false;
+  bool _isTestnet = false;
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
@@ -60,6 +61,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final keys = args?['keys'] as KeyPairInfo?;
     final shortName = args?['shortName'] as String?;
     final zilLegacy = args?['zilLegacy'] as bool?;
+    final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
     if (bip39 == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -71,12 +73,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         _keys = keys;
         _shortName = shortName;
         _zilLegacy = zilLegacy ?? false;
+        _bypassChecksumValidation = bypassChecksumValidation ?? false;
       });
     }
   }
 
   List<NetworkConfigInfo> get filteredNetworks {
-    final networks = isTestnet ? testnetNetworks : mainnetNetworks;
+    final networks = _isTestnet ? testnetNetworks : mainnetNetworks;
     if (_searchQuery.isEmpty) {
       return networks;
     }
@@ -109,7 +112,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         testnetNetworks = testnetChains;
 
         if (_shortName != null) {
-          final networks = isTestnet ? testnetNetworks : mainnetNetworks;
+          final networks = _isTestnet ? testnetNetworks : mainnetNetworks;
           int foundIndex =
               networks.indexWhere((network) => network.shortName == _shortName);
           if (foundIndex > 0) {
@@ -119,7 +122,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
       });
     } catch (e) {
       setState(() {
-        errorMessage = '$e';
+        _errorMessage = '$e';
       });
       debugPrint('Error loading chains: $e');
     }
@@ -189,17 +192,17 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                           padding: const EdgeInsets.symmetric(
                               horizontal: 8, vertical: 4),
                           decoration: BoxDecoration(
-                            color: isTestnet
+                            color: _isTestnet
                                 ? theme.warning.withValues(alpha: 0.2)
                                 : theme.success.withValues(alpha: 0.2),
                             borderRadius: BorderRadius.circular(12),
                           ),
                           child: Text(
-                            isTestnet
+                            _isTestnet
                                 ? l10n.setupNetworkSettingsPageTestnetLabel
                                 : l10n.setupNetworkSettingsPageMainnetLabel,
                             style: TextStyle(
-                              color: isTestnet ? theme.warning : theme.success,
+                              color: _isTestnet ? theme.warning : theme.success,
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
                             ),
@@ -273,10 +276,10 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                       ),
                       const SizedBox(width: 8),
                       Switch(
-                        value: isTestnet,
+                        value: _isTestnet,
                         onChanged: (value) {
                           setState(() {
-                            isTestnet = value;
+                            _isTestnet = value;
                             selectedNetworkIndex = 0;
                           });
                         },
@@ -300,11 +303,11 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                   ),
                 ),
-                if (errorMessage != null)
+                if (_errorMessage != null)
                   Padding(
                     padding: EdgeInsets.all(adaptivePadding),
                     child: Text(
-                      errorMessage!,
+                      _errorMessage!,
                       style: TextStyle(
                         color: theme.danger,
                         fontSize: 14,
@@ -360,7 +363,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                     onPressed: filteredNetworks.isEmpty
                         ? () {}
                         : () {
-                            final chain = isTestnet
+                            final chain = _isTestnet
                                 ? testnetNetworks[selectedNetworkIndex]
                                 : mainnetNetworks[selectedNetworkIndex];
                             Navigator.of(context).pushNamed(
@@ -369,8 +372,9 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                                 'bip39': _bip39List,
                                 'keys': _keys,
                                 'chain': chain,
-                                'isTestnet': isTestnet,
+                                'isTestnet': _isTestnet,
                                 'zilLegacy': _zilLegacy,
+                                'ignore_checksum': _bypassChecksumValidation,
                               },
                             );
                           },

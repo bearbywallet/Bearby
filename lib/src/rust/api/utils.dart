@@ -27,3 +27,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<List<(String, String)>> getCurrenciesTickets() =>
     RustLib.instance.api.crateApiUtilsGetCurrenciesTickets();
+
+Future<bool> bip39ChecksumValid({required String words}) =>
+    RustLib.instance.api.crateApiUtilsBip39ChecksumValid(words: words);

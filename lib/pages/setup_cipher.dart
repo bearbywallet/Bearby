@@ -25,6 +25,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
   bool _zilLegacy = false;
+  bool _bypassChecksumValidation = false;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
   int selectedCipherIndex = 2;
 
@@ -70,6 +71,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
       _chain = args['chain'] as NetworkConfigInfo?;
       _keys = args['keys'] as KeyPairInfo?;
       _zilLegacy = args['zilLegacy'] as bool? ?? false;
+      _bypassChecksumValidation = args['ignore_checksum'] as bool? ?? false;
     });
 
     cipherDescriptions[0]['title'] =
@@ -205,6 +207,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
                             'cipher': _getCipherOrders(),
                             'argon2': _argonParams,
                             'zilLegacy': _zilLegacy,
+                            'ignore_checksum': _bypassChecksumValidation,
                           },
                         ),
                         borderRadius: 30.0,

@@ -43,6 +43,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   List<AuthMethod> _authMethods = [AuthMethod.none];
   bool _useDeviceAuth = true;
   bool _zilLegacy = false;
+  bool _bypassChecksumValidation = false;
 
   String _errorMessage = '';
   bool _disabled = false;
@@ -76,6 +77,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final cipher = args?['cipher'] as Uint8List?;
     final zilLegacy = args?['zilLegacy'] as bool?;
     final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
+    final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
     if (bip39 == null && chain == null && cipher == null && keys == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -88,6 +90,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _keys = keys;
         _cipher = cipher;
         _argon2 = argon2;
+        _bypassChecksumValidation = bypassChecksumValidation ?? false;
 
         if (zilLegacy != null) {
           _zilLegacy = zilLegacy;
@@ -277,7 +280,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           biometricType: biometricType.name,
           identifiers: identifiers,
           chainHash: chainHash,
-          mnemonicCheck: _chain?.slip44 != 313,
+          mnemonicCheck: !_bypassChecksumValidation,
         );
 
         session = await addBip39Wallet(

@@ -588,6 +588,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreSecretPhrasePageRestoreButton => '復元';
 
   @override
+  String get checksumValidationFailed => 'チェックサム検証に失敗しました';
+
+  @override
+  String get proceedDespiteInvalidChecksum => 'チェックサムエラーがありますが続行しますか？';
+
+  @override
   String get settingsPageTitle => '設定';
 
   @override
