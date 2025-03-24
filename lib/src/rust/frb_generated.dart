@@ -98,7 +98,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.9.0';
 
   @override
-  int get rustContentHash => -1308246783;
+  int get rustContentHash => -1545151007;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -394,14 +394,14 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiTokenUpdateRates({required BigInt walletIndex});
 
+  Future<String> crateApiWalletZilliqaGet0X(
+      {required BigInt walletIndex, required BigInt accountIndex});
+
   Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
       {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<String> crateApiWalletZilliqaLegacyBase16ToBech32(
       {required String base16});
-
-  Future<String> crateApiWalletZilliqaLegacyNegativeBech32(
-      {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<void> crateApiWalletZilliqaSwapChain(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -2710,7 +2710,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
+  Future<String> crateApiWalletZilliqaGet0X(
       {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -2719,6 +2719,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(accountIndex, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 81, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_String,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiWalletZilliqaGet0XConstMeta,
+      argValues: [walletIndex, accountIndex],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiWalletZilliqaGet0XConstMeta => const TaskConstMeta(
+        debugName: "zilliqa_get_0x",
+        argNames: ["walletIndex", "accountIndex"],
+      );
+
+  @override
+  Future<(String, String)> crateApiWalletZilliqaGetBech32Base16Address(
+      {required BigInt walletIndex, required BigInt accountIndex}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_usize(accountIndex, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 82, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_record_string_string,
@@ -2744,7 +2770,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(base16, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 82, port: port_);
+            funcId: 83, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -2760,33 +2786,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "zilliqa_legacy_base16_to_bech32",
         argNames: ["base16"],
-      );
-
-  @override
-  Future<String> crateApiWalletZilliqaLegacyNegativeBech32(
-      {required BigInt walletIndex, required BigInt accountIndex}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 83, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_String,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiWalletZilliqaLegacyNegativeBech32ConstMeta,
-      argValues: [walletIndex, accountIndex],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiWalletZilliqaLegacyNegativeBech32ConstMeta =>
-      const TaskConstMeta(
-        debugName: "zilliqa_legacy_negative_bech32",
-        argNames: ["walletIndex", "accountIndex"],
       );
 
   @override

@@ -93,7 +93,9 @@ class _AddAccountState extends State<AddAccount> {
   }
 
   bool _isZIL(AppState appState) {
-    return appState.chain?.slip44 == 313 && appState.wallet != null;
+    return appState.chain?.slip44 == 313 &&
+        appState.wallet != null &&
+        appState.wallet?.defaultChainHash == appState.chain?.chainHash;
   }
 
   Future<bool> _authenticateWithBiometrics() async {
