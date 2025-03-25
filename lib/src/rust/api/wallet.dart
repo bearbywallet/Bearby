@@ -137,7 +137,6 @@ class AddNextBip39AccountParams {
   final List<String> identifiers;
   final String? password;
   final String? sessionCipher;
-  final BigInt chainHash;
 
   const AddNextBip39AccountParams({
     required this.walletIndex,
@@ -147,7 +146,6 @@ class AddNextBip39AccountParams {
     required this.identifiers,
     this.password,
     this.sessionCipher,
-    required this.chainHash,
   });
 
   @override
@@ -158,8 +156,7 @@ class AddNextBip39AccountParams {
       passphrase.hashCode ^
       identifiers.hashCode ^
       password.hashCode ^
-      sessionCipher.hashCode ^
-      chainHash.hashCode;
+      sessionCipher.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -172,8 +169,7 @@ class AddNextBip39AccountParams {
           passphrase == other.passphrase &&
           identifiers == other.identifiers &&
           password == other.password &&
-          sessionCipher == other.sessionCipher &&
-          chainHash == other.chainHash;
+          sessionCipher == other.sessionCipher;
 }
 
 class AddSKWalletParams {

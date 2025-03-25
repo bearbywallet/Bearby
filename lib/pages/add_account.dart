@@ -163,8 +163,6 @@ class _AddAccountState extends State<AddAccount> {
     }
 
     try {
-      BigInt chainHash = appState.account!.chainHash;
-
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
 
@@ -179,7 +177,6 @@ class _AddAccountState extends State<AddAccount> {
               ? null
               : _passwordController.text,
           sessionCipher: session.isEmpty ? null : session,
-          chainHash: chainHash,
         );
 
         await addNextBip39Account(

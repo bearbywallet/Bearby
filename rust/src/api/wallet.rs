@@ -143,7 +143,6 @@ pub struct AddNextBip39AccountParams {
     pub identifiers: Vec<String>,
     pub password: Option<String>,
     pub session_cipher: Option<String>,
-    pub chain_hash: u64,
 }
 
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
@@ -156,7 +155,10 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         }?;
 
         let wallet = core.get_wallet_by_index(params.wallet_index)?;
-        let provider = core.get_provider(params.chain_hash)?;
+        let wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+        let provider = core.get_provider(wallet_data.default_chain_hash)?;
         let bip49 = provider.get_bip49(params.account_index);
 
         wallet
@@ -454,10 +456,11 @@ pub async fn zilliqa_get_0x(wallet_index: usize, account_index: usize) -> Result
                 .get_addr()
                 .ok()
                 .and_then(|a| a.get_zil_check_sum_addr().ok()),
-            PubKey::Secp256k1Keccak256(pk) => PubKey::Secp256k1Sha256(pk)
+            PubKey::Secp256k1Keccak256(pk) => account
+                .pub_key
                 .get_addr()
                 .ok()
-                .and_then(|a| a.get_zil_check_sum_addr().ok()),
+                .and_then(|a| a.to_eth_checksummed().ok()),
             _ => None,
         }
         .ok_or(ServiceError::AccountTypeNotValid)?;

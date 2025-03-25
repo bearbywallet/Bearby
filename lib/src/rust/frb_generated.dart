@@ -2923,8 +2923,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return AddNextBip39AccountParams(
       walletIndex: dco_decode_usize(arr[0]),
       accountIndex: dco_decode_usize(arr[1]),
@@ -2933,7 +2933,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       identifiers: dco_decode_list_String(arr[4]),
       password: dco_decode_opt_String(arr[5]),
       sessionCipher: dco_decode_opt_String(arr[6]),
-      chainHash: dco_decode_u_64(arr[7]),
     );
   }
 
@@ -3947,7 +3946,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_identifiers = sse_decode_list_String(deserializer);
     var var_password = sse_decode_opt_String(deserializer);
     var var_sessionCipher = sse_decode_opt_String(deserializer);
-    var var_chainHash = sse_decode_u_64(deserializer);
     return AddNextBip39AccountParams(
         walletIndex: var_walletIndex,
         accountIndex: var_accountIndex,
@@ -3955,8 +3953,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         passphrase: var_passphrase,
         identifiers: var_identifiers,
         password: var_password,
-        sessionCipher: var_sessionCipher,
-        chainHash: var_chainHash);
+        sessionCipher: var_sessionCipher);
   }
 
   @protected
@@ -5202,7 +5199,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.identifiers, serializer);
     sse_encode_opt_String(self.password, serializer);
     sse_encode_opt_String(self.sessionCipher, serializer);
-    sse_encode_u_64(self.chainHash, serializer);
   }
 
   @protected

@@ -53,8 +53,7 @@ class _ReceivePageState extends State<ReceivePage> {
     _amountController.text = amount;
     _accountNameController.text = appState.account?.name ?? "";
 
-    if (chain.slip44 == 313 &&
-        chain.chainHash == appState.wallet?.defaultChainHash) {
+    if (chain.slip44 == 313) {
       zilliqaGet0X(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
@@ -402,9 +401,7 @@ class _ReceivePageState extends State<ReceivePage> {
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
         ),
-        if (account != null &&
-            chain.slip44 == 313 &&
-            chain.chainHash == appState.wallet?.defaultChainHash)
+        if (account != null && chain.slip44 == 313)
           TileButton(
             icon: SvgPicture.asset(
               useLegacyAddress

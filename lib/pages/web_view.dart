@@ -655,7 +655,10 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     }
                   },
                   onProgressChanged: (controller, progress) async {
-                    if (progress > 20 && appState.chain?.slip44 == 313) {
+                    final chain = appState.getChain(
+                        appState.wallet?.defaultChainHash ?? BigInt.zero);
+
+                    if (progress > 20 && chain?.slip44 == 313) {
                       String scilla = await rootBundle
                           .loadString('assets/zilpay_legacy_inject.js');
                       await _webViewController?.evaluateJavascript(

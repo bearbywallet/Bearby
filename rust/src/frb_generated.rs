@@ -3476,7 +3476,6 @@ impl SseDecode for crate::api::wallet::AddNextBip39AccountParams {
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_password = <Option<String>>::sse_decode(deserializer);
         let mut var_sessionCipher = <Option<String>>::sse_decode(deserializer);
-        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::api::wallet::AddNextBip39AccountParams {
             wallet_index: var_walletIndex,
             account_index: var_accountIndex,
@@ -3485,7 +3484,6 @@ impl SseDecode for crate::api::wallet::AddNextBip39AccountParams {
             identifiers: var_identifiers,
             password: var_password,
             session_cipher: var_sessionCipher,
-            chain_hash: var_chainHash,
         };
     }
 }
@@ -4949,7 +4947,6 @@ impl flutter_rust_bridge::IntoDart for crate::api::wallet::AddNextBip39AccountPa
             self.identifiers.into_into_dart().into_dart(),
             self.password.into_into_dart().into_dart(),
             self.session_cipher.into_into_dart().into_dart(),
-            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -5831,7 +5828,6 @@ impl SseEncode for crate::api::wallet::AddNextBip39AccountParams {
         <Vec<String>>::sse_encode(self.identifiers, serializer);
         <Option<String>>::sse_encode(self.password, serializer);
         <Option<String>>::sse_encode(self.session_cipher, serializer);
-        <u64>::sse_encode(self.chain_hash, serializer);
     }
 }
 
