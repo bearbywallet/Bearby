@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_protector/screen_protector.dart';
@@ -8,7 +9,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/services/device.dart';
-import 'package:zilpay/src/rust/api/auth.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -56,7 +57,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     await ScreenProtector.protectDataLeakageWithBlur();
   }
 
-  void _onCreateBackup(BigInt walletIndex) async {
+  void _onCreateBackup(BigInt walletIndex, String name) async {
     final l10n = AppLocalizations.of(context)!;
 
     if (_confirmPasswordController.text.isEmpty) {
@@ -78,13 +79,16 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
-      await tryUnlockWithPassword(
-        password: _confirmPasswordController.text,
+      Uint8List keystoreBytes = await makeKeystoreFile(
         walletIndex: walletIndex,
-        identifiers: identifiers,
+        password: _confirmPasswordController.text,
+        deviceIndicators: identifiers,
       );
 
-      final path = await _saveKeystoreToFile("");
+      final path = await _saveKeystoreToFile(
+        keystoreBytes,
+        name,
+      );
 
       setState(() {
         isBackupCreated = true;
@@ -105,14 +109,18 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     }
   }
 
-  Future<String> _saveKeystoreToFile(String keystoreJson) async {
+  Future<String> _saveKeystoreToFile(
+    Uint8List keystoreBytes,
+    String name,
+  ) async {
     try {
       final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final filePath = '${directory.path}/zilpay_keystore_$timestamp.json';
+      final filePath =
+          '${directory.path}/${name}_zilpay_keystore_$timestamp.zp';
 
       final file = File(filePath);
-      await file.writeAsString(keystoreJson);
+      await file.writeAsBytes(keystoreBytes);
 
       return filePath;
     } catch (e) {
@@ -158,7 +166,10 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                         focusedBorderColor: theme.primaryPurple,
                         obscureText: _obscureConfirmPassword,
                         onSubmitted: (_) => _onCreateBackup(
-                          BigInt.from(state.selectedWallet),
+                          BigInt.from(
+                            state.selectedWallet,
+                          ),
+                          state.wallet?.walletName ?? "",
                         ),
                         rightIconPath: _obscureConfirmPassword
                             ? "assets/icons/close_eye.svg"
@@ -186,6 +197,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                           controller: _btnController,
                           onPressed: () => _onCreateBackup(
                             BigInt.from(state.selectedWallet),
+                            state.wallet?.walletName ?? "",
                           ),
                           successIcon: SvgPicture.asset(
                             'assets/icons/ok.svg',

@@ -47,7 +47,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
   String _errorMessage = '';
   bool _disabled = false;
-  bool _focused = false;
   bool _walletNameInitialized = false;
   bool _needRemoveOldStorage = false;
   bool _updatedArgs = false;
@@ -353,12 +352,10 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final screenWidth = MediaQuery.of(context).size.width;
     const inputHeight = 50.0;
 
-    final shouldHideButton = screenWidth <= 480 && _focused;
-
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -398,11 +395,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                   const EdgeInsets.symmetric(horizontal: 20),
                               focusedBorderColor: theme.primaryPurple,
                               disabled: _disabled,
-                              onFocusChanged: (isFocused) {
-                                setState(() {
-                                  _focused = isFocused;
-                                });
-                              },
                               onChanged: (value) {
                                 if (_errorMessage != '') {
                                   setState(() {
@@ -434,11 +426,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                   });
                                 }
                               },
-                              onFocusChanged: (isFocused) {
-                                setState(() {
-                                  _focused = isFocused;
-                                });
-                              },
                               onRightIconTap: () {
                                 setState(() {
                                   _obscurePassword = !_obscurePassword;
@@ -464,11 +451,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                 setState(() {
                                   _obscureConfirmPassword =
                                       !_obscureConfirmPassword;
-                                });
-                              },
-                              onFocusChanged: (isFocused) {
-                                setState(() {
-                                  _focused = isFocused;
                                 });
                               },
                               onChanged: (value) {
@@ -547,34 +529,33 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                       ),
                     ),
                   ),
-                  if (!shouldHideButton)
-                    Padding(
-                      padding: EdgeInsets.only(bottom: adaptivePadding),
-                      child: RoundedLoadingButton(
-                        color: theme.primaryPurple,
-                        valueColor: theme.buttonText,
-                        controller: _btnController,
-                        onPressed: _createWallet,
-                        successIcon: SvgPicture.asset(
-                          'assets/icons/ok.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.textPrimary,
-                            BlendMode.srcIn,
-                          ),
+                  Padding(
+                    padding: EdgeInsets.only(bottom: adaptivePadding),
+                    child: RoundedLoadingButton(
+                      color: theme.primaryPurple,
+                      valueColor: theme.buttonText,
+                      controller: _btnController,
+                      onPressed: _createWallet,
+                      successIcon: SvgPicture.asset(
+                        'assets/icons/ok.svg',
+                        width: 24,
+                        height: 24,
+                        colorFilter: ColorFilter.mode(
+                          theme.textPrimary,
+                          BlendMode.srcIn,
                         ),
-                        child: Text(
-                          AppLocalizations.of(context)!
-                              .passwordSetupPageCreateButton,
-                          style: TextStyle(
-                            color: theme.buttonText,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                      ),
+                      child: Text(
+                        AppLocalizations.of(context)!
+                            .passwordSetupPageCreateButton,
+                        style: TextStyle(
+                          color: theme.buttonText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
+                  ),
                 ],
               ),
             ),

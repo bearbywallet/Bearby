@@ -129,6 +129,15 @@ Future<String> zilliqaGet0X(
     RustLib.instance.api.crateApiWalletZilliqaGet0X(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
+Future<Uint8List> makeKeystoreFile(
+        {required BigInt walletIndex,
+        required String password,
+        required List<String> deviceIndicators}) =>
+    RustLib.instance.api.crateApiWalletMakeKeystoreFile(
+        walletIndex: walletIndex,
+        password: password,
+        deviceIndicators: deviceIndicators);
+
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
   final BigInt accountIndex;

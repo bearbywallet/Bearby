@@ -1,4 +1,5 @@
 use zilpay::background::bg_provider::ProvidersManagement;
+use zilpay::background::bg_storage::StorageManagement;
 use zilpay::background::Background;
 use zilpay::errors::background::BackgroundError;
 use zilpay::errors::token::TokenError;
@@ -466,6 +467,19 @@ pub async fn zilliqa_get_0x(wallet_index: usize, account_index: usize) -> Result
         .ok_or(ServiceError::AccountTypeNotValid)?;
 
         Ok(address)
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn make_keystore_file(
+    wallet_index: usize,
+    password: String,
+    device_indicators: Vec<String>,
+) -> Result<Vec<u8>, String> {
+    with_service(|core| {
+        let keystore_bytes = core.get_keystore(wallet_index, &password, &device_indicators)?;
+        Ok(keystore_bytes)
     })
     .await
     .map_err(Into::into)
