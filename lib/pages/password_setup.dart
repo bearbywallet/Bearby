@@ -355,7 +355,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     const inputHeight = 50.0;
 
     return Scaffold(
-      resizeToAvoidBottomInset: false,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
@@ -369,167 +369,165 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                     onBackPressed: () => Navigator.pop(context),
                   ),
                   Expanded(
-                    child: Center(
-                      child: SingleChildScrollView(
-                        physics: const BouncingScrollPhysics(),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(
-                              AppLocalizations.of(context)!
-                                  .passwordSetupPageSubtitle,
-                              style: TextStyle(
-                                color: theme.textPrimary,
-                                fontSize: 24,
-                                fontWeight: FontWeight.bold,
-                              ),
+                    child: SingleChildScrollView(
+                      physics: const BouncingScrollPhysics(),
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 16),
+                          Text(
+                            AppLocalizations.of(context)!
+                                .passwordSetupPageSubtitle,
+                            style: TextStyle(
+                              color: theme.textPrimary,
+                              fontSize: 24,
+                              fontWeight: FontWeight.bold,
                             ),
-                            SizedBox(height: adaptivePadding),
-                            SmartInput(
-                              controller: _walletNameController,
-                              hint: AppLocalizations.of(context)!
-                                  .passwordSetupPageWalletNameHint,
-                              fontSize: 18,
-                              height: inputHeight,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              focusedBorderColor: theme.primaryPurple,
-                              disabled: _disabled,
-                              onChanged: (value) {
-                                if (_errorMessage != '') {
-                                  setState(() {
-                                    _errorMessage = '';
-                                  });
-                                }
-                              },
-                            ),
-                            SizedBox(height: adaptivePadding),
-                            SmartInput(
-                              key: _passwordInputKey,
-                              controller: _passwordController,
-                              hint: AppLocalizations.of(context)!
-                                  .passwordSetupPagePasswordHint,
-                              fontSize: 18,
-                              height: inputHeight,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              focusedBorderColor: theme.primaryPurple,
-                              disabled: _disabled,
-                              obscureText: _obscurePassword,
-                              rightIconPath: _obscurePassword
-                                  ? "assets/icons/close_eye.svg"
-                                  : "assets/icons/open_eye.svg",
-                              onChanged: (value) {
-                                if (_errorMessage != '') {
-                                  setState(() {
-                                    _errorMessage = '';
-                                  });
-                                }
-                              },
-                              onRightIconTap: () {
+                          ),
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            controller: _walletNameController,
+                            hint: AppLocalizations.of(context)!
+                                .passwordSetupPageWalletNameHint,
+                            fontSize: 18,
+                            height: inputHeight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            disabled: _disabled,
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
                                 setState(() {
-                                  _obscurePassword = !_obscurePassword;
+                                  _errorMessage = '';
                                 });
-                              },
-                            ),
-                            SizedBox(height: adaptivePadding),
-                            SmartInput(
-                              key: _confirmPasswordInputKey,
-                              controller: _confirmPasswordController,
-                              hint: AppLocalizations.of(context)!
-                                  .passwordSetupPageConfirmPasswordHint,
-                              height: inputHeight,
-                              fontSize: 18,
-                              disabled: _disabled,
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 20),
-                              obscureText: _obscureConfirmPassword,
-                              rightIconPath: _obscureConfirmPassword
-                                  ? "assets/icons/close_eye.svg"
-                                  : "assets/icons/open_eye.svg",
-                              onRightIconTap: () {
+                              }
+                            },
+                          ),
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            key: _passwordInputKey,
+                            controller: _passwordController,
+                            hint: AppLocalizations.of(context)!
+                                .passwordSetupPagePasswordHint,
+                            fontSize: 18,
+                            height: inputHeight,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            focusedBorderColor: theme.primaryPurple,
+                            disabled: _disabled,
+                            obscureText: _obscurePassword,
+                            rightIconPath: _obscurePassword
+                                ? "assets/icons/close_eye.svg"
+                                : "assets/icons/open_eye.svg",
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
                                 setState(() {
-                                  _obscureConfirmPassword =
-                                      !_obscureConfirmPassword;
+                                  _errorMessage = '';
                                 });
-                              },
-                              onChanged: (value) {
-                                if (_errorMessage != '') {
-                                  setState(() {
-                                    _errorMessage = '';
-                                  });
-                                }
-                              },
+                              }
+                            },
+                            onRightIconTap: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                          ),
+                          SizedBox(height: adaptivePadding),
+                          SmartInput(
+                            key: _confirmPasswordInputKey,
+                            controller: _confirmPasswordController,
+                            hint: AppLocalizations.of(context)!
+                                .passwordSetupPageConfirmPasswordHint,
+                            height: inputHeight,
+                            fontSize: 18,
+                            disabled: _disabled,
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            obscureText: _obscureConfirmPassword,
+                            rightIconPath: _obscureConfirmPassword
+                                ? "assets/icons/close_eye.svg"
+                                : "assets/icons/open_eye.svg",
+                            onRightIconTap: () {
+                              setState(() {
+                                _obscureConfirmPassword =
+                                    !_obscureConfirmPassword;
+                              });
+                            },
+                            onChanged: (value) {
+                              if (_errorMessage != '') {
+                                setState(() {
+                                  _errorMessage = '';
+                                });
+                              }
+                            },
+                          ),
+                          const SizedBox(height: 8),
+                          Text(
+                            _errorMessage,
+                            style: TextStyle(
+                              color: theme.danger,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _errorMessage,
-                              style: TextStyle(
-                                color: theme.danger,
-                                fontSize: 14,
-                                fontWeight: FontWeight.w500,
+                          ),
+                          if (_chain?.slip44 == 313)
+                            Padding(
+                              padding:
+                                  const EdgeInsets.symmetric(horizontal: 4),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SvgPicture.asset(
+                                        "assets/icons/scilla.svg",
+                                        width: 24,
+                                        height: 24,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.textPrimary,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 4),
+                                      Text(
+                                        AppLocalizations.of(context)!
+                                            .passwordSetupPageLegacyLabel,
+                                        style: TextStyle(
+                                          color: theme.textPrimary,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Switch(
+                                    value: _zilLegacy,
+                                    onChanged: _disabled
+                                        ? null
+                                        : (value) {
+                                            setState(() {
+                                              _zilLegacy = value;
+                                            });
+                                          },
+                                    activeColor: theme.primaryPurple,
+                                    activeTrackColor: theme.primaryPurple
+                                        .withValues(alpha: 0.4),
+                                  ),
+                                ],
                               ),
                             ),
-                            if (_chain?.slip44 == 313)
-                              Padding(
-                                padding:
-                                    const EdgeInsets.symmetric(horizontal: 4),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        SvgPicture.asset(
-                                          "assets/icons/scilla.svg",
-                                          width: 24,
-                                          height: 24,
-                                          colorFilter: ColorFilter.mode(
-                                            theme.textPrimary,
-                                            BlendMode.srcIn,
-                                          ),
-                                        ),
-                                        const SizedBox(width: 4),
-                                        Text(
-                                          AppLocalizations.of(context)!
-                                              .passwordSetupPageLegacyLabel,
-                                          style: TextStyle(
-                                            color: theme.textPrimary,
-                                            fontSize: 16,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    Switch(
-                                      value: _zilLegacy,
-                                      onChanged: _disabled
-                                          ? null
-                                          : (value) {
-                                              setState(() {
-                                                _zilLegacy = value;
-                                              });
-                                            },
-                                      activeColor: theme.primaryPurple,
-                                      activeTrackColor: theme.primaryPurple
-                                          .withValues(alpha: 0.4),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            BiometricSwitch(
-                              biometricType: _authMethods.first,
-                              value: _useDeviceAuth,
-                              disabled: _disabled,
-                              onChanged: (value) async {
-                                setState(() => _useDeviceAuth = value);
-                              },
-                            ),
-                          ],
-                        ),
+                          BiometricSwitch(
+                            biometricType: _authMethods.first,
+                            value: _useDeviceAuth,
+                            disabled: _disabled,
+                            onChanged: (value) async {
+                              setState(() => _useDeviceAuth = value);
+                            },
+                          ),
+                          SizedBox(height: 80), // Space for button
+                        ],
                       ),
                     ),
                   ),
-                  Padding(
+                  Container(
+                    width: double.infinity,
                     padding: EdgeInsets.only(bottom: adaptivePadding),
                     child: RoundedLoadingButton(
                       color: theme.primaryPurple,
