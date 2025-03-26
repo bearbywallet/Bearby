@@ -20,9 +20,10 @@ mod wallet_tests {
             provider::{get_chains_providers_from_json, select_accounts_chain},
             utils::bip39_checksum_valid,
             wallet::{
-                add_bip39_wallet, add_next_bip39_account, get_wallets, select_account,
-                zilliqa_get_0x, zilliqa_get_bech32_base16_address, zilliqa_swap_chain,
-                AddNextBip39AccountParams, Bip39AddWalletParams,
+                add_bip39_wallet, add_next_bip39_account, delete_account, get_wallets,
+                reveal_bip39_phrase, reveal_keypair, select_account, zilliqa_get_0x,
+                zilliqa_get_bech32_base16_address, zilliqa_swap_chain, AddNextBip39AccountParams,
+                Bip39AddWalletParams,
             },
         },
         models::settings::{WalletArgonParamsInfo, WalletSettingsInfo},
@@ -512,6 +513,62 @@ mod wallet_tests {
             })
             .await
             .unwrap();
+
+            let words = reveal_bip39_phrase(
+                0,
+                vec![String::from("test identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(words, VALID_MNEMONIC_STR);
+
+            let keypair2 = reveal_keypair(
+                0,
+                2,
+                vec![String::from("test identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+            let keypair0 = reveal_keypair(
+                0,
+                0,
+                vec![String::from("test identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(
+                keypair0.pk,
+                "03feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
+            );
+            assert_eq!(
+                keypair2.sk,
+                "0a82ab0e408290b46b509a9d573ae35302e3017f5f50c57fdd5f4b78c9dea14a"
+            );
+
+            assert_eq!(
+                keypair2.pk,
+                "02e839fb64c54e634678d8ab1432472186012fa9177f8b2ba834793ede02cc503f"
+            );
+            assert_eq!(
+                keypair2.sk,
+                "0a82ab0e408290b46b509a9d573ae35302e3017f5f50c57fdd5f4b78c9dea14a"
+            );
+
+            delete_account(0, 2).await.unwrap();
+            delete_account(0, 1).await.unwrap();
+
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            assert_eq!(wallet.accounts.len(), 1);
         }
     }
 }
