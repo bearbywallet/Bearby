@@ -504,6 +504,14 @@ mod wallet_tests {
                 assert_eq!(account3.slip_44, zil_chain_config.slip_44);
                 assert_eq!(account3.index, 2);
             }
+
+            with_wallet(0, |wallet| {
+                let ftokens = wallet.get_ftokens().unwrap();
+                assert_eq!(ftokens.len(), 3);
+                Ok(())
+            })
+            .await
+            .unwrap();
         }
     }
 }
