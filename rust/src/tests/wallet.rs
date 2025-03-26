@@ -231,12 +231,12 @@ mod wallet_tests {
         };
         let ftokens = vec![];
 
-        let (session, address) = add_bip39_wallet(params, wallet_settings.clone(), ftokens)
+        let (session, wallet_address) = add_bip39_wallet(params, wallet_settings.clone(), ftokens)
             .await
             .unwrap();
 
         assert!(!session.is_empty());
-        assert!(!address.is_empty());
+        assert!(!wallet_address.is_empty());
 
         let wallets = get_wallets().await.unwrap();
 
@@ -267,8 +267,8 @@ mod wallet_tests {
         assert_eq!(wallet.wallet_type, "SecretPhrase.false");
         assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
         assert_eq!(wallet.auth_type, "faceId");
-        assert_eq!(wallet.wallet_address, address);
-        assert_eq!(&wallet.wallet_address, &address);
+        assert_eq!(wallet.wallet_address, wallet_address);
+        assert_eq!(&wallet.wallet_address, &wallet_address);
         assert_eq!(wallet.accounts.len(), 1);
         assert_eq!(wallet.selected_account, 0);
         assert_eq!(wallet.tokens.len(), 2); // 2 because Zilliqa legacy and EVM
@@ -384,5 +384,79 @@ mod wallet_tests {
         select_accounts_chain(0, bsc_chain_config.hash())
             .await
             .unwrap();
+
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        assert_eq!(wallets.len(), 1);
+        assert_eq!(wallet.wallet_type, "SecretPhrase.false");
+        assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
+        assert_eq!(wallet.auth_type, "faceId");
+        assert_eq!(wallet.wallet_address, wallet_address);
+        assert_eq!(wallet.accounts.len(), 2);
+        assert_eq!(wallet.selected_account, 1);
+        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+
+        {
+            assert_eq!(wallet.tokens.len(), 1);
+
+            let token = &wallet.tokens[0];
+            assert_eq!(token.name, "BinanceCoin");
+            assert_eq!(token.symbol, "BNB");
+            assert_eq!(token.decimals, 18);
+            assert_eq!(token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(token.addr_type, 1);
+            assert_eq!(
+    token.logo,
+    Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+);
+            assert!(token.balances.is_empty());
+            assert_eq!(token.rate, 0.0);
+            assert!(!token.default);
+            assert!(token.native);
+            assert_eq!(token.chain_hash, bsc_chain_config.hash());
+        }
+
+        {
+            let account1 = &wallet.accounts[0];
+            assert_eq!(account1.addr, "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9");
+            assert_eq!(account1.addr_type, 1);
+            assert_eq!(account1.name, "Account 1");
+            assert_eq!(account1.chain_hash, bsc_chain_config.hash());
+            assert_eq!(account1.chain_id, 56);
+            assert_eq!(account1.slip_44, 60);
+            assert_eq!(account1.index, 0);
+
+            let account2 = &wallet.accounts[1];
+            assert_eq!(account2.addr, "0xab92316Bd8f486C773C80EC88A00721A35f2D1de");
+            assert_eq!(account2.addr_type, 1);
+            assert_eq!(account2.name, "Second account");
+            assert_eq!(account2.chain_hash, bsc_chain_config.hash());
+            assert_eq!(account2.chain_id, 56);
+            assert_eq!(account2.slip_44, 60);
+            assert_eq!(account2.index, 1);
+        }
+
+        {
+            assert_eq!(wallet.settings.cipher_orders, vec![0, 1, 2]);
+
+            assert_eq!(wallet.settings.argon_params.memory, 10);
+            assert_eq!(wallet.settings.argon_params.iterations, 1);
+            assert_eq!(wallet.settings.argon_params.threads, 1);
+            assert_eq!(
+                wallet.settings.argon_params.secret,
+                "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
+            );
+
+            assert_eq!(wallet.settings.currency_convert, "BTC");
+            assert!(wallet.settings.ipfs_node.is_none());
+
+            assert!(!wallet.settings.ens_enabled);
+            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.node_ranking_enabled);
+            assert_eq!(wallet.settings.max_connections, 0);
+            assert_eq!(wallet.settings.request_timeout_secs, 0);
+            assert_eq!(wallet.settings.rates_api_options, 0);
+        }
     }
 }
