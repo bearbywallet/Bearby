@@ -51,8 +51,8 @@ pub async fn sign_send_transactions(
         let wallet = core
             .get_wallet_by_index(wallet_index)
             .map_err(ServiceError::BackgroundError)?;
-        let tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
 
+        let tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
         let signed_tx = wallet
             .sign_transaction(
                 tx,

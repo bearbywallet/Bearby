@@ -192,7 +192,9 @@ class _AddAccountState extends State<AddAccount> {
         );
       }
 
-      if (!_zilliqaLegacy && _isZIL(appState)) {
+      await appState.syncData();
+
+      if (_zilliqaLegacy && _isZIL(appState)) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: BigInt.from(_bip39Index),
