@@ -347,7 +347,7 @@ mod wallet_tests {
             passphrase: String::new(),
             identifiers: vec![String::from("test identifier")],
             password: None,
-            session_cipher: Some(session),
+            session_cipher: Some(session.clone()),
         })
         .await
         .unwrap();
@@ -423,8 +423,8 @@ mod wallet_tests {
             assert_eq!(account1.addr_type, 1);
             assert_eq!(account1.name, "Account 1");
             assert_eq!(account1.chain_hash, bsc_chain_config.hash());
-            assert_eq!(account1.chain_id, 56);
-            assert_eq!(account1.slip_44, 60);
+            assert_eq!(account1.chain_id, bsc_chain_config.chain_id());
+            assert_eq!(account1.slip_44, bsc_chain_config.slip_44);
             assert_eq!(account1.index, 0);
 
             let account2 = &wallet.accounts[1];
@@ -432,8 +432,8 @@ mod wallet_tests {
             assert_eq!(account2.addr_type, 1);
             assert_eq!(account2.name, "Second account");
             assert_eq!(account2.chain_hash, bsc_chain_config.hash());
-            assert_eq!(account2.chain_id, 56);
-            assert_eq!(account2.slip_44, 60);
+            assert_eq!(account2.chain_id, bsc_chain_config.chain_id());
+            assert_eq!(account2.slip_44, bsc_chain_config.slip_44);
             assert_eq!(account2.index, 1);
         }
 
@@ -457,6 +457,53 @@ mod wallet_tests {
             assert_eq!(wallet.settings.max_connections, 0);
             assert_eq!(wallet.settings.request_timeout_secs, 0);
             assert_eq!(wallet.settings.rates_api_options, 0);
+
+            // try add next account with binance smart chain network
+            add_next_bip39_account(AddNextBip39AccountParams {
+                wallet_index: 0,
+                account_index: 2,
+                name: "account 3".to_string(),
+                passphrase: String::new(),
+                identifiers: vec![String::from("test identifier")],
+                password: None,
+                session_cipher: Some(session),
+            })
+            .await
+            .unwrap();
+
+            // zilliqa_swap_chain(0, 2).await.unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            {
+                let account3 = &wallet.accounts[2];
+                assert_eq!(account3.addr, "zil1rk5r7k6y8ny8l0wxasrwgr6qnrq4jgssg0qsa2");
+                assert_eq!(account3.addr_type, 1);
+                assert_eq!(account3.name, "account 3");
+                assert_eq!(account3.chain_hash, wallet.default_chain_hash);
+                assert_eq!(account3.chain_id, zil_chain_config.chain_id());
+                assert_eq!(account3.slip_44, zil_chain_config.slip_44);
+                assert_eq!(account3.index, 2);
+            }
+
+            zilliqa_swap_chain(0, 2).await.unwrap();
+
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            {
+                let account3 = &wallet.accounts[2];
+                assert_eq!(account3.addr, "zil1xancfmqvv6nhwdf8uwy79xd7fr2t94ejqr3xs8");
+                assert_eq!(account3.addr_type, 0);
+                assert_eq!(account3.name, "account 3");
+                assert_eq!(account3.chain_hash, wallet.default_chain_hash);
+                assert_eq!(
+                    &account3.chain_id,
+                    zil_chain_config.chain_ids.last().unwrap()
+                );
+                assert_eq!(account3.slip_44, zil_chain_config.slip_44);
+                assert_eq!(account3.index, 2);
+            }
         }
     }
 }
