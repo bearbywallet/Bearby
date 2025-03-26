@@ -20,8 +20,9 @@ mod wallet_tests {
             provider::get_chains_providers_from_json,
             utils::bip39_checksum_valid,
             wallet::{
-                add_bip39_wallet, get_wallets, zilliqa_get_0x, zilliqa_get_bech32_base16_address,
-                zilliqa_swap_chain, Bip39AddWalletParams,
+                add_bip39_wallet, add_next_bip39_account, get_wallets, select_account,
+                zilliqa_get_0x, zilliqa_get_bech32_base16_address, zilliqa_swap_chain,
+                AddNextBip39AccountParams, Bip39AddWalletParams,
             },
         },
         models::settings::{WalletArgonParamsInfo, WalletSettingsInfo},
@@ -252,8 +253,6 @@ mod wallet_tests {
                 "0103feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234",
                 selected_account.pub_key.to_string()
             );
-
-            //
             Ok(())
         })
         .await
@@ -286,6 +285,40 @@ mod wallet_tests {
                 selected_account.addr.auto_format(),
                 "zil1vcck56z0s0njvkuzclh7gmewglkqwntazq7h2l"
             );
+
+            Ok(())
+        })
+        .await
+        .unwrap();
+
+        add_next_bip39_account(AddNextBip39AccountParams {
+            wallet_index: 0,
+            account_index: 1,
+            name: "Second account".to_string(),
+            passphrase: String::new(),
+            identifiers: vec![String::from("test identifier")],
+            password: None,
+            session_cipher: Some(session),
+        })
+        .await
+        .unwrap();
+
+        select_account(0, 1).await.unwrap();
+
+        with_wallet(0, |wallet| {
+            let data = wallet.get_wallet_data().unwrap();
+            let selected_account = data.get_selected_account().unwrap();
+
+            assert_eq!(data.selected_account, 1);
+            assert_eq!(selected_account.chain_hash, data.default_chain_hash);
+            assert_eq!(selected_account.name, "Second account");
+            assert_eq!(selected_account.account_type.code(), 1);
+            assert_eq!(
+                selected_account.pub_key.to_string(),
+                "010317743c1830dada97f96c51fa439b7a0673700ee38c71ccb117c9f0e974af522e"
+            );
+            assert_eq!(selected_account.chain_id, chain_config.chain_id());
+            assert_eq!(selected_account.slip_44, chain_config.slip_44);
 
             Ok(())
         })
