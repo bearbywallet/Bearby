@@ -17,7 +17,7 @@ mod wallet_tests {
     use crate::{
         api::{
             backend::{get_data, load_service},
-            provider::get_chains_providers_from_json,
+            provider::{get_chains_providers_from_json, select_accounts_chain},
             utils::bip39_checksum_valid,
             wallet::{
                 add_bip39_wallet, add_next_bip39_account, get_wallets, select_account,
@@ -121,6 +121,35 @@ mod wallet_tests {
             .core
             .add_provider(zilliqa_provider_mainnet.clone())
             .unwrap();
+
+        let binance_provider_mainnet = &providers[1];
+
+        assert_eq!(binance_provider_mainnet.name, "Binance");
+        assert_eq!(binance_provider_mainnet.chain, "BNB");
+        assert_eq!(binance_provider_mainnet.short_name, "bnbchain");
+        assert_eq!(binance_provider_mainnet.diff_block_time, 0);
+        assert_eq!(binance_provider_mainnet.rpc.len(), 7);
+        assert_eq!(
+            binance_provider_mainnet.rpc[0],
+            "https://bsc-dataseed.bnbchain.org"
+        );
+        assert_eq!(&binance_provider_mainnet.features, &[155, 1559, 4844]);
+        assert_eq!(binance_provider_mainnet.chain_ids, [56, 0]);
+        assert_eq!(binance_provider_mainnet.slip_44, 60);
+        assert_eq!(binance_provider_mainnet.testnet, None);
+        assert_eq!(binance_provider_mainnet.explorers.len(), 1);
+        assert_eq!(binance_provider_mainnet.explorers[0].name, "Bscscan");
+        assert_eq!(binance_provider_mainnet.fallback_enabled, true);
+        assert_eq!(binance_provider_mainnet.ftokens.len(), 1);
+        assert_eq!(binance_provider_mainnet.ftokens[0].name, "BinanceCoin");
+        assert_eq!(binance_provider_mainnet.ftokens[0].symbol, "BNB");
+        assert_eq!(binance_provider_mainnet.ftokens[0].decimals, 18);
+        assert_eq!(binance_provider_mainnet.ftokens[0].native, true);
+
+        service
+            .core
+            .add_provider(binance_provider_mainnet.clone())
+            .unwrap();
     }
 
     #[tokio::test]
@@ -164,7 +193,7 @@ mod wallet_tests {
     #[tokio::test]
     #[serial]
     async fn test_f_create_bip39_wallet() {
-        let chain_config = {
+        let zil_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
             let providers = service.core.get_providers();
@@ -180,7 +209,7 @@ mod wallet_tests {
             passphrase: "".to_string(),
             wallet_name: "ZIlliqa Wallet".to_string(),
             biometric_type: "faceId".to_string(),
-            chain_hash: chain_config.hash(),
+            chain_hash: zil_chain_config.hash(),
             identifiers: vec![String::from("test identifier")],
         };
         let wallet_settings = WalletSettingsInfo {
@@ -213,6 +242,26 @@ mod wallet_tests {
 
         assert_eq!(wallets.len(), 1);
 
+        {
+            assert_eq!(wallets[0].tokens.len(), 2);
+            assert_eq!(wallets[0].tokens[0].chain_hash, zil_chain_config.hash());
+            assert_eq!(wallets[0].tokens[1].chain_hash, zil_chain_config.hash());
+            assert_eq!(
+                wallets[0].tokens[0].addr,
+                "0x0000000000000000000000000000000000000000"
+            );
+            assert_eq!(
+                wallets[0].tokens[1].addr,
+                "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz"
+            );
+            assert_eq!(wallets[0].tokens[1].decimals, 12);
+            assert_eq!(wallets[0].tokens[0].decimals, 18);
+            assert_eq!(wallets[0].tokens[0].addr_type, 1);
+            assert_eq!(wallets[0].tokens[1].addr_type, 0);
+            assert!(wallets[0].tokens[1].native);
+            assert!(wallets[0].tokens[0].native);
+        }
+
         let wallet = wallets.first().unwrap();
 
         assert_eq!(wallet.wallet_type, "SecretPhrase.false");
@@ -224,15 +273,15 @@ mod wallet_tests {
         assert_eq!(wallet.selected_account, 0);
         assert_eq!(wallet.tokens.len(), 2); // 2 because Zilliqa legacy and EVM
 
-        assert_eq!(wallet.default_chain_hash, chain_config.hash());
+        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
 
         let selected_account = &wallet.accounts[wallet.selected_account];
 
         assert_eq!(selected_account.name, "Account 1");
         assert_eq!(selected_account.index, 0);
-        assert_eq!(selected_account.chain_hash, chain_config.hash());
-        assert_eq!(selected_account.chain_id, chain_config.chain_id());
-        assert_eq!(selected_account.slip_44, chain_config.slip_44);
+        assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
+        assert_eq!(selected_account.chain_id, zil_chain_config.chain_id());
+        assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
         assert_eq!(selected_account.addr_type, 1); // Secp256k1Keccak256
 
         with_service(|core| {
@@ -277,10 +326,10 @@ mod wallet_tests {
                 selected_account.pub_key.to_string(),
                 "0003feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
             );
-            assert_eq!(selected_account.chain_hash, chain_config.hash());
-            assert_ne!(selected_account.chain_id, chain_config.chain_id());
-            assert_eq!(selected_account.chain_id, chain_config.chain_ids[1]);
-            assert_eq!(selected_account.slip_44, chain_config.slip_44);
+            assert_eq!(selected_account.chain_hash, zil_chain_config.hash());
+            assert_ne!(selected_account.chain_id, zil_chain_config.chain_id());
+            assert_eq!(selected_account.chain_id, zil_chain_config.chain_ids[1]);
+            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
             assert_eq!(
                 selected_account.addr.auto_format(),
                 "zil1vcck56z0s0njvkuzclh7gmewglkqwntazq7h2l"
@@ -317,12 +366,23 @@ mod wallet_tests {
                 selected_account.pub_key.to_string(),
                 "010317743c1830dada97f96c51fa439b7a0673700ee38c71ccb117c9f0e974af522e"
             );
-            assert_eq!(selected_account.chain_id, chain_config.chain_id());
-            assert_eq!(selected_account.slip_44, chain_config.slip_44);
+            assert_eq!(selected_account.chain_id, zil_chain_config.chain_id());
+            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
 
             Ok(())
         })
         .await
         .unwrap();
+        let bsc_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
+
+            providers[1].config.clone()
+        };
+
+        select_accounts_chain(0, bsc_chain_config.hash())
+            .await
+            .unwrap();
     }
 }
