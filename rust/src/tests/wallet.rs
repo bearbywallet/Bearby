@@ -3,7 +3,10 @@ mod wallet_tests {
     use tempfile::tempdir;
 
     use crate::{
-        api::backend::{get_data, load_service},
+        api::{
+            backend::{get_data, load_service},
+            utils::bip39_checksum_valid,
+        },
         service::service::BACKGROUND_SERVICE,
     };
 
@@ -36,5 +39,19 @@ mod wallet_tests {
         assert!(service.running);
         assert!(service.block_handle.is_none());
         assert!(service.history_handle.is_none());
+    }
+
+    #[test]
+    fn test_validate_mnemonic_valid() {
+        let valid_mnemonic =
+            "use fit skill orphan memory impose attract mobile delay inch ill trophy".to_string();
+        assert!(bip39_checksum_valid(valid_mnemonic));
+    }
+
+    #[test]
+    fn test_validate_mnemonic_invalid() {
+        let valid_mnemonic =
+            "use fit skill orphan memory impose attract mobile delay inch trophy ill".to_string();
+        assert!(!bip39_checksum_valid(valid_mnemonic));
     }
 }
