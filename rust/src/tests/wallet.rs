@@ -20,8 +20,8 @@ mod wallet_tests {
             provider::{get_chains_providers_from_json, select_accounts_chain},
             utils::bip39_checksum_valid,
             wallet::{
-                add_bip39_wallet, add_next_bip39_account, delete_account, get_wallets,
-                reveal_bip39_phrase, reveal_keypair, select_account, zilliqa_get_0x,
+                add_bip39_wallet, add_next_bip39_account, delete_account, delete_wallet,
+                get_wallets, reveal_bip39_phrase, reveal_keypair, select_account, zilliqa_get_0x,
                 zilliqa_get_bech32_base16_address, zilliqa_swap_chain, AddNextBip39AccountParams,
                 Bip39AddWalletParams,
             },
@@ -467,7 +467,7 @@ mod wallet_tests {
                 passphrase: String::new(),
                 identifiers: vec![String::from("test identifier")],
                 password: None,
-                session_cipher: Some(session),
+                session_cipher: Some(session.clone()),
             })
             .await
             .unwrap();
@@ -569,6 +569,19 @@ mod wallet_tests {
             let wallet = wallets.first().unwrap();
 
             assert_eq!(wallet.accounts.len(), 1);
+
+            delete_wallet(
+                0,
+                vec![String::from("test identifier")],
+                None,
+                Some(session),
+            )
+            .await
+            .unwrap();
+
+            let wallets = get_wallets().await.unwrap();
+
+            assert_eq!(wallets.len(), 0);
         }
     }
 }
