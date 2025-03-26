@@ -591,7 +591,7 @@ mod wallet_tests {
 
             assert_eq!(wallets.len(), 0);
 
-            let (new_session, new_address) = restore_from_keystore(
+            let (_, new_address) = restore_from_keystore(
                 keystore_bytes,
                 vec![String::from("new identifier")],
                 PASSWORD.to_string(),
