@@ -9,7 +9,6 @@ import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
-import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -166,13 +165,6 @@ class _AddAccountState extends State<AddAccount> {
     try {
       DeviceInfoService device = DeviceInfoService();
       List<String> identifiers = await device.getDeviceIdentifiers();
-
-      if (appState.wallet != null) {
-        await selectAccountsChain(
-          walletIndex: walletIndex,
-          chainHash: appState.wallet!.defaultChainHash,
-        );
-      }
 
       if (appState.wallet!.walletType.contains(WalletType.SecretPhrase.name)) {
         AddNextBip39AccountParams params = AddNextBip39AccountParams(
