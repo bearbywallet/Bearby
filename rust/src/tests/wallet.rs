@@ -7,17 +7,26 @@ mod wallet_tests {
 
     use serial_test::serial;
     use tempfile::tempdir;
-    use zilpay::{background::bg_provider::ProvidersManagement, rpc::network_config::ChainConfig};
+    use zilpay::{
+        background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+        proto::pubkey::PubKey,
+        rpc::network_config::ChainConfig,
+        wallet::wallet_storage::StorageOperations,
+    };
 
     use crate::{
         api::{
             backend::{get_data, load_service},
             provider::get_chains_providers_from_json,
             utils::bip39_checksum_valid,
-            wallet::{add_bip39_wallet, get_wallets, Bip39AddWalletParams},
+            wallet::{
+                add_bip39_wallet, get_wallets, zilliqa_get_0x, zilliqa_get_bech32_base16_address,
+                zilliqa_swap_chain, Bip39AddWalletParams,
+            },
         },
         models::settings::{WalletArgonParamsInfo, WalletSettingsInfo},
         service::service::BACKGROUND_SERVICE,
+        utils::utils::{with_service, with_wallet},
     };
 
     const PASSWORD: &str = "test_password";
@@ -215,5 +224,72 @@ mod wallet_tests {
         assert_eq!(wallet.tokens.len(), 2); // 2 because Zilliqa legacy and EVM
 
         assert_eq!(wallet.default_chain_hash, chain_config.hash());
+
+        let selected_account = &wallet.accounts[wallet.selected_account];
+
+        assert_eq!(selected_account.name, "Account 1");
+        assert_eq!(selected_account.index, 0);
+        assert_eq!(selected_account.chain_hash, chain_config.hash());
+        assert_eq!(selected_account.chain_id, chain_config.chain_id());
+        assert_eq!(selected_account.slip_44, chain_config.slip_44);
+        assert_eq!(selected_account.addr_type, 1); // Secp256k1Keccak256
+
+        with_service(|core| {
+            let wallet = core.get_wallet_by_index(0).unwrap();
+            let data = wallet.get_wallet_data().unwrap();
+            let selected_account = data.get_selected_account().unwrap();
+
+            match selected_account.pub_key {
+                PubKey::Secp256k1Keccak256(_) => {
+                    assert!(true);
+                }
+                _ => {
+                    panic!("invalid pubkey type");
+                }
+            }
+
+            assert_eq!(
+                "0103feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234",
+                selected_account.pub_key.to_string()
+            );
+
+            //
+            Ok(())
+        })
+        .await
+        .unwrap();
+
+        let address = zilliqa_get_0x(0, 0).await.unwrap();
+
+        assert_eq!(address, "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9");
+
+        let (bech32, base16) = zilliqa_get_bech32_base16_address(0, 0).await.unwrap();
+
+        assert_eq!("0x66316a684F83e7265B82C7eFE46f2E47ec074D7d", base16);
+        assert_eq!("zil1vcck56z0s0njvkuzclh7gmewglkqwntazq7h2l", bech32);
+
+        zilliqa_swap_chain(0, 0).await.unwrap();
+
+        with_wallet(0, |wallet| {
+            let data = wallet.get_wallet_data().unwrap();
+            let selected_account = data.get_selected_account().unwrap();
+
+            assert_eq!(
+                selected_account.pub_key.to_string(),
+                "0003feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
+            );
+            assert_eq!(selected_account.chain_hash, chain_config.hash());
+            assert_ne!(selected_account.chain_id, chain_config.chain_id());
+            assert_eq!(selected_account.chain_id, chain_config.chain_ids[1]);
+            assert_eq!(selected_account.slip_44, chain_config.slip_44);
+            assert_eq!(
+                selected_account.addr.auto_format(),
+                "zil1vcck56z0s0njvkuzclh7gmewglkqwntazq7h2l"
+            );
+
+            Ok(())
+        })
+        .await
+        .unwrap();
     }
 }
