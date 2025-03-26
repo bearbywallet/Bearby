@@ -484,3 +484,24 @@ pub async fn make_keystore_file(
     .await
     .map_err(Into::into)
 }
+
+pub async fn restore_from_keystore(
+    keystore_bytes: Vec<u8>,
+    device_indicators: Vec<String>,
+    password: String,
+    biometric_type: String,
+) -> Result<(String, String), String> {
+    with_service_mut(|core| {
+        let session = core.load_keystore(
+            keystore_bytes,
+            &password,
+            &device_indicators,
+            biometric_type.into(),
+        )?;
+        let wallet = core.wallets.last().ok_or(ServiceError::FailToSaveWallet)?;
+
+        Ok((hex::encode(session), hex::encode(wallet.wallet_address)))
+    })
+    .await
+    .map_err(Into::into)
+}

@@ -21,9 +21,9 @@ mod wallet_tests {
             utils::bip39_checksum_valid,
             wallet::{
                 add_bip39_wallet, add_next_bip39_account, delete_account, delete_wallet,
-                get_wallets, reveal_bip39_phrase, reveal_keypair, select_account, zilliqa_get_0x,
-                zilliqa_get_bech32_base16_address, zilliqa_swap_chain, AddNextBip39AccountParams,
-                Bip39AddWalletParams,
+                get_wallets, make_keystore_file, restore_from_keystore, reveal_bip39_phrase,
+                reveal_keypair, select_account, zilliqa_get_0x, zilliqa_get_bech32_base16_address,
+                zilliqa_swap_chain, AddNextBip39AccountParams, Bip39AddWalletParams,
             },
         },
         models::settings::{WalletArgonParamsInfo, WalletSettingsInfo},
@@ -549,8 +549,8 @@ mod wallet_tests {
                 "03feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
             );
             assert_eq!(
-                keypair2.sk,
-                "0a82ab0e408290b46b509a9d573ae35302e3017f5f50c57fdd5f4b78c9dea14a"
+                keypair0.sk,
+                "9a46a88b33c8c5b0c34532d461cc564dcc499ba74b5327c8a1d4cd145d53af2c"
             );
 
             assert_eq!(
@@ -570,6 +570,14 @@ mod wallet_tests {
 
             assert_eq!(wallet.accounts.len(), 1);
 
+            let keystore_bytes = make_keystore_file(
+                0,
+                PASSWORD.to_string(),
+                vec![String::from("test identifier")],
+            )
+            .await
+            .unwrap();
+
             delete_wallet(
                 0,
                 vec![String::from("test identifier")],
@@ -582,6 +590,56 @@ mod wallet_tests {
             let wallets = get_wallets().await.unwrap();
 
             assert_eq!(wallets.len(), 0);
+
+            let (new_session, new_address) = restore_from_keystore(
+                keystore_bytes,
+                vec![String::from("new identifier")],
+                PASSWORD.to_string(),
+                "fingerprint".to_string(),
+            )
+            .await
+            .unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            assert_eq!(wallets.len(), 1);
+            assert_eq!(wallet.wallet_address, new_address);
+            assert_eq!(wallet.wallet_name, "ZIlliqa Wallet");
+            assert_eq!(wallet.wallet_type, "SecretPhrase.false");
+            assert_eq!(wallet.auth_type, "fingerprint");
+            assert_eq!(wallet.selected_account, 0);
+            assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+            assert_eq!(wallet.accounts.len(), 1);
+
+            let words = reveal_bip39_phrase(
+                0,
+                vec![String::from("new identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(words, VALID_MNEMONIC_STR);
+
+            let keypair0 = reveal_keypair(
+                0,
+                0,
+                vec![String::from("new identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(
+                keypair0.pk,
+                "03feba86ca2043ac21bcf111f43658d3303f3a0d508e4c01c83e357788937cd234"
+            );
+            assert_eq!(
+                keypair0.sk,
+                "9a46a88b33c8c5b0c34532d461cc564dcc499ba74b5327c8a1d4cd145d53af2c"
+            );
         }
     }
 }
