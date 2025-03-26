@@ -457,7 +457,7 @@ pub async fn zilliqa_get_0x(wallet_index: usize, account_index: usize) -> Result
                 .get_addr()
                 .ok()
                 .and_then(|a| a.get_zil_check_sum_addr().ok()),
-            PubKey::Secp256k1Keccak256(pk) => account
+            PubKey::Secp256k1Keccak256(_) => account
                 .pub_key
                 .get_addr()
                 .ok()
