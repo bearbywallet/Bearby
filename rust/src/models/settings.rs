@@ -12,7 +12,7 @@ use zilpay::{
     token_quotes::TokenQuotesAPIOptions,
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct WalletArgonParamsInfo {
     pub memory: u32,
     pub iterations: u32,
@@ -51,7 +51,7 @@ impl TryFrom<WalletArgonParamsInfo> for ArgonParams {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct WalletSettingsInfo {
     pub cipher_orders: Vec<u8>,
     pub argon_params: WalletArgonParamsInfo,

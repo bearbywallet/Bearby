@@ -1,6 +1,6 @@
 use zilpay::wallet::account::Account;
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct AccountInfo {
     pub addr: String,
     pub addr_type: u8,

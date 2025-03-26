@@ -2,7 +2,7 @@ use super::{account::AccountInfo, ftoken::FTokenInfo, settings::WalletSettingsIn
 pub use zilpay::wallet::Wallet;
 use zilpay::{errors::wallet::WalletErrors, wallet::wallet_storage::StorageOperations};
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct WalletInfo {
     pub wallet_type: String,
     pub wallet_name: String,
