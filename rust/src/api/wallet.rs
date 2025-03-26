@@ -29,6 +29,8 @@ use crate::{
     },
 };
 
+use super::provider::select_accounts_chain;
+
 pub async fn get_wallets() -> Result<Vec<WalletInfo>, String> {
     with_service(|core| {
         let wallets = core
@@ -477,6 +479,16 @@ pub async fn make_keystore_file(
     password: String,
     device_indicators: Vec<String>,
 ) -> Result<Vec<u8>, String> {
+    let chain_hash = with_wallet(wallet_index, |wallet| {
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(data.default_chain_hash)
+    })
+    .await?;
+    select_accounts_chain(wallet_index, chain_hash).await?;
+
     with_service(|core| {
         let keystore_bytes = core.get_keystore(wallet_index, &password, &device_indicators)?;
         Ok(keystore_bytes)

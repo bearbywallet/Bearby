@@ -611,6 +611,18 @@ mod wallet_tests {
             assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
             assert_eq!(wallet.accounts.len(), 1);
 
+            {
+                assert_eq!(
+                    wallet.accounts[0].addr,
+                    "zil10yxnd0snkark2mv7p54qc5saevcn4d8eaauhca"
+                );
+                assert_eq!(wallet.accounts[0].addr_type, 1);
+                assert_eq!(wallet.accounts[0].chain_hash, zil_chain_config.hash());
+                assert_eq!(wallet.accounts[0].chain_id, zil_chain_config.chain_id());
+                assert_eq!(wallet.accounts[0].slip_44, zil_chain_config.slip_44);
+                assert_eq!(wallet.accounts[0].index, 0);
+            }
+
             let words = reveal_bip39_phrase(
                 0,
                 vec![String::from("new identifier")],
