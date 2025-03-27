@@ -1,11 +1,12 @@
 #[cfg(test)]
 mod wallet_tests {
+    use std::time::Duration;
     use std::{
         fs::{self},
         path::Path,
+        sync::atomic::AtomicU8,
     };
 
-    use serial_test::serial;
     use tempfile::tempdir;
     use zilpay::{
         background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
@@ -30,15 +31,26 @@ mod wallet_tests {
         service::service::BACKGROUND_SERVICE,
         utils::utils::{with_service, with_wallet},
     };
+    use lazy_static::lazy_static;
+
+    lazy_static! {
+        pub static ref GUARD: AtomicU8 = AtomicU8::new(1);
+    }
+
+    async fn wait_for(expected: u8) {
+        while GUARD.load(std::sync::atomic::Ordering::Relaxed) != expected {
+            tokio::time::sleep(Duration::from_millis(10)).await;
+        }
+    }
 
     const PASSWORD: &str = "test_password";
     const INVALID_MNEMONIC_STR: &str =
         "use fit orphan skill memory impose attract mobile delay inch ill trophy";
     const VALID_MNEMONIC_STR: &str =
         "use fit skill orphan memory impose attract mobile delay inch ill trophy";
+    const SK: &str = "e8351e8eb0057b809b9c3ea4e9286a6f4f5d9281cddfa77c1f52c3359ce34bad";
 
     #[tokio::test]
-    #[serial]
     async fn test_a_init_service() {
         let dir = tempdir().unwrap();
         load_service(dir.path().to_str().unwrap()).await.unwrap();
@@ -66,10 +78,11 @@ mod wallet_tests {
         assert!(service.running);
         assert!(service.block_handle.is_none());
         assert!(service.history_handle.is_none());
+
+        GUARD.store(2, std::sync::atomic::Ordering::Relaxed);
     }
 
     #[test]
-    #[serial]
     fn test_b_validate_mnemonic_valid() {
         let valid_mnemonic =
             "use fit skill orphan memory impose attract mobile delay inch ill trophy".to_string();
@@ -77,7 +90,6 @@ mod wallet_tests {
     }
 
     #[test]
-    #[serial]
     fn test_c_validate_mnemonic_invalid() {
         let valid_mnemonic =
             "use fit skill orphan memory impose attract mobile delay inch trophy ill".to_string();
@@ -85,8 +97,9 @@ mod wallet_tests {
     }
 
     #[tokio::test]
-    #[serial]
     async fn test_d_add_chain_provider() {
+        wait_for(2).await;
+
         let path = Path::new("../assets/chains/mainnet-chains.json");
         let content = fs::read_to_string(path).unwrap();
         let providers: Vec<ChainConfig> = get_chains_providers_from_json(content)
@@ -151,11 +164,14 @@ mod wallet_tests {
             .core
             .add_provider(binance_provider_mainnet.clone())
             .unwrap();
+
+        GUARD.store(3, std::sync::atomic::Ordering::Relaxed);
     }
 
     #[tokio::test]
-    #[serial]
     async fn test_e_create_bip39_wallet_check_mnemonic() {
+        wait_for(3).await;
+
         let params = Bip39AddWalletParams {
             password: PASSWORD.to_string(),
             mnemonic_str: INVALID_MNEMONIC_STR.to_string(),
@@ -189,11 +205,14 @@ mod wallet_tests {
         assert!(add_bip39_wallet(params, wallet_settings, ftokens)
             .await
             .is_err());
+
+        GUARD.store(4, std::sync::atomic::Ordering::Relaxed);
     }
 
     #[tokio::test]
-    #[serial]
     async fn test_f_create_bip39_wallet() {
+        wait_for(4).await;
+
         let zil_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
@@ -653,5 +672,22 @@ mod wallet_tests {
                 "9a46a88b33c8c5b0c34532d461cc564dcc499ba74b5327c8a1d4cd145d53af2c"
             );
         }
+        GUARD.store(5, std::sync::atomic::Ordering::Relaxed);
     }
+
+    // #[tokio::test]
+    // async fn test_c_create_sk_wallet() {
+    //     wait_for(5).await;
+    //     let zil_chain_config = {
+    //         let guard = BACKGROUND_SERVICE.read().await;
+    //         let service = guard.as_ref().unwrap();
+    //         let providers = service.core.get_providers();
+
+    //         dbg!(&providers);
+
+    //         providers[0].config.clone()
+    //     };
+
+    //     // dbg!(&zil_chain_config);
+    // }
 }
