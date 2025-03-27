@@ -1038,6 +1038,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addressSelectModalContentHistory => '履歴';
 
   @override
+  String get addressSelectModalContentSender => '送信者';
+
+  @override
   String get changePasswordModalTitle => 'パスワード変更';
 
   @override

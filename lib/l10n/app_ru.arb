@@ -383,6 +383,7 @@
   "addressSelectModalContentMyAccounts": "Мои аккаунты",
   "addressSelectModalContentAddressBook": "Адресная книга",
   "addressSelectModalContentHistory": "История",
+  "addressSelectModalContentSender": "Отправитель",
 
   "changePasswordModalTitle": "Изменить пароль",
   "changePasswordModalDescription": "Введите ваш текущий пароль и выберите новый пароль для обновления безопасности вашего кошелька.",

@@ -1038,6 +1038,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressSelectModalContentHistory => 'History';
 
   @override
+  String get addressSelectModalContentSender => 'Sender';
+
+  @override
   String get changePasswordModalTitle => 'Change Password';
 
   @override

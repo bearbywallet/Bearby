@@ -1038,6 +1038,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addressSelectModalContentHistory => 'История';
 
   @override
+  String get addressSelectModalContentSender => 'Отправитель';
+
+  @override
   String get changePasswordModalTitle => 'Изменить пароль';
 
   @override

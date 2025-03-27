@@ -383,6 +383,7 @@
   "addressSelectModalContentMyAccounts": "マイアカウント",
   "addressSelectModalContentAddressBook": "アドレス帳",
   "addressSelectModalContentHistory": "履歴",
+  "addressSelectModalContentSender": "送信者",
 
   "changePasswordModalTitle": "パスワード変更",
   "changePasswordModalDescription": "現在のパスワードを入力し、ウォレットのセキュリティを更新するための新しいパスワードを選択してください。",

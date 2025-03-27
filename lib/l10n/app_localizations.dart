@@ -2119,6 +2119,12 @@ abstract class AppLocalizations {
   /// **'History'**
   String get addressSelectModalContentHistory;
 
+  /// Label shown on addresses that belong to the sender account in the AddressSelectModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Sender'**
+  String get addressSelectModalContentSender;
+
   /// Title text for the ChangePasswordModal modal.
   ///
   /// In en, this message translates to:

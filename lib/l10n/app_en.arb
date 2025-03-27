@@ -1484,6 +1484,10 @@
   "@addressSelectModalContentHistory": {
     "description": "Section title for the 'History' list in the AddressSelectModalContent modal."
   },
+  "addressSelectModalContentSender": "Sender",
+  "@addressSelectModalContentSender": {
+    "description": "Label shown on addresses that belong to the sender account in the AddressSelectModalContent modal."
+  },
   "changePasswordModalTitle": "Change Password",
   "@changePasswordModalTitle": {
     "description": "Title text for the ChangePasswordModal modal."
