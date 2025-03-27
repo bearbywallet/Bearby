@@ -15,6 +15,7 @@ use super::evm::TransactionRequestEVM;
 use super::scilla::TransactionRequestScilla;
 use super::transaction_metadata::TransactionMetadataInfo;
 
+#[derive(Debug)]
 pub struct TransactionRequestInfo {
     pub metadata: TransactionMetadataInfo,
     pub scilla: Option<TransactionRequestScilla>,

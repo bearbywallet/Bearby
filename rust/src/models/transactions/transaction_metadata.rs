@@ -15,6 +15,7 @@ pub use zilpay::{
 
 use super::base_token::BaseTokenInfo;
 
+#[derive(Debug)]
 pub struct TransactionMetadataInfo {
     pub chain_hash: u64,
     pub hash: Option<String>,

@@ -13,6 +13,7 @@ pub use zilpay::{
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
 };
 
+#[derive(Debug)]
 pub struct AccessListItem {
     pub address: String,
     pub storage_keys: Vec<String>,

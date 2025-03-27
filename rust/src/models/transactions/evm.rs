@@ -15,6 +15,7 @@ pub use zilpay::{
 
 use super::access_list::AccessListItem;
 
+#[derive(Debug)]
 pub struct TransactionRequestEVM {
     pub nonce: Option<u64>,
     pub from: Option<String>,

@@ -2,6 +2,7 @@ use super::base_token::BaseTokenInfo;
 use zilpay::history::status::TransactionStatus;
 pub use zilpay::history::transaction::HistoricalTransaction;
 
+#[derive(Debug)]
 pub enum TransactionStatusInfo {
     Pending,
     Confirmed,
@@ -18,6 +19,7 @@ impl From<TransactionStatus> for TransactionStatusInfo {
     }
 }
 
+#[derive(Debug)]
 pub struct HistoricalTransactionInfo {
     pub transaction_hash: String,
     pub amount: String,

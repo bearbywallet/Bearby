@@ -219,6 +219,15 @@ pub async fn create_token_transfer(
                     params.wallet_index,
                     zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(params.account_index),
                 ))?;
+
+        if params.token.addr_type != sender_account.addr.prefix_type() {
+            return Err(ServiceError::AccountError(
+                params.wallet_index,
+                params.account_index,
+                WalletErrors::InvalidAccountType,
+            ));
+        }
+
         let token: FToken = params.token.try_into()?;
         let mut tx = core.build_token_transfer(&token, &sender_account, recipient, amount)?;
 
