@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -334,12 +333,20 @@ class _AddressSelectModalContentState
               child: SizedBox(
                 width: 40,
                 height: 40,
-                child: Jazzicon(
-                  diameter: 30,
-                  seed: item.address,
-                  theme: theme,
-                  shapeCount: 4,
-                ),
+                child: item.addrType == 1
+                    ? Jazzicon(
+                        diameter: 30,
+                        seed: item.address,
+                        theme: theme,
+                        shapeCount: 4,
+                      )
+                    : Blockies(
+                        color: theme.secondaryPurple,
+                        bgColor: theme.primaryPurple,
+                        size: 8,
+                        spotColor: theme.background,
+                        seed: item.address,
+                      ),
               ),
             ),
             const SizedBox(width: 12),
