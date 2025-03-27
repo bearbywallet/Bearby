@@ -1,4 +1,4 @@
-use zilpay::wallet::account::Account;
+use zilpay::wallet::{account::Account, account_type::AccountType};
 
 #[derive(Debug, PartialEq)]
 pub struct AccountInfo {
@@ -19,15 +19,20 @@ impl From<&Account> for AccountInfo {
             313 => account.addr.get_zil_bech32().unwrap_or_default(),
             _ => account.addr.auto_format(),
         };
+        let index = match account.account_type {
+            AccountType::Ledger(index) => index,
+            AccountType::Bip39HD(index) => index,
+            AccountType::PrivateKey(_) => 0,
+        };
 
         AccountInfo {
+            index,
             addr: addr_str,
             addr_type: account.addr.prefix_type(),
             name: account.name.clone(),
             chain_hash: account.chain_hash,
             chain_id: account.chain_id,
             slip_44: account.slip_44,
-            index: account.account_type.value(),
         }
     }
 }

@@ -15,6 +15,7 @@ mod wallet_tests {
         wallet::wallet_storage::StorageOperations,
     };
 
+    use crate::api::wallet::{add_sk_wallet, AddSKWalletParams};
     use crate::{
         api::{
             backend::{get_data, load_service},
@@ -427,9 +428,9 @@ mod wallet_tests {
             assert_eq!(token.addr, "0x0000000000000000000000000000000000000000");
             assert_eq!(token.addr_type, 1);
             assert_eq!(
-    token.logo,
-    Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-);
+        token.logo,
+        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+    );
             assert!(token.balances.is_empty());
             assert_eq!(token.rate, 0.0);
             assert!(!token.default);
@@ -672,22 +673,338 @@ mod wallet_tests {
                 "9a46a88b33c8c5b0c34532d461cc564dcc499ba74b5327c8a1d4cd145d53af2c"
             );
         }
+
+        delete_wallet(
+            0,
+            vec![String::from("new identifier")],
+            Some(PASSWORD.to_string()),
+            None,
+        )
+        .await
+        .unwrap();
+
         GUARD.store(5, std::sync::atomic::Ordering::Relaxed);
     }
 
-    // #[tokio::test]
-    // async fn test_c_create_sk_wallet() {
-    //     wait_for(5).await;
-    //     let zil_chain_config = {
-    //         let guard = BACKGROUND_SERVICE.read().await;
-    //         let service = guard.as_ref().unwrap();
-    //         let providers = service.core.get_providers();
+    #[tokio::test]
+    async fn test_c_create_sk_wallet() {
+        wait_for(5).await;
+        let zil_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
 
-    //         dbg!(&providers);
+            providers[0].config.clone()
+        };
+        let params = AddSKWalletParams {
+            sk: SK.to_string(),
+            password: PASSWORD.to_string(),
+            wallet_name: "SK Wallet".to_string(),
+            biometric_type: "faceId".to_string(),
+            identifiers: vec![String::from("test sk identifier")],
+            chain_hash: zil_chain_config.hash(),
+        };
+        let wallet_settings = WalletSettingsInfo {
+            cipher_orders: vec![0, 1],
+            argon_params: WalletArgonParamsInfo {
+                memory: 10,
+                iterations: 1,
+                threads: 1,
+                secret: "secret".to_string(),
+            },
+            currency_convert: "BTC".to_string(),
+            ipfs_node: None,
+            ens_enabled: false,
+            gas_control_enabled: false,
+            node_ranking_enabled: false,
+            max_connections: 0,
+            request_timeout_secs: 0,
+            rates_api_options: 0,
+        };
+        let ftokens = vec![];
+        let (session, wallet_address) = add_sk_wallet(params, wallet_settings, ftokens)
+            .await
+            .unwrap();
+        assert!(!session.is_empty());
+        assert!(!wallet_address.is_empty());
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
 
-    //         providers[0].config.clone()
-    //     };
+        {
+            assert_eq!(wallets.len(), 1);
+            assert_eq!(wallet.wallet_type, "SecretKey");
+            assert_eq!(wallet.wallet_name, "SK Wallet");
+            assert_eq!(wallet.auth_type, "faceId");
+            assert_eq!(wallet.wallet_address, wallet_address);
+            assert_eq!(wallet.accounts.len(), 1);
+            assert_eq!(wallet.selected_account, 0);
+        }
 
-    //     // dbg!(&zil_chain_config);
-    // }
+        {
+            let account = &wallet.accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.index, 0);
+            assert_eq!(account.chain_hash, zil_chain_config.hash());
+            assert_eq!(account.chain_id, zil_chain_config.chain_id());
+            assert_eq!(account.slip_44, zil_chain_config.slip_44);
+        }
+
+        {
+            assert_eq!(wallet.tokens.len(), 2);
+            let evm_token = &wallet.tokens[0];
+            assert_eq!(evm_token.name, "Zilliqa");
+            assert_eq!(evm_token.symbol, "ZIL");
+            assert_eq!(evm_token.decimals, 18);
+            assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(evm_token.addr_type, 1);
+            assert_eq!(
+            evm_token.logo,
+            Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+        );
+            assert!(evm_token.balances.is_empty());
+            assert_eq!(evm_token.rate, 0.0);
+            assert!(!evm_token.default);
+            assert!(evm_token.native);
+            assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
+
+            let zil_token = &wallet.tokens[1];
+            assert_eq!(zil_token.name, "Zilliqa");
+            assert_eq!(zil_token.symbol, "ZIL");
+            assert_eq!(zil_token.decimals, 12);
+            assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
+            assert_eq!(zil_token.addr_type, 0);
+            assert_eq!(
+            zil_token.logo,
+            Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+        );
+            assert!(zil_token.balances.is_empty());
+            assert_eq!(zil_token.rate, 0.0);
+            assert!(!zil_token.default);
+            assert!(zil_token.native);
+            assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
+        }
+
+        {
+            assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
+            assert_eq!(wallet.settings.argon_params.memory, 10);
+            assert_eq!(wallet.settings.argon_params.iterations, 1);
+            assert_eq!(wallet.settings.argon_params.threads, 1);
+            assert_eq!(
+                wallet.settings.argon_params.secret,
+                "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
+            );
+            assert_eq!(wallet.settings.currency_convert, "BTC");
+            assert!(wallet.settings.ipfs_node.is_none());
+            assert!(!wallet.settings.ens_enabled);
+            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.node_ranking_enabled);
+            assert_eq!(wallet.settings.max_connections, 0);
+            assert_eq!(wallet.settings.request_timeout_secs, 0);
+            assert_eq!(wallet.settings.rates_api_options, 0);
+        }
+
+        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+        assert_eq!(
+            reveal_bip39_phrase(
+                0,
+                vec![String::from("test sk identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await,
+            Err("Wallet error at index: 0: Invalid account type".to_string())
+        );
+
+        let keypair = reveal_keypair(
+            0,
+            0,
+            vec![String::from("test sk identifier")],
+            PASSWORD.to_string(),
+            None,
+        )
+        .await
+        .unwrap();
+
+        assert_eq!(&keypair.sk, SK);
+        assert_eq!(
+            &keypair.pk,
+            "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
+        );
+        let eth_checsum_addr = zilliqa_get_0x(0, 0).await.unwrap();
+
+        assert_eq!(
+            "0x60046369aAab40dADB0F08e9361ec012e6ebC617",
+            eth_checsum_addr
+        );
+
+        let bsc_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
+
+            providers[1].config.clone()
+        };
+
+        select_accounts_chain(0, bsc_chain_config.hash())
+            .await
+            .unwrap();
+
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        {
+            let account = &wallet.accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
+            assert_eq!(account.index, 0);
+            assert_eq!(account.chain_hash, bsc_chain_config.hash());
+            assert_eq!(account.chain_id, bsc_chain_config.chain_id());
+            assert_eq!(account.slip_44, bsc_chain_config.slip_44);
+        }
+
+        {
+            assert_eq!(wallet.tokens.len(), 1);
+            let bnb_token = &wallet.tokens[0];
+            assert_eq!(bnb_token.name, "BinanceCoin");
+            assert_eq!(bnb_token.symbol, "BNB");
+            assert_eq!(bnb_token.decimals, 18);
+            assert_eq!(bnb_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(bnb_token.addr_type, 1);
+            assert_eq!(
+        bnb_token.logo,
+        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+    );
+            assert!(bnb_token.balances.is_empty());
+            assert_eq!(bnb_token.rate, 0.0);
+            assert!(!bnb_token.default);
+            assert!(bnb_token.native);
+            assert_eq!(bnb_token.chain_hash, bsc_chain_config.hash());
+        }
+
+        assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+
+        assert_eq!(
+            zilliqa_swap_chain(0, 0).await,
+            Err("background Error: Account Error: Invalid public key type".to_string(),)
+        );
+
+        let keystore_bytes = make_keystore_file(
+            0,
+            PASSWORD.to_string(),
+            vec![String::from("test sk identifier")],
+        )
+        .await
+        .unwrap();
+
+        delete_wallet(
+            0,
+            vec![String::from("test sk identifier")],
+            None,
+            Some(session),
+        )
+        .await
+        .unwrap();
+
+        let wallets = get_wallets().await.unwrap();
+        assert_eq!(wallets.len(), 0);
+
+        let (_, _new_address) = restore_from_keystore(
+            keystore_bytes,
+            vec![String::from("test sk identifier")],
+            PASSWORD.to_string(),
+            "fingerprint".to_string(),
+        )
+        .await
+        .unwrap();
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        {
+            assert_eq!(wallets.len(), 1);
+            assert_eq!(wallet.wallet_type, "SecretKey");
+            assert_eq!(wallet.wallet_name, "SK Wallet");
+            assert_eq!(wallet.auth_type, "fingerprint");
+            assert!(!wallet.wallet_address.is_empty());
+            assert_eq!(wallet.accounts.len(), 1);
+            assert_eq!(wallet.selected_account, 0);
+
+            let account = &wallet.accounts[0];
+            assert_eq!(account.name, "SK Wallet");
+            assert_eq!(account.addr, "zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m");
+            assert_eq!(account.addr_type, 1);
+            assert_eq!(account.index, 0);
+            assert_eq!(account.chain_hash, zil_chain_config.hash());
+            assert_eq!(account.chain_id, zil_chain_config.chain_id());
+            assert_eq!(account.slip_44, zil_chain_config.slip_44);
+
+            assert_eq!(wallet.tokens.len(), 2);
+
+            let evm_token = &wallet.tokens[0];
+            assert_eq!(evm_token.name, "Zilliqa");
+            assert_eq!(evm_token.symbol, "ZIL");
+            assert_eq!(evm_token.decimals, 18);
+            assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
+            assert_eq!(evm_token.addr_type, 1);
+            assert_eq!(
+        evm_token.logo,
+        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+    );
+            assert!(evm_token.balances.is_empty());
+            assert_eq!(evm_token.rate, 0.0);
+            assert!(!evm_token.default);
+            assert!(evm_token.native);
+            assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
+
+            let zil_token = &wallet.tokens[1];
+            assert_eq!(zil_token.name, "Zilliqa");
+            assert_eq!(zil_token.symbol, "ZIL");
+            assert_eq!(zil_token.decimals, 12);
+            assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
+            assert_eq!(zil_token.addr_type, 0);
+            assert_eq!(
+        zil_token.logo,
+        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+    );
+            assert!(zil_token.balances.is_empty());
+            assert_eq!(zil_token.rate, 0.0);
+            assert!(!zil_token.default);
+            assert!(zil_token.native);
+            assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
+
+            assert_eq!(wallet.settings.cipher_orders, vec![0, 1]);
+            assert_eq!(wallet.settings.argon_params.memory, 10);
+            assert_eq!(wallet.settings.argon_params.iterations, 1);
+            assert_eq!(wallet.settings.argon_params.threads, 1);
+            assert_eq!(
+                wallet.settings.argon_params.secret,
+                "2bb80d537b1da3e38bd30361aa855686bde0eacd7162fef6a25fe97bf527a25b"
+            );
+            assert_eq!(wallet.settings.currency_convert, "BTC");
+            assert!(wallet.settings.ipfs_node.is_none());
+            assert!(!wallet.settings.ens_enabled);
+            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.node_ranking_enabled);
+            assert_eq!(wallet.settings.max_connections, 0);
+            assert_eq!(wallet.settings.request_timeout_secs, 0);
+            assert_eq!(wallet.settings.rates_api_options, 0);
+
+            assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
+
+            let restored_keypair = reveal_keypair(
+                0,
+                0,
+                vec![String::from("test sk identifier")],
+                PASSWORD.to_string(),
+                None,
+            )
+            .await
+            .unwrap();
+
+            assert_eq!(&restored_keypair.sk, SK);
+            assert_eq!(
+                &restored_keypair.pk,
+                "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
+            );
+        }
+    }
 }

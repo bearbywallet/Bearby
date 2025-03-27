@@ -63,8 +63,9 @@ pub fn secretkey_from_provider(
     let secret_key_bytes = decode_secret_key(&sk)?;
 
     let sk = match bip49.slip44 {
-        slip44::ZILLIQA => SecretKey::Secp256k1Sha256Zilliqa(secret_key_bytes),
-        slip44::ETHEREUM => SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes),
+        slip44::ETHEREUM | slip44::ZILLIQA => {
+            SecretKey::Secp256k1Keccak256Ethereum(secret_key_bytes)
+        }
         _ => todo!(),
     };
 
