@@ -504,7 +504,7 @@ mod wallet_tests {
 
             {
                 let account3 = &wallet.accounts[2];
-                assert_eq!(account3.addr, "zil1rk5r7k6y8ny8l0wxasrwgr6qnrq4jgssg0qsa2");
+                assert_eq!(account3.addr, "0x1DA83F5b443cc87FBdC6ec06E40F4098C1592210");
                 assert_eq!(account3.addr_type, 1);
                 assert_eq!(account3.name, "account 3");
                 assert_eq!(account3.chain_hash, wallet.default_chain_hash);
@@ -640,7 +640,7 @@ mod wallet_tests {
             {
                 assert_eq!(
                     wallet.accounts[0].addr,
-                    "zil10yxnd0snkark2mv7p54qc5saevcn4d8eaauhca"
+                    "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9"
                 );
                 assert_eq!(wallet.accounts[0].addr_type, 1);
                 assert_eq!(wallet.accounts[0].chain_hash, zil_chain_config.hash());
@@ -936,7 +936,7 @@ mod wallet_tests {
 
             let account = &wallet.accounts[0];
             assert_eq!(account.name, "SK Wallet");
-            assert_eq!(account.addr, "zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m");
+            assert_eq!(account.addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
             assert_eq!(account.addr_type, 1);
             assert_eq!(account.index, 0);
             assert_eq!(account.chain_hash, zil_chain_config.hash());
