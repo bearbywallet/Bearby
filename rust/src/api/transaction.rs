@@ -279,7 +279,9 @@ pub async fn cacl_gas_fee(
                 TransactionRequest::Zilliqa((tx, _)) => {
                     gas.tx_estimate_gas = U256::from(tx.gas_limit);
                 }
-                _ => {}
+                TransactionRequest::Ethereum((tx, _)) => {
+                    gas.tx_estimate_gas = tx.gas.map(|gas| U256::from(gas)).unwrap_or(U256::ZERO);
+                }
             }
         }
 

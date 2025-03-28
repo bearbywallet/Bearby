@@ -19,7 +19,7 @@ mod wallet_tests {
     };
 
     use crate::api::token::{add_ftoken, fetch_token_meta};
-    use crate::api::transaction::{create_token_transfer, TokenTransferParamsInfo};
+    use crate::api::transaction::{cacl_gas_fee, create_token_transfer, TokenTransferParamsInfo};
     use crate::api::wallet::{add_sk_wallet, AddSKWalletParams};
     use crate::{
         api::{
@@ -29,8 +29,9 @@ mod wallet_tests {
             wallet::{
                 add_bip39_wallet, add_next_bip39_account, delete_account, delete_wallet,
                 get_wallets, make_keystore_file, restore_from_keystore, reveal_bip39_phrase,
-                reveal_keypair, select_account, zilliqa_get_0x, zilliqa_get_bech32_base16_address,
-                zilliqa_swap_chain, AddNextBip39AccountParams, Bip39AddWalletParams,
+                reveal_keypair, select_account, zilliqa_get_bech32_base16_address,
+                zilliqa_get_n_format, zilliqa_swap_chain, AddNextBip39AccountParams,
+                Bip39AddWalletParams,
             },
         },
         models::settings::{WalletArgonParamsInfo, WalletSettingsInfo},
@@ -334,9 +335,9 @@ mod wallet_tests {
         .await
         .unwrap();
 
-        let address = zilliqa_get_0x(0, 0).await.unwrap();
+        let address = zilliqa_get_n_format(0, 0).await.unwrap();
 
-        assert_eq!(address, "0x790D36BE13b747656d9E0D2a0c521DCB313ab4f9");
+        assert_eq!(address, "zil10yxnd0snkark2mv7p54qc5saevcn4d8eaauhca");
 
         let (bech32, base16) = zilliqa_get_bech32_base16_address(0, 0).await.unwrap();
 
@@ -694,7 +695,7 @@ mod wallet_tests {
 
     #[tokio::test]
     async fn test_c_create_sk_wallet() {
-        wait_for(5).await;
+        wait_for(4).await;
         let zil_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();
@@ -836,12 +837,9 @@ mod wallet_tests {
             &keypair.pk,
             "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
         );
-        let eth_checsum_addr = zilliqa_get_0x(0, 0).await.unwrap();
+        let bech32 = zilliqa_get_n_format(0, 0).await.unwrap();
 
-        assert_eq!(
-            "0x60046369aAab40dADB0F08e9361ec012e6ebC617",
-            eth_checsum_addr
-        );
+        assert_eq!("zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m", bech32);
 
         let bsc_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
@@ -1088,5 +1086,74 @@ mod wallet_tests {
             // Assert EVM is None
             assert!(tx.evm.is_none());
         }
+
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        assert_eq!(
+            wallet.accounts[0].addr,
+            "zil1q2yyq6z2sz26p54700e5zpzu3gj070wxt8h75h"
+        );
+        let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
+
+        assert_eq!(diff_addr, "0x60046369aAab40dADB0F08e9361ec012e6ebC617");
+
+        zilliqa_swap_chain(0, 0).await.unwrap();
+
+        let diff_addr = zilliqa_get_n_format(0, 0).await.unwrap();
+
+        assert_eq!(diff_addr, "zil1vqzxx6d24dqd4kc0pr5nv8kqztnwh3shfm2s0m");
+
+        let token = fetch_token_meta("0x2274005778063684fbB1BfA96a2b725dC37D75f9".to_string(), 0)
+            .await
+            .unwrap();
+        let mut tx = create_token_transfer(TokenTransferParamsInfo {
+            wallet_index: 0,
+            account_index: 0,
+            token,
+            amount: "1".to_string(),
+            recipient: "0xa1B2Ff03F501A4d8278CB75a9075F406A5B8C5Ff".to_string(),
+            icon: "".to_string(),
+        })
+        .await
+        .unwrap();
+
+        if let Some(evm) = tx.evm.as_mut() {
+            evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
+        }
+
+        // let tx = TransactionRequestInfo {
+        //     metadata: TransactionMetadataInfo {
+        //         chain_hash: zil_chain_config.hash(),
+        //         hash: None,
+        //         info: None,
+        //         icon: None,
+        //         title: None,
+        //         signer: None,
+        //         token_info: None,
+        //     },
+        //     scilla: None,
+        //                 evm: Some(TransactionRequestEVM {
+        //         nonce: None,
+        //         // from: Some(wallet.accounts[0].addr.clone()),
+        //         from: Some("0xa1B2Ff03F501A4d8278CB75a9075F406A5B8C5Ff".to_string()),
+        //         to: Some("0xe30161F32A019d876F082d9FF13ed451a03A2086".to_string()),
+        //         value: Some("0xde0b6b3a7640000".to_string()),
+        //         // gas_limit: Some(1197051),
+        //         gas_limit: None,
+        //         data: Some(hex::decode("5ae401dc0000000000000000000000000000000000000000000000000000000067e63a35000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000e404e45aaf00000000000000000000000094e18ae7dd5ee57b55f30c4b63e2760c09efb1920000000000000000000000002274005778063684fbb1bfa96a2b725dc37d75f900000000000000000000000000000000000000000000000000000000000009c4000000000000000000000000a1b2ff03f501a4d8278cb75a9075f406a5b8c5ff0000000000000000000000000000000000000000000000000905438e600100000000000000000000000000000000000000000000000000000000000000001f3d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e404e45aaf00000000000000000000000094e18ae7dd5ee57b55f30c4b63e2760c09efb1920000000000000000000000002274005778063684fbb1bfa96a2b725dc37d75f900000000000000000000000000000000000000000000000000000000000001f4000000000000000000000000a1b2ff03f501a4d8278cb75a9075f406a5b8c5ff00000000000000000000000000000000000000000000000004db73254763000000000000000000000000000000000000000000000000000000000000000012c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").unwrap()),
+        //         max_fee_per_gas: None,
+        //         max_priority_fee_per_gas: None,
+        //         gas_price: None,
+        //         chain_id: None,
+        //         access_list: None,
+        //         blob_versioned_hashes: None,
+        //         max_fee_per_blob_gas: None,
+        //     }),
+        // };
+        let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
+
+        assert!(gas.gas_price > 0);
+        assert!(gas.tx_estimate_gas > 0);
     }
 }

@@ -54,7 +54,7 @@ class _ReceivePageState extends State<ReceivePage> {
     _accountNameController.text = appState.account?.name ?? "";
 
     if (chain.slip44 == 313) {
-      zilliqaGet0X(
+      zilliqaGetNFormat(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
       ).then((addr) {
@@ -412,7 +412,7 @@ class _ReceivePageState extends State<ReceivePage> {
               colorFilter:
                   ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
             ),
-            disabled: legacyAddress == null,
+            disabled: legacyAddress == null || account.addrType == 0,
             onPressed: () {
               if (legacyAddress != null) {
                 setState(() {

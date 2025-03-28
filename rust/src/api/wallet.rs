@@ -443,7 +443,10 @@ pub fn zilliqa_legacy_base16_to_bech32(base16: String) -> Result<String, String>
     Ok(addr.get_zil_bech32().unwrap_or_default())
 }
 
-pub async fn zilliqa_get_0x(wallet_index: usize, account_index: usize) -> Result<String, String> {
+pub async fn zilliqa_get_n_format(
+    wallet_index: usize,
+    account_index: usize,
+) -> Result<String, String> {
     with_wallet(wallet_index, |wallet| {
         let data = wallet
             .get_wallet_data()
@@ -458,12 +461,12 @@ pub async fn zilliqa_get_0x(wallet_index: usize, account_index: usize) -> Result
             PubKey::Secp256k1Sha256(pk) => PubKey::Secp256k1Keccak256(pk)
                 .get_addr()
                 .ok()
-                .and_then(|a| a.get_zil_check_sum_addr().ok()),
+                .and_then(|a| a.to_eth_checksummed().ok()),
             PubKey::Secp256k1Keccak256(_) => account
                 .pub_key
                 .get_addr()
                 .ok()
-                .and_then(|a| a.to_eth_checksummed().ok()),
+                .and_then(|a| a.get_zil_bech32().ok()),
             _ => None,
         }
         .ok_or(ServiceError::AccountTypeNotValid)?;

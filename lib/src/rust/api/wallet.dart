@@ -124,9 +124,9 @@ Future<String> zilliqaLegacyBase16ToBech32({required String base16}) =>
     RustLib.instance.api
         .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
 
-Future<String> zilliqaGet0X(
+Future<String> zilliqaGetNFormat(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiWalletZilliqaGet0X(
+    RustLib.instance.api.crateApiWalletZilliqaGetNFormat(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
 Future<Uint8List> makeKeystoreFile(
@@ -137,6 +137,17 @@ Future<Uint8List> makeKeystoreFile(
         walletIndex: walletIndex,
         password: password,
         deviceIndicators: deviceIndicators);
+
+Future<(String, String)> restoreFromKeystore(
+        {required List<int> keystoreBytes,
+        required List<String> deviceIndicators,
+        required String password,
+        required String biometricType}) =>
+    RustLib.instance.api.crateApiWalletRestoreFromKeystore(
+        keystoreBytes: keystoreBytes,
+        deviceIndicators: deviceIndicators,
+        password: password,
+        biometricType: biometricType);
 
 class AddNextBip39AccountParams {
   final BigInt walletIndex;
