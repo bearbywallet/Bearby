@@ -8,6 +8,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/services/social_media.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -101,6 +102,13 @@ class _SettingsPageState extends State<SettingsPage> {
                                                 .wallet!.selectedAccount,
                                           );
                                           await appState.syncData();
+
+                                          try {
+                                            await syncBalances(
+                                              walletIndex: walletIndex,
+                                            );
+                                            await appState.syncData();
+                                          } catch (_) {}
                                         },
                                         activeColor: theme.primaryPurple,
                                         activeTrackColor: theme.primaryPurple
