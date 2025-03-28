@@ -51,8 +51,29 @@ pub async fn sign_send_transactions(
         let wallet = core
             .get_wallet_by_index(wallet_index)
             .map_err(ServiceError::BackgroundError)?;
+        let wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let sender_account =
+            wallet_data
+                .accounts
+                .get(account_index)
+                .ok_or(ServiceError::AccountError(
+                    account_index,
+                    wallet_index,
+                    zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
+                ))?;
+        let mut tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
 
-        let tx = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+        match &mut tx {
+            TransactionRequest::Zilliqa((zil_tx, _)) => {
+                zil_tx.chain_id = sender_account.chain_id as u16;
+            }
+            TransactionRequest::Ethereum((eth_tx, _)) => {
+                eth_tx.chain_id = Some(sender_account.chain_id);
+            }
+        }
+
         let signed_tx = wallet
             .sign_transaction(
                 tx,

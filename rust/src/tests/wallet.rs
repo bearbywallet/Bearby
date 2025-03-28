@@ -695,7 +695,7 @@ mod wallet_tests {
 
     #[tokio::test]
     async fn test_c_create_sk_wallet() {
-        wait_for(4).await;
+        wait_for(5).await;
         let zil_chain_config = {
             let guard = BACKGROUND_SERVICE.read().await;
             let service = guard.as_ref().unwrap();

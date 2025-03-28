@@ -57,8 +57,7 @@ String processTokenLogo({
   if (token.logo == null) return 'assets/icons/warning.svg';
 
   final replacements = <String, String>{
-    'symbol':
-        token.symbol.replaceAll("t", "").replaceAll("p", "").toLowerCase(),
+    'symbol': token.symbol.toLowerCase(),
     'contract_address': token.addr.toLowerCase(),
     'name': token.name,
     'shortName': shortName,

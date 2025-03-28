@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -337,12 +338,18 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                             children: [
                               Row(
                                 children: [
-                                  AsyncImage(
-                                    url: widget.tokenIconUrl,
-                                    width: 40,
-                                    height: 40,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  if (_ftoken != null)
+                                    AsyncImage(
+                                      url: processTokenLogo(
+                                        token: _ftoken!,
+                                        shortName:
+                                            appState.chain?.shortName ?? '',
+                                        theme: theme.value,
+                                      ),
+                                      width: 40,
+                                      height: 40,
+                                      fit: BoxFit.cover,
+                                    ),
                                   const SizedBox(width: 12),
                                   Text(
                                     _ftoken?.name ?? widget.tokenName,
@@ -379,7 +386,11 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                             Row(
                               children: [
                                 AsyncImage(
-                                  url: widget.tokenIconUrl,
+                                  url: processTokenLogo(
+                                    token: _ftoken!,
+                                    shortName: appState.chain?.shortName ?? '',
+                                    theme: theme.value,
+                                  ),
                                   width: 40,
                                   height: 40,
                                   fit: BoxFit.cover,

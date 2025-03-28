@@ -148,6 +148,7 @@ class Web3EIP1193Handler {
 
   Future<List<String>> _getWalletAddresses(AppState appState) async {
     List<String> addresses = [];
+    final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
 
     if (appState.chain?.slip44 == 313) {
       addresses = await getZilEthChecksumAddresses(
@@ -156,15 +157,10 @@ class Web3EIP1193Handler {
       addresses = (appState.wallet?.accounts ?? []).map((a) => a.addr).toList();
     }
 
-    final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
-
     if (selectedAccountIndex != null &&
         selectedAccountIndex >= 0 &&
         selectedAccountIndex < addresses.length) {
-      final selectedAddress = addresses[selectedAccountIndex];
-
-      addresses.removeAt(selectedAccountIndex);
-      addresses.insert(0, selectedAddress);
+      return [addresses[selectedAccountIndex]];
     }
 
     return addresses;
@@ -1211,7 +1207,7 @@ class Web3EIP1193Handler {
         tokenAddress: tokenAddress,
         tokenName: tokenSymbol,
         tokenSymbol: tokenSymbol,
-        tokenIconUrl: tokenImage,
+        tokenIconUrl: tokenImage ?? appState.wallet?.tokens.first.logo,
         onConfirm: (ftoken) async {
           await addFtoken(
             meta: ftoken,
