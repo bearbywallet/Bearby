@@ -2941,29 +2941,11 @@ abstract class AppLocalizations {
   /// **'Temporary file location'**
   String get keystoreBackupTempLocation;
 
-  /// Message shown when no keystore file has been selected
-  ///
-  /// In en, this message translates to:
-  /// **'No keystore file selected'**
-  String get keystoreNoFileSelected;
-
   /// Hint text for the keystore password input field
   ///
   /// In en, this message translates to:
   /// **'Enter your keystore password'**
   String get keystorePasswordHint;
-
-  /// Button text to select a keystore file
-  ///
-  /// In en, this message translates to:
-  /// **'Select Keystore File'**
-  String get keystoreSelectFileButton;
-
-  /// Button text to change the selected keystore file
-  ///
-  /// In en, this message translates to:
-  /// **'Change File'**
-  String get keystoreChangeFileButton;
 
   /// Button text to restore the wallet from keystore
   ///
@@ -2971,11 +2953,23 @@ abstract class AppLocalizations {
   /// **'Restore Wallet'**
   String get keystoreRestoreButton;
 
-  /// Error message when trying to restore without selecting a file or entering a password
+  /// title when we have keystore files
   ///
   /// In en, this message translates to:
-  /// **'Please select a keystore file and enter your password'**
-  String get keystoreRestoreEmptyError;
+  /// **'Please select a valid .zp file'**
+  String get keystoreRestoreExtError;
+
+  /// No description provided for @keystoreRestoreNoFile.
+  ///
+  /// In en, this message translates to:
+  /// **'No keystore files found'**
+  String get keystoreRestoreNoFile;
+
+  /// No description provided for @keystoreRestoreFilesTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Keystore Files'**
+  String get keystoreRestoreFilesTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

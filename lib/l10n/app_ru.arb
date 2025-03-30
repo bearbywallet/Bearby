@@ -556,10 +556,9 @@
   "keystoreBackupSaveFailed": "Не удалось сохранить файл keystore",
   "keystoreBackupTempLocation": "Расположение временного файла",
 
-  "keystoreNoFileSelected": "Файл keystore не выбран",
   "keystorePasswordHint": "Введите пароль от keystore",
-  "keystoreSelectFileButton": "Выбрать файл Keystore",
-  "keystoreChangeFileButton": "Изменить файл",
   "keystoreRestoreButton": "Восстановить кошелек",
-  "keystoreRestoreEmptyError": "Пожалуйста, выберите файл keystore и введите пароль"
+  "keystoreRestoreExtError": "Пожалуйста, выберите действительный файл .zp",
+  "keystoreRestoreNoFile": "Файлы хранилища ключей не найдены",
+  "keystoreRestoreFilesTitle": "Файлы хранилища ключей"
 }

@@ -1451,20 +1451,17 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupTempLocation => 'Temporary file location';
 
   @override
-  String get keystoreNoFileSelected => 'No keystore file selected';
-
-  @override
   String get keystorePasswordHint => 'Enter your keystore password';
-
-  @override
-  String get keystoreSelectFileButton => 'Select Keystore File';
-
-  @override
-  String get keystoreChangeFileButton => 'Change File';
 
   @override
   String get keystoreRestoreButton => 'Restore Wallet';
 
   @override
-  String get keystoreRestoreEmptyError => 'Please select a keystore file and enter your password';
+  String get keystoreRestoreExtError => 'Please select a valid .zp file';
+
+  @override
+  String get keystoreRestoreNoFile => 'No keystore files found';
+
+  @override
+  String get keystoreRestoreFilesTitle => 'Keystore Files';
 }

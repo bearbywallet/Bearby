@@ -2043,28 +2043,24 @@
     "description": "Label for displaying the temporary file location"
   },
 
-  "keystoreNoFileSelected": "No keystore file selected",
-  "@keystoreNoFileSelected": {
-    "description": "Message shown when no keystore file has been selected"
-  },
   "keystorePasswordHint": "Enter your keystore password",
   "@keystorePasswordHint": {
     "description": "Hint text for the keystore password input field"
-  },
-  "keystoreSelectFileButton": "Select Keystore File",
-  "@keystoreSelectFileButton": {
-    "description": "Button text to select a keystore file"
-  },
-  "keystoreChangeFileButton": "Change File",
-  "@keystoreChangeFileButton": {
-    "description": "Button text to change the selected keystore file"
   },
   "keystoreRestoreButton": "Restore Wallet",
   "@keystoreRestoreButton": {
     "description": "Button text to restore the wallet from keystore"
   },
-  "keystoreRestoreEmptyError": "Please select a keystore file and enter your password",
-  "@keystoreRestoreEmptyError": {
-    "description": "Error message when trying to restore without selecting a file or entering a password"
+  "keystoreRestoreExtError": "Please select a valid .zp file",
+  "@keystoreRestoreExtError": {
+    "description": "an error about the wrong extension backup file"
+  },
+  "keystoreRestoreNoFile": "No keystore files found",
+  "@keystoreRestoreExtError": {
+    "description": "just a description we have no backup files found!"
+  },
+  "keystoreRestoreFilesTitle": "Keystore Files",
+  "@keystoreRestoreExtError": {
+    "description": "title when we have keystore files"
   }
 }

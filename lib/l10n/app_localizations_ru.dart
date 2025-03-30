@@ -1451,20 +1451,17 @@ class AppLocalizationsRu extends AppLocalizations {
   String get keystoreBackupTempLocation => 'Расположение временного файла';
 
   @override
-  String get keystoreNoFileSelected => 'Файл keystore не выбран';
-
-  @override
   String get keystorePasswordHint => 'Введите пароль от keystore';
-
-  @override
-  String get keystoreSelectFileButton => 'Выбрать файл Keystore';
-
-  @override
-  String get keystoreChangeFileButton => 'Изменить файл';
 
   @override
   String get keystoreRestoreButton => 'Восстановить кошелек';
 
   @override
-  String get keystoreRestoreEmptyError => 'Пожалуйста, выберите файл keystore и введите пароль';
+  String get keystoreRestoreExtError => 'Пожалуйста, выберите действительный файл .zp';
+
+  @override
+  String get keystoreRestoreNoFile => 'Файлы хранилища ключей не найдены';
+
+  @override
+  String get keystoreRestoreFilesTitle => 'Файлы хранилища ключей';
 }

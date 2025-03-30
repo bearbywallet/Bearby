@@ -560,10 +560,9 @@
   "keystoreBackupSaveFailed": "キーストアファイルの保存に失敗しました",
   "keystoreBackupTempLocation": "一時ファイルの場所",
 
-  "keystoreNoFileSelected": "キーストアファイルが選択されていません",
   "keystorePasswordHint": "キーストアのパスワードを入力してください",
-  "keystoreSelectFileButton": "キーストアファイルを選択",
-  "keystoreChangeFileButton": "ファイルを変更",
   "keystoreRestoreButton": "ウォレットを復元",
-  "keystoreRestoreEmptyError": "キーストアファイルを選択し、パスワードを入力してください"
+  "keystoreRestoreExtError": "有効な.zpファイルを選択してください",
+  "keystoreRestoreNoFile": "キーストアファイルが見つかりません",
+  "keystoreRestoreFilesTitle": "キーストアファイル"
 }
