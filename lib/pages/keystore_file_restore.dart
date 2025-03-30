@@ -140,34 +140,38 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
   }
 
   Future<KeystoreFile?> _parseKeystoreFile(File file) async {
-    final bytes = await file.readAsBytes();
-    if (bytes.length < SIGNATURE.length + 1) {
+    try {
+      final bytes = await file.readAsBytes();
+      if (bytes.length < SIGNATURE.length + 1) {
+        return KeystoreFile(
+          file: file,
+          fileName: file.path.split('/').last,
+          filePath: file.path,
+          lastModified: file.lastModifiedSync(),
+          isValid: false,
+        );
+      }
+
+      final signatureBytes = bytes.sublist(0, SIGNATURE.length);
+      final signatureMatches =
+          _compareByteList(signatureBytes, Uint8List.fromList(SIGNATURE));
+
+      int? version;
+      if (signatureMatches && bytes.length > SIGNATURE.length) {
+        version = bytes[SIGNATURE.length];
+      }
+
       return KeystoreFile(
         file: file,
         fileName: file.path.split('/').last,
         filePath: file.path,
         lastModified: file.lastModifiedSync(),
-        isValid: false,
+        isValid: signatureMatches,
+        version: version,
       );
+    } catch (e) {
+      return null;
     }
-
-    final signatureBytes = bytes.sublist(0, SIGNATURE.length);
-    final signatureMatches =
-        _compareByteList(signatureBytes, Uint8List.fromList(SIGNATURE));
-
-    int? version;
-    if (signatureMatches && bytes.length > SIGNATURE.length) {
-      version = bytes[SIGNATURE.length];
-    }
-
-    return KeystoreFile(
-      file: file,
-      fileName: file.path.split('/').last,
-      filePath: file.path,
-      lastModified: file.lastModifiedSync(),
-      isValid: signatureMatches,
-      version: version,
-    );
   }
 
   bool _compareByteList(Uint8List a, Uint8List b) {
@@ -514,6 +518,7 @@ class KeystoreFile {
   final DateTime lastModified;
   final bool isValid;
   final int? version;
+  final int fileSize;
 
   KeystoreFile({
     required this.file,
@@ -522,7 +527,7 @@ class KeystoreFile {
     required this.lastModified,
     required this.isValid,
     this.version,
-  });
+  }) : fileSize = file.lengthSync();
 }
 
 class KeystoreFileCard extends StatelessWidget {
@@ -542,6 +547,11 @@ class KeystoreFileCard extends StatelessWidget {
     required this.onPressed,
     this.disabled = false,
   }) : super(key: key);
+
+  String _formatFileSize() {
+    final sizeInKB = (file.fileSize / 1024).toStringAsFixed(1);
+    return '$sizeInKB KB';
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -590,12 +600,24 @@ class KeystoreFileCard extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                       ),
                       const SizedBox(height: 4),
-                      Text(
-                        formattedDate,
-                        style: TextStyle(
-                          color: theme.textSecondary,
-                          fontSize: 12,
-                        ),
+                      Row(
+                        children: [
+                          Text(
+                            formattedDate,
+                            style: TextStyle(
+                              color: theme.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            _formatFileSize(),
+                            style: TextStyle(
+                              color: theme.textSecondary,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -620,16 +642,6 @@ class KeystoreFileCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                const SizedBox(width: 8),
-                SvgPicture.asset(
-                  'assets/icons/right_arrow.svg',
-                  width: 16,
-                  height: 16,
-                  colorFilter: ColorFilter.mode(
-                    disabled ? theme.textSecondary : theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
               ],
             ),
             const SizedBox(height: 8),

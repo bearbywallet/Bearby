@@ -87,15 +87,14 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
         deviceIndicators: identifiers,
       );
 
-      // Save to temporary file to display success
-      final tempPath = await _saveKeystoreToTempFile(
+      final docPath = await _saveKeystoreToDocumentsDir(
         keystoreBytes!,
         name,
       );
 
       setState(() {
         isBackupCreated = true;
-        backupFilePath = tempPath;
+        backupFilePath = docPath;
         isProcessing = false;
       });
 
@@ -112,12 +111,12 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     }
   }
 
-  Future<String> _saveKeystoreToTempFile(
+  Future<String> _saveKeystoreToDocumentsDir(
     Uint8List keystoreBytes,
     String name,
   ) async {
     try {
-      final directory = await getTemporaryDirectory();
+      final directory = await getApplicationDocumentsDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final filePath =
           '${directory.path}/${name}_zilpay_keystore_$timestamp.zp';
@@ -146,13 +145,9 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final fileName = '${name}_zilpay_keystore_$timestamp.zp';
 
-      // На iOS saveFile не работает, используем getDirectoryPath вместо него
-      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
-        dialogTitle: l10n.keystoreBackupSaveDialogTitle,
-      );
-
-      if (outputDirectory != null) {
-        final outputPath = '$outputDirectory/$fileName';
+      if (Platform.isIOS) {
+        final directory = await getApplicationDocumentsDirectory();
+        final outputPath = '${directory.path}/$fileName';
 
         final file = File(outputPath);
         await file.writeAsBytes(keystoreBytes!);
@@ -161,15 +156,32 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
           backupFilePath = outputPath;
         });
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.keystoreBackupSavedSuccess),
-              backgroundColor: Provider.of<AppState>(context, listen: false)
-                  .currentTheme
-                  .success,
-            ),
-          );
+        await Share.shareXFiles([XFile(outputPath)]);
+      } else {
+        String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+          dialogTitle: l10n.keystoreBackupSaveDialogTitle,
+        );
+
+        if (outputDirectory != null) {
+          final outputPath = '$outputDirectory/$fileName';
+
+          final file = File(outputPath);
+          await file.writeAsBytes(keystoreBytes!);
+
+          setState(() {
+            backupFilePath = outputPath;
+          });
+
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(l10n.keystoreBackupSavedSuccess),
+                backgroundColor: Provider.of<AppState>(context, listen: false)
+                    .currentTheme
+                    .success,
+              ),
+            );
+          }
         }
       }
     } catch (e) {
@@ -286,20 +298,22 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                     if (isBackupCreated) ...[
                       _buildSuccessMessage(theme),
                       SizedBox(height: adaptivePadding),
-                      Container(
-                        constraints: const BoxConstraints(maxWidth: 480),
-                        child: CustomButton(
-                          textColor: theme.buttonText,
-                          backgroundColor: theme.primaryPurple,
-                          text: l10n.keystoreBackupSaveAsButton,
-                          onPressed: () => _saveKeystoreWithPicker(
-                            state.wallet?.walletName ?? "",
+                      if (!Platform.isIOS) ...[
+                        Container(
+                          constraints: const BoxConstraints(maxWidth: 480),
+                          child: CustomButton(
+                            textColor: theme.buttonText,
+                            backgroundColor: theme.primaryPurple,
+                            text: l10n.keystoreBackupSaveAsButton,
+                            onPressed: () => _saveKeystoreWithPicker(
+                              state.wallet?.walletName ?? "",
+                            ),
+                            borderRadius: 30.0,
+                            height: 56.0,
                           ),
-                          borderRadius: 30.0,
-                          height: 56.0,
                         ),
-                      ),
-                      SizedBox(height: adaptivePadding),
+                        SizedBox(height: adaptivePadding),
+                      ],
                       Container(
                         constraints: const BoxConstraints(maxWidth: 480),
                         child: CustomButton(
