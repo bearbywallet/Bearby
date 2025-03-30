@@ -27,6 +27,7 @@ dependencies:
   share_plus: ^10.1.3
   flutter_inappwebview: ^6.1.5
   screen_protector: ^1.4.2+1
+  file_picker: ^9.2.3
 
 dev_dependencies:
   flutter_test:

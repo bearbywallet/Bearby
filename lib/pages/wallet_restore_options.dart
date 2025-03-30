@@ -22,6 +22,10 @@ class RestoreWalletOptionsPage extends StatelessWidget {
     Navigator.of(context).pushNamed('/restore_sk');
   }
 
+  void _handleKeystoreResotre(BuildContext context) {
+    Navigator.of(context).pushNamed('/keystore_file_restore');
+  }
+
   void _handleQRCodeScanning(BuildContext context) {
     showQRScannerModal(
       context: context,
@@ -169,6 +173,16 @@ class RestoreWalletOptionsPage extends StatelessWidget {
       ),
     );
 
+    final fileIcon = SvgPicture.asset(
+      'assets/icons/file.svg',
+      width: 35,
+      height: 35,
+      colorFilter: ColorFilter.mode(
+        theme.primaryPurple,
+        BlendMode.srcIn,
+      ),
+    );
+
     final qrcodeIcon = SvgPicture.asset(
       'assets/icons/qrcode.svg',
       width: 35,
@@ -221,6 +235,14 @@ class RestoreWalletOptionsPage extends StatelessWidget {
                   .restoreWalletOptionsPrivateKeySubtitle,
               icon: bincodeIcon,
               onTap: () => _handlePrivateKeyRestore(context),
+            ),
+            WalletListItem(
+              title: AppLocalizations.of(context)!
+                  .restoreWalletOptionsKeyStoreTitle,
+              subtitle: AppLocalizations.of(context)!
+                  .restoreWalletOptionsKeyStoreSubtitle,
+              icon: fileIcon,
+              onTap: () => _handleKeystoreResotre(context),
             ),
             WalletListItem(
               title:

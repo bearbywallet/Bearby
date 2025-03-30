@@ -861,6 +861,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreWalletOptionsPrivateKeySubtitle => 'Восстановить с помощью приватного ключа';
 
   @override
+  String get restoreWalletOptionsKeyStoreTitle => 'Файл Keystore';
+
+  @override
+  String get restoreWalletOptionsKeyStoreSubtitle => 'Восстановление кошелька с помощью зашифрованного паролем файла резервной копии';
+
+  @override
   String get restoreWalletOptionsQRCodeTitle => 'QR-код';
 
   @override
@@ -1428,4 +1434,37 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get keystoreBackupSuccessMessage => 'Ваш файл keystore был создан. Обязательно храните в безопасности как файл, так и ваш пароль.';
+
+  @override
+  String get keystoreBackupSaveAsButton => 'Сохранить в файл';
+
+  @override
+  String get keystoreBackupSaveDialogTitle => 'Сохранить файл Keystore';
+
+  @override
+  String get keystoreBackupSavedSuccess => 'Файл keystore успешно сохранен';
+
+  @override
+  String get keystoreBackupSaveFailed => 'Не удалось сохранить файл keystore';
+
+  @override
+  String get keystoreBackupTempLocation => 'Расположение временного файла';
+
+  @override
+  String get keystoreNoFileSelected => 'Файл keystore не выбран';
+
+  @override
+  String get keystorePasswordHint => 'Введите пароль от keystore';
+
+  @override
+  String get keystoreSelectFileButton => 'Выбрать файл Keystore';
+
+  @override
+  String get keystoreChangeFileButton => 'Изменить файл';
+
+  @override
+  String get keystoreRestoreButton => 'Восстановить кошелек';
+
+  @override
+  String get keystoreRestoreEmptyError => 'Пожалуйста, выберите файл keystore и введите пароль';
 }

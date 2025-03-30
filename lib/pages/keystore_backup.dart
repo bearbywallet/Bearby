@@ -3,6 +3,7 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dar
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:screen_protector/screen_protector.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -31,6 +32,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
   bool _obscureConfirmPassword = true;
   bool isBackupCreated = false;
   String? backupFilePath;
+  Uint8List? keystoreBytes;
 
   final _confirmPasswordController = TextEditingController();
   final _confirmPasswordInputKey = GlobalKey<SmartInputState>();
@@ -79,20 +81,21 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
-      Uint8List keystoreBytes = await makeKeystoreFile(
+      keystoreBytes = await makeKeystoreFile(
         walletIndex: walletIndex,
         password: _confirmPasswordController.text,
         deviceIndicators: identifiers,
       );
 
-      final path = await _saveKeystoreToFile(
-        keystoreBytes,
+      // Save to temporary file to display success
+      final tempPath = await _saveKeystoreToTempFile(
+        keystoreBytes!,
         name,
       );
 
       setState(() {
         isBackupCreated = true;
-        backupFilePath = path;
+        backupFilePath = tempPath;
         isProcessing = false;
       });
 
@@ -109,12 +112,12 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     }
   }
 
-  Future<String> _saveKeystoreToFile(
+  Future<String> _saveKeystoreToTempFile(
     Uint8List keystoreBytes,
     String name,
   ) async {
     try {
-      final directory = await getApplicationDocumentsDirectory();
+      final directory = await getTemporaryDirectory();
       final timestamp = DateTime.now().millisecondsSinceEpoch;
       final filePath =
           '${directory.path}/${name}_zilpay_keystore_$timestamp.zp';
@@ -128,10 +131,71 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     }
   }
 
-  Future<void> _shareKeystoreFile() async {
-    if (backupFilePath != null) {
-      await Share.shareXFiles([XFile(backupFilePath!)]);
+  Future<void> _saveKeystoreWithPicker(String name) async {
+    final l10n = AppLocalizations.of(context)!;
+
+    if (keystoreBytes == null) {
+      setState(() {
+        hasError = true;
+        errorMessage = l10n.keystoreBackupError;
+      });
+      return;
     }
+
+    try {
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final fileName = '${name}_zilpay_keystore_$timestamp.zp';
+
+      // На iOS saveFile не работает, используем getDirectoryPath вместо него
+      String? outputDirectory = await FilePicker.platform.getDirectoryPath(
+        dialogTitle: l10n.keystoreBackupSaveDialogTitle,
+      );
+
+      if (outputDirectory != null) {
+        final outputPath = '$outputDirectory/$fileName';
+
+        final file = File(outputPath);
+        await file.writeAsBytes(keystoreBytes!);
+
+        setState(() {
+          backupFilePath = outputPath;
+        });
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(l10n.keystoreBackupSavedSuccess),
+              backgroundColor: Provider.of<AppState>(context, listen: false)
+                  .currentTheme
+                  .success,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          hasError = true;
+          errorMessage = '${l10n.keystoreBackupSaveFailed}: $e';
+        });
+      }
+    }
+  }
+
+  Future<void> _shareKeystoreFile() async {
+    if (backupFilePath == null || !File(backupFilePath!).existsSync()) {
+      final l10n = AppLocalizations.of(context)!;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.keystoreBackupSaveFailed),
+          backgroundColor:
+              Provider.of<AppState>(context, listen: false).currentTheme.danger,
+        ),
+      );
+      return;
+    }
+
+    await Share.shareXFiles([XFile(backupFilePath!)]);
   }
 
   @override
@@ -227,6 +291,20 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                         child: CustomButton(
                           textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
+                          text: l10n.keystoreBackupSaveAsButton,
+                          onPressed: () => _saveKeystoreWithPicker(
+                            state.wallet?.walletName ?? "",
+                          ),
+                          borderRadius: 30.0,
+                          height: 56.0,
+                        ),
+                      ),
+                      SizedBox(height: adaptivePadding),
+                      Container(
+                        constraints: const BoxConstraints(maxWidth: 480),
+                        child: CustomButton(
+                          textColor: theme.buttonText,
+                          backgroundColor: theme.primaryPurple,
                           text: l10n.keystoreBackupShareButton,
                           onPressed: _shareKeystoreFile,
                           borderRadius: 30.0,
@@ -238,7 +316,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                         constraints: const BoxConstraints(maxWidth: 480),
                         child: CustomButton(
                           textColor: theme.buttonText,
-                          backgroundColor: theme.primaryPurple,
+                          backgroundColor: theme.secondaryPurple,
                           text: l10n.keystoreBackupDoneButton,
                           onPressed: () => Navigator.pop(context),
                           borderRadius: 30.0,
@@ -337,6 +415,17 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
               fontSize: 14,
             ),
           ),
+          if (backupFilePath != null) ...[
+            const SizedBox(height: 8),
+            Text(
+              '${l10n.keystoreBackupTempLocation}:\n$backupFilePath',
+              style: TextStyle(
+                color: theme.success,
+                fontSize: 12,
+                fontStyle: FontStyle.italic,
+              ),
+            ),
+          ],
         ],
       ),
     );

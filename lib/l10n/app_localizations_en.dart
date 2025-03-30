@@ -861,6 +861,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreWalletOptionsPrivateKeySubtitle => 'Restore with private key';
 
   @override
+  String get restoreWalletOptionsKeyStoreTitle => 'Keystore File';
+
+  @override
+  String get restoreWalletOptionsKeyStoreSubtitle => 'Restore wallet using password-encrypted backup file';
+
+  @override
   String get restoreWalletOptionsQRCodeTitle => 'QRcode';
 
   @override
@@ -1428,4 +1434,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keystoreBackupSuccessMessage => 'Your keystore file has been created. Remember to keep both the file and your password safe.';
+
+  @override
+  String get keystoreBackupSaveAsButton => 'Save to File';
+
+  @override
+  String get keystoreBackupSaveDialogTitle => 'Save Keystore File';
+
+  @override
+  String get keystoreBackupSavedSuccess => 'Keystore file saved successfully';
+
+  @override
+  String get keystoreBackupSaveFailed => 'Failed to save keystore file';
+
+  @override
+  String get keystoreBackupTempLocation => 'Temporary file location';
+
+  @override
+  String get keystoreNoFileSelected => 'No keystore file selected';
+
+  @override
+  String get keystorePasswordHint => 'Enter your keystore password';
+
+  @override
+  String get keystoreSelectFileButton => 'Select Keystore File';
+
+  @override
+  String get keystoreChangeFileButton => 'Change File';
+
+  @override
+  String get keystoreRestoreButton => 'Restore Wallet';
+
+  @override
+  String get keystoreRestoreEmptyError => 'Please select a keystore file and enter your password';
 }

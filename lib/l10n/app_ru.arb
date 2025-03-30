@@ -317,6 +317,8 @@
   "restoreWalletOptionsPrivateKeySubtitle": "Восстановить с помощью приватного ключа",
   "restoreWalletOptionsQRCodeTitle": "QR-код",
   "restoreWalletOptionsQRCodeSubtitle": "Восстановить кошелек сканированием QR-кода",
+  "restoreWalletOptionsKeyStoreTitle": "Файл Keystore",
+  "restoreWalletOptionsKeyStoreSubtitle": "Восстановление кошелька с помощью зашифрованного паролем файла резервной копии",
 
   "argonSettingsModalContentLowMemoryTitle": "Низкая память",
   "argonSettingsModalContentLowMemorySubtitle": "64KB RAM, 3 итерации",
@@ -547,5 +549,17 @@
   "keystoreBackupShareButton": "Поделиться Файлом Keystore",
   "keystoreBackupDoneButton": "Готово",
   "keystoreBackupSuccessTitle": "Резервная Копия Успешно Создана",
-  "keystoreBackupSuccessMessage": "Ваш файл keystore был создан. Обязательно храните в безопасности как файл, так и ваш пароль."
+  "keystoreBackupSuccessMessage": "Ваш файл keystore был создан. Обязательно храните в безопасности как файл, так и ваш пароль.",
+  "keystoreBackupSaveAsButton": "Сохранить в файл",
+  "keystoreBackupSaveDialogTitle": "Сохранить файл Keystore",
+  "keystoreBackupSavedSuccess": "Файл keystore успешно сохранен",
+  "keystoreBackupSaveFailed": "Не удалось сохранить файл keystore",
+  "keystoreBackupTempLocation": "Расположение временного файла",
+
+  "keystoreNoFileSelected": "Файл keystore не выбран",
+  "keystorePasswordHint": "Введите пароль от keystore",
+  "keystoreSelectFileButton": "Выбрать файл Keystore",
+  "keystoreChangeFileButton": "Изменить файл",
+  "keystoreRestoreButton": "Восстановить кошелек",
+  "keystoreRestoreEmptyError": "Пожалуйста, выберите файл keystore и введите пароль"
 }

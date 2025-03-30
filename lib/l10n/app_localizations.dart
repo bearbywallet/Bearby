@@ -1765,6 +1765,18 @@ abstract class AppLocalizations {
   /// **'Restore with private key'**
   String get restoreWalletOptionsPrivateKeySubtitle;
 
+  /// Title for keystore restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Keystore File'**
+  String get restoreWalletOptionsKeyStoreTitle;
+
+  /// Subtitle for keystore restore option
+  ///
+  /// In en, this message translates to:
+  /// **'Restore wallet using password-encrypted backup file'**
+  String get restoreWalletOptionsKeyStoreSubtitle;
+
   /// Title for QR code restore option
   ///
   /// In en, this message translates to:
@@ -2898,6 +2910,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Your keystore file has been created. Remember to keep both the file and your password safe.'**
   String get keystoreBackupSuccessMessage;
+
+  /// Button text to open file picker and save keystore file
+  ///
+  /// In en, this message translates to:
+  /// **'Save to File'**
+  String get keystoreBackupSaveAsButton;
+
+  /// Dialog title for the file save picker
+  ///
+  /// In en, this message translates to:
+  /// **'Save Keystore File'**
+  String get keystoreBackupSaveDialogTitle;
+
+  /// Message shown when keystore was saved successfully
+  ///
+  /// In en, this message translates to:
+  /// **'Keystore file saved successfully'**
+  String get keystoreBackupSavedSuccess;
+
+  /// Error message when keystore file save failed
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save keystore file'**
+  String get keystoreBackupSaveFailed;
+
+  /// Label for displaying the temporary file location
+  ///
+  /// In en, this message translates to:
+  /// **'Temporary file location'**
+  String get keystoreBackupTempLocation;
+
+  /// Message shown when no keystore file has been selected
+  ///
+  /// In en, this message translates to:
+  /// **'No keystore file selected'**
+  String get keystoreNoFileSelected;
+
+  /// Hint text for the keystore password input field
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your keystore password'**
+  String get keystorePasswordHint;
+
+  /// Button text to select a keystore file
+  ///
+  /// In en, this message translates to:
+  /// **'Select Keystore File'**
+  String get keystoreSelectFileButton;
+
+  /// Button text to change the selected keystore file
+  ///
+  /// In en, this message translates to:
+  /// **'Change File'**
+  String get keystoreChangeFileButton;
+
+  /// Button text to restore the wallet from keystore
+  ///
+  /// In en, this message translates to:
+  /// **'Restore Wallet'**
+  String get keystoreRestoreButton;
+
+  /// Error message when trying to restore without selecting a file or entering a password
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a keystore file and enter your password'**
+  String get keystoreRestoreEmptyError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

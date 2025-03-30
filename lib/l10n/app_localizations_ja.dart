@@ -861,6 +861,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreWalletOptionsPrivateKeySubtitle => 'プライベートキーで復元';
 
   @override
+  String get restoreWalletOptionsKeyStoreTitle => 'キーストアファイル';
+
+  @override
+  String get restoreWalletOptionsKeyStoreSubtitle => 'パスワードで暗号化されたバックアップファイルを使用してウォレットを復元';
+
+  @override
   String get restoreWalletOptionsQRCodeTitle => 'QRコード';
 
   @override
@@ -1428,4 +1434,37 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get keystoreBackupSuccessMessage => 'キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。';
+
+  @override
+  String get keystoreBackupSaveAsButton => 'ファイルとして保存';
+
+  @override
+  String get keystoreBackupSaveDialogTitle => 'キーストアファイルを保存';
+
+  @override
+  String get keystoreBackupSavedSuccess => 'キーストアファイルが正常に保存されました';
+
+  @override
+  String get keystoreBackupSaveFailed => 'キーストアファイルの保存に失敗しました';
+
+  @override
+  String get keystoreBackupTempLocation => '一時ファイルの場所';
+
+  @override
+  String get keystoreNoFileSelected => 'キーストアファイルが選択されていません';
+
+  @override
+  String get keystorePasswordHint => 'キーストアのパスワードを入力してください';
+
+  @override
+  String get keystoreSelectFileButton => 'キーストアファイルを選択';
+
+  @override
+  String get keystoreChangeFileButton => 'ファイルを変更';
+
+  @override
+  String get keystoreRestoreButton => 'ウォレットを復元';
+
+  @override
+  String get keystoreRestoreEmptyError => 'キーストアファイルを選択し、パスワードを入力してください';
 }

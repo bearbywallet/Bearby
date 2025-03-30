@@ -1244,6 +1244,14 @@
   "@restoreWalletOptionsPrivateKeySubtitle": {
     "description": "Subtitle for Private Key restore option"
   },
+  "restoreWalletOptionsKeyStoreTitle": "Keystore File",
+  "@restoreWalletOptionsKeyStoreTitle": {
+    "description": "Title for keystore restore option"
+  },
+  "restoreWalletOptionsKeyStoreSubtitle": "Restore wallet using password-encrypted backup file",
+  "@restoreWalletOptionsKeyStoreSubtitle": {
+    "description": "Subtitle for keystore restore option"
+  },
   "restoreWalletOptionsQRCodeTitle": "QRcode",
   "@restoreWalletOptionsQRCodeTitle": {
     "description": "Title for QR code restore option"
@@ -2013,5 +2021,50 @@
   "keystoreBackupSuccessMessage": "Your keystore file has been created. Remember to keep both the file and your password safe.",
   "@keystoreBackupSuccessMessage": {
     "description": "Message explaining that backup creation was successful and reminding about security"
+  },
+  "keystoreBackupSaveAsButton": "Save to File",
+  "@keystoreBackupSaveAsButton": {
+    "description": "Button text to open file picker and save keystore file"
+  },
+  "keystoreBackupSaveDialogTitle": "Save Keystore File",
+  "@keystoreBackupSaveDialogTitle": {
+    "description": "Dialog title for the file save picker"
+  },
+  "keystoreBackupSavedSuccess": "Keystore file saved successfully",
+  "@keystoreBackupSavedSuccess": {
+    "description": "Message shown when keystore was saved successfully"
+  },
+  "keystoreBackupSaveFailed": "Failed to save keystore file",
+  "@keystoreBackupSaveFailed": {
+    "description": "Error message when keystore file save failed"
+  },
+  "keystoreBackupTempLocation": "Temporary file location",
+  "@keystoreBackupTempLocation": {
+    "description": "Label for displaying the temporary file location"
+  },
+
+  "keystoreNoFileSelected": "No keystore file selected",
+  "@keystoreNoFileSelected": {
+    "description": "Message shown when no keystore file has been selected"
+  },
+  "keystorePasswordHint": "Enter your keystore password",
+  "@keystorePasswordHint": {
+    "description": "Hint text for the keystore password input field"
+  },
+  "keystoreSelectFileButton": "Select Keystore File",
+  "@keystoreSelectFileButton": {
+    "description": "Button text to select a keystore file"
+  },
+  "keystoreChangeFileButton": "Change File",
+  "@keystoreChangeFileButton": {
+    "description": "Button text to change the selected keystore file"
+  },
+  "keystoreRestoreButton": "Restore Wallet",
+  "@keystoreRestoreButton": {
+    "description": "Button text to restore the wallet from keystore"
+  },
+  "keystoreRestoreEmptyError": "Please select a keystore file and enter your password",
+  "@keystoreRestoreEmptyError": {
+    "description": "Error message when trying to restore without selecting a file or entering a password"
   }
 }

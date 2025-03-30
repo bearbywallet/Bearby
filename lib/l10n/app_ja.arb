@@ -317,6 +317,8 @@
   "restoreWalletOptionsPrivateKeySubtitle": "プライベートキーで復元",
   "restoreWalletOptionsQRCodeTitle": "QRコード",
   "restoreWalletOptionsQRCodeSubtitle": "QRコードスキャンでウォレットを復元",
+  "restoreWalletOptionsKeyStoreTitle": "キーストアファイル",
+  "restoreWalletOptionsKeyStoreSubtitle": "パスワードで暗号化されたバックアップファイルを使用してウォレットを復元",
 
   "argonSettingsModalContentLowMemoryTitle": "低メモリ",
   "argonSettingsModalContentLowMemorySubtitle": "64KB RAM、3反復",
@@ -551,5 +553,17 @@
   "keystoreBackupShareButton": "キーストアファイルを共有",
   "keystoreBackupDoneButton": "完了",
   "keystoreBackupSuccessTitle": "バックアップの作成に成功",
-  "keystoreBackupSuccessMessage": "キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。"
+  "keystoreBackupSuccessMessage": "キーストアファイルが作成されました。ファイルとパスワードの両方を安全に保管することを忘れないでください。",
+  "keystoreBackupSaveAsButton": "ファイルとして保存",
+  "keystoreBackupSaveDialogTitle": "キーストアファイルを保存",
+  "keystoreBackupSavedSuccess": "キーストアファイルが正常に保存されました",
+  "keystoreBackupSaveFailed": "キーストアファイルの保存に失敗しました",
+  "keystoreBackupTempLocation": "一時ファイルの場所",
+
+  "keystoreNoFileSelected": "キーストアファイルが選択されていません",
+  "keystorePasswordHint": "キーストアのパスワードを入力してください",
+  "keystoreSelectFileButton": "キーストアファイルを選択",
+  "keystoreChangeFileButton": "ファイルを変更",
+  "keystoreRestoreButton": "ウォレットを復元",
+  "keystoreRestoreEmptyError": "キーストアファイルを選択し、パスワードを入力してください"
 }

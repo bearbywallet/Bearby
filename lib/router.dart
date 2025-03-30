@@ -8,6 +8,7 @@ import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/browser_settings.dart';
 import 'package:zilpay/pages/currency_conversion.dart';
 import 'package:zilpay/pages/keystore_backup.dart';
+import 'package:zilpay/pages/keystore_file_restore.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/locale.dart';
 import 'package:zilpay/pages/network.dart';
@@ -98,6 +99,7 @@ class AppRouter {
       '/restore_sk',
       '/about',
       '/keystore_backup',
+      '/keystore_file_restore',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -143,6 +145,8 @@ class AppRouter {
             return wrapWithProviders(const GenWalletOptionsPage());
           case '/new_wallet_options':
             return wrapWithProviders(const AddWalletOptionsPage());
+          case '/keystore_file_restore':
+            return wrapWithProviders(const RestoreKeystoreFilePage());
           case '/initial':
             return wrapWithProviders(const InitialPage());
           case '/language':
@@ -175,6 +179,8 @@ class AppRouter {
             return wrapWithProviders(const SetupNetworkSettingsPage());
           case '/gen_sk':
             return wrapWithProviders(const SecretKeyGeneratorPage());
+          case '/keystore_file_restore':
+            return wrapWithProviders(const RestoreKeystoreFilePage());
           case '/gen_bip39':
             return wrapWithProviders(const SecretPhraseGeneratorPage());
           case '/verify_bip39':
@@ -265,6 +271,8 @@ class AppRouter {
         return wrapWithProviders(const RestoreSecretPhrasePage());
       case '/restore_sk':
         return wrapWithProviders(const SecretKeyRestorePage());
+      case '/keystore_file_restore':
+        return wrapWithProviders(const RestoreKeystoreFilePage());
       case '/initial':
         return wrapWithProviders(const InitialPage());
       case '/web_view':
