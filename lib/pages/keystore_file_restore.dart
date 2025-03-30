@@ -4,11 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/auth_guard.dart';
+import 'package:zilpay/services/device.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -44,20 +50,39 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
   List<KeystoreFile> _backupFiles = [];
   KeystoreFile? _selectedFile;
 
+  final AuthService _authService = AuthService();
+  late AuthGuard _authGuard;
+  late AppState _appState;
+  List<AuthMethod> _authMethods = [AuthMethod.none];
+  bool _useDeviceAuth = true;
+
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
+  final _btnController = RoundedLoadingButtonController();
   bool _obscurePassword = true;
 
   @override
   void initState() {
     super.initState();
     _loadBackupFiles();
+
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
+    _appState = Provider.of<AppState>(context, listen: false);
+    _checkAuthMethods();
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
+    _btnController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkAuthMethods() async {
+    final methods = await _authService.getAvailableAuthMethods();
+    setState(() {
+      _authMethods = methods;
+    });
   }
 
   Future<void> _loadBackupFiles() async {
@@ -154,6 +179,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
   }
 
   void _selectBackupFile(KeystoreFile file) {
+    if (_disabled) return;
+
     setState(() {
       _selectedFile = file;
       _errorMessage = '';
@@ -161,6 +188,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
   }
 
   Future<void> _openFilePicker() async {
+    if (_disabled) return;
+
     try {
       final l10n = AppLocalizations.of(context)!;
       final result = await FilePicker.platform.pickFiles(type: FileType.any);
@@ -202,16 +231,72 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
       _errorMessage = '';
     });
 
-    try {
-      await Future.delayed(const Duration(milliseconds: 500));
+    if (_passwordController.text.isEmpty) {
+      setState(() {
+        _errorMessage =
+            AppLocalizations.of(context)!.passwordSetupPageShortPasswordError;
+        _disabled = false;
+      });
+      _passwordInputKey.currentState?.shake();
+      _btnController.reset();
+      return;
+    }
 
-      // On success, navigate or show success message
+    try {
+      _btnController.start();
+
+      if (_useDeviceAuth) {
+        final authenticated = await _authService.authenticate(
+          allowPinCode: true,
+          reason: AppLocalizations.of(context)!.passwordSetupPageAuthReason,
+        );
+        setState(() => _useDeviceAuth = authenticated);
+        if (!authenticated) {
+          setState(() {
+            _disabled = false;
+          });
+          _btnController.reset();
+          return;
+        }
+      }
+
+      DeviceInfoService device = DeviceInfoService();
+      List<String> identifiers = await device.getDeviceIdentifiers();
+
+      AuthMethod biometricType = AuthMethod.none;
+      if (_useDeviceAuth) {
+        biometricType = _authMethods[0];
+      }
+
+      final fileBytes = await _selectedFile!.file.readAsBytes();
+      final (String, String) session = await restoreFromKeystore(
+        keystoreBytes: fileBytes,
+        deviceIndicators: identifiers,
+        password: _passwordController.text,
+        biometricType: biometricType.name,
+      );
+
+      if (_useDeviceAuth) {
+        await _authGuard.setSession(session.$2, session.$1);
+      }
+
+      await _appState.syncData();
+      await _appState.startTrackHistoryWorker();
+
+      _btnController.success();
+
+      if (mounted) {
+        Navigator.of(context).pushReplacementNamed('/');
+      }
     } catch (e) {
       if (mounted) {
         setState(() {
           _errorMessage = e.toString();
           _disabled = false;
         });
+        _btnController.error();
+        await Future.delayed(const Duration(seconds: 1));
+        _btnController.reset();
       }
     }
   }
@@ -232,7 +317,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
           children: [
             CustomAppBar(
               title: l10n.restoreWalletOptionsKeyStoreTitle,
-              onBackPressed: () => Navigator.pop(context),
+              onBackPressed: _disabled ? () {} : () => Navigator.pop(context),
               actionIcon: SvgPicture.asset(
                 'assets/icons/reload.svg',
                 width: 24,
@@ -240,7 +325,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
                 colorFilter:
                     ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
               ),
-              onActionPressed: _loadBackupFiles,
+              onActionPressed: _disabled ? null : _loadBackupFiles,
             ),
             Expanded(
               child: Padding(
@@ -258,44 +343,57 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
                         fontSize: 18,
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         focusedBorderColor: theme.primaryPurple,
-                        disabled: _disabled,
+                        disabled: _disabled || _selectedFile == null,
                         obscureText: _obscurePassword,
                         rightIconPath: _obscurePassword
                             ? "assets/icons/close_eye.svg"
                             : "assets/icons/open_eye.svg",
-                        onRightIconTap: () {
-                          setState(() => _obscurePassword = !_obscurePassword);
-                        },
-                        onChanged: (value) {
-                          setState(() {
-                            _password = value;
-                            if (_errorMessage.isNotEmpty) {
-                              _errorMessage = '';
-                            }
-                          });
-                        },
+                        onRightIconTap: _disabled
+                            ? null
+                            : () {
+                                setState(
+                                    () => _obscurePassword = !_obscurePassword);
+                              },
+                        onChanged: _disabled
+                            ? null
+                            : (value) {
+                                setState(() {
+                                  _password = value;
+                                  if (_errorMessage.isNotEmpty) {
+                                    _errorMessage = '';
+                                  }
+                                });
+                              },
                       ),
                     ),
+                    BiometricSwitch(
+                      biometricType: _authMethods.first,
+                      value: _useDeviceAuth,
+                      disabled: _disabled,
+                      onChanged: (value) async {
+                        setState(() => _useDeviceAuth = value);
+                      },
+                    ),
                     Padding(
-                      padding: const EdgeInsets.only(bottom: 16),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: theme.primaryPurple,
-                          foregroundColor: theme.buttonText,
-                          minimumSize: const Size(double.infinity, 56),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                          disabledBackgroundColor:
-                              theme.primaryPurple.withValues(alpha: 0.5),
-                          disabledForegroundColor:
-                              theme.buttonText.withValues(alpha: 0.7),
-                        ),
+                      padding: const EdgeInsets.only(top: 8, bottom: 16),
+                      child: RoundedLoadingButton(
+                        color: theme.primaryPurple,
+                        valueColor: theme.buttonText,
+                        controller: _btnController,
                         onPressed: (_password.isNotEmpty &&
                                 _selectedFile != null &&
                                 !_disabled)
                             ? _restoreFromKeystore
-                            : null,
+                            : () {},
+                        successIcon: SvgPicture.asset(
+                          'assets/icons/ok.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.buttonText,
+                            BlendMode.srcIn,
+                          ),
+                        ),
                         child: Text(
                           l10n.keystoreRestoreButton,
                           style: const TextStyle(
@@ -331,6 +429,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
   }
 
   Widget _buildFileListHeader(AppTheme theme) {
+    final l10n = AppLocalizations.of(context)!;
+
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
@@ -350,7 +450,9 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
               'assets/icons/plus.svg',
               width: 24,
               height: 24,
-              colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+              colorFilter: ColorFilter.mode(
+                  _disabled ? theme.textSecondary : theme.textPrimary,
+                  BlendMode.srcIn),
             ),
             splashRadius: 20,
           ),
@@ -395,6 +497,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
                     isSelected: isSelected,
                     formattedDate: formattedDate,
                     theme: theme,
+                    disabled: _disabled,
                     onPressed: () => _selectBackupFile(file),
                   ),
                 );
@@ -427,6 +530,7 @@ class KeystoreFileCard extends StatelessWidget {
   final bool isSelected;
   final String formattedDate;
   final AppTheme theme;
+  final bool disabled;
   final VoidCallback onPressed;
 
   const KeystoreFileCard({
@@ -436,18 +540,20 @@ class KeystoreFileCard extends StatelessWidget {
     required this.formattedDate,
     required this.theme,
     required this.onPressed,
+    this.disabled = false,
   }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return PressableCard(
-      onPressed: onPressed,
+      onPressed: disabled ? () {} : onPressed,
       backgroundColor: isSelected
           ? theme.primaryPurple.withValues(alpha: 0.1)
           : theme.cardBackground,
       borderColor: isSelected
           ? theme.primaryPurple
           : theme.secondaryPurple.withValues(alpha: 0.3),
+      disabled: disabled,
       child: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
@@ -460,7 +566,9 @@ class KeystoreFileCard extends StatelessWidget {
                   width: 32,
                   height: 32,
                   colorFilter: ColorFilter.mode(
-                    file.isValid ? theme.primaryPurple : theme.textSecondary,
+                    file.isValid
+                        ? (disabled ? theme.textSecondary : theme.primaryPurple)
+                        : theme.textSecondary,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -472,7 +580,9 @@ class KeystoreFileCard extends StatelessWidget {
                       Text(
                         file.fileName,
                         style: TextStyle(
-                          color: theme.textPrimary,
+                          color: disabled
+                              ? theme.textSecondary
+                              : theme.textPrimary,
                           fontSize: 16,
                           fontWeight: FontWeight.w500,
                         ),
@@ -495,13 +605,16 @@ class KeystoreFileCard extends StatelessWidget {
                     padding:
                         const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                     decoration: BoxDecoration(
-                      color: theme.primaryPurple.withOpacity(0.2),
+                      color: theme.primaryPurple
+                          .withValues(alpha: disabled ? 0.1 : 0.2),
                       borderRadius: BorderRadius.circular(4),
                     ),
                     child: Text(
                       'v${file.version ?? "?"}',
                       style: TextStyle(
-                        color: theme.primaryPurple,
+                        color: disabled
+                            ? theme.textSecondary
+                            : theme.primaryPurple,
                         fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
@@ -512,8 +625,10 @@ class KeystoreFileCard extends StatelessWidget {
                   'assets/icons/right_arrow.svg',
                   width: 16,
                   height: 16,
-                  colorFilter:
-                      ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                  colorFilter: ColorFilter.mode(
+                    disabled ? theme.textSecondary : theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ],
             ),
@@ -539,6 +654,7 @@ class PressableCard extends StatefulWidget {
   final VoidCallback onPressed;
   final Color backgroundColor;
   final Color borderColor;
+  final bool disabled;
 
   const PressableCard({
     Key? key,
@@ -546,6 +662,7 @@ class PressableCard extends StatefulWidget {
     required this.onPressed,
     required this.backgroundColor,
     required this.borderColor,
+    this.disabled = false,
   }) : super(key: key);
 
   @override
@@ -558,14 +675,18 @@ class _PressableCardState extends State<PressableCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
+      onTapDown:
+          widget.disabled ? null : (_) => setState(() => _isPressed = true),
+      onTapUp: widget.disabled
+          ? null
+          : (_) {
+              setState(() => _isPressed = false);
+              widget.onPressed();
+            },
+      onTapCancel:
+          widget.disabled ? null : () => setState(() => _isPressed = false),
       child: AnimatedScale(
-        scale: _isPressed ? 0.97 : 1.0,
+        scale: (_isPressed && !widget.disabled) ? 0.97 : 1.0,
         duration: const Duration(milliseconds: 100),
         child: Card(
           margin: EdgeInsets.zero,
@@ -573,7 +694,9 @@ class _PressableCardState extends State<PressableCard> {
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(12),
             side: BorderSide(
-              color: widget.borderColor,
+              color: widget.disabled
+                  ? widget.borderColor.withValues(alpha: 0.5)
+                  : widget.borderColor,
               width: 1,
             ),
           ),

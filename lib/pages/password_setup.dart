@@ -303,7 +303,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           ftokens: ftokens,
         );
       } else {
-        throw "Invalid Wallet gen method";
+        throw "";
       }
 
       await _appState.syncData();
