@@ -37,6 +37,7 @@ class ZilPayApp extends StatelessWidget {
               ));
 
               return MaterialApp(
+                // debugShowCheckedModeBanner: false,
                 title:
                     AppLocalizations.of(context)?.appTitle ?? 'ZilPay Wallet',
                 localizationsDelegates: const [
@@ -49,6 +50,7 @@ class ZilPayApp extends StatelessWidget {
                   Locale('en'),
                   Locale('ru'),
                   Locale('ja'),
+                  Locale('cn'),
                 ],
                 locale: appState.locale,
                 builder: (context, child) {
