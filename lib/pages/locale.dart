@@ -52,6 +52,7 @@ class _LanguagePageState extends State<LanguagePage> {
       Language('ru', 'Russian', "Русский"),
       Language('en', 'English', "English"),
       Language('ja', 'Japanese', "日本語"),
+      Language('zh', 'Chinese', "中文"),
     ]);
 
     return Scaffold(
