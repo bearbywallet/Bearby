@@ -551,6 +551,9 @@ class Web3EIP1193Handler {
             result: sig,
           );
           _removeActiveRequest(method);
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
         },
         onDismiss: () {
           _returnError(
@@ -1093,6 +1096,9 @@ class Web3EIP1193Handler {
             result: sig,
           );
           _removeActiveRequest(method);
+          if (context.mounted) {
+            Navigator.pop(context);
+          }
         },
         onDismiss: () {
           _returnError(

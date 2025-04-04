@@ -135,8 +135,6 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         );
         widget.onMessageSigned(pubkey, sig);
       }
-
-      if (mounted) Navigator.pop(context);
     } catch (e) {
       if (mounted)
         setState(() => _error =

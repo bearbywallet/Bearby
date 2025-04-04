@@ -50,7 +50,7 @@ class ZilPayApp extends StatelessWidget {
                   Locale('en'),
                   Locale('ru'),
                   Locale('ja'),
-                  Locale('cn'),
+                  Locale('zh'),
                 ],
                 locale: appState.locale,
                 builder: (context, child) {
