@@ -287,6 +287,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
       await _appState.syncData();
       await _appState.startTrackHistoryWorker();
 
+      _appState.setSelectedWallet(_appState.wallets.length - 1);
+
       _btnController.success();
 
       if (mounted) {
