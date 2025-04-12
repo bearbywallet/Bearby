@@ -223,35 +223,57 @@ class _SendTokenPageState extends State<SendTokenPage> {
       return;
     }
 
-    BigInt accountIndex = appState.wallet!.selectedAccount;
-    FTokenInfo token = appState.wallet!.tokens[_tokenIndex];
-    TokenTransferParamsInfo params = TokenTransferParamsInfo(
-      walletIndex: BigInt.from(appState.selectedWallet),
-      accountIndex: accountIndex,
-      token: token,
-      amount: toWei(_amount, token.decimals).toString(),
-      recipient: _address ?? "",
-      icon: processTokenLogo(
+    try {
+      BigInt accountIndex = appState.wallet!.selectedAccount;
+      FTokenInfo token = appState.wallet!.tokens[_tokenIndex];
+      TokenTransferParamsInfo params = TokenTransferParamsInfo(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: accountIndex,
         token: token,
-        shortName: appState.chain?.shortName ?? '',
-        theme: appState.currentTheme.value,
-      ),
-    );
+        amount: toWei(_amount, token.decimals).toString(),
+        recipient: _address ?? "",
+        icon: processTokenLogo(
+          token: token,
+          shortName: appState.chain?.shortName ?? '',
+          theme: appState.currentTheme.value,
+        ),
+      );
 
-    TransactionRequestInfo tx = await createTokenTransfer(params: params);
-    if (!mounted) return;
-    showConfirmTransactionModal(
-      context: context,
-      tx: tx,
-      to: _address!,
-      tokenIndex: _tokenIndex,
-      amount: _amount,
-      onConfirm: (_) {
-        Navigator.of(context).pushNamed('/', arguments: {
-          'selectedIndex': 1,
-        });
-      },
-    );
+      TransactionRequestInfo tx = await createTokenTransfer(params: params);
+      if (!mounted) return;
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: _address!,
+        tokenIndex: _tokenIndex,
+        amount: _amount,
+        onConfirm: (_) {
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      String errorMessage = e.toString();
+
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: appState.currentTheme.cardBackground,
+          title: Text(
+            "Error",
+            style: TextStyle(color: appState.currentTheme.textPrimary),
+          ),
+          content: Text(
+            errorMessage,
+            style: TextStyle(color: appState.currentTheme.danger),
+          ),
+          actions: [],
+        ),
+      );
+    }
   }
 
   @override

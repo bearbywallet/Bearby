@@ -173,6 +173,20 @@ mod wallet_tests {
             .add_provider(binance_provider_mainnet.clone())
             .unwrap();
 
+        let path = Path::new("../assets/chains/testnet-chains.json");
+        let content = fs::read_to_string(path).unwrap();
+        let providers: Vec<ChainConfig> = get_chains_providers_from_json(content)
+            .unwrap()
+            .into_iter()
+            .map(|c| c.try_into().unwrap())
+            .collect();
+        let zilliqa_protomainnet_provider = providers.first().unwrap();
+
+        service
+            .core
+            .add_provider(zilliqa_protomainnet_provider.clone())
+            .unwrap();
+
         GUARD.store(3, std::sync::atomic::Ordering::Relaxed);
     }
 
@@ -359,6 +373,18 @@ mod wallet_tests {
         .await
         .unwrap();
 
+        let zil_testnet_chain_config = {
+            let guard = BACKGROUND_SERVICE.read().await;
+            let service = guard.as_ref().unwrap();
+            let providers = service.core.get_providers();
+
+            providers[2].config.clone()
+        };
+
+        select_accounts_chain(0, zil_testnet_chain_config.hash())
+            .await
+            .unwrap();
+
         add_next_bip39_account(AddNextBip39AccountParams {
             wallet_index: 0,
             account_index: 1,
@@ -373,19 +399,28 @@ mod wallet_tests {
 
         select_account(0, 1).await.unwrap();
 
+        let wallets = get_wallets().await.unwrap();
+        let wallet = wallets.first().unwrap();
+
+        assert_eq!(wallet.tokens.len(), 1);
+
         with_wallet(0, |wallet| {
             let data = wallet.get_wallet_data().unwrap();
             let selected_account = data.get_selected_account().unwrap();
 
             assert_eq!(data.selected_account, 1);
-            assert_eq!(selected_account.chain_hash, data.default_chain_hash);
+            assert_eq!(selected_account.chain_hash, zil_testnet_chain_config.hash());
             assert_eq!(selected_account.name, "Second account");
             assert_eq!(selected_account.account_type.code(), 1);
             assert_eq!(
                 selected_account.pub_key.to_string(),
                 "010317743c1830dada97f96c51fa439b7a0673700ee38c71ccb117c9f0e974af522e"
             );
-            assert_eq!(selected_account.chain_id, zil_chain_config.chain_id());
+            assert_eq!(
+                selected_account.chain_id,
+                zil_testnet_chain_config.chain_id()
+            );
+            assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
             assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
 
             Ok(())
@@ -490,21 +525,29 @@ mod wallet_tests {
             .await
             .unwrap();
 
-            // zilliqa_swap_chain(0, 2).await.unwrap();
             let wallets = get_wallets().await.unwrap();
             let wallet = wallets.first().unwrap();
 
             {
                 let account3 = &wallet.accounts[2];
+
+                for acc in &wallet.accounts {
+                    assert_eq!(account3.chain_hash, acc.chain_hash);
+                    assert_eq!(account3.chain_id, acc.chain_id);
+                    assert_eq!(account3.slip_44, acc.slip_44);
+                }
+
                 assert_eq!(account3.addr, "0x1DA83F5b443cc87FBdC6ec06E40F4098C1592210");
                 assert_eq!(account3.addr_type, 1);
                 assert_eq!(account3.name, "account 3");
-                assert_eq!(account3.chain_hash, wallet.default_chain_hash);
-                assert_eq!(account3.chain_id, zil_chain_config.chain_id());
-                assert_eq!(account3.slip_44, zil_chain_config.slip_44);
                 assert_eq!(account3.index, 2);
             }
 
+            assert!(zilliqa_swap_chain(0, 2).await.is_err());
+
+            select_accounts_chain(0, zil_chain_config.hash())
+                .await
+                .unwrap();
             zilliqa_swap_chain(0, 2).await.unwrap();
 
             let wallets = get_wallets().await.unwrap();
@@ -969,7 +1012,7 @@ mod wallet_tests {
             assert_eq!(
         zil_token.logo,
         Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-        
+
     );
             assert!(zil_token.balances.is_empty());
             assert_eq!(zil_token.rate, 0.0);
@@ -1011,8 +1054,7 @@ mod wallet_tests {
                 &restored_keypair.pk,
                 "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
             );
-                        zilliqa_swap_chain(0, 0).await.unwrap();
-
+            zilliqa_swap_chain(0, 0).await.unwrap();
         }
 
         select_accounts_chain(0, zil_chain_config.hash())

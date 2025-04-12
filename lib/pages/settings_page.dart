@@ -61,10 +61,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
                               if (appState.chain?.slip44 == 313 &&
-                                  appState.wallet != null &&
-                                  appState.wallet?.defaultChainHash ==
-                                      appState.chain
-                                          ?.chainHash) // 313 this is officially  zilliqa slip44 number.
+                                  appState.wallet !=
+                                      null) // 313 this is officially  zilliqa slip44 number.
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),

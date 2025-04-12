@@ -149,7 +149,7 @@ pub struct AddNextBip39AccountParams {
 }
 
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
-    with_service_mut(|core| {
+    let selected_account_chain_hash = with_service_mut(|core| {
         let seed = if let Some(pass) = params.password {
             core.unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
         } else {
@@ -161,8 +161,11 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
-        let provider = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = provider.get_bip49(params.account_index);
+        let selected_account = wallet_data
+            .get_selected_account()
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+        let default_chain = core.get_provider(wallet_data.default_chain_hash)?;
+        let bip49 = default_chain.get_bip49(params.account_index);
 
         wallet
             .add_next_bip39_account(
@@ -170,12 +173,16 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
                 &bip49,
                 &params.passphrase,
                 &seed,
-                &provider.config,
+                &default_chain.config,
             )
-            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+
+        Ok(selected_account.chain_hash)
     })
-    .await
-    .map_err(Into::into)
+    .await?;
+    select_accounts_chain(params.wallet_index, selected_account_chain_hash).await?;
+
+    Ok(())
 }
 
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
