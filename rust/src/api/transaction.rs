@@ -212,6 +212,7 @@ pub async fn clear_history(wallet_index: usize) -> Result<(), String> {
     .map_err(Into::into)
 }
 
+#[derive(Debug)]
 pub struct TokenTransferParamsInfo {
     pub wallet_index: usize,
     pub account_index: usize,

@@ -271,22 +271,14 @@ mod wallet_tests {
         assert_eq!(wallets.len(), 1);
 
         {
-            assert_eq!(wallets[0].tokens.len(), 2);
+            assert_eq!(wallets[0].tokens.len(), 1);
             assert_eq!(wallets[0].tokens[0].chain_hash, zil_chain_config.hash());
-            assert_eq!(wallets[0].tokens[1].chain_hash, zil_chain_config.hash());
             assert_eq!(
                 wallets[0].tokens[0].addr,
                 "0x0000000000000000000000000000000000000000"
             );
-            assert_eq!(
-                wallets[0].tokens[1].addr,
-                "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz"
-            );
-            assert_eq!(wallets[0].tokens[1].decimals, 12);
             assert_eq!(wallets[0].tokens[0].decimals, 18);
             assert_eq!(wallets[0].tokens[0].addr_type, 1);
-            assert_eq!(wallets[0].tokens[1].addr_type, 0);
-            assert!(wallets[0].tokens[1].native);
             assert!(wallets[0].tokens[0].native);
         }
 
@@ -299,8 +291,7 @@ mod wallet_tests {
         assert_eq!(&wallet.wallet_address, &wallet_address);
         assert_eq!(wallet.accounts.len(), 1);
         assert_eq!(wallet.selected_account, 0);
-        assert_eq!(wallet.tokens.len(), 2); // 2 because Zilliqa legacy and EVM
-
+        assert_eq!(wallet.tokens.len(), 1);
         assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
 
         let selected_account = &wallet.accounts[wallet.selected_account];
@@ -757,7 +748,7 @@ mod wallet_tests {
         }
 
         {
-            assert_eq!(wallet.tokens.len(), 2);
+            assert_eq!(wallet.tokens.len(), 1);
             let evm_token = &wallet.tokens[0];
             assert_eq!(evm_token.name, "Zilliqa");
             assert_eq!(evm_token.symbol, "ZIL");
@@ -774,7 +765,11 @@ mod wallet_tests {
             assert!(evm_token.native);
             assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
 
-            let zil_token = &wallet.tokens[1];
+            zilliqa_swap_chain(0, 0).await.unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            let zil_token = &wallet.tokens[0];
             assert_eq!(zil_token.name, "Zilliqa");
             assert_eq!(zil_token.symbol, "ZIL");
             assert_eq!(zil_token.decimals, 12);
@@ -789,6 +784,8 @@ mod wallet_tests {
             assert!(!zil_token.default);
             assert!(zil_token.native);
             assert_eq!(zil_token.chain_hash, zil_chain_config.hash());
+
+            zilliqa_swap_chain(0, 0).await.unwrap();
         }
 
         {
@@ -941,7 +938,7 @@ mod wallet_tests {
             assert_eq!(account.chain_id, zil_chain_config.chain_id());
             assert_eq!(account.slip_44, zil_chain_config.slip_44);
 
-            assert_eq!(wallet.tokens.len(), 2);
+            assert_eq!(wallet.tokens.len(), 1);
 
             let evm_token = &wallet.tokens[0];
             assert_eq!(evm_token.name, "Zilliqa");
@@ -959,7 +956,11 @@ mod wallet_tests {
             assert!(evm_token.native);
             assert_eq!(evm_token.chain_hash, zil_chain_config.hash());
 
-            let zil_token = &wallet.tokens[1];
+            zilliqa_swap_chain(0, 0).await.unwrap();
+            let wallets = get_wallets().await.unwrap();
+            let wallet = wallets.first().unwrap();
+
+            let zil_token = &wallet.tokens[0];
             assert_eq!(zil_token.name, "Zilliqa");
             assert_eq!(zil_token.symbol, "ZIL");
             assert_eq!(zil_token.decimals, 12);
@@ -968,6 +969,7 @@ mod wallet_tests {
             assert_eq!(
         zil_token.logo,
         Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
+        
     );
             assert!(zil_token.balances.is_empty());
             assert_eq!(zil_token.rate, 0.0);
@@ -1009,6 +1011,8 @@ mod wallet_tests {
                 &restored_keypair.pk,
                 "02d2f48dfb27a3e35f1029aeaed8d65a209c45cadde40a73481f2d84ed3c9205b4"
             );
+                        zilliqa_swap_chain(0, 0).await.unwrap();
+
         }
 
         select_accounts_chain(0, zil_chain_config.hash())
@@ -1042,7 +1046,7 @@ mod wallet_tests {
         let sk = SecretKey::Secp256k1Sha256Zilliqa(bytes_sk);
         let keypair = KeyPair::from_secret_key(sk).unwrap();
 
-        assert_eq!(wallet.tokens.len(), 3);
+        assert_eq!(wallet.tokens.len(), 2);
 
         let tx = create_token_transfer(TokenTransferParamsInfo {
             wallet_index: 0,

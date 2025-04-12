@@ -25,7 +25,9 @@ impl TryFrom<&Wallet> for WalletInfo {
             .get_ftokens()?
             .into_iter()
             .filter_map(|t| {
-                if t.chain_hash == account.chain_hash {
+                if t.chain_hash == account.chain_hash
+                    && t.addr.prefix_type() == account.addr.prefix_type()
+                {
                     Some(t.into())
                 } else {
                     None
