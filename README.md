@@ -70,6 +70,42 @@ $ flutter run -d android
 $ flutter run -d device
 ```
 
+### Testing
+
+#### Running Integration Tests
+
+Integration tests ensure that your app works correctly end-to-end, including Rust and Flutter components:
+
+```bash
+# Run with specific test
+$ flutter drive --driver=test_driver/integration_test.dart --target=integration_test/main.dart
+
+# Run all tests in integration_test directory
+$ flutter drive --driver=test_driver/integration_test.dart --target=integration_test
+```
+
+Make sure your Rust library is compiled before running the tests:
+
+```bash
+$ cd rust
+$ cargo build --release
+```
+
+#### Unit Tests
+
+For running Flutter unit tests:
+
+```bash
+$ flutter test
+```
+
+For running Rust unit tests:
+
+```bash
+$ cd rust
+$ cargo test
+```
+
 ### Build Release Version
 
 ```bash
