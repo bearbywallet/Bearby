@@ -521,7 +521,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                               setState(() => _useDeviceAuth = value);
                             },
                           ),
-                          SizedBox(height: 80), // Space for button
+                          SizedBox(height: 80),
                         ],
                       ),
                     ),
@@ -567,6 +567,9 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final methods = await _authService.getAvailableAuthMethods();
     setState(() {
       _authMethods = methods;
+      if (_authMethods.length == 0 || _authMethods.first == AuthMethod.none) {
+        _useDeviceAuth = false;
+      }
     });
   }
 }
