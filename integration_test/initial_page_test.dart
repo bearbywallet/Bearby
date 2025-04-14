@@ -66,23 +66,28 @@ void main() {
     // Verify locale changed
     appState =
         tester.element(find.byType(GestureDetector).first).read<AppState>();
-    if (initialLocale != "en") {
-      expect(appState.state.locale, equals("en"));
-    } else {
-      // If already English, tap Russian
-      final russianListItem = find.ancestor(
-          of: find.text("Русский").first,
-          matching: find.byType(GestureDetector));
-      await tester.tap(russianListItem);
-      await tester.pumpAndSettle(const Duration(seconds: 2));
-      appState =
-          tester.element(find.byType(GestureDetector).first).read<AppState>();
-      expect(appState.state.locale, equals("ru"));
-    }
 
-    // Navigate back to initial page using custom back button
-    final backButton = find.byType(CustomAppBar);
-    await tester.tap(backButton);
+    // If already English, tap Russian
+    final russianListItem = find.ancestor(
+        of: find.text("Русский").first, matching: find.byType(GestureDetector));
+    await tester.tap(russianListItem);
+    await tester.pumpAndSettle(const Duration(seconds: 2));
+    appState =
+        tester.element(find.byType(GestureDetector).first).read<AppState>();
+    expect(appState.state.locale, equals("ru"));
+
+    // Navigate back to initial page using the back button inside CustomAppBar
+    // Find the IconButton inside the CustomAppBar
+    final backButtonFinder = find
+        .descendant(
+          of: find.byType(CustomAppBar),
+          matching: find.byType(IconButton),
+        )
+        .first;
+
+    expect(backButtonFinder, findsOneWidget);
+
+    await tester.tap(backButtonFinder);
     await tester.pumpAndSettle();
 
     // Test 4: Get Started button navigation
