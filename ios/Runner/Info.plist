@@ -41,6 +41,8 @@
 	<string>The ZilPay needs camera access to scan QR code</string>
 	<key>NSFaceIDUsageDescription</key>
 	<string>ZilPay biometric auth</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>We need access to your photo library to scan QR codes from your saved images.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchScreen</key>
