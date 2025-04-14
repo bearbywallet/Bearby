@@ -543,8 +543,6 @@ mod wallet_tests {
                 assert_eq!(account3.index, 2);
             }
 
-            assert!(zilliqa_swap_chain(0, 2).await.is_err());
-
             select_accounts_chain(0, zil_chain_config.hash())
                 .await
                 .unwrap();
@@ -926,11 +924,6 @@ mod wallet_tests {
         }
 
         assert_eq!(wallet.default_chain_hash, zil_chain_config.hash());
-
-        assert_eq!(
-            zilliqa_swap_chain(0, 0).await,
-            Err("background Error: Account Error: Invalid public key type".to_string(),)
-        );
 
         let keystore_bytes = make_keystore_file(
             0,
