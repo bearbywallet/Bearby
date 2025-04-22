@@ -30,3 +30,9 @@ Future<List<(String, String)>> getCurrenciesTickets() =>
 
 Future<bool> bip39ChecksumValid({required String words}) =>
     RustLib.instance.api.crateApiUtilsBip39ChecksumValid(words: words);
+
+(String, int) toWei({required String value, required int decimals}) =>
+    RustLib.instance.api.crateApiUtilsToWei(value: value, decimals: decimals);
+
+String fromWei({required String value, required int decimals}) =>
+    RustLib.instance.api.crateApiUtilsFromWei(value: value, decimals: decimals);

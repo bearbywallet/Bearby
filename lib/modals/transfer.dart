@@ -7,6 +7,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
+import 'package:zilpay/components/transaction_amount_display.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -105,6 +106,7 @@ class _ConfirmTransactionContentState
   String? _error;
   BigInt _maxPriorityFee = BigInt.zero;
   BigInt _gasPrice = BigInt.zero;
+  BigInt _totalFee = BigInt.zero;
   bool _obscurePassword = true;
   Timer? _timerPooling;
 
@@ -139,8 +141,8 @@ class _ConfirmTransactionContentState
     int diffBlockTime =
         appState.getChain(chainHash)?.diffBlockTime.toInt() ?? 20;
 
-    if (diffBlockTime < 10) {
-      diffBlockTime = 10;
+    if (diffBlockTime < 2) {
+      diffBlockTime = 2;
     }
 
     _timerPooling = Timer.periodic(
@@ -168,39 +170,45 @@ class _ConfirmTransactionContentState
     }
   }
 
-  TransactionRequestInfo _prepareTx() => isEVM
-      ? TransactionRequestInfo(
-          metadata: widget.tx.metadata,
-          evm: TransactionRequestEVM(
-            nonce: _txParamsInfo.nonce,
-            from: widget.tx.evm!.from,
-            to: widget.tx.evm!.to,
-            value: widget.tx.evm!.value,
-            data: widget.tx.evm!.data,
-            chainId: widget.tx.evm!.chainId,
-            accessList: widget.tx.evm!.accessList,
-            blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
-            maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
-            maxPriorityFeePerGas: _maxPriorityFee,
-            gasLimit: _txParamsInfo.txEstimateGas,
-            gasPrice: _gasPrice,
-            maxFeePerGas: (_txParamsInfo.feeHistory.baseFee * BigInt.two) +
-                _maxPriorityFee,
-          ),
-        )
-      : TransactionRequestInfo(
-          metadata: widget.tx.metadata,
-          scilla: TransactionRequestScilla(
-            chainId: widget.tx.scilla!.chainId,
-            nonce: _txParamsInfo.nonce + BigInt.one,
-            gasPrice: _gasPrice,
-            gasLimit: widget.tx.scilla!.gasLimit,
-            toAddr: widget.tx.scilla!.toAddr,
-            amount: widget.tx.scilla!.amount,
-            code: widget.tx.scilla!.code,
-            data: widget.tx.scilla!.data,
-          ),
-        );
+  TransactionRequestInfo _prepareTx(BigInt adjustedAmount) {
+    if (isEVM) {
+      return TransactionRequestInfo(
+        metadata: widget.tx.metadata,
+        evm: TransactionRequestEVM(
+          nonce: _txParamsInfo.nonce,
+          from: widget.tx.evm!.from,
+          to: widget.tx.evm!.to,
+          value: adjustedAmount.toString(),
+          data: widget.tx.evm!.data,
+          chainId: widget.tx.evm!.chainId,
+          accessList: widget.tx.evm!.accessList,
+          blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
+          maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
+          maxPriorityFeePerGas: _maxPriorityFee,
+          gasLimit: _txParamsInfo.txEstimateGas,
+          gasPrice: _gasPrice,
+          maxFeePerGas:
+              (_txParamsInfo.feeHistory.baseFee * BigInt.two) + _maxPriorityFee,
+        ),
+      );
+    } else if (isScilla) {
+      return TransactionRequestInfo(
+        metadata: widget.tx.metadata,
+        scilla: TransactionRequestScilla(
+          chainId: widget.tx.scilla!.chainId,
+          nonce: _txParamsInfo.nonce + BigInt.one,
+          gasPrice: _gasPrice,
+          gasLimit: widget.tx.scilla!.gasLimit,
+          toAddr: widget.tx.scilla!.toAddr,
+          amount: adjustedAmount,
+          code: widget.tx.scilla!.code,
+          data: widget.tx.scilla!.data,
+        ),
+      );
+    } else {
+      throw Exception('Unsupported transaction type');
+    }
+  }
 
   Future<bool> _authenticate() async => _authService.authenticate(
       allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
@@ -232,17 +240,6 @@ class _ConfirmTransactionContentState
         tx: tx,
         password: _passwordController.text,
       );
-    }
-  }
-
-  bool _checkBalance(AppState appState) {
-    try {
-      final token = appState.wallet!.tokens[widget.tokenIndex];
-      final balance =
-          BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
-      return balance >= toWei(widget.amount, token.decimals);
-    } catch (_) {
-      return false;
     }
   }
 
@@ -338,6 +335,8 @@ class _ConfirmTransactionContentState
                             setState(() => _gasPrice = gasPrice),
                         onChangeMaxPriorityFee: (maxPriorityFee) =>
                             setState(() => _maxPriorityFee = maxPriorityFee),
+                        onTotalFeeChange: (totalFee) =>
+                            setState(() => _totalFee = totalFee),
                         primaryColor: primaryColor,
                         textColor: textColor,
                         secondaryColor: secondaryColor,
@@ -376,14 +375,54 @@ class _ConfirmTransactionContentState
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
-                            if (!_checkBalance(appState)) {
-                              throw Exception(l10n
-                                  .confirmTransactionContentInsufficientBalance);
+                            final token =
+                                appState.wallet!.tokens[widget.tokenIndex];
+                            final amount =
+                                toDecimalsWei(widget.amount, token.decimals);
+                            final fee = _totalFee;
+                            BigInt adjustedAmount = amount;
+
+                            final balance = BigInt.parse(token.balances[
+                                    appState.wallet!.selectedAccount] ??
+                                '0');
+                            if (token.native && amount == balance) {
+                              if (fee > balance) {
+                                throw Exception(
+                                    'Insufficient balance to cover fee');
+                              }
+                              adjustedAmount = amount - fee;
                             }
-                            final tx = _prepareTx();
+
+                            if (token.native) {
+                              if (adjustedAmount + fee > balance) {
+                                throw Exception(
+                                    'Insufficient balance for adjusted amount and fee');
+                              }
+                            } else {
+                              if (amount > balance) {
+                                throw Exception('Insufficient token balance');
+                              }
+                              final nativeToken =
+                                  appState.wallet!.tokens.firstWhere(
+                                (t) =>
+                                    t.native &&
+                                    t.chainHash == widget.tx.metadata.chainHash,
+                                orElse: () =>
+                                    throw Exception('Native token not found'),
+                              );
+                              final nativeBalance = BigInt.parse(
+                                  nativeToken.balances[
+                                          appState.wallet!.selectedAccount] ??
+                                      '0');
+                              if (fee > nativeBalance) {
+                                throw Exception(
+                                    'Insufficient balance for gas fee');
+                              }
+                            }
+
+                            final tx = _prepareTx(adjustedAmount);
                             HistoricalTransactionInfo? sendedTx =
                                 await _signAndSend(appState, tx);
-
                             if (mounted && sendedTx != null) {
                               widget.onConfirm(sendedTx);
                             }
@@ -474,16 +513,31 @@ class _ConfirmTransactionContentState
       final signer = appState.account ??
           (throw Exception(AppLocalizations.of(context)!
               .confirmTransactionContentNoActiveAccount));
+
+      final amount = toDecimalsWei(widget.amount.toString(), token.decimals);
+      final balance = BigInt.parse(
+          ftoken.balances[appState.wallet!.selectedAccount] ?? '0');
+
       return Padding(
         padding: const EdgeInsets.all(16),
-        child: TokenTransferAmount(
-          fromAddress: signer.addr,
-          fromName: signer.name,
-          toAddress: widget.to,
-          amount: widget.amount,
-          symbol: token.symbol,
-          textColor: textColor,
-          secondaryColor: secondaryColor,
+        child: Column(
+          children: [
+            TransactionAmountDisplay(
+              amount: amount,
+              fee: _totalFee,
+              token: ftoken,
+              balance: balance,
+              textColor: textColor,
+            ),
+            const SizedBox(height: 16),
+            TokenTransferInfo(
+              fromAddress: signer.addr,
+              fromName: signer.name,
+              toAddress: widget.to,
+              textColor: textColor,
+              secondaryColor: secondaryColor,
+            ),
+          ],
         ),
       );
     } catch (e) {

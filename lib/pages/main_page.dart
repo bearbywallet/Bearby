@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import '../components/bottom_nav_bar.dart';
 import './home_page.dart';
 import './history_page.dart';
@@ -52,9 +53,31 @@ class MainPageState extends State<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    final Color effectiveBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final Brightness backgroundBrightness =
+        ThemeData.estimateBrightnessForColor(effectiveBgColor);
+    final Brightness statusBarIconBrightness =
+        backgroundBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final Brightness statusBarBrightness = backgroundBrightness;
+
+    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: statusBarIconBrightness,
+      statusBarBrightness: statusBarBrightness,
+    );
+
     return Scaffold(
       extendBody: true,
       body: _pages.elementAt(_selectedIndex),
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: overlayStyle,
+      ),
       bottomNavigationBar: CustomBottomNavigationBar(
         items: [
           CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),

@@ -54,8 +54,6 @@ void main() {
     // Get current locale
     appState =
         tester.element(find.byType(GestureDetector).first).read<AppState>();
-    String? initialLocale = appState.state.locale;
-
     // Select a different language (English)
     final englishListItem = find.ancestor(
         of: find.text("English").first, matching: find.byType(GestureDetector));

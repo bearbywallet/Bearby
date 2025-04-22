@@ -1,5 +1,4 @@
-import 'dart:math';
-
+import 'package:flutter/rendering.dart';
 import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -14,8 +13,16 @@ double adjustAmountToDouble(BigInt rawBalance, int decimals) {
   return rawBalance.toDouble() / divisor.toDouble();
 }
 
-BigInt toWei(String amount, int decimals) {
-  return BigInt.from(double.parse(amount) * pow(10, decimals));
+BigInt toDecimalsWei(String amount, int decimals) {
+  try {
+    final (value, dec) = toWei(value: amount, decimals: decimals);
+
+    return BigInt.parse(value);
+  } catch (e) {
+    debugPrint("fail to parse number ${amount}");
+
+    return BigInt.zero;
+  }
 }
 
 (String, String) formatingAmount({

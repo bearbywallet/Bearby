@@ -187,6 +187,7 @@ class GasEIP1559 extends StatefulWidget {
   final RequiredTxParamsInfo txParamsInfo;
   final Function(BigInt maxPriorityFee) onChangeMaxPriorityFee;
   final Function(BigInt gasPrice) onChangeGasPrice;
+  final Function(BigInt totalFee) onTotalFeeChange;
   final bool disabled;
   final int timeDiffBlock;
   final Color? primaryColor;
@@ -198,6 +199,7 @@ class GasEIP1559 extends StatefulWidget {
     required this.txParamsInfo,
     required this.onChangeMaxPriorityFee,
     required this.onChangeGasPrice,
+    required this.onTotalFeeChange,
     required this.timeDiffBlock,
     this.disabled = false,
     this.primaryColor,
@@ -214,6 +216,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   late final Animation<double> _expandAnimation;
   bool _isExpanded = false;
   GasFeeOption _selected = GasFeeOption.market;
+  BigInt _currentTotalFee = BigInt.zero;
 
   @override
   void initState() {
@@ -226,6 +229,10 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       parent: _expandController,
       curve: Curves.easeInOut,
     );
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateTotalFee();
+    });
   }
 
   @override
@@ -250,7 +257,24 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
         );
         widget.onChangeMaxPriorityFee(maxPriorityFee);
         widget.onChangeGasPrice(gasPrice);
+
+        _updateTotalFee();
       });
+    }
+  }
+
+  void _updateTotalFee() {
+    final totalGasFee = calculateTotalGasCost(
+      _selected,
+      widget.txParamsInfo.feeHistory.baseFee,
+      widget.txParamsInfo.feeHistory.priorityFee,
+      widget.txParamsInfo.txEstimateGas,
+      widget.txParamsInfo.gasPrice,
+    );
+
+    if (_currentTotalFee != totalGasFee) {
+      _currentTotalFee = totalGasFee;
+      widget.onTotalFeeChange(totalGasFee);
     }
   }
 
@@ -276,6 +300,10 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       widget.txParamsInfo.feeHistory.priorityFee,
     );
     widget.onChangeMaxPriorityFee(maxPriorityFee);
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _updateTotalFee();
+    });
   }
 
   Widget _buildGasOption({
@@ -453,4 +481,22 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       ],
     );
   }
+}
+
+BigInt calculateTotalGasCost(
+  GasFeeOption option,
+  BigInt baseFee,
+  BigInt priorityFee,
+  BigInt gasLimit,
+  BigInt gasPrice,
+) {
+  if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
+    final maxFeePerGas = calculateFeeForOption(option, baseFee, priorityFee);
+    return gasLimit * maxFeePerGas;
+  } else if (gasPrice != BigInt.zero) {
+    final adjustedGasPrice = calculateGasPrice(option, gasPrice);
+    return gasLimit * adjustedGasPrice;
+  }
+
+  return BigInt.zero;
 }

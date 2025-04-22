@@ -7,33 +7,25 @@ import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
-class TokenTransferAmount extends StatelessWidget {
+class TokenTransferInfo extends StatelessWidget {
   final String fromAddress;
   final String toAddress;
-  final String amount;
-  final String symbol;
   final String? fromName;
   final String? toName;
   final bool disabled;
   final Color? textColor;
   final Color? secondaryColor;
 
-  const TokenTransferAmount({
+  const TokenTransferInfo({
     super.key,
     required this.fromAddress,
     required this.toAddress,
-    required this.amount,
-    required this.symbol,
     this.fromName,
     this.toName,
     this.disabled = false,
     this.textColor,
     this.secondaryColor,
   });
-
-  String _formatAddress(String address) {
-    return shortenAddress(address);
-  }
 
   Future<void> _copyToClipboard(BuildContext context, String text) async {
     await Clipboard.setData(ClipboardData(text: text));
@@ -69,7 +61,7 @@ class TokenTransferAmount extends StatelessWidget {
             ),
             const SizedBox(height: 2),
             Text(
-              _formatAddress(address),
+              shortenAddress(address),
               style: style,
               overflow: TextOverflow.ellipsis,
             ),
@@ -112,53 +104,21 @@ class TokenTransferAmount extends StatelessWidget {
           ),
           Expanded(
             flex: 4,
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    color: effectiveSecondaryColor.withValues(alpha: 0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: SvgPicture.asset(
-                    "assets/icons/right_arrow.svg",
-                    width: 24,
-                    height: 24,
-                    colorFilter: ColorFilter.mode(
-                      effectiveSecondaryColor,
-                      BlendMode.srcIn,
-                    ),
-                  ),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: effectiveSecondaryColor.withValues(alpha: 0.1),
+                shape: BoxShape.circle,
+              ),
+              child: SvgPicture.asset(
+                "assets/icons/right_arrow.svg",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  effectiveSecondaryColor,
+                  BlendMode.srcIn,
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Flexible(
-                      child: Text(
-                        amount,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: effectiveTextColor,
-                          letterSpacing: 0.5,
-                        ),
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      symbol,
-                      style: TextStyle(
-                        fontSize: 10,
-                        fontWeight: FontWeight.w400,
-                        color: effectiveSecondaryColor.withValues(alpha: 0.7),
-                      ),
-                    ),
-                  ],
-                ),
-              ],
+              ),
             ),
           ),
           _buildAddressButton(

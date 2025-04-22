@@ -6,6 +6,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/select_token.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -38,10 +39,9 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final token = appState.wallet!.tokens[widget.tokenIndex];
-    final BigInt bigAmount = toWei(widget.amount, token.decimals);
+    final bigAmount = toDecimalsWei(widget.amount.toString(), token.decimals);
     final bigBalance =
         BigInt.parse(token.balances[appState.wallet!.selectedAccount] ?? '0');
-    final double balance = adjustAmountToDouble(bigBalance, token.decimals);
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -57,7 +57,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         children: [
           _buildAmountRow(context, theme, token, bigAmount, appState),
           const SizedBox(height: 8),
-          _buildBalanceRow(theme, balance),
+          _buildBalanceRow(theme, bigBalance, token),
         ],
       ),
     );
@@ -91,6 +91,14 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
     const double amountHeight = 40.0;
     const double convertHeight = 20.0;
 
+    final (_, converted) = formatingAmount(
+      amount: bigAmount,
+      symbol: token.symbol,
+      decimals: token.decimals,
+      rate: token.rate,
+      appState: appState,
+    );
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -114,13 +122,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             child: Align(
               alignment: Alignment.centerLeft,
               child: Text(
-                formatingAmount(
-                  amount: bigAmount,
-                  symbol: token.symbol,
-                  decimals: token.decimals,
-                  rate: token.rate,
-                  appState: appState,
-                ).$2,
+                converted,
                 style: TextStyle(
                   color: theme.textPrimary.withValues(alpha: 0.7),
                   fontSize: 16,
@@ -220,9 +222,10 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         ));
   }
 
-  Widget _buildBalanceRow(AppTheme theme, double balance) {
-    final double currentAmount = _getAmount();
+  Widget _buildBalanceRow(AppTheme theme, BigInt balance, FTokenInfo token) {
+    final currentAmount = toDecimalsWei(widget.amount, token.decimals);
     final bool isExceeded = currentAmount > balance;
+    final bool isMax = currentAmount == balance;
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.end,
@@ -239,7 +242,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           ),
         if (isExceeded) const SizedBox(width: 4),
         Text(
-          balance.toString(),
+          fromWei(value: balance.toString(), decimals: token.decimals),
           style: TextStyle(
             color: theme.textPrimary.withValues(alpha: 0.7),
             fontSize: 14,
@@ -249,20 +252,25 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           Padding(
             padding: const EdgeInsets.only(left: 8),
             child: GestureDetector(
-              onTap: () => widget.onMaxTap(balance.toString()),
+              onTap: () => widget.onMaxTap(
+                  fromWei(value: balance.toString(), decimals: token.decimals)),
               child: Container(
                 padding: const EdgeInsets.symmetric(
                   horizontal: 8,
                   vertical: 4,
                 ),
                 decoration: BoxDecoration(
-                  color: theme.textPrimary.withValues(alpha: 0.1),
+                  color: isMax
+                      ? theme.warning.withValues(alpha: 0.2)
+                      : theme.textPrimary.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(6),
                 ),
                 child: Text(
                   'Max',
                   style: TextStyle(
-                    color: theme.textPrimary.withValues(alpha: 0.7),
+                    color: isMax
+                        ? theme.warning
+                        : theme.textPrimary.withValues(alpha: 0.7),
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
                   ),
@@ -272,14 +280,6 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
           ),
       ],
     );
-  }
-
-  double _getAmount() {
-    try {
-      return double.parse(widget.amount);
-    } catch (_) {
-      return 0;
-    }
   }
 
   double _calculateFontSize(BuildContext context, String text) {

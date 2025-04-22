@@ -230,7 +230,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: accountIndex,
         token: token,
-        amount: toWei(_amount, token.decimals).toString(),
+        amount: toDecimalsWei(_amount, token.decimals).toString(),
         recipient: _address ?? "",
         icon: processTokenLogo(
           token: token,

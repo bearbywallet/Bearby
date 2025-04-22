@@ -56,3 +56,17 @@ pub fn bip39_checksum_valid(words: String) -> bool {
         false
     }
 }
+
+#[frb(sync)]
+pub fn to_wei(value: String, decimals: u8) -> Result<(String, u8), String> {
+    let big_value = zilpay::intl::wei::to_wei(value, decimals).map_err(|e| e.to_string())?;
+
+    Ok((big_value.to_string(), decimals))
+}
+
+#[frb(sync)]
+pub fn from_wei(value: String, decimals: u8) -> Result<String, String> {
+    let value_float = zilpay::intl::wei::from_wei(value, decimals).map_err(|e| e.to_string())?;
+
+    Ok(value_float)
+}
