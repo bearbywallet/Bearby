@@ -101,13 +101,14 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
   }
 
   void _handleWordChange(int index, String word) {
-    final trimmedWord = word.trim().toLowerCase();
-    final currentIndex = index - 1;
-
-    if (word.contains(' ')) {
+    if (word.trim().contains(' ')) {
       _handlePhrasePaste(word);
       return;
     }
+
+    final trimmedWord =
+        word.trim().toLowerCase().replaceAll(RegExp(r'[^a-z]'), '');
+    final currentIndex = index - 1;
 
     _words[currentIndex] = trimmedWord;
     if (_wordsErrorIndexes.contains(currentIndex)) {
