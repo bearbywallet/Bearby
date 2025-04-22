@@ -655,8 +655,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     }
                   },
                   onProgressChanged: (controller, progress) async {
-                    final chain = appState.getChain(
-                        appState.wallet?.defaultChainHash ?? BigInt.zero);
+                    final chain = appState.chain;
 
                     if (progress > 20 && chain?.slip44 == 313) {
                       String scilla = await rootBundle
