@@ -33,6 +33,7 @@ class TransactionAmountDisplay extends StatelessWidget {
 
   Widget _buildAmountDisplay(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final nativeToken = appState.wallet?.tokens.first;
     final bool isNative = token.native;
     final bool isMaxTransfer = isNative && amount == balance;
 
@@ -88,15 +89,15 @@ class TransactionAmountDisplay extends StatelessWidget {
       );
       amountText = normalizedAmount;
       amountConversion = convertedAmount;
-      if (isNative) connector = " + ";
+      connector = " + ";
     }
 
-    if (isNative) {
+    if (nativeToken?.native == true) {
       final (normalizedFee, convertedFee) = formatingAmount(
         amount: fee,
-        symbol: token.symbol,
-        decimals: token.decimals,
-        rate: token.rate,
+        symbol: nativeToken!.symbol,
+        decimals: nativeToken.decimals,
+        rate: nativeToken.rate,
         appState: appState,
       );
       feeText = normalizedFee;
