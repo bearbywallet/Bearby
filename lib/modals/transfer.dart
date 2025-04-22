@@ -380,7 +380,7 @@ class _ConfirmTransactionContentState
                             final amount =
                                 toDecimalsWei(widget.amount, token.decimals);
                             final fee = _totalFee;
-                            BigInt adjustedAmount = amount;
+                            BigInt adjustedNativeValue = amount;
 
                             final balance = BigInt.parse(token.balances[
                                     appState.wallet!.selectedAccount] ??
@@ -390,11 +390,11 @@ class _ConfirmTransactionContentState
                                 throw Exception(
                                     'Insufficient balance to cover fee');
                               }
-                              adjustedAmount = amount - fee;
+                              adjustedNativeValue = amount - fee;
                             }
 
                             if (token.native) {
-                              if (adjustedAmount + fee > balance) {
+                              if (adjustedNativeValue + fee > balance) {
                                 throw Exception(
                                     'Insufficient balance for adjusted amount and fee');
                               }
@@ -420,7 +420,16 @@ class _ConfirmTransactionContentState
                               }
                             }
 
-                            final tx = _prepareTx(adjustedAmount);
+                            if (!token.native && isScilla) {
+                              adjustedNativeValue =
+                                  widget.tx.scilla?.amount ?? BigInt.zero;
+                            } else if (!token.native && isEVM) {
+                              adjustedNativeValue = BigInt.tryParse(
+                                      widget.tx.evm?.value ?? "0") ??
+                                  BigInt.zero;
+                            }
+
+                            final tx = _prepareTx(adjustedNativeValue);
                             HistoricalTransactionInfo? sendedTx =
                                 await _signAndSend(appState, tx);
                             if (mounted && sendedTx != null) {
