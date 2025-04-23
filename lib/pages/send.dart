@@ -11,6 +11,7 @@ import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -54,9 +55,10 @@ class _SendTokenPageState extends State<SendTokenPage> {
       final token = _appState.wallet!.tokens[_tokenIndex];
       final bigBalance = BigInt.parse(
           token.balances[_appState.wallet!.selectedAccount] ?? '0');
-      final balance = adjustAmountToDouble(bigBalance, token.decimals);
+      final balance =
+          fromWei(value: bigBalance.toString(), decimals: token.decimals);
 
-      return numAmount >= 0 && numAmount <= balance;
+      return numAmount >= 0 && numAmount <= double.parse(balance);
     } catch (e) {
       debugPrint("amount is not valid $e");
       return false;

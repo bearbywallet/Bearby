@@ -3,11 +3,11 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
@@ -166,6 +166,7 @@ class ZilPayLegacyHandler {
       final appState = Provider.of<AppState>(context, listen: false);
       final tokenIndex =
           appState.wallet!.tokens.indexWhere((t) => t.addrType == 0);
+
       if (tokenIndex == -1) throw Exception('Native token not found');
 
       final amount = BigInt.parse(message.payload['amount'].toString());
@@ -199,8 +200,10 @@ class ZilPayLegacyHandler {
         decimals: token.decimals,
       );
 
-      var recipient = toAddr;
-      var tokenAmount = adjustAmountToDouble(amount, token.decimals).toString();
+      String recipient = toAddr;
+      String tokenAmount =
+          fromWei(value: amount.toString(), decimals: token.decimals)
+              .toString();
 
       final (toAddress, ftAmount, ftMeta, teg) =
           await Web3Utils.fetchTokenMetaLegacyZilliqa(
@@ -210,9 +213,10 @@ class ZilPayLegacyHandler {
       );
 
       if (ftMeta != null) {
-        tokenAmount =
-            adjustAmountToDouble(ftAmount ?? BigInt.zero, ftMeta.decimals)
-                .toString();
+        tokenAmount = fromWei(
+                value: (ftAmount ?? BigInt.zero).toString(),
+                decimals: ftMeta.decimals)
+            .toString();
         recipient = toAddress!;
         tokenInfo = BaseTokenInfo(
           value: tokenAmount,

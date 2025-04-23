@@ -3,16 +3,6 @@ import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
 
-double adjustAmountToDouble(BigInt rawBalance, int decimals) {
-  if (rawBalance == BigInt.zero) {
-    return 0;
-  }
-
-  BigInt divisor = BigInt.from(10).pow(decimals);
-
-  return rawBalance.toDouble() / divisor.toDouble();
-}
-
 BigInt toDecimalsWei(String amount, int decimals) {
   try {
     final (value, dec) = toWei(value: amount, decimals: decimals);

@@ -6,7 +6,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/config/ftokens.dart';
-import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/modals/add_chain.dart';
 import 'package:zilpay/modals/app_connect.dart';
@@ -17,6 +16,7 @@ import 'package:zilpay/modals/watch_asset_modal.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/api/token.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -756,9 +756,10 @@ class Web3EIP1193Handler {
         to: to ?? "",
         colors: connection.colors,
         tokenIndex: tokenIndex,
-        amount: adjustAmountToDouble(
-                valueAmount, appState.wallet!.tokens[tokenIndex].decimals)
-            .toString(),
+        amount: fromWei(
+          value: valueAmount.toString(),
+          decimals: appState.wallet!.tokens[tokenIndex].decimals,
+        ).toString(),
         onConfirm: (tx) {
           _sendResponse(
             type: 'ZILPAY_RESPONSE',

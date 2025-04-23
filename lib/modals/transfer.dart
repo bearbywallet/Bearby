@@ -380,21 +380,24 @@ class _ConfirmTransactionContentState
                             final amount =
                                 toDecimalsWei(widget.amount, token.decimals);
                             final fee = _totalFee;
-                            BigInt adjustedNativeValue = amount;
-
+                            BigInt adjustedTokenValue = amount;
+                            bool isNativeTx =
+                                (widget.tx.evm?.data?.isEmpty ?? true) &&
+                                    (widget.tx.scilla?.data.isEmpty ?? true);
                             final balance = BigInt.parse(token.balances[
                                     appState.wallet!.selectedAccount] ??
                                 '0');
-                            if (token.native && amount == balance) {
+
+                            if (isNativeTx && amount == balance) {
                               if (fee > balance) {
                                 throw Exception(
                                     'Insufficient balance to cover fee');
                               }
-                              adjustedNativeValue = amount - fee;
+                              adjustedTokenValue = amount - fee;
                             }
 
-                            if (token.native) {
-                              if (adjustedNativeValue + fee > balance) {
+                            if (isNativeTx) {
+                              if (adjustedTokenValue + fee > balance) {
                                 throw Exception(
                                     'Insufficient balance for adjusted amount and fee');
                               }
@@ -420,16 +423,16 @@ class _ConfirmTransactionContentState
                               }
                             }
 
-                            if (!token.native && isScilla) {
-                              adjustedNativeValue =
+                            if (!isNativeTx && isScilla) {
+                              adjustedTokenValue =
                                   widget.tx.scilla?.amount ?? BigInt.zero;
                             } else if (!token.native && isEVM) {
-                              adjustedNativeValue = BigInt.tryParse(
+                              adjustedTokenValue = BigInt.tryParse(
                                       widget.tx.evm?.value ?? "0") ??
                                   BigInt.zero;
                             }
 
-                            final tx = _prepareTx(adjustedNativeValue);
+                            final tx = _prepareTx(adjustedTokenValue);
                             HistoricalTransactionInfo? sendedTx =
                                 await _signAndSend(appState, tx);
                             if (mounted && sendedTx != null) {
