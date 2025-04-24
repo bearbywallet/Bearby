@@ -700,14 +700,15 @@ class Web3EIP1193Handler {
         maxFeePerBlobGas: null,
       );
 
-      final tokenIndex =
-          appState.wallet!.tokens.indexWhere((t) => t.addrType == 1);
-      if (tokenIndex == -1) {
+      FTokenInfo? mbToken = appState.wallet?.tokens
+          .firstWhere((t) => t.addrType == 1 && t.native);
+
+      if (mbToken == null) {
         _removeActiveRequest(method);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.internalError,
-          'No token information found',
+          'No native token found',
         );
       }
 
@@ -717,8 +718,8 @@ class Web3EIP1193Handler {
 
       final tokenInfo = BaseTokenInfo(
         value: valueAmount.toString(),
-        symbol: appState.wallet!.tokens[tokenIndex].symbol,
-        decimals: appState.wallet!.tokens[tokenIndex].decimals,
+        symbol: mbToken.symbol,
+        decimals: mbToken.decimals,
       );
 
       final metadata = TransactionMetadataInfo(
@@ -755,10 +756,10 @@ class Web3EIP1193Handler {
         tx: transactionRequest,
         to: to ?? "",
         colors: connection.colors,
-        tokenIndex: tokenIndex,
+        token: mbToken,
         amount: fromWei(
           value: valueAmount.toString(),
-          decimals: appState.wallet!.tokens[tokenIndex].decimals,
+          decimals: mbToken.decimals,
         ).toString(),
         onConfirm: (tx) {
           _sendResponse(

@@ -247,7 +247,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
         context: context,
         tx: tx,
         to: _address!,
-        tokenIndex: _tokenIndex,
+        token: token,
         amount: _amount,
         onConfirm: (_) {
           Navigator.of(context).pushNamed('/', arguments: {

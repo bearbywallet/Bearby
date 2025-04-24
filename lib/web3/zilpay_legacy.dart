@@ -11,6 +11,7 @@ import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/src/rust/models/transactions/scilla.dart';
@@ -164,10 +165,10 @@ class ZilPayLegacyHandler {
   ) async {
     try {
       final appState = Provider.of<AppState>(context, listen: false);
-      final tokenIndex =
-          appState.wallet!.tokens.indexWhere((t) => t.addrType == 0);
+      FTokenInfo? ftoken = appState.wallet?.tokens
+          .firstWhere((t) => t.addrType == 0 && t.native);
 
-      if (tokenIndex == -1) throw Exception('Native token not found');
+      if (ftoken == null) throw Exception('Native token not found');
 
       final amount = BigInt.parse(message.payload['amount'].toString());
       final gasPrice = BigInt.parse(message.payload['gasPrice'].toString());
@@ -193,16 +194,15 @@ class ZilPayLegacyHandler {
         data: data,
       );
 
-      final token = appState.wallet!.tokens[tokenIndex];
       var tokenInfo = BaseTokenInfo(
         value: amount.toString(),
-        symbol: token.symbol,
-        decimals: token.decimals,
+        symbol: ftoken.symbol,
+        decimals: ftoken.decimals,
       );
 
       String recipient = toAddr;
       String tokenAmount =
-          fromWei(value: amount.toString(), decimals: token.decimals)
+          fromWei(value: amount.toString(), decimals: ftoken.decimals)
               .toString();
 
       final (toAddress, ftAmount, ftMeta, teg) =
@@ -223,6 +223,7 @@ class ZilPayLegacyHandler {
           symbol: ftMeta.symbol,
           decimals: ftMeta.decimals,
         );
+        ftoken = ftMeta;
       }
 
       final metadata = TransactionMetadataInfo(
@@ -256,7 +257,7 @@ class ZilPayLegacyHandler {
         context: context,
         tx: transactionRequest,
         to: recipient,
-        tokenIndex: tokenIndex,
+        token: ftoken,
         amount: tokenAmount,
         onConfirm: (tx) {
           _sendResponse(

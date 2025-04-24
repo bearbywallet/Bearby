@@ -14,6 +14,7 @@ import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
@@ -29,7 +30,7 @@ void showConfirmTransactionModal({
   required TransactionRequestInfo tx,
   required String to,
   required String amount,
-  required int tokenIndex,
+  required FTokenInfo token,
   ColorsInfo? colors,
   required Function(HistoricalTransactionInfo) onConfirm,
   VoidCallback? onDismiss,
@@ -44,7 +45,7 @@ void showConfirmTransactionModal({
     barrierColor: Colors.black54,
     builder: (context) => _ConfirmTransactionContent(
       tx: tx,
-      tokenIndex: tokenIndex,
+      token: token,
       amount: amount,
       to: to,
       colors: colors,
@@ -65,7 +66,7 @@ void showConfirmTransactionModal({
 class _ConfirmTransactionContent extends StatefulWidget {
   final TransactionRequestInfo tx;
   final String to;
-  final int tokenIndex;
+  final FTokenInfo token;
   final String amount;
   final ColorsInfo? colors;
   final Function(HistoricalTransactionInfo) onConfirm;
@@ -74,7 +75,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
     required this.tx,
     required this.amount,
     required this.to,
-    required this.tokenIndex,
+    required this.token,
     this.colors,
     required this.onConfirm,
   });
@@ -375,16 +376,16 @@ class _ConfirmTransactionContentState
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
-                            final token =
-                                appState.wallet!.tokens[widget.tokenIndex];
-                            final amount =
-                                toDecimalsWei(widget.amount, token.decimals);
+                            final amount = toDecimalsWei(
+                              widget.amount,
+                              widget.token.decimals,
+                            );
                             final fee = _totalFee;
                             BigInt adjustedTokenValue = amount;
                             bool isNativeTx =
                                 (widget.tx.evm?.data?.isEmpty ?? true) &&
                                     (widget.tx.scilla?.data.isEmpty ?? true);
-                            final balance = BigInt.parse(token.balances[
+                            final balance = BigInt.parse(widget.token.balances[
                                     appState.wallet!.selectedAccount] ??
                                 '0');
 
@@ -393,6 +394,7 @@ class _ConfirmTransactionContentState
                                 throw Exception(
                                     'Insufficient balance to cover fee');
                               }
+
                               adjustedTokenValue = amount - fee;
                             }
 
@@ -426,7 +428,7 @@ class _ConfirmTransactionContentState
                             if (!isNativeTx && isScilla) {
                               adjustedTokenValue =
                                   widget.tx.scilla?.amount ?? BigInt.zero;
-                            } else if (!token.native && isEVM) {
+                            } else if (!widget.token.native && isEVM) {
                               adjustedTokenValue = BigInt.tryParse(
                                       widget.tx.evm?.value ?? "0") ??
                                   BigInt.zero;
@@ -517,10 +519,11 @@ class _ConfirmTransactionContentState
   Widget _buildTransferDetails(
       AppState appState, Color textColor, Color secondaryColor) {
     try {
-      final ftoken = appState.wallet!.tokens[widget.tokenIndex];
       BaseTokenInfo token = widget.tx.metadata.tokenInfo ??
           BaseTokenInfo(
-              value: '', symbol: ftoken.symbol, decimals: ftoken.decimals);
+              value: '',
+              symbol: widget.token.symbol,
+              decimals: widget.token.decimals);
 
       final signer = appState.account ??
           (throw Exception(AppLocalizations.of(context)!
@@ -528,7 +531,7 @@ class _ConfirmTransactionContentState
 
       final amount = toDecimalsWei(widget.amount.toString(), token.decimals);
       final balance = BigInt.parse(
-          ftoken.balances[appState.wallet!.selectedAccount] ?? '0');
+          widget.token.balances[appState.wallet!.selectedAccount] ?? '0');
 
       return Padding(
         padding: const EdgeInsets.all(16),
@@ -537,7 +540,7 @@ class _ConfirmTransactionContentState
             TransactionAmountDisplay(
               amount: amount,
               fee: _totalFee,
-              token: ftoken,
+              token: widget.token,
               balance: balance,
               textColor: textColor,
             ),

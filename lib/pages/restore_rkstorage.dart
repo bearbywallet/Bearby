@@ -112,6 +112,7 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
         Navigator.of(context).pushNamed('/net_setup', arguments: {
           'bip39': words.split(" "),
           'zilLegacy': true,
+          'ignore_checksum': true,
         });
       }
     } catch (e) {
