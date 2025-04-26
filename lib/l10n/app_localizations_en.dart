@@ -924,6 +924,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => 'Failed to load transfer details';
 
   @override
+  String get confirmTransactionEditGasButtonText => 'Edit gas';
+
+  @override
   String get authReason => 'Please authenticate';
 
   @override
@@ -1464,4 +1467,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keystoreRestoreFilesTitle => 'Keystore Files';
+
+  @override
+  String get editGasDialogTitle => 'Edit Gas Parameters';
+
+  @override
+  String get editGasDialogGasPrice => 'Gas Price';
+
+  @override
+  String get editGasDialogMaxPriorityFee => 'Max Priority Fee';
+
+  @override
+  String get editGasDialogGasLimit => 'Gas Limit';
+
+  @override
+  String get editGasDialogCancel => 'Cancel';
+
+  @override
+  String get editGasDialogSave => 'Save';
+
+  @override
+  String get editGasDialogInvalidGasValues => 'Invalid gas values. Please check your inputs.';
 }

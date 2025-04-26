@@ -924,6 +924,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => '加载转账详情失败';
 
   @override
+  String get confirmTransactionEditGasButtonText => '编辑';
+
+  @override
   String get authReason => '请进行认证';
 
   @override
@@ -1464,4 +1467,25 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get keystoreRestoreFilesTitle => '密钥库文件';
+
+  @override
+  String get editGasDialogTitle => '编辑燃料参数';
+
+  @override
+  String get editGasDialogGasPrice => '燃料价格';
+
+  @override
+  String get editGasDialogMaxPriorityFee => '最大优先费用';
+
+  @override
+  String get editGasDialogGasLimit => '燃料限制';
+
+  @override
+  String get editGasDialogCancel => '取消';
+
+  @override
+  String get editGasDialogSave => '保存';
+
+  @override
+  String get editGasDialogInvalidGasValues => '燃料值无效。请检查您的输入。';
 }

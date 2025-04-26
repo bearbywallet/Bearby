@@ -337,6 +337,8 @@
   "confirmTransactionContentInsufficientBalance": "余额不足",
   "confirmTransactionContentNoActiveAccount": "无活动账户",
   "confirmTransactionContentFailedLoadTransfer": "加载转账详情失败",
+  "confirmTransactionEditGasButtonText": "编辑",
+
   "authReason": "请进行认证",
 
   "addChainModalContentWarning": "警惕网络诈骗和安全风险。",
@@ -544,5 +546,13 @@
   "keystoreRestoreButton": "恢复钱包",
   "keystoreRestoreExtError": "请选择有效的.zp文件",
   "keystoreRestoreNoFile": "未找到密钥库文件",
-  "keystoreRestoreFilesTitle": "密钥库文件"
+  "keystoreRestoreFilesTitle": "密钥库文件",
+
+  "editGasDialogTitle": "编辑燃料参数",
+  "editGasDialogGasPrice": "燃料价格",
+  "editGasDialogMaxPriorityFee": "最大优先费用",
+  "editGasDialogGasLimit": "燃料限制",
+  "editGasDialogCancel": "取消",
+  "editGasDialogSave": "保存",
+  "editGasDialogInvalidGasValues": "燃料值无效。请检查您的输入。"
 }

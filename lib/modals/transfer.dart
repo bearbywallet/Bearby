@@ -10,6 +10,7 @@ import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/modals/edit_gas_dialog.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -327,20 +328,117 @@ class _ConfirmTransactionContentState
                     _buildTransferDetails(appState, textColor, secondaryColor),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 16),
-                      child: GasEIP1559(
-                        timeDiffBlock:
-                            appState.chain?.diffBlockTime.toInt() ?? 10,
-                        txParamsInfo: _txParamsInfo,
-                        disabled: _isDisabled,
-                        onChangeGasPrice: (gasPrice) =>
-                            setState(() => _gasPrice = gasPrice),
-                        onChangeMaxPriorityFee: (maxPriorityFee) =>
-                            setState(() => _maxPriorityFee = maxPriorityFee),
-                        onTotalFeeChange: (totalFee) =>
-                            setState(() => _totalFee = totalFee),
-                        primaryColor: primaryColor,
-                        textColor: textColor,
-                        secondaryColor: secondaryColor,
+                      child: Column(
+                        children: [
+                          GasEIP1559(
+                            timeDiffBlock:
+                                appState.chain?.diffBlockTime.toInt() ?? 10,
+                            txParamsInfo: _txParamsInfo,
+                            disabled: _isDisabled,
+                            onChangeGasPrice: (gasPrice) =>
+                                setState(() => _gasPrice = gasPrice),
+                            onChangeMaxPriorityFee: (maxPriorityFee) =>
+                                setState(
+                                    () => _maxPriorityFee = maxPriorityFee),
+                            onTotalFeeChange: (totalFee) =>
+                                setState(() => _totalFee = totalFee),
+                            primaryColor: primaryColor,
+                            textColor: textColor,
+                            secondaryColor: secondaryColor,
+                          ),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: InkWell(
+                              splashFactory: NoSplash.splashFactory,
+                              highlightColor: Colors.transparent,
+                              onTap: _isDisabled
+                                  ? null
+                                  : () {
+                                      showDialog<void>(
+                                        context: context,
+                                        barrierDismissible: false,
+                                        builder: (context) => EditGasDialog(
+                                          txParamsInfo: _txParamsInfo,
+                                          initialGasPrice: _gasPrice,
+                                          initialMaxPriorityFee:
+                                              _maxPriorityFee,
+                                          initialGasLimit:
+                                              _txParamsInfo.txEstimateGas,
+                                          onSave: (gasPrice, maxPriorityFee,
+                                              gasLimit) {
+                                            if (!mounted) return;
+
+                                            setState(() {
+                                              _gasPrice = gasPrice;
+                                              _maxPriorityFee = maxPriorityFee;
+
+                                              _txParamsInfo =
+                                                  RequiredTxParamsInfo(
+                                                gasPrice:
+                                                    _txParamsInfo.gasPrice,
+                                                maxPriorityFee: _txParamsInfo
+                                                    .maxPriorityFee,
+                                                feeHistory:
+                                                    _txParamsInfo.feeHistory,
+                                                txEstimateGas: gasLimit,
+                                                blobBaseFee:
+                                                    _txParamsInfo.blobBaseFee,
+                                                nonce: _txParamsInfo.nonce,
+                                              );
+
+                                              final BigInt baseFee =
+                                                  _txParamsInfo
+                                                      .feeHistory.baseFee;
+                                              BigInt newTotalFee;
+
+                                              if (baseFee != BigInt.zero) {
+                                                final maxFeePerGas =
+                                                    baseFee + maxPriorityFee;
+                                                newTotalFee =
+                                                    gasLimit * maxFeePerGas;
+                                              } else {
+                                                newTotalFee =
+                                                    gasLimit * gasPrice;
+                                              }
+                                              _totalFee = newTotalFee;
+                                            });
+                                          },
+                                          primaryColor: primaryColor,
+                                          textColor: textColor,
+                                          secondaryColor: secondaryColor,
+                                        ),
+                                      );
+                                    },
+                              child: Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 8, right: 8, bottom: 8),
+                                child: Row(
+                                  mainAxisSize: MainAxisSize.min,
+                                  children: [
+                                    SvgPicture.asset(
+                                      'assets/icons/edit.svg',
+                                      width: 16,
+                                      height: 16,
+                                      colorFilter: ColorFilter.mode(
+                                        theme.warning,
+                                        BlendMode.srcIn,
+                                      ),
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      l10n.confirmTransactionEditGasButtonText,
+                                      style: TextStyle(
+                                        color: theme.warning,
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     if (appState.wallet!.authType == AuthMethod.none.name)

@@ -338,6 +338,8 @@
   "confirmTransactionContentInsufficientBalance": "Недостаточный баланс",
   "confirmTransactionContentNoActiveAccount": "Нет активного аккаунта",
   "confirmTransactionContentFailedLoadTransfer": "Не удалось загрузить детали перевода",
+  "confirmTransactionEditGasButtonText": "Изменить Газ",
+
   "authReason": "Пожалуйста, пройдите аутентификацию",
 
   "addChainModalContentWarning": "Остерегайтесь сетевых мошенничеств и рисков безопасности.",
@@ -560,5 +562,13 @@
   "keystoreRestoreButton": "Восстановить кошелек",
   "keystoreRestoreExtError": "Пожалуйста, выберите действительный файл .zp",
   "keystoreRestoreNoFile": "Файлы хранилища ключей не найдены",
-  "keystoreRestoreFilesTitle": "Файлы хранилища ключей"
+  "keystoreRestoreFilesTitle": "Файлы хранилища ключей",
+
+  "editGasDialogTitle": "Изменить параметры газа",
+  "editGasDialogGasPrice": "Цена газа",
+  "editGasDialogMaxPriorityFee": "Макс. приоритетная комиссия",
+  "editGasDialogGasLimit": "Лимит газа",
+  "editGasDialogCancel": "Отмена",
+  "editGasDialogSave": "Сохранить",
+  "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные."
 }

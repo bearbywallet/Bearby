@@ -1308,6 +1308,7 @@
   "@argonSettingsModalContentConfirmButton": {
     "description": "Text for confirm button in ArgonSettingsModalContent"
   },
+
   "confirmTransactionContentPasswordHint": "Password",
   "@confirmTransactionContentPasswordHint": {
     "description": "Hint text for the password input field in the ConfirmTransactionContent modal."
@@ -1332,6 +1333,11 @@
   "@confirmTransactionContentFailedLoadTransfer": {
     "description": "Error message displayed when transfer details fail to load in the ConfirmTransactionContent modal."
   },
+  "confirmTransactionEditGasButtonText": "Edit gas",
+  "@confirmTransactionEditGasButtonText": {
+    "description": "Text displayed on the edit gas button in the ConfirmTransactionContent modal."
+  },
+
   "authReason": "Please authenticate",
   "@authReason": {
     "description": "Reason text displayed during authentication prompt in the ConfirmTransactionContent modal."
@@ -2062,5 +2068,34 @@
   "keystoreRestoreFilesTitle": "Keystore Files",
   "@keystoreRestoreExtError": {
     "description": "title when we have keystore files"
+  },
+
+  "editGasDialogTitle": "Edit Gas Parameters",
+  "@editGasDialogTitle": {
+    "description": "Title of the dialog for editing gas parameters"
+  },
+  "editGasDialogGasPrice": "Gas Price",
+  "@editGasDialogGasPrice": {
+    "description": "Label for gas price input field in the gas edit dialog"
+  },
+  "editGasDialogMaxPriorityFee": "Max Priority Fee",
+  "@editGasDialogMaxPriorityFee": {
+    "description": "Label for max priority fee input field in the gas edit dialog"
+  },
+  "editGasDialogGasLimit": "Gas Limit",
+  "@editGasDialogGasLimit": {
+    "description": "Label for gas limit input field in the gas edit dialog"
+  },
+  "editGasDialogCancel": "Cancel",
+  "@editGasDialogCancel": {
+    "description": "Button text to cancel gas parameter changes"
+  },
+  "editGasDialogSave": "Save",
+  "@editGasDialogSave": {
+    "description": "Button text to save gas parameter changes"
+  },
+  "editGasDialogInvalidGasValues": "Invalid gas values. Please check your inputs.",
+  "@editGasDialogInvalidGasValues": {
+    "description": "Error message shown when invalid gas values are entered"
   }
 }

@@ -924,6 +924,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => '送金詳細の読み込みに失敗';
 
   @override
+  String get confirmTransactionEditGasButtonText => '編集';
+
+  @override
   String get authReason => '認証してください';
 
   @override
@@ -1464,4 +1467,25 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get keystoreRestoreFilesTitle => 'キーストアファイル';
+
+  @override
+  String get editGasDialogTitle => 'ガスパラメータの編集';
+
+  @override
+  String get editGasDialogGasPrice => 'ガス価格';
+
+  @override
+  String get editGasDialogMaxPriorityFee => '最大優先手数料';
+
+  @override
+  String get editGasDialogGasLimit => 'ガスリミット';
+
+  @override
+  String get editGasDialogCancel => 'キャンセル';
+
+  @override
+  String get editGasDialogSave => '保存';
+
+  @override
+  String get editGasDialogInvalidGasValues => '無効なガス値です。入力を確認してください。';
 }

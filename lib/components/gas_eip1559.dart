@@ -33,11 +33,13 @@ extension GasFeeOptionX on GasFeeOption {
   }
 
   String confirmationTime(int timeDiffBlock) {
-    final seconds = blocksForConfirmation * timeDiffBlock;
+    int seconds = blocksForConfirmation * timeDiffBlock;
     if (seconds < 60) {
+      seconds = seconds == 0 ? 1 : seconds;
       return '~$seconds sec';
     } else {
-      final minutes = (seconds / 60).round();
+      int minutes = (seconds / 60).round();
+
       return '~$minutes min';
     }
   }

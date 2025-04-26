@@ -338,6 +338,8 @@
   "confirmTransactionContentInsufficientBalance": "残高不足",
   "confirmTransactionContentNoActiveAccount": "アクティブなアカウントがありません",
   "confirmTransactionContentFailedLoadTransfer": "送金詳細の読み込みに失敗",
+  "confirmTransactionEditGasButtonText": "編集",
+
   "authReason": "認証してください",
 
   "addChainModalContentWarning": "ネットワーク詐欺とセキュリティリスクに注意してください。",
@@ -564,5 +566,13 @@
   "keystoreRestoreButton": "ウォレットを復元",
   "keystoreRestoreExtError": "有効な.zpファイルを選択してください",
   "keystoreRestoreNoFile": "キーストアファイルが見つかりません",
-  "keystoreRestoreFilesTitle": "キーストアファイル"
+  "keystoreRestoreFilesTitle": "キーストアファイル",
+
+  "editGasDialogTitle": "ガスパラメータの編集",
+  "editGasDialogGasPrice": "ガス価格",
+  "editGasDialogMaxPriorityFee": "最大優先手数料",
+  "editGasDialogGasLimit": "ガスリミット",
+  "editGasDialogCancel": "キャンセル",
+  "editGasDialogSave": "保存",
+  "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。"
 }

@@ -1893,6 +1893,12 @@ abstract class AppLocalizations {
   /// **'Failed to load transfer details'**
   String get confirmTransactionContentFailedLoadTransfer;
 
+  /// Text displayed on the edit gas button in the ConfirmTransactionContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit gas'**
+  String get confirmTransactionEditGasButtonText;
+
   /// Reason text displayed during authentication prompt in the ConfirmTransactionContent modal.
   ///
   /// In en, this message translates to:
@@ -2972,6 +2978,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Keystore Files'**
   String get keystoreRestoreFilesTitle;
+
+  /// Title of the dialog for editing gas parameters
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Gas Parameters'**
+  String get editGasDialogTitle;
+
+  /// Label for gas price input field in the gas edit dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Price'**
+  String get editGasDialogGasPrice;
+
+  /// Label for max priority fee input field in the gas edit dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Max Priority Fee'**
+  String get editGasDialogMaxPriorityFee;
+
+  /// Label for gas limit input field in the gas edit dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Gas Limit'**
+  String get editGasDialogGasLimit;
+
+  /// Button text to cancel gas parameter changes
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get editGasDialogCancel;
+
+  /// Button text to save gas parameter changes
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get editGasDialogSave;
+
+  /// Error message shown when invalid gas values are entered
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid gas values. Please check your inputs.'**
+  String get editGasDialogInvalidGasValues;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

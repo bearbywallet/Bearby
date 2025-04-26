@@ -924,6 +924,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmTransactionContentFailedLoadTransfer => 'Не удалось загрузить детали перевода';
 
   @override
+  String get confirmTransactionEditGasButtonText => 'Изменить Газ';
+
+  @override
   String get authReason => 'Пожалуйста, пройдите аутентификацию';
 
   @override
@@ -1464,4 +1467,25 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get keystoreRestoreFilesTitle => 'Файлы хранилища ключей';
+
+  @override
+  String get editGasDialogTitle => 'Изменить параметры газа';
+
+  @override
+  String get editGasDialogGasPrice => 'Цена газа';
+
+  @override
+  String get editGasDialogMaxPriorityFee => 'Макс. приоритетная комиссия';
+
+  @override
+  String get editGasDialogGasLimit => 'Лимит газа';
+
+  @override
+  String get editGasDialogCancel => 'Отмена';
+
+  @override
+  String get editGasDialogSave => 'Сохранить';
+
+  @override
+  String get editGasDialogInvalidGasValues => 'Недопустимые значения газа. Проверьте ваши данные.';
 }
