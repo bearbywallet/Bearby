@@ -25,10 +25,22 @@ String decodePersonalSignMessage(String dataToSign) {
 }
 
 List<String> filterByIndexes(List<String> addresses, Uint64List indexes) {
-  return [
-    for (var i = 0; i < indexes.length; i++)
-      if (i < addresses.length) addresses[indexes[i].toInt()]
-  ];
+  if (addresses.isEmpty || indexes.isEmpty) {
+    return [];
+  }
+
+  List<String> result = [];
+  int addressesLength = addresses.length;
+
+  for (var indexValue in indexes) {
+    int actualIndex = indexValue.toInt();
+
+    if (actualIndex >= 0 && actualIndex < addressesLength) {
+      result.add(addresses[actualIndex]);
+    }
+  }
+
+  return result;
 }
 
 class Web3Utils {

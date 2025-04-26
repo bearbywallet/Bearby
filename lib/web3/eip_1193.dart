@@ -404,6 +404,7 @@ class Web3EIP1193Handler {
     final addresses = await _getWalletAddresses(appState);
     final connectedAddr =
         filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
+
     _sendResponse(
       type: 'ZILPAY_RESPONSE',
       uuid: message.uuid,
