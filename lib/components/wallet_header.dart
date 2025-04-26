@@ -87,7 +87,7 @@ class _WalletHeaderState extends State<WalletHeader>
                   widget.account.name,
                   style: TextStyle(
                     color: theme.textPrimary,
-                    fontSize: 24,
+                    fontSize: 18,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
