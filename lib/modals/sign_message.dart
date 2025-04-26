@@ -168,7 +168,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         _parseColor(widget.colors?.primary) ?? theme.primaryPurple;
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
-    final textColor = _parseColor(widget.colors?.text) ?? theme.buttonText;
+    final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
 
     return Container(
       constraints:
@@ -325,6 +325,11 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                 ),
                                 const SizedBox(height: 12),
                                 Container(
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: primaryColor.withValues(alpha: 0.1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
                                   constraints:
                                       const BoxConstraints(maxHeight: 200),
                                   child: SingleChildScrollView(
@@ -469,7 +474,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                           : l10n.signMessageModalContentSign,
                       disabled: _loading,
                       backgroundColor: primaryColor,
-                      textColor: textColor,
+                      textColor: theme.buttonText,
                       onSwipeComplete: () async {
                         _handleSignMessage(appState);
                       },

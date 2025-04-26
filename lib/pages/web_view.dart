@@ -356,6 +356,17 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
     } catch (e) {
       debugPrint("$e");
     }
+
+    try {
+      if (appState.chain?.slip44 == 313) {
+        String scilla =
+            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+        await _webViewController?.evaluateJavascript(source: scilla);
+        await _legacyHandler!.sendData(appState);
+      }
+    } catch (e) {
+      debugPrint("$e");
+    }
   }
 
   void _refreshPage() {
@@ -655,14 +666,8 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     }
                   },
                   onProgressChanged: (controller, progress) async {
-                    final chain = appState.chain;
-
-                    if (progress > 20 && chain?.slip44 == 313) {
-                      String scilla = await rootBundle
-                          .loadString('assets/zilpay_legacy_inject.js');
-                      await _webViewController?.evaluateJavascript(
-                          source: scilla);
-                      await _legacyHandler!.sendData(appState);
+                    if (progress > 20) {
+                      await _initializeZilPayInjection(appState);
                     }
 
                     setState(() {
