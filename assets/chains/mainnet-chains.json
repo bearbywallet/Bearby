@@ -5,7 +5,9 @@
     "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
       "https://api.zilliqa.com",
-      "https://ssn.zilpay.io/api"
+      "https://ssn.zilpay.io/api",
+      "https://zilliqa.avely.fi/api",
+      "https://ssn.zillet.io"
     ],
     "features": [],
     "ftokens": [
