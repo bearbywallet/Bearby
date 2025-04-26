@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
@@ -52,7 +53,30 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
 
+    final Color effectiveBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final Brightness backgroundBrightness =
+        ThemeData.estimateBrightnessForColor(effectiveBgColor);
+    final Brightness statusBarIconBrightness =
+        backgroundBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final Brightness statusBarBrightness = backgroundBrightness;
+
+    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: statusBarIconBrightness,
+      statusBarBrightness: statusBarBrightness,
+    );
+
     return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: overlayStyle,
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

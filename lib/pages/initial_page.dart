@@ -1,6 +1,7 @@
 import 'dart:io' show Platform;
 import 'dart:ui';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:provider/provider.dart';
@@ -95,7 +96,30 @@ class _InitialPageState extends State<InitialPage> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
+    final Color effectiveBgColor = theme.background;
+    final Brightness backgroundBrightness =
+        ThemeData.estimateBrightnessForColor(effectiveBgColor);
+    final Brightness statusBarIconBrightness =
+        backgroundBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final Brightness statusBarBrightness = backgroundBrightness;
+
+    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: statusBarIconBrightness,
+      statusBarBrightness: statusBarBrightness,
+    );
+
     return Scaffold(
+      extendBody: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: overlayStyle,
+      ),
       backgroundColor: theme.background,
       body: SafeArea(
         child: Column(

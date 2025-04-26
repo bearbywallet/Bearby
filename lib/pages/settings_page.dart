@@ -1,5 +1,6 @@
 import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -29,8 +30,30 @@ class _SettingsPageState extends State<SettingsPage> {
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
+    final Color effectiveBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final Brightness backgroundBrightness =
+        ThemeData.estimateBrightnessForColor(effectiveBgColor);
+    final Brightness statusBarIconBrightness =
+        backgroundBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final Brightness statusBarBrightness = backgroundBrightness;
+
+    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: statusBarIconBrightness,
+      statusBarBrightness: statusBarBrightness,
+    );
+
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: overlayStyle,
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
