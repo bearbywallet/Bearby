@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -8,7 +9,6 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -27,7 +27,7 @@ class SetupNetworkSettingsPage extends StatefulWidget {
 class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
-  LedgerModel? _ledger;
+  LedgerDevice? _ledger;
   String? _errorMessage;
   String? _shortName;
   bool _zilLegacy = false;
@@ -63,7 +63,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final keys = args?['keys'] as KeyPairInfo?;
     final shortName = args?['shortName'] as String?;
     final zilLegacy = args?['zilLegacy'] as bool?;
-    final ledger = args?['ledger'] as LedgerModel?;
+    final ledger = args?['ledger'] as LedgerDevice?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
     if (bip39 == null && keys == null && ledger == null) {

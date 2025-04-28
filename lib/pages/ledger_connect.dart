@@ -11,32 +11,6 @@ import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:async/async.dart';
 
-class LedgerModel {
-  final String deviceId;
-  final String deviceName;
-  final String connectionType;
-  final LedgerConnection ledgerConnection;
-
-  LedgerModel({
-    required this.deviceId,
-    required this.deviceName,
-    required this.connectionType,
-    required this.ledgerConnection,
-  });
-
-  factory LedgerModel.fromDevice({
-    required LedgerDevice device,
-    required LedgerConnection connection,
-  }) {
-    return LedgerModel(
-      deviceId: device.id,
-      deviceName: device.name,
-      connectionType: device.connectionType.name,
-      ledgerConnection: connection,
-    );
-  }
-}
-
 class PressableCard extends StatefulWidget {
   final Widget child;
   final VoidCallback? onTap;
@@ -387,17 +361,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         _statusText = 'Successfully connected to ${device.name}!';
       });
 
-      debugPrint('[Connect] Navigating to /net_setup with device info');
-
-      final ledgerModel = LedgerModel.fromDevice(
-        device: device,
-        connection: _ledgerConnection!,
-      );
-
       Navigator.of(context).pushNamed(
         '/net_setup',
         arguments: {
-          'ledger': ledgerModel,
+          'ledger': device,
         },
       );
 

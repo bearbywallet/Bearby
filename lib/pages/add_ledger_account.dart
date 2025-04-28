@@ -9,7 +9,6 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -31,7 +30,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _loading = false;
   String _errorMessage = '';
   NetworkConfigInfo? _network;
-  LedgerModel? _ledger;
+  LedgerDevice? _ledger;
 
   @override
   void initState() {
@@ -47,7 +46,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     if (args != null) {
       final network = args['chain'] as NetworkConfigInfo?;
-      final ledger = args['ledger'] as LedgerModel?;
+      final ledger = args['ledger'] as LedgerDevice?;
 
       if (network == null || ledger == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -57,8 +56,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         setState(() {
           _network = network;
           _ledger = ledger;
-          _walletNameController.text =
-              "${ledger.deviceName} (${_network?.name})";
+          _walletNameController.text = "${ledger.name} (${_network?.name})";
         });
       }
     }
@@ -97,12 +95,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         throw Exception("Network or Ledger data is missing.");
       }
 
-      print(
-          "Attempting to get Ledger app version for ${_ledger!.deviceName}...");
-      print(
-          "Successfully communicated with Ledger: ${_ledger!.deviceName} (${_ledger!.connectionType})");
-      print(
-          "Proceeding to add account with index: $_index, name: ${_walletNameController.text}");
       await Future.delayed(const Duration(seconds: 5));
 
       if (mounted) {
@@ -165,7 +157,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             child: Column(
               children: [
                 CustomAppBar(
-                  title: "",
+                  title: "Ledger account",
                   onBackPressed: () => Navigator.pop(context),
                 ),
                 if (_network == null || _ledger == null)
@@ -192,7 +184,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                 color: theme.cardBackground,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: theme.primaryPurple.withOpacity(0.3),
+                                  color: theme.primaryPurple
+                                      .withValues(alpha: 0.3),
                                   width: 1.5,
                                 ),
                               ),
@@ -202,8 +195,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                   Row(
                                     children: [
                                       SvgPicture.asset(
-                                        _ledger!.connectionType.toLowerCase() ==
-                                                'ble'
+                                        _ledger!.connectionType ==
+                                                ConnectionType.ble
                                             ? 'assets/icons/ble.svg'
                                             : 'assets/icons/usb.svg',
                                         width: 24,
@@ -220,7 +213,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                               CrossAxisAlignment.start,
                                           children: [
                                             Text(
-                                              _ledger!.deviceName,
+                                              _ledger!.name,
                                               style: TextStyle(
                                                 color: theme.textPrimary,
                                                 fontSize: 16,
@@ -229,7 +222,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                             ),
                                             const SizedBox(height: 2),
                                             Text(
-                                              'Connection: ${_ledger!.connectionType.toUpperCase()}',
+                                              'Connection: ${_ledger!.connectionType.name.toUpperCase()}',
                                               style: TextStyle(
                                                 color: theme.textSecondary,
                                                 fontSize: 12,
@@ -291,9 +284,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                                     color: (_network!.testnet ??
                                                             false)
                                                         ? theme.warning
-                                                            .withOpacity(0.2)
+                                                            .withValues(
+                                                                alpha: 0.2)
                                                         : theme.success
-                                                            .withOpacity(0.2),
+                                                            .withValues(
+                                                                alpha: 0.2),
                                                     borderRadius:
                                                         BorderRadius.circular(
                                                             8),
@@ -341,7 +336,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                 color: theme.cardBackground,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(
-                                  color: theme.textSecondary.withOpacity(0.3),
+                                  color: theme.textSecondary
+                                      .withValues(alpha: 0.3),
                                   width: 1.5,
                                 ),
                               ),
@@ -420,7 +416,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(12),
                                 decoration: BoxDecoration(
-                                  color: theme.danger.withOpacity(0.1),
+                                  color: theme.danger.withValues(alpha: 0.1),
                                   borderRadius: BorderRadius.circular(8),
                                 ),
                                 child: Text(
