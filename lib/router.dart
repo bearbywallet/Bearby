@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/pages/about.dart';
 import 'package:zilpay/pages/add_account.dart';
+import 'package:zilpay/pages/add_ledger_account.dart';
 import 'package:zilpay/pages/add_token.dart';
 import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
@@ -100,6 +101,7 @@ class AppRouter {
       '/about',
       '/keystore_backup',
       '/keystore_file_restore',
+      '/add_ledger_account',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -121,6 +123,8 @@ class AppRouter {
         switch (settings.name) {
           case '/pass_setup':
             return wrapWithProviders(const PasswordSetupPage());
+          case '/add_ledger_account':
+            return wrapWithProviders(const AddLedgerAccountPage());
           case '/about':
             return wrapWithProviders(const AboutPage());
           case '/restore_sk':
@@ -197,6 +201,8 @@ class AppRouter {
             return wrapWithProviders(const InitialPage());
           case '/web_view':
             return wrapWithProviders(const WebViewPage(initialUrl: ''));
+          case '/add_ledger_account':
+            return wrapWithProviders(const AddLedgerAccountPage());
           default:
             return wrapWithProviders(const LoginPage());
         }
@@ -275,6 +281,8 @@ class AppRouter {
         return wrapWithProviders(const RestoreKeystoreFilePage());
       case '/initial':
         return wrapWithProviders(const InitialPage());
+      case '/add_ledger_account':
+        return wrapWithProviders(const AddLedgerAccountPage());
       case '/web_view':
         final uri =
             Uri.tryParse(settings.name?.replaceFirst('/web_view?', '') ?? '') ??

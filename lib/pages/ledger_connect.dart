@@ -118,7 +118,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _initLedger();
-      _checkAuthMethods();
       Future.delayed(const Duration(milliseconds: 500), _startScanning);
     });
   }
@@ -137,10 +136,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         ?.dispose()
         .catchError((e) => debugPrint('Error disposing USB: $e'));
     super.dispose();
-  }
-
-  Future<void> _checkAuthMethods() async {
-    debugPrint('Checking auth methods...');
   }
 
   void _initLedger() {

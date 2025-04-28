@@ -370,17 +370,30 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             final chain = _isTestnet
                                 ? testnetNetworks[selectedNetworkIndex]
                                 : mainnetNetworks[selectedNetworkIndex];
-                            Navigator.of(context).pushNamed(
-                              '/cipher_setup',
-                              arguments: {
-                                'bip39': _bip39List,
-                                'keys': _keys,
-                                'chain': chain,
-                                'isTestnet': _isTestnet,
-                                'zilLegacy': _zilLegacy,
-                                'ignore_checksum': _bypassChecksumValidation,
-                              },
-                            );
+
+                            if (_ledger != null) {
+                              Navigator.of(context).pushNamed(
+                                '/add_ledger_account',
+                                arguments: {
+                                  'chain': chain,
+                                  'isTestnet': _isTestnet,
+                                  'ledger': _ledger,
+                                },
+                              );
+                              return;
+                            } else {
+                              Navigator.of(context).pushNamed(
+                                '/cipher_setup',
+                                arguments: {
+                                  'bip39': _bip39List,
+                                  'keys': _keys,
+                                  'chain': chain,
+                                  'isTestnet': _isTestnet,
+                                  'zilLegacy': _zilLegacy,
+                                  'ignore_checksum': _bypassChecksumValidation,
+                                },
+                              );
+                            }
                           },
                     borderRadius: 30.0,
                     height: 56.0,
