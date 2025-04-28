@@ -28,6 +28,7 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   screen_protector: ^1.4.2+1
   file_picker: ^10.1.2
+  ledger_flutter_plus: ^1.5.3
 
 dev_dependencies:
   flutter_test:
