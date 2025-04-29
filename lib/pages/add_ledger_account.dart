@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
@@ -10,16 +11,21 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
+import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/src/rust/api/ledger.dart';
+import 'package:zilpay/src/rust/api/provider.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
+import 'package:zilpay/src/rust/models/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 class AddLedgerAccountPage extends StatefulWidget {
   const AddLedgerAccountPage({super.key});
-
   @override
   State<AddLedgerAccountPage> createState() => _AddLedgerAccountPageState();
 }
@@ -27,16 +33,14 @@ class AddLedgerAccountPage extends StatefulWidget {
 class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
-
   int _accountCount = 5;
   bool _loading = false;
   String _errorMessage = '';
   bool _createWallet = true;
   NetworkConfigInfo? _network;
   LedgerDevice? _ledger;
-
-  List<String> _accounts = [];
-  Map<String, bool> _selectedAccounts = {};
+  List<EthLedgerAccount> _accounts = [];
+  Map<EthLedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
 
   @override
@@ -50,12 +54,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     super.didChangeDependencies();
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-
     if (args != null) {
       final network = args['chain'] as NetworkConfigInfo?;
       final ledger = args['ledger'] as LedgerDevice?;
       final createWallet = args['createWallet'] as bool?;
-
       if (network == null || ledger == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacementNamed('/initial');
@@ -109,18 +111,15 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       );
 
       final connection = await ledgerInterface.connect(_ledger!);
-      final ethereumApp = EthereumLedgerApp(connection);
-      final indices = List<int>.generate(_accountCount, (i) => i);
-      final accounts = await ethereumApp.getAccounts(indices);
-
-      if (accounts.isEmpty) {
-        throw Exception("Could not retrieve Ethereum accounts");
-      }
+      final ethereumApp = EthereumLedgerApp(connection, transformer: null);
+      final accounts = await ethereumApp
+          .getAccounts(List<int>.generate(_accountCount, (i) => i));
 
       if (mounted) {
         setState(() {
           _accounts = accounts;
           _selectedAccounts = {for (var account in accounts) account: true};
+
           _accountsLoaded = true;
           _loading = false;
         });
@@ -153,46 +152,162 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     } else if (e is LedgerDeviceException) {
       displayError = "Ledger Error ${e.errorCode}: ${e.message}";
     }
-
     setState(() => _errorMessage = displayError);
     _btnController.error();
     Future.delayed(const Duration(seconds: 2),
         () => mounted ? _btnController.reset() : null);
   }
 
-  void _toggleAccount(String address, bool value) {
+  void _toggleAccount(EthLedgerAccount account, bool value) {
     setState(() {
-      _selectedAccounts[address] = value;
+      _selectedAccounts[account] = value;
     });
   }
 
-  void _saveSelectedAccounts() {
-    final List<Map<String, dynamic>> selectedAccounts = [];
-
-    _selectedAccounts.forEach((address, isSelected) {
-      if (isSelected) {
-        final index = _accounts.indexOf(address);
-        if (index != -1) {
-          selectedAccounts.add({
-            'name':
-                '${_walletNameController.text} ${index > 0 ? index + 1 : ''}',
-            'address': address,
-            'index': index,
-            'deviceId': _ledger!.id,
-            'network': _network!.name,
-            'chainId': _network!.chainId,
-            'createWallet': _createWallet,
-          });
-        }
-      }
+  Future<void> _saveSelectedAccounts() async {
+    setState(() {
+      _loading = true;
+      _errorMessage = '';
     });
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final l10n = AppLocalizations.of(context)!;
+      final BigInt? chainHash;
+      List<NetworkConfigInfo> chains = await getProviders();
 
-    Navigator.of(context).pop(selectedAccounts);
+      final matches = chains
+          .where((chain) => chain.chainHash == _network!.chainHash)
+          .toList();
+
+      if (matches.isEmpty) {
+        chainHash = await addProvider(providerConfig: _network!);
+      } else {
+        chainHash = matches.first.chainHash;
+      }
+
+      WalletSettingsInfo settings = WalletSettingsInfo(
+        cipherOrders: Uint8List(0),
+        argonParams: WalletArgonParamsInfo(
+          iterations: 2,
+          memory: 19456,
+          threads: 2,
+          secret: '',
+        ),
+        currencyConvert: "BTC",
+        ipfsNode: "dweb.link",
+        ensEnabled: true,
+        gasControlEnabled: true,
+        nodeRankingEnabled: true,
+        maxConnections: 5,
+        requestTimeoutSecs: 30,
+        ratesApiOptions: 1,
+      );
+
+      List<FTokenInfo> ftokens = [];
+
+      if (_createWallet) {
+        EthLedgerAccount? firstAccount;
+        _selectedAccounts.forEach((account, isSelected) {
+          if (isSelected && firstAccount == null) {
+            firstAccount = account;
+          }
+        });
+
+        if (firstAccount == null) {
+          throw Exception("l10n.ledgerConnectDialogNoAccountSelected");
+        }
+
+        LedgerParamsInput params = LedgerParamsInput(
+          pubKey: firstAccount!.publicKey,
+          walletIndex: BigInt.from(appState.wallets.length),
+          walletName: _walletNameController.text,
+          ledgerId: _ledger!.id,
+          accountName:
+              '${_walletNameController.text} ${firstAccount!.index > 0 ? firstAccount!.index + 1 : ''}',
+          biometricType: AuthMethod.none.name,
+          identifiers: [],
+          chainHash: chainHash,
+        );
+
+        await addLedgerWallet(
+          params: params,
+          walletSettings: settings,
+          ftokens: ftokens,
+        );
+
+        int currentWalletIndex = appState.wallets.length - 1;
+        bool isFirst = true;
+
+        for (var entry in _selectedAccounts.entries) {
+          final account = entry.key;
+          final isSelected = entry.value;
+
+          if (isSelected) {
+            if (isFirst && account == firstAccount) {
+              isFirst = false;
+              continue;
+            }
+
+            final accountName =
+                '${_walletNameController.text} ${account.index > 0 ? account.index + 1 : ''}';
+
+            await addLedgerAccount(
+              walletIndex: BigInt.from(currentWalletIndex),
+              accountIndex: BigInt.from(account.index),
+              name: accountName,
+              pubKey: account.publicKey,
+              identifiers: [],
+              sessionCipher: "",
+            );
+
+            isFirst = false;
+          }
+        }
+
+        await appState.syncData();
+        appState.setSelectedWallet(currentWalletIndex);
+      } else {
+        final walletIndex = appState.selectedWallet;
+        final wallet = appState.wallet;
+
+        if (wallet == null) {
+          throw Exception("No wallet selected");
+        }
+
+        _selectedAccounts.forEach((account, isSelected) async {
+          if (isSelected) {
+            final accountName =
+                '${_walletNameController.text} ${account.index > 0 ? account.index + 1 : ''}';
+
+            await addLedgerAccount(
+              walletIndex: BigInt.from(walletIndex),
+              accountIndex: BigInt.from(account.index),
+              name: accountName,
+              pubKey: account.publicKey,
+              identifiers: [],
+              sessionCipher: "",
+            );
+          }
+        });
+
+        await appState.syncData();
+      }
+
+      setState(() {
+        _loading = false;
+      });
+
+      Navigator.of(context).pushNamed("/");
+    } catch (e) {
+      setState(() {
+        _loading = false;
+        _errorMessage = e.toString();
+      });
+    }
   }
 
   Widget _buildDeviceInfoCard(AppTheme theme, AppLocalizations l10n) {
     if (_network == null || _ledger == null) return const SizedBox();
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -267,7 +382,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   Widget _buildNetworkInfoRow(AppTheme theme, AppLocalizations l10n) {
     final isTestnet = _network!.testnet ?? false;
-
     return Row(
       children: [
         SizedBox(
@@ -430,7 +544,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   Widget _buildAccountsCard(AppTheme theme) {
     if (!_accountsLoaded || _accounts.isEmpty) return const SizedBox();
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -444,12 +557,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          ...List.generate(_accounts.length, (index) {
-            final address = _accounts[index];
+          ..._accounts.map((account) {
             final shortAddress =
-                "${address.substring(0, 6)}...${address.substring(address.length - 4)}";
+                "${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}";
             return EnableCard(
-              title: "Account ${index + 1}",
+              title: "Account ${account.index + 1}",
               name: shortAddress,
               iconWidget: SvgPicture.asset(
                 'assets/icons/ledger.svg',
@@ -461,10 +573,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 ),
               ),
               isDefault: false,
-              isEnabled: _selectedAccounts[address] ?? false,
-              onToggle: (value) => _toggleAccount(address, value),
+              isEnabled: _selectedAccounts[account] ?? false,
+              onToggle: (value) => _toggleAccount(account, value),
             );
-          }),
+          }).toList(),
         ],
       ),
     );
@@ -472,7 +584,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   Widget _buildErrorMessage(AppTheme theme) {
     if (_errorMessage.isEmpty) return const SizedBox();
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
@@ -497,7 +608,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
-
     return Scaffold(
       body: SafeArea(
         child: Center(

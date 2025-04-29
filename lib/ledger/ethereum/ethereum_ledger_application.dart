@@ -11,15 +11,15 @@ class EthereumLedgerApp {
     this.transformer,
   });
 
-  Future<List<String>> getAccounts(List<int> accountIndices) async {
-    final List<String> accounts = [];
+  Future<List<EthLedgerAccount>> getAccounts(List<int> accountIndices) async {
+    final List<EthLedgerAccount> accounts = [];
 
     for (final index in accountIndices) {
       final account = await ledger.sendOperation<EthLedgerAccount>(
         EthereumPublicKeyOperation(accountIndex: index),
         transformer: transformer,
       );
-      accounts.add(account.address);
+      accounts.add(account);
     }
 
     return accounts;

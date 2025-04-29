@@ -42,6 +42,10 @@ class EthereumPublicKeyOperation extends LedgerRawOperation<EthLedgerAccount> {
         bytesToHex(bytes.sublist(1, 1 + publicKeyLength), include0x: true);
     final address =
         '0x${utf8.decode(bytes.sublist(1 + publicKeyLength + 1, 1 + publicKeyLength + 1 + addressLength))}';
-    return EthLedgerAccount(publicKey: publicKey, address: address);
+    return EthLedgerAccount(
+      publicKey: publicKey,
+      address: address,
+      index: accountIndex,
+    );
   }
 }
