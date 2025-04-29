@@ -31,21 +31,21 @@ Future<void> addLedgerAccount(
         sessionCipher: sessionCipher);
 
 class LedgerParamsInput {
-  final String pubKey;
+  final List<String> pubKeys;
   final BigInt walletIndex;
   final String walletName;
   final String ledgerId;
-  final String accountName;
+  final List<String> accountNames;
   final String biometricType;
   final List<String> identifiers;
   final BigInt chainHash;
 
   const LedgerParamsInput({
-    required this.pubKey,
+    required this.pubKeys,
     required this.walletIndex,
     required this.walletName,
     required this.ledgerId,
-    required this.accountName,
+    required this.accountNames,
     required this.biometricType,
     required this.identifiers,
     required this.chainHash,
@@ -53,11 +53,11 @@ class LedgerParamsInput {
 
   @override
   int get hashCode =>
-      pubKey.hashCode ^
+      pubKeys.hashCode ^
       walletIndex.hashCode ^
       walletName.hashCode ^
       ledgerId.hashCode ^
-      accountName.hashCode ^
+      accountNames.hashCode ^
       biometricType.hashCode ^
       identifiers.hashCode ^
       chainHash.hashCode;
@@ -67,11 +67,11 @@ class LedgerParamsInput {
       identical(this, other) ||
       other is LedgerParamsInput &&
           runtimeType == other.runtimeType &&
-          pubKey == other.pubKey &&
+          pubKeys == other.pubKeys &&
           walletIndex == other.walletIndex &&
           walletName == other.walletName &&
           ledgerId == other.ledgerId &&
-          accountName == other.accountName &&
+          accountNames == other.accountNames &&
           biometricType == other.biometricType &&
           identifiers == other.identifiers &&
           chainHash == other.chainHash;

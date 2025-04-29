@@ -3480,11 +3480,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 8)
       throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return LedgerParamsInput(
-      pubKey: dco_decode_String(arr[0]),
+      pubKeys: dco_decode_list_String(arr[0]),
       walletIndex: dco_decode_usize(arr[1]),
       walletName: dco_decode_String(arr[2]),
       ledgerId: dco_decode_String(arr[3]),
-      accountName: dco_decode_String(arr[4]),
+      accountNames: dco_decode_list_String(arr[4]),
       biometricType: dco_decode_String(arr[5]),
       identifiers: dco_decode_list_String(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
@@ -4562,20 +4562,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput sse_decode_ledger_params_input(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_pubKey = sse_decode_String(deserializer);
+    var var_pubKeys = sse_decode_list_String(deserializer);
     var var_walletIndex = sse_decode_usize(deserializer);
     var var_walletName = sse_decode_String(deserializer);
     var var_ledgerId = sse_decode_String(deserializer);
-    var var_accountName = sse_decode_String(deserializer);
+    var var_accountNames = sse_decode_list_String(deserializer);
     var var_biometricType = sse_decode_String(deserializer);
     var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     return LedgerParamsInput(
-        pubKey: var_pubKey,
+        pubKeys: var_pubKeys,
         walletIndex: var_walletIndex,
         walletName: var_walletName,
         ledgerId: var_ledgerId,
-        accountName: var_accountName,
+        accountNames: var_accountNames,
         biometricType: var_biometricType,
         identifiers: var_identifiers,
         chainHash: var_chainHash);
@@ -5718,11 +5718,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_String(self.pubKey, serializer);
+    sse_encode_list_String(self.pubKeys, serializer);
     sse_encode_usize(self.walletIndex, serializer);
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.ledgerId, serializer);
-    sse_encode_String(self.accountName, serializer);
+    sse_encode_list_String(self.accountNames, serializer);
     sse_encode_String(self.biometricType, serializer);
     sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);

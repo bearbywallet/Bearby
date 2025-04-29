@@ -20,11 +20,11 @@ use crate::{
 };
 
 pub struct LedgerParamsInput {
-    pub pub_key: String,
+    pub pub_keys: Vec<String>,
     pub wallet_index: usize,
     pub wallet_name: String,
     pub ledger_id: String,
-    pub account_name: String,
+    pub account_names: Vec<String>,
     pub biometric_type: String,
     pub identifiers: Vec<String>,
     pub chain_hash: u64,
@@ -38,7 +38,11 @@ pub async fn add_ledger_wallet(
     with_service_mut(|core| {
         let provider = core.get_provider(params.chain_hash)?;
         let bip49 = provider.get_bip49(params.wallet_index);
-        let pub_key = pubkey_from_provider(&params.pub_key, bip49)?;
+        let pub_keys = params
+            .pub_keys
+            .into_iter()
+            .map(|pk| pubkey_from_provider(&pk, bip49))
+            .collect::<Result<Vec<PubKey>, ServiceError>>()?;
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)
@@ -46,9 +50,9 @@ pub async fn add_ledger_wallet(
         let identifiers = params.identifiers;
         let params = BackgroundLedgerParams {
             ftokens,
+            pub_keys,
             chain_hash: params.chain_hash,
-            pub_key,
-            account_name: params.account_name,
+            account_names: params.account_names,
             wallet_index: params.wallet_index,
             wallet_name: params.wallet_name,
             ledger_id: params.ledger_id.as_bytes().to_vec(),

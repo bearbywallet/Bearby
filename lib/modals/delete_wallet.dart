@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
+import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -43,6 +46,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
+  late final AuthGuard _authGuard;
+
   bool _obscurePassword = true;
   bool _isDisabled = false;
   String _errorMessage = '';
@@ -55,9 +60,13 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
     super.dispose();
   }
 
-  Future<void> _handleDeleteWallet() async {
-    if (_passwordController.text.isEmpty) return;
+  @override
+  void initState() {
+    super.initState();
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
+  }
 
+  Future<void> _handleDeleteWallet(AppState appState) async {
     _btnController.start();
 
     try {
@@ -69,10 +78,15 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
 
+      final session = await _authGuard.getSession(
+          sessionKey: appState.wallet?.walletAddress ?? "");
+
       await deleteWallet(
         walletIndex: BigInt.from(widget.state.selectedWallet),
         identifiers: identifiers,
-        password: _passwordController.text,
+        password:
+            _passwordController.text.isEmpty ? null : _passwordController.text,
+        sessionCipher: session.isEmpty ? null : session,
       );
       await widget.state.syncData();
       widget.state.setSelectedWallet(0);
@@ -81,6 +95,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
       _btnController.success();
       await Navigator.of(context).pushNamed('/login');
     } catch (e) {
+      debugPrint("error: $e");
       if (mounted) {
         setState(() {
           _errorMessage = e.toString();
@@ -97,6 +112,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
     final theme = widget.state.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
@@ -159,24 +175,27 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                         ),
                       ),
                       const SizedBox(height: 24),
-                      SmartInput(
-                        key: _passwordInputKey,
-                        controller: _passwordController,
-                        hint: l10n.deleteWalletModalPasswordHint,
-                        height: _inputHeight,
-                        fontSize: 18,
-                        disabled: _isDisabled,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        obscureText: _obscurePassword,
-                        rightIconPath: _obscurePassword
-                            ? "assets/icons/close_eye.svg"
-                            : "assets/icons/open_eye.svg",
-                        onRightIconTap: () => setState(
-                            () => _obscurePassword = !_obscurePassword),
-                        onChanged: (_) => _errorMessage.isNotEmpty
-                            ? setState(() => _errorMessage = '')
-                            : null,
-                      ),
+                      if (appState.wallet?.walletType
+                              .contains(WalletType.ledger.name) ==
+                          false)
+                        SmartInput(
+                          key: _passwordInputKey,
+                          controller: _passwordController,
+                          hint: l10n.deleteWalletModalPasswordHint,
+                          height: _inputHeight,
+                          fontSize: 18,
+                          disabled: _isDisabled,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          obscureText: _obscurePassword,
+                          rightIconPath: _obscurePassword
+                              ? "assets/icons/close_eye.svg"
+                              : "assets/icons/open_eye.svg",
+                          onRightIconTap: () => setState(
+                              () => _obscurePassword = !_obscurePassword),
+                          onChanged: (_) => _errorMessage.isNotEmpty
+                              ? setState(() => _errorMessage = '')
+                              : null,
+                        ),
                       if (_errorMessage.isNotEmpty) ...[
                         const SizedBox(height: 8),
                         Text(
@@ -194,7 +213,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                         child: RoundedLoadingButton(
                           color: theme.danger,
                           valueColor: theme.buttonText,
-                          onPressed: _handleDeleteWallet,
+                          onPressed: () => _handleDeleteWallet(appState),
                           controller: _btnController,
                           successIcon: SvgPicture.asset(
                             'assets/icons/ok.svg',

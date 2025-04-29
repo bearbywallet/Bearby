@@ -64,6 +64,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final network = args['chain'] as NetworkConfigInfo?;
       final ledger = args['ledger'] as LedgerDevice?;
       final createWallet = args['createWallet'] as bool?;
+
+      print(ledger.toString());
+
       if (network == null || ledger == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacementNamed('/initial');
@@ -175,12 +178,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       _loading = true;
       _errorMessage = '';
     });
+
     try {
       final l10n = AppLocalizations.of(context)!;
       final appState = Provider.of<AppState>(context, listen: false);
       final BigInt? chainHash;
-      List<NetworkConfigInfo> chains = await getProviders();
 
+      List<NetworkConfigInfo> chains = await getProviders();
       final matches = chains
           .where((chain) => chain.chainHash == _network!.chainHash)
           .toList();
@@ -212,28 +216,30 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       List<FTokenInfo> ftokens = [];
 
       if (_createWallet) {
-        EthLedgerAccount? firstAccount;
-        _selectedAccounts.forEach((account, isSelected) {
-          if (isSelected && firstAccount == null) {
-            firstAccount = account;
-          }
-        });
+        // Get all selected accounts
+        final selectedAccounts = _selectedAccounts.entries
+            .where((entry) => entry.value)
+            .map((entry) => entry.key)
+            .toList();
 
-        if (firstAccount == null) {
+        if (selectedAccounts.isEmpty) {
           throw Exception("l10n.ledgerConnectDialogNoAccountSelected");
         }
+
+        final pubKeys = selectedAccounts.map((a) => a.publicKey).toList();
+        final accountNames =
+            selectedAccounts.map((a) => "ledger ${a.index + 1}").toList();
 
         DeviceInfoService device = DeviceInfoService();
         List<String> identifiers = await device.getDeviceIdentifiers();
 
         final (session, walletAddress) = await addLedgerWallet(
           params: LedgerParamsInput(
-            pubKey: firstAccount!.publicKey,
+            pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
             walletName: _walletNameController.text,
             ledgerId: _ledger!.id,
-            accountName:
-                '${_walletNameController.text} ${firstAccount!.index > 0 ? firstAccount!.index + 1 : ''}',
+            accountNames: accountNames,
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
             chainHash: chainHash,
@@ -245,7 +251,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         await appState.syncData();
         int currentWalletIndex = appState.wallets.length - 1;
         await _authGuard.setSession(walletAddress, session);
-
         await appState.syncData();
         appState.setSelectedWallet(currentWalletIndex);
         await appState.startTrackHistoryWorker();
@@ -265,8 +270,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
         _selectedAccounts.forEach((account, isSelected) async {
           if (isSelected) {
-            final accountName =
-                '${_walletNameController.text} ${account.index > 0 ? account.index + 1 : ''}';
+            final accountName = "ledger ${account.index + 1}";
 
             await addLedgerAccount(
               walletIndex: BigInt.from(walletIndex),
@@ -280,7 +284,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         });
 
         await appState.syncData();
-
         setState(() {
           _loading = false;
         });

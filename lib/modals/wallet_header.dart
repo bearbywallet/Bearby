@@ -156,7 +156,18 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                   color: theme.textPrimary,
                   width: 40,
                   height: 40,
-                  onTap: () => Navigator.pushNamed(context, "/add_account"),
+                  onTap: () {
+                    if (appState.wallet!.walletType
+                        .contains(WalletType.ledger.name)) {
+                      Navigator.pushNamed(context, "/add_ledger_account",
+                          arguments: {
+                            "createWallet": true,
+                            "chain": appState.chain,
+                          });
+                    } else {
+                      Navigator.pushNamed(context, "/add_account");
+                    }
+                  },
                 ),
                 if (wallet.selectedAccount != BigInt.zero)
                   HoverSvgIcon(

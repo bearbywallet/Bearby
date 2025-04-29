@@ -4013,20 +4013,20 @@ impl SseDecode for crate::models::keypair::KeyPairInfo {
 impl SseDecode for crate::api::ledger::LedgerParamsInput {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_pubKey = <String>::sse_decode(deserializer);
+        let mut var_pubKeys = <Vec<String>>::sse_decode(deserializer);
         let mut var_walletIndex = <usize>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_ledgerId = <String>::sse_decode(deserializer);
-        let mut var_accountName = <String>::sse_decode(deserializer);
+        let mut var_accountNames = <Vec<String>>::sse_decode(deserializer);
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
-            pub_key: var_pubKey,
+            pub_keys: var_pubKeys,
             wallet_index: var_walletIndex,
             wallet_name: var_walletName,
             ledger_id: var_ledgerId,
-            account_name: var_accountName,
+            account_names: var_accountNames,
             biometric_type: var_biometricType,
             identifiers: var_identifiers,
             chain_hash: var_chainHash,
@@ -5534,11 +5534,11 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::keypair::KeyPairInfo>
 impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.pub_key.into_into_dart().into_dart(),
+            self.pub_keys.into_into_dart().into_dart(),
             self.wallet_index.into_into_dart().into_dart(),
             self.wallet_name.into_into_dart().into_dart(),
             self.ledger_id.into_into_dart().into_dart(),
-            self.account_name.into_into_dart().into_dart(),
+            self.account_names.into_into_dart().into_dart(),
             self.biometric_type.into_into_dart().into_dart(),
             self.identifiers.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
@@ -6236,11 +6236,11 @@ impl SseEncode for crate::models::keypair::KeyPairInfo {
 impl SseEncode for crate::api::ledger::LedgerParamsInput {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.pub_key, serializer);
+        <Vec<String>>::sse_encode(self.pub_keys, serializer);
         <usize>::sse_encode(self.wallet_index, serializer);
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.ledger_id, serializer);
-        <String>::sse_encode(self.account_name, serializer);
+        <Vec<String>>::sse_encode(self.account_names, serializer);
         <String>::sse_encode(self.biometric_type, serializer);
         <Vec<String>>::sse_encode(self.identifiers, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
