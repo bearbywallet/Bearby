@@ -1,4 +1,5 @@
 use thiserror::Error;
+use zilpay::errors::keypair::PubKeyError;
 pub use zilpay::errors::{
     address::AddressError, background::BackgroundError, cache::CacheError, network::NetworkErrors,
     settings::SettingsErrors, token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
@@ -77,11 +78,20 @@ pub enum ServiceError {
 
     #[error("Cache Error: {0}")]
     CacheError(CacheError),
+
+    #[error("PubKey Error: {0}")]
+    PubKeyError(PubKeyError),
 }
 
 impl From<BackgroundError> for ServiceError {
     fn from(error: BackgroundError) -> Self {
         ServiceError::BackgroundError(error)
+    }
+}
+
+impl From<PubKeyError> for ServiceError {
+    fn from(error: PubKeyError) -> Self {
+        ServiceError::PubKeyError(error)
     }
 }
 

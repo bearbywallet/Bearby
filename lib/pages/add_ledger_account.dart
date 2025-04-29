@@ -14,7 +14,9 @@ import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
+import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -33,6 +35,7 @@ class AddLedgerAccountPage extends StatefulWidget {
 class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
+
   int _accountCount = 5;
   bool _loading = false;
   String _errorMessage = '';
@@ -43,9 +46,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   Map<EthLedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
 
+  late AuthGuard _authGuard;
+
   @override
   void initState() {
     super.initState();
+    _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _walletNameController.text = "";
   }
 
@@ -170,8 +176,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       _errorMessage = '';
     });
     try {
-      final appState = Provider.of<AppState>(context, listen: false);
       final l10n = AppLocalizations.of(context)!;
+      final appState = Provider.of<AppState>(context, listen: false);
       final BigInt? chainHash;
       List<NetworkConfigInfo> chains = await getProviders();
 
@@ -186,11 +192,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       }
 
       WalletSettingsInfo settings = WalletSettingsInfo(
-        cipherOrders: Uint8List(0),
+        cipherOrders: Uint8List.fromList([]),
         argonParams: WalletArgonParamsInfo(
-          iterations: 2,
-          memory: 19456,
-          threads: 2,
+          iterations: 0,
+          memory: 0,
+          threads: 0,
           secret: '',
         ),
         currencyConvert: "BTC",
@@ -217,55 +223,38 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           throw Exception("l10n.ledgerConnectDialogNoAccountSelected");
         }
 
-        LedgerParamsInput params = LedgerParamsInput(
-          pubKey: firstAccount!.publicKey,
-          walletIndex: BigInt.from(appState.wallets.length),
-          walletName: _walletNameController.text,
-          ledgerId: _ledger!.id,
-          accountName:
-              '${_walletNameController.text} ${firstAccount!.index > 0 ? firstAccount!.index + 1 : ''}',
-          biometricType: AuthMethod.none.name,
-          identifiers: [],
-          chainHash: chainHash,
-        );
+        DeviceInfoService device = DeviceInfoService();
+        List<String> identifiers = await device.getDeviceIdentifiers();
 
-        await addLedgerWallet(
-          params: params,
+        final (session, walletAddress) = await addLedgerWallet(
+          params: LedgerParamsInput(
+            pubKey: firstAccount!.publicKey,
+            walletIndex: BigInt.from(appState.wallets.length),
+            walletName: _walletNameController.text,
+            ledgerId: _ledger!.id,
+            accountName:
+                '${_walletNameController.text} ${firstAccount!.index > 0 ? firstAccount!.index + 1 : ''}',
+            biometricType: AuthMethod.none.name,
+            identifiers: identifiers,
+            chainHash: chainHash,
+          ),
           walletSettings: settings,
           ftokens: ftokens,
         );
 
+        await appState.syncData();
         int currentWalletIndex = appState.wallets.length - 1;
-        bool isFirst = true;
-
-        for (var entry in _selectedAccounts.entries) {
-          final account = entry.key;
-          final isSelected = entry.value;
-
-          if (isSelected) {
-            if (isFirst && account == firstAccount) {
-              isFirst = false;
-              continue;
-            }
-
-            final accountName =
-                '${_walletNameController.text} ${account.index > 0 ? account.index + 1 : ''}';
-
-            await addLedgerAccount(
-              walletIndex: BigInt.from(currentWalletIndex),
-              accountIndex: BigInt.from(account.index),
-              name: accountName,
-              pubKey: account.publicKey,
-              identifiers: [],
-              sessionCipher: "",
-            );
-
-            isFirst = false;
-          }
-        }
+        await _authGuard.setSession(walletAddress, session);
 
         await appState.syncData();
         appState.setSelectedWallet(currentWalletIndex);
+        await appState.startTrackHistoryWorker();
+
+        setState(() {
+          _loading = false;
+        });
+
+        Navigator.of(context).pushNamed("/");
       } else {
         final walletIndex = appState.selectedWallet;
         final wallet = appState.wallet;
@@ -291,13 +280,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         });
 
         await appState.syncData();
+
+        setState(() {
+          _loading = false;
+        });
+
+        Navigator.of(context).pushNamed("/");
       }
-
-      setState(() {
-        _loading = false;
-      });
-
-      Navigator.of(context).pushNamed("/");
     } catch (e) {
       setState(() {
         _loading = false;
@@ -640,16 +629,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 _buildDeviceInfoCard(theme, l10n),
+                                if (_errorMessage.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  _buildErrorMessage(theme),
+                                ],
                                 const SizedBox(height: 16),
                                 _buildWalletInfoCard(theme, l10n),
                                 if (_accountsLoaded &&
                                     _accounts.isNotEmpty) ...[
                                   const SizedBox(height: 16),
                                   _buildAccountsCard(theme),
-                                ],
-                                if (_errorMessage.isNotEmpty) ...[
-                                  const SizedBox(height: 16),
-                                  _buildErrorMessage(theme),
                                 ],
                                 const SizedBox(height: 80),
                               ],

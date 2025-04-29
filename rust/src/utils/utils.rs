@@ -42,7 +42,7 @@ pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError
 }
 
 pub fn pubkey_from_provider(pub_key: &str, bip49: DerivationPath) -> Result<PubKey, ServiceError> {
-    let pub_key_bytes = decode_public_key(pub_key)?;
+    let pub_key_bytes = PubKey::from_uncompressed_hex(pub_key)?;
 
     let pub_key = match bip49.slip44 {
         slip44::ZILLIQA => PubKey::Secp256k1Sha256(pub_key_bytes),
@@ -70,16 +70,6 @@ pub fn secretkey_from_provider(
     };
 
     Ok(sk)
-}
-
-pub fn decode_public_key(pub_key: &str) -> Result<[u8; PUB_KEY_SIZE], ServiceError> {
-    let pub_key = pub_key.strip_prefix("0x").unwrap_or(pub_key);
-    let pub_key_bytes: [u8; PUB_KEY_SIZE] = hex::decode(pub_key)
-        .map_err(|_| ServiceError::DecodePublicKey)?
-        .try_into()
-        .map_err(|_| ServiceError::InvalidPublicKeyLength)?;
-
-    Ok(pub_key_bytes)
 }
 
 pub fn get_background_state(service: &Background) -> Result<BackgroundState, ServiceError> {
