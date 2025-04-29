@@ -3,7 +3,6 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
@@ -35,13 +34,14 @@ class AddLedgerAccountPage extends StatefulWidget {
 class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
+  final _createBtnController = RoundedLoadingButtonController();
 
   int _accountCount = 5;
   bool _loading = false;
   String _errorMessage = '';
   bool _createWallet = true;
   NetworkConfigInfo? _network;
-  LedgerDevice? _ledger;
+  List<LedgerDevice> _ledgers = [];
   List<EthLedgerAccount> _accounts = [];
   Map<EthLedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
@@ -65,8 +65,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final ledger = args['ledger'] as LedgerDevice?;
       final createWallet = args['createWallet'] as bool?;
 
-      print(ledger.toString());
-
       if (network == null || ledger == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
           Navigator.of(context).pushReplacementNamed('/initial');
@@ -74,9 +72,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       } else {
         setState(() {
           _network = network;
-          _ledger = ledger;
+          if (_ledgers.isEmpty) {
+            _ledgers = [ledger];
+          }
           _createWallet = createWallet ?? true;
-          _walletNameController.text = "${ledger.name} (${network.name})";
+          _walletNameController.text =
+              "${_ledgers.first.name} (${network.name})";
         });
       }
     }
@@ -86,6 +87,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   void dispose() {
     _walletNameController.dispose();
     _btnController.dispose();
+    _createBtnController.dispose();
     super.dispose();
   }
 
@@ -111,7 +113,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _btnController.start();
 
     try {
-      if (_network == null || _ledger == null) {
+      if (_network == null || _ledgers.isEmpty) {
         throw Exception("Network or Ledger data is missing.");
       }
 
@@ -119,7 +121,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         onPermissionRequest: (_) async => true,
       );
 
-      final connection = await ledgerInterface.connect(_ledger!);
+      final connection = await ledgerInterface.connect(_ledgers.first);
       final ethereumApp = EthereumLedgerApp(connection, transformer: null);
       final accounts = await ethereumApp
           .getAccounts(List<int>.generate(_accountCount, (i) => i));
@@ -168,6 +170,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   void _toggleAccount(EthLedgerAccount account, bool value) {
+    if (_loading) return;
+
     setState(() {
       _selectedAccounts[account] = value;
     });
@@ -178,6 +182,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       _loading = true;
       _errorMessage = '';
     });
+    _createBtnController.start();
 
     try {
       final l10n = AppLocalizations.of(context)!;
@@ -216,7 +221,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       List<FTokenInfo> ftokens = [];
 
       if (_createWallet) {
-        // Get all selected accounts
         final selectedAccounts = _selectedAccounts.entries
             .where((entry) => entry.value)
             .map((entry) => entry.key)
@@ -238,7 +242,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
             walletName: _walletNameController.text,
-            ledgerId: _ledger!.id,
+            ledgerId: _ledgers.first.id,
             accountNames: accountNames,
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
@@ -255,11 +259,17 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         appState.setSelectedWallet(currentWalletIndex);
         await appState.startTrackHistoryWorker();
 
+        _createBtnController.success();
+
         setState(() {
           _loading = false;
         });
 
-        Navigator.of(context).pushNamed("/");
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.of(context).pushNamed("/");
+          }
+        });
       } else {
         final walletIndex = appState.selectedWallet;
         final wallet = appState.wallet;
@@ -284,22 +294,34 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         });
 
         await appState.syncData();
+        _createBtnController.success();
+
         setState(() {
           _loading = false;
         });
 
-        Navigator.of(context).pushNamed("/");
+        Future.delayed(const Duration(seconds: 1), () {
+          if (mounted) {
+            Navigator.of(context).pushNamed("/");
+          }
+        });
       }
     } catch (e) {
+      _createBtnController.error();
       setState(() {
         _loading = false;
         _errorMessage = e.toString();
+      });
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          _createBtnController.reset();
+        }
       });
     }
   }
 
   Widget _buildDeviceInfoCard(AppTheme theme, AppLocalizations l10n) {
-    if (_network == null || _ledger == null) return const SizedBox();
+    if (_network == null || _ledgers.isEmpty) return const SizedBox();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -322,10 +344,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   Widget _buildLedgerInfoRow(AppTheme theme) {
+    final mainLedger = _ledgers.first;
     return Row(
       children: [
         SvgPicture.asset(
-          _ledger!.connectionType == ConnectionType.ble
+          mainLedger.connectionType == ConnectionType.ble
               ? 'assets/icons/ble.svg'
               : 'assets/icons/usb.svg',
           width: 24,
@@ -341,7 +364,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                _ledger!.name,
+                mainLedger.name,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 16,
@@ -350,7 +373,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
               ),
               const SizedBox(height: 2),
               Text(
-                'Connection: ${_ledger!.connectionType.name.toUpperCase()}',
+                'Connection: ${mainLedger.connectionType.name.toUpperCase()}',
                 style: TextStyle(
                   color: theme.textSecondary,
                   fontSize: 12,
@@ -506,9 +529,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 color: theme.primaryPurple,
                 valueColor: theme.buttonText,
                 controller: _btnController,
-                onPressed: (_network == null || _ledger == null || _loading)
-                    ? null
-                    : _onGetAccounts,
+                onPressed: _onGetAccounts,
                 successIcon: SvgPicture.asset(
                   'assets/icons/ok.svg',
                   width: 24,
@@ -566,7 +587,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
               ),
               isDefault: false,
               isEnabled: _selectedAccounts[account] ?? false,
-              onToggle: (value) => _toggleAccount(account, value),
+              onToggle:
+                  _loading ? null : (value) => _toggleAccount(account, value),
             );
           }).toList(),
         ],
@@ -613,7 +635,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       title: "Ledger Account",
                       onBackPressed: () => Navigator.pop(context),
                     ),
-                    if (_network == null || _ledger == null)
+                    if (_network == null || _ledgers.isEmpty)
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
@@ -658,12 +680,28 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                     right: 0,
                     child: Container(
                       padding: EdgeInsets.all(adaptivePadding),
-                      child: CustomButton(
-                        text: _createWallet ? "Create" : "Add",
-                        textColor: theme.buttonText,
-                        backgroundColor: theme.primaryPurple,
+                      child: RoundedLoadingButton(
+                        controller: _createBtnController,
+                        color: theme.primaryPurple,
+                        valueColor: theme.buttonText,
                         onPressed: _saveSelectedAccounts,
-                        disabled: _loading,
+                        successIcon: SvgPicture.asset(
+                          'assets/icons/ok.svg',
+                          width: 24,
+                          height: 24,
+                          colorFilter: ColorFilter.mode(
+                            theme.buttonText,
+                            BlendMode.srcIn,
+                          ),
+                        ),
+                        child: Text(
+                          _createWallet ? "Create" : "Add",
+                          style: TextStyle(
+                            color: theme.buttonText,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
                   ),
