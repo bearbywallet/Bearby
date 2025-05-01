@@ -14,6 +14,7 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
@@ -100,6 +101,29 @@ pub async fn sign_send_transactions(
         ))?;
 
     Ok(tx)
+}
+
+pub async fn prepare_message(
+    wallet_index: usize,
+    account_index: usize,
+    message: String,
+) -> Result<Vec<u8>, String> {
+    with_service(|core| {
+        let hash = core.prepare_message(wallet_index, account_index, &message)?;
+        Ok(hash.to_vec())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn prepare_eip712_message(typed_data_json: String) -> Result<Vec<u8>, String> {
+    with_service(|core| {
+        let hash = core.prepare_eip712_message(typed_data_json)?;
+
+        Ok(hash.to_vec())
+    })
+    .await
+    .map_err(Into::into)
 }
 
 pub async fn sign_message(

@@ -34,6 +34,17 @@ Future<HistoricalTransactionInfo> signSendTransactions(
         identifiers: identifiers,
         tx: tx);
 
+Future<Uint8List> prepareMessage(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required String message}) =>
+    RustLib.instance.api.crateApiTransactionPrepareMessage(
+        walletIndex: walletIndex, accountIndex: accountIndex, message: message);
+
+Future<Uint8List> prepareEip712Message({required String typedDataJson}) =>
+    RustLib.instance.api
+        .crateApiTransactionPrepareEip712Message(typedDataJson: typedDataJson);
+
 Future<(String, String)> signMessage(
         {required BigInt walletIndex,
         required BigInt accountIndex,

@@ -276,9 +276,13 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       );
       final connection = await ledgerInterface.connect(_selectedDevice!);
       final ethLedgerApp = EthereumLedgerApp(connection);
-      final messageBytes = Uint8List.fromList(utf8.encode(widget.message!));
+      final messageHash = await prepareMessage(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+        message: widget.message!,
+      );
       final signatureBytes =
-          await ethLedgerApp.signPersonalMessage(messageBytes, accountIndex);
+          await ethLedgerApp.signPersonalMessage(messageHash, accountIndex);
       final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
       final sighex = bytesToHex(signatureBytes);
       widget.onMessageSigned(pubkey, "0x$sighex");
