@@ -1153,7 +1153,7 @@ dependencies = [
 [[package]]
 name = "background"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "async-trait",
@@ -1474,7 +1474,7 @@ dependencies = [
 [[package]]
 name = "cache"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "errors",
  "image",
@@ -1532,7 +1532,7 @@ dependencies = [
 [[package]]
 name = "cipher"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "aes-gcm",
  "config",
@@ -1591,7 +1591,7 @@ checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 [[package]]
 name = "config"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 
 [[package]]
 name = "console_error_panic_hook"
@@ -1731,7 +1731,7 @@ checksum = "43da5946c66ffcc7745f48db692ffbb10a83bfe0afd96235c5c2a4fb23994929"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "bip39",
  "config",
@@ -2052,7 +2052,7 @@ dependencies = [
 [[package]]
 name = "errors"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "bincode",
  "ntrulp",
@@ -2590,7 +2590,7 @@ dependencies = [
 [[package]]
 name = "history"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "errors",
@@ -3036,7 +3036,7 @@ dependencies = [
 [[package]]
 name = "intl"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "bigdecimal",
@@ -3395,7 +3395,7 @@ dependencies = [
 [[package]]
 name = "network"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "async-trait",
@@ -3962,7 +3962,7 @@ dependencies = [
 [[package]]
 name = "proto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "bech32",
@@ -3995,7 +3995,7 @@ dependencies = [
 [[package]]
 name = "qrcodes"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "errors",
@@ -4427,7 +4427,7 @@ checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
 [[package]]
 name = "rpc"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "async-trait",
@@ -4872,7 +4872,7 @@ dependencies = [
 [[package]]
 name = "session"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -4885,7 +4885,7 @@ dependencies = [
 [[package]]
 name = "settings"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -5055,7 +5055,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "config",
  "directories",
@@ -5349,7 +5349,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 [[package]]
 name = "token"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "bincode",
@@ -5363,7 +5363,7 @@ dependencies = [
 [[package]]
 name = "token_quotes"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "errors",
  "proto",
@@ -5831,7 +5831,7 @@ dependencies = [
 [[package]]
 name = "wallet"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "alloy",
  "async-trait",
@@ -6421,7 +6421,7 @@ dependencies = [
 [[package]]
 name = "zilpay"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "background",
  "cache",
@@ -6444,7 +6444,7 @@ dependencies = [
 [[package]]
 name = "zilpay_core"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#89839bc6316bc4da5264d1a0dc796f9456c34474"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#3143a05bcbcdd63be3a25346abeabb0929ad6b6b"
 dependencies = [
  "background",
  "cache",

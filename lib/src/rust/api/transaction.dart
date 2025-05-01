@@ -41,7 +41,7 @@ Future<Uint8List> prepareMessage(
     RustLib.instance.api.crateApiTransactionPrepareMessage(
         walletIndex: walletIndex, accountIndex: accountIndex, message: message);
 
-Future<Uint8List> prepareEip712Message({required String typedDataJson}) =>
+Future<Eip712Hashes> prepareEip712Message({required String typedDataJson}) =>
     RustLib.instance.api
         .crateApiTransactionPrepareEip712Message(typedDataJson: typedDataJson);
 
@@ -109,6 +109,27 @@ Stream<String> startHistoryWorker({required BigInt walletIndex}) =>
 
 Future<void> stopHistoryWorker() =>
     RustLib.instance.api.crateApiTransactionStopHistoryWorker();
+
+class Eip712Hashes {
+  final Uint8List domainSeparator;
+  final Uint8List hashStructMessage;
+
+  const Eip712Hashes({
+    required this.domainSeparator,
+    required this.hashStructMessage,
+  });
+
+  @override
+  int get hashCode => domainSeparator.hashCode ^ hashStructMessage.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Eip712Hashes &&
+          runtimeType == other.runtimeType &&
+          domainSeparator == other.domainSeparator &&
+          hashStructMessage == other.hashStructMessage;
+}
 
 class TokenTransferParamsInfo {
   final BigInt walletIndex;

@@ -182,6 +182,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_connection_info(dynamic raw);
 
   @protected
+  Eip712Hashes dco_decode_eip_712_hashes(dynamic raw);
+
+  @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
 
   @protected
@@ -522,6 +525,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ConnectionInfo sse_decode_connection_info(SseDeserializer deserializer);
+
+  @protected
+  Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer);
 
   @protected
   ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
@@ -895,6 +901,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_connection_info(
       ConnectionInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer);
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);

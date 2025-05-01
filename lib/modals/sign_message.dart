@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
@@ -276,16 +275,34 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       );
       final connection = await ledgerInterface.connect(_selectedDevice!);
       final ethLedgerApp = EthereumLedgerApp(connection);
-      final messageHash = await prepareMessage(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
-        message: widget.message!,
-      );
-      final signatureBytes =
-          await ethLedgerApp.signPersonalMessage(messageHash, accountIndex);
-      final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-      final sighex = bytesToHex(signatureBytes);
-      widget.onMessageSigned(pubkey, "0x$sighex");
+
+      if (widget.typedData != null) {
+        final typedDataJson = jsonEncode(widget.typedData!.toJson());
+        final eip712Hashes =
+            await prepareEip712Message(typedDataJson: typedDataJson);
+        final signatureBytes = await ethLedgerApp.signEIP712HashedMessage(
+          eip712Hashes,
+          accountIndex,
+        );
+        final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
+        final sighex = bytesToHex(signatureBytes);
+
+        widget.onMessageSigned(pubkey, "0x$sighex");
+      } else if (widget.message != null) {
+        final messageHash = await prepareMessage(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+          message: widget.message!,
+        );
+        final signatureBytes = await ethLedgerApp.signPersonalMessage(
+          messageHash,
+          accountIndex, // TODO: remake account index, because it is wrong, it should be from ledger index.
+        );
+        final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
+        final sighex = bytesToHex(signatureBytes);
+
+        widget.onMessageSigned(pubkey, "0x$sighex");
+      }
     } catch (e) {
       setState(() => _error = AppLocalizations.of(context)!
           .signMessageModalContentFailedToSignMessage(e.toString()));

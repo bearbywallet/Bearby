@@ -1,9 +1,7 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
@@ -48,7 +46,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
   String _errorMessage = '';
   bool _disabled = false;
   bool _walletNameInitialized = false;
-  bool _needRemoveOldStorage = false;
   bool _updatedArgs = false;
 
   final _btnController = RoundedLoadingButtonController();
@@ -95,7 +92,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
           _zilLegacy = zilLegacy;
         }
 
-        _needRemoveOldStorage = zilLegacy != null;
         _updatedArgs = true;
       });
     }

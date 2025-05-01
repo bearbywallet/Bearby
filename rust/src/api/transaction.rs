@@ -116,11 +116,24 @@ pub async fn prepare_message(
     .map_err(Into::into)
 }
 
-pub async fn prepare_eip712_message(typed_data_json: String) -> Result<Vec<u8>, String> {
-    with_service(|core| {
-        let hash = core.prepare_eip712_message(typed_data_json)?;
+pub struct Eip712Hashes {
+    pub domain_separator: Vec<u8>,
+    pub hash_struct_message: Vec<u8>,
+}
 
-        Ok(hash.to_vec())
+pub async fn prepare_eip712_message(typed_data_json: String) -> Result<Eip712Hashes, String> {
+    with_service(|core| {
+        let typed_data = core.prepare_eip712_message(typed_data_json)?;
+        let domain_separator = typed_data.domain.separator().to_vec();
+        let hash_struct_message = typed_data
+            .hash_struct()
+            .map_err(|e| BackgroundError::FailDeserializeTypedData(e.to_string()))?
+            .to_vec();
+
+        Ok(Eip712Hashes {
+            domain_separator,
+            hash_struct_message,
+        })
     })
     .await
     .map_err(Into::into)

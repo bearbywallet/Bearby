@@ -274,7 +274,7 @@ abstract class RustLibApi extends BaseApi {
   Future<QRcodeScanResultInfo> crateApiQrcodeParseQrcodeStr(
       {required String data});
 
-  Future<Uint8List> crateApiTransactionPrepareEip712Message(
+  Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
       {required String typedDataJson});
 
   Future<Uint8List> crateApiTransactionPrepareMessage(
@@ -1807,7 +1807,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<Uint8List> crateApiTransactionPrepareEip712Message(
+  Future<Eip712Hashes> crateApiTransactionPrepareEip712Message(
       {required String typedDataJson}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
@@ -1817,7 +1817,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
             funcId: 51, port: port_);
       },
       codec: SseCodec(
-        decodeSuccessData: sse_decode_list_prim_u_8_strict,
+        decodeSuccessData: sse_decode_eip_712_hashes,
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionPrepareEip712MessageConstMeta,
@@ -3426,6 +3426,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Eip712Hashes dco_decode_eip_712_hashes(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return Eip712Hashes(
+      domainSeparator: dco_decode_list_prim_u_8_strict(arr[0]),
+      hashStructMessage: dco_decode_list_prim_u_8_strict(arr[1]),
+    );
+  }
+
+  @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -4491,6 +4503,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         canRequestSignatures: var_canRequestSignatures,
         canSuggestTokens: var_canSuggestTokens,
         canSuggestTransactions: var_canSuggestTransactions);
+  }
+
+  @protected
+  Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_domainSeparator = sse_decode_list_prim_u_8_strict(deserializer);
+    var var_hashStructMessage = sse_decode_list_prim_u_8_strict(deserializer);
+    return Eip712Hashes(
+        domainSeparator: var_domainSeparator,
+        hashStructMessage: var_hashStructMessage);
   }
 
   @protected
@@ -5691,6 +5713,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self.canRequestSignatures, serializer);
     sse_encode_bool(self.canSuggestTokens, serializer);
     sse_encode_bool(self.canSuggestTransactions, serializer);
+  }
+
+  @protected
+  void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_prim_u_8_strict(self.domainSeparator, serializer);
+    sse_encode_list_prim_u_8_strict(self.hashStructMessage, serializer);
   }
 
   @protected
