@@ -65,14 +65,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final ledger = args['ledger'] as LedgerDevice?;
       final createWallet = args['createWallet'] as bool?;
 
-      if (network == null || ledger == null) {
+      if (network == null) {
         WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pushReplacementNamed('/initial');
+          Navigator.of(context).pop();
         });
       } else {
         setState(() {
           _network = network;
-          if (_ledgers.isEmpty) {
+          if (_ledgers.isEmpty && ledger != null) {
             _ledgers = [ledger];
           }
           _createWallet = createWallet ?? true;

@@ -34,7 +34,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSBluetoothAlwaysUsageDescription</key>
-	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
+	<string>We need Bluetooth to discover, connect ledger devices.</string>
 	<key>NSBluetoothPeripheralUsageDescription</key>
 	<string>We need Bluetooth to discover, connect and share information with other nearby devices.</string>
 	<key>NSCameraUsageDescription</key>

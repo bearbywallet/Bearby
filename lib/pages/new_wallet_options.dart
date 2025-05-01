@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -11,6 +12,21 @@ class AddWalletOptionsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
+
+    final Color effectiveBgColor = Theme.of(context).scaffoldBackgroundColor;
+    final Brightness backgroundBrightness =
+        ThemeData.estimateBrightnessForColor(effectiveBgColor);
+    final Brightness statusBarIconBrightness =
+        backgroundBrightness == Brightness.light
+            ? Brightness.dark
+            : Brightness.light;
+    final Brightness statusBarBrightness = backgroundBrightness;
+
+    final SystemUiOverlayStyle overlayStyle = SystemUiOverlayStyle(
+      statusBarColor: Colors.transparent,
+      statusBarIconBrightness: statusBarIconBrightness,
+      statusBarBrightness: statusBarBrightness,
+    );
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -29,6 +45,7 @@ class AddWalletOptionsPage extends StatelessWidget {
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
+        systemOverlayStyle: overlayStyle,
         title: Text(AppLocalizations.of(context)!.addWalletOptionsTitle,
             style: TextStyle(color: theme.textPrimary)),
       ),

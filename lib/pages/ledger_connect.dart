@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -6,7 +7,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:async/async.dart';
@@ -17,7 +17,6 @@ class PressableCard extends StatefulWidget {
   final bool enabled;
   final Duration duration;
   final double pressedScale;
-
   const PressableCard({
     super.key,
     required this.child,
@@ -26,14 +25,12 @@ class PressableCard extends StatefulWidget {
     this.duration = const Duration(milliseconds: 100),
     this.pressedScale = 0.96,
   });
-
   @override
   State<PressableCard> createState() => _PressableCardState();
 }
 
 class _PressableCardState extends State<PressableCard> {
   bool _isPressed = false;
-
   void _setPressed(bool pressed) {
     if (!widget.enabled) return;
     setState(() {
@@ -44,7 +41,6 @@ class _PressableCardState extends State<PressableCard> {
   @override
   Widget build(BuildContext context) {
     final scale = widget.enabled && _isPressed ? widget.pressedScale : 1.0;
-
     return GestureDetector(
       onTapDown: (_) => _setPressed(true),
       onTapUp: (_) {
@@ -70,7 +66,6 @@ class _PressableCardState extends State<PressableCard> {
 
 class LedgerConnectPage extends StatefulWidget {
   const LedgerConnectPage({super.key});
-
   @override
   State<LedgerConnectPage> createState() => _LedgerConnectPageState();
 }
@@ -114,7 +109,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   void _initLedger() {
     if (!mounted) return;
-
     try {
       _ledgerBle = LedgerInterface.ble(
         onPermissionRequest: _handlePermissionRequest,
@@ -122,8 +116,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           maxScanDuration: const Duration(seconds: 15),
         ),
       );
-      _ledgerUsb = LedgerInterface.usb();
-
+      _ledgerUsb = Platform.isAndroid ? LedgerInterface.usb() : null;
       setState(() {
         _statusText = 'Ready to scan. Press refresh button.';
       });
@@ -141,50 +134,89 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   Future<bool> _handlePermissionRequest(AvailabilityState status) async {
     if (!mounted) return false;
 
-    if (status == AvailabilityState.poweredOff ||
-        status == AvailabilityState.unauthorized ||
-        status == AvailabilityState.unsupported) {
+    if (status == AvailabilityState.poweredOff) {
       setState(() {
-        _statusText = 'Bluetooth Error: $status';
+        _statusText =
+            'Bluetooth is turned off. Please enable Bluetooth on your device.';
       });
-      _showErrorDialog('Bluetooth Issue',
-          'Bluetooth seems to be $status. Please check your Bluetooth settings and app permissions.');
+      _showErrorDialog('Bluetooth Off',
+          'Please turn on Bluetooth in your device settings and try again.');
       return false;
     }
 
-    Map<Permission, PermissionStatus> statuses = await [
-      Permission.locationWhenInUse,
+    if (status == AvailabilityState.unauthorized) {
+      setState(() {
+        _statusText = 'Bluetooth permission denied. Please enable in settings.';
+      });
+
+      // For iOS, we need to show a more specific dialog
+      if (Platform.isIOS) {
+        _showErrorDialog('Permission Required',
+            'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.',
+            showSettingsButton: true);
+      } else {
+        // For Android, request permissions
+        final statuses = await [
+          Permission.bluetoothScan,
+          Permission.bluetoothConnect,
+          Permission.locationWhenInUse,
+        ].request();
+
+        final allGranted = statuses.values.every((s) => s.isGranted);
+        if (!allGranted && mounted) {
+          _showErrorDialog('Permission Denied',
+              'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.',
+              showSettingsButton: true);
+          return false;
+        }
+      }
+      return false;
+    }
+
+    if (status == AvailabilityState.unsupported) {
+      setState(() {
+        _statusText = 'Bluetooth LE is not supported on this device.';
+      });
+      _showErrorDialog('Unsupported Device',
+          'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.');
+      return false;
+    }
+
+    // For iOS, we don't need to explicitly request permissions through the permission_handler
+    // as the system dialog will be shown automatically when we start scanning
+    if (Platform.isIOS) {
+      return true;
+    }
+
+    // For Android, we proceed with permissions as before
+    final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,
+      Permission.locationWhenInUse,
     ].request();
 
-    bool allGranted = statuses.values.every((s) => s.isGranted);
+    final allGranted = statuses.values.every((s) => s.isGranted);
 
-    if (!allGranted) {
-      if (!mounted) return false;
+    if (!allGranted && mounted) {
       setState(() {
         _statusText = 'Permissions denied. Cannot scan via BLE.';
       });
+
       _showErrorDialog('Permission Denied',
-          'Bluetooth permissions are required to scan for Ledger devices via BLE. Please grant permissions in settings.');
+          'Bluetooth permissions are required to scan for Ledger devices via BLE. Please grant permissions in settings.',
+          showSettingsButton: true);
+      return false;
     }
 
-    return allGranted;
+    return true;
   }
 
   Future<void> _startScanning() async {
-    if (_isScanning ||
-        _isConnecting ||
-        _ledgerBle == null ||
-        _ledgerUsb == null) {
-      debugPrint(
-          'Scan aborted: Already scanning, connecting, or Ledger not initialized.');
-      return;
-    }
+    if (_isScanning || _isConnecting || _ledgerBle == null) return;
 
     await _disconnectDevice();
-
     if (!mounted) return;
+
     setState(() {
       _isScanning = true;
       _discoveredDevices.clear();
@@ -196,77 +228,63 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     try {
       final bleStatus = await _ledgerBle!.status;
+      debugPrint('[Scan] Current BLE status: $bleStatus');
+
       if (bleStatus != AvailabilityState.poweredOn) {
+        debugPrint('[Scan] BLE not powered on, current state: $bleStatus');
         final granted = await _handlePermissionRequest(bleStatus);
         if (!granted) {
-          if (!mounted) return;
-          setState(() {
-            _isScanning = false;
-          });
+          setState(() => _isScanning = false);
           return;
         }
-        await Future.delayed(const Duration(milliseconds: 500));
       }
 
-      final bleStream = _ledgerBle!.scan();
-      final usbStream = _ledgerUsb!.scan();
-      final combinedStream = StreamGroup.merge([bleStream, usbStream]);
+      await Future.delayed(const Duration(milliseconds: 500));
 
-      debugPrint("[Scan] Starting combined BLE and USB scan.");
+      final bleStream = _ledgerBle!.scan();
+      final usbStream = Platform.isAndroid ? _ledgerUsb?.scan() : null;
+
+      final combinedStream = StreamGroup.merge([
+        bleStream,
+        if (usbStream != null) usbStream,
+      ]);
+
       _scanSubscription = combinedStream.listen(
         (device) {
           if (!mounted) return;
-          debugPrint(
-              "[Scan] Discovered device: ${device.name} (${device.id}) via ${device.connectionType.name}");
           setState(() {
-            bool added = _discoveredDevices.add(device);
-            if (added) {
-              _statusText = 'Found ${_discoveredDevices.length} device(s)...';
-            }
+            _discoveredDevices.add(device);
+            _statusText = 'Found ${_discoveredDevices.length} device(s)...';
           });
         },
         onError: (error) {
           if (!mounted) return;
           debugPrint('[Scan] Scan Error: $error');
-          String errorMessage = 'An error occurred during scanning.';
-          if (error is PermissionException) {
-            errorMessage = 'Permission error during scan: ${error}';
-          } else if (error is LedgerException) {
-            errorMessage = 'Ledger Error during scan: ${error}';
-          } else {
-            errorMessage = 'Scan Error: ${error.toString()}';
-          }
-
           setState(() {
             _isScanning = false;
-            _statusText = errorMessage;
+            _statusText = 'Scan Error: $error';
           });
-          _showErrorDialog('Scan Error', errorMessage);
+          _showErrorDialog('Scan Error', 'Scan Error: $error');
         },
         onDone: () {
           if (!mounted) return;
-          debugPrint("[Scan] Scan stream done.");
           setState(() {
             _isScanning = false;
-            if (!_isConnecting && _ledgerConnection == null) {
-              _statusText = _discoveredDevices.isEmpty
-                  ? 'Scan finished. No devices found.'
-                  : 'Scan finished. Found ${_discoveredDevices.length} device(s). Select one to connect.';
-            }
+            _statusText = _discoveredDevices.isEmpty
+                ? 'Scan finished. No devices found.'
+                : 'Scan finished. Found ${_discoveredDevices.length} device(s). Select one to connect.';
           });
         },
-        cancelOnError: true,
       );
 
       Future.delayed(const Duration(seconds: 16), () {
         if (mounted && _isScanning) {
-          debugPrint("[Scan] Stopping scan due to timeout.");
           _stopScan();
         }
       });
     } catch (e, s) {
-      if (!mounted) return;
       debugPrint('[Scan] Error starting scan: $e\n$s');
+      if (!mounted) return;
       setState(() {
         _isScanning = false;
         _statusText = 'Failed to start scan: $e';
@@ -279,7 +297,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     debugPrint("[Scan] Stopping scan...");
     await _scanSubscription?.cancel();
     _scanSubscription = null;
-
     if (mounted && _isScanning) {
       setState(() {
         _isScanning = false;
@@ -298,11 +315,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       debugPrint('[Connect] Attempt aborted: Already connecting or connected.');
       return;
     }
-
     if (_isScanning) {
       await _stopScan();
     }
-
     if (!mounted) return;
     debugPrint(
         '[Connect] Attempting connection to ${device.name} (${device.id}) via ${device.connectionType.name}');
@@ -312,14 +327,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       _statusText =
           'Connecting to ${device.name} (${device.connectionType.name.toUpperCase()})...';
     });
-
     LedgerConnection? tempConnection;
     const connectionTimeout = Duration(seconds: 25);
-
     try {
       debugPrint(
           '[Connect] Calling ${device.connectionType.name}.connect() with ${connectionTimeout.inSeconds}s timeout...');
-
       if (device.connectionType == ConnectionType.ble && _ledgerBle != null) {
         tempConnection = await _ledgerBle!.connect(device).timeout(
           connectionTimeout,
@@ -342,10 +354,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       } else {
         throw Exception('Appropriate Ledger interface not available.');
       }
-
       debugPrint(
           '[Connect] Connection call successful for ${device.id}. Connection object present:');
-
       if (!mounted) {
         debugPrint(
             '[Connect] Widget unmounted after connection success, disconnecting.');
@@ -353,21 +363,17 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             '[Connect] Error disconnecting after widget disposed: $e'));
         return;
       }
-
       _ledgerConnection = tempConnection;
-
       setState(() {
         debugPrint('[Connect] Setting state to connected.');
         _statusText = 'Successfully connected to ${device.name}!';
       });
-
       Navigator.of(context).pushNamed(
         '/net_setup',
         arguments: {
           'ledger': device,
         },
       );
-
       debugPrint('[Connect] Setting up disconnect listener for ${device.id}');
       _listenForDisconnection(device.id);
       debugPrint('[Connect] Disconnect listener setup initiated.');
@@ -391,16 +397,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     } catch (e, s) {
       debugPrint('[Connect] Generic Exception caught: $e\n$s');
       if (!mounted) return;
-
       String errorString = e.toString();
       bool isStreamListenedError = errorString
           .contains('Bad state: Stream has already been listened to.');
-
       String failureMsg = 'Connection Failed: $e';
       String dialogContent = 'Could not connect to ${device.name}.\nError: $e';
       String dialogTitle = 'Connection Failed';
       bool showErrorDialog = true;
-
       if (isStreamListenedError) {
         debugPrint(
             '[Connect] Skipping error dialog for stream listener error.');
@@ -415,7 +418,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       } else {
         _ledgerConnection = null;
       }
-
       if (mounted) {
         setState(() {
           _statusText = failureMsg;
@@ -441,7 +443,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   void _listenForDisconnection(String deviceId) {
     _disconnectionSubscription?.cancel();
     _disconnectionSubscription = null;
-
     final manager = (_ledgerConnection?.connectionType == ConnectionType.ble)
         ? _ledgerBle
         : _ledgerUsb;
@@ -450,7 +451,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           "[Disconnect Listener] Cannot listen: Manager or connection is null.");
       return;
     }
-
     debugPrint("[Disconnect Listener] Setting up listener for $deviceId");
     try {
       _disconnectionSubscription =
@@ -460,7 +460,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         if (manager == _ledgerBle) {
           isDisconnected = state == BleConnectionState.disconnected;
         }
-
         if (isDisconnected &&
             mounted &&
             _ledgerConnection?.device.id == deviceId) {
@@ -494,22 +493,18 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     debugPrint("[Disconnect] Initiating disconnection...");
     await _disconnectionSubscription?.cancel();
     _disconnectionSubscription = null;
-
     if (_ledgerConnection == null) {
       debugPrint("[Disconnect] No active connection to disconnect.");
       return;
     }
-
     final deviceName = _ledgerConnection?.device.name ?? 'Ledger';
     final deviceId = _ledgerConnection?.device.id ?? 'unknown';
     debugPrint("[Disconnect] Disconnecting from $deviceName ($deviceId)");
     final connectionToClose = _ledgerConnection;
     _ledgerConnection = null;
-
     if (mounted) {
       _handleDisconnectionUI('Disconnecting from $deviceName...');
     }
-
     try {
       await connectionToClose!.disconnect();
       debugPrint('[Disconnect] Successfully disconnected from $deviceName.');
@@ -538,30 +533,34 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     });
   }
 
-  void _showErrorDialog(String title, String content) {
+  void _showErrorDialog(String title, String content,
+      {bool showSettingsButton = false}) {
     if (!mounted) return;
     final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+
     showDialog(
       context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          backgroundColor: theme.cardBackground,
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(15.0)),
-          title: Text(title,
-              style: TextStyle(
-                  fontWeight: FontWeight.bold, color: theme.textPrimary)),
-          content: Text(content, style: TextStyle(color: theme.textSecondary)),
-          actions: <Widget>[
+      builder: (context) => AlertDialog(
+        backgroundColor: theme.cardBackground,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
+        title: Text(title, style: TextStyle(color: theme.textPrimary)),
+        content: Text(content, style: TextStyle(color: theme.textSecondary)),
+        actions: [
+          TextButton(
+            onPressed: Navigator.of(context).pop,
+            child: Text('Cancel', style: TextStyle(color: theme.primaryPurple)),
+          ),
+          if (showSettingsButton)
             TextButton(
-              child: Text('OK', style: TextStyle(color: theme.primaryPurple)),
-              onPressed: () {
+              onPressed: () async {
                 Navigator.of(context).pop();
+                await openAppSettings();
               },
+              child: Text('Go to Settings',
+                  style: TextStyle(color: theme.primaryPurple)),
             ),
-          ],
-        );
-      },
+        ],
+      ),
     );
   }
 
@@ -573,7 +572,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     final String pageTitle =
         AppLocalizations.of(context)?.ledgerConnectPageTitle ??
             'Connect Ledger';
-
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
@@ -592,7 +590,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                     colorFilter: ColorFilter.mode(
                       (_isScanning || _isConnecting)
                           ? theme.textSecondary.withAlpha(128)
-                          : theme.primaryPurple,
+                          : theme.textPrimary,
                       BlendMode.srcIn,
                     ),
                   ),
@@ -655,7 +653,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 30.0),
                                     child: Text(
-                                      'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\n\nPull down or use refresh icon to scan again.',
+                                      'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.',
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: theme.textSecondary,
@@ -682,7 +680,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                       _connectingDevice?.id == device.id;
                               final bool isDisabled =
                                   isCurrentlyConnected || _isConnecting;
-
                               final cardChild = Card(
                                 elevation: 0,
                                 margin: EdgeInsets.zero,
@@ -761,7 +758,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                             ),
                                 ),
                               );
-
                               return Padding(
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 6, horizontal: 4),
