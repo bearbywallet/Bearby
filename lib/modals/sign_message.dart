@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -9,6 +10,7 @@ import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
+import 'package:zilpay/ledger/ethereum/utils.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -93,7 +95,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   void initState() {
     super.initState();
     _authGuard = context.read<AuthGuard>();
-    _checkLedgerDevice();
+    _checkLedgerDevices();
   }
 
   @override
@@ -104,28 +106,50 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     super.dispose();
   }
 
-  void _checkLedgerDevice() {
+  Future<void> _checkLedgerDevices() async {
     final appState = context.read<AppState>();
     final isLedgerWallet = appState.selectedWallet != -1 &&
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
-    if (isLedgerWallet) {
-      final deviceId =
-          appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-      if (deviceId != null) {
-        _selectedDevice = LedgerDevice(
-          id: deviceId,
-          name: 'Ledger Device',
-          connectionType: ConnectionType.ble,
-          deviceInfo: LedgerDeviceType.nanoX,
-        );
-        setState(() {
-          _ledgerDevices.add(_selectedDevice!);
-        });
-        _verifyDeviceConnection();
-      } else {
+
+    if (!isLedgerWallet) return;
+
+    final deviceId =
+        appState.wallet?.walletType.split('.').last.replaceAll('"', '');
+    final ledgerBle = LedgerInterface.ble(
+      onPermissionRequest: (status) async =>
+          status == AvailabilityState.poweredOn,
+    );
+    final ledgerUsb = LedgerInterface.usb();
+
+    try {
+      final bleDevices = await ledgerBle.devices;
+      final usbDevices =
+          Platform.isAndroid ? await ledgerUsb.devices : <LedgerDevice>[];
+      final allDevices = [...bleDevices, ...usbDevices];
+
+      setState(() {
+        _ledgerDevices = allDevices;
+        if (deviceId != null && allDevices.isNotEmpty) {
+          _selectedDevice = allDevices.firstWhere(
+            (device) => device.id.contains(deviceId),
+          );
+        } else {
+          _selectedDevice = null;
+        }
+      });
+
+      if (_ledgerDevices.isEmpty) {
         _startLedgerScan();
+      } else if (_selectedDevice != null) {
+        _verifyDeviceConnection();
       }
+    } catch (e) {
+      setState(() {
+        _error = AppLocalizations.of(context)!
+            .signMessageModalContentFailedToScanLedger(e.toString());
+      });
+      _startLedgerScan();
     }
   }
 
@@ -133,17 +157,14 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     if (_selectedDevice == null) return;
     try {
       final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (status) async {
-          if (status != AvailabilityState.poweredOn) {
-            setState(() => _error = AppLocalizations.of(context)!
-                .signMessageModalContentBluetoothOff);
-            return false;
-          }
-          return true;
-        },
+        onPermissionRequest: (status) async =>
+            status == AvailabilityState.poweredOn,
       );
       await ledgerInterface.connect(_selectedDevice!);
     } catch (e) {
+      setState(() {
+        _error = e.toString();
+      });
       _startLedgerScan();
     }
   }
@@ -184,9 +205,12 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             final appState = context.read<AppState>();
             final deviceId =
                 appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-            if (device.id.contains(deviceId ?? '') && _selectedDevice == null) {
+            if (deviceId != null &&
+                device.id.contains(deviceId) &&
+                _selectedDevice == null) {
               _selectedDevice = device;
               _stopLedgerScan();
+              _verifyDeviceConnection();
             }
           });
         }
@@ -256,7 +280,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
       final signatureBytes =
           await ethLedgerApp.signPersonalMessage(messageBytes, accountIndex);
       final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-      widget.onMessageSigned(pubkey, signatureBytes.toString());
+      final sighex = bytesToHex(signatureBytes);
+      widget.onMessageSigned(pubkey, "0x$sighex");
     } catch (e) {
       setState(() => _error = AppLocalizations.of(context)!
           .signMessageModalContentFailedToSignMessage(e.toString()));
@@ -422,6 +447,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                             if (!_isLoading) {
                                               setState(() =>
                                                   _selectedDevice = device);
+                                              _verifyDeviceConnection();
                                             }
                                           },
                                         ),
@@ -648,11 +674,13 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                         theme.danger, BlendMode.srcIn),
                                   ),
                                   const SizedBox(width: 8),
-                                  Text(
-                                    _error!,
-                                    style: TextStyle(
-                                        color: theme.danger, fontSize: 14),
-                                    textAlign: TextAlign.center,
+                                  Expanded(
+                                    child: Text(
+                                      _error!,
+                                      style: TextStyle(
+                                          color: theme.danger, fontSize: 14),
+                                      textAlign: TextAlign.center,
+                                    ),
                                   ),
                                 ],
                               ),
