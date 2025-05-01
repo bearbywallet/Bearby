@@ -1,0 +1,263 @@
+Project Path: ledger
+
+Source Tree:
+
+```txt
+ledger
+└── ethereum
+    ├── ethereum_ledger_application.dart
+    ├── ethereum_personal_message_operation.dart
+    ├── ethereum_public_key_operation.dart
+    ├── models.dart
+    └── utils.dart
+
+```
+
+`ledger/ethereum/ethereum_ledger_application.dart`:
+
+```dart
+import 'dart:typed_data';
+
+import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
+import 'package:zilpay/ledger/ethereum/ethereum_personal_message_operation.dart';
+import 'package:zilpay/ledger/ethereum/ethereum_public_key_operation.dart';
+import 'package:zilpay/ledger/ethereum/models.dart';
+
+class EthereumLedgerApp {
+  final LedgerConnection ledger;
+  final LedgerTransformer? transformer;
+
+  EthereumLedgerApp(
+    this.ledger, {
+    this.transformer,
+  });
+
+  Future<List<EthLedgerAccount>> getAccounts(List<int> accountIndices) async {
+    final List<EthLedgerAccount> accounts = [];
+
+    for (final index in accountIndices) {
+      final account = await ledger.sendOperation<EthLedgerAccount>(
+        EthereumPublicKeyOperation(accountIndex: index),
+        transformer: transformer,
+      );
+      accounts.add(account);
+    }
+
+    return accounts;
+  }
+
+  @override
+  Future<Uint8List> signPersonalMessage(
+      Uint8List message, int accountIndex) async {
+    final signature = await ledger.sendOperation<Uint8List>(
+      EthereumPersonalMessageOperation(
+          accountIndex: accountIndex, message: message),
+      transformer: transformer,
+    );
+
+    return signature;
+  }
+}
+
+```
+
+`ledger/ethereum/ethereum_personal_message_operation.dart`:
+
+```dart
+import 'dart:typed_data';
+
+import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
+import 'package:zilpay/ledger/ethereum/utils.dart';
+
+class EthereumPersonalMessageOperation extends LedgerRawOperation<Uint8List> {
+  final int accountIndex;
+  final Uint8List message;
+
+  EthereumPersonalMessageOperation(
+      {this.accountIndex = 0, required this.message});
+
+  @override
+  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+    final output = <Uint8List>[];
+    final List<int> paths = splitPath(getWalletDerivationPath(accountIndex));
+    int offset = 0;
+    while (offset != message.length) {
+      final writer = ByteDataWriter();
+      writer.writeUint8(0xe0);
+      writer.writeUint8(0x08);
+
+      int maxChunkSize = offset == 0 ? 150 - 1 - paths.length * 4 - 4 : 150;
+      int chunkSize = offset + maxChunkSize > message.length
+          ? message.length - offset
+          : maxChunkSize;
+      ByteData buffer = ByteData(
+          offset == 0 ? 1 + paths.length * 4 + 4 + chunkSize : chunkSize);
+      if (offset == 0) {
+        buffer.setUint8(0, paths.length);
+        for (int i = 0; i < paths.length; i++) {
+          buffer.setUint32(1 + 4 * i, paths[i], Endian.big);
+        }
+        buffer.setUint32(1 + 4 * paths.length, message.length, Endian.big);
+        buffer.buffer.asUint8List().setAll(1 + 4 * paths.length + 4,
+            message.sublist(offset, offset + chunkSize));
+        writer.writeUint8(0x00);
+      } else {
+        buffer.buffer
+            .asUint8List()
+            .setAll(0, message.sublist(offset, offset + chunkSize));
+        writer.writeUint8(0x80);
+      }
+
+      writer.writeUint8(0x00);
+
+      final List<int> bufferBytes = buffer.buffer.asUint8List();
+      writer.writeUint8(buffer.lengthInBytes);
+      writer.write(bufferBytes);
+
+      offset += chunkSize;
+
+      output.add(writer.toBytes());
+    }
+
+    return output;
+  }
+
+  @override
+  Future<Uint8List> read(ByteDataReader reader) async {
+    final bytes = reader.read(reader.remainingLength);
+
+    return bytes;
+  }
+}
+
+```
+
+`ledger/ethereum/ethereum_public_key_operation.dart`:
+
+```dart
+import 'dart:convert';
+import 'dart:typed_data';
+
+import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
+import 'package:zilpay/ledger/ethereum/models.dart';
+import 'package:zilpay/ledger/ethereum/utils.dart';
+
+class EthereumPublicKeyOperation extends LedgerRawOperation<EthLedgerAccount> {
+  final int accountIndex;
+
+  EthereumPublicKeyOperation({
+    this.accountIndex = 0,
+  });
+
+  @override
+  Future<List<Uint8List>> write(ByteDataWriter writer) async {
+    writer.writeUint8(0xe0); // CLA (class of instruction)
+    writer.writeUint8(0x02); // INS (instruction code) - GET_PUBLIC_KEY
+    writer.writeUint8(0x00); // P1 parameter
+    writer.writeUint8(0x00); // P2 parameter
+
+    final List<int> paths = splitPath(getWalletDerivationPath(accountIndex));
+    final int bufferSize = 1 + paths.length * 4;
+    final ByteData buffer = ByteData(bufferSize)..setUint8(0, paths.length);
+    for (int i = 0; i < paths.length; i++) {
+      buffer.setUint32(1 + 4 * i, paths[i], Endian.big);
+    }
+
+    final List<int> bufferBytes = buffer.buffer.asUint8List();
+    writer.writeUint8(buffer.lengthInBytes); // CDATA length
+    writer.write(bufferBytes); // CDATA
+
+    return [writer.toBytes()];
+  }
+
+  @override
+  Future<EthLedgerAccount> read(ByteDataReader reader) async {
+    final bytes = reader.read(reader.remainingLength);
+    int publicKeyLength = bytes[0];
+    int addressLength = bytes[1 + publicKeyLength];
+    final publicKey =
+        bytesToHex(bytes.sublist(1, 1 + publicKeyLength), include0x: true);
+    final address =
+        '0x${utf8.decode(bytes.sublist(1 + publicKeyLength + 1, 1 + publicKeyLength + 1 + addressLength))}';
+    return EthLedgerAccount(
+      publicKey: publicKey,
+      address: address,
+      index: accountIndex,
+    );
+  }
+}
+
+```
+
+`ledger/ethereum/models.dart`:
+
+```dart
+class EthLedgerAccount {
+  final String publicKey;
+  final String address;
+  final int index;
+
+  EthLedgerAccount({
+    required this.publicKey,
+    required this.address,
+    required this.index,
+  });
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is EthLedgerAccount &&
+          runtimeType == other.runtimeType &&
+          publicKey == other.publicKey &&
+          index == other.index);
+
+  @override
+  int get hashCode => Object.hash(publicKey, index);
+}
+
+```
+
+`ledger/ethereum/utils.dart`:
+
+```dart
+/// Returns the BIP32 derivation path for the given account index
+/// Path format: m/44'/60'/account'/0/0
+String getWalletDerivationPath(int accountIndex) =>
+    "44'/60'/$accountIndex'/0/0";
+
+/// Splits a BIP32 path into integer components
+/// Handles hardened paths (ending with ')
+List<int> splitPath(String path) {
+  List<int> result = [];
+  List<String> components = path.split("/");
+
+  for (var element in components) {
+    if (element.isEmpty) continue; // Skip empty parts (first slash)
+
+    int number = int.tryParse(element.replaceAll("'", "")) ?? 0;
+
+    if (element.length > 1 && element[element.length - 1] == "'") {
+      // For hardened paths, add 0x80000000
+      number += 0x80000000;
+    }
+
+    result.add(number);
+  }
+
+  return result;
+}
+
+String bytesToHex(List<int> bytes, {bool include0x = false}) {
+  final buffer = StringBuffer();
+  if (include0x) {
+    buffer.write('0x');
+  }
+
+  for (final byte in bytes) {
+    buffer.write(byte.toRadixString(16).padLeft(2, '0'));
+  }
+
+  return buffer.toString();
+}
+
+```

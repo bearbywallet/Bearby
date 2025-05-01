@@ -7,6 +7,7 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
@@ -258,9 +259,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         await appState.syncData();
         appState.setSelectedWallet(currentWalletIndex);
         await appState.startTrackHistoryWorker();
-
         _createBtnController.success();
-
         setState(() {
           _loading = false;
         });
@@ -323,7 +322,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   Widget _buildDeviceInfoCard(AppTheme theme, AppLocalizations l10n) {
     if (_network == null || _ledgers.isEmpty) return const SizedBox();
     return Container(
-      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: BorderRadius.circular(12),
@@ -335,130 +333,85 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildLedgerInfoRow(theme),
-          const Divider(height: 24),
+          LedgerCard(
+            device: _ledgers.first,
+            isConnected: true,
+            isConnecting: false,
+            onTap: () {},
+          ),
           _buildNetworkInfoRow(theme, l10n),
         ],
       ),
     );
   }
 
-  Widget _buildLedgerInfoRow(AppTheme theme) {
-    final mainLedger = _ledgers.first;
-    return Row(
-      children: [
-        SvgPicture.asset(
-          mainLedger.connectionType == ConnectionType.ble
-              ? 'assets/icons/ble.svg'
-              : 'assets/icons/usb.svg',
-          width: 24,
-          height: 24,
-          colorFilter: ColorFilter.mode(
-            theme.primaryPurple,
-            BlendMode.srcIn,
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                mainLedger.name,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              const SizedBox(height: 2),
-              Text(
-                'Connection: ${mainLedger.connectionType.name.toUpperCase()}',
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 12,
-                ),
-              ),
-            ],
-          ),
-        ),
-        SvgPicture.asset(
-          'assets/icons/check.svg',
-          width: 18,
-          height: 18,
-          colorFilter: ColorFilter.mode(
-            theme.success,
-            BlendMode.srcIn,
-          ),
-        ),
-      ],
-    );
-  }
-
   Widget _buildNetworkInfoRow(AppTheme theme, AppLocalizations l10n) {
     final isTestnet = _network!.testnet ?? false;
-    return Row(
-      children: [
-        SizedBox(
-          width: 32,
-          height: 32,
-          child: AsyncImage(
-            url: viewChain(network: _network!, theme: theme.value),
-            fit: BoxFit.contain,
-            errorWidget: const Icon(Icons.error),
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          SizedBox(
+            width: 32,
+            height: 32,
+            child: AsyncImage(
+              url: viewChain(network: _network!, theme: theme.value),
+              fit: BoxFit.contain,
+              errorWidget: const Icon(Icons.error),
+            ),
           ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  Expanded(
-                    child: Text(
-                      _network!.name,
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        _network!.name,
+                        style: TextStyle(
+                          color: theme.textPrimary,
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
                       ),
                     ),
-                  ),
-                  Container(
-                    padding:
-                        const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: isTestnet
-                          ? theme.warning.withValues(alpha: 0.2)
-                          : theme.success.withValues(alpha: 0.2),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    child: Text(
-                      isTestnet
-                          ? l10n.setupNetworkSettingsPageTestnetLabel
-                          : l10n.setupNetworkSettingsPageMainnetLabel,
-                      style: TextStyle(
-                        color: isTestnet ? theme.warning : theme.success,
-                        fontSize: 10,
-                        fontWeight: FontWeight.w500,
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 8, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: isTestnet
+                            ? theme.warning.withValues(alpha: 0.2)
+                            : theme.success.withValues(alpha: 0.2),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        isTestnet
+                            ? l10n.setupNetworkSettingsPageTestnetLabel
+                            : l10n.setupNetworkSettingsPageMainnetLabel,
+                        style: TextStyle(
+                          color: isTestnet ? theme.warning : theme.success,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 2),
-              Text(
-                '${l10n.setupNetworkSettingsPageTokenLabel} ${_network!.chain} (Chain ID: ${_network!.chainId})',
-                style: TextStyle(
-                  color: theme.textSecondary,
-                  fontSize: 12,
+                  ],
                 ),
-              ),
-            ],
+                const SizedBox(height: 2),
+                Text(
+                  '${l10n.setupNetworkSettingsPageTokenLabel} ${_network!.chain} (Chain ID: ${_network!.chainId})',
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 

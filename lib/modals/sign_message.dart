@@ -1,9 +1,14 @@
+import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
+import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
 import 'package:zilpay/mixins/eip712.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -93,7 +98,51 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         reason: AppLocalizations.of(context)!.signMessageModalContentAuthReason,
       );
 
-  Future<void> _signMessage(AppState appState) async {
+  Future<bool> _requestBlePermission(AvailabilityState status) async {
+    return status == AvailabilityState.poweredOn;
+  }
+
+  Future<List<LedgerDevice>> getConnectedBleLedgers() async {
+    LedgerInterface ledgerBle =
+        LedgerInterface.ble(onPermissionRequest: _requestBlePermission);
+
+    try {
+      List<LedgerDevice> connectedDevices = await ledgerBle.devices;
+      print(
+          'Подключенные BLE Ledger устройства: ${connectedDevices.map((d) => d.name).toList()}');
+
+      return connectedDevices;
+    } catch (e) {
+      print('Ошибка при получении BLE устройств: $e');
+      return [];
+    }
+  }
+
+  Future<void> _signMessageLedger(AppState appState) async {
+    if (appState.wallet == null) {
+      throw new Error();
+    }
+
+    final accountIndex = appState.wallet?.selectedAccount.toInt() ?? 0;
+    final String? deviceId = appState.wallet?.walletType.split('.').last;
+
+    if (deviceId == null) {
+      throw new Error();
+    }
+
+    final devices = await getConnectedBleLedgers();
+    print(devices);
+
+    // final ethLedgerApp = EthereumLedgerApp(ledgerConnection!);
+    // final messageBytes = Uint8List.fromList(utf8.encode(widget.message!));
+    // final signatureBytes = await ethLedgerApp.signPersonalMessage(
+    //   messageBytes,
+    //   accountIndex,
+    // );
+    // print(signatureBytes);
+  }
+
+  Future<void> _signMessageNative(AppState appState) async {
     try {
       final device = DeviceInfoService();
       final identifiers = await device.getDeviceIdentifiers();
@@ -144,7 +193,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   void _handleSignMessage(AppState appState) async {
     setState(() => _loading = true);
-    await _signMessage(appState);
+    await _signMessageLedger(appState);
+    // await _signMessageNative(appState);
     if (mounted) setState(() => _loading = false);
   }
 
@@ -430,7 +480,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                               ),
                             ),
                           ),
-                        if (appState.wallet!.authType == AuthMethod.none.name)
+                        if (appState.wallet!.authType == AuthMethod.none.name &&
+                            !appState.wallet!.walletType
+                                .contains(WalletType.ledger.name))
                           Padding(
                             padding: const EdgeInsets.only(top: 16),
                             child: SmartInput(

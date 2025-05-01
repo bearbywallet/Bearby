@@ -4,65 +4,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:async/async.dart';
-
-class PressableCard extends StatefulWidget {
-  final Widget child;
-  final VoidCallback? onTap;
-  final bool enabled;
-  final Duration duration;
-  final double pressedScale;
-  const PressableCard({
-    super.key,
-    required this.child,
-    this.onTap,
-    this.enabled = true,
-    this.duration = const Duration(milliseconds: 100),
-    this.pressedScale = 0.96,
-  });
-  @override
-  State<PressableCard> createState() => _PressableCardState();
-}
-
-class _PressableCardState extends State<PressableCard> {
-  bool _isPressed = false;
-  void _setPressed(bool pressed) {
-    if (!widget.enabled) return;
-    setState(() {
-      _isPressed = pressed;
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final scale = widget.enabled && _isPressed ? widget.pressedScale : 1.0;
-    return GestureDetector(
-      onTapDown: (_) => _setPressed(true),
-      onTapUp: (_) {
-        _setPressed(false);
-        if (widget.enabled && widget.onTap != null) {
-          Future.delayed(const Duration(milliseconds: 50), () {
-            if (mounted && widget.onTap != null) {
-              widget.onTap!();
-            }
-          });
-        }
-      },
-      onTapCancel: () => _setPressed(false),
-      child: AnimatedScale(
-        scale: scale,
-        duration: widget.duration,
-        curve: Curves.easeOut,
-        child: widget.child,
-      ),
-    );
-  }
-}
 
 class LedgerConnectPage extends StatefulWidget {
   const LedgerConnectPage({super.key});
@@ -149,13 +97,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         _statusText = 'Bluetooth permission denied. Please enable in settings.';
       });
 
-      // For iOS, we need to show a more specific dialog
       if (Platform.isIOS) {
         _showErrorDialog('Permission Required',
             'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.',
             showSettingsButton: true);
       } else {
-        // For Android, request permissions
         final statuses = await [
           Permission.bluetoothScan,
           Permission.bluetoothConnect,
@@ -182,13 +128,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       return false;
     }
 
-    // For iOS, we don't need to explicitly request permissions through the permission_handler
-    // as the system dialog will be shown automatically when we start scanning
     if (Platform.isIOS) {
       return true;
     }
 
-    // For Android, we proceed with permissions as before
     final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,
@@ -678,95 +621,17 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                               final bool isCurrentlyConnecting =
                                   _isConnecting &&
                                       _connectingDevice?.id == device.id;
-                              final bool isDisabled =
-                                  isCurrentlyConnected || _isConnecting;
-                              final cardChild = Card(
-                                elevation: 0,
-                                margin: EdgeInsets.zero,
-                                clipBehavior: Clip.antiAlias,
-                                shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12.0)),
-                                color: theme.cardBackground,
-                                child: ListTile(
-                                  contentPadding: const EdgeInsets.symmetric(
-                                      vertical: 8, horizontal: 16),
-                                  leading: SvgPicture.asset(
-                                    device.connectionType == ConnectionType.ble
-                                        ? 'assets/icons/ble.svg'
-                                        : 'assets/icons/usb.svg',
-                                    width: 24,
-                                    height: 24,
-                                    colorFilter: ColorFilter.mode(
-                                      isCurrentlyConnected
-                                          ? theme.success
-                                          : theme.primaryPurple,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  title: Text(
-                                    device.name.isEmpty
-                                        ? '(Unknown Device)'
-                                        : device.name,
-                                    style: TextStyle(
-                                      fontWeight: isCurrentlyConnected
-                                          ? FontWeight.bold
-                                          : FontWeight.normal,
-                                      color: isDisabled &&
-                                              !isCurrentlyConnecting &&
-                                              !isCurrentlyConnected
-                                          ? theme.textSecondary.withAlpha(180)
-                                          : theme.textPrimary,
-                                      fontSize: 16,
-                                    ),
-                                    maxLines: 1,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  subtitle: Text(
-                                    'ID: ${device.id.length > 12 ? '${device.id.substring(0, 6)}...${device.id.substring(device.id.length - 6)}' : device.id}\nType: ${device.connectionType.name.toUpperCase()}',
-                                    style: TextStyle(
-                                        color: theme.textSecondary,
-                                        fontSize: 12),
-                                    maxLines: 2,
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                  trailing: isCurrentlyConnecting
-                                      ? SizedBox(
-                                          width: 24,
-                                          height: 24,
-                                          child: CircularProgressIndicator(
-                                              strokeWidth: 2,
-                                              valueColor:
-                                                  AlwaysStoppedAnimation<Color>(
-                                                      theme.primaryPurple)),
-                                        )
-                                      : isCurrentlyConnected
-                                          ? SvgPicture.asset(
-                                              'assets/icons/check.svg',
-                                              width: 26,
-                                              height: 26,
-                                              colorFilter: ColorFilter.mode(
-                                                  theme.success,
-                                                  BlendMode.srcIn),
-                                            )
-                                          : SvgPicture.asset(
-                                              'assets/icons/chevron_right.svg',
-                                              width: 24,
-                                              height: 24,
-                                              colorFilter: ColorFilter.mode(
-                                                  theme.textSecondary,
-                                                  BlendMode.srcIn),
-                                            ),
+                              return Padding(
+                                padding: const EdgeInsets.symmetric(
+                                    vertical: 6, horizontal: 4),
+                                child: LedgerCard(
+                                  key: ValueKey(device.id),
+                                  device: device,
+                                  isConnected: isCurrentlyConnected,
+                                  isConnecting: isCurrentlyConnecting,
+                                  onTap: () => _connectToDevice(device),
                                 ),
                               );
-                              return Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 6, horizontal: 4),
-                                  child: PressableCard(
-                                    key: ValueKey(device.id),
-                                    enabled: !isDisabled,
-                                    onTap: () => _connectToDevice(device),
-                                    child: cardChild,
-                                  ));
                             },
                           ),
                   ),
