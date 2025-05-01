@@ -60,6 +60,10 @@ class EthereumPersonalMessageOperation extends LedgerRawOperation<Uint8List> {
   Future<Uint8List> read(ByteDataReader reader) async {
     final bytes = reader.read(reader.remainingLength);
 
+    if (bytes.length == 2 && bytes.first == 105 && bytes.last == 103) {
+      throw "Rejected";
+    }
+
     return bytes;
   }
 }

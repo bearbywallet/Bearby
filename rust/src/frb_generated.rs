@@ -3602,6 +3602,7 @@ impl SseDecode for crate::models::account::AccountInfo {
         let mut var_addr = <String>::sse_decode(deserializer);
         let mut var_addrType = <u8>::sse_decode(deserializer);
         let mut var_name = <String>::sse_decode(deserializer);
+        let mut var_pubKey = <String>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
         let mut var_chainId = <u64>::sse_decode(deserializer);
         let mut var_slip44 = <u32>::sse_decode(deserializer);
@@ -3610,6 +3611,7 @@ impl SseDecode for crate::models::account::AccountInfo {
             addr: var_addr,
             addr_type: var_addrType,
             name: var_name,
+            pub_key: var_pubKey,
             chain_hash: var_chainHash,
             chain_id: var_chainId,
             slip_44: var_slip44,
@@ -5086,6 +5088,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::account::AccountInfo {
             self.addr.into_into_dart().into_dart(),
             self.addr_type.into_into_dart().into_dart(),
             self.name.into_into_dart().into_dart(),
+            self.pub_key.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
             self.chain_id.into_into_dart().into_dart(),
             self.slip_44.into_into_dart().into_dart(),
@@ -5980,6 +5983,7 @@ impl SseEncode for crate::models::account::AccountInfo {
         <String>::sse_encode(self.addr, serializer);
         <u8>::sse_encode(self.addr_type, serializer);
         <String>::sse_encode(self.name, serializer);
+        <String>::sse_encode(self.pub_key, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
         <u64>::sse_encode(self.chain_id, serializer);
         <u32>::sse_encode(self.slip_44, serializer);

@@ -1402,13 +1402,14 @@
   "@tokenSelectModalContentSearchHint": {
     "description": "Hint text for the search input field in the TokenSelectModalContent modal."
   },
+
   "signMessageModalContentAuthReason": "Please authenticate to sign the message",
   "@signMessageModalContentAuthReason": {
     "description": "Reason text for authentication prompt in the SignMessageModalContent modal."
   },
-  "signMessageModalContentFailedToSign": "Failed to sign:",
+  "signMessageModalContentFailedToSign": "Failed to sign: {error}",
   "@signMessageModalContentFailedToSign": {
-    "description": "Prefix for error message when signing fails in the SignMessageModalContent modal."
+    "description": "Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
   },
   "signMessageModalContentTitle": "Sign Message",
   "@signMessageModalContentTitle": {
@@ -1450,6 +1451,35 @@
   "@signMessageModalContentSign": {
     "description": "Text displayed on the swipe button to confirm signing in the SignMessageModalContent modal."
   },
+  "signMessageModalContentScanning": "Scanning Ledger devices...",
+  "@signMessageModalContentScanning": {
+    "description": "Text displayed below the progress indicator when scanning for Ledger devices in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentNoLedgerDevices": "No Ledger devices found",
+  "@signMessageModalContentNoLedgerDevices": {
+    "description": "Error message displayed when no Ledger devices are found after scanning in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentWalletNotSelected": "Wallet not selected",
+  "@signMessageModalContentWalletNotSelected": {
+    "description": "Error message displayed when no wallet is selected in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentLedgerNotSelected": "Ledger device not selected",
+  "@signMessageModalContentLedgerNotSelected": {
+    "description": "Error message displayed when no Ledger device is selected in the SignMessageModalContent modal."
+  },
+  "signMessageModalContentFailedToScanLedger": "Failed to scan Ledger devices: {error}",
+  "@signMessageModalContentFailedToScanLedger": {
+    "description": "Error message format when scanning for Ledger devices fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
+  },
+  "signMessageModalContentFailedToSignMessage": "Failed to sign message: {error}",
+  "@signMessageModalContentFailedToSignMessage": {
+    "description": "Error message format when signing a message with a Ledger device fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
+  },
+  "signMessageModalContentBluetoothOff": "Bluetooth is turned off. Please enable it to scan for Ledger devices.",
+  "@signMessageModalContentBluetoothOff": {
+    "description": "Error message displayed when Bluetooth is not enabled during Ledger device scanning in the SignMessageModalContent modal."
+  },
+
   "deleteWalletModalTitle": "Delete Wallet",
   "@deleteWalletModalTitle": {
     "description": "Title text for the DeleteWalletModal modal."

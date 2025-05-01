@@ -975,16 +975,18 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => 'Поиск';
 
   @override
-  String get signMessageModalContentAuthReason => 'Пожалуйста, пройдите аутентификацию для подписи сообщения';
+  String get signMessageModalContentAuthReason => 'Пожалуйста, авторизуйтесь для подписи сообщения';
 
   @override
-  String get signMessageModalContentFailedToSign => 'Не удалось подписать:';
+  String signMessageModalContentFailedToSign(Object error) {
+    return 'Не удалось подписать: $error';
+  }
 
   @override
   String get signMessageModalContentTitle => 'Подписать сообщение';
 
   @override
-  String get signMessageModalContentDescription => 'Просмотрите и подпишите следующее сообщение своим кошельком.';
+  String get signMessageModalContentDescription => 'Просмотрите и подпишите следующее сообщение с помощью вашего кошелька.';
 
   @override
   String get signMessageModalContentDomain => 'Домен:';
@@ -1009,6 +1011,31 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get signMessageModalContentSign => 'Подписать сообщение';
+
+  @override
+  String get signMessageModalContentScanning => 'Сканирование устройств Ledger...';
+
+  @override
+  String get signMessageModalContentNoLedgerDevices => 'Устройства Ledger не найдены';
+
+  @override
+  String get signMessageModalContentWalletNotSelected => 'Кошелёк не выбран';
+
+  @override
+  String get signMessageModalContentLedgerNotSelected => 'Устройство Ledger не выбрано';
+
+  @override
+  String signMessageModalContentFailedToScanLedger(Object error) {
+    return 'Не удалось сканировать устройства Ledger: $error';
+  }
+
+  @override
+  String signMessageModalContentFailedToSignMessage(Object error) {
+    return 'Не удалось подписать сообщение: $error';
+  }
+
+  @override
+  String get signMessageModalContentBluetoothOff => 'Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.';
 
   @override
   String get deleteWalletModalTitle => 'Удалить кошелек';

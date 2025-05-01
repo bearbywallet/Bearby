@@ -2001,11 +2001,11 @@ abstract class AppLocalizations {
   /// **'Please authenticate to sign the message'**
   String get signMessageModalContentAuthReason;
 
-  /// Prefix for error message when signing fails in the SignMessageModalContent modal.
+  /// Error message format when signing fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
   ///
   /// In en, this message translates to:
-  /// **'Failed to sign:'**
-  String get signMessageModalContentFailedToSign;
+  /// **'Failed to sign: {error}'**
+  String signMessageModalContentFailedToSign(Object error);
 
   /// Title text for the SignMessageModalContent modal.
   ///
@@ -2066,6 +2066,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Sign Message'**
   String get signMessageModalContentSign;
+
+  /// Text displayed below the progress indicator when scanning for Ledger devices in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning Ledger devices...'**
+  String get signMessageModalContentScanning;
+
+  /// Error message displayed when no Ledger devices are found after scanning in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'No Ledger devices found'**
+  String get signMessageModalContentNoLedgerDevices;
+
+  /// Error message displayed when no wallet is selected in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet not selected'**
+  String get signMessageModalContentWalletNotSelected;
+
+  /// Error message displayed when no Ledger device is selected in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger device not selected'**
+  String get signMessageModalContentLedgerNotSelected;
+
+  /// Error message format when scanning for Ledger devices fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to scan Ledger devices: {error}'**
+  String signMessageModalContentFailedToScanLedger(Object error);
+
+  /// Error message format when signing a message with a Ledger device fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to sign message: {error}'**
+  String signMessageModalContentFailedToSignMessage(Object error);
+
+  /// Error message displayed when Bluetooth is not enabled during Ledger device scanning in the SignMessageModalContent modal.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is turned off. Please enable it to scan for Ledger devices.'**
+  String get signMessageModalContentBluetoothOff;
 
   /// Title text for the DeleteWalletModal modal.
   ///

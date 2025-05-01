@@ -360,10 +360,10 @@
 
   "tokenSelectModalContentSearchHint": "Поиск",
 
-  "signMessageModalContentAuthReason": "Пожалуйста, пройдите аутентификацию для подписи сообщения",
-  "signMessageModalContentFailedToSign": "Не удалось подписать:",
+  "signMessageModalContentAuthReason": "Пожалуйста, авторизуйтесь для подписи сообщения",
+  "signMessageModalContentFailedToSign": "Не удалось подписать: {error}",
   "signMessageModalContentTitle": "Подписать сообщение",
-  "signMessageModalContentDescription": "Просмотрите и подпишите следующее сообщение своим кошельком.",
+  "signMessageModalContentDescription": "Просмотрите и подпишите следующее сообщение с помощью вашего кошелька.",
   "signMessageModalContentDomain": "Домен:",
   "signMessageModalContentChainId": "ID цепи:",
   "signMessageModalContentContract": "Контракт:",
@@ -372,6 +372,13 @@
   "signMessageModalContentPasswordHint": "Пароль",
   "signMessageModalContentProcessing": "Обработка...",
   "signMessageModalContentSign": "Подписать сообщение",
+  "signMessageModalContentScanning": "Сканирование устройств Ledger...",
+  "signMessageModalContentNoLedgerDevices": "Устройства Ledger не найдены",
+  "signMessageModalContentWalletNotSelected": "Кошелёк не выбран",
+  "signMessageModalContentLedgerNotSelected": "Устройство Ledger не выбрано",
+  "signMessageModalContentFailedToScanLedger": "Не удалось сканировать устройства Ledger: {error}",
+  "signMessageModalContentFailedToSignMessage": "Не удалось подписать сообщение: {error}",
+  "signMessageModalContentBluetoothOff": "Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.",
 
   "deleteWalletModalTitle": "Удалить кошелек",
   "deleteWalletModalWarning": "Внимание: Это действие нельзя отменить. Ваш кошелек можно восстановить только с помощью секретной фразы. Если у вас нет к ней доступа, вы навсегда потеряете все средства, связанные с этим аккаунтом.",

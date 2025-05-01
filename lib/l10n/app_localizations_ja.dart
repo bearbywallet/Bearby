@@ -978,25 +978,27 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signMessageModalContentAuthReason => 'メッセージに署名するために認証してください';
 
   @override
-  String get signMessageModalContentFailedToSign => '署名に失敗:';
+  String signMessageModalContentFailedToSign(Object error) {
+    return '署名に失敗しました: $error';
+  }
 
   @override
   String get signMessageModalContentTitle => 'メッセージに署名';
 
   @override
-  String get signMessageModalContentDescription => 'ウォレットで以下のメッセージを確認して署名してください。';
+  String get signMessageModalContentDescription => 'ウォレットを使用して以下のメッセージを確認し、署名してください。';
 
   @override
-  String get signMessageModalContentDomain => 'ドメイン:';
+  String get signMessageModalContentDomain => 'ドメイン：';
 
   @override
-  String get signMessageModalContentChainId => 'チェーンID:';
+  String get signMessageModalContentChainId => 'チェーンID：';
 
   @override
-  String get signMessageModalContentContract => 'コントラクト:';
+  String get signMessageModalContentContract => 'コントラクト：';
 
   @override
-  String get signMessageModalContentType => 'タイプ:';
+  String get signMessageModalContentType => 'タイプ：';
 
   @override
   String get signMessageModalContentNoData => 'データなし';
@@ -1009,6 +1011,31 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get signMessageModalContentSign => 'メッセージに署名';
+
+  @override
+  String get signMessageModalContentScanning => 'Ledgerデバイスをスキャン中...';
+
+  @override
+  String get signMessageModalContentNoLedgerDevices => 'Ledgerデバイスが見つかりませんでした';
+
+  @override
+  String get signMessageModalContentWalletNotSelected => 'ウォレットが選択されていません';
+
+  @override
+  String get signMessageModalContentLedgerNotSelected => 'Ledgerデバイスが選択されていません';
+
+  @override
+  String signMessageModalContentFailedToScanLedger(Object error) {
+    return 'Ledgerデバイスのスキャンに失敗しました: $error';
+  }
+
+  @override
+  String signMessageModalContentFailedToSignMessage(Object error) {
+    return 'メッセージの署名に失敗しました: $error';
+  }
+
+  @override
+  String get signMessageModalContentBluetoothOff => 'Bluetoothがオフになっています。Ledgerデバイスのスキャンには有効にしてください。';
 
   @override
   String get deleteWalletModalTitle => 'ウォレットを削除';

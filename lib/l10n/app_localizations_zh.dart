@@ -975,22 +975,24 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tokenSelectModalContentSearchHint => '搜索';
 
   @override
-  String get signMessageModalContentAuthReason => '请认证以签署消息';
+  String get signMessageModalContentAuthReason => '请进行身份验证以签署消息';
 
   @override
-  String get signMessageModalContentFailedToSign => '签名失败：';
+  String signMessageModalContentFailedToSign(Object error) {
+    return '签名失败：$error';
+  }
 
   @override
   String get signMessageModalContentTitle => '签署消息';
 
   @override
-  String get signMessageModalContentDescription => '查看并使用您的钱包签署以下消息。';
+  String get signMessageModalContentDescription => '使用您的钱包审阅并签署以下消息。';
 
   @override
   String get signMessageModalContentDomain => '域名：';
 
   @override
-  String get signMessageModalContentChainId => '链 ID：';
+  String get signMessageModalContentChainId => '链ID：';
 
   @override
   String get signMessageModalContentContract => '合约：';
@@ -1009,6 +1011,31 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get signMessageModalContentSign => '签署消息';
+
+  @override
+  String get signMessageModalContentScanning => '正在扫描Ledger设备...';
+
+  @override
+  String get signMessageModalContentNoLedgerDevices => '未找到Ledger设备';
+
+  @override
+  String get signMessageModalContentWalletNotSelected => '未选择钱包';
+
+  @override
+  String get signMessageModalContentLedgerNotSelected => '未选择Ledger设备';
+
+  @override
+  String signMessageModalContentFailedToScanLedger(Object error) {
+    return '扫描Ledger设备失败：$error';
+  }
+
+  @override
+  String signMessageModalContentFailedToSignMessage(Object error) {
+    return '消息签名失败：$error';
+  }
+
+  @override
+  String get signMessageModalContentBluetoothOff => '蓝牙已关闭。请启用蓝牙以扫描Ledger设备。';
 
   @override
   String get deleteWalletModalTitle => '删除钱包';

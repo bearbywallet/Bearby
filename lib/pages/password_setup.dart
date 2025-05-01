@@ -142,26 +142,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     return "$networkName #$walletNumber ($type)";
   }
 
-  void _removeOldStorage() async {
-    if (_needRemoveOldStorage) {
-      if (Platform.isAndroid) {
-        Directory path = Directory("/data/data/com.zilpaymobile/databases");
-
-        if (path.existsSync()) {
-          path.deleteSync();
-        }
-      } else if (Platform.isIOS) {
-        final appDocDir = await getApplicationSupportDirectory();
-        Directory path =
-            Directory("${appDocDir.path}/org.reactjs.native.zilpayMobile");
-
-        if (path.existsSync()) {
-          path.deleteSync();
-        }
-      }
-    }
-  }
-
   bool _validatePasswords() {
     if (_walletNameController.text.trim().isEmpty) {
       setState(() {
@@ -326,10 +306,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       }
 
       await _appState.startTrackHistoryWorker();
-
-      try {
-        _removeOldStorage();
-      } catch (_) {}
 
       _appState.setSelectedWallet(_appState.wallets.length - 1);
       _btnController.success();

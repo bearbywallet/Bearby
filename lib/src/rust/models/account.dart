@@ -10,6 +10,7 @@ class AccountInfo {
   final String addr;
   final int addrType;
   final String name;
+  final String pubKey;
   final BigInt chainHash;
   final BigInt chainId;
   final int slip44;
@@ -19,6 +20,7 @@ class AccountInfo {
     required this.addr,
     required this.addrType,
     required this.name,
+    required this.pubKey,
     required this.chainHash,
     required this.chainId,
     required this.slip44,
@@ -30,6 +32,7 @@ class AccountInfo {
       addr.hashCode ^
       addrType.hashCode ^
       name.hashCode ^
+      pubKey.hashCode ^
       chainHash.hashCode ^
       chainId.hashCode ^
       slip44.hashCode ^
@@ -43,6 +46,7 @@ class AccountInfo {
           addr == other.addr &&
           addrType == other.addrType &&
           name == other.name &&
+          pubKey == other.pubKey &&
           chainHash == other.chainHash &&
           chainId == other.chainId &&
           slip44 == other.slip44 &&

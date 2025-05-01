@@ -978,7 +978,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signMessageModalContentAuthReason => 'Please authenticate to sign the message';
 
   @override
-  String get signMessageModalContentFailedToSign => 'Failed to sign:';
+  String signMessageModalContentFailedToSign(Object error) {
+    return 'Failed to sign: $error';
+  }
 
   @override
   String get signMessageModalContentTitle => 'Sign Message';
@@ -1009,6 +1011,31 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signMessageModalContentSign => 'Sign Message';
+
+  @override
+  String get signMessageModalContentScanning => 'Scanning Ledger devices...';
+
+  @override
+  String get signMessageModalContentNoLedgerDevices => 'No Ledger devices found';
+
+  @override
+  String get signMessageModalContentWalletNotSelected => 'Wallet not selected';
+
+  @override
+  String get signMessageModalContentLedgerNotSelected => 'Ledger device not selected';
+
+  @override
+  String signMessageModalContentFailedToScanLedger(Object error) {
+    return 'Failed to scan Ledger devices: $error';
+  }
+
+  @override
+  String signMessageModalContentFailedToSignMessage(Object error) {
+    return 'Failed to sign message: $error';
+  }
+
+  @override
+  String get signMessageModalContentBluetoothOff => 'Bluetooth is turned off. Please enable it to scan for Ledger devices.';
 
   @override
   String get deleteWalletModalTitle => 'Delete Wallet';
