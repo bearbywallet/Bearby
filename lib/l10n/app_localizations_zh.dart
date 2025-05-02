@@ -1508,9 +1508,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addLedgerAccountPageAppBarTitle => '添加Ledger账户';
 
   @override
-  String get addLedgerAccountPageWalletNameHint => '钱包名称';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => '获取账户';
 
   @override

@@ -579,7 +579,6 @@
   "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。",
 
   "addLedgerAccountPageAppBarTitle": "Ledgerアカウントを追加",
-  "addLedgerAccountPageWalletNameHint": "ウォレット名",
   "addLedgerAccountPageGetAccountsButton": "アカウントを取得",
   "addLedgerAccountPageCreateButton": "作成",
   "addLedgerAccountPageAddButton": "追加",

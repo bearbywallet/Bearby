@@ -2118,10 +2118,6 @@
   "@addLedgerAccountPageAppBarTitle": {
     "description": "Title for the app bar in the AddLedgerAccountPage component"
   },
-  "addLedgerAccountPageWalletNameHint": "Wallet Name",
-  "@addLedgerAccountPageWalletNameHint": {
-    "description": "Label for the wallet name input field in the AddLedgerAccountPage component"
-  },
   "addLedgerAccountPageGetAccountsButton": "Get Accounts",
   "@addLedgerAccountPageGetAccountsButton": {
     "description": "Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component"

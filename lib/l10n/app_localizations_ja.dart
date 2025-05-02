@@ -1508,9 +1508,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addLedgerAccountPageAppBarTitle => 'Ledgerアカウントを追加';
 
   @override
-  String get addLedgerAccountPageWalletNameHint => 'ウォレット名';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'アカウントを取得';
 
   @override

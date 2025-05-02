@@ -559,7 +559,6 @@
   "editGasDialogInvalidGasValues": "燃料值无效。请检查您的输入。",
 
   "addLedgerAccountPageAppBarTitle": "添加Ledger账户",
-  "addLedgerAccountPageWalletNameHint": "钱包名称",
   "addLedgerAccountPageGetAccountsButton": "获取账户",
   "addLedgerAccountPageCreateButton": "创建",
   "addLedgerAccountPageAddButton": "添加",

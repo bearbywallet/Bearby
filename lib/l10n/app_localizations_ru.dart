@@ -1508,9 +1508,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addLedgerAccountPageAppBarTitle => 'Добавить аккаунт Ledger';
 
   @override
-  String get addLedgerAccountPageWalletNameHint => 'Имя кошелька';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'Получить аккаунты';
 
   @override

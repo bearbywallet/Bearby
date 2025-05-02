@@ -11,7 +11,6 @@ import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/load_button.dart';
-import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -41,7 +40,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   final _btnController = RoundedLoadingButtonController();
   final _createBtnController = RoundedLoadingButtonController();
 
-  int _accountCount = 5;
+  int _accountCount = 1;
   bool _loading = false;
   String _errorMessage = '';
   bool _createWallet = true;
@@ -111,7 +110,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       address: account.addr,
                       publicKey: account.pubKey,
                     ))
-                .toList();
+                .toList()
+              ..sort((a, b) => a.index.compareTo(b.index));
             _selectedAccounts = {for (var account in _accounts) account: true};
             _accountsLoaded = true;
           }
@@ -268,29 +268,33 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final accounts = await ethereumApp
           .getAccounts(List<int>.generate(_accountCount, (i) => i));
 
-      final appState = context.read<AppState>();
-      final existingPubKeys = appState.wallet?.accounts
-              .map((account) => account.pubKey.toLowerCase())
-              .toSet() ??
-          {};
-
-      if (mounted) {
+      if (_createWallet) {
         setState(() {
-          _accounts = accounts;
-          _selectedAccounts = {
-            for (var account in accounts)
-              account: existingPubKeys.contains(account.publicKey.toLowerCase())
-                  ? true
-                  : true
-          };
+          _accounts = accounts..sort((a, b) => a.index.compareTo(b.index));
+          _selectedAccounts = {for (var account in _accounts) account: true};
           _accountsLoaded = true;
-          _loading = false;
         });
-
-        _btnController.success();
-        Future.delayed(const Duration(seconds: 1),
-            () => mounted ? _btnController.reset() : null);
+      } else {
+        final existingPubKeys = {
+          for (var acc in _accounts) acc.publicKey.toLowerCase()
+        };
+        final newAccounts = accounts
+            .where(
+                (acc) => !existingPubKeys.contains(acc.publicKey.toLowerCase()))
+            .toList();
+        setState(() {
+          _accounts.addAll(newAccounts);
+          _accounts.sort((a, b) => a.index.compareTo(b.index));
+          for (var acc in newAccounts) {
+            _selectedAccounts[acc] = true;
+          }
+          _accountsLoaded = true;
+        });
       }
+
+      _btnController.success();
+      Future.delayed(const Duration(seconds: 1),
+          () => mounted ? _btnController.reset() : null);
     } on LedgerException catch (e) {
       _handleLedgerError(e);
     } catch (e) {
@@ -579,11 +583,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   Widget _buildWalletInfoCard(AppTheme theme, AppLocalizations l10n) {
-    final appState = context.read<AppState>();
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -597,32 +596,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!isLedgerWallet) ...[
-            Text(
-              l10n.addLedgerAccountPageWalletNameHint,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-              ),
-            ),
-            const SizedBox(height: 8),
-            SmartInput(
-              controller: _walletNameController,
-              hint: l10n.addLedgerAccountPageWalletNameHint,
-              fontSize: 14,
-              height: 45,
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              focusedBorderColor: theme.primaryPurple,
-              disabled: _loading || !_createWallet,
-              onChanged: (_) {
-                if (_errorMessage.isNotEmpty) {
-                  setState(() => _errorMessage = '');
-                }
-              },
-            ),
-            const SizedBox(height: 16),
-          ],
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -636,6 +609,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                     fontWeight: FontWeight.bold,
                     color: theme.textPrimary,
                   ),
+                  minValue: 1,
                   initialValue: _accountCount,
                   disabled: _loading,
                   onChanged: !_loading

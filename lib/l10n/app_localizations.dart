@@ -3045,12 +3045,6 @@ abstract class AppLocalizations {
   /// **'Add Ledger Account'**
   String get addLedgerAccountPageAppBarTitle;
 
-  /// Label for the wallet name input field in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet Name'**
-  String get addLedgerAccountPageWalletNameHint;
-
   /// Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component
   ///
   /// In en, this message translates to:

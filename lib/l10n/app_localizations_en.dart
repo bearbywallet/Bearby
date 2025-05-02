@@ -1508,9 +1508,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addLedgerAccountPageAppBarTitle => 'Add Ledger Account';
 
   @override
-  String get addLedgerAccountPageWalletNameHint => 'Wallet Name';
-
-  @override
   String get addLedgerAccountPageGetAccountsButton => 'Get Accounts';
 
   @override

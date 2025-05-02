@@ -575,7 +575,6 @@
   "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные.",
 
   "addLedgerAccountPageAppBarTitle": "Добавить аккаунт Ledger",
-  "addLedgerAccountPageWalletNameHint": "Имя кошелька",
   "addLedgerAccountPageGetAccountsButton": "Получить аккаунты",
   "addLedgerAccountPageCreateButton": "Создать",
   "addLedgerAccountPageAddButton": "Добавить",
