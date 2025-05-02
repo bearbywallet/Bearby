@@ -61,7 +61,7 @@ class EthereumLedgerApp {
     return signature;
   }
 
-  Future<Uint8List> signTransaction(
+  Future<String> signTransaction(
     TransactionRequestInfo transaction,
     int accountIndex,
   ) async {
@@ -73,7 +73,8 @@ class EthereumLedgerApp {
       ),
       transformer: transformer,
     );
+    await sendSignedTransactions(tx: transaction, sig: signature.toBytes());
 
-    return Uint8List(0);
+    return signature.toHexString();
   }
 }

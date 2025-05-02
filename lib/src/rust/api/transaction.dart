@@ -17,6 +17,14 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 // These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`
 
+Future<HistoricalTransactionInfo> sendSignedTransactions(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required TransactionRequestInfo tx,
+        required List<int> sig}) =>
+    RustLib.instance.api.crateApiTransactionSendSignedTransactions(
+        walletIndex: walletIndex, accountIndex: accountIndex, tx: tx, sig: sig);
+
 Future<HistoricalTransactionInfo> signSendTransactions(
         {required BigInt walletIndex,
         required BigInt accountIndex,

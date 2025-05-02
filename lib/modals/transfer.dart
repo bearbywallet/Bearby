@@ -411,6 +411,7 @@ class _ConfirmTransactionContentState
       final ethLedgerApp = EthereumLedgerApp(connection);
 
       final signedTx = await ethLedgerApp.signTransaction(tx, accountIndex);
+      // should be send here.
     } catch (e) {
       setState(() => _error = "Failed to sign transaction with Ledger: $e");
       return null;

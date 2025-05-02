@@ -26,6 +26,35 @@ use zilpay::token::ft::FToken;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
+pub async fn send_signed_transactions(
+    wallet_index: usize,
+    account_index: usize,
+    tx: TransactionRequestInfo,
+    sig: Vec<u8>,
+) -> Result<HistoricalTransactionInfo, String> {
+    let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+    let signed_tx = tx
+        .with_signature(sig)
+        .map_err(ServiceError::TransactionErrors)?;
+
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+    let core = Arc::clone(&service.core);
+
+    let tx = core
+        .broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+        .await
+        .map_err(ServiceError::BackgroundError)?
+        .into_iter()
+        .next()
+        .map(|v| v.into())
+        .ok_or(ServiceError::TransactionErrors(
+            zilpay::errors::tx::TransactionErrors::InvalidTxHash,
+        ))?;
+
+    Ok(tx)
+}
+
 pub async fn sign_send_transactions(
     wallet_index: usize,
     account_index: usize,
