@@ -8,6 +8,7 @@ import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -84,8 +85,10 @@ class _SettingsPageState extends State<SettingsPage> {
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
                               if (appState.chain?.slip44 == 313 &&
-                                  appState.wallet !=
-                                      null) // 313 this is officially  zilliqa slip44 number.
+                                  appState.wallet != null &&
+                                  !appState.wallet!.walletType.contains(WalletType
+                                      .ledger
+                                      .name)) // 313 this is officially  zilliqa slip44 number.
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
