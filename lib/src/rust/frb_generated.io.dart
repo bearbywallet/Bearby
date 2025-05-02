@@ -260,6 +260,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw);
 
   @protected
+  List<(int, String, String)> dco_decode_list_record_u_8_string_string(
+      dynamic raw);
+
+  @protected
   List<(BigInt, BackgroundNotificationState)>
       dco_decode_list_record_usize_background_notification_state(dynamic raw);
 
@@ -328,6 +332,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (int, String) dco_decode_record_u_8_string(dynamic raw);
+
+  @protected
+  (int, String, String) dco_decode_record_u_8_string_string(dynamic raw);
 
   @protected
   (BigInt, BackgroundNotificationState)
@@ -620,6 +627,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<(int, String, String)> sse_decode_list_record_u_8_string_string(
+      SseDeserializer deserializer);
+
+  @protected
   List<(BigInt, BackgroundNotificationState)>
       sse_decode_list_record_usize_background_notification_state(
           SseDeserializer deserializer);
@@ -697,6 +708,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer);
+
+  @protected
+  (int, String, String) sse_decode_record_u_8_string_string(
+      SseDeserializer deserializer);
 
   @protected
   (BigInt, BackgroundNotificationState)
@@ -1009,6 +1024,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<(int, String)> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_record_u_8_string_string(
+      List<(int, String, String)> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_record_usize_background_notification_state(
       List<(BigInt, BackgroundNotificationState)> self,
       SseSerializer serializer);
@@ -1089,6 +1108,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_record_u_8_string(
       (int, String) self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_record_u_8_string_string(
+      (int, String, String) self, SseSerializer serializer);
 
   @protected
   void sse_encode_record_usize_background_notification_state(

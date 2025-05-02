@@ -73,35 +73,30 @@ pub async fn add_ledger_wallet(
     .map_err(Into::into)
 }
 
-pub async fn add_ledger_account(
+pub async fn update_ledger_accounts(
     wallet_index: usize,
-    account_index: usize,
-    name: String,
-    pub_key: String,
-    identifiers: &[String],
-    session_cipher: Option<String>,
+    accounts: Vec<(u8, String, String)>, // index, pubkey, name
 ) -> Result<(), String> {
     with_service(|core| {
-        let session = decode_session(session_cipher)?;
-
-        core.unlock_wallet_with_session(session, identifiers, wallet_index)?;
-
         let wallet = core.get_wallet_by_index(wallet_index)?;
-        let data = wallet
+        let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let first_account = data
-            .accounts
-            .first()
-            .ok_or(ServiceError::AccountAccess(0, wallet_index))?;
 
-        let provider = core.get_provider(first_account.chain_hash)?;
+        let provider = core.get_provider(wallet_data.default_chain_hash)?;
         let bip49 = provider.get_bip49(wallet_index);
-        let pub_key = pubkey_from_provider(&pub_key, bip49)?;
+        let accounts = accounts
+            .into_iter()
+            .map(|(ledger_index, pk, name)| {
+                pubkey_from_provider(&pk, bip49).map(|pub_key| (ledger_index, pub_key, name))
+            })
+            .collect::<Result<Vec<(u8, PubKey, String)>, ServiceError>>()?;
 
         wallet
-            .add_ledger_account(name, pub_key, account_index, &provider.config)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))
+            .update_ledger_accounts(accounts, &provider.config)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
     })
     .await
     .map_err(Into::into)

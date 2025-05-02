@@ -15,20 +15,11 @@ Future<(String, String)> addLedgerWallet(
     RustLib.instance.api.crateApiLedgerAddLedgerWallet(
         params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-Future<void> addLedgerAccount(
+Future<void> updateLedgerAccounts(
         {required BigInt walletIndex,
-        required BigInt accountIndex,
-        required String name,
-        required String pubKey,
-        required List<String> identifiers,
-        String? sessionCipher}) =>
-    RustLib.instance.api.crateApiLedgerAddLedgerAccount(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        name: name,
-        pubKey: pubKey,
-        identifiers: identifiers,
-        sessionCipher: sessionCipher);
+        required List<(int, String, String)> accounts}) =>
+    RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
+        walletIndex: walletIndex, accounts: accounts);
 
 class LedgerParamsInput {
   final List<(int, String)> pubKeys;
