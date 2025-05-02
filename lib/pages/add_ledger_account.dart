@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/svg.dart';
@@ -14,6 +16,7 @@ import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -47,6 +50,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   List<EthLedgerAccount> _accounts = [];
   Map<EthLedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
+  LedgerDevice? _selectedDevice;
+  bool _isScanning = false;
+  StreamSubscription<LedgerDevice>? _scanSubscription;
+  Timer? _scanTimeout;
+  int _scanRetries = 0;
+  static const _maxRetries = 2;
 
   late AuthGuard _authGuard;
 
@@ -55,6 +64,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     super.initState();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _walletNameController.text = "";
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkLedgerDevices();
+    });
   }
 
   @override
@@ -90,7 +102,105 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.dispose();
     _btnController.dispose();
     _createBtnController.dispose();
+    _scanSubscription?.cancel();
+    _scanTimeout?.cancel();
     super.dispose();
+  }
+
+  Future<void> _checkLedgerDevices() async {
+    final appState = context.read<AppState>();
+    final isLedgerWallet = appState.selectedWallet != -1 &&
+        appState.wallets[appState.selectedWallet].walletType
+            .contains(WalletType.ledger.name);
+
+    if (!_createWallet || isLedgerWallet) {
+      _startLedgerScan();
+    } else {
+      setState(() {
+        _selectedDevice = _ledgers.first;
+      });
+    }
+  }
+
+  Future<void> _startLedgerScan() async {
+    if (_scanRetries >= _maxRetries) {
+      setState(() {
+        _isScanning = false;
+        _errorMessage = AppLocalizations.of(context)!
+            .signMessageModalContentFailedToScanLedger('Max retries reached');
+      });
+      return;
+    }
+
+    setState(() {
+      _isScanning = true;
+      _scanRetries++;
+    });
+
+    final ledgerBle = LedgerInterface.ble(
+      onPermissionRequest: (status) async {
+        if (status != AvailabilityState.poweredOn) {
+          setState(() => _errorMessage = AppLocalizations.of(context)!
+              .signMessageModalContentBluetoothOff);
+          return false;
+        }
+        return true;
+      },
+    );
+
+    _scanSubscription = ledgerBle.scan().listen(
+      (device) {
+        if (mounted) {
+          setState(() {
+            if (!_ledgers.any((d) => d.id == device.id)) {
+              _ledgers.add(device);
+            }
+            final appState = context.read<AppState>();
+            final deviceId =
+                appState.wallet?.walletType.split('.').last.replaceAll('"', '');
+            if (deviceId != null &&
+                device.id.contains(deviceId) &&
+                _selectedDevice == null) {
+              _selectedDevice = device;
+              _stopLedgerScan();
+            }
+          });
+        }
+      },
+      onError: (e) {
+        if (mounted) {
+          setState(() {
+            _isScanning = false;
+            _errorMessage = AppLocalizations.of(context)!
+                .signMessageModalContentFailedToScanLedger(e.toString());
+          });
+          Future.delayed(const Duration(seconds: 2), () {
+            if (mounted && _ledgers.isEmpty) {
+              _startLedgerScan();
+            }
+          });
+        }
+      },
+    );
+
+    _scanTimeout = Timer(const Duration(seconds: 15), () {
+      _stopLedgerScan();
+      if (mounted && _ledgers.isEmpty) {
+        setState(() => _errorMessage = AppLocalizations.of(context)!
+            .signMessageModalContentNoLedgerDevices);
+        Future.delayed(const Duration(seconds: 2), () {
+          if (mounted) {
+            _startLedgerScan();
+          }
+        });
+      }
+    });
+  }
+
+  void _stopLedgerScan() {
+    _scanSubscription?.cancel();
+    _scanTimeout?.cancel();
+    setState(() => _isScanning = false);
   }
 
   Future<void> _onGetAccounts() async {
@@ -115,7 +225,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _btnController.start();
 
     try {
-      if (_network == null || _ledgers.isEmpty) {
+      if (_network == null || _selectedDevice == null) {
         throw Exception("Network or Ledger data is missing.");
       }
 
@@ -123,7 +233,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         onPermissionRequest: (_) async => true,
       );
 
-      final connection = await ledgerInterface.connect(_ledgers.first);
+      final connection = await ledgerInterface.connect(_selectedDevice!);
       final ethereumApp = EthereumLedgerApp(connection, transformer: null);
       final accounts = await ethereumApp
           .getAccounts(List<int>.generate(_accountCount, (i) => i));
@@ -242,7 +352,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
             walletName: _walletNameController.text,
-            ledgerId: _ledgers.first.id,
+            ledgerId: _selectedDevice!.id,
             accountNames: accountNames,
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
@@ -318,7 +428,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   Widget _buildDeviceInfoCard(AppTheme theme, AppLocalizations l10n) {
-    if (_network == null || _ledgers.isEmpty) return const SizedBox();
+    if (_selectedDevice == null) return const SizedBox();
     return Container(
       decoration: BoxDecoration(
         color: theme.cardBackground,
@@ -332,7 +442,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           LedgerCard(
-            device: _ledgers.first,
+            device: _selectedDevice!,
             isConnected: true,
             isConnecting: false,
             onTap: () {},
@@ -559,6 +669,48 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     );
   }
 
+  Widget _buildDeviceList(AppTheme theme, AppLocalizations l10n) {
+    if (_isScanning) {
+      return Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(height: 16),
+            Text(
+              'Scan Ledger...',
+              style: TextStyle(color: theme.textSecondary),
+            ),
+          ],
+        ),
+      );
+    } else if (_ledgers.isEmpty) {
+      return Center(
+        child: Text(
+          l10n.signMessageModalContentNoLedgerDevices,
+          style: TextStyle(color: theme.textSecondary),
+        ),
+      );
+    }
+    return ListView.builder(
+      itemCount: _ledgers.length,
+      itemBuilder: (context, index) {
+        final device = _ledgers[index];
+        return Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: LedgerCard(
+            device: device,
+            isConnected: device.id == _selectedDevice?.id,
+            isConnecting: false,
+            onTap: () {
+              setState(() => _selectedDevice = device);
+            },
+          ),
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -577,7 +729,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       title: "Ledger Account",
                       onBackPressed: () => Navigator.pop(context),
                     ),
-                    if (_network == null || _ledgers.isEmpty)
+                    if (_network == null)
                       Expanded(
                         child: Center(
                           child: CircularProgressIndicator(
@@ -585,6 +737,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                 theme.primaryPurple),
                           ),
                         ),
+                      )
+                    else if (!_createWallet ||
+                        (Provider.of<AppState>(context).selectedWallet != -1 &&
+                            Provider.of<AppState>(context)
+                                .wallets[Provider.of<AppState>(context)
+                                    .selectedWallet]
+                                .walletType
+                                .contains(WalletType.ledger.name)))
+                      Expanded(
+                        child: _buildDeviceList(theme, l10n),
                       )
                     else
                       Expanded(

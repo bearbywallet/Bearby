@@ -253,7 +253,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     }
   }
 
-  Future<void> _connectToDevice(LedgerDevice device) async {
+  Future<void> _connectToDevice(LedgerDevice device, {int retries = 2}) async {
     if (_isConnecting || _ledgerConnection != null) {
       debugPrint('[Connect] Attempt aborted: Already connecting or connected.');
       return;
@@ -271,116 +271,104 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           'Connecting to ${device.name} (${device.connectionType.name.toUpperCase()})...';
     });
     LedgerConnection? tempConnection;
-    const connectionTimeout = Duration(seconds: 25);
-    try {
-      debugPrint(
-          '[Connect] Calling ${device.connectionType.name}.connect() with ${connectionTimeout.inSeconds}s timeout...');
-      if (device.connectionType == ConnectionType.ble && _ledgerBle != null) {
-        tempConnection = await _ledgerBle!.connect(device).timeout(
-          connectionTimeout,
-          onTimeout: () {
-            debugPrint('[Connect] BLE connection timed out.');
-            throw TimeoutException(
-                'Connection timed out after ${connectionTimeout.inSeconds} seconds');
-          },
-        );
-      } else if (device.connectionType == ConnectionType.usb &&
-          _ledgerUsb != null) {
-        tempConnection = await _ledgerUsb!.connect(device).timeout(
-          connectionTimeout,
-          onTimeout: () {
-            debugPrint('[Connect] USB connection timed out.');
-            throw TimeoutException(
-                'Connection timed out after ${connectionTimeout.inSeconds} seconds');
-          },
-        );
-      } else {
-        throw Exception('Appropriate Ledger interface not available.');
-      }
-      debugPrint(
-          '[Connect] Connection call successful for ${device.id}. Connection object present:');
-      if (!mounted) {
+    const connectionTimeout = Duration(seconds: 30);
+    int attempt = 0;
+
+    while (attempt < retries) {
+      try {
         debugPrint(
-            '[Connect] Widget unmounted after connection success, disconnecting.');
-        await tempConnection.disconnect().catchError((e) => debugPrint(
-            '[Connect] Error disconnecting after widget disposed: $e'));
-        return;
-      }
-      _ledgerConnection = tempConnection;
-      setState(() {
-        debugPrint('[Connect] Setting state to connected.');
-        _statusText = 'Successfully connected to ${device.name}!';
-      });
-      Navigator.of(context).pushNamed(
-        '/net_setup',
-        arguments: {
-          'ledger': device,
-        },
-      );
-      debugPrint('[Connect] Setting up disconnect listener for ${device.id}');
-      _listenForDisconnection(device.id);
-      debugPrint('[Connect] Disconnect listener setup initiated.');
-    } on LedgerException catch (e) {
-      debugPrint('[Connect] LedgerException caught: ${e}');
-      if (!mounted) return;
-      setState(() {
-        _statusText = 'Connection Failed: ${e}';
-        _ledgerConnection = null;
-      });
-      _showErrorDialog('Connection Failed', 'Ledger Error: ${e}');
-    } on TimeoutException catch (e) {
-      debugPrint('[Connect] TimeoutException caught: ${e.message}');
-      if (!mounted) return;
-      setState(() {
-        _statusText = 'Connection Failed: Timed out';
-        _ledgerConnection = null;
-      });
-      _showErrorDialog('Connection Failed',
-          'Connection timed out (${connectionTimeout.inSeconds}s). Please ensure the device is unlocked, the correct app is open (if necessary), and try again.');
-    } catch (e, s) {
-      debugPrint('[Connect] Generic Exception caught: $e\n$s');
-      if (!mounted) return;
-      String errorString = e.toString();
-      bool isStreamListenedError = errorString
-          .contains('Bad state: Stream has already been listened to.');
-      String failureMsg = 'Connection Failed: $e';
-      String dialogContent = 'Could not connect to ${device.name}.\nError: $e';
-      String dialogTitle = 'Connection Failed';
-      bool showErrorDialog = true;
-      if (isStreamListenedError) {
-        debugPrint(
-            '[Connect] Skipping error dialog for stream listener error.');
-        showErrorDialog = false;
-        if (_ledgerConnection != null) {
-          failureMsg =
-              'Connected to ${_ledgerConnection!.device.name} (listener error)';
+            '[Connect] Calling ${device.connectionType.name}.connect() with ${connectionTimeout.inSeconds}s timeout... (Attempt ${attempt + 1} of $retries)');
+        if (device.connectionType == ConnectionType.ble && _ledgerBle != null) {
+          tempConnection = await _ledgerBle!.connect(device).timeout(
+            connectionTimeout,
+            onTimeout: () {
+              debugPrint('[Connect] BLE connection timed out.');
+              throw TimeoutException(
+                  'Connection timed out after ${connectionTimeout.inSeconds} seconds');
+            },
+          );
+        } else if (device.connectionType == ConnectionType.usb &&
+            _ledgerUsb != null) {
+          tempConnection = await _ledgerUsb!.connect(device).timeout(
+            connectionTimeout,
+            onTimeout: () {
+              debugPrint('[Connect] USB connection timed out.');
+              throw TimeoutException(
+                  'Connection timed out after ${connectionTimeout.inSeconds} seconds');
+            },
+          );
         } else {
-          failureMsg = 'Connection Failed: $e';
-          showErrorDialog = true;
+          throw Exception('Appropriate Ledger interface not available.');
         }
-      } else {
-        _ledgerConnection = null;
-      }
-      if (mounted) {
+        debugPrint(
+            '[Connect] Connection call successful for ${device.id}. Connection object present:');
+        if (!mounted) {
+          debugPrint(
+              '[Connect] Widget unmounted after connection success, disconnecting.');
+          await tempConnection.disconnect().catchError((e) => debugPrint(
+              '[Connect] Error disconnecting after widget disposed: $e'));
+          return;
+        }
+        _ledgerConnection = tempConnection;
         setState(() {
-          _statusText = failureMsg;
+          debugPrint('[Connect] Setting state to connected.');
+          _statusText = 'Successfully connected to ${device.name}!';
         });
-        if (showErrorDialog) {
-          _showErrorDialog(dialogTitle, dialogContent);
+        Navigator.of(context).pushNamed(
+          '/net_setup',
+          arguments: {
+            'ledger': device,
+          },
+        );
+        debugPrint('[Connect] Setting up disconnect listener for ${device.id}');
+        _listenForDisconnection(device.id);
+        debugPrint('[Connect] Disconnect listener setup initiated.');
+        return;
+      } on TimeoutException catch (e) {
+        debugPrint('[Connect] TimeoutException caught: ${e.message}');
+        attempt++;
+        if (attempt >= retries) {
+          if (!mounted) return;
+          setState(() {
+            _statusText =
+                'Connection Failed: Timed out after $attempt attempts';
+            _ledgerConnection = null;
+          });
+          _showErrorDialog('Connection Failed',
+              'Connection timed out after $attempt attempts. Please ensure the device is unlocked and try again.');
+        } else {
+          debugPrint(
+              '[Connect] Retrying connection (attempt ${attempt + 1} of $retries)');
+          await Future.delayed(const Duration(milliseconds: 500));
+        }
+      } on LedgerException catch (e) {
+        debugPrint('[Connect] LedgerException caught: $e');
+        if (!mounted) return;
+        setState(() {
+          _statusText = 'Connection Failed: $e';
+          _ledgerConnection = null;
+        });
+        _showErrorDialog('Connection Failed', 'Ledger Error: $e');
+        return;
+      } catch (e, s) {
+        debugPrint('[Connect] Generic Exception caught: $e\n$s');
+        if (!mounted) return;
+        setState(() {
+          _statusText = 'Connection Failed: $e';
+          _ledgerConnection = null;
+        });
+        _showErrorDialog('Connection Failed',
+            'Could not connect to ${device.name}.\nError: $e');
+        return;
+      } finally {
+        if (mounted && attempt >= retries) {
+          setState(() {
+            _isConnecting = false;
+            _connectingDevice = null;
+          });
         }
       }
-    } finally {
-      debugPrint('[Connect] Entering finally block.');
-      if (mounted) {
-        setState(() {
-          _isConnecting = false;
-          _connectingDevice = null;
-          debugPrint('[Connect] Resetting connecting state in finally block.');
-        });
-      }
-      debugPrint('[Connect] Exiting finally block.');
     }
-    debugPrint('[Connect] Exiting _connectToDevice function.');
   }
 
   void _listenForDisconnection(String deviceId) {
