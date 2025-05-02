@@ -1,21 +1,20 @@
-/// Returns the BIP32 derivation path for the given account index
-/// Path format: m/44'/60'/account'/0/0
-String getWalletDerivationPath(int accountIndex) =>
-    "44'/60'/$accountIndex'/0/0";
+String getWalletDerivationPath(int accountIndex) {
+  if (accountIndex < 0) {
+    throw ArgumentError('accountIndex должен быть >= 0');
+  }
+  return "m/44'/60'/0'/0/$accountIndex";
+}
 
-/// Splits a BIP32 path into integer components
-/// Handles hardened paths (ending with ')
 List<int> splitPath(String path) {
   List<int> result = [];
   List<String> components = path.split("/");
 
   for (var element in components) {
-    if (element.isEmpty) continue; // Skip empty parts (first slash)
+    if (element.isEmpty || element == "m") continue;
 
     int number = int.tryParse(element.replaceAll("'", "")) ?? 0;
 
     if (element.length > 1 && element[element.length - 1] == "'") {
-      // For hardened paths, add 0x80000000
       number += 0x80000000;
     }
 

@@ -298,6 +298,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     } on LedgerException catch (e) {
       _handleLedgerError(e);
     } catch (e) {
+      debugPrint("$e");
       setState(() => _errorMessage = e.toString());
       _btnController.error();
       Future.delayed(const Duration(seconds: 2),
