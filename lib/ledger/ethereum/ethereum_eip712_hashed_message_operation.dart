@@ -1,10 +1,11 @@
 import 'dart:typed_data';
 
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
+import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
 
 class EthereumEIP712HashedMessageOperation
-    extends LedgerRawOperation<Uint8List> {
+    extends LedgerRawOperation<EthLedgerSignature> {
   final int accountIndex;
   final Uint8List domainSeparator;
   final Uint8List hashStructMessage;
@@ -43,9 +44,8 @@ class EthereumEIP712HashedMessageOperation
   }
 
   @override
-  Future<Uint8List> read(ByteDataReader reader) async {
+  Future<EthLedgerSignature> read(ByteDataReader reader) async {
     final bytes = reader.read(reader.remainingLength);
-
-    return bytes;
+    return EthLedgerSignature.fromLedgerResponse(bytes);
   }
 }

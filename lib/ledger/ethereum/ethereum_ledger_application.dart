@@ -30,24 +30,24 @@ class EthereumLedgerApp {
     return accounts;
   }
 
-  Future<Uint8List> signPersonalMessage(
-      Uint8List message, int accountIndex) async {
-    final signature = await ledger.sendOperation<Uint8List>(
+  Future<EthLedgerSignature> signPersonalMessage(
+    Uint8List message,
+    int accountIndex,
+  ) async {
+    final signature = await ledger.sendOperation<EthLedgerSignature>(
       EthereumPersonalMessageOperation(
           accountIndex: accountIndex, message: message),
       transformer: transformer,
     );
 
-    _checkResult(signature);
-
     return signature;
   }
 
-  Future<Uint8List> signEIP712HashedMessage(
+  Future<EthLedgerSignature> signEIP712HashedMessage(
     Eip712Hashes hashes,
     int accountIndex,
   ) async {
-    final signature = await ledger.sendOperation<Uint8List>(
+    final signature = await ledger.sendOperation<EthLedgerSignature>(
       EthereumEIP712HashedMessageOperation(
         accountIndex: accountIndex,
         domainSeparator: hashes.domainSeparator,
@@ -56,20 +56,6 @@ class EthereumLedgerApp {
       transformer: transformer,
     );
 
-    _checkResult(signature);
-
     return signature;
-  }
-
-  void _checkResult(Uint8List result) {
-    if (result.length != 2) {
-      return;
-    }
-
-    if (result.first == 105 && result.last == 103) {
-      throw "Rejected";
-    } else if (result.first == 85 && result.last == 21) {
-      throw "device is lock";
-    }
   }
 }

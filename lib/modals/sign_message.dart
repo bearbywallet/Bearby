@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
@@ -9,7 +10,6 @@ import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
-import 'package:zilpay/ledger/ethereum/utils.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -280,28 +280,22 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         final typedDataJson = jsonEncode(widget.typedData!.toJson());
         final eip712Hashes =
             await prepareEip712Message(typedDataJson: typedDataJson);
-        final signatureBytes = await ethLedgerApp.signEIP712HashedMessage(
+        final signature = await ethLedgerApp.signEIP712HashedMessage(
           eip712Hashes,
           accountIndex,
         );
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-        final sighex = bytesToHex(signatureBytes);
 
-        widget.onMessageSigned(pubkey, "0x$sighex");
+        widget.onMessageSigned(pubkey, signature.toHexString());
       } else if (widget.message != null) {
-        final messageHash = await prepareMessage(
-          walletIndex: BigInt.from(appState.selectedWallet),
-          accountIndex: appState.wallet!.selectedAccount,
-          message: widget.message!,
-        );
-        final signatureBytes = await ethLedgerApp.signPersonalMessage(
-          messageHash,
+        Uint8List bytes = utf8.encode(widget.message!);
+        final signature = await ethLedgerApp.signPersonalMessage(
+          bytes,
           accountIndex, // TODO: remake account index, because it is wrong, it should be from ledger index.
         );
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-        final sighex = bytesToHex(signatureBytes);
 
-        widget.onMessageSigned(pubkey, "0x$sighex");
+        widget.onMessageSigned(pubkey, signature.toHexString());
       }
     } catch (e) {
       setState(() => _error = AppLocalizations.of(context)!
