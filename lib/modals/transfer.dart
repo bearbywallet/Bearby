@@ -393,29 +393,33 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Future<void> _signAndSendLedger(
+  Future<HistoricalTransactionInfo> _signAndSendLedger(
     AppState appState,
     TransactionRequestInfo tx,
   ) async {
-    try {
-      if (appState.wallet == null || _selectedDevice == null) {
-        setState(() => _error = "Wallet or device not selected");
-        return null;
-      }
-      final accountIndex = appState.wallet!.selectedAccount.toInt();
-      final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (status) async =>
-            status == AvailabilityState.poweredOn,
-      );
-      final connection = await ledgerInterface.connect(_selectedDevice!);
-      final ethLedgerApp = EthereumLedgerApp(connection);
-
-      final signedTx = await ethLedgerApp.signTransaction(tx, accountIndex);
-      // should be send here.
-    } catch (e) {
-      setState(() => _error = "Failed to sign transaction with Ledger: $e");
-      return null;
+    if (appState.wallet == null || _selectedDevice == null) {
+      throw "Wallet or device not selected";
     }
+
+    final accountIndex = appState.wallet!.selectedAccount.toInt();
+    final ledgerInterface = LedgerInterface.ble(
+      onPermissionRequest: (status) async =>
+          status == AvailabilityState.poweredOn,
+    );
+    final connection = await ledgerInterface.connect(_selectedDevice!);
+    final ethLedgerApp = EthereumLedgerApp(connection);
+
+    final sig = await ethLedgerApp.signTransaction(
+      tx,
+      accountIndex,
+    );
+
+    return await sendSignedTransactions(
+      tx: tx,
+      sig: sig.toBytes(),
+      walletIndex: appState.selectedWallet,
+      accountIndex: accountIndex,
+    );
   }
 
   Color? _parseColor(String? colorString) {
@@ -762,12 +766,13 @@ class _ConfirmTransactionContentState
 
                             final tx = _prepareTx(adjustedTokenValue);
                             HistoricalTransactionInfo? sendedTx;
+
                             if (isLedgerWallet) {
-                              await _signAndSendLedger(appState, tx);
-                              throw "";
+                              sendedTx = await _signAndSendLedger(appState, tx);
                             } else {
                               sendedTx = await _signAndSend(appState, tx);
                             }
+
                             if (mounted && sendedTx != null) {
                               widget.onConfirm(sendedTx);
                             }
