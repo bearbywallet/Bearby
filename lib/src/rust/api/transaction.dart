@@ -34,6 +34,9 @@ Future<HistoricalTransactionInfo> signSendTransactions(
         identifiers: identifiers,
         tx: tx);
 
+Future<Uint8List> encodeTxRlp({required TransactionRequestInfo tx}) =>
+    RustLib.instance.api.crateApiTransactionEncodeTxRlp(tx: tx);
+
 Future<Uint8List> prepareMessage(
         {required BigInt walletIndex,
         required BigInt accountIndex,

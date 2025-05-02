@@ -102,6 +102,14 @@ pub async fn sign_send_transactions(
     Ok(tx)
 }
 
+pub fn encode_tx_rlp(tx: TransactionRequestInfo) -> Result<Vec<u8>, String> {
+    let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+
+    Ok(tx
+        .to_rlp_encode()
+        .map_err(ServiceError::TransactionErrors)?)
+}
+
 pub async fn prepare_message(
     wallet_index: usize,
     account_index: usize,
