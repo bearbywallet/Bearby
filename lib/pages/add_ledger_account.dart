@@ -439,25 +439,19 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
-        final existingPubKeys = wallet.accounts
-            .map((account) => account.pubKey.toLowerCase())
-            .toSet();
+        final accountsToUpdate = _selectedAccounts.entries
+            .where((entry) => entry.value)
+            .map((entry) => (
+                  entry.key.index,
+                  entry.key.publicKey,
+                  "ledger ${entry.key.index + 1}"
+                ))
+            .toList();
 
-        for (var entry in _selectedAccounts.entries) {
-          if (entry.value &&
-              !existingPubKeys.contains(entry.key.publicKey.toLowerCase())) {
-            final account = entry.key;
-            final accountName = "ledger ${account.index + 1}";
-            await addLedgerAccount(
-              walletIndex: BigInt.from(walletIndex),
-              accountIndex: BigInt.from(account.index),
-              name: accountName,
-              pubKey: account.publicKey,
-              identifiers: [],
-              sessionCipher: "",
-            );
-          }
-        }
+        await updateLedgerAccounts(
+          walletIndex: BigInt.from(walletIndex),
+          accounts: accountsToUpdate,
+        );
 
         await appState.syncData();
         _createBtnController.success();
