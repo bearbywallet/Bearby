@@ -14,7 +14,6 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
-use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;

@@ -20,7 +20,7 @@ use crate::{
 };
 
 pub struct LedgerParamsInput {
-    pub pub_keys: Vec<String>,
+    pub pub_keys: Vec<(u8, String)>,
     pub wallet_index: usize,
     pub wallet_name: String,
     pub ledger_id: String,
@@ -41,8 +41,10 @@ pub async fn add_ledger_wallet(
         let pub_keys = params
             .pub_keys
             .into_iter()
-            .map(|pk| pubkey_from_provider(&pk, bip49))
-            .collect::<Result<Vec<PubKey>, ServiceError>>()?;
+            .map(|(ledger_index, pk)| {
+                pubkey_from_provider(&pk, bip49).map(|pub_key| (ledger_index, pub_key))
+            })
+            .collect::<Result<Vec<(u8, PubKey)>, ServiceError>>()?;
         let ftokens = ftokens
             .into_iter()
             .map(TryFrom::try_from)

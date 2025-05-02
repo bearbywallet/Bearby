@@ -31,7 +31,7 @@ Future<void> addLedgerAccount(
         sessionCipher: sessionCipher);
 
 class LedgerParamsInput {
-  final List<String> pubKeys;
+  final List<(int, String)> pubKeys;
   final BigInt walletIndex;
   final String walletName;
   final String ledgerId;

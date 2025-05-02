@@ -4108,7 +4108,7 @@ impl SseDecode for crate::models::keypair::KeyPairInfo {
 impl SseDecode for crate::api::ledger::LedgerParamsInput {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_pubKeys = <Vec<String>>::sse_decode(deserializer);
+        let mut var_pubKeys = <Vec<(u8, String)>>::sse_decode(deserializer);
         let mut var_walletIndex = <usize>::sse_decode(deserializer);
         let mut var_walletName = <String>::sse_decode(deserializer);
         let mut var_ledgerId = <String>::sse_decode(deserializer);
@@ -4312,6 +4312,18 @@ impl SseDecode for Vec<(String, String)> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<(String, String)>::sse_decode(deserializer));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<(u8, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<(u8, String)>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -4605,6 +4617,15 @@ impl SseDecode for (String, u8) {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_field0 = <String>::sse_decode(deserializer);
         let mut var_field1 = <u8>::sse_decode(deserializer);
+        return (var_field0, var_field1);
+    }
+}
+
+impl SseDecode for (u8, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_field0 = <u8>::sse_decode(deserializer);
+        let mut var_field1 = <String>::sse_decode(deserializer);
         return (var_field0, var_field1);
     }
 }
@@ -6371,7 +6392,7 @@ impl SseEncode for crate::models::keypair::KeyPairInfo {
 impl SseEncode for crate::api::ledger::LedgerParamsInput {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <Vec<String>>::sse_encode(self.pub_keys, serializer);
+        <Vec<(u8, String)>>::sse_encode(self.pub_keys, serializer);
         <usize>::sse_encode(self.wallet_index, serializer);
         <String>::sse_encode(self.wallet_name, serializer);
         <String>::sse_encode(self.ledger_id, serializer);
@@ -6522,6 +6543,16 @@ impl SseEncode for Vec<(String, String)> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <(String, String)>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<(u8, String)> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <(u8, String)>::sse_encode(item, serializer);
         }
     }
 }
@@ -6754,6 +6785,14 @@ impl SseEncode for (String, u8) {
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.0, serializer);
         <u8>::sse_encode(self.1, serializer);
+    }
+}
+
+impl SseEncode for (u8, String) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <u8>::sse_encode(self.0, serializer);
+        <String>::sse_encode(self.1, serializer);
     }
 }
 

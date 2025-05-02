@@ -257,7 +257,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   Future<void> _signMessageLedger(AppState appState) async {
     try {
-      if (appState.wallet == null) {
+      if (appState.wallet == null || appState.account == null) {
         setState(() => _error = AppLocalizations.of(context)!
             .signMessageModalContentWalletNotSelected);
         return;
@@ -282,7 +282,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             await prepareEip712Message(typedDataJson: typedDataJson);
         final signature = await ethLedgerApp.signEIP712HashedMessage(
           eip712Hashes,
-          accountIndex,
+          appState.account!.index.toInt(),
         );
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
 
@@ -291,7 +291,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         Uint8List bytes = utf8.encode(widget.message!);
         final signature = await ethLedgerApp.signPersonalMessage(
           bytes,
-          accountIndex, // TODO: remake account index, because it is wrong, it should be from ledger index.
+          appState.account!.index.toInt(),
         );
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
 

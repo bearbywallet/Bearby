@@ -3557,7 +3557,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (arr.length != 8)
       throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return LedgerParamsInput(
-      pubKeys: dco_decode_list_String(arr[0]),
+      pubKeys: dco_decode_list_record_u_8_string(arr[0]),
       walletIndex: dco_decode_usize(arr[1]),
       walletName: dco_decode_String(arr[2]),
       ledgerId: dco_decode_String(arr[3]),
@@ -3662,6 +3662,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<(String, String)> dco_decode_list_record_string_string(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_record_string_string).toList();
+  }
+
+  @protected
+  List<(int, String)> dco_decode_list_record_u_8_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_record_u_8_string).toList();
   }
 
   @protected
@@ -3855,6 +3861,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     return (
       dco_decode_String(arr[0]),
       dco_decode_u_8(arr[1]),
+    );
+  }
+
+  @protected
+  (int, String) dco_decode_record_u_8_string(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2) {
+      throw Exception('Expected 2 elements, got ${arr.length}');
+    }
+    return (
+      dco_decode_u_8(arr[0]),
+      dco_decode_String(arr[1]),
     );
   }
 
@@ -4651,7 +4670,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput sse_decode_ledger_params_input(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    var var_pubKeys = sse_decode_list_String(deserializer);
+    var var_pubKeys = sse_decode_list_record_u_8_string(deserializer);
     var var_walletIndex = sse_decode_usize(deserializer);
     var var_walletName = sse_decode_String(deserializer);
     var var_ledgerId = sse_decode_String(deserializer);
@@ -4828,6 +4847,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <(String, String)>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_record_string_string(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<(int, String)> sse_decode_list_record_u_8_string(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <(int, String)>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_record_u_8_string(deserializer));
     }
     return ans_;
   }
@@ -5103,6 +5135,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_field0 = sse_decode_String(deserializer);
     var var_field1 = sse_decode_u_8(deserializer);
+    return (var_field0, var_field1);
+  }
+
+  @protected
+  (int, String) sse_decode_record_u_8_string(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_field0 = sse_decode_u_8(deserializer);
+    var var_field1 = sse_decode_String(deserializer);
     return (var_field0, var_field1);
   }
 
@@ -5815,7 +5855,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   void sse_encode_ledger_params_input(
       LedgerParamsInput self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
-    sse_encode_list_String(self.pubKeys, serializer);
+    sse_encode_list_record_u_8_string(self.pubKeys, serializer);
     sse_encode_usize(self.walletIndex, serializer);
     sse_encode_String(self.walletName, serializer);
     sse_encode_String(self.ledgerId, serializer);
@@ -5962,6 +6002,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_record_string_string(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_record_u_8_string(
+      List<(int, String)> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_record_u_8_string(item, serializer);
     }
   }
 
@@ -6187,6 +6237,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.$1, serializer);
     sse_encode_u_8(self.$2, serializer);
+  }
+
+  @protected
+  void sse_encode_record_u_8_string(
+      (int, String) self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_u_8(self.$1, serializer);
+    sse_encode_String(self.$2, serializer);
   }
 
   @protected

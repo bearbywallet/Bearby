@@ -231,7 +231,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           throw Exception("l10n.ledgerConnectDialogNoAccountSelected");
         }
 
-        final pubKeys = selectedAccounts.map((a) => a.publicKey).toList();
+        final pubKeys =
+            selectedAccounts.map((a) => (a.index, a.publicKey)).toList();
         final accountNames =
             selectedAccounts.map((a) => "ledger ${a.index + 1}").toList();
 
