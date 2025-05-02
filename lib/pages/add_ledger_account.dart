@@ -28,6 +28,7 @@ import 'package:zilpay/theme/app_theme.dart';
 
 class AddLedgerAccountPage extends StatefulWidget {
   const AddLedgerAccountPage({super.key});
+
   @override
   State<AddLedgerAccountPage> createState() => _AddLedgerAccountPageState();
 }
@@ -131,7 +132,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         setState(() {
           _accounts = accounts;
           _selectedAccounts = {for (var account in accounts) account: true};
-
           _accountsLoaded = true;
           _loading = false;
         });
@@ -172,7 +172,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   void _toggleAccount(EthLedgerAccount account, bool value) {
     if (_loading) return;
-
     setState(() {
       _selectedAccounts[account] = value;
     });
@@ -186,7 +185,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _createBtnController.start();
 
     try {
-      final l10n = AppLocalizations.of(context)!;
       final appState = Provider.of<AppState>(context, listen: false);
       final BigInt? chainHash;
 
@@ -228,7 +226,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             .toList();
 
         if (selectedAccounts.isEmpty) {
-          throw Exception("l10n.ledgerConnectDialogNoAccountSelected");
+          throw Exception("No accounts selected.");
         }
 
         final pubKeys =
@@ -281,7 +279,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         _selectedAccounts.forEach((account, isSelected) async {
           if (isSelected) {
             final accountName = "ledger ${account.index + 1}";
-
             await addLedgerAccount(
               walletIndex: BigInt.from(walletIndex),
               accountIndex: BigInt.from(account.index),
@@ -484,15 +481,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 valueColor: theme.buttonText,
                 controller: _btnController,
                 onPressed: _onGetAccounts,
-                successIcon: SvgPicture.asset(
-                  'assets/icons/ok.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.buttonText,
-                    BlendMode.srcIn,
-                  ),
-                ),
                 child: Text(
                   "Get Accounts",
                   style: TextStyle(
@@ -639,15 +627,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                         color: theme.primaryPurple,
                         valueColor: theme.buttonText,
                         onPressed: _saveSelectedAccounts,
-                        successIcon: SvgPicture.asset(
-                          'assets/icons/ok.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.buttonText,
-                            BlendMode.srcIn,
-                          ),
-                        ),
+                        successIcon: "assets/icons/ok.svg",
                         child: Text(
                           _createWallet ? "Create" : "Add",
                           style: TextStyle(

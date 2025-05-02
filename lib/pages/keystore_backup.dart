@@ -275,15 +275,6 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
                             BigInt.from(state.selectedWallet),
                             state.wallet?.walletName ?? "",
                           ),
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
                           child: Text(
                             l10n.keystoreBackupCreateButton,
                             style: TextStyle(

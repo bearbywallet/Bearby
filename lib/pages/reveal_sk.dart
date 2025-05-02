@@ -161,15 +161,6 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
                             BigInt.from(state.selectedWallet),
                             state.wallet!.selectedAccount,
                           ),
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
                           child: Text(
                             l10n.revealSecretKeySubmitButton,
                             style: TextStyle(

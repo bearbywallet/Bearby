@@ -215,13 +215,6 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                           valueColor: theme.buttonText,
                           onPressed: () => _handleDeleteWallet(appState),
                           controller: _btnController,
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                                theme.textPrimary, BlendMode.srcIn),
-                          ),
                           child: Text(
                             l10n.deleteWalletModalSubmit,
                             style: TextStyle(

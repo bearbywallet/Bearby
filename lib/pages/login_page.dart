@@ -355,15 +355,6 @@ class _LoginPageState extends State<LoginPage> {
         valueColor: theme.buttonText,
         controller: _btnController,
         onPressed: _handleAuthentication,
-        successIcon: SvgPicture.asset(
-          'assets/icons/ok.svg',
-          width: 24,
-          height: 24,
-          colorFilter: ColorFilter.mode(
-            theme.textPrimary,
-            BlendMode.srcIn,
-          ),
-        ),
         child: Text(
           l10n.loginPageUnlockButton,
           style: TextStyle(

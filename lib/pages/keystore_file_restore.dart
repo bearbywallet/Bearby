@@ -391,15 +391,6 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
                                 !_disabled)
                             ? _restoreFromKeystore
                             : () {},
-                        successIcon: SvgPicture.asset(
-                          'assets/icons/ok.svg',
-                          width: 24,
-                          height: 24,
-                          colorFilter: ColorFilter.mode(
-                            theme.buttonText,
-                            BlendMode.srcIn,
-                          ),
-                        ),
                         child: Text(
                           l10n.keystoreRestoreButton,
                           style: const TextStyle(

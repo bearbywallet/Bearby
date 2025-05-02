@@ -214,15 +214,6 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
                           valueColor: widget.theme.buttonText,
                           controller: _btnController,
                           onPressed: () => _handleConfirmPassword(context),
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              widget.theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
                           child: Text(
                             l10n.confirmPasswordModalButton,
                             style: TextStyle(

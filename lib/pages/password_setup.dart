@@ -506,15 +506,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                       valueColor: theme.buttonText,
                       controller: _btnController,
                       onPressed: _createWallet,
-                      successIcon: SvgPicture.asset(
-                        'assets/icons/ok.svg',
-                        width: 24,
-                        height: 24,
-                        colorFilter: ColorFilter.mode(
-                          theme.textPrimary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
                       child: Text(
                         AppLocalizations.of(context)!
                             .passwordSetupPageCreateButton,

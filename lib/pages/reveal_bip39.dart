@@ -156,15 +156,6 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                           onPressed: () => _onPasswordSubmit(
                             BigInt.from(state.selectedWallet),
                           ),
-                          successIcon: SvgPicture.asset(
-                            'assets/icons/ok.svg',
-                            width: 24,
-                            height: 24,
-                            colorFilter: ColorFilter.mode(
-                              theme.textPrimary,
-                              BlendMode.srcIn,
-                            ),
-                          ),
                           child: Text(
                             AppLocalizations.of(context)!
                                 .revealSecretPhraseSubmitButton,

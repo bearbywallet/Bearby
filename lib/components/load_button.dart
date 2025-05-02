@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -14,8 +15,8 @@ class RoundedLoadingButton extends StatefulWidget {
   final double loaderSize;
   final Color valueColor;
   final double borderRadius;
-  final Widget? successIcon;
-  final Widget? failedIcon;
+  final String? successIcon;
+  final String? failedSvgAsset;
   final Color errorColor;
 
   const RoundedLoadingButton({
@@ -29,8 +30,8 @@ class RoundedLoadingButton extends StatefulWidget {
     this.loaderSize = 24.0,
     this.valueColor = Colors.white,
     this.borderRadius = 30.0,
-    this.successIcon,
-    this.failedIcon,
+    this.successIcon = 'assets/icons/ok.svg',
+    this.failedSvgAsset = 'assets/icons/close.svg',
     this.errorColor = Colors.red,
   });
 
@@ -105,8 +106,15 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           width: _bounceAnimation.value,
           height: _bounceAnimation.value,
           child: _bounceAnimation.value > 20
-              ? widget.successIcon ??
-                  Icon(Icons.check, color: widget.valueColor)
+              ? SvgPicture.asset(
+                  widget.successIcon!,
+                  width: widget.loaderSize,
+                  height: widget.loaderSize,
+                  colorFilter: ColorFilter.mode(
+                    widget.valueColor,
+                    BlendMode.srcIn,
+                  ),
+                )
               : null,
         );
 
@@ -119,7 +127,15 @@ class _RoundedLoadingButtonState extends State<RoundedLoadingButton>
           width: _bounceAnimation.value,
           height: _bounceAnimation.value,
           child: _bounceAnimation.value > 20
-              ? widget.failedIcon ?? Icon(Icons.close, color: widget.valueColor)
+              ? SvgPicture.asset(
+                  widget.failedSvgAsset!,
+                  width: widget.loaderSize,
+                  height: widget.loaderSize,
+                  colorFilter: ColorFilter.mode(
+                    widget.valueColor,
+                    BlendMode.srcIn,
+                  ),
+                )
               : null,
         );
 
