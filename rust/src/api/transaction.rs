@@ -27,8 +27,8 @@ pub use zilpay::wallet::wallet_storage::StorageOperations;
 pub use zilpay::wallet::wallet_transaction::WalletTransaction;
 
 pub async fn send_signed_transactions(
-    wallet_index: usize,
-    account_index: usize,
+    wallet_index: u8,
+    account_index: u8,
     tx: TransactionRequestInfo,
     sig: Vec<u8>,
 ) -> Result<HistoricalTransactionInfo, String> {
@@ -42,7 +42,11 @@ pub async fn send_signed_transactions(
     let core = Arc::clone(&service.core);
 
     let tx = core
-        .broadcast_signed_transactions(wallet_index, account_index, vec![signed_tx])
+        .broadcast_signed_transactions(
+            wallet_index as usize,
+            account_index as usize,
+            vec![signed_tx],
+        )
         .await
         .map_err(ServiceError::BackgroundError)?
         .into_iter()

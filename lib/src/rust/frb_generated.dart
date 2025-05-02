@@ -314,8 +314,8 @@ abstract class RustLibApi extends BaseApi {
       {required BigInt walletIndex, required BigInt chainHash});
 
   Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
+      {required int walletIndex,
+      required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig});
 
@@ -2113,15 +2113,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<HistoricalTransactionInfo> crateApiTransactionSendSignedTransactions(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
+      {required int walletIndex,
+      required int accountIndex,
       required TransactionRequestInfo tx,
       required List<int> sig}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_usize(accountIndex, serializer);
+        sse_encode_u_8(walletIndex, serializer);
+        sse_encode_u_8(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
         sse_encode_list_prim_u_8_loose(sig, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,

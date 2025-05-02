@@ -2391,8 +2391,8 @@ fn wire__crate__api__transaction__send_signed_transactions_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
+            let api_wallet_index = <u8>::sse_decode(&mut deserializer);
+            let api_account_index = <u8>::sse_decode(&mut deserializer);
             let api_tx = <crate::models::transactions::request::TransactionRequestInfo>::sse_decode(
                 &mut deserializer,
             );

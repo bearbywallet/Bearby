@@ -7,6 +7,7 @@ import 'package:zilpay/ledger/ethereum/ethereum_public_key_operation.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_transaction_operation.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 
 class EthereumLedgerApp {
@@ -61,9 +62,10 @@ class EthereumLedgerApp {
     return signature;
   }
 
-  Future<String> signTransaction(
+  Future<HistoricalTransactionInfo> signTransaction(
     TransactionRequestInfo transaction,
     int accountIndex,
+    int walletIndex,
   ) async {
     final txRLP = await encodeTxRlp(tx: transaction);
     final signature = await ledger.sendOperation<EthLedgerSignature>(
@@ -73,8 +75,11 @@ class EthereumLedgerApp {
       ),
       transformer: transformer,
     );
-    await sendSignedTransactions(tx: transaction, sig: signature.toBytes());
-
-    return signature.toHexString();
+    return await sendSignedTransactions(
+      tx: transaction,
+      sig: signature.toBytes(),
+      walletIndex: walletIndex,
+      accountIndex: accountIndex,
+    );
   }
 }
