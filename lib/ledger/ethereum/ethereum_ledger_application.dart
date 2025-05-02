@@ -36,20 +36,22 @@ class EthereumLedgerApp {
     Uint8List message,
     int accountIndex,
   ) async {
-    final signature = await ledger.sendOperation<EthLedgerSignature>(
+    final signatureBytes = await ledger.sendOperation<Uint8List>(
       EthereumPersonalMessageOperation(
           accountIndex: accountIndex, message: message),
       transformer: transformer,
     );
 
-    return signature;
+    _checkResult(signatureBytes);
+
+    return EthLedgerSignature.fromLedgerResponse(signatureBytes);
   }
 
   Future<EthLedgerSignature> signEIP712HashedMessage(
     Eip712Hashes hashes,
     int accountIndex,
   ) async {
-    final signature = await ledger.sendOperation<EthLedgerSignature>(
+    final signatureBytes = await ledger.sendOperation<Uint8List>(
       EthereumEIP712HashedMessageOperation(
         accountIndex: accountIndex,
         domainSeparator: hashes.domainSeparator,
@@ -58,7 +60,9 @@ class EthereumLedgerApp {
       transformer: transformer,
     );
 
-    return signature;
+    _checkResult(signatureBytes);
+
+    return EthLedgerSignature.fromLedgerResponse(signatureBytes);
   }
 
   Future<EthLedgerSignature> signTransaction(
@@ -66,7 +70,7 @@ class EthereumLedgerApp {
     int accountIndex,
   ) async {
     final txRLP = await encodeTxRlp(tx: transaction);
-    final signature = await ledger.sendOperation<EthLedgerSignature>(
+    final signatureBytes = await ledger.sendOperation<Uint8List>(
       EthereumTransactionOperation(
         accountIndex: accountIndex,
         transaction: txRLP,
@@ -74,6 +78,20 @@ class EthereumLedgerApp {
       transformer: transformer,
     );
 
-    return signature;
+    _checkResult(signatureBytes);
+
+    return EthLedgerSignature.fromLedgerResponse(signatureBytes);
+  }
+
+  static void _checkResult(Uint8List result) {
+    if (result.length != 2) {
+      return;
+    }
+
+    if (result.first == 105 && result.last == 103) {
+      throw Exception('Rejected');
+    } else if (result.first == 85 && result.last == 21) {
+      throw Exception('Device is locked');
+    }
   }
 }

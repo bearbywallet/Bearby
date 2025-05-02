@@ -72,8 +72,6 @@ class EthLedgerSignature {
   }
 
   static EthLedgerSignature fromLedgerResponse(Uint8List bytes) {
-    _checkResult(bytes);
-
     if (bytes.length < 65) {
       throw FormatException('Response too short to contain valid signature');
     }
@@ -83,17 +81,5 @@ class EthLedgerSignature {
     Uint8List s = Uint8List.sublistView(bytes, 1 + 32, 1 + 32 + 32);
 
     return EthLedgerSignature(v: v, r: r, s: s);
-  }
-
-  static void _checkResult(Uint8List result) {
-    if (result.length != 2) {
-      return;
-    }
-
-    if (result.first == 105 && result.last == 103) {
-      throw Exception('Rejected');
-    } else if (result.first == 85 && result.last == 21) {
-      throw Exception('Device is locked');
-    }
   }
 }

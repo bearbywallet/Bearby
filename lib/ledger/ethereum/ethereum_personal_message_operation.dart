@@ -1,11 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
-import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
 
-class EthereumPersonalMessageOperation
-    extends LedgerRawOperation<EthLedgerSignature> {
+class EthereumPersonalMessageOperation extends LedgerRawOperation<Uint8List> {
   final int accountIndex;
   final Uint8List message;
 
@@ -59,8 +57,8 @@ class EthereumPersonalMessageOperation
   }
 
   @override
-  Future<EthLedgerSignature> read(ByteDataReader reader) async {
+  Future<Uint8List> read(ByteDataReader reader) async {
     final bytes = reader.read(reader.remainingLength);
-    return EthLedgerSignature.fromLedgerResponse(bytes);
+    return bytes;
   }
 }
