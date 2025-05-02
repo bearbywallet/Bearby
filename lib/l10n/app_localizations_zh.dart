@@ -1232,18 +1232,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get dappListItemJustNow => '刚刚';
 
   @override
-  String get ledgerConnectDialogWalletNameHint => '钱包名称';
-
-  @override
-  String get ledgerConnectDialogEmptyWalletName => '钱包名称不能为空';
-
-  @override
-  String get ledgerConnectDialogWalletNameTooLong => '钱包名称过长';
-
-  @override
-  String get ledgerConnectDialogConnectButton => '连接';
-
-  @override
   String get secretRecoveryModalRevealPhraseTitle => '显示助记词';
 
   @override
@@ -1515,4 +1503,48 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get editGasDialogInvalidGasValues => '燃料值无效。请检查您的输入。';
+
+  @override
+  String get addLedgerAccountPageAppBarTitle => '添加Ledger账户';
+
+  @override
+  String get addLedgerAccountPageWalletNameHint => '钱包名称';
+
+  @override
+  String get addLedgerAccountPageGetAccountsButton => '获取账户';
+
+  @override
+  String get addLedgerAccountPageCreateButton => '创建';
+
+  @override
+  String get addLedgerAccountPageAddButton => '添加';
+
+  @override
+  String get addLedgerAccountPageScanningMessage => '正在扫描Ledger设备...';
+
+  @override
+  String get addLedgerAccountPageNoDevicesMessage => '未找到Ledger设备';
+
+  @override
+  String get addLedgerAccountPageBluetoothOffError => '蓝牙已关闭。请启用蓝牙以扫描Ledger设备。';
+
+  @override
+  String get addLedgerAccountPageEmptyWalletNameError => '钱包名称不能为空';
+
+  @override
+  String get addLedgerAccountPageWalletNameTooLongError => '钱包名称过长（最多24个字符）';
+
+  @override
+  String addLedgerAccountPageFailedToScanError(Object error) {
+    return '无法扫描Ledger设备：$error';
+  }
+
+  @override
+  String get addLedgerAccountPageNetworkOrLedgerMissingError => '缺少网络或Ledger数据';
+
+  @override
+  String get addLedgerAccountPageNoAccountsSelectedError => '未选择任何账户';
+
+  @override
+  String get addLedgerAccountPageNoWalletSelectedError => '未选择钱包';
 }

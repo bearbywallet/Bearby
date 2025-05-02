@@ -86,12 +86,35 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       } else {
         setState(() {
           _network = network;
-          if (_ledgers.isEmpty && ledger != null) {
-            _ledgers = [ledger];
+          if (ledger != null) {
+            if (!_ledgers.any((d) => d.id == ledger.id)) {
+              _ledgers.add(ledger);
+            }
+            _selectedDevice = ledger;
+            _stopLedgerScan();
           }
           _createWallet = createWallet ?? true;
-          _walletNameController.text =
-              "${_ledgers.first.name} (${network.name})";
+          _walletNameController.text = _ledgers.isNotEmpty
+              ? "${_ledgers.first.name} (${network.name})"
+              : "Ledger Wallet (${network.name})";
+
+          final appState = context.read<AppState>();
+          final isLedgerWallet = appState.selectedWallet != -1 &&
+              appState.wallets[appState.selectedWallet].walletType
+                  .contains(WalletType.ledger.name);
+
+          if (isLedgerWallet && !_createWallet) {
+            final existingAccounts = appState.wallet?.accounts ?? [];
+            _accounts = existingAccounts
+                .map((account) => EthLedgerAccount(
+                      index: account.index.toInt(),
+                      address: account.addr,
+                      publicKey: account.pubKey,
+                    ))
+                .toList();
+            _selectedAccounts = {for (var account in _accounts) account: true};
+            _accountsLoaded = true;
+          }
         });
       }
     }
@@ -113,11 +136,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
 
+    if (_selectedDevice != null) {
+      return;
+    }
+
     if (!_createWallet || isLedgerWallet) {
       _startLedgerScan();
-    } else {
+    } else if (_ledgers.isNotEmpty) {
       setState(() {
         _selectedDevice = _ledgers.first;
+        _stopLedgerScan();
       });
     }
   }
@@ -127,7 +155,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       setState(() {
         _isScanning = false;
         _errorMessage = AppLocalizations.of(context)!
-            .signMessageModalContentFailedToScanLedger('Max retries reached');
+            .addLedgerAccountPageFailedToScanError('Max retries reached');
       });
       return;
     }
@@ -141,7 +169,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       onPermissionRequest: (status) async {
         if (status != AvailabilityState.poweredOn) {
           setState(() => _errorMessage = AppLocalizations.of(context)!
-              .signMessageModalContentBluetoothOff);
+              .addLedgerAccountPageBluetoothOffError);
           return false;
         }
         return true;
@@ -172,10 +200,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           setState(() {
             _isScanning = false;
             _errorMessage = AppLocalizations.of(context)!
-                .signMessageModalContentFailedToScanLedger(e.toString());
+                .addLedgerAccountPageFailedToScanError(e.toString());
           });
           Future.delayed(const Duration(seconds: 2), () {
-            if (mounted && _ledgers.isEmpty) {
+            if (mounted && _ledgers.isEmpty && _selectedDevice == null) {
               _startLedgerScan();
             }
           });
@@ -185,11 +213,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     _scanTimeout = Timer(const Duration(seconds: 15), () {
       _stopLedgerScan();
-      if (mounted && _ledgers.isEmpty) {
-        setState(() => _errorMessage = AppLocalizations.of(context)!
-            .signMessageModalContentNoLedgerDevices);
+      if (mounted && _ledgers.isEmpty && _selectedDevice == null) {
+        setState(() => _errorMessage =
+            AppLocalizations.of(context)!.addLedgerAccountPageNoDevicesMessage);
         Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
+          if (mounted && _selectedDevice == null) {
             _startLedgerScan();
           }
         });
@@ -206,14 +234,16 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   Future<void> _onGetAccounts() async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (_walletNameController.text.trim().isEmpty) {
-      setState(() => _errorMessage = l10n.ledgerConnectDialogEmptyWalletName);
+    if (_walletNameController.text.trim().isEmpty && _createWallet) {
+      setState(
+          () => _errorMessage = l10n.addLedgerAccountPageEmptyWalletNameError);
       _btnController.reset();
       return;
     }
 
-    if (_walletNameController.text.length > 24) {
-      setState(() => _errorMessage = l10n.ledgerConnectDialogWalletNameTooLong);
+    if (_walletNameController.text.length > 24 && _createWallet) {
+      setState(() =>
+          _errorMessage = l10n.addLedgerAccountPageWalletNameTooLongError);
       _btnController.reset();
       return;
     }
@@ -226,7 +256,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     try {
       if (_network == null || _selectedDevice == null) {
-        throw Exception("Network or Ledger data is missing.");
+        throw Exception(l10n.addLedgerAccountPageNetworkOrLedgerMissingError);
       }
 
       final ledgerInterface = LedgerInterface.ble(
@@ -238,10 +268,21 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final accounts = await ethereumApp
           .getAccounts(List<int>.generate(_accountCount, (i) => i));
 
+      final appState = context.read<AppState>();
+      final existingPubKeys = appState.wallet?.accounts
+              .map((account) => account.pubKey.toLowerCase())
+              .toSet() ??
+          {};
+
       if (mounted) {
         setState(() {
           _accounts = accounts;
-          _selectedAccounts = {for (var account in accounts) account: true};
+          _selectedAccounts = {
+            for (var account in accounts)
+              account: existingPubKeys.contains(account.publicKey.toLowerCase())
+                  ? true
+                  : true
+          };
           _accountsLoaded = true;
           _loading = false;
         });
@@ -253,8 +294,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     } on LedgerException catch (e) {
       _handleLedgerError(e);
     } catch (e) {
-      setState(() =>
-          _errorMessage = "An unexpected error occurred: ${e.toString()}");
+      setState(() => _errorMessage = e.toString());
       _btnController.error();
       Future.delayed(const Duration(seconds: 2),
           () => mounted ? _btnController.reset() : null);
@@ -282,6 +322,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   void _toggleAccount(EthLedgerAccount account, bool value) {
     if (_loading) return;
+    final appState = context.read<AppState>();
+    final existingPubKeys = appState.wallet?.accounts
+            .map((account) => account.pubKey.toLowerCase())
+            .toSet() ??
+        {};
+    if (existingPubKeys.contains(account.publicKey.toLowerCase())) {
+      return;
+    }
     setState(() {
       _selectedAccounts[account] = value;
     });
@@ -296,6 +344,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     try {
       final appState = Provider.of<AppState>(context, listen: false);
+      final l10n = AppLocalizations.of(context)!;
       final BigInt? chainHash;
 
       List<NetworkConfigInfo> chains = await getProviders();
@@ -336,7 +385,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             .toList();
 
         if (selectedAccounts.isEmpty) {
-          throw Exception("No accounts selected.");
+          throw Exception(l10n.addLedgerAccountPageNoAccountsSelectedError);
         }
 
         final pubKeys =
@@ -383,11 +432,17 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         final wallet = appState.wallet;
 
         if (wallet == null) {
-          throw Exception("No wallet selected");
+          throw Exception(l10n.addLedgerAccountPageNoWalletSelectedError);
         }
 
-        _selectedAccounts.forEach((account, isSelected) async {
-          if (isSelected) {
+        final existingPubKeys = wallet.accounts
+            .map((account) => account.pubKey.toLowerCase())
+            .toSet();
+
+        for (var entry in _selectedAccounts.entries) {
+          if (entry.value &&
+              !existingPubKeys.contains(entry.key.publicKey.toLowerCase())) {
+            final account = entry.key;
             final accountName = "ledger ${account.index + 1}";
             await addLedgerAccount(
               walletIndex: BigInt.from(walletIndex),
@@ -398,7 +453,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
               sessionCipher: "",
             );
           }
-        });
+        }
 
         await appState.syncData();
         _createBtnController.success();
@@ -524,6 +579,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   Widget _buildWalletInfoCard(AppTheme theme, AppLocalizations l10n) {
+    final appState = context.read<AppState>();
+    final isLedgerWallet = appState.selectedWallet != -1 &&
+        appState.wallets[appState.selectedWallet].walletType
+            .contains(WalletType.ledger.name);
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -537,30 +597,32 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            l10n.ledgerConnectDialogWalletNameHint,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
+          if (!isLedgerWallet) ...[
+            Text(
+              l10n.addLedgerAccountPageWalletNameHint,
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
             ),
-          ),
-          const SizedBox(height: 8),
-          SmartInput(
-            controller: _walletNameController,
-            hint: l10n.ledgerConnectDialogWalletNameHint,
-            fontSize: 14,
-            height: 45,
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            focusedBorderColor: theme.primaryPurple,
-            disabled: _loading,
-            onChanged: (_) {
-              if (_errorMessage.isNotEmpty) {
-                setState(() => _errorMessage = '');
-              }
-            },
-          ),
-          const SizedBox(height: 16),
+            const SizedBox(height: 8),
+            SmartInput(
+              controller: _walletNameController,
+              hint: l10n.addLedgerAccountPageWalletNameHint,
+              fontSize: 14,
+              height: 45,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              focusedBorderColor: theme.primaryPurple,
+              disabled: _loading || !_createWallet,
+              onChanged: (_) {
+                if (_errorMessage.isNotEmpty) {
+                  setState(() => _errorMessage = '');
+                }
+              },
+            ),
+            const SizedBox(height: 16),
+          ],
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
@@ -592,7 +654,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 controller: _btnController,
                 onPressed: _onGetAccounts,
                 child: Text(
-                  "Get Accounts",
+                  l10n.addLedgerAccountPageGetAccountsButton,
                   style: TextStyle(
                     color: theme.buttonText,
                     fontSize: 18,
@@ -625,6 +687,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           ..._accounts.map((account) {
             final shortAddress =
                 "${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}";
+            final isExisting = _selectedAccounts[account] == true &&
+                context.read<AppState>().wallet?.accounts.any((a) =>
+                        a.pubKey.toLowerCase() ==
+                        account.publicKey.toLowerCase()) ==
+                    true;
             return EnableCard(
               title: "Account ${account.index + 1}",
               name: shortAddress,
@@ -633,14 +700,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 width: 20,
                 height: 20,
                 colorFilter: ColorFilter.mode(
-                  theme.success,
+                  isExisting ? theme.textSecondary : theme.success,
                   BlendMode.srcIn,
                 ),
               ),
               isDefault: false,
               isEnabled: _selectedAccounts[account] ?? false,
               onToggle:
-                  _loading ? null : (value) => _toggleAccount(account, value),
+                  isExisting ? null : (value) => _toggleAccount(account, value),
             );
           }).toList(),
         ],
@@ -657,57 +724,103 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         color: theme.danger.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(8),
       ),
-      child: Text(
-        _errorMessage,
-        style: TextStyle(
-          color: theme.danger,
-          fontSize: 14,
-          fontWeight: FontWeight.w500,
-        ),
-        textAlign: TextAlign.center,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'assets/icons/warning.svg',
+            width: 24,
+            height: 24,
+            colorFilter: ColorFilter.mode(theme.danger, BlendMode.srcIn),
+          ),
+          const SizedBox(width: 8),
+          Expanded(
+            child: Text(
+              _errorMessage,
+              style: TextStyle(
+                color: theme.danger,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        ],
       ),
     );
   }
 
   Widget _buildDeviceList(AppTheme theme, AppLocalizations l10n) {
     if (_isScanning) {
-      return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            CircularProgressIndicator(),
-            SizedBox(height: 16),
-            Text(
-              'Scan Ledger...',
-              style: TextStyle(color: theme.textSecondary),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                LinearProgressIndicator(
+                  backgroundColor: theme.textSecondary.withValues(alpha: 0.3),
+                  valueColor:
+                      AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                ),
+                const SizedBox(height: 16),
+                Text(
+                  l10n.addLedgerAccountPageScanningMessage,
+                  style: TextStyle(color: theme.textSecondary),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       );
     } else if (_ledgers.isEmpty) {
-      return Center(
-        child: Text(
-          l10n.signMessageModalContentNoLedgerDevices,
-          style: TextStyle(color: theme.textSecondary),
-        ),
+      return Column(
+        mainAxisAlignment: MainAxisAlignment.start,
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Text(
+              l10n.addLedgerAccountPageNoDevicesMessage,
+              style: TextStyle(color: theme.textSecondary),
+            ),
+          ),
+        ],
       );
     }
-    return ListView.builder(
-      itemCount: _ledgers.length,
-      itemBuilder: (context, index) {
-        final device = _ledgers[index];
-        return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: LedgerCard(
-            device: device,
-            isConnected: device.id == _selectedDevice?.id,
-            isConnecting: false,
-            onTap: () {
-              setState(() => _selectedDevice = device);
-            },
-          ),
-        );
+    return RefreshIndicator(
+      onRefresh: () async {
+        _stopLedgerScan();
+        setState(() {
+          _scanRetries = 0;
+          _ledgers.clear();
+          _selectedDevice = null;
+        });
+        await _startLedgerScan();
       },
+      color: theme.primaryPurple,
+      backgroundColor: theme.cardBackground,
+      child: ListView.builder(
+        physics: const AlwaysScrollableScrollPhysics(),
+        itemCount: _ledgers.length,
+        itemBuilder: (context, index) {
+          final device = _ledgers[index];
+          return Padding(
+            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
+            child: LedgerCard(
+              device: device,
+              isConnected: device.id == _selectedDevice?.id,
+              isConnecting: false,
+              onTap: () {
+                setState(() {
+                  _selectedDevice = device;
+                  _stopLedgerScan();
+                });
+              },
+            ),
+          );
+        },
+      ),
     );
   }
 
@@ -726,51 +839,74 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 Column(
                   children: [
                     CustomAppBar(
-                      title: "Ledger Account",
+                      title: l10n.addLedgerAccountPageAppBarTitle,
                       onBackPressed: () => Navigator.pop(context),
                     ),
                     if (_network == null)
                       Expanded(
-                        child: Center(
-                          child: CircularProgressIndicator(
-                            valueColor: AlwaysStoppedAnimation<Color>(
-                                theme.primaryPurple),
-                          ),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: LinearProgressIndicator(
+                                backgroundColor:
+                                    theme.textSecondary.withValues(alpha: 0.3),
+                                valueColor: AlwaysStoppedAnimation<Color>(
+                                    theme.primaryPurple),
+                              ),
+                            ),
+                          ],
                         ),
                       )
-                    else if (!_createWallet ||
-                        (Provider.of<AppState>(context).selectedWallet != -1 &&
-                            Provider.of<AppState>(context)
-                                .wallets[Provider.of<AppState>(context)
-                                    .selectedWallet]
-                                .walletType
-                                .contains(WalletType.ledger.name)))
+                    else if (_selectedDevice == null &&
+                        (!_createWallet ||
+                            (Provider.of<AppState>(context).selectedWallet !=
+                                    -1 &&
+                                Provider.of<AppState>(context)
+                                    .wallets[Provider.of<AppState>(context)
+                                        .selectedWallet]
+                                    .walletType
+                                    .contains(WalletType.ledger.name))))
                       Expanded(
                         child: _buildDeviceList(theme, l10n),
                       )
                     else
                       Expanded(
-                        child: SingleChildScrollView(
-                          physics: const BouncingScrollPhysics(),
-                          child: Padding(
-                            padding: EdgeInsets.all(adaptivePadding),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                _buildDeviceInfoCard(theme, l10n),
-                                if (_errorMessage.isNotEmpty) ...[
+                        child: RefreshIndicator(
+                          onRefresh: () async {
+                            _stopLedgerScan();
+                            setState(() {
+                              _scanRetries = 0;
+                              _ledgers.clear();
+                              _selectedDevice = null;
+                            });
+                            await _startLedgerScan();
+                          },
+                          color: theme.primaryPurple,
+                          backgroundColor: theme.cardBackground,
+                          child: SingleChildScrollView(
+                            physics: const AlwaysScrollableScrollPhysics(),
+                            child: Padding(
+                              padding: EdgeInsets.all(adaptivePadding),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  _buildDeviceInfoCard(theme, l10n),
+                                  if (_errorMessage.isNotEmpty) ...[
+                                    const SizedBox(height: 16),
+                                    _buildErrorMessage(theme),
+                                  ],
                                   const SizedBox(height: 16),
-                                  _buildErrorMessage(theme),
+                                  _buildWalletInfoCard(theme, l10n),
+                                  if (_accountsLoaded &&
+                                      _accounts.isNotEmpty) ...[
+                                    const SizedBox(height: 16),
+                                    _buildAccountsCard(theme),
+                                  ],
+                                  const SizedBox(height: 80),
                                 ],
-                                const SizedBox(height: 16),
-                                _buildWalletInfoCard(theme, l10n),
-                                if (_accountsLoaded &&
-                                    _accounts.isNotEmpty) ...[
-                                  const SizedBox(height: 16),
-                                  _buildAccountsCard(theme),
-                                ],
-                                const SizedBox(height: 80),
-                              ],
+                              ),
                             ),
                           ),
                         ),
@@ -791,7 +927,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                         onPressed: _saveSelectedAccounts,
                         successIcon: "assets/icons/ok.svg",
                         child: Text(
-                          _createWallet ? "Create" : "Add",
+                          _createWallet
+                              ? l10n.addLedgerAccountPageCreateButton
+                              : l10n.addLedgerAccountPageAddButton,
                           style: TextStyle(
                             color: theme.buttonText,
                             fontSize: 18,

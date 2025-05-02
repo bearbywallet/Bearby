@@ -1232,18 +1232,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get dappListItemJustNow => 'just now';
 
   @override
-  String get ledgerConnectDialogWalletNameHint => 'Wallet Name';
-
-  @override
-  String get ledgerConnectDialogEmptyWalletName => 'Wallet name cannot be empty';
-
-  @override
-  String get ledgerConnectDialogWalletNameTooLong => 'Wallet name is too long';
-
-  @override
-  String get ledgerConnectDialogConnectButton => 'Connect';
-
-  @override
   String get secretRecoveryModalRevealPhraseTitle => 'Reveal Secret Recovery Phrase';
 
   @override
@@ -1515,4 +1503,48 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get editGasDialogInvalidGasValues => 'Invalid gas values. Please check your inputs.';
+
+  @override
+  String get addLedgerAccountPageAppBarTitle => 'Add Ledger Account';
+
+  @override
+  String get addLedgerAccountPageWalletNameHint => 'Wallet Name';
+
+  @override
+  String get addLedgerAccountPageGetAccountsButton => 'Get Accounts';
+
+  @override
+  String get addLedgerAccountPageCreateButton => 'Create';
+
+  @override
+  String get addLedgerAccountPageAddButton => 'Add';
+
+  @override
+  String get addLedgerAccountPageScanningMessage => 'Scanning for Ledger devices...';
+
+  @override
+  String get addLedgerAccountPageNoDevicesMessage => 'No Ledger devices found';
+
+  @override
+  String get addLedgerAccountPageBluetoothOffError => 'Bluetooth is turned off. Please enable it to scan for Ledger devices.';
+
+  @override
+  String get addLedgerAccountPageEmptyWalletNameError => 'Wallet name cannot be empty';
+
+  @override
+  String get addLedgerAccountPageWalletNameTooLongError => 'Wallet name is too long (max 24 characters)';
+
+  @override
+  String addLedgerAccountPageFailedToScanError(Object error) {
+    return 'Failed to scan for Ledger devices: $error';
+  }
+
+  @override
+  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'Network or Ledger data is missing';
+
+  @override
+  String get addLedgerAccountPageNoAccountsSelectedError => 'No accounts selected';
+
+  @override
+  String get addLedgerAccountPageNoWalletSelectedError => 'No wallet selected';
 }

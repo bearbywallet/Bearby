@@ -2493,30 +2493,6 @@ abstract class AppLocalizations {
   /// **'just now'**
   String get dappListItemJustNow;
 
-  /// Hint text for the wallet name input field in the LedgerConnectDialog component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet Name'**
-  String get ledgerConnectDialogWalletNameHint;
-
-  /// Error message displayed when the wallet name is empty in the LedgerConnectDialog component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet name cannot be empty'**
-  String get ledgerConnectDialogEmptyWalletName;
-
-  /// Error message displayed when the wallet name exceeds the maximum length in the LedgerConnectDialog component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet name is too long'**
-  String get ledgerConnectDialogWalletNameTooLong;
-
-  /// Text for the connect button in the LedgerConnectDialog component
-  ///
-  /// In en, this message translates to:
-  /// **'Connect'**
-  String get ledgerConnectDialogConnectButton;
-
   /// Title for the secret recovery phrase option in the SecretRecoveryModal component
   ///
   /// In en, this message translates to:
@@ -3062,6 +3038,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Invalid gas values. Please check your inputs.'**
   String get editGasDialogInvalidGasValues;
+
+  /// Title for the app bar in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Add Ledger Account'**
+  String get addLedgerAccountPageAppBarTitle;
+
+  /// Label for the wallet name input field in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet Name'**
+  String get addLedgerAccountPageWalletNameHint;
+
+  /// Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Get Accounts'**
+  String get addLedgerAccountPageGetAccountsButton;
+
+  /// Button text for creating a new wallet in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get addLedgerAccountPageCreateButton;
+
+  /// Button text for adding accounts to an existing wallet in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get addLedgerAccountPageAddButton;
+
+  /// Message displayed while scanning for Ledger devices in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning for Ledger devices...'**
+  String get addLedgerAccountPageScanningMessage;
+
+  /// Message displayed when no Ledger devices are found in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'No Ledger devices found'**
+  String get addLedgerAccountPageNoDevicesMessage;
+
+  /// Error message displayed when Bluetooth is disabled in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is turned off. Please enable it to scan for Ledger devices.'**
+  String get addLedgerAccountPageBluetoothOffError;
+
+  /// Error message displayed when the wallet name is empty in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name cannot be empty'**
+  String get addLedgerAccountPageEmptyWalletNameError;
+
+  /// Error message displayed when the wallet name exceeds the maximum length in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Wallet name is too long (max 24 characters)'**
+  String get addLedgerAccountPageWalletNameTooLongError;
+
+  /// Error message displayed when scanning for Ledger devices fails in the AddLedgerAccountPage component, with a placeholder for the error details
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to scan for Ledger devices: {error}'**
+  String addLedgerAccountPageFailedToScanError(Object error);
+
+  /// Error message displayed when network or Ledger data is missing in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'Network or Ledger data is missing'**
+  String get addLedgerAccountPageNetworkOrLedgerMissingError;
+
+  /// Error message displayed when no accounts are selected for creating a wallet in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'No accounts selected'**
+  String get addLedgerAccountPageNoAccountsSelectedError;
+
+  /// Error message displayed when no wallet is selected for adding accounts in the AddLedgerAccountPage component
+  ///
+  /// In en, this message translates to:
+  /// **'No wallet selected'**
+  String get addLedgerAccountPageNoWalletSelectedError;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

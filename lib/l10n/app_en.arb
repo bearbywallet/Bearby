@@ -1744,22 +1744,7 @@
   "@dappListItemJustNow": {
     "description": "Text indicating a DApp was connected very recently in the DappListItem component"
   },
-  "ledgerConnectDialogWalletNameHint": "Wallet Name",
-  "@ledgerConnectDialogWalletNameHint": {
-    "description": "Hint text for the wallet name input field in the LedgerConnectDialog component"
-  },
-  "ledgerConnectDialogEmptyWalletName": "Wallet name cannot be empty",
-  "@ledgerConnectDialogEmptyWalletName": {
-    "description": "Error message displayed when the wallet name is empty in the LedgerConnectDialog component"
-  },
-  "ledgerConnectDialogWalletNameTooLong": "Wallet name is too long",
-  "@ledgerConnectDialogWalletNameTooLong": {
-    "description": "Error message displayed when the wallet name exceeds the maximum length in the LedgerConnectDialog component"
-  },
-  "ledgerConnectDialogConnectButton": "Connect",
-  "@ledgerConnectDialogConnectButton": {
-    "description": "Text for the connect button in the LedgerConnectDialog component"
-  },
+
   "secretRecoveryModalRevealPhraseTitle": "Reveal Secret Recovery Phrase",
   "@secretRecoveryModalRevealPhraseTitle": {
     "description": "Title for the secret recovery phrase option in the SecretRecoveryModal component"
@@ -2127,5 +2112,65 @@
   "editGasDialogInvalidGasValues": "Invalid gas values. Please check your inputs.",
   "@editGasDialogInvalidGasValues": {
     "description": "Error message shown when invalid gas values are entered"
+  },
+
+  "addLedgerAccountPageAppBarTitle": "Add Ledger Account",
+  "@addLedgerAccountPageAppBarTitle": {
+    "description": "Title for the app bar in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageWalletNameHint": "Wallet Name",
+  "@addLedgerAccountPageWalletNameHint": {
+    "description": "Label for the wallet name input field in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageGetAccountsButton": "Get Accounts",
+  "@addLedgerAccountPageGetAccountsButton": {
+    "description": "Button text for fetching accounts from a Ledger device in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageCreateButton": "Create",
+  "@addLedgerAccountPageCreateButton": {
+    "description": "Button text for creating a new wallet in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageAddButton": "Add",
+  "@addLedgerAccountPageAddButton": {
+    "description": "Button text for adding accounts to an existing wallet in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageScanningMessage": "Scanning for Ledger devices...",
+  "@addLedgerAccountPageScanningMessage": {
+    "description": "Message displayed while scanning for Ledger devices in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageNoDevicesMessage": "No Ledger devices found",
+  "@addLedgerAccountPageNoDevicesMessage": {
+    "description": "Message displayed when no Ledger devices are found in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageBluetoothOffError": "Bluetooth is turned off. Please enable it to scan for Ledger devices.",
+  "@addLedgerAccountPageBluetoothOffError": {
+    "description": "Error message displayed when Bluetooth is disabled in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageEmptyWalletNameError": "Wallet name cannot be empty",
+  "@addLedgerAccountPageEmptyWalletNameError": {
+    "description": "Error message displayed when the wallet name is empty in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageWalletNameTooLongError": "Wallet name is too long (max 24 characters)",
+  "@addLedgerAccountPageWalletNameTooLongError": {
+    "description": "Error message displayed when the wallet name exceeds the maximum length in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageFailedToScanError": "Failed to scan for Ledger devices: {error}",
+  "@addLedgerAccountPageFailedToScanError": {
+    "description": "Error message displayed when scanning for Ledger devices fails in the AddLedgerAccountPage component, with a placeholder for the error details",
+    "placeholders": {
+      "error": {}
+    }
+  },
+  "addLedgerAccountPageNetworkOrLedgerMissingError": "Network or Ledger data is missing",
+  "@addLedgerAccountPageNetworkOrLedgerMissingError": {
+    "description": "Error message displayed when network or Ledger data is missing in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageNoAccountsSelectedError": "No accounts selected",
+  "@addLedgerAccountPageNoAccountsSelectedError": {
+    "description": "Error message displayed when no accounts are selected for creating a wallet in the AddLedgerAccountPage component"
+  },
+  "addLedgerAccountPageNoWalletSelectedError": "No wallet selected",
+  "@addLedgerAccountPageNoWalletSelectedError": {
+    "description": "Error message displayed when no wallet is selected for adding accounts in the AddLedgerAccountPage component"
   }
 }

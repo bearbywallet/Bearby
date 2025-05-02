@@ -1232,18 +1232,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get dappListItemJustNow => 'только что';
 
   @override
-  String get ledgerConnectDialogWalletNameHint => 'Название кошелька';
-
-  @override
-  String get ledgerConnectDialogEmptyWalletName => 'Название кошелька не может быть пустым';
-
-  @override
-  String get ledgerConnectDialogWalletNameTooLong => 'Название кошелька слишком длинное';
-
-  @override
-  String get ledgerConnectDialogConnectButton => 'Подключить';
-
-  @override
   String get secretRecoveryModalRevealPhraseTitle => 'Показать фразу восстановления';
 
   @override
@@ -1515,4 +1503,48 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get editGasDialogInvalidGasValues => 'Недопустимые значения газа. Проверьте ваши данные.';
+
+  @override
+  String get addLedgerAccountPageAppBarTitle => 'Добавить аккаунт Ledger';
+
+  @override
+  String get addLedgerAccountPageWalletNameHint => 'Имя кошелька';
+
+  @override
+  String get addLedgerAccountPageGetAccountsButton => 'Получить аккаунты';
+
+  @override
+  String get addLedgerAccountPageCreateButton => 'Создать';
+
+  @override
+  String get addLedgerAccountPageAddButton => 'Добавить';
+
+  @override
+  String get addLedgerAccountPageScanningMessage => 'Сканирование устройств Ledger...';
+
+  @override
+  String get addLedgerAccountPageNoDevicesMessage => 'Устройства Ledger не найдены';
+
+  @override
+  String get addLedgerAccountPageBluetoothOffError => 'Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.';
+
+  @override
+  String get addLedgerAccountPageEmptyWalletNameError => 'Имя кошелька не может быть пустым';
+
+  @override
+  String get addLedgerAccountPageWalletNameTooLongError => 'Имя кошелька слишком длинное (максимум 24 символа)';
+
+  @override
+  String addLedgerAccountPageFailedToScanError(Object error) {
+    return 'Не удалось отсканировать устройства Ledger: $error';
+  }
+
+  @override
+  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'Отсутствуют данные сети или Ledger';
+
+  @override
+  String get addLedgerAccountPageNoAccountsSelectedError => 'Аккаунты не выбраны';
+
+  @override
+  String get addLedgerAccountPageNoWalletSelectedError => 'Кошелёк не выбран';
 }

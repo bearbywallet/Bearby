@@ -1232,18 +1232,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get dappListItemJustNow => 'たった今';
 
   @override
-  String get ledgerConnectDialogWalletNameHint => 'ウォレット名';
-
-  @override
-  String get ledgerConnectDialogEmptyWalletName => 'ウォレット名は空にできません';
-
-  @override
-  String get ledgerConnectDialogWalletNameTooLong => 'ウォレット名が長すぎます';
-
-  @override
-  String get ledgerConnectDialogConnectButton => '接続';
-
-  @override
   String get secretRecoveryModalRevealPhraseTitle => '秘密回復フレーズを表示';
 
   @override
@@ -1515,4 +1503,48 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get editGasDialogInvalidGasValues => '無効なガス値です。入力を確認してください。';
+
+  @override
+  String get addLedgerAccountPageAppBarTitle => 'Ledgerアカウントを追加';
+
+  @override
+  String get addLedgerAccountPageWalletNameHint => 'ウォレット名';
+
+  @override
+  String get addLedgerAccountPageGetAccountsButton => 'アカウントを取得';
+
+  @override
+  String get addLedgerAccountPageCreateButton => '作成';
+
+  @override
+  String get addLedgerAccountPageAddButton => '追加';
+
+  @override
+  String get addLedgerAccountPageScanningMessage => 'Ledgerデバイスをスキャン中...';
+
+  @override
+  String get addLedgerAccountPageNoDevicesMessage => 'Ledgerデバイスが見つかりません';
+
+  @override
+  String get addLedgerAccountPageBluetoothOffError => 'Bluetoothがオフになっています。Ledgerデバイスをスキャンするためにオンにしてください。';
+
+  @override
+  String get addLedgerAccountPageEmptyWalletNameError => 'ウォレット名は空にできません';
+
+  @override
+  String get addLedgerAccountPageWalletNameTooLongError => 'ウォレット名が長すぎます（最大24文字）';
+
+  @override
+  String addLedgerAccountPageFailedToScanError(Object error) {
+    return 'Ledgerデバイスのスキャンに失敗しました：$error';
+  }
+
+  @override
+  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'ネットワークまたはLedgerデータが不足しています';
+
+  @override
+  String get addLedgerAccountPageNoAccountsSelectedError => 'アカウントが選択されていません';
+
+  @override
+  String get addLedgerAccountPageNoWalletSelectedError => 'ウォレットが選択されていません';
 }

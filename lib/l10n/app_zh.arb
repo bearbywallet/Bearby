@@ -453,11 +453,6 @@
   "dappListItemConnected": "已连接 {time}",
   "dappListItemJustNow": "刚刚",
 
-  "ledgerConnectDialogWalletNameHint": "钱包名称",
-  "ledgerConnectDialogEmptyWalletName": "钱包名称不能为空",
-  "ledgerConnectDialogWalletNameTooLong": "钱包名称过长",
-  "ledgerConnectDialogConnectButton": "连接",
-  
   "secretRecoveryModalRevealPhraseTitle": "显示助记词",
   "secretRecoveryModalRevealPhraseDescription": "如果您更换浏览器或更换电脑，您将需要这个助记词来访问您的账户。将它们保存在安全且隐秘的地方。",
   "secretRecoveryModalRevealPhraseButton": "显示",
@@ -561,5 +556,20 @@
   "editGasDialogGasLimit": "燃料限制",
   "editGasDialogCancel": "取消",
   "editGasDialogSave": "保存",
-  "editGasDialogInvalidGasValues": "燃料值无效。请检查您的输入。"
+  "editGasDialogInvalidGasValues": "燃料值无效。请检查您的输入。",
+
+  "addLedgerAccountPageAppBarTitle": "添加Ledger账户",
+  "addLedgerAccountPageWalletNameHint": "钱包名称",
+  "addLedgerAccountPageGetAccountsButton": "获取账户",
+  "addLedgerAccountPageCreateButton": "创建",
+  "addLedgerAccountPageAddButton": "添加",
+  "addLedgerAccountPageScanningMessage": "正在扫描Ledger设备...",
+  "addLedgerAccountPageNoDevicesMessage": "未找到Ledger设备",
+  "addLedgerAccountPageBluetoothOffError": "蓝牙已关闭。请启用蓝牙以扫描Ledger设备。",
+  "addLedgerAccountPageEmptyWalletNameError": "钱包名称不能为空",
+  "addLedgerAccountPageWalletNameTooLongError": "钱包名称过长（最多24个字符）",
+  "addLedgerAccountPageFailedToScanError": "无法扫描Ledger设备：{error}",
+  "addLedgerAccountPageNetworkOrLedgerMissingError": "缺少网络或Ledger数据",
+  "addLedgerAccountPageNoAccountsSelectedError": "未选择任何账户",
+  "addLedgerAccountPageNoWalletSelectedError": "未选择钱包"
 }

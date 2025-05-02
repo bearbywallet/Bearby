@@ -471,11 +471,6 @@
   "dappListItemConnected": "Подключено {time}",
   "dappListItemJustNow": "только что",
 
-  "ledgerConnectDialogWalletNameHint": "Название кошелька",
-  "ledgerConnectDialogEmptyWalletName": "Название кошелька не может быть пустым",
-  "ledgerConnectDialogWalletNameTooLong": "Название кошелька слишком длинное",
-  "ledgerConnectDialogConnectButton": "Подключить",
-
   "secretRecoveryModalRevealPhraseTitle": "Показать фразу восстановления",
   "secretRecoveryModalRevealPhraseDescription": "Если вы когда-либо смените браузер или компьютер, вам понадобится эта секретная фраза восстановления для доступа к вашим аккаунтам. Сохраните её в безопасном и секретном месте.",
   "secretRecoveryModalRevealPhraseButton": "Показать",
@@ -577,5 +572,20 @@
   "editGasDialogGasLimit": "Лимит газа",
   "editGasDialogCancel": "Отмена",
   "editGasDialogSave": "Сохранить",
-  "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные."
+  "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные.",
+
+  "addLedgerAccountPageAppBarTitle": "Добавить аккаунт Ledger",
+  "addLedgerAccountPageWalletNameHint": "Имя кошелька",
+  "addLedgerAccountPageGetAccountsButton": "Получить аккаунты",
+  "addLedgerAccountPageCreateButton": "Создать",
+  "addLedgerAccountPageAddButton": "Добавить",
+  "addLedgerAccountPageScanningMessage": "Сканирование устройств Ledger...",
+  "addLedgerAccountPageNoDevicesMessage": "Устройства Ledger не найдены",
+  "addLedgerAccountPageBluetoothOffError": "Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.",
+  "addLedgerAccountPageEmptyWalletNameError": "Имя кошелька не может быть пустым",
+  "addLedgerAccountPageWalletNameTooLongError": "Имя кошелька слишком длинное (максимум 24 символа)",
+  "addLedgerAccountPageFailedToScanError": "Не удалось отсканировать устройства Ledger: {error}",
+  "addLedgerAccountPageNetworkOrLedgerMissingError": "Отсутствуют данные сети или Ledger",
+  "addLedgerAccountPageNoAccountsSelectedError": "Аккаунты не выбраны",
+  "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран"
 }

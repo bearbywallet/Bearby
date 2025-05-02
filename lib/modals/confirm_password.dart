@@ -1,10 +1,9 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import '../../components/load_button.dart';
-import '../../components/smart_input.dart';
-import '../../theme/app_theme.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 void showConfirmPasswordModal({

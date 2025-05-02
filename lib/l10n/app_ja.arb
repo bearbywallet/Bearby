@@ -475,11 +475,6 @@
   "dappListItemConnected": "{time}に接続",
   "dappListItemJustNow": "たった今",
 
-  "ledgerConnectDialogWalletNameHint": "ウォレット名",
-  "ledgerConnectDialogEmptyWalletName": "ウォレット名は空にできません",
-  "ledgerConnectDialogWalletNameTooLong": "ウォレット名が長すぎます",
-  "ledgerConnectDialogConnectButton": "接続",
-
   "secretRecoveryModalRevealPhraseTitle": "秘密回復フレーズを表示",
   "secretRecoveryModalRevealPhraseDescription": "ブラウザを変更したりコンピュータを移動する場合、アカウントにアクセスするにはこの秘密回復フレーズが必要です。安全で秘密の場所に保存してください。",
   "secretRecoveryModalRevealPhraseButton": "表示",
@@ -581,5 +576,20 @@
   "editGasDialogGasLimit": "ガスリミット",
   "editGasDialogCancel": "キャンセル",
   "editGasDialogSave": "保存",
-  "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。"
+  "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。",
+
+  "addLedgerAccountPageAppBarTitle": "Ledgerアカウントを追加",
+  "addLedgerAccountPageWalletNameHint": "ウォレット名",
+  "addLedgerAccountPageGetAccountsButton": "アカウントを取得",
+  "addLedgerAccountPageCreateButton": "作成",
+  "addLedgerAccountPageAddButton": "追加",
+  "addLedgerAccountPageScanningMessage": "Ledgerデバイスをスキャン中...",
+  "addLedgerAccountPageNoDevicesMessage": "Ledgerデバイスが見つかりません",
+  "addLedgerAccountPageBluetoothOffError": "Bluetoothがオフになっています。Ledgerデバイスをスキャンするためにオンにしてください。",
+  "addLedgerAccountPageEmptyWalletNameError": "ウォレット名は空にできません",
+  "addLedgerAccountPageWalletNameTooLongError": "ウォレット名が長すぎます（最大24文字）",
+  "addLedgerAccountPageFailedToScanError": "Ledgerデバイスのスキャンに失敗しました：{error}",
+  "addLedgerAccountPageNetworkOrLedgerMissingError": "ネットワークまたはLedgerデータが不足しています",
+  "addLedgerAccountPageNoAccountsSelectedError": "アカウントが選択されていません",
+  "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません"
 }
