@@ -161,7 +161,7 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                         .contains(WalletType.ledger.name)) {
                       Navigator.pushNamed(context, "/add_ledger_account",
                           arguments: {
-                            "createWallet": true,
+                            "createWallet": false,
                             "chain": appState.chain,
                           });
                     } else {

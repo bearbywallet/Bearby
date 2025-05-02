@@ -98,9 +98,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
               : "Ledger Wallet (${network.name})";
 
           final appState = context.read<AppState>();
-          final isLedgerWallet = appState.selectedWallet != -1 &&
-              appState.wallets[appState.selectedWallet].walletType
-                  .contains(WalletType.ledger.name);
+          final isLedgerWallet = appState
+              .wallets[appState.selectedWallet].walletType
+              .contains(WalletType.ledger.name);
 
           if (isLedgerWallet && !_createWallet) {
             final existingAccounts = appState.wallet?.accounts ?? [];
@@ -661,11 +661,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           ..._accounts.map((account) {
             final shortAddress =
                 "${account.address.substring(0, 6)}...${account.address.substring(account.address.length - 4)}";
-            final isExisting = _selectedAccounts[account] == true &&
-                context.read<AppState>().wallet?.accounts.any((a) =>
-                        a.pubKey.toLowerCase() ==
-                        account.publicKey.toLowerCase()) ==
-                    true;
             return EnableCard(
               title: "Account ${account.index + 1}",
               name: shortAddress,
@@ -674,14 +669,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 width: 20,
                 height: 20,
                 colorFilter: ColorFilter.mode(
-                  isExisting ? theme.textSecondary : theme.success,
+                  theme.success,
                   BlendMode.srcIn,
                 ),
               ),
               isDefault: false,
               isEnabled: _selectedAccounts[account] ?? false,
-              onToggle:
-                  isExisting ? null : (value) => _toggleAccount(account, value),
+              onToggle: (value) => _toggleAccount(account, value),
             );
           }).toList(),
         ],
@@ -887,7 +881,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       ),
                   ],
                 ),
-                if (_accountsLoaded && _accounts.isNotEmpty)
+                if (_accountsLoaded && _accounts.isNotEmpty && !_isScanning)
                   Positioned(
                     bottom: 0,
                     left: 0,
