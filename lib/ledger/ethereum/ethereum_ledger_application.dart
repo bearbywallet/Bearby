@@ -4,8 +4,10 @@ import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_eip712_hashed_message_operation.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_personal_message_operation.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_public_key_operation.dart';
+import 'package:zilpay/ledger/ethereum/ethereum_transaction_operation.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 
 class EthereumLedgerApp {
   final LedgerConnection ledger;
@@ -57,5 +59,21 @@ class EthereumLedgerApp {
     );
 
     return signature;
+  }
+
+  Future<Uint8List> signTransaction(
+    TransactionRequestInfo transaction,
+    int accountIndex,
+  ) async {
+    final txRLP = await encodeTxRlp(tx: transaction);
+    final signature = await ledger.sendOperation<EthLedgerSignature>(
+      EthereumTransactionOperation(
+        accountIndex: accountIndex,
+        transaction: txRLP,
+      ),
+      transformer: transformer,
+    );
+
+    return Uint8List(0);
   }
 }
