@@ -77,7 +77,9 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
       });
     }
 
-    if (appState.chain?.testnet == true || appState.chain?.slip44 != 313) {
+    if (appState.chain?.testnet == true ||
+        appState.chain?.slip44 != 313 ||
+        appState.account?.addrType != 0) {
       return;
     }
 
@@ -122,7 +124,8 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
                     decimals: t.decimals,
                     addr: t.addr,
                     addrType: t.addrType,
-                    logo: appState.wallet?.tokens.first.logo,
+                    logo:
+                        "https://meta.viewblock.io/zilliqa.%{contract_address}%/logo?t=%{light,dark}%",
                     balances: t.balances,
                     rate: t.rate,
                     default_: t.default_,
