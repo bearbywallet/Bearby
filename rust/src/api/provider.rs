@@ -15,6 +15,7 @@ use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     network::provider::NetworkProvider,
     proto::pubkey::PubKey,
+    wallet::wallet_types::WalletTypes,
 };
 
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
@@ -138,6 +139,20 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
         let mut ftokens = wallet
             .get_ftokens()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        if let WalletTypes::Ledger(_) = data.wallet_type {
+            let default_provider = core.get_provider(data.default_chain_hash)?;
+
+            if default_provider.config.slip_44 == 313 {
+                // old ledger doesn't support evm.
+                return Err(ServiceError::WalletError(
+                    wallet_index,
+                    zilpay::errors::wallet::WalletErrors::WalletTypeSerialize(
+                        "The Old ledger app is not support evm".to_string(),
+                    ),
+                ));
+            }
+        }
 
         for provider_ftoken in &provider.config.ftokens {
             if let Some(existing_ftoken) = ftokens.iter_mut().find(|t| {
