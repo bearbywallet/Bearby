@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
 
@@ -16,18 +15,28 @@ class EthereumTransactionOperation extends LedgerRawOperation<Uint8List> {
   Future<List<Uint8List>> write(ByteDataWriter writer) async {
     final output = <Uint8List>[];
     final List<int> paths = splitPath(getWalletDerivationPath(accountIndex));
+
+    if (paths.isEmpty) {
+      throw Exception('Derivation path is empty');
+    }
+
     int offset = 0;
 
     while (offset < transaction.length) {
       writer = ByteDataWriter();
-      writer.writeUint8(0xe0);
-      writer.writeUint8(0x04);
+
+      writer.writeUint8(0xe0); // CLA
+      writer.writeUint8(0x04); // ins (SIGN)
 
       final bool first = offset == 0;
       final int maxChunkSize = first ? 150 - 1 - paths.length * 4 : 150;
-      int chunkSize = offset + maxChunkSize > transaction.length
+      final int chunkSize = offset + maxChunkSize > transaction.length
           ? transaction.length - offset
           : maxChunkSize;
+
+      if (chunkSize <= 0) {
+        throw Exception('Invalid chunk size: $chunkSize at offset $offset');
+      }
 
       final buffer =
           Uint8List(first ? 1 + paths.length * 4 + chunkSize : chunkSize);
@@ -49,8 +58,15 @@ class EthereumTransactionOperation extends LedgerRawOperation<Uint8List> {
       writer.writeUint8(buffer.lengthInBytes);
       writer.write(buffer);
 
+      final chunkData = writer.toBytes();
+      output.add(chunkData);
+
       offset += chunkSize;
-      output.add(writer.toBytes());
+    }
+
+    if (offset != transaction.length) {
+      throw Exception(
+          'Incomplete data sent: sent $offset of ${transaction.length} bytes');
     }
 
     return output;

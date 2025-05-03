@@ -6,7 +6,6 @@ import 'package:zilpay/ledger/ethereum/ethereum_personal_message_operation.dart'
 import 'package:zilpay/ledger/ethereum/ethereum_public_key_operation.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_transaction_operation.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
-import 'package:zilpay/ledger/ethereum/utils.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 
