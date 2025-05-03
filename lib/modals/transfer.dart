@@ -411,6 +411,7 @@ class _ConfirmTransactionContentState
 
     final sig = await ethLedgerApp.signTransaction(
       tx,
+      appState.selectedWallet,
       accountIndex,
     );
 

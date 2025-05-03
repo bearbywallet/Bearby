@@ -857,7 +857,7 @@ fn wire__crate__api__transaction__encode_tx_rlp_impl(
     rust_vec_len_: i32,
     data_len_: i32,
 ) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_normal::<flutter_rust_bridge::for_generated::SseCodec, _, _>(
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
             debug_name: "encode_tx_rlp",
             port: Some(port_),
@@ -873,15 +873,25 @@ fn wire__crate__api__transaction__encode_tx_rlp_impl(
             };
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
             let api_tx = <crate::models::transactions::request::TransactionRequestInfo>::sse_decode(
                 &mut deserializer,
             );
             deserializer.end();
-            move |context| {
-                transform_result_sse::<_, String>((move || {
-                    let output_ok = crate::api::transaction::encode_tx_rlp(api_tx)?;
-                    Ok(output_ok)
-                })())
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::transaction::encode_tx_rlp(
+                            api_wallet_index,
+                            api_account_index,
+                            api_tx,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
             }
         },
     )

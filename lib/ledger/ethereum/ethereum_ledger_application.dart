@@ -68,9 +68,14 @@ class EthereumLedgerApp {
 
   Future<EthLedgerSignature> signTransaction(
     TransactionRequestInfo transaction,
+    int walletIndex,
     int accountIndex,
   ) async {
-    final txRLP = await encodeTxRlp(tx: transaction);
+    final txRLP = await encodeTxRlp(
+      tx: transaction,
+      walletIndex: BigInt.from(walletIndex),
+      accountIndex: BigInt.from(accountIndex),
+    );
     final signatureBytes = await ledger.sendOperation<Uint8List>(
       EthereumTransactionOperation(
         accountIndex: accountIndex,

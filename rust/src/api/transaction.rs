@@ -7,7 +7,7 @@ use crate::models::transactions::history::HistoricalTransactionInfo;
 use crate::models::transactions::request::TransactionRequestInfo;
 use crate::service::service::BACKGROUND_SERVICE;
 use crate::utils::errors::ServiceError;
-use crate::utils::utils::{decode_session, parse_address, with_service};
+use crate::utils::utils::{decode_session, parse_address, with_service, with_wallet};
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_tx::TransactionsManagement;
@@ -33,13 +33,31 @@ pub async fn send_signed_transactions(
     sig: Vec<u8>,
 ) -> Result<HistoricalTransactionInfo, String> {
     let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
-    let signed_tx = tx
-        .with_signature(sig)
-        .map_err(ServiceError::TransactionErrors)?;
+    let wallet_index = wallet_index as usize;
+    let account_index = account_index as usize;
 
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
     let core = Arc::clone(&service.core);
+    let wallet = core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+    let wallet_data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+    let sender_account =
+        wallet_data
+            .accounts
+            .get(account_index)
+            .ok_or(ServiceError::AccountError(
+                account_index,
+                wallet_index,
+                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
+            ))?;
+
+    let signed_tx = tx
+        .with_signature(sig, &sender_account.pub_key)
+        .map_err(ServiceError::TransactionErrors)?;
 
     let tx = core
         .broadcast_signed_transactions(
@@ -135,12 +153,31 @@ pub async fn sign_send_transactions(
     Ok(tx)
 }
 
-pub fn encode_tx_rlp(tx: TransactionRequestInfo) -> Result<Vec<u8>, String> {
-    let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+pub async fn encode_tx_rlp(
+    wallet_index: usize,
+    account_index: usize,
+    tx: TransactionRequestInfo,
+) -> Result<Vec<u8>, String> {
+    with_wallet(wallet_index, |wallet| {
+        let walelt_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = walelt_data
+            .accounts
+            .get(account_index)
+            .ok_or(ServiceError::AccountError(
+                account_index,
+                wallet_index,
+                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
+            ))?;
+        let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
 
-    Ok(tx
-        .to_rlp_encode()
-        .map_err(ServiceError::TransactionErrors)?)
+        Ok(tx
+            .to_rlp_encode(&account.pub_key)
+            .map_err(ServiceError::TransactionErrors)?)
+    })
+    .await
+    .map_err(Into::into)
 }
 
 pub async fn prepare_message(

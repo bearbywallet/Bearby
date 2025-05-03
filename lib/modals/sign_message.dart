@@ -317,7 +317,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
 
-        widget.onMessageSigned(pubkey, sig!);
+        widget.onMessageSigned(pubkey, sig);
       }
     } catch (e) {
       setState(() => _error = AppLocalizations.of(context)!
