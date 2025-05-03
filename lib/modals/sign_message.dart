@@ -10,6 +10,7 @@ import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
+import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -274,9 +275,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
             status == AvailabilityState.poweredOn,
       );
       final connection = await ledgerInterface.connect(_selectedDevice!);
-      final ethLedgerApp = EthereumLedgerApp(connection);
 
       if (widget.typedData != null) {
+        final ethLedgerApp = EthereumLedgerApp(connection);
         final typedDataJson = jsonEncode(widget.typedData!.toJson());
         final eip712Hashes =
             await prepareEip712Message(typedDataJson: typedDataJson);
@@ -288,14 +289,35 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
         widget.onMessageSigned(pubkey, signature.toHexString());
       } else if (widget.message != null) {
+        final chain = appState.getChain(appState.wallet!.defaultChainHash);
         Uint8List bytes = utf8.encode(widget.message!);
-        final signature = await ethLedgerApp.signPersonalMessage(
-          bytes,
-          appState.account!.index.toInt(),
-        );
+        String? sig;
+
+        if (chain?.slip44 == 60) {
+          final ethLedgerApp = EthereumLedgerApp(connection);
+          final signature = await ethLedgerApp.signPersonalMessage(
+            bytes,
+            appState.account!.index.toInt(),
+          );
+          sig = signature.toHexString();
+        } else if (chain?.slip44 == 313) {
+          final zilLedgerApp = ZilliqaLedgerApp(connection);
+          final hashBytes = await prepareMessage(
+            walletIndex: BigInt.from(appState.selectedWallet),
+            accountIndex: BigInt.from(accountIndex),
+            message: widget.message!,
+          );
+          sig = await zilLedgerApp.signHash(
+            hashBytes,
+            appState.account!.index.toInt(),
+          );
+        } else {
+          throw "unsupported network";
+        }
+
         final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
 
-        widget.onMessageSigned(pubkey, signature.toHexString());
+        widget.onMessageSigned(pubkey, sig!);
       }
     } catch (e) {
       setState(() => _error = AppLocalizations.of(context)!
