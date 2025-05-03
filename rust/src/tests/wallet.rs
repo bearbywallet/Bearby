@@ -121,7 +121,7 @@ mod wallet_tests {
         assert_eq!(zilliqa_provider_mainnet.chain, "ZIL");
         assert_eq!(zilliqa_provider_mainnet.short_name, "zilliqa");
         assert_eq!(zilliqa_provider_mainnet.diff_block_time, 0);
-        assert_eq!(zilliqa_provider_mainnet.rpc.len(), 2);
+        assert_eq!(zilliqa_provider_mainnet.rpc.len(), 4);
         assert_eq!(zilliqa_provider_mainnet.rpc[0], "https://api.zilliqa.com");
         assert_eq!(zilliqa_provider_mainnet.chain_ids, [32769, 1]);
         assert_eq!(zilliqa_provider_mainnet.slip_44, 313);
