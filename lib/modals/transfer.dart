@@ -736,6 +736,11 @@ class _ConfirmTransactionContentState
                                     appState.wallet!.selectedAccount] ??
                                 '0');
 
+                            if (widget.token.addrType == 0 &&
+                                widget.to.startsWith("0x")) {
+                              throw "Cannot transfer ZRC2 to evm address, use migration";
+                            }
+
                             if (isNativeTx && amount == balance) {
                               if (fee > balance) {
                                 throw Exception(
