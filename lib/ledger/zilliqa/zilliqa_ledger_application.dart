@@ -47,6 +47,8 @@ class ZilliqaLedgerApp {
       transformer: transformer,
     );
 
+    _checkResult(signature);
+
     return bytesToHex(signature);
   }
 
@@ -69,6 +71,34 @@ class ZilliqaLedgerApp {
       transformer: transformer,
     );
 
-    return signatureBytes;
+    _checkResult(signatureBytes);
+
+    return signatureBytes.sublist(0, signatureBytes.length - 2);
+  }
+
+  static void _checkResult(Uint8List result) {
+    if (result.length != 2) {
+      return;
+    }
+
+    int status = (result[0] << 8) | result[1];
+
+    switch (status) {
+      case 0x9000:
+        break;
+      case 0x5515:
+        throw Exception('Device is locked');
+      case 0x6967:
+        throw Exception('Operation rejected');
+      case 0x6985:
+        throw Exception('Condition not satisfied (possibly rejected by user)');
+      case 0x6a80:
+        throw Exception('Invalid data');
+      case 0x6f00:
+        throw Exception('Unknown error');
+      default:
+        throw Exception(
+            'Unknown status code: 0x${status.toRadixString(16).padLeft(4, '0')}');
+    }
   }
 }
