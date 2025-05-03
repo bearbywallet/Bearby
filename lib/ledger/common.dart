@@ -1,9 +1,9 @@
-class ZilLedgerAccount {
+class LedgerAccount {
   final String publicKey;
   final String address;
   final int index;
 
-  ZilLedgerAccount({
+  LedgerAccount({
     required this.publicKey,
     required this.address,
     required this.index,
@@ -12,7 +12,7 @@ class ZilLedgerAccount {
   @override
   bool operator ==(Object other) =>
       identical(this, other) ||
-      (other is ZilLedgerAccount &&
+      (other is LedgerAccount &&
           runtimeType == other.runtimeType &&
           publicKey == other.publicKey &&
           index == other.index);

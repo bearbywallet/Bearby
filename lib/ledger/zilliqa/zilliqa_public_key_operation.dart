@@ -1,10 +1,9 @@
 import 'dart:typed_data';
 
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
-import 'package:zilpay/ledger/zilliqa/models.dart';
+import 'package:zilpay/ledger/common.dart';
 
-class ZilliqaPublicAddressOperation
-    extends LedgerRawOperation<ZilLedgerAccount> {
+class ZilliqaPublicAddressOperation extends LedgerRawOperation<LedgerAccount> {
   static const cla = 0xE0;
   static const ins = 0x02;
   static const pubKeyByteLen = 33;
@@ -27,7 +26,7 @@ class ZilliqaPublicAddressOperation
   }
 
   @override
-  Future<ZilLedgerAccount> read(ByteDataReader reader) async {
+  Future<LedgerAccount> read(ByteDataReader reader) async {
     final publicKeyBytes = reader.read(pubKeyByteLen);
     final publicKey = publicKeyBytes
         .map((byte) => byte.toRadixString(16).padLeft(2, '0'))
@@ -36,7 +35,7 @@ class ZilliqaPublicAddressOperation
     final addressBytes = reader.read(bech32AddrLen);
     final address = String.fromCharCodes(addressBytes);
 
-    return ZilLedgerAccount(
+    return LedgerAccount(
       publicKey: publicKey,
       address: address,
       index: accountIndex,

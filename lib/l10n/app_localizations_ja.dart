@@ -636,9 +636,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get settingsPageAbout => 'アプリについて';
 
   @override
-  String get ledgerConnectPageTitle => 'Ledger接続';
-
-  @override
   String get passwordSetupPageTitle => 'パスワード設定';
 
   @override

@@ -233,8 +233,6 @@
   "settingsPageGitHub": "GitHub",
   "settingsPageAbout": "关于",
 
-  "ledgerConnectPageTitle": "Ledger 连接",
-
   "passwordSetupPageTitle": "密码设置",
   "passwordSetupPageSubtitle": "创建密码",
   "passwordSetupPageWalletNameHint": "钱包名称",

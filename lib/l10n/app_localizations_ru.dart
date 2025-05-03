@@ -636,9 +636,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get settingsPageAbout => 'О приложении';
 
   @override
-  String get ledgerConnectPageTitle => 'Подключение Ledger';
-
-  @override
   String get passwordSetupPageTitle => 'Настройка пароля';
 
   @override

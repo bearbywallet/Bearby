@@ -11,8 +11,9 @@ import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
-import 'package:zilpay/ledger/ethereum/models.dart';
+import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -46,8 +47,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _createWallet = true;
   NetworkConfigInfo? _network;
   List<LedgerDevice> _ledgers = [];
-  List<EthLedgerAccount> _accounts = [];
-  Map<EthLedgerAccount, bool> _selectedAccounts = {};
+  List<LedgerAccount> _accounts = [];
+  Map<LedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
   LedgerDevice? _selectedDevice;
   bool _isScanning = false;
@@ -105,7 +106,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
           if (isLedgerWallet && !_createWallet) {
             final existingAccounts = appState.wallet?.accounts ?? [];
             _accounts = existingAccounts
-                .map((account) => EthLedgerAccount(
+                .map((account) => LedgerAccount(
                       index: account.index.toInt(),
                       address: account.addr,
                       publicKey: account.pubKey,
@@ -264,9 +265,17 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       );
 
       final connection = await ledgerInterface.connect(_selectedDevice!);
-      final ethereumApp = EthereumLedgerApp(connection, transformer: null);
-      final newAccounts = await ethereumApp
-          .getAccounts(List<int>.generate(_accountCount, (i) => i));
+      List<LedgerAccount> newAccounts = [];
+
+      if (_network?.slip44 == 60) {
+        final ethereumApp = EthereumLedgerApp(connection, transformer: null);
+        newAccounts = await ethereumApp
+            .getAccounts(List<int>.generate(_accountCount, (i) => i));
+      } else if (_network?.slip44 == 313) {
+        final zilliqaApp = ZilliqaLedgerApp(connection, transformer: null);
+        newAccounts = await zilliqaApp
+            .getPublicAddress(List<int>.generate(_accountCount, (i) => i));
+      }
 
       setState(() {
         final existingPubKeys =
@@ -323,7 +332,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         () => mounted ? _btnController.reset() : null);
   }
 
-  void _toggleAccount(EthLedgerAccount account, bool value) {
+  void _toggleAccount(LedgerAccount account, bool value) {
     if (_loading) return;
     setState(() {
       _selectedAccounts[account] = value;

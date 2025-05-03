@@ -1,8 +1,8 @@
 import 'dart:typed_data';
 
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
+import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
-import 'package:zilpay/ledger/zilliqa/models.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_public_key_operation.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_sign_hash_operation.dart';
 
@@ -15,20 +15,24 @@ class ZilliqaLedgerApp {
     this.transformer,
   });
 
-  Future<ZilLedgerAccount> getPublicAddress(
-    LedgerDevice device,
-    int accountIndex,
+  Future<List<LedgerAccount>> getPublicAddress(
+    List<int> accountIndices,
   ) async {
-    final account = await ledger.sendOperation<ZilLedgerAccount>(
-      ZilliqaPublicAddressOperation(accountIndex),
-      transformer: transformer,
-    );
+    final List<LedgerAccount> accounts = [];
 
-    return account;
+    for (final index in accountIndices) {
+      final account = await ledger.sendOperation<LedgerAccount>(
+        ZilliqaPublicAddressOperation(index),
+        transformer: transformer,
+      );
+
+      accounts.add(account);
+    }
+
+    return accounts;
   }
 
   Future<String> signHash(
-    LedgerDevice device,
     Uint8List hashBytes,
     int accountIndex,
   ) async {

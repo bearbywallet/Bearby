@@ -233,8 +233,6 @@
   "settingsPageGitHub": "GitHub",
   "settingsPageAbout": "О приложении",
 
-  "ledgerConnectPageTitle": "Подключение Ledger",
-
   "passwordSetupPageTitle": "Настройка пароля",
   "passwordSetupPageSubtitle": "Создать пароль",
   "passwordSetupPageWalletNameHint": "Название кошелька",

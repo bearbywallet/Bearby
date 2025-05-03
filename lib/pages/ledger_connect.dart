@@ -7,7 +7,6 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:async/async.dart';
@@ -500,9 +499,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 20);
     final theme = Provider.of<AppState>(context).currentTheme;
     final bool isConnected = _ledgerConnection != null;
-    final String pageTitle =
-        AppLocalizations.of(context)?.ledgerConnectPageTitle ??
-            'Connect Ledger';
+    final String pageTitle = "Connect Ledger";
+
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(

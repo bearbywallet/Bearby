@@ -636,9 +636,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get settingsPageAbout => '关于';
 
   @override
-  String get ledgerConnectPageTitle => 'Ledger 连接';
-
-  @override
   String get passwordSetupPageTitle => '密码设置';
 
   @override

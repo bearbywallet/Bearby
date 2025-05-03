@@ -943,10 +943,7 @@
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
   },
-  "ledgerConnectPageTitle": "Ledger Connect",
-  "@ledgerConnectPageTitle": {
-    "description": "Title displayed in the app bar of the LedgerConnectPage component"
-  },
+
   "passwordSetupPageTitle": "Password Setup",
   "@passwordSetupPageTitle": {
     "description": "Title displayed in the app bar of the PasswordSetupPage component"

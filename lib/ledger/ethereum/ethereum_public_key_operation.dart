@@ -2,10 +2,10 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
-import 'package:zilpay/ledger/ethereum/models.dart';
+import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
 
-class EthereumPublicKeyOperation extends LedgerRawOperation<EthLedgerAccount> {
+class EthereumPublicKeyOperation extends LedgerRawOperation<LedgerAccount> {
   final int accountIndex;
 
   EthereumPublicKeyOperation({
@@ -34,7 +34,7 @@ class EthereumPublicKeyOperation extends LedgerRawOperation<EthLedgerAccount> {
   }
 
   @override
-  Future<EthLedgerAccount> read(ByteDataReader reader) async {
+  Future<LedgerAccount> read(ByteDataReader reader) async {
     final bytes = reader.read(reader.remainingLength);
     int publicKeyLength = bytes[0];
     int addressLength = bytes[1 + publicKeyLength];
@@ -42,7 +42,7 @@ class EthereumPublicKeyOperation extends LedgerRawOperation<EthLedgerAccount> {
         bytesToHex(bytes.sublist(1, 1 + publicKeyLength), include0x: true);
     final address =
         '0x${utf8.decode(bytes.sublist(1 + publicKeyLength + 1, 1 + publicKeyLength + 1 + addressLength))}';
-    return EthLedgerAccount(
+    return LedgerAccount(
       publicKey: publicKey,
       address: address,
       index: accountIndex,

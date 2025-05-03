@@ -1317,12 +1317,6 @@ abstract class AppLocalizations {
   /// **'About'**
   String get settingsPageAbout;
 
-  /// Title displayed in the app bar of the LedgerConnectPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Ledger Connect'**
-  String get ledgerConnectPageTitle;
-
   /// Title displayed in the app bar of the PasswordSetupPage component
   ///
   /// In en, this message translates to:
