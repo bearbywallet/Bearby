@@ -12,6 +12,7 @@ pub use zilpay::proto::address::Address;
 use zilpay::{
     background::bg_wallet::WalletManagement,
     token::ft::FToken,
+    token_quotes::zilliqa_tokens::zilpay_get_tokens,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
 
@@ -57,6 +58,20 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
     } else {
         Err(ServiceError::NotRunning.to_string())
     }
+}
+
+pub async fn fetch_tokens_list_zilliqa_legacy(
+    limit: u32,
+    offset: u32,
+) -> Result<Vec<FTokenInfo>, String> {
+    let tokens = zilpay_get_tokens(limit, offset)
+        .await
+        .map_err(|e| e.to_string())?;
+
+    Ok(tokens
+        .into_iter()
+        .map(From::from)
+        .collect::<Vec<FTokenInfo>>())
 }
 
 pub async fn add_ftoken(meta: FTokenInfo, wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {

@@ -18,6 +18,11 @@ Future<FTokenInfo> fetchTokenMeta(
     RustLib.instance.api
         .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
 
+Future<List<FTokenInfo>> fetchTokensListZilliqaLegacy(
+        {required int limit, required int offset}) =>
+    RustLib.instance.api.crateApiTokenFetchTokensListZilliqaLegacy(
+        limit: limit, offset: offset);
+
 Future<List<FTokenInfo>> addFtoken(
         {required FTokenInfo meta, required BigInt walletIndex}) =>
     RustLib.instance.api
