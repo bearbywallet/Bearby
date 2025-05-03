@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
@@ -12,6 +13,7 @@ import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
+import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
@@ -407,17 +409,31 @@ class _ConfirmTransactionContentState
           status == AvailabilityState.poweredOn,
     );
     final connection = await ledgerInterface.connect(_selectedDevice!);
-    final ethLedgerApp = EthereumLedgerApp(connection);
+    final chain = appState.getChain(appState.wallet!.defaultChainHash);
+    Uint8List sig;
 
-    final sig = await ethLedgerApp.signTransaction(
-      tx,
-      appState.selectedWallet,
-      accountIndex,
-    );
+    if (chain?.slip44 == 60) {
+      final ethLedgerApp = EthereumLedgerApp(connection);
+      final signature = await ethLedgerApp.signTransaction(
+        tx,
+        appState.selectedWallet,
+        accountIndex,
+      );
+      sig = signature.toBytes();
+    } else if (chain?.slip44 == 313) {
+      final zilLedgerApp = ZilliqaLedgerApp(connection);
+      sig = await zilLedgerApp.signTransaction(
+        tx,
+        appState.selectedWallet,
+        accountIndex,
+      );
+    } else {
+      throw "unsupported network";
+    }
 
     return await sendSignedTransactions(
       tx: tx,
-      sig: sig.toBytes(),
+      sig: sig,
       walletIndex: appState.selectedWallet,
       accountIndex: accountIndex,
     );
