@@ -26,6 +26,7 @@ pub struct LedgerParamsInput {
     pub biometric_type: String,
     pub identifiers: Vec<String>,
     pub chain_hash: u64,
+    pub zilliqa_legacy: bool,
 }
 
 pub async fn add_ledger_wallet(
@@ -40,7 +41,8 @@ pub async fn add_ledger_wallet(
             .pub_keys
             .into_iter()
             .map(|(ledger_index, pk)| {
-                pubkey_from_provider(&pk, bip49).map(|pub_key| (ledger_index, pub_key))
+                pubkey_from_provider(&pk, bip49, params.zilliqa_legacy)
+                    .map(|pub_key| (ledger_index, pub_key))
             })
             .collect::<Result<Vec<(u8, PubKey)>, ServiceError>>()?;
         let ftokens = ftokens
@@ -74,6 +76,7 @@ pub async fn add_ledger_wallet(
 pub async fn update_ledger_accounts(
     wallet_index: usize,
     accounts: Vec<(u8, String, String)>, // index, pubkey, name
+    zilliqa_legacy: bool,
 ) -> Result<(), String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
@@ -86,7 +89,8 @@ pub async fn update_ledger_accounts(
         let mut accounts = accounts
             .into_iter()
             .map(|(ledger_index, pk, name)| {
-                pubkey_from_provider(&pk, bip49).map(|pub_key| (ledger_index, pub_key, name))
+                pubkey_from_provider(&pk, bip49, zilliqa_legacy)
+                    .map(|pub_key| (ledger_index, pub_key, name))
             })
             .collect::<Result<Vec<(u8, PubKey, String)>, ServiceError>>()?;
 

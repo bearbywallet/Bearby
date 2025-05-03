@@ -41,14 +41,19 @@ pub fn decode_secret_key(sk: &str) -> Result<[u8; SECRET_KEY_SIZE], ServiceError
         .map_err(|_| ServiceError::InvalidSecretKeyLength)
 }
 
-pub fn pubkey_from_provider(pub_key: &str, bip49: DerivationPath) -> Result<PubKey, ServiceError> {
+pub fn pubkey_from_provider(
+    pub_key: &str,
+    bip49: DerivationPath,
+    zilliqa_legacy: bool,
+) -> Result<PubKey, ServiceError> {
     let pub_key_bytes = PubKey::from_uncompressed_hex(pub_key)?;
 
-    let pub_key = match bip49.slip44 {
-        slip44::ZILLIQA => PubKey::Secp256k1Sha256(pub_key_bytes),
-        slip44::ETHEREUM => PubKey::Secp256k1Keccak256(pub_key_bytes),
-        slip44::BITCOIN => PubKey::Secp256k1Bitcoin(pub_key_bytes),
-        slip44::SOLANA => PubKey::Ed25519Solana(pub_key_bytes),
+    let pub_key = match (bip49.slip44, zilliqa_legacy) {
+        (slip44::ZILLIQA, true) => PubKey::Secp256k1Sha256(pub_key_bytes),
+        (slip44::ZILLIQA, false) => PubKey::Secp256k1Keccak256(pub_key_bytes),
+        (slip44::ETHEREUM, _) => PubKey::Secp256k1Keccak256(pub_key_bytes),
+        (slip44::BITCOIN, _) => PubKey::Secp256k1Bitcoin(pub_key_bytes),
+        (slip44::SOLANA, _) => PubKey::Ed25519Solana(pub_key_bytes),
         _ => todo!(),
     };
 

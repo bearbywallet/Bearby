@@ -379,6 +379,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         requestTimeoutSecs: 30,
         ratesApiOptions: 1,
       );
+      final isLegacyZilliq = _network?.slip44 == 313 &&
+          _selectedAccounts.entries
+              .map((entry) => entry.key)
+              .every((a) => a.address.startsWith("zil1"));
 
       List<FTokenInfo> ftokens = [];
 
@@ -410,6 +414,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
             chainHash: chainHash,
+            zilliqaLegacy: isLegacyZilliq,
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -451,6 +456,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         await updateLedgerAccounts(
           walletIndex: BigInt.from(walletIndex),
           accounts: accountsToUpdate,
+          zilliqaLegacy: isLegacyZilliq,
         );
 
         await appState.syncData();

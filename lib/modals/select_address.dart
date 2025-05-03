@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/jazzicon.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
@@ -69,7 +70,8 @@ class _AddressSelectModalContentState
           final account = appState.wallet!.accounts[i];
           final name = account.name;
 
-          if (account.slip44 == 313) {
+          if (account.slip44 == 313 &&
+              !appState.wallet!.walletType.contains(WalletType.ledger.name)) {
             final addresses = await getZilEthChecksumAddresses(
               walletIndex: BigInt.from(appState.selectedWallet),
             );

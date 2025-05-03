@@ -423,7 +423,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<void> crateApiLedgerUpdateLedgerAccounts(
       {required BigInt walletIndex,
-      required List<(int, String, String)> accounts});
+      required List<(int, String, String)> accounts,
+      required bool zilliqaLegacy});
 
   Future<void> crateApiTokenUpdateRates({required BigInt walletIndex});
 
@@ -2930,12 +2931,14 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   @override
   Future<void> crateApiLedgerUpdateLedgerAccounts(
       {required BigInt walletIndex,
-      required List<(int, String, String)> accounts}) {
+      required List<(int, String, String)> accounts,
+      required bool zilliqaLegacy}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_list_record_u_8_string_string(accounts, serializer);
+        sse_encode_bool(zilliqaLegacy, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 88, port: port_);
       },
@@ -2944,7 +2947,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiLedgerUpdateLedgerAccountsConstMeta,
-      argValues: [walletIndex, accounts],
+      argValues: [walletIndex, accounts, zilliqaLegacy],
       apiImpl: this,
     ));
   }
@@ -2952,7 +2955,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiLedgerUpdateLedgerAccountsConstMeta =>
       const TaskConstMeta(
         debugName: "update_ledger_accounts",
-        argNames: ["walletIndex", "accounts"],
+        argNames: ["walletIndex", "accounts", "zilliqaLegacy"],
       );
 
   @override
@@ -3601,8 +3604,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput dco_decode_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 8)
-      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    if (arr.length != 9)
+      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
     return LedgerParamsInput(
       pubKeys: dco_decode_list_record_u_8_string(arr[0]),
       walletIndex: dco_decode_usize(arr[1]),
@@ -3612,6 +3615,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       biometricType: dco_decode_String(arr[5]),
       identifiers: dco_decode_list_String(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
+      zilliqaLegacy: dco_decode_bool(arr[8]),
     );
   }
 
@@ -4748,6 +4752,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_biometricType = sse_decode_String(deserializer);
     var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
+    var var_zilliqaLegacy = sse_decode_bool(deserializer);
     return LedgerParamsInput(
         pubKeys: var_pubKeys,
         walletIndex: var_walletIndex,
@@ -4756,7 +4761,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         accountNames: var_accountNames,
         biometricType: var_biometricType,
         identifiers: var_identifiers,
-        chainHash: var_chainHash);
+        chainHash: var_chainHash,
+        zilliqaLegacy: var_zilliqaLegacy);
   }
 
   @protected
@@ -5956,6 +5962,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.biometricType, serializer);
     sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_bool(self.zilliqaLegacy, serializer);
   }
 
   @protected

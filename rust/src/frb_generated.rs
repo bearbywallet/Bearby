@@ -3473,6 +3473,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_accounts = <Vec<(u8, String, String)>>::sse_decode(&mut deserializer);
+            let api_zilliqa_legacy = <bool>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -3480,6 +3481,7 @@ fn wire__crate__api__ledger__update_ledger_accounts_impl(
                         let output_ok = crate::api::ledger::update_ledger_accounts(
                             api_wallet_index,
                             api_accounts,
+                            api_zilliqa_legacy,
                         )
                         .await?;
                         Ok(output_ok)
@@ -4200,6 +4202,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
         let mut var_biometricType = <String>::sse_decode(deserializer);
         let mut var_identifiers = <Vec<String>>::sse_decode(deserializer);
         let mut var_chainHash = <u64>::sse_decode(deserializer);
+        let mut var_zilliqaLegacy = <bool>::sse_decode(deserializer);
         return crate::api::ledger::LedgerParamsInput {
             pub_keys: var_pubKeys,
             wallet_index: var_walletIndex,
@@ -4209,6 +4212,7 @@ impl SseDecode for crate::api::ledger::LedgerParamsInput {
             biometric_type: var_biometricType,
             identifiers: var_identifiers,
             chain_hash: var_chainHash,
+            zilliqa_legacy: var_zilliqaLegacy,
         };
     }
 }
@@ -5804,6 +5808,7 @@ impl flutter_rust_bridge::IntoDart for crate::api::ledger::LedgerParamsInput {
             self.biometric_type.into_into_dart().into_dart(),
             self.identifiers.into_into_dart().into_dart(),
             self.chain_hash.into_into_dart().into_dart(),
+            self.zilliqa_legacy.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6515,6 +6520,7 @@ impl SseEncode for crate::api::ledger::LedgerParamsInput {
         <String>::sse_encode(self.biometric_type, serializer);
         <Vec<String>>::sse_encode(self.identifiers, serializer);
         <u64>::sse_encode(self.chain_hash, serializer);
+        <bool>::sse_encode(self.zilliqa_legacy, serializer);
     }
 }
 

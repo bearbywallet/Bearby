@@ -17,9 +17,12 @@ Future<(String, String)> addLedgerWallet(
 
 Future<void> updateLedgerAccounts(
         {required BigInt walletIndex,
-        required List<(int, String, String)> accounts}) =>
+        required List<(int, String, String)> accounts,
+        required bool zilliqaLegacy}) =>
     RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
-        walletIndex: walletIndex, accounts: accounts);
+        walletIndex: walletIndex,
+        accounts: accounts,
+        zilliqaLegacy: zilliqaLegacy);
 
 class LedgerParamsInput {
   final List<(int, String)> pubKeys;
@@ -30,6 +33,7 @@ class LedgerParamsInput {
   final String biometricType;
   final List<String> identifiers;
   final BigInt chainHash;
+  final bool zilliqaLegacy;
 
   const LedgerParamsInput({
     required this.pubKeys,
@@ -40,6 +44,7 @@ class LedgerParamsInput {
     required this.biometricType,
     required this.identifiers,
     required this.chainHash,
+    required this.zilliqaLegacy,
   });
 
   @override
@@ -51,7 +56,8 @@ class LedgerParamsInput {
       accountNames.hashCode ^
       biometricType.hashCode ^
       identifiers.hashCode ^
-      chainHash.hashCode;
+      chainHash.hashCode ^
+      zilliqaLegacy.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -65,5 +71,6 @@ class LedgerParamsInput {
           accountNames == other.accountNames &&
           biometricType == other.biometricType &&
           identifiers == other.identifiers &&
-          chainHash == other.chainHash;
+          chainHash == other.chainHash &&
+          zilliqaLegacy == other.zilliqaLegacy;
 }
