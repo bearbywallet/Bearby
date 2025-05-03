@@ -83,12 +83,14 @@ pub async fn update_ledger_accounts(
 
         let provider = core.get_provider(wallet_data.default_chain_hash)?;
         let bip49 = provider.get_bip49(wallet_index);
-        let accounts = accounts
+        let mut accounts = accounts
             .into_iter()
             .map(|(ledger_index, pk, name)| {
                 pubkey_from_provider(&pk, bip49).map(|pub_key| (ledger_index, pub_key, name))
             })
             .collect::<Result<Vec<(u8, PubKey, String)>, ServiceError>>()?;
+
+        accounts.dedup_by(|a, b| a.0 == b.0 && a.1 == b.1);
 
         wallet
             .update_ledger_accounts(accounts, &provider.config)

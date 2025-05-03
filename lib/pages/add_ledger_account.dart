@@ -265,32 +265,30 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
       final connection = await ledgerInterface.connect(_selectedDevice!);
       final ethereumApp = EthereumLedgerApp(connection, transformer: null);
-      final accounts = await ethereumApp
+      final newAccounts = await ethereumApp
           .getAccounts(List<int>.generate(_accountCount, (i) => i));
 
-      if (_createWallet) {
-        setState(() {
-          _accounts = accounts..sort((a, b) => a.index.compareTo(b.index));
-          _selectedAccounts = {for (var account in _accounts) account: true};
-          _accountsLoaded = true;
-        });
-      } else {
-        final existingPubKeys = {
-          for (var acc in _accounts) acc.publicKey.toLowerCase()
-        };
-        final newAccounts = accounts
+      setState(() {
+        final existingPubKeys =
+            _accounts.map((acc) => acc.publicKey.toLowerCase()).toSet();
+        final uniqueNewAccounts = newAccounts
             .where(
                 (acc) => !existingPubKeys.contains(acc.publicKey.toLowerCase()))
             .toList();
-        setState(() {
-          _accounts.addAll(newAccounts);
+
+        if (_createWallet) {
+          _accounts = uniqueNewAccounts
+            ..sort((a, b) => a.index.compareTo(b.index));
+          _selectedAccounts = {for (var account in _accounts) account: true};
+        } else {
+          _accounts.addAll(uniqueNewAccounts);
           _accounts.sort((a, b) => a.index.compareTo(b.index));
-          for (var acc in newAccounts) {
+          for (var acc in uniqueNewAccounts) {
             _selectedAccounts[acc] = true;
           }
-          _accountsLoaded = true;
-        });
-      }
+        }
+        _accountsLoaded = true;
+      });
 
       _btnController.success();
       Future.delayed(const Duration(seconds: 1),
@@ -327,14 +325,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   void _toggleAccount(EthLedgerAccount account, bool value) {
     if (_loading) return;
-    final appState = context.read<AppState>();
-    final existingPubKeys = appState.wallet?.accounts
-            .map((account) => account.pubKey.toLowerCase())
-            .toSet() ??
-        {};
-    if (existingPubKeys.contains(account.publicKey.toLowerCase())) {
-      return;
-    }
     setState(() {
       _selectedAccounts[account] = value;
     });
@@ -788,7 +778,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
