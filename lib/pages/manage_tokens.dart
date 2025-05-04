@@ -13,6 +13,7 @@ import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'dart:convert';
+import 'dart:async';
 
 extension FTokenInfoJsonExtension on FTokenInfo {
   static FTokenInfo fromJson(Map<String, dynamic> json) {
@@ -57,9 +58,11 @@ class ManageTokensPage extends StatefulWidget {
 
 class _ManageTokensPageState extends State<ManageTokensPage> {
   final TextEditingController _searchController = TextEditingController();
+  final ScrollController _scrollController = ScrollController();
   String _searchQuery = '';
-  List<FTokenInfo> _displayTokens = [];
+  List<FTokenInfo> _allTokens = [];
   bool _isLoading = false;
+  Timer? _debounce;
 
   bool _canFetchApiTokens(AppState appState) {
     final chain = appState.chain;
@@ -69,12 +72,18 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
   @override
   void initState() {
     super.initState();
+    _scrollController.addListener(() {
+      if (_scrollController.position.pixels ==
+          _scrollController.position.maxScrollExtent) {}
+    });
     _initializeTokens();
   }
 
   @override
   void dispose() {
     _searchController.dispose();
+    _scrollController.dispose();
+    _debounce?.cancel();
     super.dispose();
   }
 
@@ -91,7 +100,7 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
     final appState = Provider.of<AppState>(context, listen: false);
     final walletTokens = appState.wallet?.tokens ?? [];
     setState(() {
-      _displayTokens = walletTokens;
+      _allTokens = walletTokens;
     });
     if (_canFetchApiTokens(appState)) {
       _loadCachedTokens();
@@ -111,7 +120,7 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
       final cachedTokens = decoded
           .map((item) => FTokenInfoJsonExtension.fromJson(item))
           .toList();
-      _updateDisplayTokens(cachedTokens);
+      _updateAllTokens(cachedTokens);
     } else {
       _fetchApiTokens();
     }
@@ -138,10 +147,10 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
             addrType: token.addrType,
             logo: logo,
             balances: token.balances,
-            rate: token.rate,
-            default_: token.default_,
-            native: token.native,
-            chainHash: token.chainHash,
+            rate: 0,
+            default_: false,
+            native: false,
+            chainHash: chain.chainHash,
           );
         }).toList();
       } else if (chain.slip44 == 60 && appState.account?.addrType == 1) {
@@ -158,17 +167,17 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
             addrType: token.addrType,
             logo: logo,
             balances: token.balances,
-            rate: token.rate,
-            default_: token.default_,
-            native: token.native,
-            chainHash: token.chainHash,
+            rate: 0,
+            default_: false,
+            native: false,
+            chainHash: chain.chainHash,
           );
         }).toList();
       } else {
         return;
       }
 
-      _updateDisplayTokens(apiTokens);
+      _updateAllTokens(apiTokens);
       final prefs = await SharedPreferences.getInstance();
       final cacheKey = _getCacheKey(chain);
       final encoded =
@@ -189,24 +198,26 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
     }
   }
 
-  void _updateDisplayTokens(List<FTokenInfo> additionalTokens) {
+  void _updateAllTokens(List<FTokenInfo> additionalTokens) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final walletTokens = appState.wallet?.tokens ?? [];
     final uniqueTokens = <String, FTokenInfo>{};
-    for (var token in walletTokens) {
-      uniqueTokens[token.addr] = token;
-    }
-    for (var token in additionalTokens) {
-      uniqueTokens[token.addr] = token;
-    }
+    await Future.microtask(() {
+      for (var token in walletTokens) {
+        uniqueTokens[token.addr.toLowerCase()] = token;
+      }
+      for (var token in additionalTokens) {
+        uniqueTokens[token.addr.toLowerCase()] = token;
+      }
+    });
     setState(() {
-      _displayTokens = uniqueTokens.values.toList();
+      _allTokens = uniqueTokens.values.toList();
     });
   }
 
   Future<void> _fetchTokenByAddress(String address) async {
     final appState = Provider.of<AppState>(context, listen: false);
-    if (_displayTokens
+    if (_allTokens
         .any((token) => token.addr.toLowerCase() == address.toLowerCase())) {
       return;
     }
@@ -217,7 +228,7 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
         walletIndex: BigInt.from(appState.selectedWallet),
       );
       setState(() {
-        _displayTokens.add(meta);
+        _allTokens.add(meta);
       });
     } catch (e) {
       debugPrint("Fetch token meta error: $e");
@@ -226,13 +237,12 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
     }
   }
 
-  @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    final filteredTokens = _displayTokens.where((token) {
+    final filteredTokens = _allTokens.where((token) {
       final query = _searchQuery.toLowerCase();
       return token.name.toLowerCase().contains(query) ||
           token.symbol.toLowerCase().contains(query) ||
@@ -242,133 +252,145 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
-        child: Column(
-          children: [
-            CustomAppBar(
-              title: "Tokens",
-              onBackPressed: () => Navigator.pop(context),
-            ),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding, vertical: 16),
-              child: SmartInput(
-                controller: _searchController,
-                hint: "Search tokens",
-                leftIconPath: 'assets/icons/search.svg',
-                rightIconPath: "assets/icons/close.svg",
-                onChanged: (value) {
-                  setState(() {
-                    _searchQuery = value;
-                    if (value.length == 42) {
-                      _fetchTokenByAddress(value);
-                    }
-                  });
-                },
-                onRightIconTap: () {
-                  _searchController.text = "";
-                  setState(() => _searchQuery = "");
-                },
-                borderColor: theme.textPrimary,
-                focusedBorderColor: theme.primaryPurple,
-                height: 48,
-                fontSize: 16,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                autofocus: false,
-              ),
-            ),
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 8),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-            Expanded(
-              child: RefreshIndicator(
-                onRefresh: _fetchApiTokens,
-                child: CustomScrollView(
-                  slivers: [
-                    if (filteredTokens.isEmpty)
-                      SliverToBoxAdapter(
-                        child: Center(child: Text("No tokens found")),
-                      )
-                    else
-                      SliverPadding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: adaptivePadding),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final token = filteredTokens[index];
-                              final isEnabled = appState.wallet?.tokens
-                                      .any((t) => t.addr == token.addr) ??
-                                  false;
-                              return EnableCard(
-                                title: token.symbol,
-                                name: token.name,
-                                iconWidget: AsyncImage(
-                                  url: processTokenLogo(
-                                    token: token,
-                                    shortName: appState.chain?.shortName ?? "",
-                                    theme: theme.value,
-                                  ),
-                                  width: 32.0,
-                                  height: 32.0,
-                                  fit: BoxFit.contain,
-                                  errorWidget: SvgPicture.asset(
-                                    "assets/icons/warning.svg",
-                                    width: 32.0,
-                                    height: 32.0,
-                                    colorFilter: ColorFilter.mode(
-                                      theme.warning,
-                                      BlendMode.srcIn,
-                                    ),
-                                  ),
-                                  loadingWidget: const Center(
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2,
-                                    ),
-                                  ),
-                                ),
-                                isDefault: token.native,
-                                isEnabled: isEnabled,
-                                onToggle: (value) async {
-                                  try {
-                                    if (value) {
-                                      await addFtoken(
-                                        meta: token,
-                                        walletIndex: BigInt.from(
-                                            appState.selectedWallet),
-                                      );
-                                    } else {
-                                      await rmFtoken(
-                                        walletIndex: BigInt.from(
-                                            appState.selectedWallet),
-                                        tokenAddress: token.addr,
-                                      );
-                                    }
-                                    await appState.syncData();
-                                  } catch (e) {
-                                    debugPrint("Toggle token error: $e");
-                                  }
-                                },
-                              );
-                            },
-                            childCount: filteredTokens.length,
-                          ),
-                        ),
-                      ),
-                    if (_isLoading)
-                      SliverToBoxAdapter(
-                        child: LinearProgressIndicator(),
-                      ),
-                  ],
+        child: Center(
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 480),
+            child: Column(
+              children: [
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: "Tokens",
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
-              ),
+                Padding(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 16),
+                  child: SmartInput(
+                    controller: _searchController,
+                    hint: "Search tokens",
+                    leftIconPath: 'assets/icons/search.svg',
+                    rightIconPath: 'assets/icons/close.svg',
+                    onChanged: (value) {
+                      setState(() => _searchQuery = value);
+                      if (_debounce?.isActive ?? false) _debounce!.cancel();
+                      _debounce = Timer(const Duration(milliseconds: 500), () {
+                        if (value.length == 42) {
+                          _fetchTokenByAddress(value);
+                        }
+                      });
+                    },
+                    onRightIconTap: () {
+                      _searchController.text = "";
+                      setState(() => _searchQuery = "");
+                    },
+                    borderColor: theme.textPrimary,
+                    focusedBorderColor: theme.primaryPurple,
+                    height: 48,
+                    fontSize: 16,
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    autofocus: false,
+                  ),
+                ),
+                Container(
+                  width: 36,
+                  height: 4,
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  decoration: BoxDecoration(
+                    color: theme.modalBorder,
+                    borderRadius: BorderRadius.circular(2),
+                  ),
+                ),
+                Expanded(
+                  child: RefreshIndicator(
+                    onRefresh: _fetchApiTokens,
+                    child: CustomScrollView(
+                      controller: _scrollController,
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      slivers: [
+                        if (filteredTokens.isEmpty)
+                          SliverToBoxAdapter(
+                            child: Center(child: Text("No tokens found")),
+                          )
+                        else
+                          SliverPadding(
+                            padding: EdgeInsets.symmetric(
+                                horizontal: adaptivePadding),
+                            sliver: SliverList(
+                              delegate: SliverChildBuilderDelegate(
+                                (context, index) {
+                                  final token = filteredTokens[index];
+                                  final isEnabled = appState.wallet?.tokens
+                                          .any((t) => t.addr == token.addr) ??
+                                      false;
+                                  return EnableCard(
+                                    title: token.symbol,
+                                    name: token.name,
+                                    iconWidget: AsyncImage(
+                                      url: processTokenLogo(
+                                        token: token,
+                                        shortName:
+                                            appState.chain?.shortName ?? "",
+                                        theme: theme.value,
+                                      ),
+                                      width: 32.0,
+                                      height: 32.0,
+                                      fit: BoxFit.contain,
+                                      errorWidget: SvgPicture.asset(
+                                        "assets/icons/warning.svg",
+                                        width: 32.0,
+                                        height: 32.0,
+                                        colorFilter: ColorFilter.mode(
+                                          theme.warning,
+                                          BlendMode.srcIn,
+                                        ),
+                                      ),
+                                      loadingWidget: const Center(
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                        ),
+                                      ),
+                                    ),
+                                    isDefault: token.native,
+                                    isEnabled: isEnabled,
+                                    onToggle: (value) async {
+                                      try {
+                                        if (value) {
+                                          await addFtoken(
+                                            meta: token,
+                                            walletIndex: BigInt.from(
+                                                appState.selectedWallet),
+                                          );
+                                        } else {
+                                          await rmFtoken(
+                                            walletIndex: BigInt.from(
+                                                appState.selectedWallet),
+                                            tokenAddress: token.addr,
+                                          );
+                                        }
+                                        await appState.syncData();
+                                      } catch (e) {
+                                        debugPrint("Toggle token error: $e");
+                                      }
+                                    },
+                                  );
+                                },
+                                childCount: filteredTokens.length,
+                              ),
+                            ),
+                          ),
+                        if (_isLoading)
+                          SliverToBoxAdapter(
+                            child: LinearProgressIndicator(),
+                          ),
+                      ],
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ],
+          ),
         ),
       ),
     );
