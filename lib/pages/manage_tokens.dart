@@ -79,6 +79,8 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
 
   Future<void> _fetchApiTokens() async {
     setState(() => _isLoading = true);
+    final appState = Provider.of<AppState>(context, listen: false);
+
     try {
       final apiTokens =
           await fetchTokensListZilliqaLegacy(limit: 100, offset: 0);
@@ -95,7 +97,7 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
           rate: token.rate,
           default_: token.default_,
           native: token.native,
-          chainHash: token.chainHash,
+          chainHash: appState.chain?.chainHash ?? BigInt.zero,
         );
       }).toList();
       _updateDisplayTokens(formattedTokens);
