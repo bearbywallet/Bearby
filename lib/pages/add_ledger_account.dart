@@ -74,51 +74,58 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     super.didChangeDependencies();
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    if (args != null) {
-      final network = args['chain'] as NetworkConfigInfo?;
-      final ledger = args['ledger'] as LedgerDevice?;
-      final createWallet = args['createWallet'] as bool?;
+    if (args == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
+      return;
+    }
 
-      if (network == null) {
-        WidgetsBinding.instance.addPostFrameCallback((_) {
-          Navigator.of(context).pop();
-        });
-      } else {
-        setState(() {
-          _network = network;
-          if (ledger != null) {
-            if (!_ledgers.any((d) => d.id == ledger.id)) {
-              _ledgers.add(ledger);
-            }
-            _selectedDevice = ledger;
-            _stopLedgerScan();
-          }
-          _createWallet = createWallet ?? true;
-          _walletNameController.text = _ledgers.isNotEmpty
-              ? "${_ledgers.first.name} (${network.name})"
-              : "Ledger Wallet (${network.name})";
+    final network = args['chain'] as NetworkConfigInfo?;
+    final ledger = args['ledger'] as LedgerDevice?;
+    final createWallet = args['createWallet'] as bool?;
 
-          final appState = context.read<AppState>();
-          final isLedgerWallet = appState
-              .wallets[appState.selectedWallet].walletType
+    if (network == null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        Navigator.of(context).pop();
+      });
+      return;
+    }
+
+    setState(() {
+      _network = network;
+      if (ledger != null) {
+        if (!_ledgers.any((d) => d.id == ledger.id)) {
+          _ledgers.add(ledger);
+        }
+        _selectedDevice = ledger;
+        _stopLedgerScan();
+      }
+      _createWallet = createWallet ?? true;
+      _walletNameController.text = _ledgers.isNotEmpty
+          ? "${_ledgers.first.name} (${network.name})"
+          : "Ledger Wallet (${network.name})";
+
+      final appState = context.read<AppState>();
+      final isLedgerWallet = appState.selectedWallet != -1 &&
+          appState.wallets.isNotEmpty &&
+          appState.wallets[appState.selectedWallet].walletType
               .contains(WalletType.ledger.name);
 
-          if (isLedgerWallet && !_createWallet) {
-            final existingAccounts = appState.wallet?.accounts ?? [];
-            _accounts = existingAccounts
-                .map((account) => LedgerAccount(
-                      index: account.index.toInt(),
-                      address: account.addr,
-                      publicKey: account.pubKey,
-                    ))
-                .toList()
-              ..sort((a, b) => a.index.compareTo(b.index));
-            _selectedAccounts = {for (var account in _accounts) account: true};
-            _accountsLoaded = true;
-          }
-        });
+      if (isLedgerWallet && !_createWallet) {
+        final existingAccounts = appState.wallet?.accounts ?? [];
+        _accounts = existingAccounts
+            .map((account) => LedgerAccount(
+                  index: account.index.toInt(),
+                  address: account.addr,
+                  publicKey: account.pubKey,
+                ))
+            .toList()
+          ..sort((a, b) => a.index.compareTo(b.index));
+        _selectedAccounts = {for (var account in _accounts) account: true};
+        _accountsLoaded = true;
       }
-    }
+    });
   }
 
   @override
@@ -134,6 +141,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   Future<void> _checkLedgerDevices() async {
     final appState = context.read<AppState>();
     final isLedgerWallet = appState.selectedWallet != -1 &&
+        appState.wallets.isNotEmpty &&
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
 
@@ -797,6 +805,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     final theme = Provider.of<AppState>(context).currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -831,6 +840,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                         (!_createWallet ||
                             (Provider.of<AppState>(context).selectedWallet !=
                                     -1 &&
+                                Provider.of<AppState>(context)
+                                    .wallets
+                                    .isNotEmpty &&
                                 Provider.of<AppState>(context)
                                     .wallets[Provider.of<AppState>(context)
                                         .selectedWallet]

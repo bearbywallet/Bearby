@@ -53,6 +53,7 @@ class _LoginPageState extends State<LoginPage> {
     super.didChangeDependencies();
 
     if (_appState.wallets.isEmpty) {
+      setState(() => _selectedWallet = -1);
       Navigator.of(context).pushNamed('/initial');
     }
   }
@@ -132,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> _handleAuthentication() async {
-    if (_selectedWallet == -1) return;
+    if (_selectedWallet == -1 || _appState.wallets.isEmpty) return;
 
     final wallet = _appState.wallets[_selectedWallet];
     final device = DeviceInfoService();
@@ -265,6 +266,8 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Widget _buildWalletItem(int index, AppState theme) {
+    if (index >= _appState.wallets.length) return const SizedBox.shrink();
+
     final wallet = _appState.wallets[index];
     final l10n = AppLocalizations.of(context)!;
 
@@ -310,6 +313,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginForm(AppState theme) {
     final isLedgerWallet = _selectedWallet != -1 &&
+        _appState.wallets.isNotEmpty &&
         _appState.wallets[_selectedWallet].walletType
             .contains(WalletType.ledger.name);
     final l10n = AppLocalizations.of(context)!;
