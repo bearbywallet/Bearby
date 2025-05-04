@@ -10,8 +10,43 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
+import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'dart:convert';
+
+extension FTokenInfoJsonExtension on FTokenInfo {
+  static FTokenInfo fromJson(Map<String, dynamic> json) {
+    return FTokenInfo(
+      name: json['name'] as String,
+      symbol: json['symbol'] as String,
+      decimals: json['decimals'] as int,
+      addr: json['addr'] as String,
+      addrType: json['addrType'] as int,
+      logo: json['logo'] as String?,
+      balances: {},
+      rate: json['rate'] as double,
+      default_: json['default_'] as bool,
+      native: json['native'] as bool,
+      chainHash: BigInt.parse(json['chainHash'] as String),
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'name': name,
+      'symbol': symbol,
+      'decimals': decimals,
+      'addr': addr,
+      'addrType': addrType,
+      'logo': logo,
+      'balances': {},
+      'rate': rate,
+      'default_': default_,
+      'native': native,
+      'chainHash': chainHash.toString(),
+    };
+  }
+}
 
 class ManageTokensPage extends StatefulWidget {
   const ManageTokensPage({super.key});
@@ -26,18 +61,15 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
   List<FTokenInfo> _displayTokens = [];
   bool _isLoading = false;
 
+  bool _canFetchApiTokens(AppState appState) {
+    final chain = appState.chain;
+    return chain != null && chain.testnet != true;
+  }
+
   @override
   void initState() {
     super.initState();
-    final appState = Provider.of<AppState>(context, listen: false);
-    final walletTokens = appState.wallet?.tokens ?? [];
-    setState(() {
-      _displayTokens = walletTokens;
-    });
-    if (_canFetchApiTokens(appState)) {
-      _loadCachedTokens();
-      _fetchApiTokens();
-    }
+    _initializeTokens();
   }
 
   @override
@@ -46,76 +78,114 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
     super.dispose();
   }
 
-  bool _canFetchApiTokens(AppState appState) {
-    return appState.chain?.testnet != true &&
-        appState.chain?.slip44 == 313 &&
-        appState.account?.addrType == 0;
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    final appState = Provider.of<AppState>(context);
+    if (_canFetchApiTokens(appState)) {
+      _initializeTokens();
+    }
+  }
+
+  void _initializeTokens() {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final walletTokens = appState.wallet?.tokens ?? [];
+    setState(() {
+      _displayTokens = walletTokens;
+    });
+    if (_canFetchApiTokens(appState)) {
+      _loadCachedTokens();
+    }
   }
 
   Future<void> _loadCachedTokens() async {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final chain = appState.chain;
+    if (chain == null ||
+        (chain.slip44 == 313 && appState.account?.addrType == 1)) return;
+    final cacheKey = _getCacheKey(chain);
     final prefs = await SharedPreferences.getInstance();
-    final cachedData = prefs.getString('legacy_zilliqa_tokens_cache');
+    final cachedData = prefs.getString(cacheKey);
     if (cachedData != null) {
       final List<dynamic> decoded = jsonDecode(cachedData);
-      final appState = Provider.of<AppState>(context, listen: false);
       final cachedTokens = decoded
-          .map((item) => FTokenInfo(
-                name: item['name'],
-                symbol: item['symbol'],
-                decimals: item['decimals'],
-                addr: item['addr'],
-                addrType: 0,
-                logo: item['logo'],
-                balances: {},
-                rate: 0,
-                default_: false,
-                native: false,
-                chainHash: appState.chain?.chainHash ?? BigInt.zero,
-              ))
+          .map((item) => FTokenInfoJsonExtension.fromJson(item))
           .toList();
       _updateDisplayTokens(cachedTokens);
+    } else {
+      _fetchApiTokens();
     }
   }
 
   Future<void> _fetchApiTokens() async {
     setState(() => _isLoading = true);
     final appState = Provider.of<AppState>(context, listen: false);
+    final chain = appState.chain;
+    if (chain == null) return;
+    String logo =
+        "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/${chain.shortName}/%{contract_address}%/%{dark,light}%.webp";
 
     try {
-      final apiTokens =
-          await fetchTokensListZilliqaLegacy(limit: 100, offset: 0);
-      final formattedTokens = apiTokens.map((token) {
-        return FTokenInfo(
-          name: token.name,
-          symbol: token.symbol,
-          decimals: token.decimals,
-          addr: token.addr,
-          addrType: token.addrType,
-          logo:
-              "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
-          balances: token.balances,
-          rate: token.rate,
-          default_: token.default_,
-          native: token.native,
-          chainHash: appState.chain?.chainHash ?? BigInt.zero,
+      List<FTokenInfo> apiTokens;
+      if (chain.slip44 == 313 && appState.account?.addrType == 0) {
+        apiTokens = await fetchTokensListZilliqaLegacy(limit: 200, offset: 0);
+        apiTokens = apiTokens.map((token) {
+          return FTokenInfo(
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            addr: token.addr,
+            addrType: token.addrType,
+            logo: logo,
+            balances: token.balances,
+            rate: token.rate,
+            default_: token.default_,
+            native: token.native,
+            chainHash: token.chainHash,
+          );
+        }).toList();
+      } else if (chain.slip44 == 60 && appState.account?.addrType == 1) {
+        apiTokens = await fetchTokensEvmList(
+          chainName: chain.shortName,
+          chainId: chain.chainId.toInt(),
         );
-      }).toList();
-      _updateDisplayTokens(formattedTokens);
+        apiTokens = apiTokens.map((token) {
+          return FTokenInfo(
+            name: token.name,
+            symbol: token.symbol,
+            decimals: token.decimals,
+            addr: token.addr,
+            addrType: token.addrType,
+            logo: logo,
+            balances: token.balances,
+            rate: token.rate,
+            default_: token.default_,
+            native: token.native,
+            chainHash: token.chainHash,
+          );
+        }).toList();
+      } else {
+        return;
+      }
+
+      _updateDisplayTokens(apiTokens);
       final prefs = await SharedPreferences.getInstance();
-      final encoded = jsonEncode(formattedTokens
-          .map((token) => {
-                'name': token.name,
-                'symbol': token.symbol,
-                'decimals': token.decimals,
-                'addr': token.addr,
-                'logo': token.logo,
-              })
-          .toList());
-      await prefs.setString('legacy_zilliqa_tokens_cache', encoded);
+      final cacheKey = _getCacheKey(chain);
+      final encoded =
+          jsonEncode(apiTokens.map((token) => token.toJson()).toList());
+      await prefs.setString(cacheKey, encoded);
     } catch (e) {
       debugPrint("Fetch tokens error: $e");
     } finally {
       setState(() => _isLoading = false);
+    }
+  }
+
+  String _getCacheKey(NetworkConfigInfo chain) {
+    if (chain.slip44 == 313) {
+      return 'legacy_zilliqa_tokens_cache_${chain.shortName}';
+    } else {
+      return 'evm_tokens_cache_${chain.shortName}';
     }
   }
 
@@ -146,32 +216,8 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
         addr: address,
         walletIndex: BigInt.from(appState.selectedWallet),
       );
-      final logo = meta.logo != null && meta.logo!.isNotEmpty
-          ? meta.logo!
-              .replaceAll(
-                '%{contract_address}%',
-                meta.addr.toLowerCase(),
-              )
-              .replaceAll(
-                '%{dark,light}%',
-                appState.currentTheme.value == 'dark' ? 'dark' : 'light',
-              )
-          : null;
-      final formattedMeta = FTokenInfo(
-        name: meta.name,
-        symbol: meta.symbol,
-        decimals: meta.decimals,
-        addr: meta.addr,
-        addrType: meta.addrType,
-        logo: logo,
-        balances: meta.balances,
-        rate: meta.rate,
-        default_: meta.default_,
-        native: meta.native,
-        chainHash: meta.chainHash,
-      );
       setState(() {
-        _displayTokens.add(formattedMeta);
+        _displayTokens.add(meta);
       });
     } catch (e) {
       debugPrint("Fetch token meta error: $e");
