@@ -254,21 +254,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get webViewPageTryAgain => 'Попробовать снова';
 
   @override
-  String get addTokenPageTitle => 'Добавить токен';
-
-  @override
-  String get addTokenPageTokenInfo => 'Информация о токене';
-
-  @override
-  String get addTokenPageHint => 'Адрес, название, символ';
-
-  @override
-  String get addTokenPageAddError => 'Не удалось добавить токен:';
-
-  @override
-  String get addTokenPageInvalidAddressError => 'Неверный адрес токена или ошибка сети';
-
-  @override
   String get secretPhraseGeneratorPageTitle => 'Новый кошелек';
 
   @override

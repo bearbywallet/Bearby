@@ -93,12 +93,6 @@
   "webViewPageLoadError": "加载失败",
   "webViewPageTryAgain": "重试",
   
-  "addTokenPageTitle": "添加代币",
-  "addTokenPageTokenInfo": "代币信息",
-  "addTokenPageHint": "地址、名称、符号",
-  "addTokenPageAddError": "添加代币失败：",
-  "addTokenPageInvalidAddressError": "无效的代币地址或网络错误",
-
   "secretPhraseGeneratorPageTitle": "新钱包",
   "secretPhraseGeneratorPageBackupCheckbox": "我已备份助记词",
   "secretPhraseGeneratorPageNextButton": "下一步",

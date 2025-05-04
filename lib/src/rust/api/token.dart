@@ -23,6 +23,11 @@ Future<List<FTokenInfo>> fetchTokensListZilliqaLegacy(
     RustLib.instance.api.crateApiTokenFetchTokensListZilliqaLegacy(
         limit: limit, offset: offset);
 
+Future<List<FTokenInfo>> fetchTokensEvmList(
+        {required String chainName, required int chainId}) =>
+    RustLib.instance.api.crateApiTokenFetchTokensEvmList(
+        chainName: chainName, chainId: chainId);
+
 Future<List<FTokenInfo>> addFtoken(
         {required FTokenInfo meta, required BigInt walletIndex}) =>
     RustLib.instance.api

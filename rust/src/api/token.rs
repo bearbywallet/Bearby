@@ -12,7 +12,10 @@ pub use zilpay::proto::address::Address;
 use zilpay::{
     background::bg_wallet::WalletManagement,
     token::ft::FToken,
-    token_quotes::zilliqa_tokens::zilpay_get_tokens,
+    token_quotes::{
+        bnb_tokens::pancakeswap_get_tokens, coingecko_tokens::coingecko_get_tokens,
+        zilliqa_tokens::zilpay_get_tokens,
+    },
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
 
@@ -67,6 +70,23 @@ pub async fn fetch_tokens_list_zilliqa_legacy(
     let tokens = zilpay_get_tokens(limit, offset)
         .await
         .map_err(|e| e.to_string())?;
+
+    Ok(tokens
+        .into_iter()
+        .map(From::from)
+        .collect::<Vec<FTokenInfo>>())
+}
+
+pub async fn fetch_tokens_evm_list(
+    chain_name: String,
+    chain_id: u16,
+) -> Result<Vec<FTokenInfo>, String> {
+    let tokens = match chain_id {
+        56 => pancakeswap_get_tokens().await.map_err(|e| e.to_string())?,
+        _ => coingecko_get_tokens(&chain_name)
+            .await
+            .map_err(|e| e.to_string())?,
+    };
 
     Ok(tokens
         .into_iter()

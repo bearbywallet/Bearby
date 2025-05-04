@@ -254,21 +254,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get webViewPageTryAgain => '重试';
 
   @override
-  String get addTokenPageTitle => '添加代币';
-
-  @override
-  String get addTokenPageTokenInfo => '代币信息';
-
-  @override
-  String get addTokenPageHint => '地址、名称、符号';
-
-  @override
-  String get addTokenPageAddError => '添加代币失败：';
-
-  @override
-  String get addTokenPageInvalidAddressError => '无效的代币地址或网络错误';
-
-  @override
   String get secretPhraseGeneratorPageTitle => '新钱包';
 
   @override

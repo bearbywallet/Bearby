@@ -92,12 +92,6 @@
   "webViewPageIncognitoLabel": "シークレット",
   "webViewPageLoadError": "読み込みに失敗",
   "webViewPageTryAgain": "再試行",
-  
-  "addTokenPageTitle": "トークンを追加",
-  "addTokenPageTokenInfo": "トークン情報",
-  "addTokenPageHint": "アドレス、名前、シンボル",
-  "addTokenPageAddError": "トークンの追加に失敗:",
-  "addTokenPageInvalidAddressError": "無効なトークンアドレスまたはネットワークエラー",
 
   "secretPhraseGeneratorPageTitle": "新しいウォレット",
   "secretPhraseGeneratorPageBackupCheckbox": "単語をバックアップしました",

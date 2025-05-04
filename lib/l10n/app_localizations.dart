@@ -585,36 +585,6 @@ abstract class AppLocalizations {
   /// **'Try Again'**
   String get webViewPageTryAgain;
 
-  /// Title for the AddTokenPage
-  ///
-  /// In en, this message translates to:
-  /// **'Add Token'**
-  String get addTokenPageTitle;
-
-  /// Section title for token information input on AddTokenPage
-  ///
-  /// In en, this message translates to:
-  /// **'Token Information'**
-  String get addTokenPageTokenInfo;
-
-  /// Hint text for token input field on AddTokenPage
-  ///
-  /// In en, this message translates to:
-  /// **'Address, name, symbol'**
-  String get addTokenPageHint;
-
-  /// Error message prefix when adding token fails on AddTokenPage
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to add token:'**
-  String get addTokenPageAddError;
-
-  /// Error message for invalid token address or network issues on AddTokenPage
-  ///
-  /// In en, this message translates to:
-  /// **'Invalid token address or network error'**
-  String get addTokenPageInvalidAddressError;
-
   /// Title for the SecretPhraseGeneratorPage
   ///
   /// In en, this message translates to:

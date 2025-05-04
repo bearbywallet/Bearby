@@ -254,21 +254,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get webViewPageTryAgain => 'Try Again';
 
   @override
-  String get addTokenPageTitle => 'Add Token';
-
-  @override
-  String get addTokenPageTokenInfo => 'Token Information';
-
-  @override
-  String get addTokenPageHint => 'Address, name, symbol';
-
-  @override
-  String get addTokenPageAddError => 'Failed to add token:';
-
-  @override
-  String get addTokenPageInvalidAddressError => 'Invalid token address or network error';
-
-  @override
   String get secretPhraseGeneratorPageTitle => 'New Wallet';
 
   @override

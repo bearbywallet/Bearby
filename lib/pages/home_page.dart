@@ -8,7 +8,6 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/modals/manage_tokens.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -343,12 +342,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     30, adaptivePadding, adaptivePadding, adaptivePadding),
                 color: theme.textSecondary,
                 onTap: () {
-                  showManageTokensModal(
-                    context: context,
-                    onAddToken: () {
-                      Navigator.pushNamed(context, '/add_token');
-                    },
-                  );
+                  Navigator.pushNamed(context, '/manage_tokens');
                 },
               ),
             ],

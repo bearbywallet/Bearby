@@ -254,21 +254,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get webViewPageTryAgain => '再試行';
 
   @override
-  String get addTokenPageTitle => 'トークンを追加';
-
-  @override
-  String get addTokenPageTokenInfo => 'トークン情報';
-
-  @override
-  String get addTokenPageHint => 'アドレス、名前、シンボル';
-
-  @override
-  String get addTokenPageAddError => 'トークンの追加に失敗:';
-
-  @override
-  String get addTokenPageInvalidAddressError => '無効なトークンアドレスまたはネットワークエラー';
-
-  @override
   String get secretPhraseGeneratorPageTitle => '新しいウォレット';
 
   @override

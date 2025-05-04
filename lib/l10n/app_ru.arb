@@ -93,12 +93,6 @@
   "webViewPageLoadError": "Ошибка загрузки",
   "webViewPageTryAgain": "Попробовать снова",
   
-  "addTokenPageTitle": "Добавить токен",
-  "addTokenPageTokenInfo": "Информация о токене",
-  "addTokenPageHint": "Адрес, название, символ",
-  "addTokenPageAddError": "Не удалось добавить токен:",
-  "addTokenPageInvalidAddressError": "Неверный адрес токена или ошибка сети",
-
   "secretPhraseGeneratorPageTitle": "Новый кошелек",
   "secretPhraseGeneratorPageBackupCheckbox": "Я сохранил секретные слова",
   "secretPhraseGeneratorPageNextButton": "Далее",

@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/pages/about.dart';
 import 'package:zilpay/pages/add_account.dart';
 import 'package:zilpay/pages/add_ledger_account.dart';
-import 'package:zilpay/pages/add_token.dart';
 import 'package:zilpay/pages/address_book.dart';
 import 'package:zilpay/pages/appearance.dart';
 import 'package:zilpay/pages/browser_settings.dart';
@@ -12,6 +11,7 @@ import 'package:zilpay/pages/keystore_backup.dart';
 import 'package:zilpay/pages/keystore_file_restore.dart';
 import 'package:zilpay/pages/ledger_connect.dart';
 import 'package:zilpay/pages/locale.dart';
+import 'package:zilpay/pages/manage_tokens.dart';
 import 'package:zilpay/pages/network.dart';
 import 'package:zilpay/pages/notification.dart';
 import 'package:zilpay/pages/password_setup.dart';
@@ -221,8 +221,8 @@ class AppRouter {
         return wrapWithProviders(const ReceivePage());
       case '/add_account':
         return wrapWithProviders(const AddAccount());
-      case '/add_token':
-        return wrapWithProviders(const AddTokenPage());
+      case '/manage_tokens':
+        return wrapWithProviders(const ManageTokensPage());
       case '/send':
         return wrapWithProviders(const SendTokenPage());
       case '/reveal_sk':

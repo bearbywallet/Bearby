@@ -404,31 +404,6 @@
     "description": "Button text to retry loading the web page on WebViewPage"
   },
   
-  "addTokenPageTitle": "Add Token",
-  "@addTokenPageTitle": {
-    "description": "Title for the AddTokenPage"
-  },
-  
-  "addTokenPageTokenInfo": "Token Information",
-  "@addTokenPageTokenInfo": {
-    "description": "Section title for token information input on AddTokenPage"
-  },
-  
-  "addTokenPageHint": "Address, name, symbol",
-  "@addTokenPageHint": {
-    "description": "Hint text for token input field on AddTokenPage"
-  },
-  
-  "addTokenPageAddError": "Failed to add token:",
-  "@addTokenPageAddError": {
-    "description": "Error message prefix when adding token fails on AddTokenPage"
-  },
-  
-  "addTokenPageInvalidAddressError": "Invalid token address or network error",
-  "@addTokenPageInvalidAddressError": {
-    "description": "Error message for invalid token address or network issues on AddTokenPage"
-  },
-
   "secretPhraseGeneratorPageTitle": "New Wallet",
   "@secretPhraseGeneratorPageTitle": {
     "description": "Title for the SecretPhraseGeneratorPage"
