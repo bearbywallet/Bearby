@@ -2,7 +2,7 @@
   {
     "name": "Zilliqa proto",
     "chain": "ZIL",
-    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/zilliqa/chain/%{dark,light}%.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.webp",
     "rpc": [
       "https://api.zq2-protomainnet.zilliqa.com"
     ],
@@ -10,7 +10,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Zilliqa",
         "symbol": "ZIL",
@@ -18,7 +18,7 @@
       },
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
         "name": "Zilliqa Scilla",
         "symbol": "ZIL",
@@ -42,7 +42,7 @@
   {
     "name": "Binance testnet",
     "chain": "BNB",
-    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.webp",
     "rpc": [
       "https://data-seed-prebsc-1-s1.binance.org:8545/",
       "https://data-seed-prebsc-2-s1.binance.org:8545/",
@@ -59,7 +59,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "BinanceCoin",
         "symbol": "BNB",
@@ -98,7 +98,7 @@
         "native": true,
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ethereum",
-        "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
         "symbol": "ETH",
         "decimals": 18
       }
@@ -106,7 +106,7 @@
     "testnet": true,
     "infoURL": "https://sepolia.dev/",
     "shortName": "ethereum",
-    "logo": "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/chain/%{dark,light}%.svg",
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
     "chainIds": [11155111, 0],
     "slip44": 60,
     "explorers": [
