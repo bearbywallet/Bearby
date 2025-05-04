@@ -70,11 +70,13 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
   Future<void> _loadTokens({bool forceRefresh = false}) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final walletTokens = appState.wallet?.tokens ?? [];
+    bool needUpdate = false;
 
     if (walletTokens.isNotEmpty) {
       setState(() {
         _displayTokens = walletTokens;
       });
+      needUpdate = true;
     }
 
     if (appState.chain?.testnet == true ||
@@ -108,9 +110,11 @@ class _ManageTokensModalContentState extends State<_ManageTokensModalContent> {
             .toList();
         _updateDisplayTokens(cachedTokens);
       }
+
+      needUpdate = false;
     }
 
-    if (forceRefresh || _displayTokens.isEmpty) {
+    if (forceRefresh || needUpdate) {
       setState(() => _isLoading = true);
       try {
         List<FTokenInfo> tokens =
