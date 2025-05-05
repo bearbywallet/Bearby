@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.9.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -823157925;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1381717903;
 
 // Section: executor
 
@@ -2787,6 +2787,47 @@ fn wire__crate__api__settings__set_theme_impl(
         },
     )
 }
+fn wire__crate__api__settings__set_tokens_list_fetcher_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "set_tokens_list_fetcher",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_enabled = <bool>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::settings::set_tokens_list_fetcher(
+                            api_wallet_index,
+                            api_enabled,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__settings__set_wallet_ens_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -2818,47 +2859,6 @@ fn wire__crate__api__settings__set_wallet_ens_impl(
                         let output_ok =
                             crate::api::settings::set_wallet_ens(api_wallet_index, api_ens_enabled)
                                 .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__settings__set_wallet_gas_control_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "set_wallet_gas_control",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_enabled = <bool>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::settings::set_wallet_gas_control(
-                            api_wallet_index,
-                            api_enabled,
-                        )
-                        .await?;
                         Ok(output_ok)
                     })()
                     .await,
@@ -5093,7 +5093,7 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
         let mut var_currencyConvert = <String>::sse_decode(deserializer);
         let mut var_ipfsNode = <Option<String>>::sse_decode(deserializer);
         let mut var_ensEnabled = <bool>::sse_decode(deserializer);
-        let mut var_gasControlEnabled = <bool>::sse_decode(deserializer);
+        let mut var_tokensListFetcher = <bool>::sse_decode(deserializer);
         let mut var_nodeRankingEnabled = <bool>::sse_decode(deserializer);
         let mut var_maxConnections = <u8>::sse_decode(deserializer);
         let mut var_requestTimeoutSecs = <u32>::sse_decode(deserializer);
@@ -5104,7 +5104,7 @@ impl SseDecode for crate::models::settings::WalletSettingsInfo {
             currency_convert: var_currencyConvert,
             ipfs_node: var_ipfsNode,
             ens_enabled: var_ensEnabled,
-            gas_control_enabled: var_gasControlEnabled,
+            tokens_list_fetcher: var_tokensListFetcher,
             node_ranking_enabled: var_nodeRankingEnabled,
             max_connections: var_maxConnections,
             request_timeout_secs: var_requestTimeoutSecs,
@@ -5289,13 +5289,13 @@ fn pde_ffi_dispatcher_primary_impl(
         69 => wire__crate__api__settings__set_rate_engine_impl(port, ptr, rust_vec_len, data_len),
         70 => wire__crate__api__settings__set_rate_fetcher_impl(port, ptr, rust_vec_len, data_len),
         71 => wire__crate__api__settings__set_theme_impl(port, ptr, rust_vec_len, data_len),
-        72 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
-        73 => wire__crate__api__settings__set_wallet_gas_control_impl(
+        72 => wire__crate__api__settings__set_tokens_list_fetcher_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
+        73 => wire__crate__api__settings__set_wallet_ens_impl(port, ptr, rust_vec_len, data_len),
         74 => {
             wire__crate__api__settings__set_wallet_ipfs_node_impl(port, ptr, rust_vec_len, data_len)
         }
@@ -6244,7 +6244,7 @@ impl flutter_rust_bridge::IntoDart for crate::models::settings::WalletSettingsIn
             self.currency_convert.into_into_dart().into_dart(),
             self.ipfs_node.into_into_dart().into_dart(),
             self.ens_enabled.into_into_dart().into_dart(),
-            self.gas_control_enabled.into_into_dart().into_dart(),
+            self.tokens_list_fetcher.into_into_dart().into_dart(),
             self.node_ranking_enabled.into_into_dart().into_dart(),
             self.max_connections.into_into_dart().into_dart(),
             self.request_timeout_secs.into_into_dart().into_dart(),
@@ -7231,7 +7231,7 @@ impl SseEncode for crate::models::settings::WalletSettingsInfo {
         <String>::sse_encode(self.currency_convert, serializer);
         <Option<String>>::sse_encode(self.ipfs_node, serializer);
         <bool>::sse_encode(self.ens_enabled, serializer);
-        <bool>::sse_encode(self.gas_control_enabled, serializer);
+        <bool>::sse_encode(self.tokens_list_fetcher, serializer);
         <bool>::sse_encode(self.node_ranking_enabled, serializer);
         <u8>::sse_encode(self.max_connections, serializer);
         <u32>::sse_encode(self.request_timeout_secs, serializer);

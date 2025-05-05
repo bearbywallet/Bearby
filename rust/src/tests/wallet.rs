@@ -216,7 +216,7 @@ mod wallet_tests {
             currency_convert: "BTC".to_string(),
             ipfs_node: None,
             ens_enabled: false,
-            gas_control_enabled: false,
+            tokens_list_fetcher: false,
             node_ranking_enabled: false,
             max_connections: 0,
             request_timeout_secs: 0,
@@ -265,7 +265,7 @@ mod wallet_tests {
             currency_convert: "BTC".to_string(),
             ipfs_node: None,
             ens_enabled: false,
-            gas_control_enabled: false,
+            tokens_list_fetcher: false,
             node_ranking_enabled: false,
             max_connections: 0,
             request_timeout_secs: 0,
@@ -506,7 +506,7 @@ mod wallet_tests {
             assert!(wallet.settings.ipfs_node.is_none());
 
             assert!(!wallet.settings.ens_enabled);
-            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.tokens_list_fetcher);
             assert!(!wallet.settings.node_ranking_enabled);
             assert_eq!(wallet.settings.max_connections, 0);
             assert_eq!(wallet.settings.request_timeout_secs, 0);
@@ -754,7 +754,7 @@ mod wallet_tests {
             currency_convert: "BTC".to_string(),
             ipfs_node: None,
             ens_enabled: false,
-            gas_control_enabled: false,
+            tokens_list_fetcher: false,
             node_ranking_enabled: false,
             max_connections: 0,
             request_timeout_secs: 0,
@@ -841,7 +841,7 @@ mod wallet_tests {
             assert_eq!(wallet.settings.currency_convert, "BTC");
             assert!(wallet.settings.ipfs_node.is_none());
             assert!(!wallet.settings.ens_enabled);
-            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.tokens_list_fetcher);
             assert!(!wallet.settings.node_ranking_enabled);
             assert_eq!(wallet.settings.max_connections, 0);
             assert_eq!(wallet.settings.request_timeout_secs, 0);
@@ -1024,7 +1024,7 @@ mod wallet_tests {
             assert_eq!(wallet.settings.currency_convert, "BTC");
             assert!(wallet.settings.ipfs_node.is_none());
             assert!(!wallet.settings.ens_enabled);
-            assert!(!wallet.settings.gas_control_enabled);
+            assert!(!wallet.settings.tokens_list_fetcher);
             assert!(!wallet.settings.node_ranking_enabled);
             assert_eq!(wallet.settings.max_connections, 0);
             assert_eq!(wallet.settings.request_timeout_secs, 0);

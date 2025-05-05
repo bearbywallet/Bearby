@@ -98,7 +98,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.9.0';
 
   @override
-  int get rustContentHash => -823157925;
+  int get rustContentHash => 1381717903;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -351,11 +351,11 @@ abstract class RustLibApi extends BaseApi {
   Future<void> crateApiSettingsSetTheme(
       {required int appearancesCode, required bool compactNumbers});
 
+  Future<void> crateApiSettingsSetTokensListFetcher(
+      {required BigInt walletIndex, required bool enabled});
+
   Future<void> crateApiSettingsSetWalletEns(
       {required BigInt walletIndex, required bool ensEnabled});
-
-  Future<void> crateApiSettingsSetWalletGasControl(
-      {required BigInt walletIndex, required bool enabled});
 
   Future<void> crateApiSettingsSetWalletIpfsNode(
       {required BigInt walletIndex, String? node});
@@ -2414,6 +2414,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<void> crateApiSettingsSetTokensListFetcher(
+      {required BigInt walletIndex, required bool enabled}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_usize(walletIndex, serializer);
+        sse_encode_bool(enabled, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 72, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_unit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiSettingsSetTokensListFetcherConstMeta,
+      argValues: [walletIndex, enabled],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiSettingsSetTokensListFetcherConstMeta =>
+      const TaskConstMeta(
+        debugName: "set_tokens_list_fetcher",
+        argNames: ["walletIndex", "enabled"],
+      );
+
+  @override
   Future<void> crateApiSettingsSetWalletEns(
       {required BigInt walletIndex, required bool ensEnabled}) {
     return handler.executeNormal(NormalTask(
@@ -2422,7 +2449,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_usize(walletIndex, serializer);
         sse_encode_bool(ensEnabled, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 72, port: port_);
+            funcId: 73, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -2438,33 +2465,6 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       const TaskConstMeta(
         debugName: "set_wallet_ens",
         argNames: ["walletIndex", "ensEnabled"],
-      );
-
-  @override
-  Future<void> crateApiSettingsSetWalletGasControl(
-      {required BigInt walletIndex, required bool enabled}) {
-    return handler.executeNormal(NormalTask(
-      callFfi: (port_) {
-        final serializer = SseSerializer(generalizedFrbRustBinding);
-        sse_encode_usize(walletIndex, serializer);
-        sse_encode_bool(enabled, serializer);
-        pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 73, port: port_);
-      },
-      codec: SseCodec(
-        decodeSuccessData: sse_decode_unit,
-        decodeErrorData: sse_decode_String,
-      ),
-      constMeta: kCrateApiSettingsSetWalletGasControlConstMeta,
-      argValues: [walletIndex, enabled],
-      apiImpl: this,
-    ));
-  }
-
-  TaskConstMeta get kCrateApiSettingsSetWalletGasControlConstMeta =>
-      const TaskConstMeta(
-        debugName: "set_wallet_gas_control",
-        argNames: ["walletIndex", "enabled"],
       );
 
   @override
@@ -4228,7 +4228,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       currencyConvert: dco_decode_String(arr[2]),
       ipfsNode: dco_decode_opt_String(arr[3]),
       ensEnabled: dco_decode_bool(arr[4]),
-      gasControlEnabled: dco_decode_bool(arr[5]),
+      tokensListFetcher: dco_decode_bool(arr[5]),
       nodeRankingEnabled: dco_decode_bool(arr[6]),
       maxConnections: dco_decode_u_8(arr[7]),
       requestTimeoutSecs: dco_decode_u_32(arr[8]),
@@ -5544,7 +5544,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_currencyConvert = sse_decode_String(deserializer);
     var var_ipfsNode = sse_decode_opt_String(deserializer);
     var var_ensEnabled = sse_decode_bool(deserializer);
-    var var_gasControlEnabled = sse_decode_bool(deserializer);
+    var var_tokensListFetcher = sse_decode_bool(deserializer);
     var var_nodeRankingEnabled = sse_decode_bool(deserializer);
     var var_maxConnections = sse_decode_u_8(deserializer);
     var var_requestTimeoutSecs = sse_decode_u_32(deserializer);
@@ -5555,7 +5555,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         currencyConvert: var_currencyConvert,
         ipfsNode: var_ipfsNode,
         ensEnabled: var_ensEnabled,
-        gasControlEnabled: var_gasControlEnabled,
+        tokensListFetcher: var_tokensListFetcher,
         nodeRankingEnabled: var_nodeRankingEnabled,
         maxConnections: var_maxConnections,
         requestTimeoutSecs: var_requestTimeoutSecs,
@@ -6597,7 +6597,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.currencyConvert, serializer);
     sse_encode_opt_String(self.ipfsNode, serializer);
     sse_encode_bool(self.ensEnabled, serializer);
-    sse_encode_bool(self.gasControlEnabled, serializer);
+    sse_encode_bool(self.tokensListFetcher, serializer);
     sse_encode_bool(self.nodeRankingEnabled, serializer);
     sse_encode_u_8(self.maxConnections, serializer);
     sse_encode_u_32(self.requestTimeoutSecs, serializer);

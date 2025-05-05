@@ -102,7 +102,7 @@ class WalletSettingsInfo {
   final String currencyConvert;
   final String? ipfsNode;
   final bool ensEnabled;
-  final bool gasControlEnabled;
+  final bool tokensListFetcher;
   final bool nodeRankingEnabled;
   final int maxConnections;
   final int requestTimeoutSecs;
@@ -114,7 +114,7 @@ class WalletSettingsInfo {
     required this.currencyConvert,
     this.ipfsNode,
     required this.ensEnabled,
-    required this.gasControlEnabled,
+    required this.tokensListFetcher,
     required this.nodeRankingEnabled,
     required this.maxConnections,
     required this.requestTimeoutSecs,
@@ -128,7 +128,7 @@ class WalletSettingsInfo {
       currencyConvert.hashCode ^
       ipfsNode.hashCode ^
       ensEnabled.hashCode ^
-      gasControlEnabled.hashCode ^
+      tokensListFetcher.hashCode ^
       nodeRankingEnabled.hashCode ^
       maxConnections.hashCode ^
       requestTimeoutSecs.hashCode ^
@@ -144,7 +144,7 @@ class WalletSettingsInfo {
           currencyConvert == other.currencyConvert &&
           ipfsNode == other.ipfsNode &&
           ensEnabled == other.ensEnabled &&
-          gasControlEnabled == other.gasControlEnabled &&
+          tokensListFetcher == other.tokensListFetcher &&
           nodeRankingEnabled == other.nodeRankingEnabled &&
           maxConnections == other.maxConnections &&
           requestTimeoutSecs == other.requestTimeoutSecs &&

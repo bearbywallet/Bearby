@@ -489,17 +489,17 @@ abstract class AppLocalizations {
   /// **'ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser\'s address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you\'re using them.'**
   String get securityPageIpfsDescription;
 
-  /// Label for gas station setting on SecurityPage
+  /// Label for tokens fetcher setting on SecurityPage
   ///
   /// In en, this message translates to:
-  /// **'Gas station'**
-  String get securityPageGasStation;
+  /// **'Tokens fetcher'**
+  String get securityPageTokensFetcherTitle;
 
-  /// Description for gas station setting on SecurityPage
+  /// Label for tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.
   ///
   /// In en, this message translates to:
-  /// **'Use ZilPay server for optimize your gas usage'**
-  String get securityPageGasDescription;
+  /// **'tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.'**
+  String get securityPageTokensFetcherDescription;
 
   /// Label for node ranking setting on SecurityPage
   ///

@@ -154,13 +154,13 @@ class _SecurityPageState extends State<SecurityPage> {
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
               _buildPreferenceItem(
                 state,
-                l10n.securityPageGasStation,
-                'assets/icons/gas.svg',
-                l10n.securityPageGasDescription,
+                l10n.securityPageTokensFetcherTitle,
+                'assets/icons/globe.svg',
+                l10n.securityPageTokensFetcherDescription,
                 true,
-                state.wallet!.settings.gasControlEnabled,
+                state.wallet!.settings.tokensListFetcher,
                 (value) async {
-                  await setWalletGasControl(
+                  await setTokensListFetcher(
                     walletIndex: BigInt.from(state.selectedWallet),
                     enabled: value,
                   );

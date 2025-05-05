@@ -127,8 +127,13 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
   }
 
   Future<void> _fetchApiTokens() async {
-    setState(() => _isLoading = true);
     final appState = Provider.of<AppState>(context, listen: false);
+
+    if (appState.wallet?.settings.tokensListFetcher != true) {
+      return;
+    }
+
+    setState(() => _isLoading = true);
     final chain = appState.chain;
     if (chain == null) return;
     String logo =

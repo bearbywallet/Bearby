@@ -206,10 +206,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageIpfsDescription => 'ZIlPayは、IPFS上のNFT画像の表示、ブラウザのアドレスバーに入力されたENS(ZNS)アドレスに関する情報の表示、およびトークンアイコンの取得にサードパーティサービスを使用します。これらのサービスを利用する際、IPアドレスが公開される可能性があります。';
 
   @override
-  String get securityPageGasStation => 'ガスステーション';
+  String get securityPageTokensFetcherTitle => 'トークンフェッチャー';
 
   @override
-  String get securityPageGasDescription => 'ガス使用量の最適化にZilPayサーバーを使用';
+  String get securityPageTokensFetcherDescription => 'セキュリティページのトークンフェッチャー設定。有効にすると、トークンがサーバーから自動的に取得され、追加できます。';
 
   @override
   String get securityPageNodeRanking => 'ノードランキング';

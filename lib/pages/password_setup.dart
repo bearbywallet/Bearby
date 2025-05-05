@@ -236,7 +236,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         currencyConvert: "BTC",
         ipfsNode: "dweb.link",
         ensEnabled: true,
-        gasControlEnabled: true,
+        tokensListFetcher: true,
         nodeRankingEnabled: true,
         maxConnections: 5,
         requestTimeoutSecs: 30,

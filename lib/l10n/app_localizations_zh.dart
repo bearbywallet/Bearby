@@ -206,10 +206,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageIpfsDescription => 'ZIlPay 使用第三方服务来显示存储在 IPFS 上的 NFT 图像，显示与浏览器地址栏中输入的 ENS（ZNS）地址相关的信息，以及获取不同代币的图标。当您使用这些服务时，您的 IP 地址可能会暴露给这些服务。';
 
   @override
-  String get securityPageGasStation => '加油站';
+  String get securityPageTokensFetcherTitle => '令牌获取器';
 
   @override
-  String get securityPageGasDescription => '使用 ZilPay 服务器优化您的燃料使用';
+  String get securityPageTokensFetcherDescription => '安全页面上的令牌获取器设置。如果启用，将自动从服务器获取令牌并可添加。';
 
   @override
   String get securityPageNodeRanking => '节点排名';

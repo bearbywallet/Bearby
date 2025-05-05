@@ -325,14 +325,14 @@
     "description": "Description for IPFS gateway setting on SecurityPage"
   },
   
-  "securityPageGasStation": "Gas station",
-  "@securityPageGasStation": {
-    "description": "Label for gas station setting on SecurityPage"
+  "securityPageTokensFetcherTitle": "Tokens fetcher",
+  "@securityPageTokensFetcherTitle": {
+    "description": "Label for tokens fetcher setting on SecurityPage"
   },
   
-  "securityPageGasDescription": "Use ZilPay server for optimize your gas usage",
-  "@securityPageGasDescription": {
-    "description": "Description for gas station setting on SecurityPage"
+  "securityPageTokensFetcherDescription": "tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.",
+  "@securityPageTokensFetcherDescription": {
+    "description": "Label for tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added."
   },
   
   "securityPageNodeRanking": "Node ranking",

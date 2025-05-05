@@ -206,10 +206,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityPageIpfsDescription => 'ZIlPay использует сторонние сервисы для отображения изображений ваших NFT, хранящихся в IPFS, информации, связанной с ENS(ZNS) адресами в адресной строке браузера, и получения иконок для различных токенов. Ваш IP-адрес может быть раскрыт этим сервисам при их использовании.';
 
   @override
-  String get securityPageGasStation => 'Газовая станция';
+  String get securityPageTokensFetcherTitle => 'Получатель токенов';
 
   @override
-  String get securityPageGasDescription => 'Использовать сервер ZilPay для оптимизации использования газа';
+  String get securityPageTokensFetcherDescription => 'Настройка получения токенов на странице безопасности. Если включена, токены будут автоматически запрашиваться с сервера и могут быть добавлены.';
 
   @override
   String get securityPageNodeRanking => 'Ранжирование узлов';

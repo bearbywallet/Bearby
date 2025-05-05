@@ -134,13 +134,13 @@ pub async fn set_wallet_ipfs_node(wallet_index: usize, node: Option<String>) -> 
     .map_err(Into::into)
 }
 
-pub async fn set_wallet_gas_control(wallet_index: usize, enabled: bool) -> Result<(), String> {
+pub async fn set_tokens_list_fetcher(wallet_index: usize, enabled: bool) -> Result<(), String> {
     with_wallet(wallet_index, |wallet| {
         let mut data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
-        data.settings.network.gas_control_enabled = enabled;
+        data.settings.network.tokens_list_fetcher = enabled;
 
         wallet
             .save_wallet_data(data)

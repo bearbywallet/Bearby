@@ -51,9 +51,9 @@ Future<void> setWalletIpfsNode({required BigInt walletIndex, String? node}) =>
     RustLib.instance.api.crateApiSettingsSetWalletIpfsNode(
         walletIndex: walletIndex, node: node);
 
-Future<void> setWalletGasControl(
+Future<void> setTokensListFetcher(
         {required BigInt walletIndex, required bool enabled}) =>
-    RustLib.instance.api.crateApiSettingsSetWalletGasControl(
+    RustLib.instance.api.crateApiSettingsSetTokensListFetcher(
         walletIndex: walletIndex, enabled: enabled);
 
 Future<void> setWalletNodeRanking(
