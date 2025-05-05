@@ -118,6 +118,23 @@ class _SecurityPageState extends State<SecurityPage> {
             children: [
               _buildPreferenceItem(
                 state,
+                l10n.securityPageTokensFetcherTitle,
+                'assets/icons/globe.svg',
+                l10n.securityPageTokensFetcherDescription,
+                true,
+                state.wallet!.settings.tokensListFetcher,
+                (value) async {
+                  await setTokensListFetcher(
+                    walletIndex: BigInt.from(state.selectedWallet),
+                    enabled: value,
+                  );
+                  await state.syncData();
+                },
+              ),
+              Divider(
+                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
+              _buildPreferenceItem(
+                state,
                 l10n.securityPageEnsDomains,
                 'assets/icons/graph.svg',
                 l10n.securityPageEnsDescription,
@@ -149,23 +166,6 @@ class _SecurityPageState extends State<SecurityPage> {
                 },
                 showInput: true,
                 controller: _ipfsController,
-              ),
-              Divider(
-                  height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
-              _buildPreferenceItem(
-                state,
-                l10n.securityPageTokensFetcherTitle,
-                'assets/icons/globe.svg',
-                l10n.securityPageTokensFetcherDescription,
-                true,
-                state.wallet!.settings.tokensListFetcher,
-                (value) async {
-                  await setTokensListFetcher(
-                    walletIndex: BigInt.from(state.selectedWallet),
-                    enabled: value,
-                  );
-                  await state.syncData();
-                },
               ),
               Divider(
                   height: 1, color: theme.textSecondary.withValues(alpha: 0.1)),
