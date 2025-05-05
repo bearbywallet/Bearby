@@ -64,16 +64,16 @@ class ZilliqaLedgerApp {
     );
 
     final signatureBytes = await ledger.sendOperation<Uint8List>(
-      ZilliqaSignTransactionOperation(
-        accountIndex: accountIndex,
-        transaction: protoBuf,
+      SignZilliqaTransactionOperation(
+        keyIndex: accountIndex,
+        transactionBytes: protoBuf,
       ),
       transformer: transformer,
     );
 
     _checkResult(signatureBytes);
 
-    return signatureBytes.sublist(0, signatureBytes.length - 2);
+    return signatureBytes;
   }
 
   static void _checkResult(Uint8List result) {

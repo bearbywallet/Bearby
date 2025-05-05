@@ -1,92 +1,110 @@
-import 'package:flutter/foundation.dart';
+import 'dart:async';
+import 'dart:math';
+import 'dart:typed_data';
+
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
 
-class ZilliqaSignTransactionOperation extends LedgerRawOperation<Uint8List> {
-  static const cla = 0xE0;
-  static const ins = 0x04;
-  static const sigByteLen = 64;
-  static const streamLen = 128;
+const int CLA = 0xe0;
+const int INS_SIGN_TXN = 0x04;
+const int P1_FIRST = 0x00;
+const int P2_FIRST = 0x00;
+const int STREAM_LEN = 128;
+const int SIG_BYTE_LEN = 64;
 
-  final int accountIndex;
-  final Uint8List transaction;
+class SignZilliqaTransactionOperation
+    extends LedgerComplexOperation<Uint8List> {
+  final int keyIndex;
+  final Uint8List transactionBytes;
 
-  ZilliqaSignTransactionOperation({
-    required this.accountIndex,
-    required this.transaction,
+  const SignZilliqaTransactionOperation({
+    required this.keyIndex,
+    required this.transactionBytes,
   });
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
-    final List<Uint8List> apduList = [];
-    int offset = 0;
-    int remainingBytes = transaction.length;
+  Future<Uint8List> invoke(LedgerSendFct send) async {
+    Uint8List txnBytes = transactionBytes;
+    int txnOffset = 0;
 
-    final firstWriter = ByteDataWriter();
-    firstWriter.writeUint8(cla);
-    firstWriter.writeUint8(ins);
-    firstWriter.writeUint8(0x00);
-    firstWriter.writeUint8(0x00);
+    final indexBytesWriter = ByteDataWriter(endian: Endian.little);
+    indexBytesWriter.writeInt32(keyIndex);
+    final indexBytes = indexBytesWriter.toBytes();
 
-    final chunkSize = remainingBytes > streamLen ? streamLen : remainingBytes;
-    final hostBytesLeft = remainingBytes - chunkSize;
+    final firstChunkSize = min(txnBytes.length, STREAM_LEN);
+    final txn1Bytes = txnBytes.sublist(txnOffset, txnOffset + firstChunkSize);
+    txnOffset += firstChunkSize;
+    final hostBytesLeft = txnBytes.length - txnOffset;
 
-    final indexBytes = ByteData(4)..setInt32(0, accountIndex, Endian.little);
-    final hostBytesLeftBytes = ByteData(4)
-      ..setInt32(0, hostBytesLeft, Endian.little);
-    final txn1SizeBytes = ByteData(4)..setInt32(0, chunkSize, Endian.little);
-    final txn1Bytes = transaction.sublist(offset, offset + chunkSize);
+    final hostBytesLeftWriter = ByteDataWriter(endian: Endian.little);
+    hostBytesLeftWriter.writeInt32(hostBytesLeft);
+    final hostBytesLeftBytes = hostBytesLeftWriter.toBytes();
 
-    final firstData = Uint8List.fromList([
-      ...indexBytes.buffer.asUint8List(),
-      ...hostBytesLeftBytes.buffer.asUint8List(),
-      ...txn1SizeBytes.buffer.asUint8List(),
-      ...txn1Bytes,
-    ]);
+    final txn1SizeWriter = ByteDataWriter(endian: Endian.little);
+    txn1SizeWriter.writeInt32(txn1Bytes.length);
+    final txn1SizeBytes = txn1SizeWriter.toBytes();
 
-    firstWriter.writeUint8(firstData.length);
-    firstWriter.write(firstData);
-    apduList.add(firstWriter.toBytes());
+    final firstPayloadWriter = ByteDataWriter();
+    firstPayloadWriter.write(indexBytes);
+    firstPayloadWriter.write(hostBytesLeftBytes);
+    firstPayloadWriter.write(txn1SizeBytes);
+    firstPayloadWriter.write(txn1Bytes);
+    final firstPayload = firstPayloadWriter.toBytes();
 
-    offset += chunkSize;
-    remainingBytes -= chunkSize;
+    ByteDataReader responseReader = await send(
+      LedgerSimpleOperation(
+        cla: CLA,
+        ins: INS_SIGN_TXN,
+        p1: P1_FIRST,
+        p2: P2_FIRST,
+        data: firstPayload,
+        prependDataLength: true,
+        debugName: 'Sign Zilliqa Txn Chunk 1',
+      ),
+    );
 
-    while (remainingBytes > 0) {
-      final subsequentWriter = ByteDataWriter();
-      subsequentWriter.writeUint8(cla);
-      subsequentWriter.writeUint8(ins);
-      subsequentWriter.writeUint8(0x00);
-      subsequentWriter.writeUint8(0x00);
+    while (txnOffset < txnBytes.length) {
+      final currentChunkSize = min(txnBytes.length - txnOffset, STREAM_LEN);
+      final txnNBytes =
+          txnBytes.sublist(txnOffset, txnOffset + currentChunkSize);
+      txnOffset += currentChunkSize;
+      final remainingBytes = txnBytes.length - txnOffset;
 
-      final chunkSizeN =
-          remainingBytes > streamLen ? streamLen : remainingBytes;
-      final hostBytesLeftN = remainingBytes - chunkSizeN;
+      final hostBytesLeftWriterNext = ByteDataWriter(endian: Endian.little);
+      hostBytesLeftWriterNext.writeInt32(remainingBytes);
+      final hostBytesLeftBytesNext = hostBytesLeftWriterNext.toBytes();
 
-      final hostBytesLeftBytesN = ByteData(4)
-        ..setInt32(0, hostBytesLeftN, Endian.little);
-      final txnNSizeBytes = ByteData(4)..setInt32(0, chunkSizeN, Endian.little);
-      final txnNBytes = transaction.sublist(offset, offset + chunkSizeN);
+      final txnNSizeWriter = ByteDataWriter(endian: Endian.little);
+      txnNSizeWriter.writeInt32(txnNBytes.length);
+      final txnNSizeBytes = txnNSizeWriter.toBytes();
 
-      final subsequentData = Uint8List.fromList([
-        ...hostBytesLeftBytesN.buffer.asUint8List(),
-        ...txnNSizeBytes.buffer.asUint8List(),
-        ...txnNBytes,
-      ]);
+      final nextPayloadWriter = ByteDataWriter();
+      nextPayloadWriter.write(hostBytesLeftBytesNext);
+      nextPayloadWriter.write(txnNSizeBytes);
+      nextPayloadWriter.write(txnNBytes);
+      final nextPayload = nextPayloadWriter.toBytes();
 
-      subsequentWriter.writeUint8(subsequentData.length);
-      subsequentWriter.write(subsequentData);
-      apduList.add(subsequentWriter.toBytes());
-
-      offset += chunkSizeN;
-      remainingBytes -= chunkSizeN;
+      responseReader = await send(
+        LedgerSimpleOperation(
+          cla: CLA,
+          ins: INS_SIGN_TXN,
+          p1: P1_FIRST,
+          p2: P2_FIRST,
+          data: nextPayload,
+          prependDataLength: true,
+          debugName: 'Sign Zilliqa Txn Chunk N',
+        ),
+      );
     }
 
-    return apduList;
-  }
+    if (responseReader.remainingLength < SIG_BYTE_LEN) {
+      throw LedgerDeviceException(
+        message:
+            'Signature response too short. Expected $SIG_BYTE_LEN bytes, got ${responseReader.remainingLength}',
+        connectionType: ConnectionType.ble,
+      );
+    }
 
-  @override
-  Future<Uint8List> read(ByteDataReader reader) async {
-    final response = reader.read(reader.remainingLength);
-
-    return response;
+    final signatureBytes = responseReader.read(SIG_BYTE_LEN);
+    return signatureBytes;
   }
 }
