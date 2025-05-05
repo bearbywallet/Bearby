@@ -1,80 +1,115 @@
+import 'dart:async';
+import 'dart:math';
+
 import 'package:flutter/foundation.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus_dart.dart';
 import 'package:zilpay/ledger/ethereum/utils.dart';
 
-class EthereumTransactionOperation extends LedgerRawOperation<Uint8List> {
+const int ETH_CLA = 0xe0;
+const int ETH_INS_SIGN = 0x04;
+const int P1_FIRST_CHUNK = 0x00;
+const int P1_MORE_CHUNKS = 0x80;
+const int P2_UNUSED = 0x00;
+const int MAX_APDU_PAYLOAD_SIZE = 250;
+const int ETH_SIGNATURE_LENGTH = 65;
+
+class EthereumTransactionOperation extends LedgerComplexOperation<Uint8List> {
   final int accountIndex;
   final Uint8List transaction;
+  final ConnectionType connectionType;
 
-  EthereumTransactionOperation({
-    this.accountIndex = 0,
+  const EthereumTransactionOperation({
+    required this.accountIndex,
     required this.transaction,
+    required this.connectionType,
   });
 
   @override
-  Future<List<Uint8List>> write(ByteDataWriter writer) async {
-    final output = <Uint8List>[];
+  Future<Uint8List> invoke(LedgerSendFct send) async {
     final List<int> paths = splitPath(getWalletDerivationPath(accountIndex));
-
     if (paths.isEmpty) {
       throw Exception('Derivation path is empty');
     }
 
+    final pathWriter = ByteDataWriter();
+    pathWriter.writeUint8(paths.length);
+    for (var pathElement in paths) {
+      pathWriter.writeUint32(pathElement, Endian.big);
+    }
+    final pathBytes = pathWriter.toBytes();
+
     int offset = 0;
+    ByteDataReader? responseReader;
 
-    while (offset < transaction.length) {
-      writer = ByteDataWriter();
+    final firstChunkSize = min(
+      transaction.length,
+      MAX_APDU_PAYLOAD_SIZE - pathBytes.length,
+    );
 
-      writer.writeUint8(0xe0); // CLA
-      writer.writeUint8(0x04); // ins (SIGN)
-
-      final bool first = offset == 0;
-      final int maxChunkSize = first ? 150 - 1 - paths.length * 4 : 150;
-      final int chunkSize = offset + maxChunkSize > transaction.length
-          ? transaction.length - offset
-          : maxChunkSize;
-
-      if (chunkSize <= 0) {
-        throw Exception('Invalid chunk size: $chunkSize at offset $offset');
-      }
-
-      final buffer =
-          Uint8List(first ? 1 + paths.length * 4 + chunkSize : chunkSize);
-
-      if (first) {
-        buffer[0] = paths.length;
-        for (var i = 0; i < paths.length; i++) {
-          buffer.buffer.asByteData().setUint32(1 + 4 * i, paths[i], Endian.big);
-        }
-        buffer.setAll(1 + 4 * paths.length,
-            transaction.sublist(offset, offset + chunkSize));
-        writer.writeUint8(0x00);
-      } else {
-        buffer.setAll(0, transaction.sublist(offset, offset + chunkSize));
-        writer.writeUint8(0x80);
-      }
-
-      writer.writeUint8(0x00);
-      writer.writeUint8(buffer.lengthInBytes);
-      writer.write(buffer);
-
-      final chunkData = writer.toBytes();
-      output.add(chunkData);
-
-      offset += chunkSize;
-    }
-
-    if (offset != transaction.length) {
+    if (firstChunkSize < 0) {
       throw Exception(
-          'Incomplete data sent: sent $offset of ${transaction.length} bytes');
+          'Transaction data is too small to fit with derivation path in the first chunk.');
     }
 
-    return output;
-  }
+    final firstPayloadWriter = ByteDataWriter();
+    firstPayloadWriter.write(pathBytes);
+    firstPayloadWriter
+        .write(transaction.sublist(offset, offset + firstChunkSize));
+    final firstPayload = firstPayloadWriter.toBytes();
 
-  @override
-  Future<Uint8List> read(ByteDataReader reader) async {
-    final bytes = reader.read(reader.remainingLength);
-    return bytes;
+    responseReader = await send(
+      LedgerSimpleOperation(
+        cla: ETH_CLA,
+        ins: ETH_INS_SIGN,
+        p1: P1_FIRST_CHUNK,
+        p2: P2_UNUSED,
+        data: firstPayload,
+        prependDataLength: true,
+        debugName: 'Sign Ethereum Txn Chunk 1',
+      ),
+    );
+
+    offset += firstChunkSize;
+    while (offset < transaction.length) {
+      final remainingBytes = transaction.length - offset;
+      final currentChunkSize = min(remainingBytes, MAX_APDU_PAYLOAD_SIZE);
+
+      final nextPayload =
+          transaction.sublist(offset, offset + currentChunkSize);
+
+      responseReader = await send(
+        LedgerSimpleOperation(
+          cla: ETH_CLA,
+          ins: ETH_INS_SIGN,
+          p1: P1_MORE_CHUNKS,
+          p2: P2_UNUSED,
+          data: nextPayload,
+          prependDataLength: true,
+          debugName: 'Sign Ethereum Txn Chunk N',
+        ),
+      );
+
+      offset += currentChunkSize;
+    }
+
+    if (responseReader == null) {
+      throw LedgerDeviceException(
+        message:
+            'No response received from Ledger device after sending transaction data.',
+        connectionType: connectionType,
+      );
+    }
+
+    if (responseReader.remainingLength < ETH_SIGNATURE_LENGTH) {
+      throw LedgerDeviceException(
+        message:
+            'Signature response too short. Expected $ETH_SIGNATURE_LENGTH bytes, got ${responseReader.remainingLength}',
+        connectionType: connectionType,
+      );
+    }
+
+    final signatureBytes = responseReader.read(ETH_SIGNATURE_LENGTH);
+
+    return signatureBytes;
   }
 }

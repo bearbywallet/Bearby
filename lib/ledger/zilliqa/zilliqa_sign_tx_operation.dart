@@ -15,10 +15,12 @@ class SignZilliqaTransactionOperation
     extends LedgerComplexOperation<Uint8List> {
   final int keyIndex;
   final Uint8List transactionBytes;
+  final ConnectionType connectionType;
 
   const SignZilliqaTransactionOperation({
     required this.keyIndex,
     required this.transactionBytes,
+    required this.connectionType,
   });
 
   @override
@@ -100,7 +102,7 @@ class SignZilliqaTransactionOperation
       throw LedgerDeviceException(
         message:
             'Signature response too short. Expected $SIG_BYTE_LEN bytes, got ${responseReader.remainingLength}',
-        connectionType: ConnectionType.ble,
+        connectionType: connectionType,
       );
     }
 

@@ -67,6 +67,7 @@ class ZilliqaLedgerApp {
       SignZilliqaTransactionOperation(
         keyIndex: accountIndex,
         transactionBytes: protoBuf,
+        connectionType: ledger.connectionType,
       ),
       transformer: transformer,
     );

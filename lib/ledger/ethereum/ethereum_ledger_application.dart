@@ -80,6 +80,7 @@ class EthereumLedgerApp {
       EthereumTransactionOperation(
         accountIndex: accountIndex,
         transaction: txRLP,
+        connectionType: ledger.connectionType,
       ),
       transformer: transformer,
     );
