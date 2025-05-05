@@ -104,7 +104,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       _createWallet = createWallet ?? true;
       _walletNameController.text = _ledgers.isNotEmpty
           ? "${_ledgers.first.name} (${network.name})"
-          : "Ledger Wallet (${network.name})";
+          : "Ledger (${network.name})";
 
       final appState = context.read<AppState>();
       final isLedgerWallet = appState.selectedWallet != -1 &&
@@ -250,7 +250,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       return;
     }
 
-    if (_walletNameController.text.length > 24 && _createWallet) {
+    if (_walletNameController.text.length > 100 && _createWallet) {
       setState(() =>
           _errorMessage = l10n.addLedgerAccountPageWalletNameTooLongError);
       _btnController.reset();
