@@ -19,7 +19,9 @@ mod wallet_tests {
     };
 
     use crate::api::token::{add_ftoken, fetch_token_meta};
-    use crate::api::transaction::{cacl_gas_fee, create_token_transfer, TokenTransferParamsInfo};
+    use crate::api::transaction::{
+        cacl_gas_fee, create_token_transfer, encode_tx_rlp, TokenTransferParamsInfo,
+    };
     use crate::api::wallet::{add_sk_wallet, AddSKWalletParams};
     use crate::{
         api::{
@@ -57,6 +59,8 @@ mod wallet_tests {
         "use fit skill orphan memory impose attract mobile delay inch ill trophy";
     const SK: &str = "e8351e8eb0057b809b9c3ea4e9286a6f4f5d9281cddfa77c1f52c3359ce34bad";
     const ZLP_ADDR: &str = "zil1l0g8u6f9g0fsvjuu74ctyla2hltefrdyt7k5f4";
+    const CDN: &str = "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp";
+    const BNB_CDN: &str = "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp";
 
     #[tokio::test]
     async fn test_a_init_service() {
@@ -460,10 +464,7 @@ mod wallet_tests {
             assert_eq!(token.decimals, 18);
             assert_eq!(token.addr, "0x0000000000000000000000000000000000000000");
             assert_eq!(token.addr_type, 1);
-            assert_eq!(
-        token.logo,
-        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-    );
+            assert_eq!(token.logo, Some(BNB_CDN.to_string()));
             assert!(token.balances.is_empty());
             assert_eq!(token.rate, 0.0);
             assert!(!token.default);
@@ -796,10 +797,7 @@ mod wallet_tests {
             assert_eq!(evm_token.decimals, 18);
             assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
             assert_eq!(evm_token.addr_type, 1);
-            assert_eq!(
-            evm_token.logo,
-            Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-        );
+            assert_eq!(evm_token.logo, Some(CDN.to_string()));
             assert!(evm_token.balances.is_empty());
             assert_eq!(evm_token.rate, 0.0);
             assert!(!evm_token.default);
@@ -816,10 +814,7 @@ mod wallet_tests {
             assert_eq!(zil_token.decimals, 12);
             assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
             assert_eq!(zil_token.addr_type, 0);
-            assert_eq!(
-            zil_token.logo,
-            Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-        );
+            assert_eq!(zil_token.logo, Some(CDN.to_string()));
             assert!(zil_token.balances.is_empty());
             assert_eq!(zil_token.rate, 0.0);
             assert!(!zil_token.default);
@@ -912,10 +907,7 @@ mod wallet_tests {
             assert_eq!(bnb_token.decimals, 18);
             assert_eq!(bnb_token.addr, "0x0000000000000000000000000000000000000000");
             assert_eq!(bnb_token.addr_type, 1);
-            assert_eq!(
-        bnb_token.logo,
-        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-    );
+            assert_eq!(bnb_token.logo, Some(BNB_CDN.to_string()));
             assert!(bnb_token.balances.is_empty());
             assert_eq!(bnb_token.rate, 0.0);
             assert!(!bnb_token.default);
@@ -982,10 +974,7 @@ mod wallet_tests {
             assert_eq!(evm_token.decimals, 18);
             assert_eq!(evm_token.addr, "0x0000000000000000000000000000000000000000");
             assert_eq!(evm_token.addr_type, 1);
-            assert_eq!(
-        evm_token.logo,
-        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-    );
+            assert_eq!(evm_token.logo, Some(CDN.to_string()));
             assert!(evm_token.balances.is_empty());
             assert_eq!(evm_token.rate, 0.0);
             assert!(!evm_token.default);
@@ -1002,11 +991,7 @@ mod wallet_tests {
             assert_eq!(zil_token.decimals, 12);
             assert_eq!(zil_token.addr, "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz");
             assert_eq!(zil_token.addr_type, 0);
-            assert_eq!(
-        zil_token.logo,
-        Some("https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/icons/%{shortName}%/%{symbol}%/%{dark,light}%.webp".to_string())
-
-    );
+            assert_eq!(zil_token.logo, Some(CDN.to_string()));
             assert!(zil_token.balances.is_empty());
             assert_eq!(zil_token.rate, 0.0);
             assert!(!zil_token.default);
@@ -1156,40 +1141,11 @@ mod wallet_tests {
         })
         .await
         .unwrap();
+        let bytes_rlp = encode_tx_rlp(0, 0, tx.clone()).await.unwrap();
 
         if let Some(evm) = tx.evm.as_mut() {
             evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
         }
-
-        // let tx = TransactionRequestInfo {
-        //     metadata: TransactionMetadataInfo {
-        //         chain_hash: zil_chain_config.hash(),
-        //         hash: None,
-        //         info: None,
-        //         icon: None,
-        //         title: None,
-        //         signer: None,
-        //         token_info: None,
-        //     },
-        //     scilla: None,
-        //                 evm: Some(TransactionRequestEVM {
-        //         nonce: None,
-        //         // from: Some(wallet.accounts[0].addr.clone()),
-        //         from: Some("0xa1B2Ff03F501A4d8278CB75a9075F406A5B8C5Ff".to_string()),
-        //         to: Some("0xe30161F32A019d876F082d9FF13ed451a03A2086".to_string()),
-        //         value: Some("0xde0b6b3a7640000".to_string()),
-        //         // gas_limit: Some(1197051),
-        //         gas_limit: None,
-        //         data: Some(hex::decode("5ae401dc0000000000000000000000000000000000000000000000000000000067e63a35000000000000000000000000000000000000000000000000000000000000004000000000000000000000000000000000000000000000000000000000000000020000000000000000000000000000000000000000000000000000000000000040000000000000000000000000000000000000000000000000000000000000016000000000000000000000000000000000000000000000000000000000000000e404e45aaf00000000000000000000000094e18ae7dd5ee57b55f30c4b63e2760c09efb1920000000000000000000000002274005778063684fbb1bfa96a2b725dc37d75f900000000000000000000000000000000000000000000000000000000000009c4000000000000000000000000a1b2ff03f501a4d8278cb75a9075f406a5b8c5ff0000000000000000000000000000000000000000000000000905438e600100000000000000000000000000000000000000000000000000000000000000001f3d00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000e404e45aaf00000000000000000000000094e18ae7dd5ee57b55f30c4b63e2760c09efb1920000000000000000000000002274005778063684fbb1bfa96a2b725dc37d75f900000000000000000000000000000000000000000000000000000000000001f4000000000000000000000000a1b2ff03f501a4d8278cb75a9075f406a5b8c5ff00000000000000000000000000000000000000000000000004db73254763000000000000000000000000000000000000000000000000000000000000000012c0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000").unwrap()),
-        //         max_fee_per_gas: None,
-        //         max_priority_fee_per_gas: None,
-        //         gas_price: None,
-        //         chain_id: None,
-        //         access_list: None,
-        //         blob_versioned_hashes: None,
-        //         max_fee_per_blob_gas: None,
-        //     }),
-        // };
         let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
 
         assert!(gas.gas_price > 0);

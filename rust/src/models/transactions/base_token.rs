@@ -1,6 +1,6 @@
 pub use zilpay::history::transaction::TokenInfo;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct BaseTokenInfo {
     pub value: String,
     pub symbol: String,

@@ -12,10 +12,12 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
@@ -735,6 +737,13 @@ class _ConfirmTransactionContentState
                             final balance = BigInt.parse(widget.token.balances[
                                     appState.wallet!.selectedAccount] ??
                                 '0');
+
+                            if (widget.token.addr != zeroEVM &&
+                                widget.token.addrType == 1 &&
+                                appState.wallet!.walletType
+                                    .contains(WalletType.ledger.name)) {
+                              throw "ERC20 for ledger is not working for now.";
+                            }
 
                             if (widget.token.addrType == 0 &&
                                 widget.to.startsWith("0x")) {

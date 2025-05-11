@@ -11,7 +11,7 @@ pub use zilpay::{
     proto::{tx::ETHTransactionRequest, zil_tx::ZILTransactionRequest},
 };
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct TransactionRequestScilla {
     pub chain_id: u16,
     pub nonce: u64,
