@@ -452,11 +452,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get addressBookPageEmptyMessage => '您的联系人及其钱包地址将\n在此处显示。';
 
   @override
-  String addressBookPageNetwork(Object network) {
-    return '网络 $network';
-  }
-
-  @override
   String get addressBookPageDeleteConfirmationTitle => '删除联系人';
 
   @override

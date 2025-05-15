@@ -452,11 +452,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get addressBookPageEmptyMessage => '連絡先とそのウォレットアドレスが\nここに表示されます。';
 
   @override
-  String addressBookPageNetwork(Object network) {
-    return 'ネットワーク $network';
-  }
-
-  @override
   String get addressBookPageDeleteConfirmationTitle => '連絡先を削除';
 
   @override

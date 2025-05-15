@@ -452,11 +452,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressBookPageEmptyMessage => 'Your contacts and their wallet address will\nappear here.';
 
   @override
-  String addressBookPageNetwork(Object network) {
-    return 'Network $network';
-  }
-
-  @override
   String get addressBookPageDeleteConfirmationTitle => 'Delete Contact';
 
   @override

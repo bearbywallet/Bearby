@@ -452,11 +452,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addressBookPageEmptyMessage => 'Ваши контакты и их адреса кошельков\nпоявятся здесь.';
 
   @override
-  String addressBookPageNetwork(Object network) {
-    return 'Сеть $network';
-  }
-
-  @override
   String get addressBookPageDeleteConfirmationTitle => 'Удалить контакт';
 
   @override

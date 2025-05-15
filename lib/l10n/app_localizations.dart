@@ -957,12 +957,6 @@ abstract class AppLocalizations {
   /// **'Your contacts and their wallet address will\nappear here.'**
   String get addressBookPageEmptyMessage;
 
-  /// Network label format for each address entry on the Address Book page
-  ///
-  /// In en, this message translates to:
-  /// **'Network {network}'**
-  String addressBookPageNetwork(Object network);
-
   /// Title for the delete contact confirmation dialog
   ///
   /// In en, this message translates to:

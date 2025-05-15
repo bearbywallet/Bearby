@@ -693,13 +693,6 @@
   "@addressBookPageEmptyMessage": {
     "description": "Message displayed when the address book is empty on the Address Book page"
   },
-  "addressBookPageNetwork": "Network {network}",
-  "@addressBookPageNetwork": {
-    "description": "Network label format for each address entry on the Address Book page",
-    "placeholders": {
-      "network": {}
-    }
-  },
   "addressBookPageDeleteConfirmationTitle": "Delete Contact",
   "@addressBookPageDeleteConfirmationTitle": {
     "description": "Title for the delete contact confirmation dialog"

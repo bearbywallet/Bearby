@@ -163,7 +163,6 @@
 
   "addressBookPageTitle": "地址簿",
   "addressBookPageEmptyMessage": "您的联系人及其钱包地址将\n在此处显示。",
-  "addressBookPageNetwork": "网络 {network}",
   "addressBookPageDeleteConfirmationTitle": "删除联系人",
   "addressBookPageDeleteConfirmationMessage": "您确定要从地址簿中删除{contactName}吗？",
   "addressBookPageDeleteTooltip": "删除{contactName}",

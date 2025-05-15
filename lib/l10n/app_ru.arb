@@ -163,7 +163,6 @@
 
   "addressBookPageTitle": "Адресная книга",
   "addressBookPageEmptyMessage": "Ваши контакты и их адреса кошельков\nпоявятся здесь.",
-  "addressBookPageNetwork": "Сеть {network}",
   "addressBookPageDeleteConfirmationTitle": "Удалить контакт",
   "addressBookPageDeleteConfirmationMessage": "Вы уверены, что хотите удалить {contactName} из вашей адресной книги?",
   "addressBookPageDeleteTooltip": "Удалить {contactName}",

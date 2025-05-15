@@ -2,6 +2,7 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/modals/add_contect.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/models/book.dart';
@@ -212,7 +213,8 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        l10n.addressBookPageNetwork(address.net.toString()),
+                        shortenAddress(address.addr,
+                            leftSize: 12, rightSize: 12),
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
