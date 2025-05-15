@@ -250,7 +250,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   width: ICON_SIZE_TILE_BUTTON,
                   height: ICON_SIZE_TILE_BUTTON,
                   colorFilter: ColorFilter.mode(
-                    theme.secondaryPurple,
+                    theme.primaryPurple,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -259,7 +259,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   Navigator.pushNamed(context, '/receive');
                 },
                 backgroundColor: theme.cardBackground,
-                textColor: theme.secondaryPurple,
+                textColor: theme.primaryPurple,
               ),
               if (appState.account != null &&
                   appState.chain?.slip44 == 313) ...[

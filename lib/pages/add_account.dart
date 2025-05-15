@@ -200,15 +200,15 @@ class _AddAccountState extends State<AddAccount> {
 
       await appState.syncData();
 
-      if (_zilliqaLegacy && _isZIL(appState)) {
+      if (_zilliqaLegacy && _isZIL(appState) && appState.wallet != null) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
-          accountIndex: BigInt.from(_bip39Index),
+          accountIndex: BigInt.from(appState.wallet!.accounts.length - 1),
         );
       }
 
       try {
-        await syncBalances(walletIndex: walletIndex);
+        await syncBalances(walletIndex: BigInt.from(appState.selectedWallet));
       } catch (_) {}
 
       await appState.syncData();
