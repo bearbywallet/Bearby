@@ -71,7 +71,6 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final chain = args?['chain'] as NetworkConfigInfo?;
     final keys = args?['keys'] as KeyPairInfo?;
     final cipher = args?['cipher'] as Uint8List?;
-    final zilLegacy = args?['zilLegacy'] as bool?;
     final argon2 = args?['argon2'] as WalletArgonParamsInfo?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
@@ -88,8 +87,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
         _argon2 = argon2;
         _bypassChecksumValidation = bypassChecksumValidation ?? false;
 
-        if (zilLegacy != null) {
-          _zilLegacy = zilLegacy;
+        if (_chain?.slip44 == 313) {
+          _zilLegacy = true;
         }
 
         _updatedArgs = true;

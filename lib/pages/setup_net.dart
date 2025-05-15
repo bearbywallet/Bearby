@@ -30,7 +30,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   LedgerDevice? _ledger;
   String? _errorMessage;
   String? _shortName;
-  bool _zilLegacy = false;
   bool _bypassChecksumValidation = false;
   bool _isTestnet = false;
 
@@ -62,7 +61,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final keys = args?['keys'] as KeyPairInfo?;
     final shortName = args?['shortName'] as String?;
-    final zilLegacy = args?['zilLegacy'] as bool?;
     final ledger = args?['ledger'] as LedgerDevice?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
@@ -76,7 +74,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
         _ledger = ledger;
         _keys = keys;
         _shortName = shortName;
-        _zilLegacy = zilLegacy ?? false;
         _bypassChecksumValidation = bypassChecksumValidation ?? false;
       });
     }
@@ -389,7 +386,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                                   'keys': _keys,
                                   'chain': chain,
                                   'isTestnet': _isTestnet,
-                                  'zilLegacy': _zilLegacy,
                                   'ignore_checksum': _bypassChecksumValidation,
                                 },
                               );
