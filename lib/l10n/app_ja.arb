@@ -164,6 +164,11 @@
   "addressBookPageTitle": "アドレス帳",
   "addressBookPageEmptyMessage": "連絡先とそのウォレットアドレスが\nここに表示されます。",
   "addressBookPageNetwork": "ネットワーク {network}",
+  "addressBookPageDeleteConfirmationTitle": "連絡先を削除",
+  "addressBookPageDeleteConfirmationMessage": "本当に{contactName}をアドレス帳から削除しますか？",
+  "addressBookPageDeleteTooltip": "{contactName}を削除",
+  "cancel": "キャンセル",
+  "delete": "削除",
 
   "browserPageConnectedTab": "接続済み",
   "browserPageExploreTab": "探索",

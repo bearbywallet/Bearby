@@ -963,6 +963,36 @@ abstract class AppLocalizations {
   /// **'Network {network}'**
   String addressBookPageNetwork(Object network);
 
+  /// Title for the delete contact confirmation dialog
+  ///
+  /// In en, this message translates to:
+  /// **'Delete Contact'**
+  String get addressBookPageDeleteConfirmationTitle;
+
+  /// Confirmation message when attempting to delete a contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {contactName} from your address book?'**
+  String addressBookPageDeleteConfirmationMessage(String contactName);
+
+  /// Tooltip for the delete icon button for a contact.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete {contactName}'**
+  String addressBookPageDeleteTooltip(String contactName);
+
+  /// Label for the cancel button, typically in dialogs
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// Label for the delete button, typically in dialogs or for destructive actions
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
   /// Label for the Connected tab on the Browser page
   ///
   /// In en, this message translates to:

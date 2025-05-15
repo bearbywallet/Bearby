@@ -15,5 +15,8 @@ Future<void> addNewBookAddress(
     RustLib.instance.api.crateApiBookAddNewBookAddress(
         name: name, addr: addr, net: net, slip44: slip44);
 
+Future<void> removeFromAddressBook({required String addr}) =>
+    RustLib.instance.api.crateApiBookRemoveFromAddressBook(addr: addr);
+
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();

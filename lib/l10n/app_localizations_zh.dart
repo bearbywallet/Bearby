@@ -457,6 +457,25 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
+  String get addressBookPageDeleteConfirmationTitle => '删除联系人';
+
+  @override
+  String addressBookPageDeleteConfirmationMessage(String contactName) {
+    return '您确定要从地址簿中删除$contactName吗？';
+  }
+
+  @override
+  String addressBookPageDeleteTooltip(String contactName) {
+    return '删除$contactName';
+  }
+
+  @override
+  String get cancel => '取消';
+
+  @override
+  String get delete => '删除';
+
+  @override
   String get browserPageConnectedTab => '已连接';
 
   @override

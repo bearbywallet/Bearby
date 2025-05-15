@@ -457,6 +457,25 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
+  String get addressBookPageDeleteConfirmationTitle => 'Удалить контакт';
+
+  @override
+  String addressBookPageDeleteConfirmationMessage(String contactName) {
+    return 'Вы уверены, что хотите удалить $contactName из вашей адресной книги?';
+  }
+
+  @override
+  String addressBookPageDeleteTooltip(String contactName) {
+    return 'Удалить $contactName';
+  }
+
+  @override
+  String get cancel => 'Отмена';
+
+  @override
+  String get delete => 'Удалить';
+
+  @override
   String get browserPageConnectedTab => 'Подключенные';
 
   @override

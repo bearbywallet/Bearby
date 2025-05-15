@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/modals/add_contect.dart';
+import 'package:zilpay/src/rust/api/book.dart';
+import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
@@ -16,6 +18,61 @@ class AddressBookPage extends StatefulWidget {
 }
 
 class _AddressBookPageState extends State<AddressBookPage> {
+  Future<void> _showDeleteConfirmationDialog(BuildContext context,
+      AppState state, AddressBookEntryInfo address) async {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = state.currentTheme;
+
+    return showDialog<void>(
+      context: context,
+      barrierDismissible: true,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          backgroundColor: theme.background,
+          title: Text(
+            l10n.addressBookPageDeleteConfirmationTitle,
+            style: TextStyle(color: theme.textPrimary),
+          ),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                  l10n.addressBookPageDeleteConfirmationMessage(address.name),
+                  style: TextStyle(color: theme.textSecondary),
+                ),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: Text(
+                l10n.cancel,
+                style: TextStyle(color: theme.textSecondary),
+              ),
+              onPressed: () {
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+            TextButton(
+              child: Text(
+                l10n.delete,
+                style: TextStyle(color: theme.danger),
+              ),
+              onPressed: () async {
+                try {
+                  await removeFromAddressBook(addr: address.addr);
+                  await state.syncData();
+                } catch (_) {
+                } finally {}
+                Navigator.of(dialogContext).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
@@ -52,8 +109,8 @@ class _AddressBookPageState extends State<AddressBookPage> {
                 ),
                 Expanded(
                   child: state.book.isEmpty
-                      ? _buildEmptyState(theme)
-                      : _buildAddressList(state),
+                      ? _buildEmptyState(theme, l10n)
+                      : _buildAddressList(state, theme, l10n),
                 ),
               ],
             ),
@@ -63,9 +120,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
     );
   }
 
-  Widget _buildEmptyState(AppTheme theme) {
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildEmptyState(AppTheme theme, AppLocalizations l10n) {
     return Center(
       child: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -77,7 +132,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
               width: 120,
               height: 120,
               colorFilter: ColorFilter.mode(
-                theme.textSecondary.withValues(alpha: 0.4),
+                theme.textSecondary.withOpacity(0.4),
                 BlendMode.srcIn,
               ),
             ),
@@ -96,10 +151,8 @@ class _AddressBookPageState extends State<AddressBookPage> {
     );
   }
 
-  Widget _buildAddressList(AppState state) {
-    final theme = state.currentTheme;
-    final l10n = AppLocalizations.of(context)!;
-
+  Widget _buildAddressList(
+      AppState state, AppTheme theme, AppLocalizations l10n) {
     return ListView.builder(
       itemCount: state.book.length,
       padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -110,14 +163,16 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
         return GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onTap: () {},
+          onTap: () {
+            // print('Tapped on ${address.name}');
+          },
           child: Container(
             height: 72,
             decoration: BoxDecoration(
               border: !isLastItem
                   ? Border(
                       bottom: BorderSide(
-                        color: theme.textSecondary.withValues(alpha: 0.1),
+                        color: theme.textSecondary.withOpacity(0.1),
                         width: 1,
                       ),
                     )
@@ -134,6 +189,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                       seed: address.addr.toLowerCase(),
                       size: 8,
                       color: theme.primaryPurple,
+                      bgColor: theme.background,
                       spotColor: theme.textSecondary,
                     ),
                   ),
@@ -151,27 +207,41 @@ class _AddressBookPageState extends State<AddressBookPage> {
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                       const SizedBox(height: 4),
                       Text(
-                        l10n.addressBookPageNetwork(address.net),
+                        l10n.addressBookPageNetwork(address.net.toString()),
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 14,
                         ),
+                        overflow: TextOverflow.ellipsis,
+                        maxLines: 1,
                       ),
                     ],
                   ),
                 ),
                 SizedBox(
-                  width: 24,
-                  height: 24,
-                  child: SvgPicture.asset(
-                    'assets/icons/chevron_right.svg',
-                    colorFilter: ColorFilter.mode(
-                      theme.textSecondary,
-                      BlendMode.srcIn,
+                  width: 48,
+                  height: double.infinity,
+                  child: IconButton(
+                    padding: EdgeInsets.zero,
+                    iconSize: 24,
+                    icon: SvgPicture.asset(
+                      'assets/icons/close.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.danger,
+                        BlendMode.srcIn,
+                      ),
                     ),
+                    tooltip: l10n.addressBookPageDeleteTooltip(address.name),
+                    onPressed: () {
+                      _showDeleteConfirmationDialog(context, state, address);
+                    },
                   ),
                 ),
               ],

@@ -29,6 +29,17 @@ pub async fn add_new_book_address(
     .map_err(Into::into)
 }
 
+pub async fn remove_from_address_book(addr: String) -> Result<(), String> {
+    with_service(|core| {
+        let address = parse_address(addr)?;
+
+        core.remove_from_address_book(&address)
+            .map_err(ServiceError::BackgroundError)
+    })
+    .await
+    .map_err(Into::into)
+}
+
 pub async fn get_address_book_list() -> Result<Vec<AddressBookEntryInfo>, String> {
     with_service(|core| Ok(core.get_address_book().iter().map(Into::into).collect()))
         .await

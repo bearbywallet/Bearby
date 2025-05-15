@@ -206,8 +206,8 @@ class _AddAddressModalState extends State<AddAddressModal> {
                         child: CustomButton(
                           text: l10n.addAddressModalButton,
                           onPressed: () => _handleAddAddress(appState),
+                          textColor: theme.buttonText,
                           backgroundColor: theme.primaryPurple,
-                          textColor: theme.textPrimary,
                           height: 48,
                         ),
                       ),

@@ -684,6 +684,7 @@
       "error": {}
     }
   },
+
   "addressBookPageTitle": "Address Book",
   "@addressBookPageTitle": {
     "description": "Title for the Address Book page"
@@ -699,6 +700,39 @@
       "network": {}
     }
   },
+  "addressBookPageDeleteConfirmationTitle": "Delete Contact",
+  "@addressBookPageDeleteConfirmationTitle": {
+    "description": "Title for the delete contact confirmation dialog"
+  },
+  "addressBookPageDeleteConfirmationMessage": "Are you sure you want to delete {contactName} from your address book?",
+  "@addressBookPageDeleteConfirmationMessage": {
+    "description": "Confirmation message when attempting to delete a contact.",
+    "placeholders": {
+      "contactName": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
+  "addressBookPageDeleteTooltip": "Delete {contactName}",
+  "@addressBookPageDeleteTooltip": {
+    "description": "Tooltip for the delete icon button for a contact.",
+    "placeholders": {
+      "contactName": {
+        "type": "String",
+        "example": "Alice"
+      }
+    }
+  },
+  "cancel": "Cancel",
+  "@cancel": {
+    "description": "Label for the cancel button, typically in dialogs"
+  },
+  "delete": "Delete",
+  "@delete": {
+    "description": "Label for the delete button, typically in dialogs or for destructive actions"
+  },
+
   "browserPageConnectedTab": "Connected",
   "@browserPageConnectedTab": {
     "description": "Label for the Connected tab on the Browser page"

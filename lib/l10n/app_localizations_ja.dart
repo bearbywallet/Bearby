@@ -457,6 +457,25 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
+  String get addressBookPageDeleteConfirmationTitle => '連絡先を削除';
+
+  @override
+  String addressBookPageDeleteConfirmationMessage(String contactName) {
+    return '本当に$contactNameをアドレス帳から削除しますか？';
+  }
+
+  @override
+  String addressBookPageDeleteTooltip(String contactName) {
+    return '$contactNameを削除';
+  }
+
+  @override
+  String get cancel => 'キャンセル';
+
+  @override
+  String get delete => '削除';
+
+  @override
   String get browserPageConnectedTab => '接続済み';
 
   @override
