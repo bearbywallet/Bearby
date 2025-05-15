@@ -9,9 +9,14 @@ import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/api/token.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+
+const double ICON_SIZE_SMALL = 24.0;
+const double ICON_SIZE_MEDIUM = 40.0;
+const double ICON_SIZE_TILE_BUTTON = 35.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -170,8 +175,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/close.svg',
-                        width: 24,
-                        height: 24,
+                        width: ICON_SIZE_SMALL,
+                        height: ICON_SIZE_SMALL,
                         colorFilter: ColorFilter.mode(
                           theme.buttonText,
                           BlendMode.srcIn,
@@ -195,15 +200,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Expanded(
-                child: WalletHeader(
-                  account: appState.account!,
+              if (appState.account != null)
+                Expanded(
+                  child: WalletHeader(
+                    account: appState.account!,
+                  ),
                 ),
-              ),
               HoverSvgIcon(
                 assetName: 'assets/icons/gear.svg',
-                width: 30,
-                height: 30,
+                width: ICON_SIZE_MEDIUM,
+                height: ICON_SIZE_MEDIUM,
                 padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
                 color: theme.textSecondary,
                 onTap: () {
@@ -223,13 +229,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               TileButton(
                 icon: SvgPicture.asset(
                   "assets/icons/send.svg",
-                  width: 24,
-                  height: 24,
+                  width: ICON_SIZE_TILE_BUTTON,
+                  height: ICON_SIZE_TILE_BUTTON,
                   colorFilter: ColorFilter.mode(
                     theme.primaryPurple,
                     BlendMode.srcIn,
                   ),
                 ),
+                title: l10n.homePageSendButton,
                 onPressed: () {
                   Navigator.pushNamed(context, '/send');
                 },
@@ -240,67 +247,53 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               TileButton(
                 icon: SvgPicture.asset(
                   "assets/icons/receive.svg",
-                  width: 24,
-                  height: 24,
+                  width: ICON_SIZE_TILE_BUTTON,
+                  height: ICON_SIZE_TILE_BUTTON,
                   colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
+                    theme.secondaryPurple,
                     BlendMode.srcIn,
                   ),
                 ),
+                title: l10n.homePageReceiveButton,
                 onPressed: () {
                   Navigator.pushNamed(context, '/receive');
                 },
                 backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
+                textColor: theme.secondaryPurple,
               ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/swap.svg",
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
+              if (appState.account != null &&
+                  appState.chain?.slip44 == 313) ...[
+                SizedBox(width: adaptivePaddingCard),
+                TileButton(
+                  icon: SvgPicture.asset(
+                    appState.account?.addrType == 0
+                        ? "assets/icons/scilla.svg"
+                        : "assets/icons/solidity.svg",
+                    width: 24,
+                    height: 24,
+                    colorFilter:
+                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
+                  title: appState.account?.addrType == 0 ? "Scilla" : "EVM",
+                  onPressed: () async {
+                    BigInt walletIndex = BigInt.from(appState.selectedWallet);
+                    await zilliqaSwapChain(
+                      walletIndex: walletIndex,
+                      accountIndex: appState.wallet!.selectedAccount,
+                    );
+                    await appState.syncData();
+
+                    try {
+                      await syncBalances(
+                        walletIndex: walletIndex,
+                      );
+                      await appState.syncData();
+                    } catch (_) {}
+                  },
+                  backgroundColor: theme.cardBackground,
+                  textColor: theme.primaryPurple,
                 ),
-                disabled: true,
-                onPressed: () {},
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/buy.svg",
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                disabled: true,
-                onPressed: () {},
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: SvgPicture.asset(
-                  "assets/icons/sell.svg",
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onPressed: () {},
-                disabled: true,
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
+              ],
             ],
           ),
         ),
@@ -336,10 +329,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 ),
               HoverSvgIcon(
                 assetName: 'assets/icons/manage.svg',
-                width: 30,
-                height: 30,
+                width: ICON_SIZE_MEDIUM,
+                height: ICON_SIZE_MEDIUM,
                 padding: EdgeInsets.fromLTRB(
-                    30, adaptivePadding, adaptivePadding, adaptivePadding),
+                    30, adaptivePadding, 0, adaptivePadding),
                 color: theme.textSecondary,
                 onTap: () {
                   Navigator.pushNamed(context, '/manage_tokens');

@@ -99,6 +99,8 @@
 
   "homePageTestnetLabel": "测试网",
   "homePageErrorTitle": "无信号",
+  "homePageSendButton": "发送",
+  "homePageReceiveButton": "接收",
 
   "revealSecretKeyTitle": "显示私钥",
   "revealSecretKeyPasswordHint": "密码",

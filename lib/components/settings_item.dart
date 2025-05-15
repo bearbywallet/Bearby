@@ -28,17 +28,45 @@ class SettingsItem extends StatefulWidget {
 class _SettingsItemState extends State<SettingsItem> {
   bool _isPressed = false;
 
-  BorderRadius? _getBorderRadius() {
+  ({double iconSize, double fontSize, double padding, double borderRadius})
+      _getDynamicSizes(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    const double baseIconSize = 28.0;
+    const double baseFontSize = 16.0;
+    const double basePadding = 20.0;
+    const double baseBorderRadius = 20.0;
+    double sizeMultiplier;
+
+    if (screenWidth < 400) {
+      sizeMultiplier = 0.9;
+    } else if (screenWidth < 600) {
+      sizeMultiplier = 1.0;
+    } else if (screenWidth > 900) {
+      sizeMultiplier = 1.4;
+    } else {
+      sizeMultiplier = 1.0;
+    }
+
+    return (
+      iconSize: baseIconSize * sizeMultiplier,
+      fontSize: baseFontSize * sizeMultiplier,
+      padding: basePadding * sizeMultiplier,
+      borderRadius: baseBorderRadius * sizeMultiplier,
+    );
+  }
+
+  BorderRadius? _getBorderRadius(double borderRadius) {
     if (widget.isGrouped) {
       if (widget.isFirst && widget.isLast) {
-        return BorderRadius.circular(16);
+        return BorderRadius.circular(borderRadius);
       } else if (widget.isFirst) {
-        return const BorderRadius.vertical(top: Radius.circular(16));
+        return BorderRadius.vertical(top: Radius.circular(borderRadius));
       } else if (widget.isLast) {
-        return const BorderRadius.vertical(bottom: Radius.circular(16));
+        return BorderRadius.vertical(bottom: Radius.circular(borderRadius));
       }
     } else {
-      return BorderRadius.circular(16);
+      return BorderRadius.circular(borderRadius);
     }
     return null;
   }
@@ -46,7 +74,8 @@ class _SettingsItemState extends State<SettingsItem> {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-    final borderRadius = _getBorderRadius();
+    final sizes = _getDynamicSizes(context);
+    final borderRadius = _getBorderRadius(sizes.borderRadius);
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -57,7 +86,10 @@ class _SettingsItemState extends State<SettingsItem> {
       },
       onTapCancel: () => setState(() => _isPressed = false),
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        padding: EdgeInsets.symmetric(
+          horizontal: sizes.padding,
+          vertical: sizes.padding * 0.6, // Slightly reduced vertical padding
+        ),
         decoration: BoxDecoration(
           color: _isPressed
               ? theme.background.withValues(alpha: 1.0)
@@ -71,7 +103,7 @@ class _SettingsItemState extends State<SettingsItem> {
                 widget.title,
                 style: TextStyle(
                   color: theme.textPrimary,
-                  fontSize: 16,
+                  fontSize: sizes.fontSize,
                   fontWeight: FontWeight.w500,
                 ),
               ),
@@ -82,8 +114,8 @@ class _SettingsItemState extends State<SettingsItem> {
                 theme.textSecondary,
                 BlendMode.srcIn,
               ),
-              width: 24,
-              height: 24,
+              width: sizes.iconSize,
+              height: sizes.iconSize,
             ),
           ],
         ),

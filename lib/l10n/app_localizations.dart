@@ -615,6 +615,18 @@ abstract class AppLocalizations {
   /// **'No signal'**
   String get homePageErrorTitle;
 
+  /// A Receive Tile Button title
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get homePageSendButton;
+
+  /// No description provided for @homePageReceiveButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Receive'**
+  String get homePageReceiveButton;
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:

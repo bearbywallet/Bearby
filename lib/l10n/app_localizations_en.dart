@@ -269,6 +269,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageErrorTitle => 'No signal';
 
   @override
+  String get homePageSendButton => 'Send';
+
+  @override
+  String get homePageReceiveButton => 'Receive';
+
+  @override
   String get revealSecretKeyTitle => 'Reveal Secret Key';
 
   @override

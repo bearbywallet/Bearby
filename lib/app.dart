@@ -52,6 +52,8 @@ class ZilPayApp extends StatelessWidget {
                     textScale = 0.8;
                   } else if (screenWidth <= 390) {
                     textScale = 0.85;
+                  } else {
+                    textScale = 1.1;
                   }
 
                   return MediaQuery(
@@ -70,6 +72,26 @@ class ZilPayApp extends StatelessWidget {
                   textTheme: TextTheme(
                     bodyLarge: TextStyle(color: currentTheme.textPrimary),
                     bodyMedium: TextStyle(color: currentTheme.textSecondary),
+                    displayLarge: TextStyle(
+                        color: currentTheme.textPrimary,
+                        fontSize: 34.0,
+                        fontWeight: FontWeight.bold),
+                    displayMedium: TextStyle(
+                        color: currentTheme.textPrimary,
+                        fontSize: 28.0,
+                        fontWeight: FontWeight.bold),
+                    headlineMedium: TextStyle(
+                        color: currentTheme.textPrimary,
+                        fontSize: 24.0,
+                        fontWeight: FontWeight.w600),
+                    titleMedium: TextStyle(
+                        color: currentTheme.textPrimary,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w500),
+                    labelLarge: TextStyle(
+                        color: currentTheme.buttonText,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w500),
                   ),
                   pageTransitionsTheme: const PageTransitionsTheme(
                     builders: {

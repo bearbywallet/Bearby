@@ -99,6 +99,8 @@
 
   "homePageTestnetLabel": "Тестовая сеть",
   "homePageErrorTitle": "Нет сигнала",
+  "homePageSendButton": "Отправить",
+  "homePageReceiveButton": "Получить",
 
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",

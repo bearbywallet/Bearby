@@ -269,6 +269,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get homePageErrorTitle => 'Нет сигнала';
 
   @override
+  String get homePageSendButton => 'Отправить';
+
+  @override
+  String get homePageReceiveButton => 'Получить';
+
+  @override
   String get revealSecretKeyTitle => 'Показать секретный ключ';
 
   @override

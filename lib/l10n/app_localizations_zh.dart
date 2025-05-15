@@ -269,6 +269,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get homePageErrorTitle => '无信号';
 
   @override
+  String get homePageSendButton => '发送';
+
+  @override
+  String get homePageReceiveButton => '接收';
+
+  @override
   String get revealSecretKeyTitle => '显示私钥';
 
   @override

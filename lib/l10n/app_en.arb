@@ -427,6 +427,14 @@
   "@homePageErrorTitle": {
     "description": "Label displayed when shows error on home page"
   },
+  "homePageSendButton": "Send",
+  "@homePageSendButton": {
+    "description": "A Send Tile Button title"
+  },
+  "homePageReceiveButton": "Receive",
+  "@homePageSendButton": {
+    "description": "A Receive Tile Button title"
+  },
 
 
   "revealSecretKeyTitle": "Reveal Secret Key",
