@@ -46,6 +46,10 @@ class _AddAccountState extends State<AddAccount> {
     AppState appState = Provider.of<AppState>(context, listen: false);
     _bip39Index = appState.wallet!.accounts.length;
     _checkBiometricAvailability(appState);
+
+    if (appState.account?.addrType == 0) {
+      _zilliqaLegacy = true;
+    }
   }
 
   @override

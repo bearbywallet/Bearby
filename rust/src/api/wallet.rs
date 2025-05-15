@@ -149,7 +149,7 @@ pub struct AddNextBip39AccountParams {
 }
 
 pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result<(), String> {
-    let selected_account_chain_hash = with_service_mut(|core| {
+    with_service_mut(|core| {
         let seed = if let Some(pass) = params.password {
             core.unlock_wallet_with_password(&pass, &params.identifiers, params.wallet_index)
         } else {
@@ -177,12 +177,37 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
             )
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
-        Ok(selected_account.chain_hash)
-    })
-    .await?;
-    select_accounts_chain(params.wallet_index, selected_account_chain_hash).await?;
+        let mut wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
-    Ok(())
+        if let Some(added_account) = wallet_data.accounts.last_mut() {
+            // convert pub key for zilliqa only if need.
+            match selected_account.pub_key {
+                PubKey::Secp256k1Sha256(_) => {
+                    added_account.pub_key =
+                        PubKey::Secp256k1Sha256(added_account.pub_key.as_bytes())
+                }
+                PubKey::Secp256k1Keccak256(_) => {
+                    added_account.pub_key =
+                        PubKey::Secp256k1Keccak256(added_account.pub_key.as_bytes())
+                }
+                _ => {}
+            }
+
+            added_account.slip_44 = selected_account.slip_44;
+            added_account.chain_hash = selected_account.chain_hash;
+            added_account.chain_id = selected_account.chain_id;
+        }
+
+        wallet
+            .save_wallet_data(wallet_data)
+            .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
+
+        Ok(())
+    })
+    .await
+    .map_err(Into::into)
 }
 
 pub async fn select_account(wallet_index: usize, account_index: usize) -> Result<(), String> {
