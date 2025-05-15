@@ -82,7 +82,7 @@
   },
   {
     "name": "Sepolia",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/shortName/chain/%{dark,light}%.svg",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/chain/%{dark,light}%.svg",
     "chain": "ETH",
     "rpc": [
       "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",

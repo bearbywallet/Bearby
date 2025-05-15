@@ -420,7 +420,7 @@ mod wallet_tests {
             );
             assert_eq!(
                 selected_account.chain_id,
-                zil_testnet_chain_config.chain_id()
+                *zil_testnet_chain_config.chain_ids.last().unwrap()
             );
             assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);
             assert_eq!(selected_account.slip_44, zil_chain_config.slip_44);

@@ -139,10 +139,9 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
         let mut ftokens = wallet
             .get_ftokens()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let default_provider = core.get_provider(data.default_chain_hash)?;
 
         if let WalletTypes::Ledger(_) = data.wallet_type {
-            let default_provider = core.get_provider(data.default_chain_hash)?;
-
             if default_provider.config.slip_44 == 313 {
                 // old ledger doesn't support evm.
                 return Err(ServiceError::WalletError(
@@ -167,22 +166,38 @@ pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Resu
         }
 
         data.accounts.iter_mut().for_each(|a| {
-            a.chain_hash = chain_hash;
-            a.chain_id = provider.config.chain_id();
-
-            match a.pub_key {
-                PubKey::Secp256k1Sha256(pub_key)
-                    if provider.config.slip_44 == 60 || provider.config.slip_44 == 313 =>
-                {
-                    a.pub_key = PubKey::Secp256k1Keccak256(pub_key);
+            if provider.config.slip_44 == 313 {
+                match a.pub_key {
+                    PubKey::Secp256k1Sha256(_pub_key) => {
+                        if let Some(chain_id) = provider.config.chain_ids.last() {
+                            a.chain_id = *chain_id;
+                        }
+                    }
+                    PubKey::Secp256k1Keccak256(_pub_key) => {
+                        if let Some(chain_id) = provider.config.chain_ids.first() {
+                            a.chain_id = *chain_id;
+                        }
+                    }
+                    _ => {}
                 }
-                _ => {}
+            } else if provider.config.slip_44 == 60 {
+                match a.pub_key {
+                    PubKey::Secp256k1Sha256(pub_key) => {
+                        a.pub_key = PubKey::Secp256k1Keccak256(pub_key);
+                    }
+                    _ => {}
+                }
+
+                if let Some(addr) = a.pub_key.get_addr().ok() {
+                    a.addr = addr;
+                }
+
+                a.chain_id = provider.config.chain_id();
+            } else {
+                a.chain_id = provider.config.chain_id();
             }
 
-            if let Some(addr) = a.pub_key.get_addr().ok() {
-                a.addr = addr;
-            }
-
+            a.chain_hash = chain_hash;
             a.slip_44 = provider.config.slip_44;
         });
 
