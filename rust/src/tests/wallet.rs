@@ -19,9 +19,7 @@ mod wallet_tests {
     };
 
     use crate::api::token::{add_ftoken, fetch_token_meta};
-    use crate::api::transaction::{
-        cacl_gas_fee, create_token_transfer, encode_tx_rlp, TokenTransferParamsInfo,
-    };
+    use crate::api::transaction::{cacl_gas_fee, create_token_transfer, TokenTransferParamsInfo};
     use crate::api::wallet::{add_sk_wallet, AddSKWalletParams};
     use crate::{
         api::{
@@ -1141,14 +1139,13 @@ mod wallet_tests {
         })
         .await
         .unwrap();
-        let bytes_rlp = encode_tx_rlp(0, 0, tx.clone()).await.unwrap();
 
-        // if let Some(evm) = tx.evm.as_mut() {
-        //     evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
-        // }
-        // let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
+        if let Some(evm) = tx.evm.as_mut() {
+            evm.from = Some("0x558d34db1952A45b1CC216F0B39646aA6306D90b".to_string());
+        }
+        let gas = cacl_gas_fee(0, 0, tx).await.unwrap();
 
-        // assert!(gas.gas_price > 0);
-        // assert!(gas.tx_estimate_gas > 0);
+        assert!(gas.gas_price > 0);
+        assert!(gas.tx_estimate_gas > 0);
     }
 }

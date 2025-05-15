@@ -182,19 +182,6 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
 
         if let Some(added_account) = wallet_data.accounts.last_mut() {
-            // convert pub key for zilliqa only if need.
-            match selected_account.pub_key {
-                PubKey::Secp256k1Sha256(_) => {
-                    added_account.pub_key =
-                        PubKey::Secp256k1Sha256(added_account.pub_key.as_bytes())
-                }
-                PubKey::Secp256k1Keccak256(_) => {
-                    added_account.pub_key =
-                        PubKey::Secp256k1Keccak256(added_account.pub_key.as_bytes())
-                }
-                _ => {}
-            }
-
             added_account.slip_44 = selected_account.slip_44;
             added_account.chain_hash = selected_account.chain_hash;
             added_account.chain_id = selected_account.chain_id;
