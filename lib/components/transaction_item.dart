@@ -159,19 +159,16 @@ class _HistoryItemState extends State<HistoryItem>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(formattedValue,
-            style: TextStyle(
+            style: theme.bodyText1.copyWith(
                 color: theme.textPrimary,
-                fontSize: 16,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.5),
             overflow: TextOverflow.ellipsis),
         if (convertedValue.isNotEmpty && convertedValue != '0')
           const SizedBox(height: 2),
         Text(convertedValue,
-            style: TextStyle(
-                color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 14,
-                fontWeight: FontWeight.w400)),
+            style: theme.bodyText2.copyWith(
+                color: theme.textSecondary.withOpacity(0.7))),
       ],
     );
   }
@@ -202,20 +199,15 @@ class _HistoryItemState extends State<HistoryItem>
       children: [
         Text(
           formattedValue,
-          style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-              fontWeight: FontWeight.w400),
+          style: theme.bodyText2.copyWith(color: theme.textSecondary),
           overflow: TextOverflow.ellipsis,
         ),
         if (convertedValue.isNotEmpty && convertedValue != '0')
           const SizedBox(height: 2),
         Text(
           convertedValue,
-          style: TextStyle(
-            color: theme.textSecondary.withValues(alpha: 0.7),
-            fontSize: 12,
-            fontWeight: FontWeight.w400,
+          style: theme.caption.copyWith(
+            color: theme.textSecondary.withOpacity(0.7),
           ),
         ),
       ],
@@ -276,9 +268,8 @@ class _HistoryItemState extends State<HistoryItem>
                                     child: Text(
                                         widget.transaction.status.name
                                             .toUpperCase(),
-                                        style: TextStyle(
+                                        style: theme.caption.copyWith(
                                             color: _getStatusColor(theme),
-                                            fontSize: 12,
                                             fontWeight: FontWeight.w600)),
                                   ),
                                   const SizedBox(width: 8),
@@ -287,10 +278,9 @@ class _HistoryItemState extends State<HistoryItem>
                                         widget.transaction.title ??
                                             l10n
                                                 .transactionDetailsModal_transaction,
-                                        style: TextStyle(
+                                        style: theme.bodyText1.copyWith(
                                             color: theme.textPrimary
-                                                .withValues(alpha: 0.7),
-                                            fontSize: 16,
+                                                .withOpacity(0.7),
                                             fontWeight: FontWeight.w500),
                                         overflow: TextOverflow.ellipsis),
                                   ),
@@ -311,10 +301,8 @@ class _HistoryItemState extends State<HistoryItem>
                       children: [
                         Text(
                           _formatDateTime(),
-                          style: TextStyle(
-                            color: theme.textSecondary.withValues(alpha: 0.7),
-                            fontSize: 14,
-                            fontWeight: FontWeight.w400,
+                          style: theme.bodyText2.copyWith(
+                            color: theme.textSecondary.withOpacity(0.7),
                           ),
                         ),
                         _buildFeeWithPrice(state),

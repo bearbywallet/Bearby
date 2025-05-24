@@ -74,8 +74,7 @@ class NetworkTile extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: theme.bodyText1.copyWith(
                     fontWeight: FontWeight.w500,
                     color: textColor,
                   ),
@@ -141,8 +140,7 @@ class NetworkTile extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 12,
+        style: theme.caption.copyWith(
           fontWeight: FontWeight.w500,
           color: color,
         ),

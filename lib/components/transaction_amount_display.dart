@@ -37,28 +37,24 @@ class TransactionAmountDisplay extends StatelessWidget {
     final bool isNative = token.native;
     final bool isMaxTransfer = isNative && amount == balance;
 
-    final TextStyle amountStyle = TextStyle(
-      fontSize: 16,
+    final TextStyle amountStyle = theme.bodyText1.copyWith(
       fontWeight: FontWeight.w600,
       color: textColor,
     );
 
-    final TextStyle feeStyle = TextStyle(
-      fontSize: 10,
+    final TextStyle feeStyle = theme.overline.copyWith(
       fontWeight: FontWeight.w500,
-      color: textColor.withValues(alpha: 0.8),
+      color: textColor.withOpacity(0.8),
     );
 
-    final TextStyle conversionAmountStyle = TextStyle(
-      fontSize: 12,
-      fontWeight: FontWeight.w400,
-      color: textColor.withValues(alpha: 0.6),
+    final TextStyle conversionAmountStyle = theme.caption.copyWith(
+      // fontWeight is already normal in caption
+      color: textColor.withOpacity(0.6),
     );
 
-    final TextStyle conversionFeeStyle = TextStyle(
-      fontSize: 10,
-      fontWeight: FontWeight.w400,
-      color: textColor.withValues(alpha: 0.6),
+    final TextStyle conversionFeeStyle = theme.overline.copyWith(
+      // fontWeight is already normal in overline
+      color: textColor.withOpacity(0.6),
     );
 
     String amountText;

@@ -85,10 +85,9 @@ class _WalletHeaderState extends State<WalletHeader>
                 const SizedBox(height: 8),
                 Text(
                   widget.account.name,
-                  style: TextStyle(
+                  style: theme.headline2.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 22,
-                    fontWeight: FontWeight.w600,
+                    fontSize: 22, // headline2 is 24, adjusting
                   ),
                 ),
               ],

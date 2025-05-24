@@ -108,10 +108,10 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             alignment: Alignment.centerLeft,
             child: Text(
               widget.amount,
-              style: TextStyle(
+              style: theme.subtitle1.copyWith(
                 color: theme.textPrimary,
                 fontSize: _calculateFontSize(context, widget.amount),
-                fontWeight: FontWeight.w500,
+                // fontWeight is already w500 in subtitle1, but explicitly set if different
               ),
             ),
           ),
@@ -123,10 +123,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               alignment: Alignment.centerLeft,
               child: Text(
                 converted,
-                style: TextStyle(
-                  color: theme.textPrimary.withValues(alpha: 0.7),
-                  fontSize: 16,
-                  fontWeight: FontWeight.w400,
+                style: theme.bodyText1.copyWith(
+                  color: theme.textPrimary.withOpacity(0.7),
                 ),
               ),
             ),
@@ -170,9 +168,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
             const SizedBox(width: 8),
             Text(
               token.symbol,
-              style: TextStyle(
+              style: theme.bodyText1.copyWith(
                 color: theme.textPrimary,
-                fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
             ),
@@ -243,9 +240,8 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         if (isExceeded) const SizedBox(width: 4),
         Text(
           fromWei(value: balance.toString(), decimals: token.decimals),
-          style: TextStyle(
-            color: theme.textPrimary.withValues(alpha: 0.7),
-            fontSize: 14,
+          style: theme.bodyText2.copyWith(
+            color: theme.textPrimary.withOpacity(0.7),
           ),
         ),
         if (widget.showMax)
@@ -267,11 +263,10 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                 ),
                 child: Text(
                   'Max',
-                  style: TextStyle(
+                  style: theme.caption.copyWith(
                     color: isMax
                         ? theme.warning
-                        : theme.textPrimary.withValues(alpha: 0.7),
-                    fontSize: 12,
+                        : theme.textPrimary.withOpacity(0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),

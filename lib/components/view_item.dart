@@ -100,18 +100,16 @@ class _WalletListItemState extends State<WalletListItem>
                     children: [
                       Text(
                         widget.title,
-                        style: TextStyle(
-                          color: theme.textPrimary.withValues(alpha: opacity),
-                          fontSize: 16,
+                        style: theme.bodyText1.copyWith(
+                          color: theme.textPrimary.withOpacity(opacity),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         widget.subtitle,
-                        style: TextStyle(
-                          color: theme.textSecondary.withValues(alpha: opacity),
-                          fontSize: 14,
+                        style: theme.bodyText2.copyWith(
+                          color: theme.textSecondary.withOpacity(opacity),
                         ),
                       ),
                     ],

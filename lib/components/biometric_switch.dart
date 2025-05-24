@@ -5,6 +5,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 class BiometricSwitch extends StatelessWidget {
   final AuthMethod biometricType;
@@ -79,9 +80,8 @@ class BiometricSwitch extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 _authMethodText(context),
-                style: TextStyle(
+                style: theme.bodyText1.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
                 ),
               ),
             ],

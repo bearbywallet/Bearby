@@ -45,9 +45,8 @@ class SwitchSettingItem extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
-                  style: TextStyle(
+                  style: theme.bodyText1.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
                   ),
                 ),
               ),
@@ -64,9 +63,8 @@ class SwitchSettingItem extends StatelessWidget {
               padding: const EdgeInsets.only(left: 40),
               child: Text(
                 description,
-                style: TextStyle(
+                style: theme.bodyText2.copyWith(
                   color: theme.textSecondary,
-                  fontSize: 14,
                 ),
               ),
             ),

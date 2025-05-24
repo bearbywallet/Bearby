@@ -162,10 +162,9 @@ class _TokenCardState extends State<TokenCard>
                                     Flexible(
                                       child: Text(
                                         widget.ftoken.name,
-                                        style: TextStyle(
+                                        style: theme.bodyText1.copyWith(
                                           color: theme.textPrimary
-                                              .withValues(alpha: 0.7),
-                                          fontSize: 16,
+                                              .withOpacity(0.7),
                                           fontWeight: FontWeight.w500,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -175,10 +174,10 @@ class _TokenCardState extends State<TokenCard>
                                     const SizedBox(width: 8),
                                     Text(
                                       '(${widget.ftoken.symbol})',
-                                      style: TextStyle(
+                                      style: theme.caption.copyWith(
                                         color: theme.textSecondary
-                                            .withValues(alpha: 0.5),
-                                        fontSize: 13,
+                                            .withOpacity(0.5),
+                                        fontSize: 13, // caption is 12, adjusting
                                       ),
                                     ),
                                   ],
@@ -191,10 +190,9 @@ class _TokenCardState extends State<TokenCard>
                                 Flexible(
                                   child: Text(
                                     amount,
-                                    style: TextStyle(
+                                    style: theme.subtitle1.copyWith(
                                       color: theme.textPrimary,
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.w600,
+                                      fontWeight: FontWeight.w600, // subtitle1 is w500
                                       letterSpacing: 0.5,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -207,8 +205,8 @@ class _TokenCardState extends State<TokenCard>
                                 null)
                               Text(
                                 converted,
-                                style: TextStyle(
-                                    color: theme.textSecondary, fontSize: 14),
+                                style: theme.bodyText2.copyWith(
+                                    color: theme.textSecondary),
                               ),
                           ],
                         ),

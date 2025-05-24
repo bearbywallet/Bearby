@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;
@@ -61,13 +63,12 @@ class _CustomButtonState extends State<CustomButton> {
           child: Center(
             child: Text(
               widget.text,
-              style: TextStyle(
-                color: widget.disabled
-                    ? widget.textColor.withValues(alpha: 0.5)
-                    : widget.textColor,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(context).extension<AppTheme>()!.subtitle1.copyWith(
+                    color: widget.disabled
+                        ? widget.textColor.withAlpha(128) // Using withAlpha for 0.5 opacity
+                        : widget.textColor,
+                    fontWeight: FontWeight.bold, // subtitle1 is w500, explicit bold needed
+                  ),
             ),
           ),
         ),

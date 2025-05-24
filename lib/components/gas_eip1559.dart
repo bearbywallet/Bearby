@@ -166,16 +166,14 @@ class GasDetails extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
-              color: secondaryColor.withValues(alpha: disabled ? 0.5 : 1.0),
-              fontSize: 12,
+            style: theme.caption.copyWith(
+              color: secondaryColor.withOpacity(disabled ? 0.5 : 1.0),
             ),
           ),
           Text(
             value,
-            style: TextStyle(
-              color: textColor.withValues(alpha: disabled ? 0.5 : 1.0),
-              fontSize: 12,
+            style: theme.caption.copyWith(
+              color: textColor.withOpacity(disabled ? 0.5 : 1.0),
               fontWeight: FontWeight.w500,
             ),
           ),
@@ -370,7 +368,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                       children: [
                         Text(
                           option.icon,
-                          style: const TextStyle(fontSize: 16),
+                          style: theme.bodyText1,
                         ),
                         const SizedBox(width: 8),
                         Column(
@@ -378,7 +376,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                           children: [
                             Text(
                               option.title(context),
-                              style: TextStyle(
+                              style: theme.bodyText1.copyWith(
                                 color: effectiveTextColor,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -386,9 +384,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                             const SizedBox(height: 4),
                             Text(
                               confirmationTime,
-                              style: TextStyle(
+                              style: theme.caption.copyWith(
                                 color: effectiveSecondaryColor,
-                                fontSize: 12,
                               ),
                             ),
                           ],
@@ -401,7 +398,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                                 '≈ $normalizedGasFee',
                                 overflow: TextOverflow.ellipsis,
                                 maxLines: 1,
-                                style: TextStyle(
+                                style: theme.bodyText1.copyWith(
                                   color: optionTextColor,
                                   fontWeight: FontWeight.w600,
                                 ),
@@ -409,9 +406,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                               const SizedBox(height: 4),
                               Text(
                                 convertedGasFee,
-                                style: TextStyle(
+                                style: theme.caption.copyWith(
                                   color: effectiveSecondaryColor,
-                                  fontSize: 12,
                                 ),
                               ),
                             ],

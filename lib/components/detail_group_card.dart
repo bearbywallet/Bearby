@@ -41,9 +41,8 @@ class DetailGroupCard extends StatelessWidget {
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: theme.bodyText1.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),

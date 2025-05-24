@@ -79,18 +79,16 @@ class TokenSelectItem extends StatelessWidget {
                 children: [
                   Text(
                     ftoken.symbol,
-                    style: TextStyle(
+                    style: theme.bodyText1.copyWith(
                       color: theme.textPrimary,
-                      fontSize: 16,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                   const SizedBox(height: 4),
                   Text(
                     ftoken.name,
-                    style: TextStyle(
+                    style: theme.bodyText2.copyWith(
                       color: theme.textSecondary,
-                      fontSize: 14,
                     ),
                   ),
                 ],
@@ -101,17 +99,15 @@ class TokenSelectItem extends StatelessWidget {
               children: [
                 Text(
                   amount,
-                  style: TextStyle(
+                  style: theme.bodyText1.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 Text(
                   converted,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: theme.textSecondary,
-                    fontSize: 14,
                   ),
                 ),
               ],

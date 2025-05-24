@@ -101,7 +101,7 @@ class _SettingsItemState extends State<SettingsItem> {
             Expanded(
               child: Text(
                 widget.title,
-                style: TextStyle(
+                style: theme.bodyText1.copyWith(
                   color: theme.textPrimary,
                   fontSize: sizes.fontSize,
                   fontWeight: FontWeight.w500,

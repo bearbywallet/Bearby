@@ -158,18 +158,16 @@ class _ButtonItemContentState extends State<_ButtonItemContent>
                   children: [
                     Text(
                       widget.title,
-                      style: TextStyle(
+                      style: widget.theme.bodyText1.copyWith(
                         color: widget.theme.textPrimary,
-                        fontSize: 16,
                       ),
                     ),
                     if (widget.subtitleText != null) ...[
                       const SizedBox(height: 4),
                       Text(
                         widget.subtitleText!,
-                        style: TextStyle(
+                        style: widget.theme.bodyText2.copyWith(
                           color: widget.theme.primaryPurple,
-                          fontSize: 14,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -194,9 +192,8 @@ class _ButtonItemContentState extends State<_ButtonItemContent>
               padding: const EdgeInsets.only(left: 40),
               child: Text(
                 widget.description,
-                style: TextStyle(
+                style: widget.theme.bodyText2.copyWith(
                   color: widget.theme.textSecondary,
-                  fontSize: 14,
                 ),
               ),
             ),

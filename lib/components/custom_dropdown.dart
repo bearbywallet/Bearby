@@ -59,7 +59,7 @@ class _CustomDropdownState extends State<CustomDropdown>
           children: [
             Text(
               widget.selectedItem.toString(),
-              style: TextStyle(color: theme.textPrimary, fontSize: 16),
+              style: theme.bodyText1.copyWith(color: theme.textPrimary),
             ),
             const SizedBox(width: 8),
             Icon(
@@ -135,8 +135,7 @@ class _CustomDropdownState extends State<CustomDropdown>
                                   vertical: 12, horizontal: 16),
                               child: Text(
                                 item.toString(),
-                                style: const TextStyle(
-                                    color: Colors.white, fontSize: 16),
+                                style: theme.bodyText1.copyWith(color: Colors.white),
                               ),
                             ),
                           );

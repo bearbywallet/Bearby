@@ -149,9 +149,8 @@ class BrowserActionMenu extends StatelessWidget {
             const SizedBox(width: 12),
             Text(
               title,
-              style: TextStyle(
+              style: theme.bodyText2.copyWith(
                 color: theme.textPrimary,
-                fontSize: 14,
               ),
             ),
           ],

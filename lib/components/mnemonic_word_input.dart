@@ -75,7 +75,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
         children: [
           Text(
             '${widget.index}',
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: widget.hasError
                   ? (widget.errorBorderColor ?? theme.danger)
                   : theme.textSecondary,
@@ -85,7 +85,7 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
           Expanded(
             child: TextField(
               controller: _controller,
-              style: TextStyle(
+              style: theme.bodyText1.copyWith(
                 color: widget.hasError
                     ? (widget.errorBorderColor ?? theme.danger)
                     : theme.textPrimary,

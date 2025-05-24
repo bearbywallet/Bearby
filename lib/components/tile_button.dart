@@ -1,4 +1,6 @@
+import 'package:flutter/material.dart'; // Added for Theme.of(context)
 import 'package:flutter/widgets.dart';
+import 'package:zilpay/theme/app_theme.dart'; // Added for AppTheme
 
 class TileButton extends StatefulWidget {
   final String? title;
@@ -151,11 +153,11 @@ class _TileButtonState extends State<TileButton>
             const SizedBox(height: 6),
             Text(
               widget.title!,
-              style: TextStyle(
-                color: widget.textColor,
-                fontSize: sizes.fontSize,
-                fontWeight: FontWeight.w500,
-              ),
+              style: Theme.of(context).extension<AppTheme>()!.caption.copyWith(
+                    color: widget.textColor,
+                    fontSize: sizes.fontSize,
+                    fontWeight: FontWeight.w500,
+                  ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
               textAlign: TextAlign.center,

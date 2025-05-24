@@ -143,10 +143,9 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
             padding: EdgeInsets.only(bottom: adaptivePadding),
             child: Text(
               widget.title,
-              style: TextStyle(
+              style: theme.subtitle1.copyWith(
                 color: theme.textSecondary,
-                fontSize: 18,
-                fontWeight: FontWeight.w500,
+                fontSize: 18, // subtitle1 is 20, adjusting to 18
               ),
             ),
           ),
@@ -171,11 +170,10 @@ class _HexKeyDisplayState extends State<HexKeyDisplay> {
                     ),
                     child: Text(
                       pairEntry.value,
-                      style: TextStyle(
+                      style: theme.bodyText1.copyWith(
                         color: isAnimating
                             ? theme.secondaryPurple
                             : theme.textPrimary,
-                        fontSize: 16,
                         fontFamily: 'Courier',
                         fontWeight: FontWeight.w500,
                       ),
