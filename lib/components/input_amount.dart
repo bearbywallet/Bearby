@@ -124,7 +124,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
               child: Text(
                 converted,
                 style: theme.bodyText1.copyWith(
-                  color: theme.textPrimary.withOpacity(0.7),
+                  color: theme.textPrimary.withValues(alpha: 0.7),
                 ),
               ),
             ),
@@ -241,7 +241,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
         Text(
           fromWei(value: balance.toString(), decimals: token.decimals),
           style: theme.bodyText2.copyWith(
-            color: theme.textPrimary.withOpacity(0.7),
+            color: theme.textPrimary.withValues(alpha: 0.7),
           ),
         ),
         if (widget.showMax)
@@ -266,7 +266,7 @@ class _TokenAmountCardState extends State<TokenAmountCard> {
                   style: theme.caption.copyWith(
                     color: isMax
                         ? theme.warning
-                        : theme.textPrimary.withOpacity(0.7),
+                        : theme.textPrimary.withValues(alpha: 0.7),
                     fontWeight: FontWeight.w500,
                   ),
                 ),

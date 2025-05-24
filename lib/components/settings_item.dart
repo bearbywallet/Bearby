@@ -30,23 +30,11 @@ class _SettingsItemState extends State<SettingsItem> {
 
   ({double iconSize, double fontSize, double padding, double borderRadius})
       _getDynamicSizes(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    const double baseIconSize = 28.0;
-    const double baseFontSize = 16.0;
-    const double basePadding = 20.0;
+    const double baseIconSize = 26.0;
+    const double baseFontSize = 17.0;
+    const double basePadding = 16.0;
     const double baseBorderRadius = 20.0;
-    double sizeMultiplier;
-
-    if (screenWidth < 400) {
-      sizeMultiplier = 0.9;
-    } else if (screenWidth < 600) {
-      sizeMultiplier = 1.0;
-    } else if (screenWidth > 900) {
-      sizeMultiplier = 1.4;
-    } else {
-      sizeMultiplier = 1.0;
-    }
+    double sizeMultiplier = 1.0;
 
     return (
       iconSize: baseIconSize * sizeMultiplier,
@@ -88,7 +76,7 @@ class _SettingsItemState extends State<SettingsItem> {
       child: Container(
         padding: EdgeInsets.symmetric(
           horizontal: sizes.padding,
-          vertical: sizes.padding * 0.6, // Slightly reduced vertical padding
+          vertical: sizes.padding * 0.8,
         ),
         decoration: BoxDecoration(
           color: _isPressed

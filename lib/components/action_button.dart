@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/state/app_state.dart';
-import 'package:zilpay/theme/app_theme.dart';
 
 class CustomActionButton extends StatefulWidget {
   final String label;

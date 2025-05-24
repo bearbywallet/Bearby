@@ -33,6 +33,7 @@ class TransactionAmountDisplay extends StatelessWidget {
 
   Widget _buildAmountDisplay(BuildContext context) {
     final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final nativeToken = appState.wallet?.tokens.first;
     final bool isNative = token.native;
     final bool isMaxTransfer = isNative && amount == balance;
@@ -44,17 +45,17 @@ class TransactionAmountDisplay extends StatelessWidget {
 
     final TextStyle feeStyle = theme.overline.copyWith(
       fontWeight: FontWeight.w500,
-      color: textColor.withOpacity(0.8),
+      color: textColor.withValues(alpha: 0.8),
     );
 
     final TextStyle conversionAmountStyle = theme.caption.copyWith(
       // fontWeight is already normal in caption
-      color: textColor.withOpacity(0.6),
+      color: textColor.withValues(alpha: 0.6),
     );
 
     final TextStyle conversionFeeStyle = theme.overline.copyWith(
       // fontWeight is already normal in overline
-      color: textColor.withOpacity(0.6),
+      color: textColor.withValues(alpha: 0.6),
     );
 
     String amountText;

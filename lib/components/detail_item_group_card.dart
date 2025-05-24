@@ -30,7 +30,7 @@ class DetailItem extends StatelessWidget {
             child: Text(
               label,
               style: theme.bodyText2.copyWith(
-                color: theme.textSecondary.withOpacity(0.7),
+                color: theme.textSecondary.withValues(alpha: 0.7),
               ),
             ),
           ),

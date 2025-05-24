@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart'; // Added for Theme.of(context)
-import 'package:flutter/widgets.dart';
-import 'package:zilpay/theme/app_theme.dart'; // Added for AppTheme
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class TileButton extends StatefulWidget {
   final String? title;
@@ -89,48 +89,23 @@ class _TileButtonState extends State<TileButton>
     }
   }
 
-  ({
-    double containerSize,
-    double iconSize,
-    double borderRadius,
-    double fontSize
-  }) _getDynamicSizes(BuildContext context) {
-    final screenWidth = MediaQuery.of(context).size.width;
-    final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
-
-    double baseTextHeight = 2 * 12.0 * 1.5;
-    double calculatedBaseContainerHeightForTitle =
-        16.0 + 28.0 + 6.0 + baseTextHeight + 16.0;
-
-    double baseContainerSize =
-        hasTitle ? calculatedBaseContainerHeightForTitle : 56.0;
-    double baseIconSize = hasTitle ? 28.0 : 24.0;
-    double baseBorderRadius = hasTitle ? 24.0 : 20.0;
-    double baseFontSize = 12.0;
-
-    double sizeMultiplier;
-    if (screenWidth < 400) {
-      sizeMultiplier = 1.0;
-    } else if (screenWidth < 600) {
-      sizeMultiplier = 1.1;
-    } else if (screenWidth < 900) {
-      sizeMultiplier = 1.2;
-    } else {
-      sizeMultiplier = 1.3;
-    }
-
-    return (
-      containerSize: baseContainerSize * sizeMultiplier,
-      iconSize: baseIconSize * sizeMultiplier,
-      borderRadius: baseBorderRadius * sizeMultiplier,
-      fontSize: baseFontSize * sizeMultiplier,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
-    final sizes = _getDynamicSizes(context);
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
+
+    final double iconSize = hasTitle ? 28.0 : 24.0;
+    final double borderRadius = 20.0;
+
+    final double containerSize;
+
+    if (hasTitle) {
+      final double textHeight = theme.caption.fontSize ?? 16 * 2 * 1.5;
+      containerSize = 16.0 + iconSize + 6.0 + textHeight + 16.0;
+    } else {
+      containerSize = 56.0;
+    }
 
     Widget buttonContent;
 
@@ -138,26 +113,23 @@ class _TileButtonState extends State<TileButton>
       buttonContent = Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.start,
+          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisSize: MainAxisSize.min,
           children: [
-            Align(
-              alignment: Alignment.centerLeft,
-              child: SizedBox(
-                width: sizes.iconSize,
-                height: sizes.iconSize,
-                child: widget.icon,
-              ),
+            SizedBox(
+              width: iconSize,
+              height: iconSize,
+              child: Center(child: widget.icon),
             ),
             const SizedBox(height: 6),
             Text(
               widget.title!,
-              style: Theme.of(context).extension<AppTheme>()!.caption.copyWith(
-                    color: widget.textColor,
-                    fontSize: sizes.fontSize,
-                    fontWeight: FontWeight.w500,
-                  ),
+              style: theme.caption.copyWith(
+                color: widget.textColor,
+                fontSize: theme.caption.fontSize,
+                fontWeight: FontWeight.w500,
+              ),
               overflow: TextOverflow.ellipsis,
               maxLines: 2,
               textAlign: TextAlign.center,
@@ -168,8 +140,8 @@ class _TileButtonState extends State<TileButton>
     } else {
       buttonContent = Center(
         child: SizedBox(
-          width: sizes.iconSize,
-          height: sizes.iconSize,
+          width: iconSize,
+          height: iconSize,
           child: widget.icon,
         ),
       );
@@ -194,11 +166,11 @@ class _TileButtonState extends State<TileButton>
               child: Opacity(
                 opacity: widget.disabled ? 0.5 : _opacityAnimation.value,
                 child: Container(
-                  width: sizes.containerSize,
-                  height: sizes.containerSize,
+                  width: containerSize,
+                  height: containerSize,
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
-                    borderRadius: BorderRadius.circular(sizes.borderRadius),
+                    borderRadius: BorderRadius.circular(borderRadius),
                     boxShadow: [
                       if (_isHovered && !widget.disabled)
                         BoxShadow(

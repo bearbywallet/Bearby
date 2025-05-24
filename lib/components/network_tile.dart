@@ -124,14 +124,19 @@ class NetworkTile extends StatelessWidget {
           _buildNetworkLabel(
             isTestnet! ? "Testnet" : "Mainnet",
             isTestnet! ? theme.warning : theme.success,
+            theme,
           ),
         if (isDefault == true)
-          _buildNetworkLabel("Default", theme.primaryPurple),
+          _buildNetworkLabel(
+            "Default",
+            theme.primaryPurple,
+            theme,
+          ),
       ],
     );
   }
 
-  Widget _buildNetworkLabel(String text, Color color) {
+  Widget _buildNetworkLabel(String text, Color color, AppTheme theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(

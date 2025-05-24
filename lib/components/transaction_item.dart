@@ -167,8 +167,8 @@ class _HistoryItemState extends State<HistoryItem>
         if (convertedValue.isNotEmpty && convertedValue != '0')
           const SizedBox(height: 2),
         Text(convertedValue,
-            style: theme.bodyText2.copyWith(
-                color: theme.textSecondary.withOpacity(0.7))),
+            style: theme.bodyText2
+                .copyWith(color: theme.textSecondary.withValues(alpha: 0.7))),
       ],
     );
   }
@@ -207,7 +207,7 @@ class _HistoryItemState extends State<HistoryItem>
         Text(
           convertedValue,
           style: theme.caption.copyWith(
-            color: theme.textSecondary.withOpacity(0.7),
+            color: theme.textSecondary.withValues(alpha: 0.7),
           ),
         ),
       ],
@@ -280,7 +280,7 @@ class _HistoryItemState extends State<HistoryItem>
                                                 .transactionDetailsModal_transaction,
                                         style: theme.bodyText1.copyWith(
                                             color: theme.textPrimary
-                                                .withOpacity(0.7),
+                                                .withValues(alpha: 0.7),
                                             fontWeight: FontWeight.w500),
                                         overflow: TextOverflow.ellipsis),
                                   ),
@@ -302,7 +302,7 @@ class _HistoryItemState extends State<HistoryItem>
                         Text(
                           _formatDateTime(),
                           style: theme.bodyText2.copyWith(
-                            color: theme.textSecondary.withOpacity(0.7),
+                            color: theme.textSecondary.withValues(alpha: 0.7),
                           ),
                         ),
                         _buildFeeWithPrice(state),

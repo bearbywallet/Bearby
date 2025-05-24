@@ -98,7 +98,7 @@ class NumberKeyboardState extends State<NumberKeyboard>
                   value,
                   style: theme.headline1.copyWith(
                     color: theme.textPrimary
-                        .withOpacity(isActive ? 1.0 : 0.5),
+                        .withValues(alpha: isActive ? 1.0 : 0.5),
                     fontSize: 32,
                     fontWeight: FontWeight.w500,
                   ),

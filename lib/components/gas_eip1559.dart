@@ -167,13 +167,13 @@ class GasDetails extends StatelessWidget {
           Text(
             label,
             style: theme.caption.copyWith(
-              color: secondaryColor.withOpacity(disabled ? 0.5 : 1.0),
+              color: secondaryColor.withValues(alpha: disabled ? 0.5 : 1.0),
             ),
           ),
           Text(
             value,
             style: theme.caption.copyWith(
-              color: textColor.withOpacity(disabled ? 0.5 : 1.0),
+              color: textColor.withValues(alpha: disabled ? 0.5 : 1.0),
               fontWeight: FontWeight.w500,
             ),
           ),

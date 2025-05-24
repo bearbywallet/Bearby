@@ -164,7 +164,7 @@ class _TokenCardState extends State<TokenCard>
                                         widget.ftoken.name,
                                         style: theme.bodyText1.copyWith(
                                           color: theme.textPrimary
-                                              .withOpacity(0.7),
+                                              .withValues(alpha: 0.7),
                                           fontWeight: FontWeight.w500,
                                         ),
                                         overflow: TextOverflow.ellipsis,
@@ -176,8 +176,8 @@ class _TokenCardState extends State<TokenCard>
                                       '(${widget.ftoken.symbol})',
                                       style: theme.caption.copyWith(
                                         color: theme.textSecondary
-                                            .withOpacity(0.5),
-                                        fontSize: 13, // caption is 12, adjusting
+                                            .withValues(alpha: 0.5),
+                                        fontSize: 13,
                                       ),
                                     ),
                                   ],
@@ -192,7 +192,8 @@ class _TokenCardState extends State<TokenCard>
                                     amount,
                                     style: theme.subtitle1.copyWith(
                                       color: theme.textPrimary,
-                                      fontWeight: FontWeight.w600, // subtitle1 is w500
+                                      fontWeight:
+                                          FontWeight.w600, // subtitle1 is w500
                                       letterSpacing: 0.5,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -205,8 +206,8 @@ class _TokenCardState extends State<TokenCard>
                                 null)
                               Text(
                                 converted,
-                                style: theme.bodyText2.copyWith(
-                                    color: theme.textSecondary),
+                                style: theme.bodyText2
+                                    .copyWith(color: theme.textSecondary),
                               ),
                           ],
                         ),

@@ -101,7 +101,7 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.title,
                         style: theme.bodyText1.copyWith(
-                          color: theme.textPrimary.withOpacity(opacity),
+                          color: theme.textPrimary.withValues(alpha: opacity),
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -109,7 +109,7 @@ class _WalletListItemState extends State<WalletListItem>
                       Text(
                         widget.subtitle,
                         style: theme.bodyText2.copyWith(
-                          color: theme.textSecondary.withOpacity(opacity),
+                          color: theme.textSecondary.withValues(alpha: opacity),
                         ),
                       ),
                     ],

@@ -225,7 +225,7 @@ class SmartInputState extends State<SmartInput>
                       },
                       style: theme.bodyText1.copyWith(
                         color: widget.disabled
-                            ? effectiveTextColor.withOpacity(0.5)
+                            ? effectiveTextColor.withValues(alpha: 0.5)
                             : effectiveTextColor,
                         fontSize: widget.fontSize,
                       ),
@@ -234,7 +234,7 @@ class SmartInputState extends State<SmartInput>
                         hintText: widget.hint,
                         hintStyle: theme.bodyText1.copyWith(
                           color: widget.disabled
-                              ? effectiveSecondaryColor.withOpacity(0.5)
+                              ? effectiveSecondaryColor.withValues(alpha: 0.5)
                               : effectiveSecondaryColor,
                           fontSize: widget.fontSize,
                         ),

@@ -134,7 +134,7 @@ class _WalletCardState extends State<WalletCard>
                         Text(
                           widget.account.name,
                           style: theme.bodyText1.copyWith(
-                            color: theme.textPrimary.withOpacity(0.7),
+                            color: theme.textPrimary.withValues(alpha: 0.7),
                             fontSize: widget.fontSize ?? 16,
                             fontWeight: FontWeight.w500,
                           ),
@@ -145,7 +145,7 @@ class _WalletCardState extends State<WalletCard>
                           shortenAddress(widget.account.addr,
                               leftSize: 8, rightSize: 8),
                           style: theme.bodyText2.copyWith(
-                            color: theme.textPrimary.withOpacity(0.5),
+                            color: theme.textPrimary.withValues(alpha: 0.5),
                             fontSize: (widget.fontSize ?? 16) - 2,
                           ),
                           overflow: TextOverflow.ellipsis,

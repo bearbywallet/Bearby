@@ -173,10 +173,10 @@ class _SwipeButtonState extends State<SwipeButton>
                 widget.text,
                 style: theme.subtitle1.copyWith(
                   color: widget.disabled
-                      ? txtColor.withOpacity(0.5)
+                      ? txtColor.withValues(alpha: 0.5)
                       : txtColor,
                   fontSize: 18,
-                  fontWeight: FontWeight.bold, // subtitle1 is w500, ensure bold
+                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),
