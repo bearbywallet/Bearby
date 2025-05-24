@@ -74,8 +74,7 @@ class NetworkTile extends StatelessWidget {
                 const SizedBox(height: 4),
                 Text(
                   title,
-                  style: TextStyle(
-                    fontSize: 16,
+                  style: theme.bodyText1.copyWith(
                     fontWeight: FontWeight.w500,
                     color: textColor,
                   ),
@@ -125,14 +124,19 @@ class NetworkTile extends StatelessWidget {
           _buildNetworkLabel(
             isTestnet! ? "Testnet" : "Mainnet",
             isTestnet! ? theme.warning : theme.success,
+            theme,
           ),
         if (isDefault == true)
-          _buildNetworkLabel("Default", theme.primaryPurple),
+          _buildNetworkLabel(
+            "Default",
+            theme.primaryPurple,
+            theme,
+          ),
       ],
     );
   }
 
-  Widget _buildNetworkLabel(String text, Color color) {
+  Widget _buildNetworkLabel(String text, Color color, AppTheme theme) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
       decoration: BoxDecoration(
@@ -141,8 +145,7 @@ class NetworkTile extends StatelessWidget {
       ),
       child: Text(
         text,
-        style: TextStyle(
-          fontSize: 12,
+        style: theme.caption.copyWith(
           fontWeight: FontWeight.w500,
           color: color,
         ),

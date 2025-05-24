@@ -105,9 +105,8 @@ class _CopyContentState extends State<CopyContent>
                         widget.isShort
                             ? shortenAddress(widget.address)
                             : widget.address,
-                        style: TextStyle(
+                        style: theme.bodyText2.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 14,
                         ),
                       ),
                       SvgPicture.asset(

@@ -87,18 +87,16 @@ class WalletOption extends StatelessWidget {
                       children: [
                         Text(
                           title,
-                          style: TextStyle(
+                          style: theme.bodyText1.copyWith(
                             color: theme.textPrimary,
-                            fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           address,
-                          style: TextStyle(
+                          style: theme.bodyText2.copyWith(
                             color: theme.textSecondary,
-                            fontSize: 14,
                           ),
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,

@@ -29,10 +29,8 @@ class DetailItem extends StatelessWidget {
             flex: 2,
             child: Text(
               label,
-              style: TextStyle(
+              style: theme.bodyText2.copyWith(
                 color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 14,
-                fontWeight: FontWeight.w400,
               ),
             ),
           ),
@@ -60,10 +58,8 @@ class DetailItem extends StatelessWidget {
                         ? value
                         : Text(
                             value?.toString() ?? '',
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.textPrimary,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w400,
                             ),
                             textAlign: TextAlign.right,
                             overflow: TextOverflow.ellipsis,

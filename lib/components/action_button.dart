@@ -64,9 +64,8 @@ class CustomActionButtonState extends State<CustomActionButton> {
               const SizedBox(height: 6),
               Text(
                 widget.label,
-                style: TextStyle(
+                style: theme.caption.copyWith(
                   color: theme.buttonText,
-                  fontSize: 11,
                   fontWeight: FontWeight.w500,
                 ),
               ),

@@ -223,7 +223,7 @@ class SmartInputState extends State<SmartInput>
                           widget.onSubmitted?.call(value);
                         }
                       },
-                      style: TextStyle(
+                      style: theme.bodyText1.copyWith(
                         color: widget.disabled
                             ? effectiveTextColor.withValues(alpha: 0.5)
                             : effectiveTextColor,
@@ -232,7 +232,7 @@ class SmartInputState extends State<SmartInput>
                       decoration: InputDecoration(
                         border: InputBorder.none,
                         hintText: widget.hint,
-                        hintStyle: TextStyle(
+                        hintStyle: theme.bodyText1.copyWith(
                           color: widget.disabled
                               ? effectiveSecondaryColor.withValues(alpha: 0.5)
                               : effectiveSecondaryColor,

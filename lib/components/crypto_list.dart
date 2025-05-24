@@ -60,18 +60,16 @@ class CryptoListItem extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
+                  style: theme.bodyText1.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   balanceInUsd,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: theme.textSecondary,
-                    fontSize: 14,
                   ),
                 ),
               ],
@@ -82,9 +80,8 @@ class CryptoListItem extends StatelessWidget {
             children: [
               Text(
                 balance,
-                style: TextStyle(
+                style: theme.bodyText1.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),

@@ -1,4 +1,6 @@
-import 'package:flutter/widgets.dart';
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:zilpay/state/app_state.dart';
 
 class CustomButton extends StatefulWidget {
   final String text;
@@ -33,6 +35,9 @@ class _CustomButtonState extends State<CustomButton> {
 
   @override
   Widget build(BuildContext context) {
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+
     return GestureDetector(
       onTap: widget.disabled ? null : widget.onPressed,
       onTapDown:
@@ -61,11 +66,10 @@ class _CustomButtonState extends State<CustomButton> {
           child: Center(
             child: Text(
               widget.text,
-              style: TextStyle(
+              style: theme.subtitle1.copyWith(
                 color: widget.disabled
-                    ? widget.textColor.withValues(alpha: 0.5)
+                    ? widget.textColor.withAlpha(128)
                     : widget.textColor,
-                fontSize: 18,
                 fontWeight: FontWeight.bold,
               ),
             ),

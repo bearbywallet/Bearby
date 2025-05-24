@@ -80,20 +80,19 @@ class _LedgerCardState extends State<LedgerCard> {
               widget.device.name.isEmpty
                   ? '(Unknown Device)'
                   : widget.device.name,
-              style: TextStyle(
+              style: theme.bodyText1.copyWith(
                 fontWeight:
                     widget.isConnected ? FontWeight.bold : FontWeight.normal,
                 color: (widget.isConnected || widget.isConnecting)
                     ? theme.textSecondary.withAlpha(180)
                     : theme.textPrimary,
-                fontSize: 16,
               ),
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
             ),
             subtitle: Text(
               'ID: ${widget.device.id.length > 12 ? '${widget.device.id.substring(0, 6)}...${widget.device.id.substring(widget.device.id.length - 6)}' : widget.device.id}\nType: ${widget.device.connectionType.name.toUpperCase()}',
-              style: TextStyle(color: theme.textSecondary, fontSize: 12),
+              style: theme.caption.copyWith(color: theme.textSecondary),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
             ),

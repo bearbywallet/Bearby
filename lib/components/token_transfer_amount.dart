@@ -54,15 +54,16 @@ class TokenTransferInfo extends StatelessWidget {
             Text(
               name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown,
               style: style.copyWith(
+                // style is already themed addressStyle
                 fontSize: 8,
-                fontWeight: FontWeight.w400,
+                fontWeight: FontWeight.normal, // w400 is FontWeight.normal
               ),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
               shortenAddress(address),
-              style: style,
+              style: style, // style is already themed addressStyle
               overflow: TextOverflow.ellipsis,
             ),
           ],
@@ -79,8 +80,7 @@ class TokenTransferInfo extends StatelessWidget {
     final effectiveTextColor = textColor ?? theme.textPrimary;
     final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
 
-    final addressStyle = TextStyle(
-      fontSize: 10,
+    final addressStyle = theme.overline.copyWith(
       color: effectiveTextColor.withValues(alpha: 0.7),
       letterSpacing: 0.5,
       fontWeight: FontWeight.w500,

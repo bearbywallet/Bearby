@@ -89,18 +89,17 @@ class _WalletSelectionCardState extends State<WalletSelectionCard> {
                   children: [
                     Text(
                       widget.walletName ?? "",
-                      style: TextStyle(
+                      style: theme.subtitle1.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
+                        fontSize: 18, // subtitle1 is 20, adjusting
+                        fontWeight: FontWeight.w600, // subtitle1 is w500
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       widget.address ?? "",
-                      style: TextStyle(
+                      style: theme.caption.copyWith(
                         color: theme.textSecondary,
-                        fontSize: 12,
                       ),
                     ),
                   ],

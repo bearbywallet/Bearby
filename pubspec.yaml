@@ -12,7 +12,7 @@ dependencies:
     sdk: flutter
   rust_lib_zilpay:
     path: rust_builder
-  flutter_rust_bridge: ^2.9.0
+  flutter_rust_bridge: ^2.10.0
   blockies: ^0.1.2
   path_provider: ^2.0.11
   provider: ^6.1.2
@@ -23,8 +23,8 @@ dependencies:
   package_info_plus: ^8.1.0
   permission_handler: ^12.0.0+1
   url_launcher: ^6.3.1
-  mobile_scanner: ^6.0.7
-  share_plus: ^10.1.3
+  mobile_scanner: ^7.0.0
+  share_plus: ^11.0.0
   flutter_inappwebview: ^6.1.5
   screen_protector: ^1.4.2+1
   file_picker: ^10.1.2

@@ -79,9 +79,8 @@ class BiometricSwitch extends StatelessWidget {
               const SizedBox(width: 4),
               Text(
                 _authMethodText(context),
-                style: TextStyle(
+                style: theme.bodyText1.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
                 ),
               ),
             ],

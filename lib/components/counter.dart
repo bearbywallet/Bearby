@@ -177,8 +177,7 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
                     child: Text(
                       '$_count',
                       style: widget.numberStyle ??
-                          TextStyle(
-                            fontSize: 14,
+                          theme.bodyText2.copyWith(
                             color: theme.textSecondary,
                             fontWeight: FontWeight.w500,
                           ),
@@ -210,10 +209,8 @@ class _CounterState extends State<Counter> with SingleTickerProviderStateMixin {
               padding: const EdgeInsets.only(top: 4.0),
               child: Text(
                 _errorMessage ?? widget.errorText ?? '',
-                style: TextStyle(
+                style: theme.caption.copyWith(
                   color: theme.danger,
-                  fontSize: 12,
-                  fontWeight: FontWeight.w400,
                 ),
                 textAlign: TextAlign.center,
               ),
