@@ -93,25 +93,31 @@ class _TileButtonState extends State<TileButton>
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+
     final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
 
-    final double iconSize = hasTitle ? 28.0 : 24.0;
-    final double borderRadius = 20.0;
+    final double iconSize = hasTitle ? 24.0 : 20.0;
+    final double borderRadius = 16.0;
 
-    final double containerSize;
+    double containerSize;
 
     if (hasTitle) {
-      final double textHeight = theme.caption.fontSize ?? 16 * 2 * 1.5;
-      containerSize = 16.0 + iconSize + 6.0 + textHeight + 16.0;
+      final double estimatedFontSize = theme.caption.fontSize ?? 14.0;
+      final double estimatedLineHeightFactor = theme.caption.height ?? 1.3;
+      final double actualTextHeightForTwoLines =
+          estimatedFontSize * 2 * estimatedLineHeightFactor;
+
+      containerSize =
+          12.0 + iconSize + 4.0 + actualTextHeightForTwoLines + 12.0;
     } else {
-      containerSize = 56.0;
+      containerSize = 48.0;
     }
 
     Widget buttonContent;
 
     if (hasTitle) {
       buttonContent = Padding(
-        padding: const EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(12.0),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -122,12 +128,12 @@ class _TileButtonState extends State<TileButton>
               height: iconSize,
               child: Center(child: widget.icon),
             ),
-            const SizedBox(height: 6),
+            const SizedBox(height: 4),
             Text(
               widget.title!,
               style: theme.caption.copyWith(
                 color: widget.textColor,
-                fontSize: theme.caption.fontSize,
+                fontSize: theme.caption.fontSize ?? 14.0,
                 fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,

@@ -192,7 +192,7 @@ class _SettingsPageState extends State<SettingsPage> {
                               ),
                               SettingsItem(
                                 isFirst: false,
-                                isLast: true,
+                                isLast: false,
                                 title: AppLocalizations.of(context)!
                                     .settingsPageLanguage,
                                 trailingSvgPath: 'assets/icons/language.svg',
@@ -303,19 +303,14 @@ class _SettingsPageState extends State<SettingsPage> {
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  appState.wallet!.walletName,
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 14,
-                  ),
-                ),
+                Text(appState.wallet!.walletName,
+                    style: theme.caption.copyWith(
+                      color: theme.textSecondary,
+                    )),
                 Text(
                   appState.chain?.name ?? "",
-                  style: TextStyle(
+                  style: theme.headline2.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

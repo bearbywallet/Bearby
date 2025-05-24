@@ -8,6 +8,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -15,7 +16,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 const double ICON_SIZE_SMALL = 24.0;
-const double ICON_SIZE_MEDIUM = 40.0;
+const double ICON_SIZE_MEDIUM = 32.0;
 const double ICON_SIZE_TILE_BUTTON = 35.0;
 
 class HomePage extends StatefulWidget {
@@ -153,14 +154,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            l10n.homePageErrorTitle,
-                            style: TextStyle(
-                              color: theme.buttonText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
+                          Text(l10n.homePageErrorTitle,
+                              style: theme.subtitle1.copyWith(
+                                color: theme.buttonText,
+                              )),
                           const SizedBox(height: 4),
                           Text(
                             _errorMessage!,
@@ -204,18 +201,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 Expanded(
                   child: WalletHeader(
                     account: appState.account!,
+                    onSettings: () {
+                      Navigator.pushNamed(context, '/settings');
+                    },
                   ),
                 ),
-              HoverSvgIcon(
-                assetName: 'assets/icons/gear.svg',
-                width: ICON_SIZE_MEDIUM,
-                height: ICON_SIZE_MEDIUM,
-                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
-                color: theme.textSecondary,
-                onTap: () {
-                  Navigator.pushNamed(context, '/settings');
-                },
-              ),
             ],
           ),
         ),
@@ -262,7 +252,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 textColor: theme.primaryPurple,
               ),
               if (appState.account != null &&
-                  appState.chain?.slip44 == 313) ...[
+                  appState.chain?.slip44 == 313 &&
+                  !appState.wallet!.walletType
+                      .contains(WalletType.ledger.name)) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
