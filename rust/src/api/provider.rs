@@ -8,14 +8,9 @@ pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
+use zilpay::{background::bg_provider::ProvidersManagement, network::provider::NetworkProvider};
 pub use zilpay::{
     background::bg_settings::SettingsManagement, wallet::wallet_storage::StorageOperations,
-};
-use zilpay::{
-    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
-    network::provider::NetworkProvider,
-    proto::pubkey::PubKey,
-    wallet::wallet_types::WalletTypes,
 };
 
 pub async fn get_providers() -> Result<Vec<NetworkConfigInfo>, String> {
@@ -131,84 +126,8 @@ pub async fn create_or_update_chain(provider_config: NetworkConfigInfo) -> Resul
 
 pub async fn select_accounts_chain(wallet_index: usize, chain_hash: u64) -> Result<(), String> {
     with_service(|core| {
-        let provider = core.get_provider(chain_hash)?;
-        let wallet = core.get_wallet_by_index(wallet_index)?;
-        let mut data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let mut ftokens = wallet
-            .get_ftokens()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let default_provider = core.get_provider(data.default_chain_hash)?;
-
-        if let WalletTypes::Ledger(_) = data.wallet_type {
-            if default_provider.config.slip_44 == 313 {
-                // old ledger doesn't support evm.
-                return Err(ServiceError::WalletError(
-                    wallet_index,
-                    zilpay::errors::wallet::WalletErrors::WalletTypeSerialize(
-                        "The Old ledger app is not support evm".to_string(),
-                    ),
-                ));
-            }
-        }
-
-        for provider_ftoken in &provider.config.ftokens {
-            if let Some(existing_ftoken) = ftokens.iter_mut().find(|t| {
-                t.symbol == provider_ftoken.symbol && t.decimals == provider_ftoken.decimals
-            }) {
-                existing_ftoken.chain_hash = chain_hash;
-                existing_ftoken.balances = Default::default();
-            } else {
-                let new_ftoken = provider_ftoken.clone();
-                ftokens.insert(0, new_ftoken);
-            }
-        }
-
-        data.accounts.iter_mut().for_each(|a| {
-            if provider.config.slip_44 == 313 {
-                match a.pub_key {
-                    PubKey::Secp256k1Sha256(_pub_key) => {
-                        if let Some(chain_id) = provider.config.chain_ids.last() {
-                            a.chain_id = *chain_id;
-                        }
-                    }
-                    PubKey::Secp256k1Keccak256(_pub_key) => {
-                        if let Some(chain_id) = provider.config.chain_ids.first() {
-                            a.chain_id = *chain_id;
-                        }
-                    }
-                    _ => {}
-                }
-            } else if provider.config.slip_44 == 60 {
-                match a.pub_key {
-                    PubKey::Secp256k1Sha256(pub_key) => {
-                        a.pub_key = PubKey::Secp256k1Keccak256(pub_key);
-                    }
-                    _ => {}
-                }
-
-                if let Some(addr) = a.pub_key.get_addr().ok() {
-                    a.addr = addr;
-                }
-
-                a.chain_id = provider.config.chain_id();
-            } else {
-                a.chain_id = provider.config.chain_id();
-            }
-
-            a.chain_hash = chain_hash;
-            a.slip_44 = provider.config.slip_44;
-        });
-
-        wallet
-            .save_wallet_data(data)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        wallet
-            .save_ftokens(&ftokens)
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
-        Ok(())
+        core.select_accounts_chain(wallet_index, chain_hash)
+            .map_err(ServiceError::BackgroundError)
     })
     .await
     .map_err(Into::into)
