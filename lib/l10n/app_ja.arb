@@ -190,6 +190,7 @@
   "revealSecretPhrasePasswordHint": "パスワード",
   "revealSecretPhraseInvalidPassword": "無効なパスワード、エラー:",
   "revealSecretPhraseSubmitButton": "送信",
+  "revealSecretPhraseRevealAfter": "シードフレーズは次の時間後に表示されます:",
   "revealSecretPhraseDoneButton": "完了",
   "revealSecretPhraseScamAlertTitle": "詐欺警告",
   "revealSecretPhraseScamAlertDescription": "秘密フレーズを他人と共有したり、いかなるウェブサイトにも入力したりしないでください。",

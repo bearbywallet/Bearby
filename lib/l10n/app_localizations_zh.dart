@@ -524,6 +524,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => '密码无效，错误：';
 
   @override
+  String get revealSecretPhraseRevealAfter => '您的助记词将在以下时间后显示:';
+
+  @override
   String get revealSecretPhraseSubmitButton => '提交';
 
   @override

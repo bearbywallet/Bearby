@@ -1089,6 +1089,12 @@ abstract class AppLocalizations {
   /// **'invalid password, error:'**
   String get revealSecretPhraseInvalidPassword;
 
+  /// the label for wait until time done, and secret phrase reveal
+  ///
+  /// In en, this message translates to:
+  /// **'Your seed phrase will be revealed after:'**
+  String get revealSecretPhraseRevealAfter;
+
   /// Text on the submit button in the RevealSecretPhrase component
   ///
   /// In en, this message translates to:

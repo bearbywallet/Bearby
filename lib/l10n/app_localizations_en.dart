@@ -524,6 +524,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => 'invalid password, error:';
 
   @override
+  String get revealSecretPhraseRevealAfter => 'Your seed phrase will be revealed after:';
+
+  @override
   String get revealSecretPhraseSubmitButton => 'Submit';
 
   @override

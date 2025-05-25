@@ -283,7 +283,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
           ),
           const SizedBox(height: 8),
           Text(
-            "Your seed phrase will be revealed after:",
+            AppLocalizations.of(context)!.revealSecretPhraseRevealAfter,
             style: TextStyle(
               color: theme.textSecondary,
               fontSize: 14,

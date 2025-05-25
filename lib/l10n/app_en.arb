@@ -797,6 +797,10 @@
   "@revealSecretPhraseInvalidPassword": {
     "description": "Error message prefix shown when password validation fails in the RevealSecretPhrase component"
   },
+  "revealSecretPhraseRevealAfter": "Your seed phrase will be revealed after:",
+  "@revealSecretPhraseRevealAfter": {
+    "description": "the label for wait until time done, and secret phrase reveal"
+  },
   "revealSecretPhraseSubmitButton": "Submit",
   "@revealSecretPhraseSubmitButton": {
     "description": "Text on the submit button in the RevealSecretPhrase component"

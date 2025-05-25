@@ -190,6 +190,7 @@
   "revealSecretPhrasePasswordHint": "Пароль",
   "revealSecretPhraseInvalidPassword": "неверный пароль, ошибка:",
   "revealSecretPhraseSubmitButton": "Отправить",
+  "revealSecretPhraseRevealAfter": "Ваша секретная фраза будет раскрыта через:",
   "revealSecretPhraseDoneButton": "Готово",
   "revealSecretPhraseScamAlertTitle": "ВНИМАНИЕ МОШЕННИЧЕСТВО",
   "revealSecretPhraseScamAlertDescription": "Никогда не делитесь своей секретной фразой с кем-либо. Никогда не вводите её на каких-либо сайтах.",

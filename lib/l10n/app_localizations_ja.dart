@@ -524,6 +524,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => '無効なパスワード、エラー:';
 
   @override
+  String get revealSecretPhraseRevealAfter => 'シードフレーズは次の時間後に表示されます:';
+
+  @override
   String get revealSecretPhraseSubmitButton => '送信';
 
   @override

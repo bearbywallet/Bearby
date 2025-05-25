@@ -524,6 +524,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revealSecretPhraseInvalidPassword => 'неверный пароль, ошибка:';
 
   @override
+  String get revealSecretPhraseRevealAfter => 'Ваша секретная фраза будет раскрыта через:';
+
+  @override
   String get revealSecretPhraseSubmitButton => 'Отправить';
 
   @override

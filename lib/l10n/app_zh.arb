@@ -190,6 +190,7 @@
   "revealSecretPhrasePasswordHint": "密码",
   "revealSecretPhraseInvalidPassword": "密码无效，错误：",
   "revealSecretPhraseSubmitButton": "提交",
+  "revealSecretPhraseRevealAfter": "您的助记词将在以下时间后显示:",
   "revealSecretPhraseDoneButton": "完成",
   "revealSecretPhraseScamAlertTitle": "诈骗警告",
   "revealSecretPhraseScamAlertDescription": "绝不与任何人分享您的助记词。绝不在任何网站上输入。",
