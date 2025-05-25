@@ -33,7 +33,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _heightAnimation;
   late Animation<double> _opacityAnimation;
-  bool showEye = true;
 
   @override
   void initState() {
@@ -309,9 +308,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   ),
                   SizedBox(width: adaptivePadding),
                   HoverSvgIcon(
-                    assetName: showEye
-                        ? 'assets/icons/open_eye.svg'
-                        : 'assets/icons/close_eye.svg',
+                    assetName: appState.hideBalance
+                        ? 'assets/icons/close_eye.svg'
+                        : 'assets/icons/open_eye.svg',
                     width: ICON_SIZE_MEDIUM,
                     height: ICON_SIZE_MEDIUM,
                     padding: EdgeInsets.fromLTRB(
@@ -319,7 +318,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     color: theme.textSecondary,
                     onTap: () {
                       setState(() {
-                        showEye = !showEye;
+                        appState.setHideBalance(!appState.hideBalance);
                       });
                     },
                   ),
@@ -356,6 +355,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
             return TokenCard(
               ftoken: token,
+              hideBalance: appState.hideBalance,
               tokenAmount: tokenAmountValue,
               showDivider: !isLast,
               onTap: () {

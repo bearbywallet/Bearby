@@ -13,6 +13,7 @@ class TokenCard extends StatefulWidget {
   final BigInt tokenAmount;
   final bool showDivider;
   final VoidCallback? onTap;
+  final bool hideBalance;
 
   const TokenCard({
     super.key,
@@ -20,6 +21,7 @@ class TokenCard extends StatefulWidget {
     required this.ftoken,
     this.showDivider = true,
     this.onTap,
+    this.hideBalance = false,
   });
 
   @override
@@ -100,6 +102,10 @@ class _TokenCardState extends State<TokenCard>
     );
   }
 
+  String maskBalance() {
+    return "*******";
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -112,6 +118,8 @@ class _TokenCardState extends State<TokenCard>
       rate: widget.ftoken.rate,
       appState: appState,
     );
+    final displayAmount = widget.hideBalance ? maskBalance() : amount;
+    final displayConverted = widget.hideBalance ? maskBalance() : converted;
 
     return Column(
       children: [
@@ -189,11 +197,10 @@ class _TokenCardState extends State<TokenCard>
                               children: [
                                 Flexible(
                                   child: Text(
-                                    amount,
+                                    displayAmount,
                                     style: theme.subtitle1.copyWith(
                                       color: theme.textPrimary,
-                                      fontWeight:
-                                          FontWeight.w600, // subtitle1 is w500
+                                      fontWeight: FontWeight.w600,
                                       letterSpacing: 0.5,
                                     ),
                                     overflow: TextOverflow.ellipsis,
@@ -205,7 +212,7 @@ class _TokenCardState extends State<TokenCard>
                             if (appState.wallet?.settings.currencyConvert !=
                                 null)
                               Text(
-                                converted,
+                                displayConverted,
                                 style: theme.bodyText2
                                     .copyWith(color: theme.textSecondary),
                               ),

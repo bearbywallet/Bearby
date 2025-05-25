@@ -2,6 +2,7 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -22,10 +23,13 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<ConnectionInfo> _connections = [];
   DateTime _lastRateUpdateTime = DateTime.fromMillisecondsSinceEpoch(0);
   static const Duration _rateUpdateCooldown = Duration(minutes: 1);
+  static const String _hideBalanceStorageKey = "hide_balance_key";
 
   late BackgroundState _state;
   late String _cahceDir;
   int _selectedWallet = 0;
+  bool _hideBalance = false;
+
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
 
@@ -45,6 +49,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   String get cahceDir {
     return _cahceDir;
+  }
+
+  bool get hideBalance {
+    return _hideBalance;
   }
 
   List<WalletInfo> get wallets {
@@ -112,6 +120,13 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     return _selectedWallet;
   }
 
+  void setHideBalance(bool value) async {
+    _hideBalance = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_hideBalanceStorageKey, value);
+    notifyListeners();
+  }
+
   Future<void> syncData() async {
     _state = await getData();
     await syncBook();
@@ -122,6 +137,12 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> syncBook() async {
     _book = await getAddressBookList();
 
+    notifyListeners();
+  }
+
+  Future<void> loadHideBalance() async {
+    final prefs = await SharedPreferences.getInstance();
+    _hideBalance = prefs.getBool(_hideBalanceStorageKey) ?? false;
     notifyListeners();
   }
 
