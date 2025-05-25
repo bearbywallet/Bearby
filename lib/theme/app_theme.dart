@@ -11,7 +11,7 @@ class _TextStyles {
   static const TextStyle headline2 = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 24,
-    fontWeight: FontWeight.w600,
+    fontWeight: FontWeight.w700,
   );
   static const TextStyle subtitle1 = TextStyle(
     fontFamily: _fontFamily,

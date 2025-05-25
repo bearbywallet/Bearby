@@ -309,7 +309,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     )),
                 Text(
                   appState.chain?.name ?? "",
-                  style: theme.headline2.copyWith(
+                  style: theme.bodyText1.copyWith(
                     color: theme.textPrimary,
                   ),
                 ),

@@ -45,9 +45,8 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
               Expanded(
                 child: Text(
                   title!,
-                  style: theme.subtitle1.copyWith(
+                  style: theme.headline2.copyWith(
                     color: theme.textPrimary,
-                    fontWeight: FontWeight.bold, // subtitle1 is w500, explicit bold needed
                   ),
                   textAlign: TextAlign.center,
                 ),

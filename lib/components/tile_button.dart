@@ -133,11 +133,8 @@ class _TileButtonState extends State<TileButton>
               widget.title!,
               style: theme.caption.copyWith(
                 color: widget.textColor,
-                fontSize: theme.caption.fontSize ?? 14.0,
-                fontWeight: FontWeight.w500,
               ),
               overflow: TextOverflow.ellipsis,
-              maxLines: 2,
               textAlign: TextAlign.center,
             ),
           ],
