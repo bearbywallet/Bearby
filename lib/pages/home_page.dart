@@ -18,7 +18,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 
 const double ICON_SIZE_SMALL = 24.0;
 const double ICON_SIZE_MEDIUM = 32.0;
-const double ICON_SIZE_TILE_BUTTON = 35.0;
+const double ICON_SIZE_TILE_BUTTON = 45.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -262,8 +262,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     appState.account?.addrType == 0
                         ? "assets/icons/scilla.svg"
                         : "assets/icons/solidity.svg",
-                    width: 24,
-                    height: 24,
+                    width: 34,
+                    height: 34,
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),

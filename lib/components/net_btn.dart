@@ -68,8 +68,10 @@ class _NetworkDownButtonState extends State<NetworkDownButton>
         scale: _scaleAnimation,
         child: Container(
           decoration: BoxDecoration(
-            color: theme.buttonBackground,
+            color: theme.cardBackground,
             borderRadius: BorderRadius.circular(20.0),
+            border:
+                Border.all(color: theme.primaryPurple.withValues(alpha: 0.4)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(

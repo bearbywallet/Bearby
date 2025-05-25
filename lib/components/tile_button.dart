@@ -96,7 +96,7 @@ class _TileButtonState extends State<TileButton>
 
     final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
 
-    final double iconSize = hasTitle ? 24.0 : 20.0;
+    final double iconSize = hasTitle ? 34.0 : 20.0;
     final double borderRadius = 16.0;
 
     double containerSize;
@@ -174,6 +174,8 @@ class _TileButtonState extends State<TileButton>
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.circular(borderRadius),
+                    // border: Border.all(
+                    //     color: theme.primaryPurple.withValues(alpha: 0.2)),
                     boxShadow: [
                       if (_isHovered && !widget.disabled)
                         BoxShadow(
