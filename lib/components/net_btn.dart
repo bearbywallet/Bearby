@@ -71,7 +71,7 @@ class _NetworkDownButtonState extends State<NetworkDownButton>
             color: theme.cardBackground,
             borderRadius: BorderRadius.circular(20.0),
             border:
-                Border.all(color: theme.primaryPurple.withValues(alpha: 0.4)),
+                Border.all(color: theme.textSecondary.withValues(alpha: 0.4)),
           ),
           padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
           child: Row(

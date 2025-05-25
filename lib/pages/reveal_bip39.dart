@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,9 +30,13 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
   bool isCopied = false;
   bool isAuthenticated = false;
   bool hasError = false;
+  bool isTimerActive = false;
+  bool canShowPhrase = false;
   String? errorMessage;
   bool _obscurePassword = true;
   String? seedPhrase;
+  Timer? _countdownTimer;
+  int _remainingTime = 3600;
 
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -45,6 +50,7 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     ScreenProtector.preventScreenshotOff();
     ScreenProtector.protectDataLeakageOff();
     ScreenProtector.protectDataLeakageWithBlurOff();
@@ -55,6 +61,32 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
     await ScreenProtector.preventScreenshotOn();
     await ScreenProtector.protectDataLeakageOn();
     await ScreenProtector.protectDataLeakageWithBlur();
+  }
+
+  void _startCountdown() {
+    setState(() {
+      isTimerActive = true;
+      _remainingTime = 3600;
+    });
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_remainingTime > 0) {
+          _remainingTime--;
+        } else {
+          canShowPhrase = true;
+          isTimerActive = false;
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  String _formatTime(int seconds) {
+    final hours = seconds ~/ 3600;
+    final minutes = (seconds % 3600) ~/ 60;
+    final secs = seconds % 60;
+    return '${hours.toString().padLeft(2, '0')}:${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   void _onPasswordSubmit(BigInt walletIndex) async {
@@ -81,7 +113,9 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
         hasError = false;
         errorMessage = null;
       });
+
       _btnController.success();
+      _startCountdown();
     } catch (e) {
       setState(() {
         isAuthenticated = false;
@@ -168,7 +202,12 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
                         ),
                       ),
                     ],
-                    if (isAuthenticated && seedPhrase != null) ...[
+                    if (isAuthenticated && isTimerActive && !canShowPhrase) ...[
+                      _buildTimerDisplay(theme),
+                    ],
+                    if (isAuthenticated &&
+                        canShowPhrase &&
+                        seedPhrase != null) ...[
                       _buildQrCode(theme),
                       _buildPhraseDisplay(theme),
                       SizedBox(height: adaptivePadding),
@@ -213,6 +252,66 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
     );
   }
 
+  Widget _buildTimerDisplay(AppTheme theme) {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.secondaryPurple),
+      ),
+      child: Column(
+        children: [
+          SvgPicture.asset(
+            "assets/icons/time.svg",
+            width: 48,
+            height: 48,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            "Security Timer",
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 20,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            "Your seed phrase will be revealed after:",
+            style: TextStyle(
+              color: theme.textSecondary,
+              fontSize: 14,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _formatTime(_remainingTime),
+            style: TextStyle(
+              color: theme.primaryPurple,
+              fontSize: 32,
+              fontWeight: FontWeight.bold,
+              fontFamily: 'monospace',
+            ),
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: 1 - (_remainingTime / 3600),
+            backgroundColor: theme.background,
+            valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildScamAlert(AppTheme theme) {
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
@@ -226,10 +325,14 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: theme.danger,
-                size: 24,
+              SvgPicture.asset(
+                "assets/icons/warning.svg",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.danger,
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 8),
               Text(

@@ -10,8 +10,8 @@ class _TextStyles {
   );
   static const TextStyle headline2 = TextStyle(
     fontFamily: _fontFamily,
-    fontSize: 24,
-    fontWeight: FontWeight.w700,
+    fontSize: 22,
+    fontWeight: FontWeight.w600,
   );
   static const TextStyle subtitle1 = TextStyle(
     fontFamily: _fontFamily,
@@ -20,7 +20,7 @@ class _TextStyles {
   );
   static const TextStyle bodyText1 = TextStyle(
     fontFamily: _fontFamily,
-    fontSize: 17,
+    fontSize: 15,
     fontWeight: FontWeight.w500,
   );
   static const TextStyle bodyText2 = TextStyle(

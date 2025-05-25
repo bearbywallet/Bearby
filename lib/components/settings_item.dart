@@ -92,6 +92,7 @@ class _SettingsItemState extends State<SettingsItem> {
                 style: theme.headline1.copyWith(
                   color: theme.textPrimary,
                   fontSize: sizes.fontSize,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

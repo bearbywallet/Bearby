@@ -82,6 +82,9 @@ class BiometricSwitch extends StatelessWidget {
                 style: theme.bodyText1.copyWith(
                   color: theme.textPrimary,
                 ),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 2,
+                softWrap: true,
               ),
             ],
           ),
