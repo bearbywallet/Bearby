@@ -51,7 +51,7 @@ class AuthGuard extends ChangeNotifier {
     }
   }
 
-  Future<String> getSession({
+  Future<String?> getSession({
     required String sessionKey,
     bool requireAuth = true,
     String reason = 'Please authenticate to access your wallet',
@@ -59,7 +59,7 @@ class AuthGuard extends ChangeNotifier {
     final value = await _storage.read(key: sessionKey);
 
     if (value == null) {
-      throw 'Session key is empty';
+      return null;
     }
 
     _enabled = true;

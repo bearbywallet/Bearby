@@ -85,7 +85,7 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
         identifiers: identifiers,
         password:
             _passwordController.text.isEmpty ? null : _passwordController.text,
-        sessionCipher: session.isEmpty ? null : session,
+        sessionCipher: session,
       );
       await widget.state.syncData();
       widget.state.setSelectedWallet(0);

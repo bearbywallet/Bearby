@@ -156,7 +156,7 @@ class _AddAccountState extends State<AddAccount> {
       _errorMessage = null;
     });
 
-    String session = "";
+    String? session;
 
     if (_useBiometrics && _passwordController.text.isEmpty) {
       bool authenticated = await _authenticateWithBiometrics();
@@ -190,7 +190,7 @@ class _AddAccountState extends State<AddAccount> {
           password: _passwordController.text.isEmpty
               ? null
               : _passwordController.text,
-          sessionCipher: session.isEmpty ? null : session,
+          sessionCipher: session,
         );
 
         await addNextBip39Account(

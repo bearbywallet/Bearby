@@ -174,7 +174,7 @@ class _WalletPageState extends State<WalletPage> {
           },
         );
       } else {
-        String sessionCipher = "";
+        String? sessionCipher;
 
         try {
           sessionCipher = await _authGuard.getSession(

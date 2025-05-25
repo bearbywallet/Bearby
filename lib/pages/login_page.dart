@@ -148,7 +148,7 @@ class _LoginPageState extends State<LoginPage> {
         final session =
             await _authGuard.getSession(sessionKey: wallet.walletAddress);
         isAuthenticated = await _authenticateWithSession(
-          session,
+          session ?? "",
           _selectedWallet,
           identifiers,
         );
@@ -159,7 +159,7 @@ class _LoginPageState extends State<LoginPage> {
           final session =
               await _authGuard.getSession(sessionKey: wallet.walletAddress);
           isAuthenticated = await _authenticateWithSession(
-            session,
+            session ?? "",
             _selectedWallet,
             identifiers,
           );
