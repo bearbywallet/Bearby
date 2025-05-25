@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class _TextStyles {
-  static const String _fontFamily = 'Roboto';
+  static const String _fontFamily = 'SFRounded';
 
   static const TextStyle headline1 = TextStyle(
     fontFamily: _fontFamily,
@@ -21,28 +21,28 @@ class _TextStyles {
   static const TextStyle bodyText1 = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 17,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.w500,
   );
   static const TextStyle bodyText2 = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 14,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.w500,
   );
   static const TextStyle button = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 16,
-    fontWeight: FontWeight.w500,
+    fontWeight: FontWeight.w600,
     letterSpacing: 1.25,
   );
   static const TextStyle caption = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 11,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.w400,
   );
   static const TextStyle overline = TextStyle(
     fontFamily: _fontFamily,
     fontSize: 10,
-    fontWeight: FontWeight.normal,
+    fontWeight: FontWeight.w300,
     letterSpacing: 1.5,
   );
 }
@@ -115,7 +115,7 @@ class DarkTheme implements AppTheme {
   Color get gradientEnd => Colors.black;
 
   @override
-  Color get modalBorder => Colors.grey.withOpacity(0.2);
+  Color get modalBorder => Colors.grey.withValues(alpha: 0.2);
 
   @override
   Brightness get brightness => Brightness.light;

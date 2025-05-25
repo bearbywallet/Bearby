@@ -114,7 +114,9 @@ class AddWalletOptionsPage extends StatelessWidget {
                 padding: const EdgeInsets.only(left: 16.0),
                 child: Text(
                   AppLocalizations.of(context)!.addWalletOptionsOtherOptions,
-                  style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                  style: theme.caption.copyWith(
+                    color: theme.textSecondary,
+                  ),
                 ),
               ),
               const SizedBox(height: 16),

@@ -46,3 +46,14 @@ flutter:
     - assets/chains/
     - assets/zilpay_legacy_inject.js
     - assets/evm_inject.js
+  fonts:
+    - family: SFRounded
+      fonts:
+        - asset: assets/fonts/Regular.ttf    
+          weight: 400                        
+        - asset: assets/fonts/Bold.ttf       
+          weight: 700                        
+        - asset: assets/fonts/Semibold.ttf   
+          weight: 600                        
+        - asset: assets/fonts/Ultralight.ttf
+          weight: 300    
