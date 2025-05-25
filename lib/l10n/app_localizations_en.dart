@@ -1118,9 +1118,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPasswordModalEmptyError => 'Password cannot be empty';
 
   @override
-  String get confirmPasswordModalIncorrectError => 'Incorrect password';
-
-  @override
   String get confirmPasswordModalGenericError => 'Error:';
 
   @override

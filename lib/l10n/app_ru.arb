@@ -408,7 +408,6 @@
   "confirmPasswordModalDescription": "Введите пароль для продолжения.",
   "confirmPasswordModalHint": "Пароль",
   "confirmPasswordModalEmptyError": "Пароль не может быть пустым",
-  "confirmPasswordModalIncorrectError": "Неверный пароль",
   "confirmPasswordModalGenericError": "Ошибка:",
   "confirmPasswordModalButton": "Подтвердить",
 

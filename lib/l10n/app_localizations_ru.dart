@@ -1118,9 +1118,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get confirmPasswordModalEmptyError => 'Пароль не может быть пустым';
 
   @override
-  String get confirmPasswordModalIncorrectError => 'Неверный пароль';
-
-  @override
   String get confirmPasswordModalGenericError => 'Ошибка:';
 
   @override

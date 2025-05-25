@@ -407,7 +407,6 @@
   "confirmPasswordModalDescription": "输入您的密码以继续。",
   "confirmPasswordModalHint": "密码",
   "confirmPasswordModalEmptyError": "密码不能为空",
-  "confirmPasswordModalIncorrectError": "密码不正确",
   "confirmPasswordModalGenericError": "错误：",
   "confirmPasswordModalButton": "确认",
 

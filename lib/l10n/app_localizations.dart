@@ -2265,12 +2265,6 @@ abstract class AppLocalizations {
   /// **'Password cannot be empty'**
   String get confirmPasswordModalEmptyError;
 
-  /// Error message displayed when the entered password is incorrect in the ConfirmPasswordModal modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Incorrect password'**
-  String get confirmPasswordModalIncorrectError;
-
   /// Prefix for generic error messages followed by the specific error in the ConfirmPasswordModal modal.
   ///
   /// In en, this message translates to:

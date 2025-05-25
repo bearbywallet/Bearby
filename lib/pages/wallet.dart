@@ -143,7 +143,7 @@ class _WalletPageState extends State<WalletPage> {
               );
 
               if (!authenticated) {
-                return false;
+                return "Authorization declined for biometrics";
               }
 
               final biometricType = _authMethods.first.name;
@@ -167,9 +167,9 @@ class _WalletPageState extends State<WalletPage> {
                 });
               }
 
-              return true;
+              return null;
             } catch (e) {
-              return false;
+              return e.toString();
             }
           },
         );

@@ -1591,10 +1591,6 @@
   "@confirmPasswordModalEmptyError": {
     "description": "Error message displayed when the password field is empty in the ConfirmPasswordModal modal."
   },
-  "confirmPasswordModalIncorrectError": "Incorrect password",
-  "@confirmPasswordModalIncorrectError": {
-    "description": "Error message displayed when the entered password is incorrect in the ConfirmPasswordModal modal."
-  },
   "confirmPasswordModalGenericError": "Error:",
   "@confirmPasswordModalGenericError": {
     "description": "Prefix for generic error messages followed by the specific error in the ConfirmPasswordModal modal."

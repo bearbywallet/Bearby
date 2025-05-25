@@ -9,7 +9,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 void showConfirmPasswordModal({
   required BuildContext context,
   required AppTheme theme,
-  required Future<bool> Function(String password) onConfirm,
+  required Future<String?> Function(String password) onConfirm,
   VoidCallback? onDismiss,
 }) {
   showModalBottomSheet<void>(
@@ -29,7 +29,7 @@ void showConfirmPasswordModal({
 
 class ConfirmPasswordModal extends StatefulWidget {
   final AppTheme theme;
-  final Future<bool> Function(String password) onConfirm;
+  final Future<String?> Function(String password) onConfirm;
 
   const ConfirmPasswordModal({
     super.key,
@@ -82,9 +82,9 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
     }
 
     try {
-      bool success = await widget.onConfirm(_passwordController.text);
+      String? error = await widget.onConfirm(_passwordController.text);
 
-      if (success && mounted) {
+      if (error == null && mounted) {
         _btnController.success();
 
         Timer(const Duration(milliseconds: 300), () {
@@ -94,8 +94,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
         });
       } else if (mounted) {
         setState(() {
-          _errorMessage =
-              AppLocalizations.of(context)!.confirmPasswordModalIncorrectError;
+          _errorMessage = error ?? "";
         });
         _passwordInputKey.currentState?.shake();
         _btnController.error();

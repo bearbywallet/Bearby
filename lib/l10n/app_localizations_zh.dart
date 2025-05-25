@@ -1118,9 +1118,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get confirmPasswordModalEmptyError => '密码不能为空';
 
   @override
-  String get confirmPasswordModalIncorrectError => '密码不正确';
-
-  @override
   String get confirmPasswordModalGenericError => '错误：';
 
   @override

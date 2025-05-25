@@ -408,7 +408,6 @@
   "confirmPasswordModalDescription": "続行するにはパスワードを入力してください。",
   "confirmPasswordModalHint": "パスワード",
   "confirmPasswordModalEmptyError": "パスワードは空にできません",
-  "confirmPasswordModalIncorrectError": "パスワードが正しくありません",
   "confirmPasswordModalGenericError": "エラー:",
   "confirmPasswordModalButton": "確認",
 
