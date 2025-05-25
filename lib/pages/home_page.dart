@@ -33,6 +33,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _heightAnimation;
   late Animation<double> _opacityAnimation;
+  bool showEye = true;
 
   @override
   void initState() {
@@ -298,11 +299,31 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              NetworkDownButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/networks');
-                },
-                chain: appState.chain!,
+              Row(
+                children: [
+                  NetworkDownButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/networks');
+                    },
+                    chain: appState.chain!,
+                  ),
+                  SizedBox(width: adaptivePadding),
+                  HoverSvgIcon(
+                    assetName: showEye
+                        ? 'assets/icons/open_eye.svg'
+                        : 'assets/icons/close_eye.svg',
+                    width: ICON_SIZE_MEDIUM,
+                    height: ICON_SIZE_MEDIUM,
+                    padding: EdgeInsets.fromLTRB(
+                        0, adaptivePadding, 0, adaptivePadding),
+                    color: theme.textSecondary,
+                    onTap: () {
+                      setState(() {
+                        showEye = !showEye;
+                      });
+                    },
+                  ),
+                ],
               ),
               HoverSvgIcon(
                 assetName: 'assets/icons/manage.svg',
