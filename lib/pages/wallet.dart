@@ -254,7 +254,6 @@ class _WalletPageState extends State<WalletPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final l10n = AppLocalizations.of(context)!;
 
     final Color effectiveBgColor = Theme.of(context).scaffoldBackgroundColor;
     final Brightness backgroundBrightness =

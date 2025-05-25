@@ -528,7 +528,11 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
             BrowserActionMenu(
               parentContext: context,
               onShare: () {
-                Share.share(_currentUrl);
+                SharePlus.instance.share(
+                  ShareParams(
+                    text: _currentUrl,
+                  ),
+                );
               },
               onCopyLink: () {
                 Clipboard.setData(ClipboardData(text: _currentUrl));

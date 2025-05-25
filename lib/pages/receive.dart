@@ -127,9 +127,11 @@ class _ReceivePageState extends State<ReceivePage> {
       final tempFile = File('${tempDir.path}/qrcode.png');
       await tempFile.writeAsBytes(pngBytes);
       final xFile = XFile(tempFile.path, mimeType: 'image/png');
-      await Share.shareXFiles(
-        [xFile],
-        text: '$addr, amount: $amount',
+      await SharePlus.instance.share(
+        ShareParams(
+          files: [xFile],
+          text: '$addr, amount: $amount',
+        ),
       );
       await tempFile.delete();
     } catch (e) {

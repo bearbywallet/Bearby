@@ -156,7 +156,11 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
           backupFilePath = outputPath;
         });
 
-        await Share.shareXFiles([XFile(outputPath)]);
+        await SharePlus.instance.share(
+          ShareParams(
+            files: [XFile(outputPath)],
+          ),
+        );
       } else {
         String? outputDirectory = await FilePicker.platform.getDirectoryPath(
           dialogTitle: l10n.keystoreBackupSaveDialogTitle,
@@ -207,7 +211,11 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
       return;
     }
 
-    await Share.shareXFiles([XFile(backupFilePath!)]);
+    await SharePlus.instance.share(
+      ShareParams(
+        files: [XFile(backupFilePath!)],
+      ),
+    );
   }
 
   @override
