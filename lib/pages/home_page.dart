@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
+import 'package:zilpay/components/net_btn.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
@@ -295,30 +296,14 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           padding:
               EdgeInsets.symmetric(horizontal: adaptivePadding, vertical: 4),
           child: Row(
-            mainAxisAlignment: appState.chain?.testnet == true
-                ? MainAxisAlignment.spaceBetween
-                : MainAxisAlignment.end,
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              if (appState.chain?.testnet == true)
-                Container(
-                  padding:
-                      const EdgeInsets.symmetric(vertical: 4, horizontal: 8),
-                  decoration: BoxDecoration(
-                    color: theme.warning,
-                    borderRadius: const BorderRadius.all(Radius.circular(8)),
-                    border: Border.all(color: theme.modalBorder, width: 2),
-                  ),
-                  child: Center(
-                    child: Text(
-                      l10n.homePageTestnetLabel,
-                      style: TextStyle(
-                        color: theme.buttonText,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ),
+              NetworkDownButton(
+                onPressed: () {
+                  Navigator.pushNamed(context, '/networks');
+                },
+                chain: appState.chain!,
+              ),
               HoverSvgIcon(
                 assetName: 'assets/icons/manage.svg',
                 width: ICON_SIZE_MEDIUM,
