@@ -50,12 +50,10 @@ class ZilPayLegacyTransactionParam {
 
 class ZilPayLegacyHandler {
   final InAppWebViewController webViewController;
-  final String initialUrl;
   StreamSubscription<BlockEvent>? _blockStreamSubscription;
 
   ZilPayLegacyHandler({
     required this.webViewController,
-    required this.initialUrl,
   });
 
   void dispose() {
@@ -83,7 +81,8 @@ class ZilPayLegacyHandler {
   }
 
   Future<Map<String, String>?> _getAccountIfConnected(AppState appState) async {
-    final currentDomain = Uri.parse(initialUrl).host;
+    final webUrl = await webViewController.getUrl();
+    final currentDomain = Uri.parse(webUrl.toString()).host;
     final connected =
         Web3Utils.findConnected(currentDomain, appState.connections);
 
@@ -362,7 +361,10 @@ class ZilPayLegacyHandler {
     BuildContext context,
   ) async {
     await appState.syncConnections();
-    final currentDomain = Uri.parse(initialUrl).host;
+
+    final webUrl = await webViewController.getUrl();
+    final currentDomain = Uri.parse(webUrl.toString()).host;
+
     final isAlreadyConnected =
         Web3Utils.findConnected(currentDomain, appState.connections);
 

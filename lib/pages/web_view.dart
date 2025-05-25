@@ -87,7 +87,6 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
           final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
           _legacyHandler ??= ZilPayLegacyHandler(
             webViewController: _webViewController!,
-            initialUrl: _currentUrl,
           );
           _legacyHandler!.handleLegacyZilPayMessage(zilPayMessage, context);
         } catch (e) {
