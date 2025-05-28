@@ -328,12 +328,15 @@ class ZilPayLegacyHandler {
       context: context,
       message: messageContent,
       onMessageSigned: (pubkey, sig) async {
+        String signature =
+            sig.startsWith("0x") ? sig.replaceFirst("0x", "") : sig;
+
         await _sendResponse(
           type: ZilliqaLegacyMessages.signMessageResponse,
           payload: {
             'resolve': {
               'message': messageContent,
-              'signature': sig,
+              'signature': signature,
               'publicKey': pubkey,
             },
           },
