@@ -1,0 +1,10 @@
+ZilPay is a quantum-resistant, multi-currency decentralized wallet. Create and interact with decentralized applications across multiple blockchains with industry-leading security powered by advanced cryptographic primitives.
+
+## Features
+
+- **Multi-Currency Support**: Manage multiple cryptocurrencies in one secure wallet
+- **Quantum-Resistant Security**: Implemented with post-quantum cryptographic algorithms
+- **Native Performance**: Core functionality written in Rust for optimal speed and security
+- **Modern UI/UX**: Built with Flutter for a smooth, responsive experience across platforms
+- **Decentralized App Browser**: Interact with dApps directly through the wallet interface
+- **Open Source**: Fully transparent codebase
