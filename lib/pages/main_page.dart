@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../components/bottom_nav_bar.dart';
 import './home_page.dart';
+import './chat.dart';
 import './history_page.dart';
 import './browser_page.dart';
 
@@ -18,6 +19,7 @@ class MainPageState extends State<MainPage> {
   static final List<Widget> _pages = <Widget>[
     const HomePage(),
     const HistoryPage(),
+    const ChatPage(),
     const BrowserPage()
   ];
 
@@ -82,6 +84,7 @@ class MainPageState extends State<MainPage> {
         items: [
           CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),
           CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
+          CustomBottomNavigationBarItem(iconPath: 'assets/icons/ai.svg'),
           CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
         ],
         currentIndex: _selectedIndex,
