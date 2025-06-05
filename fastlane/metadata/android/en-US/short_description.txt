@@ -1,0 +1,1 @@
+ZilPay is a quantum-resistant, multi-currency decentralized wallet.
