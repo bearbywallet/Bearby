@@ -62,7 +62,7 @@ class _AddressSelectModalContentState
     try {
       final categories = await getCombineSortAddresses(
         walletIndex: BigInt.from(appState.selectedWallet),
-        history: true,
+        history: appState.showAddressesThroughTransactionHistory,
       );
 
       if (mounted) {

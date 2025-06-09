@@ -24,10 +24,13 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<ConnectionInfo> _connections = [];
   DateTime _lastRateUpdateTime = DateTime.fromMillisecondsSinceEpoch(0);
   GasFeeOption _selectedGasOption = GasFeeOption.market;
+  bool _showAddressesThroughTransactionHistory = false;
 
   static const Duration _rateUpdateCooldown = Duration(minutes: 1);
   static const String _hideBalanceStorageKey = "hide_balance_key";
   static const String _gasOptionStorageKey = "gas_option_key";
+  static const String _showAddressesThroughTransactionHistoryKey =
+      "show_addresses_transaction_history_key";
 
   late BackgroundState _state;
   late String _cahceDir;
@@ -49,6 +52,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   void setSelectedWallet(int index) {
     _selectedWallet = index;
     notifyListeners();
+  }
+
+  bool get showAddressesThroughTransactionHistory {
+    return _showAddressesThroughTransactionHistory;
   }
 
   GasFeeOption get selectedGasOption {
@@ -141,6 +148,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await syncConnections();
     await loadSelectedGasOption();
     await loadHideBalance();
+    await loadShowAddressesThroughTransactionHistory();
     notifyListeners();
   }
 
@@ -233,6 +241,21 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
         _selectedGasOption = GasFeeOption.market;
       }
     }
+    notifyListeners();
+  }
+
+  Future<void> setShowAddressesThroughTransactionHistory(bool value) async {
+    _showAddressesThroughTransactionHistory = value;
+    final prefs = await SharedPreferences.getInstance();
+    final key = "$_showAddressesThroughTransactionHistoryKey:$selectedWallet";
+    await prefs.setBool(key, value);
+    notifyListeners();
+  }
+
+  Future<void> loadShowAddressesThroughTransactionHistory() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = "$_showAddressesThroughTransactionHistoryKey:$selectedWallet";
+    _showAddressesThroughTransactionHistory = prefs.getBool(key) ?? false;
     notifyListeners();
   }
 

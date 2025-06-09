@@ -584,5 +584,8 @@
   "addLedgerAccountPageFailedToScanError": "Не удалось отсканировать устройства Ledger: {error}",
   "addLedgerAccountPageNetworkOrLedgerMissingError": "Отсутствуют данные сети или Ledger",
   "addLedgerAccountPageNoAccountsSelectedError": "Аккаунты не выбраны",
-  "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран"
+  "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран",
+
+  "transactionHistoryTitle": "История транзакций",
+  "transactionHistoryDescription": "Показывать адреса из истории транзакций"
 }

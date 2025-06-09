@@ -1546,4 +1546,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageNoWalletSelectedError => 'Кошелёк не выбран';
+
+  @override
+  String get transactionHistoryTitle => 'История транзакций';
+
+  @override
+  String get transactionHistoryDescription => 'Показывать адреса из истории транзакций';
 }

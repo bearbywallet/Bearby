@@ -9,6 +9,7 @@ import 'package:zilpay/src/rust/models/book.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
+import '../components/switch_setting_item.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 class AddressBookPage extends StatefulWidget {
@@ -74,6 +75,11 @@ class _AddressBookPageState extends State<AddressBookPage> {
     );
   }
 
+  Future<void> _handleTransactionHistoryChange(bool value) async {
+    final stateProvider = Provider.of<AppState>(context, listen: false);
+    await stateProvider.setShowAddressesThroughTransactionHistory(value);
+  }
+
   @override
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
@@ -108,6 +114,18 @@ class _AddressBookPageState extends State<AddressBookPage> {
                     ),
                   ),
                 ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: SwitchSettingItem(
+                    backgroundColor: theme.cardBackground,
+                    iconPath: "assets/icons/history.svg",
+                    title: l10n.transactionHistoryTitle,
+                    description: l10n.transactionHistoryDescription,
+                    value: state.showAddressesThroughTransactionHistory,
+                    onChanged: _handleTransactionHistoryChange,
+                  ),
+                ),
+                const SizedBox(height: 16),
                 Expanded(
                   child: state.book.isEmpty
                       ? _buildEmptyState(theme, l10n)

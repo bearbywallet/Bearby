@@ -568,5 +568,8 @@
   "addLedgerAccountPageFailedToScanError": "无法扫描Ledger设备：{error}",
   "addLedgerAccountPageNetworkOrLedgerMissingError": "缺少网络或Ledger数据",
   "addLedgerAccountPageNoAccountsSelectedError": "未选择任何账户",
-  "addLedgerAccountPageNoWalletSelectedError": "未选择钱包"
+  "addLedgerAccountPageNoWalletSelectedError": "未选择钱包",
+
+  "transactionHistoryTitle": "交易历史",
+  "transactionHistoryDescription": "在地址簿中显示来自交易历史的地址。"
 }

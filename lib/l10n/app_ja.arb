@@ -588,5 +588,8 @@
   "addLedgerAccountPageFailedToScanError": "Ledgerデバイスのスキャンに失敗しました：{error}",
   "addLedgerAccountPageNetworkOrLedgerMissingError": "ネットワークまたはLedgerデータが不足しています",
   "addLedgerAccountPageNoAccountsSelectedError": "アカウントが選択されていません",
-  "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません"
+  "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません",
+
+  "transactionHistoryTitle": "取引履歴",
+  "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。"
 }

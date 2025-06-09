@@ -1546,4 +1546,10 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageNoWalletSelectedError => 'ウォレットが選択されていません';
+
+  @override
+  String get transactionHistoryTitle => '取引履歴';
+
+  @override
+  String get transactionHistoryDescription => 'アドレス帳に取引履歴からのアドレスを表示します。';
 }

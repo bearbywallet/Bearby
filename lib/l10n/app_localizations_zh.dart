@@ -1546,4 +1546,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageNoWalletSelectedError => '未选择钱包';
+
+  @override
+  String get transactionHistoryTitle => '交易历史';
+
+  @override
+  String get transactionHistoryDescription => '在地址簿中显示来自交易历史的地址。';
 }

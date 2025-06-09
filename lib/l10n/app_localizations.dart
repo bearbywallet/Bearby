@@ -3116,6 +3116,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No wallet selected'**
   String get addLedgerAccountPageNoWalletSelectedError;
+
+  /// Title for the transaction history toggle in the address book settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Transaction History'**
+  String get transactionHistoryTitle;
+
+  /// Description for the toggle that enables displaying transaction history addresses in the address book.
+  ///
+  /// In en, this message translates to:
+  /// **'Show addresses from transaction history in the address book.'**
+  String get transactionHistoryDescription;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

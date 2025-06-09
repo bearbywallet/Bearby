@@ -1546,4 +1546,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageNoWalletSelectedError => 'No wallet selected';
+
+  @override
+  String get transactionHistoryTitle => 'Transaction History';
+
+  @override
+  String get transactionHistoryDescription => 'Show addresses from transaction history in the address book.';
 }
