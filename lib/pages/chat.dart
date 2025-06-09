@@ -26,11 +26,10 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
   @override
   void initState() {
     super.initState();
-    _messageController.addListener(() {
-      setState(() {}); // Rebuild when text changes
-    });
+    _messageController.addListener(() => setState(() {}));
     _streamAIMessage(
-        "Hello! ✨ I'm your DeFi investment assistant. I can help you find the best liquidity pools for your tokens. How can I help you today?");
+      "Hello! ✨ I'm your DeFi investment assistant. I can help you find the best liquidity pools for your tokens. How can I help you today?",
+    );
   }
 
   @override
@@ -56,13 +55,12 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       _messages.add(ChatMessage(text: '', isUser: false));
       _isTyping = true;
     });
-
     _scrollToBottom();
 
-    List<String> words = fullText.split(' ');
-    String currentText = '';
+    final words = fullText.split(' ');
+    var currentText = '';
 
-    for (int i = 0; i < words.length; i++) {
+    for (var i = 0; i < words.length; i++) {
       currentText += (i == 0 ? '' : ' ') + words[i];
       setState(() {
         if (_messages.isNotEmpty && !_messages.last.isUser) {
@@ -78,7 +76,6 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       }
       _isTyping = false;
     });
-
     _scrollToBottom();
   }
 
@@ -88,23 +85,15 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       _messageController.clear();
     });
 
-    // Step 1: Searching DeFi
-    setState(() {
-      _currentAnalysisStep = '🔍 Searching DeFi protocols...';
-    });
+    setState(() => _currentAnalysisStep = '🔍 Searching DeFi protocols...');
     await Future.delayed(const Duration(seconds: 2));
 
-    // Step 2: Collecting information
-    setState(() {
-      _currentAnalysisStep = '📊 Collecting information from 140+ services...';
-    });
+    setState(() => _currentAnalysisStep =
+        '📊 Collecting information from 140+ services...');
     await Future.delayed(const Duration(seconds: 3));
 
-    // Step 3: Calculating
-    setState(() {
-      _currentAnalysisStep =
-          '🧮 Calculating the best options for your portfolio...';
-    });
+    setState(() => _currentAnalysisStep =
+        '🧮 Calculating the best options for your portfolio...');
     await Future.delayed(const Duration(seconds: 2));
 
     setState(() {
@@ -112,8 +101,7 @@ class _ChatPageState extends State<ChatPage> with TickerProviderStateMixin {
       _currentAnalysisStep = '';
     });
 
-    // Show analysis results
-    String analysisResult = """🎉 Analysis Complete!
+    const analysisResult = """🎉 Analysis Complete!
 
 I've analyzed 140 DeFi services in the Ethereum ecosystem and found the best options for your portfolio:
 
@@ -129,7 +117,7 @@ Perfect for your stablecoin and wrapped assets!
 
 Choose your investment strategy:""";
 
-    List<ChatAction> investmentOptions = [
+    final investmentOptions = [
       ChatAction(
         label: "🛡️ Safety (5-8% APY)",
         type: ChatActionType.safety,
@@ -167,10 +155,21 @@ Choose your investment strategy:""";
 
   Future<void> _showInvestmentDetails(ChatAction action) async {
     final data = action.data as Map<String, dynamic>;
-    String strategy = data['strategy'];
+    final strategy = data['strategy'];
 
-    String detailsText = "";
-    List<ChatAction> nextActions = [];
+    String detailsText;
+    final nextActions = [
+      ChatAction(
+          label: "✅ Approve Tokens",
+          type: ChatActionType.approve,
+          data: {'strategy': strategy}),
+      ChatAction(
+          label: "🚀 Create Pool Position",
+          type: ChatActionType.createPool,
+          data: {'strategy': strategy}),
+      ChatAction(
+          label: "← Back to Options", type: ChatActionType.back, data: {}),
+    ];
 
     switch (strategy) {
       case 'safety':
@@ -189,7 +188,6 @@ Choose your investment strategy:""";
 ⏱️ Withdraw: Anytime
 💰 Expected yearly: \$3,000-5,000""";
         break;
-
       case 'market':
         detailsText = """📈 Market Strategy
 
@@ -205,7 +203,6 @@ Choose your investment strategy:""";
 📊 Risk Level: Medium
 💰 Expected yearly: \$8,000-12,000""";
         break;
-
       case 'high_risk':
         detailsText = """🚀 High Risk Strategy
 
@@ -222,25 +219,9 @@ Choose your investment strategy:""";
 🎯 Potential yearly: \$25,000-40,000
 💀 Possible loss: Up to 50%""";
         break;
+      default:
+        detailsText = '';
     }
-
-    nextActions = [
-      ChatAction(
-        label: "✅ Approve Tokens",
-        type: ChatActionType.approve,
-        data: {'strategy': strategy},
-      ),
-      ChatAction(
-        label: "🚀 Create Pool Position",
-        type: ChatActionType.createPool,
-        data: {'strategy': strategy},
-      ),
-      ChatAction(
-        label: "← Back to Options",
-        type: ChatActionType.back,
-        data: {},
-      ),
-    ];
 
     await _streamAIMessage(detailsText, actions: nextActions);
   }
@@ -248,10 +229,10 @@ Choose your investment strategy:""";
   Future<void> _handleApproval(String strategy) async {
     await _streamAIMessage(
         "🔄 Initiating token approvals for $strategy strategy...");
-
     await Future.delayed(const Duration(seconds: 2));
 
-    await _streamAIMessage("""✅ Token approvals completed successfully!
+    await _streamAIMessage(
+      """✅ Token approvals completed successfully!
 
 🎯 Next step: Create your pool positions
 
@@ -261,27 +242,28 @@ This will:
 • Generate LP tokens for your positions
 • Begin automatic compound farming
 
-Ready to proceed? 🚀""", actions: [
-      ChatAction(
-        label: "🚀 Create Pool Now",
-        type: ChatActionType.createPool,
-        data: {'strategy': strategy},
-      ),
-    ]);
+Ready to proceed? 🚀""",
+      actions: [
+        ChatAction(
+            label: "🚀 Create Pool Now",
+            type: ChatActionType.createPool,
+            data: {'strategy': strategy}),
+      ],
+    );
   }
 
   Future<void> _handlePoolCreation(String strategy) async {
     await _streamAIMessage("🚀 Creating your liquidity pool positions...");
-
     await Future.delayed(const Duration(seconds: 3));
 
-    String apyText = strategy == 'safety'
+    final apyText = strategy == 'safety'
         ? '5-8%'
         : strategy == 'market'
             ? '12-18%'
             : '25-45%';
 
-    await _streamAIMessage("""🎉 Congratulations! Your pools are live!
+    await _streamAIMessage(
+      """🎉 Congratulations! Your pools are live!
 
 ✨ Pool Creation Summary:
 • Position value: \$45,000 - \$85,000  
@@ -291,18 +273,18 @@ Ready to proceed? 🚀""", actions: [
 • Rewards accumulating now! 
 
 📈 Your DeFi journey has begun!
-Track your earnings in real-time 👇""", actions: [
-      ChatAction(
-        label: "📱 Open Dashboard",
-        type: ChatActionType.dashboard,
-        data: {},
-      ),
-      ChatAction(
-        label: "💬 Ask Another Question",
-        type: ChatActionType.newQuestion,
-        data: {},
-      ),
-    ]);
+Track your earnings in real-time 👇""",
+      actions: [
+        ChatAction(
+            label: "📱 Open Dashboard",
+            type: ChatActionType.dashboard,
+            data: {}),
+        ChatAction(
+            label: "💬 Ask Another Question",
+            type: ChatActionType.newQuestion,
+            data: {}),
+      ],
+    );
   }
 
   Future<void> _handleUserMessage(String text) async {
@@ -311,7 +293,6 @@ Track your earnings in real-time 👇""", actions: [
     setState(() {
       _messages.add(ChatMessage(text: text, isUser: true));
     });
-
     _messageController.clear();
     _scrollToBottom();
 
@@ -322,10 +303,8 @@ Track your earnings in real-time 👇""", actions: [
       return;
     }
 
-    // Handle other messages
-    String aiResponse =
+    const aiResponse =
         "I specialize in DeFi investment analysis! ✨\n\nTry asking: 'Help me invest my tokens wisely' to get personalized recommendations based on current market conditions! 🚀";
-
     await _streamAIMessage(aiResponse);
   }
 
@@ -335,158 +314,48 @@ Track your earnings in real-time 👇""", actions: [
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
-    return Scaffold(
-      backgroundColor: theme.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            // Beautiful Header
-            Container(
-              padding: EdgeInsets.all(adaptivePadding),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topLeft,
-                  end: Alignment.bottomRight,
-                  colors: [
-                    theme.primaryPurple.withValues(alpha: 0.1),
-                    theme.background,
-                  ],
-                ),
-              ),
-              child: Row(
-                children: [
-                  Container(
-                    width: 50,
-                    height: 50,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      gradient: LinearGradient(
-                        colors: [
-                          theme.primaryPurple,
-                          theme.primaryPurple.withValues(alpha: 0.7)
-                        ],
-                      ),
-                    ),
-                    child: Padding(
-                      padding: const EdgeInsets.all(12),
-                      child: SvgPicture.asset(
-                        "assets/icons/ai.svg",
-                        width: 30,
-                        height: 30,
-                        colorFilter: ColorFilter.mode(
-                          Colors.white,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "DeFi AI Assistant",
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          "Smart investment recommendations",
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            Expanded(
-              child: ListView.builder(
-                controller: _scrollController,
-                reverse: true,
-                padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding, vertical: 8),
-                itemCount: _messages.length,
-                itemBuilder: (context, index) {
-                  final message = _messages[_messages.length - 1 - index];
-                  return ChatBubble(
-                    message: message,
-                    theme: theme,
-                    onActionPressed: (action) async {
-                      switch (action.type) {
-                        case ChatActionType.safety:
-                        case ChatActionType.market:
-                        case ChatActionType.highRisk:
-                          await _showInvestmentDetails(action);
-                          break;
-                        case ChatActionType.approve:
-                          await _handleApproval(action.data!['strategy']);
-                          break;
-                        case ChatActionType.createPool:
-                          await _handlePoolCreation(action.data!['strategy']);
-                          break;
-                        case ChatActionType.dashboard:
-                          await _streamAIMessage(
-                              "🚀 Dashboard opening... Track your positions, earnings, and yield opportunities! 📊✨");
-                          break;
-                        case ChatActionType.newQuestion:
-                          await _streamAIMessage(
-                              "What else would you like to know about DeFi investing? I'm here to help! 💎");
-                          break;
-                        case ChatActionType.back:
-                          await _performDeFiAnalysis();
-                          break;
-                        default:
-                          break;
-                      }
-                    },
-                  );
-                },
-              ),
-            ),
-
-            // Beautiful Analysis Progress
-            if (_isAnalyzing)
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      behavior: HitTestBehavior.translucent,
+      child: Scaffold(
+        backgroundColor: theme.background,
+        body: SafeArea(
+          child: Column(
+            children: [
               Container(
-                margin: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding, vertical: 8),
-                padding: const EdgeInsets.all(16),
+                padding: EdgeInsets.all(adaptivePadding),
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
                     colors: [
                       theme.primaryPurple.withValues(alpha: 0.1),
-                      theme.primaryPurple.withValues(alpha: 0.05),
+                      theme.background
                     ],
-                  ),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: theme.primaryPurple.withValues(alpha: 0.2),
                   ),
                 ),
                 child: Row(
                   children: [
                     Container(
-                      width: 40,
-                      height: 40,
+                      width: 50,
+                      height: 50,
                       decoration: BoxDecoration(
-                        color: theme.primaryPurple.withValues(alpha: 0.2),
                         shape: BoxShape.circle,
+                        gradient: LinearGradient(
+                          colors: [
+                            theme.primaryPurple,
+                            theme.primaryPurple.withValues(alpha: 0.7)
+                          ],
+                        ),
                       ),
-                      child: Center(
-                        child: SizedBox(
-                          width: 20,
-                          height: 20,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: theme.primaryPurple,
-                          ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(12),
+                        child: SvgPicture.asset(
+                          "assets/icons/ai.svg",
+                          width: 30,
+                          height: 30,
+                          colorFilter: const ColorFilter.mode(
+                              Colors.white, BlendMode.srcIn),
                         ),
                       ),
                     ),
@@ -496,20 +365,17 @@ Track your earnings in real-time 👇""", actions: [
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            "AI Analysis in Progress",
+                            "DeFi AI Assistant",
                             style: TextStyle(
                               color: theme.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              fontSize: 22,
+                              fontWeight: FontWeight.bold,
                             ),
                           ),
-                          const SizedBox(height: 4),
                           Text(
-                            _currentAnalysisStep,
+                            "Smart investment recommendations",
                             style: TextStyle(
-                              color: theme.textSecondary,
-                              fontSize: 14,
-                            ),
+                                color: theme.textSecondary, fontSize: 14),
                           ),
                         ],
                       ),
@@ -517,145 +383,245 @@ Track your earnings in real-time 👇""", actions: [
                   ],
                 ),
               ),
-
-            if (_isTyping && !_isAnalyzing)
-              Container(
-                padding: EdgeInsets.symmetric(
-                    horizontal: adaptivePadding, vertical: 8),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        color: theme.primaryPurple,
-                        shape: BoxShape.circle,
-                      ),
+              Expanded(
+                child: ListView.builder(
+                  controller: _scrollController,
+                  reverse: true,
+                  padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 8),
+                  itemCount: _messages.length,
+                  itemBuilder: (context, index) {
+                    final message = _messages[_messages.length - 1 - index];
+                    return ChatBubble(
+                      message: message,
+                      theme: theme,
+                      onActionPressed: (action) async {
+                        switch (action.type) {
+                          case ChatActionType.safety:
+                          case ChatActionType.market:
+                          case ChatActionType.highRisk:
+                            await _showInvestmentDetails(action);
+                            break;
+                          case ChatActionType.approve:
+                            await _handleApproval(action.data!['strategy']);
+                            break;
+                          case ChatActionType.createPool:
+                            await _handlePoolCreation(action.data!['strategy']);
+                            break;
+                          case ChatActionType.dashboard:
+                            await _streamAIMessage(
+                              "🚀 Dashboard opening... Track your positions, earnings, and yield opportunities! 📊✨",
+                            );
+                            break;
+                          case ChatActionType.newQuestion:
+                            await _streamAIMessage(
+                              "What else would you like to know about DeFi investing? I'm here to help! 💎",
+                            );
+                            break;
+                          case ChatActionType.back:
+                            await _performDeFiAnalysis();
+                            break;
+                          default:
+                            break;
+                        }
+                      },
+                    );
+                  },
+                ),
+              ),
+              if (_isAnalyzing)
+                Container(
+                  margin: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 8),
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    gradient: LinearGradient(
+                      colors: [
+                        theme.primaryPurple.withValues(alpha: 0.1),
+                        theme.primaryPurple.withValues(alpha: 0.05),
+                      ],
                     ),
-                    const SizedBox(width: 8),
-                    Text(
-                      "AI is typing...",
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontStyle: FontStyle.italic,
+                    borderRadius: BorderRadius.circular(16),
+                    border: Border.all(
+                        color: theme.primaryPurple.withValues(alpha: 0.2)),
+                  ),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 40,
+                        height: 40,
+                        decoration: BoxDecoration(
+                          color: theme.primaryPurple.withValues(alpha: 0.2),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Center(
+                          child: SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: theme.primaryPurple,
+                            ),
+                          ),
+                        ),
                       ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text(
+                              "AI Analysis in Progress",
+                              style: TextStyle(
+                                color: theme.textPrimary,
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                            const SizedBox(height: 4),
+                            Text(
+                              _currentAnalysisStep,
+                              style: TextStyle(
+                                  color: theme.textSecondary, fontSize: 14),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (_isTyping && !_isAnalyzing)
+                Container(
+                  padding: EdgeInsets.symmetric(
+                      horizontal: adaptivePadding, vertical: 8),
+                  child: Row(
+                    children: [
+                      Container(
+                        width: 8,
+                        height: 8,
+                        decoration: BoxDecoration(
+                            color: theme.primaryPurple, shape: BoxShape.circle),
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        "AI is typing...",
+                        style: TextStyle(
+                            color: theme.textSecondary,
+                            fontStyle: FontStyle.italic),
+                      ),
+                    ],
+                  ),
+                ),
+              Container(
+                margin: EdgeInsets.all(adaptivePadding),
+                decoration: BoxDecoration(
+                  color: theme.cardBackground,
+                  borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: theme.primaryPurple.withValues(alpha: 0.1),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
-              ),
-
-            // Beautiful Input Area
-            Container(
-              margin: EdgeInsets.all(adaptivePadding),
-              decoration: BoxDecoration(
-                color: theme.cardBackground,
-                borderRadius: BorderRadius.circular(24),
-                boxShadow: [
-                  BoxShadow(
-                    color: theme.primaryPurple.withValues(alpha: 0.1),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: TextField(
-                      controller: _messageController,
-                      enabled: !_isAnalyzing,
-                      style: TextStyle(color: theme.textPrimary),
-                      maxLines: null,
-                      keyboardType: TextInputType.multiline,
-                      decoration: InputDecoration(
-                        hintText: _isAnalyzing
-                            ? "Please wait while I analyze your portfolio..."
-                            : "Ask me something ✨",
-                        hintStyle: TextStyle(
-                          color: theme.textSecondary,
-                          fontSize: 15,
-                        ),
-                        border: InputBorder.none,
-                        contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 20,
-                          vertical: 16,
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _messageController,
+                        enabled: !_isAnalyzing,
+                        style: TextStyle(color: theme.textPrimary),
+                        maxLines: null,
+                        keyboardType: TextInputType.multiline,
+                        decoration: InputDecoration(
+                          hintText: _isAnalyzing
+                              ? "Please wait while I analyze your portfolio..."
+                              : "Ask me something ✨",
+                          hintStyle: TextStyle(
+                              color: theme.textSecondary, fontSize: 15),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 20, vertical: 16),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 8),
-                  AnimatedContainer(
-                    duration: const Duration(milliseconds: 200),
-                    margin: const EdgeInsets.all(4),
-                    child: (_isAnalyzing || _isTyping)
-                        ? Container(
-                            width: 48,
-                            height: 48,
-                            decoration: BoxDecoration(
-                              color: theme.background.withValues(alpha: 0.2),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Center(
-                              child: SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: theme.textPrimary,
-                                ),
-                              ),
-                            ),
-                          )
-                        : GestureDetector(
-                            onTap: (_messageController.text.trim().isNotEmpty &&
-                                    !_isTyping &&
-                                    !_isAnalyzing)
-                                ? () =>
-                                    _handleUserMessage(_messageController.text)
-                                : null,
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 200),
+                    const SizedBox(width: 8),
+                    AnimatedContainer(
+                      duration: const Duration(milliseconds: 200),
+                      margin: const EdgeInsets.all(4),
+                      child: _isAnalyzing || _isTyping
+                          ? Container(
                               width: 48,
                               height: 48,
                               decoration: BoxDecoration(
-                                gradient:
-                                    _messageController.text.trim().isNotEmpty &&
-                                            !_isTyping &&
-                                            !_isAnalyzing
-                                        ? LinearGradient(
-                                            colors: [
-                                              theme.background
-                                                  .withValues(alpha: 0.2),
-                                              theme.background
-                                                  .withValues(alpha: 0.8)
-                                            ],
-                                          )
-                                        : null,
-                                color: _messageController.text.trim().isEmpty ||
-                                        _isTyping ||
-                                        _isAnalyzing
-                                    ? theme.background.withValues(alpha: 0.3)
-                                    : null,
+                                color: theme.background.withValues(alpha: 0.2),
                                 shape: BoxShape.circle,
                               ),
                               child: Center(
-                                child: SvgPicture.asset(
-                                  "assets/icons/right_circle_arrow.svg",
-                                  width: 35,
-                                  height: 35,
-                                  colorFilter: ColorFilter.mode(
-                                    Colors.white,
-                                    BlendMode.srcIn,
+                                child: SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: theme.textPrimary,
+                                  ),
+                                ),
+                              ),
+                            )
+                          : GestureDetector(
+                              onTap:
+                                  _messageController.text.trim().isNotEmpty &&
+                                          !_isTyping &&
+                                          !_isAnalyzing
+                                      ? () => _handleUserMessage(
+                                          _messageController.text)
+                                      : null,
+                              child: AnimatedContainer(
+                                duration: const Duration(milliseconds: 200),
+                                width: 48,
+                                height: 48,
+                                decoration: BoxDecoration(
+                                  gradient: _messageController.text
+                                              .trim()
+                                              .isNotEmpty &&
+                                          !_isTyping &&
+                                          !_isAnalyzing
+                                      ? LinearGradient(
+                                          colors: [
+                                            theme.background
+                                                .withValues(alpha: 0.2),
+                                            theme.background
+                                                .withValues(alpha: 0.8)
+                                          ],
+                                        )
+                                      : null,
+                                  color: _messageController.text
+                                              .trim()
+                                              .isEmpty ||
+                                          _isTyping ||
+                                          _isAnalyzing
+                                      ? theme.background.withValues(alpha: 0.3)
+                                      : null,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Center(
+                                  child: SvgPicture.asset(
+                                    "assets/icons/right_circle_arrow.svg",
+                                    width: 35,
+                                    height: 35,
+                                    colorFilter: const ColorFilter.mode(
+                                        Colors.white, BlendMode.srcIn),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -673,7 +639,7 @@ enum ChatActionType {
   createPool,
   dashboard,
   newQuestion,
-  back
+  back,
 }
 
 class ChatAction {
@@ -713,22 +679,21 @@ class ChatBubble extends StatelessWidget {
             message.isUser ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (!message.isUser) ...[
+          if (!message.isUser)
             Container(
-                width: 36,
-                height: 36,
-                margin: const EdgeInsets.only(right: 12, top: 4),
-                child: SvgPicture.asset(
-                  "assets/icons/bear.svg",
-                  width: 30,
-                  height: 30,
-                )),
-          ],
+              width: 36,
+              height: 36,
+              margin: const EdgeInsets.only(right: 12, top: 4),
+              child: SvgPicture.asset(
+                "assets/icons/bear.svg",
+                width: 30,
+                height: 30,
+              ),
+            ),
           Flexible(
             child: Container(
               constraints: BoxConstraints(
-                maxWidth: MediaQuery.of(context).size.width * 0.8,
-              ),
+                  maxWidth: MediaQuery.of(context).size.width * 0.8),
               padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 14),
               decoration: BoxDecoration(
                 gradient: message.isUser
@@ -770,19 +735,17 @@ class ChatBubble extends StatelessWidget {
                   ),
                   if (message.actions != null && message.actions!.isNotEmpty)
                     Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
+                      padding: const EdgeInsets.only(top: 16),
                       child: Wrap(
-                        spacing: 8.0,
-                        runSpacing: 8.0,
+                        spacing: 8,
+                        runSpacing: 8,
                         children: message.actions!
                             .map(
                               (action) => GestureDetector(
                                 onTap: () => onActionPressed(action),
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 16,
-                                    vertical: 10,
-                                  ),
+                                      horizontal: 16, vertical: 10),
                                   decoration: BoxDecoration(
                                     gradient: LinearGradient(
                                       colors: [
@@ -794,10 +757,9 @@ class ChatBubble extends StatelessWidget {
                                     ),
                                     borderRadius: BorderRadius.circular(12),
                                     border: Border.all(
-                                      color: theme.primaryPurple
-                                          .withValues(alpha: 0.3),
-                                      width: 1,
-                                    ),
+                                        color: theme.primaryPurple
+                                            .withValues(alpha: 0.3),
+                                        width: 1),
                                   ),
                                   child: Text(
                                     action.label,

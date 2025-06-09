@@ -1,7 +1,7 @@
 use flutter_rust_bridge::frb;
 use sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
-use zilpay::{background::Mnemonic, proto::U256};
+use zilpay::{background::Mnemonic, config::bip39::EN_WORDS, proto::U256};
 
 #[frb(sync)]
 pub fn intl_number_formating(
@@ -36,18 +36,18 @@ pub fn get_currencies_tickets() -> Vec<(String, String)> {
 }
 
 pub fn bip39_checksum_valid(words: String) -> bool {
-    let mnemonic = match Mnemonic::parse_normalized(&words) {
+    let mnemonic = match Mnemonic::parse_str(&EN_WORDS, &words) {
         Ok(m) => m,
         Err(_) => return false,
     };
     let checksum = mnemonic.checksum();
-    let entropy = mnemonic.to_entropy();
+    let entropy: Vec<u8> = mnemonic.to_entropy().collect();
 
     let mut hasher = Sha256::new();
     hasher.update(&entropy);
     let digest = hasher.finalize();
 
-    let word_count = mnemonic.word_count();
+    let word_count = mnemonic.word_count;
     let expected_checksum = digest[0] >> (8 - word_count / 3);
 
     if checksum == expected_checksum {
@@ -69,4 +69,13 @@ pub fn from_wei(value: String, decimals: u8) -> Result<String, String> {
     let value_float = zilpay::intl::wei::from_wei(value, decimals).map_err(|e| e.to_string())?;
 
     Ok(value_float)
+}
+
+#[test]
+fn test_bip39_checksum_valid() {
+    const CORRECT_WORDS: &str = "minor convince list alarm tide wasp define poverty valley around clump bamboo please beauty finish fall expose stairs muscle noise stand swamp erase six";
+    const INCORRECT_WORDS: &str = "minor convince list alarm tide wasp define poverty valley around clump bamboo please beauty finish fall stairs muscle noise stand swamp erase six expose";
+
+    assert!(bip39_checksum_valid(CORRECT_WORDS.to_string()));
+    assert!(!bip39_checksum_valid(INCORRECT_WORDS.to_string()));
 }
