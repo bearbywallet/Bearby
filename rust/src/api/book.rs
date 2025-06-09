@@ -11,6 +11,12 @@ pub use zilpay::settings::{
     notifications::NotificationState,
     theme::{Appearances, Theme},
 };
+use zilpay::{
+    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+    crypto::slip44::ZILLIQA,
+    proto::{address::Address, pubkey::PubKey},
+    wallet::wallet_storage::StorageOperations,
+};
 
 pub async fn add_new_book_address(
     name: String,
@@ -44,4 +50,160 @@ pub async fn get_address_book_list() -> Result<Vec<AddressBookEntryInfo>, String
     with_service(|core| Ok(core.get_address_book().iter().map(Into::into).collect()))
         .await
         .map_err(Into::into)
+}
+
+pub struct Category {
+    pub name: String,
+    pub entries: Vec<Entry>,
+}
+
+pub struct Entry {
+    pub name: String,
+    pub address: String,
+    pub tag: Option<String>,
+}
+
+pub async fn get_combine_sort_addresses(
+    wallet_index: usize,
+    history: bool,
+) -> Result<Vec<Category>, String> {
+    with_service(|core| {
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let selected_account = wallet_data
+            .get_selected_account()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let providers = core.get_providers();
+
+        let my_accounts: Vec<Entry> = if selected_account.slip_44 == ZILLIQA {
+            let capacity = wallet_data.accounts.len() * 2;
+            let mut accounts = Vec::with_capacity(capacity);
+
+            accounts.extend(wallet_data.accounts.iter().flat_map(|acc| {
+                let name = acc.name.clone();
+                let pub_key_bytes = acc.pub_key.as_bytes();
+                vec![
+                    Entry {
+                        name: name.clone(),
+                        address: PubKey::Secp256k1Sha256(pub_key_bytes)
+                            .get_addr()
+                            .unwrap_or(Address::Secp256k1Sha256(Address::ZERO))
+                            .auto_format(),
+                        tag: Some("legacy".to_string()),
+                    },
+                    Entry {
+                        name: name,
+                        address: PubKey::Secp256k1Keccak256(pub_key_bytes)
+                            .get_addr()
+                            .unwrap_or(Address::Secp256k1Keccak256(Address::ZERO))
+                            .auto_format(),
+                        tag: Some("evm".to_string()),
+                    },
+                ]
+            }));
+
+            accounts
+        } else {
+            wallet_data
+                .accounts
+                .iter()
+                .map(|acc| Entry {
+                    name: acc.name.clone(),
+                    address: acc.addr.auto_format(),
+                    tag: None,
+                })
+                .collect()
+        };
+        let book: Vec<Entry> = core
+            .get_address_book()
+            .into_iter()
+            .filter_map(|contact| {
+                if contact.slip44 == selected_account.slip_44 {
+                    Some(Entry {
+                        name: contact.name,
+                        address: contact.addr.auto_format(),
+                        tag: Some("book".to_string()),
+                    })
+                } else {
+                    None
+                }
+            })
+            .collect();
+        let wallets_category: Vec<Category> = core
+            .wallets
+            .iter()
+            .filter_map(|other_wallet| {
+                if other_wallet.wallet_address == wallet.wallet_address {
+                    return None;
+                }
+
+                let data = if let Some(data) = other_wallet.get_wallet_data().ok() {
+                    data
+                } else {
+                    return None;
+                };
+
+                let chain_teg = providers
+                    .iter()
+                    .find(|p| p.config.hash() == data.default_chain_hash)
+                    .and_then(|p| Some(&p.config.name));
+                let entries: Vec<Entry> = data
+                    .accounts
+                    .into_iter()
+                    .map(|acc| Entry {
+                        name: acc.name,
+                        address: acc.addr.auto_format(),
+                        tag: chain_teg.cloned(),
+                    })
+                    .collect();
+
+                Some(Category {
+                    entries,
+                    name: data.wallet_name,
+                })
+            })
+            .collect();
+        let mut categories: Vec<Category> = vec![
+            Category {
+                name: String::from("my_accounts"),
+                entries: my_accounts,
+            },
+            Category {
+                name: String::from("book"),
+                entries: book,
+            },
+        ];
+
+        categories.extend(wallets_category);
+
+        if history {
+            let history_accounts: Vec<Entry> = wallet
+                .get_history()
+                .map_err(|e| ServiceError::WalletError(wallet_index, e))?
+                .into_iter()
+                .filter_map(|tx| {
+                    if tx.chain_hash == selected_account.chain_hash {
+                        Some(Entry {
+                            name: tx.title.unwrap_or_default(),
+                            address: tx.recipient,
+                            tag: None,
+                        })
+                    } else {
+                        None
+                    }
+                })
+                .collect();
+
+            categories.push(Category {
+                name: String::from("history"),
+                entries: history_accounts,
+            });
+        }
+
+        Ok(categories)
+    })
+    .await
+    .map_err(Into::into)
 }
