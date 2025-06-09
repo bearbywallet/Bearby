@@ -758,33 +758,6 @@ class _ConfirmTransactionContentState
                               adjustedTokenValue = amount - fee;
                             }
 
-                            if (isNativeTx) {
-                              if (adjustedTokenValue + fee > balance) {
-                                throw Exception(
-                                    'Insufficient balance for adjusted amount and fee');
-                              }
-                            } else {
-                              if (amount > balance) {
-                                throw Exception('Insufficient token balance');
-                              }
-                              final nativeToken =
-                                  appState.wallet!.tokens.firstWhere(
-                                (t) =>
-                                    t.native &&
-                                    t.chainHash == widget.tx.metadata.chainHash,
-                                orElse: () =>
-                                    throw Exception('Native token not found'),
-                              );
-                              final nativeBalance = BigInt.parse(
-                                  nativeToken.balances[
-                                          appState.wallet!.selectedAccount] ??
-                                      '0');
-                              if (fee > nativeBalance) {
-                                throw Exception(
-                                    'Insufficient balance for gas fee');
-                              }
-                            }
-
                             if (!isNativeTx && isScilla) {
                               adjustedTokenValue =
                                   widget.tx.scilla?.amount ?? BigInt.zero;
