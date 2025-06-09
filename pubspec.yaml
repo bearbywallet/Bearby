@@ -1,6 +1,6 @@
 name: zilpay
 description: "ZilPay wallet IOS, Android"
-version: 3.8.6+895
+version: 3.8.7+896
 
 environment:
   sdk: ^3.5.1
@@ -23,7 +23,7 @@ dependencies:
   package_info_plus: ^8.1.0
   permission_handler: ^12.0.0+1
   url_launcher: ^6.3.1
-  mobile_scanner: ^7.0.0
+  mobile_scanner: ^7.0.1
   share_plus: ^11.0.0
   flutter_inappwebview: ^6.1.5
   screen_protector: ^1.4.2+1

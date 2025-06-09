@@ -1,11 +1,9 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -42,101 +40,73 @@ class _QRScannerModalContent extends StatefulWidget {
 
 class _QRScannerModalContentState extends State<_QRScannerModalContent>
     with WidgetsBindingObserver {
-  MobileScannerController? controller;
-  bool hasError = false;
-  String errorMessage = '';
-  bool isPermissionGranted = false;
-  bool isCameraInitialized = false;
+  late final MobileScannerController controller;
+  String? _lastScannedCode;
+  DateTime? _lastScanTime;
+  static const Duration _scanCooldown = Duration(milliseconds: 1000);
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-    _initializeScanner();
+    controller = MobileScannerController(
+      detectionSpeed: DetectionSpeed.normal,
+      facing: CameraFacing.back,
+    );
     _requestCameraPermission();
   }
 
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+
+    switch (state) {
+      case AppLifecycleState.resumed:
+        if (mounted) {
+          unawaited(controller.start());
+        }
+        break;
+      case AppLifecycleState.paused:
+      case AppLifecycleState.detached:
+        unawaited(controller.stop());
+        break;
+      default:
+        break;
+    }
+  }
+
   Future<void> _requestCameraPermission() async {
-    PermissionStatus status = await Permission.camera.status;
-    if (status.isGranted) {
-      setState(() {
-        isPermissionGranted = true;
-      });
-    } else {
-      status = await Permission.camera.request();
-      if (status.isGranted) {
-        setState(() {
-          isPermissionGranted = true;
-        });
-      } else {
-        setState(() {
-          isPermissionGranted = false;
-        });
-      }
-    }
+    await Permission.camera.request();
   }
 
-  Future<void> _initializeScanner() async {
-    try {
-      controller = MobileScannerController(
-        detectionSpeed: DetectionSpeed.normal,
-        facing: CameraFacing.back,
-        torchEnabled: false,
-      );
-      setState(() {
-        isCameraInitialized = true;
-      });
-    } catch (e) {
-      if (!mounted) return;
-      setState(() {
-        hasError = true;
-        errorMessage =
-            '${AppLocalizations.of(context)!.qrScannerModalContentCameraInitError} ${e.toString()}';
-      });
-    }
-  }
+  void _onBarcodeDetected(BarcodeCapture capture) {
+    if (!mounted) return;
 
-  Future<void> _toggleTorch() async {
-    try {
-      await controller?.toggleTorch();
-      setState(() {});
-    } catch (e) {
-      setState(() {
-        errorMessage =
-            '${AppLocalizations.of(context)!.qrScannerModalContentTorchError} ${e.toString()}';
-      });
-    }
-  }
+    final barcodes = capture.barcodes;
+    if (barcodes.isEmpty) return;
 
-  Future<void> _openAppSettings() async {
-    await openAppSettings();
+    final code = barcodes.first.rawValue;
+    if (code == null || code.isEmpty) return;
+
+    final now = DateTime.now();
+
+    if (_lastScannedCode == code &&
+        _lastScanTime != null &&
+        now.difference(_lastScanTime!) < _scanCooldown) {
+      return;
+    }
+
+    _lastScannedCode = code;
+    _lastScanTime = now;
+
+    widget.onScanned(code);
   }
 
   @override
   void dispose() {
     WidgetsBinding.instance.removeObserver(this);
-    controller?.dispose();
+    controller.dispose();
     super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      _requestCameraPermission();
-    } else if (state == AppLifecycleState.paused) {
-      controller?.stop();
-    }
-  }
-
-  void _onDetect(BarcodeCapture capture) {
-    if (!mounted) return;
-    final List<Barcode> barcodes = capture.barcodes;
-    if (barcodes.isNotEmpty) {
-      final String? code = barcodes.first.rawValue;
-      if (code != null) {
-        widget.onScanned(code);
-      }
-    }
   }
 
   @override
@@ -145,26 +115,17 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
 
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 300),
-      curve: Curves.easeInOut,
+    return DecoratedBox(
       decoration: BoxDecoration(
         color: theme.cardBackground,
         borderRadius: const BorderRadius.vertical(top: Radius.circular(20)),
         border: Border.all(color: theme.modalBorder, width: 2),
-        boxShadow: [
-          BoxShadow(
-            color: theme.cardBackground.withValues(alpha: 0.2),
-            blurRadius: 10,
-            offset: const Offset(0, -2),
-          ),
-        ],
       ),
       child: Column(
         children: [
           _buildHeader(theme, l10n),
           const SizedBox(height: 20),
-          Expanded(child: _buildScannerView(theme, l10n)),
+          Expanded(child: _buildScannerArea(theme, l10n)),
           const SizedBox(height: 30),
         ],
       ),
@@ -213,7 +174,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
     );
   }
 
-  Widget _buildScannerView(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildScannerArea(AppTheme theme, AppLocalizations l10n) {
     return Column(
       mainAxisAlignment: MainAxisAlignment.center,
       children: [
@@ -226,59 +187,66 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
           ),
           child: ClipRRect(
             borderRadius: BorderRadius.circular(13),
-            child: controller != null && isCameraInitialized
-                ? MobileScanner(
-                    controller: controller!,
-                    onDetect: _onDetect,
-                    fit: BoxFit.cover,
-                  )
-                : Container(
-                    color: Colors.black,
-                    child: const Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
+            child: MobileScanner(
+              controller: controller,
+              onDetect: _onBarcodeDetected,
+              fit: BoxFit.cover,
+              errorBuilder: (context, error) =>
+                  _buildErrorView(error, theme, l10n),
+            ),
           ),
         ),
         const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            IconButton(
-              icon: controller?.torchEnabled == true
-                  ? SvgPicture.asset(
-                      'assets/icons/torch_on.svg',
-                      width: 32,
-                      height: 32,
-                      colorFilter:
-                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
-                    )
-                  : SvgPicture.asset(
-                      'assets/icons/torch_off.svg',
-                      width: 32,
-                      height: 32,
-                      colorFilter:
-                          ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
-                    ),
-              onPressed: _toggleTorch,
-            ),
-          ],
-        ),
-        if (Platform.isIOS && !isPermissionGranted) ...[
-          const SizedBox(height: 16),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24),
-            child: CustomButton(
-              text: l10n.qrScannerModalContentOpenSettings,
-              textColor: theme.buttonText,
-              backgroundColor: theme.secondaryPurple,
-              onPressed: _openAppSettings,
-            ),
-          ),
-        ],
+        _buildTorchButton(theme),
       ],
+    );
+  }
+
+  Widget _buildTorchButton(AppTheme theme) {
+    return ValueListenableBuilder<MobileScannerState>(
+      valueListenable: controller,
+      builder: (context, state, child) {
+        if (!state.isInitialized ||
+            state.torchState == TorchState.unavailable) {
+          return const SizedBox(height: 48);
+        }
+
+        return IconButton(
+          iconSize: 32,
+          icon: SvgPicture.asset(
+            state.torchState == TorchState.on
+                ? 'assets/icons/torch_on.svg'
+                : 'assets/icons/torch_off.svg',
+            width: 32,
+            height: 32,
+            colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
+          ),
+          onPressed: () => controller.toggleTorch(),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorView(
+      MobileScannerException error, AppTheme theme, AppLocalizations l10n) {
+    return Container(
+      color: Colors.black,
+      child: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              Text(
+                l10n.qrScannerModalContentCameraInitError,
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: Colors.white, fontSize: 16),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
