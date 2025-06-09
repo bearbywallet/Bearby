@@ -174,6 +174,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   BrowserSettingsInfo dco_decode_browser_settings_info(dynamic raw);
 
   @protected
+  Category dco_decode_category(dynamic raw);
+
+  @protected
   ColorsInfo dco_decode_colors_info(dynamic raw);
 
   @protected
@@ -181,6 +184,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Eip712Hashes dco_decode_eip_712_hashes(dynamic raw);
+
+  @protected
+  Entry dco_decode_entry(dynamic raw);
 
   @protected
   ExplorerInfo dco_decode_explorer_info(dynamic raw);
@@ -223,7 +229,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  List<Category> dco_decode_list_category(dynamic raw);
+
+  @protected
   List<ConnectionInfo> dco_decode_list_connection_info(dynamic raw);
+
+  @protected
+  List<Entry> dco_decode_list_entry(dynamic raw);
 
   @protected
   List<ExplorerInfo> dco_decode_list_explorer_info(dynamic raw);
@@ -532,6 +544,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Category sse_decode_category(SseDeserializer deserializer);
+
+  @protected
   ColorsInfo sse_decode_colors_info(SseDeserializer deserializer);
 
   @protected
@@ -539,6 +554,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Eip712Hashes sse_decode_eip_712_hashes(SseDeserializer deserializer);
+
+  @protected
+  Entry sse_decode_entry(SseDeserializer deserializer);
 
   @protected
   ExplorerInfo sse_decode_explorer_info(SseDeserializer deserializer);
@@ -585,8 +603,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<Category> sse_decode_list_category(SseDeserializer deserializer);
+
+  @protected
   List<ConnectionInfo> sse_decode_list_connection_info(
       SseDeserializer deserializer);
+
+  @protected
+  List<Entry> sse_decode_list_entry(SseDeserializer deserializer);
 
   @protected
   List<ExplorerInfo> sse_decode_list_explorer_info(
@@ -922,6 +946,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       BrowserSettingsInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_category(Category self, SseSerializer serializer);
+
+  @protected
   void sse_encode_colors_info(ColorsInfo self, SseSerializer serializer);
 
   @protected
@@ -930,6 +957,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_eip_712_hashes(Eip712Hashes self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_entry(Entry self, SseSerializer serializer);
 
   @protected
   void sse_encode_explorer_info(ExplorerInfo self, SseSerializer serializer);
@@ -977,8 +1007,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<AddressBookEntryInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_category(List<Category> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_connection_info(
       List<ConnectionInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_entry(List<Entry> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_explorer_info(

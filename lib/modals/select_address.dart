@@ -3,16 +3,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/addr.dart';
 import 'package:zilpay/mixins/jazzicon.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
+import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
 void showAddressSelectModal({
   required BuildContext context,
@@ -48,8 +47,7 @@ class _AddressSelectModalContentState
     extends State<_AddressSelectModalContent> {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
-  List<AddressItem> _evmAddresses = [];
-  List<AddressItem> _scillaAddresses = [];
+  List<Category> _categories = [];
   bool _isLoading = true;
 
   @override
@@ -61,72 +59,20 @@ class _AddressSelectModalContentState
   Future<void> _loadAddresses() async {
     final appState = Provider.of<AppState>(context, listen: false);
 
-    if (appState.wallet != null) {
-      try {
-        final List<AddressItem> evmItems = [];
-        final List<AddressItem> scillaItems = [];
+    try {
+      final categories = await getCombineSortAddresses(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        history: true,
+      );
 
-        for (var i = 0; i < appState.wallet!.accounts.length; i++) {
-          final account = appState.wallet!.accounts[i];
-          final name = account.name;
-
-          if (account.slip44 == 313 &&
-              !appState.wallet!.walletType.contains(WalletType.ledger.name)) {
-            final addresses = await getZilEthChecksumAddresses(
-              walletIndex: BigInt.from(appState.selectedWallet),
-            );
-
-            if (i < addresses.length) {
-              evmItems.add(AddressItem(
-                name: name,
-                address: addresses[i],
-                addrType: 1,
-                accountIndex: i,
-              ));
-            }
-
-            final (bech32, base16) = await zilliqaGetBech32Base16Address(
-              walletIndex: BigInt.from(appState.selectedWallet),
-              accountIndex: BigInt.from(i),
-            );
-
-            scillaItems.add(AddressItem(
-              name: name,
-              address: bech32,
-              addrType: 0,
-              accountIndex: i,
-            ));
-          } else if (account.addrType == 1) {
-            evmItems.add(AddressItem(
-              name: name,
-              address: account.addr,
-              addrType: 1,
-              accountIndex: i,
-            ));
-          } else {
-            scillaItems.add(AddressItem(
-              name: name,
-              address: account.addr,
-              addrType: 0,
-              accountIndex: i,
-            ));
-          }
-        }
-
-        if (mounted) {
-          setState(() {
-            _evmAddresses = evmItems;
-            _scillaAddresses = scillaItems;
-            _isLoading = false;
-          });
-        }
-      } catch (e) {
-        debugPrint("Error loading addresses: $e");
-        if (mounted) {
-          setState(() => _isLoading = false);
-        }
+      if (mounted) {
+        setState(() {
+          _categories = categories;
+          _isLoading = false;
+        });
       }
-    } else {
+    } catch (e) {
+      debugPrint("Error loading addresses: $e");
       if (mounted) {
         setState(() => _isLoading = false);
       }
@@ -142,7 +88,6 @@ class _AddressSelectModalContentState
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-    final appState = Provider.of<AppState>(context);
     final l10n = AppLocalizations.of(context)!;
 
     return Container(
@@ -222,28 +167,7 @@ class _AddressSelectModalContentState
                   physics: const ClampingScrollPhysics(),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildSection(
-                          appState,
-                          '${appState.chain?.name} EVM',
-                          _getFilteredAddresses(_evmAddresses),
-                          'assets/icons/solidity.svg'),
-                      _buildSection(
-                          appState,
-                          '${appState.chain?.name} Scilla',
-                          _getFilteredAddresses(_scillaAddresses),
-                          'assets/icons/scilla.svg'),
-                      _buildSection(
-                          appState,
-                          l10n.addressSelectModalContentAddressBook,
-                          _getFilteredAddressBook(appState),
-                          null),
-                      _buildSection(
-                          appState,
-                          l10n.addressSelectModalContentHistory,
-                          _getFilteredHistory(appState),
-                          null),
-                    ],
+                    children: _buildCategoryWidgets(),
                   ),
                 ),
               ),
@@ -253,10 +177,22 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildSection(
-      AppState state, String title, List<AddressItem> items, String? iconPath) {
-    if (items.isEmpty) return const SizedBox.shrink();
-    final theme = state.currentTheme;
+  List<Widget> _buildCategoryWidgets() {
+    return _categories.map((category) {
+      final filteredEntries = _getFilteredEntries(category.entries);
+      if (filteredEntries.isEmpty) return const SizedBox.shrink();
+
+      return _buildCategorySection(category.name, filteredEntries);
+    }).toList();
+  }
+
+  Widget _buildCategorySection(String categoryName, List<Entry> entries) {
+    final appState = Provider.of<AppState>(context, listen: false);
+    final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    final categoryInfo = _getCategoryInfo(categoryName, l10n);
+
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Column(
@@ -264,9 +200,9 @@ class _AddressSelectModalContentState
         children: [
           Row(
             children: [
-              if (iconPath != null) ...[
+              if (categoryInfo.iconPath != null) ...[
                 SvgPicture.asset(
-                  iconPath,
+                  categoryInfo.iconPath!,
                   width: 16,
                   height: 16,
                   colorFilter: ColorFilter.mode(
@@ -277,7 +213,7 @@ class _AddressSelectModalContentState
                 const SizedBox(width: 8),
               ],
               Text(
-                title,
+                categoryInfo.displayName,
                 style: TextStyle(
                   color: theme.textSecondary,
                   fontSize: 14,
@@ -287,12 +223,12 @@ class _AddressSelectModalContentState
             ],
           ),
           const SizedBox(height: 8),
-          ...List.generate(items.length, (index) {
-            final item = items[index];
+          ...List.generate(entries.length, (index) {
+            final entry = entries[index];
             return Column(
               children: [
-                _buildAddressItem(state, item),
-                if (index < items.length - 1)
+                _buildAddressItem(appState, entry),
+                if (index < entries.length - 1)
                   Divider(
                     height: 1,
                     thickness: 1,
@@ -307,49 +243,64 @@ class _AddressSelectModalContentState
     );
   }
 
-  Widget _buildAddressItem(AppState state, AddressItem item) {
+  Widget _buildAddressItem(AppState appState, Entry entry) {
     final l10n = AppLocalizations.of(context)!;
-    final theme = state.currentTheme;
-    final selectedAccountIndex = state.wallet?.selectedAccount.toInt() ?? 0;
+    final theme = appState.currentTheme;
 
-    // Get current account's address type
-    final selectedAccount = state.wallet?.accounts[selectedAccountIndex];
-    final selectedAddrType = selectedAccount?.addrType ?? -1;
-
-    // Only show sender tag if both index and type match
-    final isSender = item.accountIndex == selectedAccountIndex &&
-        item.addrType == selectedAddrType;
+    final currentAccount = appState.wallet?.selectedAccount.toInt() ?? 0;
+    final currentAccountData = appState.wallet?.accounts[currentAccount];
+    final isCurrentAccount = currentAccountData?.addr == entry.address;
 
     return InkWell(
       onTap: () {
         QRcodeScanResultInfo params =
-            QRcodeScanResultInfo(recipient: item.address);
-        widget.onAddressSelected(params, item.name);
+            QRcodeScanResultInfo(recipient: entry.address);
+        widget.onAddressSelected(params, entry.name);
       },
       child: Container(
         height: 72,
         padding: const EdgeInsets.all(12),
         child: Row(
           children: [
-            ClipOval(
-              child: SizedBox(
-                width: 40,
-                height: 40,
-                child: item.addrType == 1
-                    ? Jazzicon(
-                        diameter: 30,
-                        seed: item.address,
-                        theme: theme,
-                        shapeCount: 4,
-                      )
-                    : Blockies(
-                        color: theme.secondaryPurple,
-                        bgColor: theme.primaryPurple,
-                        size: 8,
-                        spotColor: theme.background,
-                        seed: item.address,
+            Stack(
+              children: [
+                ClipOval(
+                  child: SizedBox(
+                    width: 40,
+                    height: 40,
+                    child: _getAvatarWidget(entry, theme),
+                  ),
+                ),
+                if (_shouldShowNetworkIcon(appState, entry))
+                  Positioned(
+                    right: -2,
+                    bottom: -2,
+                    child: Container(
+                      width: 20,
+                      height: 20,
+                      decoration: BoxDecoration(
+                        color: theme.background,
+                        shape: BoxShape.circle,
+                        border:
+                            Border.all(color: theme.cardBackground, width: 1),
                       ),
-              ),
+                      child: Padding(
+                        padding: EdgeInsets.all(2),
+                        child: Center(
+                          child: SvgPicture.asset(
+                            _getNetworkIconPath(entry),
+                            width: 24,
+                            height: 24,
+                            colorFilter: ColorFilter.mode(
+                              theme.textSecondary,
+                              BlendMode.srcIn,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+              ],
             ),
             const SizedBox(width: 12),
             Expanded(
@@ -361,7 +312,9 @@ class _AddressSelectModalContentState
                     children: [
                       Expanded(
                         child: Text(
-                          item.name,
+                          entry.name.isNotEmpty
+                              ? entry.name
+                              : l10n.addressSelectModalContentUnknown,
                           style: TextStyle(
                             color: theme.textPrimary,
                             fontSize: 16,
@@ -370,27 +323,11 @@ class _AddressSelectModalContentState
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      if (isSender)
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: theme.primaryPurple.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(4),
-                          ),
-                          child: Text(
-                            l10n.addressSelectModalContentSender,
-                            style: TextStyle(
-                              color: theme.primaryPurple,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ),
+                      ..._buildTags(entry, isCurrentAccount, theme, l10n),
                     ],
                   ),
                   Text(
-                    shortenAddress(item.address),
+                    shortenAddress(entry.address),
                     style: TextStyle(
                       color: theme.textSecondary,
                       fontSize: 14,
@@ -403,6 +340,142 @@ class _AddressSelectModalContentState
         ),
       ),
     );
+  }
+
+  List<Widget> _buildTags(Entry entry, bool isCurrentAccount, AppTheme theme,
+      AppLocalizations l10n) {
+    List<Widget> tags = [];
+
+    if (isCurrentAccount) {
+      tags.add(_buildTag(
+        l10n.addressSelectModalContentSender,
+        theme.primaryPurple,
+        theme,
+      ));
+    }
+
+    if (entry.tag != null) {
+      tags.add(_buildTag(
+        _getTagDisplayName(entry.tag!, l10n),
+        _getTagColor(entry.tag!, theme),
+        theme,
+      ));
+    }
+
+    return tags;
+  }
+
+  bool _shouldShowNetworkIcon(AppState appState, Entry entry) {
+    return _isZilliqaNetwork(appState);
+  }
+
+  bool _isZilliqaNetwork(AppState appState) {
+    return appState.account?.slip44 == 313;
+  }
+
+  String _getNetworkIconPath(Entry entry) {
+    final isEvm = entry.tag == "evm" || _isEvmAddress(entry.address);
+    return isEvm ? 'assets/icons/solidity.svg' : 'assets/icons/scilla.svg';
+  }
+
+  Widget _getAvatarWidget(Entry entry, AppTheme theme) {
+    final isEvm = entry.tag == "evm" || _isEvmAddress(entry.address);
+
+    if (isEvm) {
+      return Jazzicon(
+        diameter: 30,
+        seed: entry.address,
+        theme: theme,
+        shapeCount: 4,
+      );
+    } else {
+      return Blockies(
+        color: theme.secondaryPurple,
+        bgColor: theme.primaryPurple,
+        size: 8,
+        spotColor: theme.background,
+        seed: entry.address,
+      );
+    }
+  }
+
+  Widget _buildTag(String text, Color color, AppTheme theme) {
+    return Container(
+      margin: const EdgeInsets.only(left: 8),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      decoration: BoxDecoration(
+        color: color.withValues(alpha: 0.2),
+        borderRadius: BorderRadius.circular(4),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          color: color,
+          fontSize: 12,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+    );
+  }
+
+  CategoryInfo _getCategoryInfo(String categoryName, AppLocalizations l10n) {
+    switch (categoryName) {
+      case "my_accounts":
+        return CategoryInfo(
+          displayName: l10n.addressSelectModalContentMyAccounts,
+          iconPath: "assets/icons/wallet.svg",
+        );
+      case "book":
+        return CategoryInfo(
+          displayName: l10n.addressSelectModalContentAddressBook,
+          iconPath: "assets/icons/book.svg",
+        );
+      case "history":
+        return CategoryInfo(
+          displayName: l10n.addressSelectModalContentHistory,
+          iconPath: "assets/icons/history.svg",
+        );
+      default:
+        return CategoryInfo(
+          displayName: categoryName,
+          iconPath: "assets/icons/wallet.svg",
+        );
+    }
+  }
+
+  String _getTagDisplayName(String tag, AppLocalizations l10n) {
+    switch (tag) {
+      case "legacy":
+        return "Legacy";
+      case "evm":
+        return "EVM";
+      case "book":
+        return l10n.addressSelectModalContentAddressBook;
+      default:
+        return tag;
+    }
+  }
+
+  Color _getTagColor(String tag, AppTheme theme) {
+    switch (tag) {
+      case "legacy":
+        return theme.primaryPurple;
+      case "evm":
+        return theme.primaryPurple;
+      case "book":
+        return theme.secondaryPurple;
+      default:
+        return theme.textSecondary;
+    }
+  }
+
+  bool _isEvmAddress(String address) {
+    return address.toLowerCase().startsWith('0x');
+  }
+
+  String shortenAddress(String address) {
+    if (address.length <= 12) return address;
+    return '${address.substring(0, 6)}...${address.substring(address.length - 6)}';
   }
 
   Future<void> _parseQrcodRes(String data) async {
@@ -418,48 +491,23 @@ class _AddressSelectModalContentState
     }
   }
 
-  List<AddressItem> _getFilteredAddresses(List<AddressItem> addresses) {
-    if (_searchQuery.isEmpty) return addresses;
+  List<Entry> _getFilteredEntries(List<Entry> entries) {
+    if (_searchQuery.isEmpty) return entries;
 
-    return addresses
-        .where((item) =>
-            item.name.toLowerCase().contains(_searchQuery) ||
-            item.address.toLowerCase().contains(_searchQuery))
+    return entries
+        .where((entry) =>
+            entry.name.toLowerCase().contains(_searchQuery) ||
+            entry.address.toLowerCase().contains(_searchQuery))
         .toList();
-  }
-
-  List<AddressItem> _getFilteredAddressBook(AppState appState) {
-    final slip44 = appState.chain?.slip44 ?? 0;
-
-    return appState.book
-        .where((account) =>
-            account.slip44 == slip44 &&
-            (account.name.toLowerCase().contains(_searchQuery) ||
-                account.addr.toLowerCase().contains(_searchQuery)))
-        .map((account) => AddressItem(
-              name: account.name,
-              address: account.addr,
-              addrType: -1,
-              accountIndex: -1,
-            ))
-        .toList();
-  }
-
-  List<AddressItem> _getFilteredHistory(AppState appState) {
-    return [];
   }
 }
 
-class AddressItem {
-  final String name;
-  final String address;
-  final int addrType;
-  final int accountIndex;
+class CategoryInfo {
+  final String displayName;
+  final String? iconPath;
 
-  AddressItem({
-    required this.name,
-    required this.address,
-    required this.addrType,
-    required this.accountIndex,
+  CategoryInfo({
+    required this.displayName,
+    this.iconPath,
   });
 }

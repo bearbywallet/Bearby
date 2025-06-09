@@ -20,3 +20,53 @@ Future<void> removeFromAddressBook({required String addr}) =>
 
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();
+
+Future<List<Category>> getCombineSortAddresses(
+        {required BigInt walletIndex, required bool history}) =>
+    RustLib.instance.api.crateApiBookGetCombineSortAddresses(
+        walletIndex: walletIndex, history: history);
+
+class Category {
+  final String name;
+  final List<Entry> entries;
+
+  const Category({
+    required this.name,
+    required this.entries,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ entries.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Category &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          entries == other.entries;
+}
+
+class Entry {
+  final String name;
+  final String address;
+  final String? tag;
+
+  const Entry({
+    required this.name,
+    required this.address,
+    this.tag,
+  });
+
+  @override
+  int get hashCode => name.hashCode ^ address.hashCode ^ tag.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Entry &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          address == other.address &&
+          tag == other.tag;
+}

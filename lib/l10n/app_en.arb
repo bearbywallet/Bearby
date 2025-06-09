@@ -1515,6 +1515,7 @@
   "@manageTokensModalContentSearchHint": {
     "description": "Hint text for the search input field in the ManageTokensModalContent modal."
   },
+
   "addressSelectModalContentTitle": "Select Address",
   "@addressSelectModalContentTitle": {
     "description": "Title text for the AddressSelectModalContent modal."
@@ -1543,6 +1544,7 @@
   "@addressSelectModalContentSender": {
     "description": "Label shown on addresses that belong to the sender account in the AddressSelectModalContent modal."
   },
+
   "changePasswordModalTitle": "Change Password",
   "@changePasswordModalTitle": {
     "description": "Title text for the ChangePasswordModal modal."
