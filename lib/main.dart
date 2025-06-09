@@ -40,8 +40,6 @@ Future<void> main() async {
       cahceDir: tempDir.path,
     );
 
-    await appState.loadHideBalance();
-
     final authGuard = AuthGuard(state: appState);
 
     runApp(ZilPayApp(authGuard: authGuard, appState: appState));

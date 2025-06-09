@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -22,8 +23,11 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   List<AddressBookEntryInfo> _book = [];
   List<ConnectionInfo> _connections = [];
   DateTime _lastRateUpdateTime = DateTime.fromMillisecondsSinceEpoch(0);
+  GasFeeOption _selectedGasOption = GasFeeOption.market;
+
   static const Duration _rateUpdateCooldown = Duration(minutes: 1);
   static const String _hideBalanceStorageKey = "hide_balance_key";
+  static const String _gasOptionStorageKey = "gas_option_key";
 
   late BackgroundState _state;
   late String _cahceDir;
@@ -45,6 +49,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   void setSelectedWallet(int index) {
     _selectedWallet = index;
     notifyListeners();
+  }
+
+  GasFeeOption get selectedGasOption {
+    return _selectedGasOption;
   }
 
   String get cahceDir {
@@ -131,6 +139,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
+    await loadSelectedGasOption();
+    await loadHideBalance();
     notifyListeners();
   }
 
@@ -199,6 +209,31 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       systemNavigationBarColor: currentTheme.background,
       systemNavigationBarIconBrightness: currentTheme.brightness,
     ));
+  }
+
+  Future<void> setSelectedGasOption(GasFeeOption option) async {
+    _selectedGasOption = option;
+    final prefs = await SharedPreferences.getInstance();
+    final key = "$_gasOptionStorageKey:$selectedWallet";
+    await prefs.setString(key, option.name);
+    notifyListeners();
+  }
+
+  Future<void> loadSelectedGasOption() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = "$_gasOptionStorageKey:$selectedWallet";
+    final optionName = prefs.getString(key);
+
+    if (optionName != null) {
+      try {
+        _selectedGasOption = GasFeeOption.values.firstWhere(
+          (option) => option.name == optionName,
+        );
+      } catch (e) {
+        _selectedGasOption = GasFeeOption.market;
+      }
+    }
+    notifyListeners();
   }
 
   Future<void> startTrackHistoryWorker() async {

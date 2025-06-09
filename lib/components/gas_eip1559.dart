@@ -39,7 +39,6 @@ extension GasFeeOptionX on GasFeeOption {
       return '~$seconds sec';
     } else {
       int minutes = (seconds / 60).round();
-
       return '~$minutes min';
     }
   }
@@ -231,7 +230,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateTotalFee();
+      _initializeSelectedOption();
     });
   }
 
@@ -247,20 +246,30 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
     if (oldWidget.txParamsInfo != widget.txParamsInfo) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
-        BigInt maxPriorityFee = calculateMaxPriorityFee(
-          _selected,
-          widget.txParamsInfo.feeHistory.priorityFee,
-        );
-        BigInt gasPrice = calculateGasPrice(
-          _selected,
-          widget.txParamsInfo.gasPrice,
-        );
-        widget.onChangeMaxPriorityFee(maxPriorityFee);
-        widget.onChangeGasPrice(gasPrice);
-
-        _updateTotalFee();
+        _updateGasFees();
       });
     }
+  }
+
+  void _initializeSelectedOption() {
+    final appState = Provider.of<AppState>(context, listen: false);
+    _selected = appState.selectedGasOption;
+    _updateGasFees();
+  }
+
+  void _updateGasFees() {
+    BigInt maxPriorityFee = calculateMaxPriorityFee(
+      _selected,
+      widget.txParamsInfo.feeHistory.priorityFee,
+    );
+    BigInt gasPrice = calculateGasPrice(
+      _selected,
+      widget.txParamsInfo.gasPrice,
+    );
+
+    widget.onChangeMaxPriorityFee(maxPriorityFee);
+    widget.onChangeGasPrice(gasPrice);
+    _updateTotalFee();
   }
 
   void _updateTotalFee() {
@@ -294,6 +303,9 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       _isExpanded = false;
       _expandController.reverse();
     });
+
+    final appState = Provider.of<AppState>(context, listen: false);
+    appState.setSelectedGasOption(option);
 
     final maxPriorityFee = calculateMaxPriorityFee(
       option,
