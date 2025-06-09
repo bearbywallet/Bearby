@@ -755,11 +755,6 @@ class _ConfirmTransactionContentState
                             }
 
                             if (isNativeTx && amount == balance) {
-                              if (fee > balance) {
-                                throw Exception(
-                                    'Insufficient balance to cover fee');
-                              }
-
                               adjustedTokenValue = amount - fee;
                             }
 
