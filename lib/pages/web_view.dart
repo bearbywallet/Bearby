@@ -680,13 +680,9 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                   onConsoleMessage: (_, value) {
                     // print(value);
                   },
-                  // onReceivedError: (controller, request, error) {
-                  //   setState(() {
-                  //     _isLoading = false;
-                  //     _hasError = true;
-                  //     _errorMessage = error.description;
-                  //   });
-                  // },
+                  onReceivedError: (_, __, error) {
+                    print("browser error: $error");
+                  },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {
                     final url =

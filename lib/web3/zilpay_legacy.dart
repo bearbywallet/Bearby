@@ -104,6 +104,7 @@ class ZilPayLegacyHandler {
       type: ZilliqaLegacyMessages.getWalletData,
       payload: {
         'account': account,
+        'http': appState.chain!.rpc.first,
         'network': appState.chain?.testnet ?? false ? 'testnet' : 'mainnet',
         'isConnect': account != null,
         'isEnable': true,
