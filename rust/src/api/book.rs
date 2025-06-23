@@ -120,7 +120,7 @@ pub async fn get_combine_sort_addresses(
             .get_address_book()
             .into_iter()
             .filter_map(|contact| {
-                if contact.slip44 == selected_account.slip_44 {
+                if selected_account.addr.prefix_type() == contact.addr.prefix_type() {
                     Some(Entry {
                         name: contact.name,
                         address: contact.addr.auto_format(),
@@ -152,10 +152,16 @@ pub async fn get_combine_sort_addresses(
                 let entries: Vec<Entry> = data
                     .accounts
                     .into_iter()
-                    .map(|acc| Entry {
-                        name: acc.name,
-                        address: acc.addr.auto_format(),
-                        tag: chain_teg.cloned(),
+                    .filter_map(|acc| {
+                        if acc.addr.prefix_type() == selected_account.addr.prefix_type() {
+                            Some(Entry {
+                                name: acc.name,
+                                address: acc.addr.auto_format(),
+                                tag: chain_teg.cloned(),
+                            })
+                        } else {
+                            None
+                        }
                     })
                     .collect();
 
