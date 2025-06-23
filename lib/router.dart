@@ -29,6 +29,7 @@ import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
 import 'package:zilpay/pages/wallet.dart';
 import 'package:zilpay/pages/web_view.dart';
+import 'package:zilpay/pages/zil_stake.dart';
 
 import 'services/auth_guard.dart';
 import 'state/app_state.dart';
@@ -102,6 +103,7 @@ class AppRouter {
       '/keystore_backup',
       '/keystore_file_restore',
       '/add_ledger_account',
+      '/zil_stake',
     ];
 
     if (settings.name == '/ledger_connect') {
@@ -283,6 +285,8 @@ class AppRouter {
         return wrapWithProviders(const InitialPage());
       case '/add_ledger_account':
         return wrapWithProviders(const AddLedgerAccountPage());
+      case '/zil_stake':
+        return wrapWithProviders(const ZilStakePage());
       case '/web_view':
         final uri =
             Uri.tryParse(settings.name?.replaceFirst('/web_view?', '') ?? '') ??

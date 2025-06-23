@@ -18,7 +18,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 
 const double ICON_SIZE_SMALL = 24.0;
 const double ICON_SIZE_MEDIUM = 32.0;
-const double ICON_SIZE_TILE_BUTTON = 45.0;
+const double ICON_SIZE_TILE_BUTTON = 25.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -259,11 +259,27 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
+                    "assets/icons/anchor.svg",
+                    width: ICON_SIZE_TILE_BUTTON,
+                    height: ICON_SIZE_TILE_BUTTON,
+                    colorFilter:
+                        ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                  ),
+                  title: "Stake",
+                  onPressed: () async {
+                    Navigator.pushNamed(context, '/zil_stake');
+                  },
+                  backgroundColor: theme.cardBackground,
+                  textColor: theme.primaryPurple,
+                ),
+                SizedBox(width: adaptivePaddingCard),
+                TileButton(
+                  icon: SvgPicture.asset(
                     appState.account?.addrType == 0
                         ? "assets/icons/scilla.svg"
                         : "assets/icons/solidity.svg",
-                    width: 34,
-                    height: 34,
+                    width: ICON_SIZE_TILE_BUTTON,
+                    height: ICON_SIZE_TILE_BUTTON,
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
