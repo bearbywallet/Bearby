@@ -1552,4 +1552,42 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get transactionHistoryDescription => 'Показывать адреса из истории транзакций';
+
+  @override
+  String get zilStakePageTitle => 'Стейкинг Zilliqa';
+
+  @override
+  String get noStakingPoolsFound => 'Пулы для стейкинга не найдены';
+
+  @override
+  String get aprSort => 'APR';
+
+  @override
+  String get commissionSort => 'Комиссия';
+
+  @override
+  String get tvlSort => 'TVL';
+
+  @override
+  String claimButton(String amount) {
+    return 'Забрать ($amount ZIL)';
+  }
+
+  @override
+  String get stakeButton => 'Стейкать';
+
+  @override
+  String get unstakeButton => 'Анстейк';
+
+  @override
+  String get aprLabel => 'APR';
+
+  @override
+  String get commissionLabel => 'Комиссия';
+
+  @override
+  String get tvlLabel => 'TVL';
+
+  @override
+  String get lpStakingBadge => 'LP Стейкинг';
 }

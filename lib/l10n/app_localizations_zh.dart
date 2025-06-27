@@ -1552,4 +1552,42 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get transactionHistoryDescription => '在地址簿中显示来自交易历史的地址。';
+
+  @override
+  String get zilStakePageTitle => 'Zilliqa 质押';
+
+  @override
+  String get noStakingPoolsFound => '未找到质押池';
+
+  @override
+  String get aprSort => '年化率';
+
+  @override
+  String get commissionSort => '佣金';
+
+  @override
+  String get tvlSort => '总锁仓价值';
+
+  @override
+  String claimButton(String amount) {
+    return '领取 ($amount ZIL)';
+  }
+
+  @override
+  String get stakeButton => '质押';
+
+  @override
+  String get unstakeButton => '取消质押';
+
+  @override
+  String get aprLabel => '年化率';
+
+  @override
+  String get commissionLabel => '佣金';
+
+  @override
+  String get tvlLabel => '总锁仓价值';
+
+  @override
+  String get lpStakingBadge => 'LP 质押';
 }

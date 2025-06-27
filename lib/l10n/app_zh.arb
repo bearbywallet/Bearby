@@ -571,5 +571,18 @@
   "addLedgerAccountPageNoWalletSelectedError": "未选择钱包",
 
   "transactionHistoryTitle": "交易历史",
-  "transactionHistoryDescription": "在地址簿中显示来自交易历史的地址。"
+  "transactionHistoryDescription": "在地址簿中显示来自交易历史的地址。",
+
+  "zilStakePageTitle": "Zilliqa 质押",
+  "noStakingPoolsFound": "未找到质押池",
+  "aprSort": "年化率",
+  "commissionSort": "佣金",
+  "tvlSort": "总锁仓价值",
+  "claimButton": "领取 ({amount} ZIL)",
+  "stakeButton": "质押",
+  "unstakeButton": "取消质押",
+  "aprLabel": "年化率",
+  "commissionLabel": "佣金",
+  "tvlLabel": "总锁仓价值",
+  "lpStakingBadge": "LP 质押"
 }

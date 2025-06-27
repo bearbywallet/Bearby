@@ -1552,4 +1552,42 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get transactionHistoryDescription => 'アドレス帳に取引履歴からのアドレスを表示します。';
+
+  @override
+  String get zilStakePageTitle => 'Zilliqa ステーキング';
+
+  @override
+  String get noStakingPoolsFound => 'ステーキングプールが見つかりません';
+
+  @override
+  String get aprSort => 'APR';
+
+  @override
+  String get commissionSort => '手数料';
+
+  @override
+  String get tvlSort => 'TVL';
+
+  @override
+  String claimButton(String amount) {
+    return '請求 ($amount ZIL)';
+  }
+
+  @override
+  String get stakeButton => 'ステーク';
+
+  @override
+  String get unstakeButton => 'アンステーク';
+
+  @override
+  String get aprLabel => 'APR';
+
+  @override
+  String get commissionLabel => '手数料';
+
+  @override
+  String get tvlLabel => 'TVL';
+
+  @override
+  String get lpStakingBadge => 'LP ステーキング';
 }

@@ -591,5 +591,18 @@
   "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません",
 
   "transactionHistoryTitle": "取引履歴",
-  "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。"
+  "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。",
+
+  "zilStakePageTitle": "Zilliqa ステーキング",
+  "noStakingPoolsFound": "ステーキングプールが見つかりません",
+  "aprSort": "APR",
+  "commissionSort": "手数料",
+  "tvlSort": "TVL",
+  "claimButton": "請求 ({amount} ZIL)",
+  "stakeButton": "ステーク",
+  "unstakeButton": "アンステーク",
+  "aprLabel": "APR",
+  "commissionLabel": "手数料",
+  "tvlLabel": "TVL",
+  "lpStakingBadge": "LP ステーキング"
 }

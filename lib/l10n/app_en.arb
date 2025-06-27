@@ -2186,5 +2186,59 @@
   "transactionHistoryDescription": "Show addresses from transaction history in the address book.",
   "@transactionHistoryDescription": {
     "description": "Description for the toggle that enables displaying transaction history addresses in the address book."
+  },
+
+    "zilStakePageTitle": "Zilliqa Staking",
+  "@zilStakePageTitle": {
+    "description": "Title for the Zilliqa Staking page"
+  },
+  "noStakingPoolsFound": "No Staking Pools Found",
+  "@noStakingPoolsFound": {
+    "description": "Message displayed when no staking pools are available"
+  },
+  "aprSort": "APR",
+  "@aprSort": {
+    "description": "Label for sorting by Annual Percentage Rate"
+  },
+  "commissionSort": "Commission",
+  "@commissionSort": {
+    "description": "Label for sorting by Commission"
+  },
+  "tvlSort": "TVL",
+  "@tvlSort": {
+    "description": "Label for sorting by Total Value Locked"
+  },
+  "claimButton": "Claim ({amount} ZIL)",
+  "@claimButton": {
+    "description": "Text for the claim rewards button",
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "stakeButton": "Stake",
+  "@stakeButton": {
+    "description": "Text for the stake button"
+  },
+  "unstakeButton": "Unstake",
+  "@unstakeButton": {
+    "description": "Text for the unstake button"
+  },
+  "aprLabel": "APR",
+  "@aprLabel": {
+    "description": "Label for APR in the staking pool card"
+  },
+  "commissionLabel": "Commission",
+  "@commissionLabel": {
+    "description": "Label for Commission in the staking pool card"
+  },
+  "tvlLabel": "TVL",
+  "@tvlLabel": {
+    "description": "Label for TVL in the staking pool card"
+  },
+  "lpStakingBadge": "LP Staking",
+  "@lpStakingBadge": {
+    "description": "Badge text for liquidity pool staking"
   }
 }

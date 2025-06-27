@@ -8,14 +8,16 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/linear_refresh_indicator.dart';
+import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
-enum SortType { apr, commission, tvl }
+enum SortType { apr, commission, tvl, votePower }
 
 class ZilStakePage extends StatefulWidget {
   const ZilStakePage({super.key});
@@ -37,7 +39,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
   }
 
   Future<void> _fetchStakes({bool isRefresh = false}) async {
-    if (!isRefresh) {
+    if (!isRefresh && mounted) {
       setState(() {
         _isLoading = true;
         _errorMessage = null;
@@ -73,6 +75,12 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
   void _sortStakes() {
     _stakes.sort((a, b) {
+      bool aIsAvely = a.name.toLowerCase().contains('avely');
+      bool bIsAvely = b.name.toLowerCase().contains('avely');
+
+      if (aIsAvely && !bIsAvely) return -1;
+      if (!aIsAvely && bIsAvely) return 1;
+
       switch (_sortType) {
         case SortType.apr:
           return (b.apr ?? 0).compareTo(a.apr ?? 0);
@@ -80,6 +88,8 @@ class _ZilStakePageState extends State<ZilStakePage> {
           return (a.commission ?? 0).compareTo(b.commission ?? 0);
         case SortType.tvl:
           return (b.tvl ?? BigInt.zero).compareTo(a.tvl ?? BigInt.zero);
+        case SortType.votePower:
+          return (b.votePower ?? 0).compareTo(a.votePower ?? 0);
       }
     });
   }
@@ -95,7 +105,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
     Widget buildContent() {
       if (_isLoading) {
-        return const Center(child: CircularProgressIndicator());
+        return _buildSkeletonLoading(theme, adaptivePadding, isIOS);
       }
 
       if (_errorMessage != null) {
@@ -127,7 +137,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
               ),
               const SizedBox(height: 24),
               Text(
-                'No Staking Pools Found',
+                l10n.noStakingPoolsFound,
                 style: TextStyle(
                   color: theme.textPrimary,
                   fontSize: 24,
@@ -167,7 +177,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
               vertical: 8,
             ),
             sliver: SliverToBoxAdapter(
-              child: _buildSortButtons(theme),
+              child: _buildSortButtons(theme, l10n),
             ),
           ),
           SliverPadding(
@@ -221,13 +231,228 @@ class _ZilStakePageState extends State<ZilStakePage> {
     );
   }
 
-  Widget _buildSortButtons(AppTheme theme) {
+  Widget _buildSkeletonLoading(
+      AppTheme theme, double adaptivePadding, bool isIOS) {
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        if (isIOS)
+          CupertinoSliverRefreshControl(
+            onRefresh: () => _fetchStakes(isRefresh: true),
+            builder: (
+              BuildContext context,
+              RefreshIndicatorMode refreshState,
+              double pulledExtent,
+              double refreshTriggerPullDistance,
+              double refreshIndicatorExtent,
+            ) {
+              return LinearRefreshIndicator(
+                pulledExtent: pulledExtent,
+                refreshTriggerPullDistance: refreshTriggerPullDistance,
+                refreshIndicatorExtent: refreshIndicatorExtent,
+              );
+            },
+          ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(
+            horizontal: adaptivePadding,
+            vertical: 8,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: _buildSkeletonSortButtons(theme),
+          ),
+        ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            adaptivePadding,
+            8,
+            adaptivePadding,
+            adaptivePadding,
+          ),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _buildSkeletonStakingPoolCard(theme),
+                );
+              },
+              childCount: 3,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSkeletonSortButtons(AppTheme theme) {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      physics: const BouncingScrollPhysics(),
+      child: Row(
+        children: List.generate(4, (index) {
+          return Padding(
+            padding: const EdgeInsets.only(right: 8.0),
+            child: Container(
+              width: 80,
+              height: 32,
+              decoration: BoxDecoration(
+                color: theme.textSecondary.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+            ),
+          );
+        }),
+      ),
+    );
+  }
+
+  Widget _buildSkeletonStakingPoolCard(AppTheme theme) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.textSecondary.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Row(
+                  children: [
+                    Container(
+                      width: 48,
+                      height: 48,
+                      decoration: BoxDecoration(
+                        color: theme.textSecondary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 120,
+                            height: 18,
+                            decoration: BoxDecoration(
+                              color: theme.textSecondary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Container(
+                            width: 60,
+                            height: 14,
+                            decoration: BoxDecoration(
+                              color: theme.textSecondary.withValues(alpha: 0.1),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: List.generate(4, (index) {
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 40,
+                          height: 12,
+                          decoration: BoxDecoration(
+                            color: theme.textSecondary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Container(
+                          width: 60,
+                          height: 16,
+                          decoration: BoxDecoration(
+                            color: theme.textSecondary.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                ),
+              ],
+            ),
+          ),
+          Container(
+            decoration: BoxDecoration(
+              border: Border(
+                top: BorderSide(
+                  color: theme.textSecondary.withValues(alpha: 0.1),
+                ),
+              ),
+            ),
+            padding: const EdgeInsets.all(16),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Expanded(
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: theme.textSecondary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
+                Expanded(
+                  child: Container(
+                    height: 44,
+                    decoration: BoxDecoration(
+                      color: theme.textSecondary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSortButtons(AppTheme theme, AppLocalizations l10n) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
         children: SortType.values.map((type) {
           final isSelected = _sortType == type;
+          String label;
+          switch (type) {
+            case SortType.apr:
+              label = l10n.aprSort;
+              break;
+            case SortType.commission:
+              label = l10n.commissionSort;
+              break;
+            case SortType.tvl:
+              label = l10n.tvlSort;
+              break;
+            case SortType.votePower:
+              label = "VP";
+              break;
+          }
           return Padding(
             padding: const EdgeInsets.only(right: 8.0),
             child: GestureDetector(
@@ -251,7 +476,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
                   ),
                 ),
                 child: Text(
-                  describeEnum(type).toUpperCase(),
+                  label.toUpperCase(),
                   style: TextStyle(
                     color: isSelected ? theme.buttonText : theme.textPrimary,
                     fontSize: 12,
@@ -280,7 +505,7 @@ class StakingPoolCard extends StatelessWidget {
     final hasRewards = double.tryParse(stake.rewards.replaceAll(',', ''))! > 0;
     final hasDelegation =
         double.tryParse(stake.delegAmt.replaceAll(',', ''))! > 0;
-    final isLP = stake.tokenAddress != null;
+    final isLP = stake.tokenAddress == zeroEVM;
 
     return Container(
       decoration: BoxDecoration(
@@ -296,9 +521,9 @@ class StakingPoolCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                _buildCardHeader(theme, isLP),
+                _buildCardHeader(theme, isLP, l10n),
                 const SizedBox(height: 16),
-                _buildStatsRow(theme, l10n),
+                _buildStatsRow(theme, l10n, appState),
               ],
             ),
           ),
@@ -317,7 +542,7 @@ class StakingPoolCard extends StatelessWidget {
                 if (hasRewards)
                   Expanded(
                     child: CustomButton(
-                      text: '${l10n.claimButton} (${stake.rewards} ZIL)',
+                      text: l10n.claimButton(stake.rewards),
                       onPressed: () {},
                       textColor: theme.buttonText,
                       backgroundColor: theme.success,
@@ -345,7 +570,7 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildCardHeader(AppTheme theme, bool isLP) {
+  Widget _buildCardHeader(AppTheme theme, bool isLP, AppLocalizations l10n) {
     return Row(
       children: [
         AsyncImage(
@@ -396,7 +621,7 @@ class StakingPoolCard extends StatelessWidget {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   child: Text(
-                    'LP Staking',
+                    l10n.lpStakingBadge,
                     style: TextStyle(
                       color: theme.primaryPurple,
                       fontSize: 10,
@@ -412,16 +637,22 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsRow(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildStatsRow(
+      AppTheme theme, AppLocalizations l10n, AppState appState) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         _buildStatItem(
+            theme,
+            "VP",
+            '${stake.votePower?.toStringAsFixed(2) ?? 0}%',
+            theme.primaryPurple),
+        _buildStatItem(
             theme, l10n.aprLabel, '${stake.apr ?? 0}%', theme.success),
         _buildStatItem(theme, l10n.commissionLabel, '${stake.commission ?? 0}%',
             theme.warning),
-        _buildStatItem(
-            theme, l10n.tvlLabel, _formatTvl(stake.tvl), theme.textPrimary),
+        _buildStatItem(theme, l10n.tvlLabel, _formatTvl(stake.tvl, appState),
+            theme.textPrimary),
       ],
     );
   }
@@ -452,18 +683,31 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  String _formatTvl(BigInt? tvl) {
+  String _formatTvl(BigInt? tvl, AppState appState) {
     if (tvl == null) return 'N/A';
-    final tvlDouble = tvl.toDouble();
-    if (tvlDouble >= 1e12) {
-      return '${(tvlDouble / 1e12).toStringAsFixed(2)}T';
-    } else if (tvlDouble >= 1e9) {
-      return '${(tvlDouble / 1e9).toStringAsFixed(2)}B';
-    } else if (tvlDouble >= 1e6) {
-      return '${(tvlDouble / 1e6).toStringAsFixed(2)}M';
-    } else if (tvlDouble >= 1e3) {
-      return '${(tvlDouble / 1e3).toStringAsFixed(1)}K';
-    }
-    return tvl.toString();
+
+    String symbol = "ZIL";
+    int decimals = 18;
+    double rate = 0;
+
+    try {
+      final nativeToken = appState.wallet?.tokens
+          .firstWhere((t) => t.native && t.addrType == 0);
+      if (nativeToken != null) {
+        decimals = nativeToken.decimals;
+        symbol = nativeToken.symbol;
+        rate = nativeToken.rate;
+      }
+    } catch (_) {}
+
+    final (formattedValue, _) = formatingAmount(
+      amount: tvl,
+      symbol: symbol,
+      decimals: decimals,
+      rate: rate,
+      appState: appState,
+    );
+
+    return formattedValue.split(' ')[0];
   }
 }

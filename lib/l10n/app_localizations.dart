@@ -3128,6 +3128,78 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Show addresses from transaction history in the address book.'**
   String get transactionHistoryDescription;
+
+  /// Title for the Zilliqa Staking page
+  ///
+  /// In en, this message translates to:
+  /// **'Zilliqa Staking'**
+  String get zilStakePageTitle;
+
+  /// Message displayed when no staking pools are available
+  ///
+  /// In en, this message translates to:
+  /// **'No Staking Pools Found'**
+  String get noStakingPoolsFound;
+
+  /// Label for sorting by Annual Percentage Rate
+  ///
+  /// In en, this message translates to:
+  /// **'APR'**
+  String get aprSort;
+
+  /// Label for sorting by Commission
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get commissionSort;
+
+  /// Label for sorting by Total Value Locked
+  ///
+  /// In en, this message translates to:
+  /// **'TVL'**
+  String get tvlSort;
+
+  /// Text for the claim rewards button
+  ///
+  /// In en, this message translates to:
+  /// **'Claim ({amount} ZIL)'**
+  String claimButton(String amount);
+
+  /// Text for the stake button
+  ///
+  /// In en, this message translates to:
+  /// **'Stake'**
+  String get stakeButton;
+
+  /// Text for the unstake button
+  ///
+  /// In en, this message translates to:
+  /// **'Unstake'**
+  String get unstakeButton;
+
+  /// Label for APR in the staking pool card
+  ///
+  /// In en, this message translates to:
+  /// **'APR'**
+  String get aprLabel;
+
+  /// Label for Commission in the staking pool card
+  ///
+  /// In en, this message translates to:
+  /// **'Commission'**
+  String get commissionLabel;
+
+  /// Label for TVL in the staking pool card
+  ///
+  /// In en, this message translates to:
+  /// **'TVL'**
+  String get tvlLabel;
+
+  /// Badge text for liquidity pool staking
+  ///
+  /// In en, this message translates to:
+  /// **'LP Staking'**
+  String get lpStakingBadge;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

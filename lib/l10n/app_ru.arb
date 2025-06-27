@@ -587,5 +587,18 @@
   "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран",
 
   "transactionHistoryTitle": "История транзакций",
-  "transactionHistoryDescription": "Показывать адреса из истории транзакций"
+  "transactionHistoryDescription": "Показывать адреса из истории транзакций",
+
+  "zilStakePageTitle": "Стейкинг Zilliqa",
+  "noStakingPoolsFound": "Пулы для стейкинга не найдены",
+  "aprSort": "APR",
+  "commissionSort": "Комиссия",
+  "tvlSort": "TVL",
+  "claimButton": "Забрать ({amount} ZIL)",
+  "stakeButton": "Стейкать",
+  "unstakeButton": "Анстейк",
+  "aprLabel": "APR",
+  "commissionLabel": "Комиссия",
+  "tvlLabel": "TVL",
+  "lpStakingBadge": "LP Стейкинг"
 }

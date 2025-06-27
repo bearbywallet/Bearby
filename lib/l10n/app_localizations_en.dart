@@ -1552,4 +1552,42 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get transactionHistoryDescription => 'Show addresses from transaction history in the address book.';
+
+  @override
+  String get zilStakePageTitle => 'Zilliqa Staking';
+
+  @override
+  String get noStakingPoolsFound => 'No Staking Pools Found';
+
+  @override
+  String get aprSort => 'APR';
+
+  @override
+  String get commissionSort => 'Commission';
+
+  @override
+  String get tvlSort => 'TVL';
+
+  @override
+  String claimButton(String amount) {
+    return 'Claim ($amount ZIL)';
+  }
+
+  @override
+  String get stakeButton => 'Stake';
+
+  @override
+  String get unstakeButton => 'Unstake';
+
+  @override
+  String get aprLabel => 'APR';
+
+  @override
+  String get commissionLabel => 'Commission';
+
+  @override
+  String get tvlLabel => 'TVL';
+
+  @override
+  String get lpStakingBadge => 'LP Staking';
 }
