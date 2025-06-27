@@ -71,7 +71,8 @@ class MainPageState extends State<MainPage> {
 
     return Scaffold(
       extendBody: true,
-      body: _pages.elementAt(_selectedIndex),
+      body: SafeArea(
+          top: true, bottom: false, child: _pages.elementAt(_selectedIndex)),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
@@ -79,15 +80,16 @@ class MainPageState extends State<MainPage> {
         toolbarHeight: 0,
         systemOverlayStyle: overlayStyle,
       ),
-      bottomNavigationBar: CustomBottomNavigationBar(
-        items: [
-          CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),
-          CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
-          // CustomBottomNavigationBarItem(iconPath: 'assets/icons/ai.svg'),
-          CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
+      bottomNavigationBar: SafeArea(
+        child: CustomBottomNavigationBar(
+          items: [
+            CustomBottomNavigationBarItem(iconPath: 'assets/icons/wallet.svg'),
+            CustomBottomNavigationBarItem(iconPath: 'assets/icons/history.svg'),
+            CustomBottomNavigationBarItem(iconPath: 'assets/icons/nav.svg'),
+          ],
+          currentIndex: _selectedIndex,
+          onTap: _onItemTapped,
+        ),
       ),
     );
   }
