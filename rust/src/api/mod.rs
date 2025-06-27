@@ -8,6 +8,7 @@ pub mod methods;
 pub mod provider;
 pub mod qrcode;
 pub mod settings;
+pub mod stake;
 pub mod token;
 pub mod transaction;
 pub mod utils;
