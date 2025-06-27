@@ -1,473 +1,261 @@
+import 'dart:async';
+import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/components/linear_refresh_indicator.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/src/rust/api/stake.dart';
+import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 
-enum StakingType { liquid, regular }
+enum SortType { apr, commission, tvl }
 
-enum SortType { vp, apr, commission, uptime }
-
-class StakingPool {
-  final String name;
-  final String token;
-  final String iconUrl;
-  final double vp;
-  final double commission;
-  final double apr;
-  final double minStake;
-  final bool isLiquid;
-  final String description;
-  final double uptime;
-
-  StakingPool({
-    required this.name,
-    required this.token,
-    required this.iconUrl,
-    required this.vp,
-    required this.commission,
-    required this.apr,
-    required this.minStake,
-    required this.isLiquid,
-    required this.description,
-    required this.uptime,
-  });
-}
-
-class ZilStakePage extends StatelessWidget {
+class ZilStakePage extends StatefulWidget {
   const ZilStakePage({super.key});
 
   @override
-  Widget build(BuildContext context) {
-    final appState = Provider.of<AppState>(context);
-    final theme = appState.currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-
-    return DefaultTabController(
-      length: 3,
-      child: Scaffold(
-        backgroundColor: theme.background,
-        body: SafeArea(
-          child: Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 480),
-              child: Column(
-                children: [
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    child: CustomAppBar(
-                      title: '',
-                      onBackPressed: () => Navigator.pop(context),
-                    ),
-                  ),
-                  Container(
-                    margin: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                    decoration: BoxDecoration(
-                      color: theme.cardBackground,
-                      borderRadius: BorderRadius.circular(16),
-                    ),
-                    child: TabBar(
-                      labelColor: theme.textPrimary,
-                      unselectedLabelColor: theme.textSecondary,
-                      indicatorColor: theme.primaryPurple,
-                      indicatorSize: TabBarIndicatorSize.tab,
-                      dividerColor: Colors.transparent,
-                      indicator: BoxDecoration(
-                        color: theme.primaryPurple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      labelStyle: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
-                      unselectedLabelStyle: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w500,
-                      ),
-                      tabs: const [
-                        Tab(text: 'Stake'),
-                        Tab(text: 'Unstake'),
-                        Tab(text: 'Migrate'),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                  Expanded(
-                    child: TabBarView(
-                      children: [
-                        StakeTab(),
-                        _buildComingSoonTab(theme, 'Unstake'),
-                        _buildComingSoonTab(theme, 'Migrate'),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildComingSoonTab(theme, String feature) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/anchor.svg',
-            width: 80,
-            height: 80,
-            colorFilter: ColorFilter.mode(
-              theme.textSecondary.withValues(alpha: 0.3),
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            '$feature Coming Soon',
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'This feature is under development',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  State<ZilStakePage> createState() => _ZilStakePageState();
 }
 
-class StakeTab extends StatefulWidget {
+class _ZilStakePageState extends State<ZilStakePage> {
+  List<FinalOutputInfo> _stakes = [];
+  bool _isLoading = true;
+  String? _errorMessage;
+  SortType _sortType = SortType.apr;
+
   @override
-  _StakeTabState createState() => _StakeTabState();
-}
+  void initState() {
+    super.initState();
+    _fetchStakes();
+  }
 
-class _StakeTabState extends State<StakeTab> {
-  StakingType selectedType = StakingType.liquid;
-  SortType currentSort = SortType.vp;
+  Future<void> _fetchStakes({bool isRefresh = false}) async {
+    if (!isRefresh) {
+      setState(() {
+        _isLoading = true;
+        _errorMessage = null;
+      });
+    }
 
-  final List<StakingPool> pools = [
-    StakingPool(
-      name: 'Luganodes',
-      token: 'LNZIL',
-      iconUrl: 'https://stake.zilliqa.com/assets/luganodes.png',
-      vp: 2.07,
-      commission: 10,
-      apr: 14.2,
-      minStake: 1000,
-      isLiquid: true,
-      description: 'Liquid staking with instant rewards',
-      uptime: 99.8,
-    ),
-    StakingPool(
-      name: 'PlunderSwap',
-      token: 'pZIL',
-      iconUrl: 'https://stake.zilliqa.com/assets/plunderswap.png',
-      vp: 2.04,
-      commission: 8,
-      apr: 15.1,
-      minStake: 500,
-      isLiquid: true,
-      description: 'DeFi-integrated liquid staking',
-      uptime: 99.5,
-    ),
-    StakingPool(
-      name: 'stZIL Protocol',
-      token: 'stZIL',
-      iconUrl: 'https://stake.zilliqa.com/assets/stzil.png',
-      vp: 1.89,
-      commission: 8,
-      apr: 14.8,
-      minStake: 250,
-      isLiquid: true,
-      description: 'Community-driven liquid staking',
-      uptime: 99.9,
-    ),
-    StakingPool(
-      name: 'ZilPool',
-      token: 'ZILP',
-      iconUrl: 'https://stake.zilliqa.com/assets/zilpool.png',
-      vp: 1.95,
-      commission: 12,
-      apr: 13.5,
-      minStake: 100,
-      isLiquid: true,
-      description: 'Low barrier liquid staking',
-      uptime: 99.3,
-    ),
-    StakingPool(
-      name: 'ZilPay Validator',
-      token: 'ZIL',
-      iconUrl: 'https://stake.zilliqa.com/assets/zilpay.png',
-      vp: 3.25,
-      commission: 5,
-      apr: 16.2,
-      minStake: 10000,
-      isLiquid: false,
-      description: 'Traditional validator staking',
-      uptime: 99.95,
-    ),
-    StakingPool(
-      name: 'Moonlet Validator',
-      token: 'ZIL',
-      iconUrl: 'https://stake.zilliqa.com/assets/moonlet.png',
-      vp: 2.85,
-      commission: 7,
-      apr: 15.8,
-      minStake: 10000,
-      isLiquid: false,
-      description: 'Enterprise-grade validator',
-      uptime: 99.7,
-    ),
-  ];
-
-  Future<void> _onRefresh() async {
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Pools updated successfully'),
-          backgroundColor: Provider.of<AppState>(context, listen: false)
-              .currentTheme
-              .success,
-          behavior: SnackBarBehavior.floating,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(12),
-          ),
-          margin: const EdgeInsets.all(16),
-          duration: const Duration(seconds: 2),
-        ),
+    try {
+      final appState = Provider.of<AppState>(context, listen: false);
+      final list = await getStakes(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
       );
+
+      if (mounted) {
+        setState(() {
+          _stakes = list;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = e.toString();
+        });
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 
+  void _sortStakes() {
+    _stakes.sort((a, b) {
+      switch (_sortType) {
+        case SortType.apr:
+          return (b.apr ?? 0).compareTo(a.apr ?? 0);
+        case SortType.commission:
+          return (a.commission ?? 0).compareTo(b.commission ?? 0);
+        case SortType.tvl:
+          return (b.tvl ?? BigInt.zero).compareTo(a.tvl ?? BigInt.zero);
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    _sortStakes();
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final l10n = AppLocalizations.of(context)!;
 
-    List<StakingPool> filteredPools = pools
-        .where((pool) => pool.isLiquid == (selectedType == StakingType.liquid))
-        .toList();
-
-    filteredPools.sort((a, b) {
-      switch (currentSort) {
-        case SortType.vp:
-          return b.vp.compareTo(a.vp);
-        case SortType.apr:
-          return b.apr.compareTo(a.apr);
-        case SortType.commission:
-          return a.commission.compareTo(b.commission);
-        case SortType.uptime:
-          return b.uptime.compareTo(a.uptime);
+    Widget buildContent() {
+      if (_isLoading) {
+        return const Center(child: CircularProgressIndicator());
       }
-    });
 
-    return Padding(
-      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          _buildStakingTypeSelector(theme),
-          const SizedBox(height: 16),
-          _buildSortOptions(theme),
-          const SizedBox(height: 16),
-          Expanded(
-            child: filteredPools.isEmpty
-                ? _buildEmptyState(theme)
-                : RefreshIndicator(
-                    onRefresh: _onRefresh,
-                    color: theme.primaryPurple,
-                    backgroundColor: theme.cardBackground,
-                    child: ListView.builder(
-                      physics: const AlwaysScrollableScrollPhysics(
-                        parent: BouncingScrollPhysics(),
-                      ),
-                      itemCount: filteredPools.length,
-                      itemBuilder: (context, index) {
-                        final pool = filteredPools[index];
-                        return Padding(
-                          padding: const EdgeInsets.only(bottom: 12),
-                          child: StakingPoolCard(pool: pool),
-                        );
-                      },
-                    ),
-                  ),
+      if (_errorMessage != null) {
+        return Center(
+          child: Padding(
+            padding: const EdgeInsets.all(20),
+            child: Text(
+              'Error: $_errorMessage',
+              style: TextStyle(color: theme.danger),
+              textAlign: TextAlign.center,
+            ),
+          ),
+        );
+      }
+
+      if (_stakes.isEmpty) {
+        return Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SvgPicture.asset(
+                'assets/icons/anchor.svg',
+                width: 80,
+                height: 80,
+                colorFilter: ColorFilter.mode(
+                  theme.textSecondary.withValues(alpha: 0.3),
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(height: 24),
+              Text(
+                'No Staking Pools Found',
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ],
+          ),
+        );
+      }
+
+      return CustomScrollView(
+        physics: const AlwaysScrollableScrollPhysics(
+          parent: BouncingScrollPhysics(),
+        ),
+        slivers: [
+          if (isIOS)
+            CupertinoSliverRefreshControl(
+              onRefresh: () => _fetchStakes(isRefresh: true),
+              builder: (
+                BuildContext context,
+                RefreshIndicatorMode refreshState,
+                double pulledExtent,
+                double refreshTriggerPullDistance,
+                double refreshIndicatorExtent,
+              ) {
+                return LinearRefreshIndicator(
+                  pulledExtent: pulledExtent,
+                  refreshTriggerPullDistance: refreshTriggerPullDistance,
+                  refreshIndicatorExtent: refreshIndicatorExtent,
+                );
+              },
+            ),
+          SliverPadding(
+            padding: EdgeInsets.symmetric(
+              horizontal: adaptivePadding,
+              vertical: 8,
+            ),
+            sliver: SliverToBoxAdapter(
+              child: _buildSortButtons(theme),
+            ),
+          ),
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              adaptivePadding,
+              8,
+              adaptivePadding,
+              adaptivePadding,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: StakingPoolCard(stake: _stakes[index]),
+                  );
+                },
+                childCount: _stakes.length,
+              ),
+            ),
           ),
         ],
-      ),
-    );
-  }
+      );
+    }
 
-  Widget _buildStakingTypeSelector(theme) {
-    return Container(
-      padding: const EdgeInsets.all(4),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.2),
+    return Scaffold(
+      backgroundColor: theme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: CustomAppBar(
+                title: l10n.zilStakePageTitle,
+                onBackPressed: () => Navigator.pop(context),
+              ),
+            ),
+            Expanded(
+              child: isIOS
+                  ? buildContent()
+                  : RefreshIndicator(
+                      onRefresh: () => _fetchStakes(isRefresh: true),
+                      color: theme.primaryPurple,
+                      backgroundColor: theme.cardBackground,
+                      child: buildContent(),
+                    ),
+            ),
+          ],
         ),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => selectedType = StakingType.liquid),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: selectedType == StakingType.liquid
-                      ? theme.primaryPurple
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/currency.svg',
-                      width: 16,
-                      height: 16,
-                      colorFilter: ColorFilter.mode(
-                        selectedType == StakingType.liquid
-                            ? theme.buttonText
-                            : theme.textSecondary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Liquid Staking',
-                      style: TextStyle(
-                        color: selectedType == StakingType.liquid
-                            ? theme.buttonText
-                            : theme.textSecondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: GestureDetector(
-              onTap: () => setState(() => selectedType = StakingType.regular),
-              child: Container(
-                padding: const EdgeInsets.symmetric(vertical: 12),
-                decoration: BoxDecoration(
-                  color: selectedType == StakingType.regular
-                      ? theme.primaryPurple
-                      : Colors.transparent,
-                  borderRadius: BorderRadius.circular(8),
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SvgPicture.asset(
-                      'assets/icons/anchor.svg',
-                      width: 16,
-                      height: 16,
-                      colorFilter: ColorFilter.mode(
-                        selectedType == StakingType.regular
-                            ? theme.buttonText
-                            : theme.textSecondary,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Regular Staking',
-                      style: TextStyle(
-                        color: selectedType == StakingType.regular
-                            ? theme.buttonText
-                            : theme.textSecondary,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-          ),
-        ],
-      ),
     );
   }
 
-  Widget _buildSortOptions(theme) {
+  Widget _buildSortButtons(AppTheme theme) {
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       physics: const BouncingScrollPhysics(),
       child: Row(
-        children: SortType.values.asMap().entries.map((entry) {
-          final int index = entry.key;
-          final SortType type = entry.value;
-
-          String label;
-          switch (type) {
-            case SortType.vp:
-              label = 'VP';
-              break;
-            case SortType.apr:
-              label = 'APR';
-              break;
-            case SortType.commission:
-              label = 'Commission';
-              break;
-            case SortType.uptime:
-              label = 'Uptime';
-              break;
-          }
-
-          final bool isSelected = currentSort == type;
-
+        children: SortType.values.map((type) {
+          final isSelected = _sortType == type;
           return Padding(
-            padding: EdgeInsets.only(
-              right: index < SortType.values.length - 1 ? 24 : 0,
-            ),
+            padding: const EdgeInsets.only(right: 8.0),
             child: GestureDetector(
-              onTap: () => setState(() => currentSort = type),
-              child: Container(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 8,
+              onTap: () {
+                if (_sortType != type) {
+                  setState(() => _sortType = type);
+                }
+              },
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 200),
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                decoration: BoxDecoration(
+                  color:
+                      isSelected ? theme.primaryPurple : theme.cardBackground,
+                  borderRadius: BorderRadius.circular(20),
+                  border: Border.all(
+                    color: isSelected
+                        ? Colors.transparent
+                        : theme.textSecondary.withValues(alpha: 0.2),
+                  ),
                 ),
-                decoration: isSelected
-                    ? BoxDecoration(
-                        color: theme.primaryPurple.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: theme.primaryPurple,
-                          width: 1,
-                        ),
-                      )
-                    : null,
                 child: Text(
-                  label,
+                  describeEnum(type).toUpperCase(),
                   style: TextStyle(
-                    color:
-                        isSelected ? theme.primaryPurple : theme.textSecondary,
-                    fontSize: 14,
-                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? theme.buttonText : theme.textPrimary,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -477,54 +265,22 @@ class _StakeTabState extends State<StakeTab> {
       ),
     );
   }
-
-  Widget _buildEmptyState(theme) {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/anchor.svg',
-            width: 64,
-            height: 64,
-            colorFilter: ColorFilter.mode(
-              theme.textSecondary.withValues(alpha: 0.3),
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'No pools available',
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 18,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Check back later for new staking opportunities',
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-            ),
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
 }
 
 class StakingPoolCard extends StatelessWidget {
-  final StakingPool pool;
+  final FinalOutputInfo stake;
 
-  const StakingPoolCard({required this.pool});
+  const StakingPoolCard({super.key, required this.stake});
 
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+    final hasRewards = double.tryParse(stake.rewards.replaceAll(',', ''))! > 0;
+    final hasDelegation =
+        double.tryParse(stake.delegAmt.replaceAll(',', ''))! > 0;
+    final isLP = stake.tokenAddress != null;
 
     return Container(
       decoration: BoxDecoration(
@@ -540,134 +296,9 @@ class StakingPoolCard extends StatelessWidget {
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
-                Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: theme.background,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: AsyncImage(
-                        url: pool.iconUrl,
-                        width: 48,
-                        height: 48,
-                        fit: BoxFit.contain,
-                        errorWidget: Container(
-                          decoration: BoxDecoration(
-                            color: theme.primaryPurple.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Icon(
-                            Icons.account_balance,
-                            color: theme.primaryPurple,
-                            size: 24,
-                          ),
-                        ),
-                        loadingWidget: Container(
-                          decoration: BoxDecoration(
-                            color: theme.textSecondary.withValues(alpha: 0.1),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Center(
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            children: [
-                              Expanded(
-                                child: Text(
-                                  pool.name,
-                                  style: TextStyle(
-                                    color: theme.textPrimary,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 8,
-                                  vertical: 4,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: pool.isLiquid
-                                      ? theme.success.withValues(alpha: 0.1)
-                                      : theme.primaryPurple
-                                          .withValues(alpha: 0.1),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: Text(
-                                  pool.token,
-                                  style: TextStyle(
-                                    color: pool.isLiquid
-                                        ? theme.success
-                                        : theme.primaryPurple,
-                                    fontSize: 12,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 4),
-                          Text(
-                            pool.description,
-                            style: TextStyle(
-                              color: theme.textSecondary,
-                              fontSize: 13,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ],
-                ),
+                _buildCardHeader(theme, isLP),
                 const SizedBox(height: 16),
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildStatItem(
-                        theme,
-                        'VP',
-                        '${pool.vp.toStringAsFixed(2)}%',
-                        theme.primaryPurple,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildStatItem(
-                        theme,
-                        'APR',
-                        '${pool.apr.toStringAsFixed(1)}%',
-                        theme.success,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildStatItem(
-                        theme,
-                        'Commission',
-                        '${pool.commission.toStringAsFixed(0)}%',
-                        theme.textSecondary,
-                      ),
-                    ),
-                    Expanded(
-                      child: _buildStatItem(
-                        theme,
-                        'Uptime',
-                        '${pool.uptime.toStringAsFixed(1)}%',
-                        theme.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
+                _buildStatsRow(theme, l10n),
               ],
             ),
           ),
@@ -681,40 +312,30 @@ class StakingPoolCard extends StatelessWidget {
             ),
             padding: const EdgeInsets.all(16),
             child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Min. Stake',
-                        style: TextStyle(
-                          color: theme.textSecondary,
-                          fontSize: 12,
-                        ),
-                      ),
-                      Text(
-                        '${_formatAmount(pool.minStake)} ZIL',
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ],
+                if (hasRewards)
+                  Expanded(
+                    child: CustomButton(
+                      text: '${l10n.claimButton} (${stake.rewards} ZIL)',
+                      onPressed: () {},
+                      textColor: theme.buttonText,
+                      backgroundColor: theme.success,
+                      borderRadius: 12,
+                      height: 44.0,
+                    ),
                   ),
-                ),
-                CustomButton(
-                  text: 'Stake',
-                  onPressed: () {
-                    //
-                  },
-                  textColor: theme.buttonText,
-                  backgroundColor: theme.primaryPurple,
-                  borderRadius: 25.0,
-                  height: 44.0,
-                  width: 80.0,
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                if (hasRewards) const SizedBox(width: 8),
+                Expanded(
+                  child: CustomButton(
+                    text: hasDelegation ? l10n.unstakeButton : l10n.stakeButton,
+                    onPressed: () {},
+                    textColor: theme.buttonText,
+                    backgroundColor:
+                        hasDelegation ? theme.danger : theme.primaryPurple,
+                    borderRadius: 12,
+                    height: 44.0,
+                  ),
                 ),
               ],
             ),
@@ -724,14 +345,97 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatItem(theme, String label, String value, Color valueColor) {
+  Widget _buildCardHeader(AppTheme theme, bool isLP) {
+    return Row(
+      children: [
+        AsyncImage(
+          url: stake.url,
+          width: 48,
+          height: 48,
+          fit: BoxFit.contain,
+          loadingWidget: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: theme.textSecondary.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child:
+                const Center(child: CupertinoActivityIndicator(radius: 10.0)),
+          ),
+          errorWidget: Container(
+            width: 48,
+            height: 48,
+            decoration: BoxDecoration(
+              color: theme.danger.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(Icons.broken_image, color: theme.danger, size: 24),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                stake.name,
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              if (isLP) ...[
+                const SizedBox(height: 4),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: theme.primaryPurple.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    'LP Staking',
+                    style: TextStyle(
+                      color: theme.primaryPurple,
+                      fontSize: 10,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ]
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildStatsRow(AppTheme theme, AppLocalizations l10n) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        _buildStatItem(
+            theme, l10n.aprLabel, '${stake.apr ?? 0}%', theme.success),
+        _buildStatItem(theme, l10n.commissionLabel, '${stake.commission ?? 0}%',
+            theme.warning),
+        _buildStatItem(
+            theme, l10n.tvlLabel, _formatTvl(stake.tvl), theme.textPrimary),
+      ],
+    );
+  }
+
+  Widget _buildStatItem(
+      AppTheme theme, String label, String value, Color valueColor) {
     return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,
           style: TextStyle(
             color: theme.textSecondary,
-            fontSize: 11,
+            fontSize: 12,
             fontWeight: FontWeight.w500,
           ),
         ),
@@ -740,7 +444,7 @@ class StakingPoolCard extends StatelessWidget {
           value,
           style: TextStyle(
             color: valueColor,
-            fontSize: 14,
+            fontSize: 16,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -748,12 +452,18 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  String _formatAmount(double amount) {
-    if (amount >= 1000000) {
-      return '${(amount / 1000000).toStringAsFixed(1)}M';
-    } else if (amount >= 1000) {
-      return '${(amount / 1000).toStringAsFixed(1)}K';
+  String _formatTvl(BigInt? tvl) {
+    if (tvl == null) return 'N/A';
+    final tvlDouble = tvl.toDouble();
+    if (tvlDouble >= 1e12) {
+      return '${(tvlDouble / 1e12).toStringAsFixed(2)}T';
+    } else if (tvlDouble >= 1e9) {
+      return '${(tvlDouble / 1e9).toStringAsFixed(2)}B';
+    } else if (tvlDouble >= 1e6) {
+      return '${(tvlDouble / 1e6).toStringAsFixed(2)}M';
+    } else if (tvlDouble >= 1e3) {
+      return '${(tvlDouble / 1e3).toStringAsFixed(1)}K';
     }
-    return amount.toStringAsFixed(0);
+    return tvl.toString();
   }
 }
