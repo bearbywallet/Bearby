@@ -16,6 +16,7 @@ import 'api/methods.dart';
 import 'api/provider.dart';
 import 'api/qrcode.dart';
 import 'api/settings.dart';
+import 'api/stake.dart';
 import 'api/token.dart';
 import 'api/transaction.dart';
 import 'api/utils.dart';
@@ -34,6 +35,7 @@ import 'models/notification.dart';
 import 'models/provider.dart';
 import 'models/qrcode.dart';
 import 'models/settings.dart';
+import 'models/stake.dart';
 import 'models/transactions/access_list.dart';
 import 'models/transactions/base_token.dart';
 import 'models/transactions/evm.dart';
@@ -136,6 +138,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ConnectionInfo dco_decode_box_autoadd_connection_info(dynamic raw);
 
   @protected
+  double dco_decode_box_autoadd_f_64(dynamic raw);
+
+  @protected
   FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw);
 
   @protected
@@ -203,6 +208,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo dco_decode_f_token_info(dynamic raw);
 
   @protected
+  FinalOutputInfo dco_decode_final_output_info(dynamic raw);
+
+  @protected
   GasFeeHistoryInfo dco_decode_gas_fee_history_info(dynamic raw);
 
   @protected
@@ -244,6 +252,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<FTokenInfo> dco_decode_list_f_token_info(dynamic raw);
+
+  @protected
+  List<FinalOutputInfo> dco_decode_list_final_output_info(dynamic raw);
 
   @protected
   List<HistoricalTransactionInfo> dco_decode_list_historical_transaction_info(
@@ -304,6 +315,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   ColorsInfo? dco_decode_opt_box_autoadd_colors_info(dynamic raw);
+
+  @protected
+  double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
 
   @protected
   TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
@@ -501,6 +515,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
+
+  @protected
   FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer);
 
   @protected
@@ -573,6 +590,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo sse_decode_f_token_info(SseDeserializer deserializer);
 
   @protected
+  FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer);
+
+  @protected
   GasFeeHistoryInfo sse_decode_gas_fee_history_info(
       SseDeserializer deserializer);
 
@@ -620,6 +640,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   List<FTokenInfo> sse_decode_list_f_token_info(SseDeserializer deserializer);
+
+  @protected
+  List<FinalOutputInfo> sse_decode_list_final_output_info(
+      SseDeserializer deserializer);
 
   @protected
   List<HistoricalTransactionInfo> sse_decode_list_historical_transaction_info(
@@ -688,6 +712,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   ColorsInfo? sse_decode_opt_box_autoadd_colors_info(
       SseDeserializer deserializer);
+
+  @protected
+  double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
 
   @protected
   TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
@@ -902,6 +929,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       ConnectionInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_f_token_info(
       FTokenInfo self, SseSerializer serializer);
 
@@ -976,6 +1006,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_f_token_info(FTokenInfo self, SseSerializer serializer);
 
   @protected
+  void sse_encode_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_gas_fee_history_info(
       GasFeeHistoryInfo self, SseSerializer serializer);
 
@@ -1025,6 +1059,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_list_f_token_info(
       List<FTokenInfo> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_final_output_info(
+      List<FinalOutputInfo> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_historical_transaction_info(
@@ -1098,6 +1136,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_colors_info(
       ColorsInfo? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_evm(
