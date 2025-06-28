@@ -30,7 +30,7 @@ class ZilStakePage extends StatefulWidget {
 
 class _ZilStakePageState extends State<ZilStakePage> {
   List<FinalOutputInfo> _stakes = [];
-  FinalOutputInfo? _withdrawalStake;
+  List<FinalOutputInfo> _withdrawalStakes = [];
   List<FinalOutputInfo> _sortedStakes = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -60,11 +60,11 @@ class _ZilStakePageState extends State<ZilStakePage> {
       if (mounted) {
         setState(() {
           _stakes = list;
-          _withdrawalStake = _stakes.firstWhere(
-            (stake) => stake.tag == "withdrawal",
-          );
+          _withdrawalStakes =
+              _stakes.where((stake) => stake.tag == "withdrawal").toList();
           _sortedStakes =
               _stakes.where((stake) => stake.tag != "withdrawal").toList();
+          _errorMessage = null;
         });
       }
     } catch (e) {
@@ -112,123 +112,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final l10n = AppLocalizations.of(context)!;
 
-    Widget buildContent() {
-      if (_isLoading) {
-        return _buildSkeletonLoading(theme, adaptivePadding, isIOS);
-      }
-
-      if (_errorMessage != null) {
-        return Center(
-          child: Padding(
-            padding: const EdgeInsets.all(20),
-            child: Text(
-              'Error: $_errorMessage',
-              style: TextStyle(color: theme.danger),
-              textAlign: TextAlign.center,
-            ),
-          ),
-        );
-      }
-
-      if (_stakes.isEmpty) {
-        return Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SvgPicture.asset(
-                'assets/icons/anchor.svg',
-                width: 80,
-                height: 80,
-                colorFilter: ColorFilter.mode(
-                  theme.textSecondary.withValues(alpha: 0.3),
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                l10n.noStakingPoolsFound,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-            ],
-          ),
-        );
-      }
-
-      return CustomScrollView(
-        physics: const AlwaysScrollableScrollPhysics(
-          parent: BouncingScrollPhysics(),
-        ),
-        slivers: [
-          if (isIOS)
-            CupertinoSliverRefreshControl(
-              onRefresh: () => _fetchStakes(isRefresh: true),
-              builder: (
-                BuildContext context,
-                RefreshIndicatorMode refreshState,
-                double pulledExtent,
-                double refreshTriggerPullDistance,
-                double refreshIndicatorExtent,
-              ) {
-                return LinearRefreshIndicator(
-                  pulledExtent: pulledExtent,
-                  refreshTriggerPullDistance: refreshTriggerPullDistance,
-                  refreshIndicatorExtent: refreshIndicatorExtent,
-                );
-              },
-            ),
-          SliverPadding(
-            padding: EdgeInsets.symmetric(
-              horizontal: adaptivePadding,
-              vertical: 8,
-            ),
-            sliver: SliverToBoxAdapter(
-              child: _buildSortButtons(theme, l10n),
-            ),
-          ),
-          if (_withdrawalStake != null)
-            SliverPadding(
-              padding: EdgeInsets.fromLTRB(
-                adaptivePadding,
-                8,
-                adaptivePadding,
-                12,
-              ),
-              sliver: SliverToBoxAdapter(
-                child: _buildWithdrawalCard(
-                  _withdrawalStake!,
-                  theme,
-                  appState,
-                  l10n,
-                ),
-              ),
-            ),
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              adaptivePadding,
-              _withdrawalStake != null ? 0 : 8,
-              adaptivePadding,
-              adaptivePadding,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: StakingPoolCard(stake: _sortedStakes[index]),
-                  );
-                },
-                childCount: _sortedStakes.length,
-              ),
-            ),
-          ),
-        ],
-      );
-    }
-
     return Scaffold(
       backgroundColor: theme.background,
       body: SafeArea(
@@ -242,17 +125,182 @@ class _ZilStakePageState extends State<ZilStakePage> {
               ),
             ),
             Expanded(
-              child: isIOS
-                  ? buildContent()
-                  : RefreshIndicator(
-                      onRefresh: () => _fetchStakes(isRefresh: true),
-                      color: theme.primaryPurple,
-                      backgroundColor: theme.cardBackground,
-                      child: buildContent(),
-                    ),
+              child: isIOS ? _buildIosBody() : _buildAndroidBody(),
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildIosBody() {
+    return _buildContent();
+  }
+
+  Widget _buildAndroidBody() {
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    return RefreshIndicator(
+      onRefresh: () => _fetchStakes(isRefresh: true),
+      color: theme.primaryPurple,
+      backgroundColor: theme.cardBackground,
+      child: _buildContent(),
+    );
+  }
+
+  Widget _buildContent() {
+    if (_isLoading) {
+      return _buildSkeletonLoading();
+    }
+
+    if (_errorMessage != null) {
+      return _buildErrorState();
+    }
+
+    if (_stakes.isEmpty) {
+      return _buildEmptyState();
+    }
+
+    return _buildStakeList();
+  }
+
+  Widget _buildStakeList() {
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        if (isIOS)
+          CupertinoSliverRefreshControl(
+            onRefresh: () => _fetchStakes(isRefresh: true),
+            builder: (
+              BuildContext context,
+              RefreshIndicatorMode refreshState,
+              double pulledExtent,
+              double refreshTriggerPullDistance,
+              double refreshIndicatorExtent,
+            ) {
+              return LinearRefreshIndicator(
+                pulledExtent: pulledExtent,
+                refreshTriggerPullDistance: refreshTriggerPullDistance,
+                refreshIndicatorExtent: refreshIndicatorExtent,
+              );
+            },
+          ),
+        SliverPadding(
+          padding: EdgeInsets.symmetric(
+            horizontal: adaptivePadding,
+            vertical: 8,
+          ),
+          sliver: SliverToBoxAdapter(
+            child: _buildSortButtons(theme, l10n),
+          ),
+        ),
+        if (_withdrawalStakes.isNotEmpty)
+          SliverPadding(
+            padding: EdgeInsets.fromLTRB(
+              adaptivePadding,
+              8,
+              adaptivePadding,
+              12,
+            ),
+            sliver: SliverList(
+              delegate: SliverChildBuilderDelegate(
+                (context, index) {
+                  return Padding(
+                    padding: const EdgeInsets.only(bottom: 12),
+                    child: _buildWithdrawalCard(
+                        _withdrawalStakes[index], theme, appState, l10n),
+                  );
+                },
+                childCount: _withdrawalStakes.length,
+              ),
+            ),
+          ),
+        SliverPadding(
+          padding: EdgeInsets.fromLTRB(
+            adaptivePadding,
+            _withdrawalStakes.isNotEmpty ? 0 : 8,
+            adaptivePadding,
+            adaptivePadding,
+          ),
+          sliver: SliverList(
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                return Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: StakingPoolCard(stake: _sortedStakes[index]),
+                );
+              },
+              childCount: _sortedStakes.length,
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildErrorState() {
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
+      ),
+      slivers: [
+        if (isIOS)
+          CupertinoSliverRefreshControl(
+            onRefresh: () => _fetchStakes(isRefresh: true),
+          ),
+        SliverFillRemaining(
+          child: Center(
+            child: Padding(
+              padding: EdgeInsets.all(adaptivePadding),
+              child: Text(
+                'Error: $_errorMessage',
+                style: TextStyle(color: theme.danger),
+                textAlign: TextAlign.center,
+              ),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    final theme = Provider.of<AppState>(context).currentTheme;
+    final l10n = AppLocalizations.of(context)!;
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          SvgPicture.asset(
+            'assets/icons/anchor.svg',
+            width: 80,
+            height: 80,
+            colorFilter: ColorFilter.mode(
+              theme.textSecondary.withValues(alpha: 0.3),
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(height: 24),
+          Text(
+            l10n.noStakingPoolsFound,
+            style: TextStyle(
+              color: theme.textPrimary,
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -407,29 +455,17 @@ class _ZilStakePageState extends State<ZilStakePage> {
     );
   }
 
-  Widget _buildSkeletonLoading(
-      AppTheme theme, double adaptivePadding, bool isIOS) {
+  Widget _buildSkeletonLoading() {
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+
     return CustomScrollView(
-      physics: const AlwaysScrollableScrollPhysics(
-        parent: BouncingScrollPhysics(),
-      ),
+      physics: const NeverScrollableScrollPhysics(),
       slivers: [
         if (isIOS)
           CupertinoSliverRefreshControl(
             onRefresh: () => _fetchStakes(isRefresh: true),
-            builder: (
-              BuildContext context,
-              RefreshIndicatorMode refreshState,
-              double pulledExtent,
-              double refreshTriggerPullDistance,
-              double refreshIndicatorExtent,
-            ) {
-              return LinearRefreshIndicator(
-                pulledExtent: pulledExtent,
-                refreshTriggerPullDistance: refreshTriggerPullDistance,
-                refreshIndicatorExtent: refreshIndicatorExtent,
-              );
-            },
           ),
         SliverPadding(
           padding: EdgeInsets.symmetric(

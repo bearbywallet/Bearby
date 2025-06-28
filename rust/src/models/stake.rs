@@ -1,4 +1,4 @@
-use zilpay::{network::zil_stake_parse::FinalOutput, proto::U256};
+use zilpay::network::zil_stake_parse::FinalOutput;
 
 pub struct FinalOutputInfo {
     pub name: String,
