@@ -3717,8 +3717,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FinalOutputInfo dco_decode_final_output_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 11)
-      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return FinalOutputInfo(
       name: dco_decode_String(arr[0]),
       url: dco_decode_String(arr[1]),
@@ -3731,6 +3731,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       apr: dco_decode_opt_box_autoadd_f_64(arr[8]),
       commission: dco_decode_opt_box_autoadd_f_64(arr[9]),
       tag: dco_decode_String(arr[10]),
+      withdrawalBlock: dco_decode_opt_box_autoadd_u_64(arr[11]),
+      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
     );
   }
 
@@ -4920,6 +4922,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_apr = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_tag = sse_decode_String(deserializer);
+    var var_withdrawalBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
     return FinalOutputInfo(
         name: var_name,
         url: var_url,
@@ -4931,7 +4935,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         votePower: var_votePower,
         apr: var_apr,
         commission: var_commission,
-        tag: var_tag);
+        tag: var_tag,
+        withdrawalBlock: var_withdrawalBlock,
+        currentBlock: var_currentBlock);
   }
 
   @protected
@@ -6257,6 +6263,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_f_64(self.apr, serializer);
     sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
     sse_encode_String(self.tag, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.withdrawalBlock, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
   }
 
   @protected

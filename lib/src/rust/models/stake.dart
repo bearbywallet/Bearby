@@ -18,6 +18,8 @@ class FinalOutputInfo {
   final double? apr;
   final double? commission;
   final String tag;
+  final BigInt? withdrawalBlock;
+  final BigInt? currentBlock;
 
   const FinalOutputInfo({
     required this.name,
@@ -31,6 +33,8 @@ class FinalOutputInfo {
     this.apr,
     this.commission,
     required this.tag,
+    this.withdrawalBlock,
+    this.currentBlock,
   });
 
   @override
@@ -45,7 +49,9 @@ class FinalOutputInfo {
       votePower.hashCode ^
       apr.hashCode ^
       commission.hashCode ^
-      tag.hashCode;
+      tag.hashCode ^
+      withdrawalBlock.hashCode ^
+      currentBlock.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -62,5 +68,7 @@ class FinalOutputInfo {
           votePower == other.votePower &&
           apr == other.apr &&
           commission == other.commission &&
-          tag == other.tag;
+          tag == other.tag &&
+          withdrawalBlock == other.withdrawalBlock &&
+          currentBlock == other.currentBlock;
 }

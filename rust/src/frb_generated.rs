@@ -4334,6 +4334,8 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
         let mut var_apr = <Option<f64>>::sse_decode(deserializer);
         let mut var_commission = <Option<f64>>::sse_decode(deserializer);
         let mut var_tag = <String>::sse_decode(deserializer);
+        let mut var_withdrawalBlock = <Option<u64>>::sse_decode(deserializer);
+        let mut var_currentBlock = <Option<u64>>::sse_decode(deserializer);
         return crate::models::stake::FinalOutputInfo {
             name: var_name,
             url: var_url,
@@ -4346,6 +4348,8 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
             apr: var_apr,
             commission: var_commission,
             tag: var_tag,
+            withdrawal_block: var_withdrawalBlock,
+            current_block: var_currentBlock,
         };
     }
 }
@@ -6074,6 +6078,8 @@ impl flutter_rust_bridge::IntoDart for crate::models::stake::FinalOutputInfo {
             self.apr.into_into_dart().into_dart(),
             self.commission.into_into_dart().into_dart(),
             self.tag.into_into_dart().into_dart(),
+            self.withdrawal_block.into_into_dart().into_dart(),
+            self.current_block.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6863,6 +6869,8 @@ impl SseEncode for crate::models::stake::FinalOutputInfo {
         <Option<f64>>::sse_encode(self.apr, serializer);
         <Option<f64>>::sse_encode(self.commission, serializer);
         <String>::sse_encode(self.tag, serializer);
+        <Option<u64>>::sse_encode(self.withdrawal_block, serializer);
+        <Option<u64>>::sse_encode(self.current_block, serializer);
     }
 }
 

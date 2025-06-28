@@ -9,6 +9,7 @@ import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/stakeing_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -25,6 +26,8 @@ class ZilStakePage extends StatefulWidget {
 
 class _ZilStakePageState extends State<ZilStakePage> {
   List<FinalOutputInfo> _stakes = [];
+  FinalOutputInfo? _withdrawalStake;
+  List<FinalOutputInfo> _sortedStakes = [];
   bool _isLoading = true;
   String? _errorMessage;
   SortType _sortType = SortType.apr;
@@ -53,6 +56,11 @@ class _ZilStakePageState extends State<ZilStakePage> {
       if (mounted) {
         setState(() {
           _stakes = list;
+          _withdrawalStake = _stakes.firstWhere(
+            (stake) => stake.tag == "withdrawal",
+          );
+          _sortedStakes =
+              _stakes.where((stake) => stake.tag != "withdrawal").toList();
         });
       }
     } catch (e) {
@@ -71,9 +79,9 @@ class _ZilStakePageState extends State<ZilStakePage> {
   }
 
   void _sortStakes() {
-    _stakes.sort((a, b) {
-      bool aIsAvely = a.name.toLowerCase().contains('avely');
-      bool bIsAvely = b.name.toLowerCase().contains('avely');
+    _sortedStakes.sort((a, b) {
+      final aIsAvely = a.name.toLowerCase().contains('avely');
+      final bIsAvely = b.name.toLowerCase().contains('avely');
 
       if (aIsAvely && !bIsAvely) return -1;
       if (!aIsAvely && bIsAvely) return 1;
@@ -177,10 +185,27 @@ class _ZilStakePageState extends State<ZilStakePage> {
               child: _buildSortButtons(theme, l10n),
             ),
           ),
+          if (_withdrawalStake != null)
+            SliverPadding(
+              padding: EdgeInsets.fromLTRB(
+                adaptivePadding,
+                8,
+                adaptivePadding,
+                12,
+              ),
+              sliver: SliverToBoxAdapter(
+                child: _buildWithdrawalCard(
+                  _withdrawalStake!,
+                  theme,
+                  appState,
+                  l10n,
+                ),
+              ),
+            ),
           SliverPadding(
             padding: EdgeInsets.fromLTRB(
               adaptivePadding,
-              8,
+              _withdrawalStake != null ? 0 : 8,
               adaptivePadding,
               adaptivePadding,
             ),
@@ -189,10 +214,10 @@ class _ZilStakePageState extends State<ZilStakePage> {
                 (context, index) {
                   return Padding(
                     padding: const EdgeInsets.only(bottom: 12),
-                    child: StakingPoolCard(stake: _stakes[index]),
+                    child: StakingPoolCard(stake: _sortedStakes[index]),
                   );
                 },
-                childCount: _stakes.length,
+                childCount: _sortedStakes.length,
               ),
             ),
           ),
@@ -221,6 +246,99 @@ class _ZilStakePageState extends State<ZilStakePage> {
                       backgroundColor: theme.cardBackground,
                       child: buildContent(),
                     ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWithdrawalCard(
+    FinalOutputInfo stake,
+    AppTheme theme,
+    AppState appState,
+    AppLocalizations l10n,
+  ) {
+    final isClaimable = stake.currentBlock != null &&
+        stake.withdrawalBlock != null &&
+        stake.currentBlock! >= stake.withdrawalBlock!;
+    final progress = isClaimable ? 1.0 : 0.0;
+
+    double rate = 0;
+    String symbol = "ZIL";
+
+    try {
+      final nativeToken = appState.wallet?.tokens
+          .firstWhere((t) => t.native && t.addrType == 0);
+
+      if (nativeToken != null) {
+        symbol = nativeToken.symbol;
+        rate = nativeToken.rate;
+      }
+    } catch (_) {}
+
+    final (amount, converted) = formatingAmount(
+      amount: BigInt.parse(stake.delegAmt),
+      symbol: symbol,
+      decimals: stake.tokenAddress == null ? 12 : 18,
+      rate: rate,
+      appState: appState,
+    );
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.textSecondary.withValues(alpha: 0.1),
+        ),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              amount,
+              style: TextStyle(
+                color: theme.textSecondary,
+                fontSize: 14,
+              ),
+            ),
+            Text(
+              converted,
+              style: TextStyle(
+                color: theme.textSecondary.withValues(alpha: 0.7),
+                fontSize: 12,
+              ),
+            ),
+            const SizedBox(height: 16),
+            LinearProgressIndicator(
+              value: progress,
+              backgroundColor: theme.textSecondary.withValues(alpha: 0.2),
+              valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton(
+                onPressed: isClaimable
+                    ? () {
+                        // Placeholder for unstake action
+                      }
+                    : null,
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: theme.primaryPurple,
+                  foregroundColor: theme.buttonText,
+                  disabledBackgroundColor:
+                      theme.textSecondary.withValues(alpha: 0.2),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 12),
+                ),
+                child: Text(l10n.claimButton),
+              ),
             ),
           ],
         ),

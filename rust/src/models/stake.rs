@@ -12,6 +12,8 @@ pub struct FinalOutputInfo {
     pub apr: Option<f64>,
     pub commission: Option<f64>,
     pub tag: String,
+    pub withdrawal_block: Option<u64>,
+    pub current_block: Option<u64>,
 }
 
 impl From<FinalOutput> for FinalOutputInfo {
@@ -28,6 +30,8 @@ impl From<FinalOutput> for FinalOutputInfo {
             apr: stake.apr,
             commission: stake.commission,
             tag: stake.tag,
+            withdrawal_block: stake.withdrawal_block,
+            current_block: stake.current_block,
         }
     }
 }
