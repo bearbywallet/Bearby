@@ -380,8 +380,10 @@ class _ZilStakePageState extends State<ZilStakePage> {
                           final walletIndex =
                               BigInt.from(appState.selectedWallet);
                           final accountIndex = appState.wallet!.selectedAccount;
+                          TransactionRequestInfo tx;
 
-                          if (stake.tag == 'withdrawal' &&
+                          if ((stake.tag == 'withdrawalAvely' ||
+                                  stake.tag == 'withdrawal') &&
                               appState.account!.addrType == 1) {
                             await zilliqaSwapChain(
                               walletIndex: walletIndex,
@@ -392,11 +394,20 @@ class _ZilStakePageState extends State<ZilStakePage> {
                           nativeToken = appState.wallet?.tokens
                               .firstWhere((t) => t.native);
 
-                          TransactionRequestInfo tx =
-                              await buildTxScillaCompleteWithdrawal(
-                            walletIndex: walletIndex,
-                            accountIndex: accountIndex,
-                          );
+                          if (stake.tag == 'withdrawalAvely') {
+                            tx = await buildTxScillaCompleteWithdrawalAvely(
+                              walletIndex: walletIndex,
+                              accountIndex: accountIndex,
+                            );
+                          } else if (stake.tag == 'withdrawal') {
+                            tx = await buildTxScillaCompleteWithdrawal(
+                              walletIndex: walletIndex,
+                              accountIndex: accountIndex,
+                            );
+                          } else {
+                            throw "Invalid tx";
+                          }
+
                           if (!mounted) return;
                           showConfirmTransactionModal(
                             context: context,
