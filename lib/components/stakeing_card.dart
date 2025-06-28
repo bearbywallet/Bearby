@@ -394,7 +394,7 @@ class StakingPoolCard extends StatelessWidget {
           Expanded(
             child: CustomButton(
               text: l10n.claimButton,
-              onPressed: () {},
+              onPressed: () => _claimRewards(context, appState),
               textColor: theme.buttonText,
               backgroundColor: theme.success,
               borderRadius: 16,
@@ -471,6 +471,50 @@ class StakingPoolCard extends StatelessWidget {
       );
 
       final tx = await buildTxScillaInitUnstake(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+        stake: stake,
+      );
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: stake.address,
+        token: nativeToken!,
+        amount: "0",
+        onConfirm: (_) {
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: appState.currentTheme.cardBackground,
+          title: Text(
+            "Error",
+            style: TextStyle(color: appState.currentTheme.textPrimary),
+          ),
+          content: Text(
+            e.toString(),
+            style: TextStyle(color: appState.currentTheme.danger),
+          ),
+          actions: [],
+        ),
+      );
+    }
+  }
+
+  Future<void> _claimRewards(BuildContext context, AppState appState) async {
+    try {
+      final nativeToken = appState.wallet?.tokens.firstWhere(
+        (t) => t.native && t.addrType == 0,
+        orElse: () => throw Exception('Native token not found'),
+      );
+
+      final tx = await buildClaimScillaStakingRewardsTx(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
         stake: stake,
