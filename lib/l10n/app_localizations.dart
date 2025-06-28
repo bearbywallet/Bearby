@@ -3200,6 +3200,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'LP Staking'**
   String get lpStakingBadge;
+
+  /// Label for the amount of tokens staked by user
+  ///
+  /// In en, this message translates to:
+  /// **'Staked'**
+  String get stakedAmount;
+
+  /// Label for the rewards available to claim
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards'**
+  String get rewardsAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

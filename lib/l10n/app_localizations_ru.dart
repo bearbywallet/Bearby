@@ -1590,4 +1590,10 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get lpStakingBadge => 'LP Стейкинг';
+
+  @override
+  String get stakedAmount => 'В стейке';
+
+  @override
+  String get rewardsAvailable => 'Награды';
 }

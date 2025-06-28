@@ -2188,7 +2188,7 @@
     "description": "Description for the toggle that enables displaying transaction history addresses in the address book."
   },
 
-    "zilStakePageTitle": "Zilliqa Staking",
+  "zilStakePageTitle": "Zilliqa Staking",
   "@zilStakePageTitle": {
     "description": "Title for the Zilliqa Staking page"
   },
@@ -2240,5 +2240,13 @@
   "lpStakingBadge": "LP Staking",
   "@lpStakingBadge": {
     "description": "Badge text for liquidity pool staking"
+  },
+  "stakedAmount": "Staked",
+  "@stakedAmount": {
+    "description": "Label for the amount of tokens staked by user"
+  },
+  "rewardsAvailable": "Rewards",
+  "@rewardsAvailable": {
+    "description": "Label for the rewards available to claim"
   }
 }

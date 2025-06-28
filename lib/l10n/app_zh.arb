@@ -584,5 +584,7 @@
   "aprLabel": "年化率",
   "commissionLabel": "佣金",
   "tvlLabel": "总锁仓价值",
-  "lpStakingBadge": "LP 质押"
+  "lpStakingBadge": "LP 质押",
+  "stakedAmount": "已质押",
+  "rewardsAvailable": "奖励"
 }

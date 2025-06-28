@@ -1590,4 +1590,10 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get lpStakingBadge => 'LP Staking';
+
+  @override
+  String get stakedAmount => 'Staked';
+
+  @override
+  String get rewardsAvailable => 'Rewards';
 }

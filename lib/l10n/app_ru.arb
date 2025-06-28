@@ -600,5 +600,7 @@
   "aprLabel": "APR",
   "commissionLabel": "Комиссия",
   "tvlLabel": "TVL",
-  "lpStakingBadge": "LP Стейкинг"
+  "lpStakingBadge": "LP Стейкинг",
+  "stakedAmount": "В стейке",
+  "rewardsAvailable": "Награды"
 }

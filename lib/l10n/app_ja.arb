@@ -604,5 +604,7 @@
   "aprLabel": "APR",
   "commissionLabel": "手数料",
   "tvlLabel": "TVL",
-  "lpStakingBadge": "LP ステーキング"
+  "lpStakingBadge": "LP ステーキング",
+  "stakedAmount": "ステーク済み",
+  "rewardsAvailable": "報酬"
 }

@@ -1590,4 +1590,10 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get lpStakingBadge => 'LP 质押';
+
+  @override
+  String get stakedAmount => '已质押';
+
+  @override
+  String get rewardsAvailable => '奖励';
 }
