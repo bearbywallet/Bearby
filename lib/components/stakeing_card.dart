@@ -7,6 +7,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/modals/stake_modal.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -407,7 +408,9 @@ class StakingPoolCard extends StatelessWidget {
         Expanded(
           child: CustomButton(
             text: hasDelegation ? l10n.unstakeButton : l10n.stakeButton,
-            onPressed: () => _initUnstake(context, appState),
+            onPressed: () => hasDelegation
+                ? _initUnstake(context, appState)
+                : _stake(context),
             textColor: theme.buttonText,
             backgroundColor: hasDelegation ? theme.danger : theme.primaryPurple,
             borderRadius: 16,
@@ -527,6 +530,14 @@ class StakingPoolCard extends StatelessWidget {
         ),
       );
     }
+  }
+
+  void _stake(BuildContext context) {
+    showStakeModal(
+      context: context,
+      stake: stake,
+    );
+    return;
   }
 
   Future<void> _claimRewards(BuildContext context, AppState appState) async {
