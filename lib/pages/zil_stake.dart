@@ -10,8 +10,11 @@ import 'package:zilpay/components/stakeing_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -266,9 +269,10 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
     double rate = 0;
     String symbol = "ZIL";
+    FTokenInfo? nativeToken;
 
     try {
-      final nativeToken = appState.wallet?.tokens
+      nativeToken = appState.wallet?.tokens
           .firstWhere((t) => t.native && t.addrType == 0);
 
       if (nativeToken != null) {
@@ -323,8 +327,53 @@ class _ZilStakePageState extends State<ZilStakePage> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: isClaimable
-                    ? () {
-                        // Placeholder for unstake action
+                    ? () async {
+                        try {
+                          BigInt accountIndex =
+                              appState.wallet!.selectedAccount;
+                          TransactionRequestInfo tx =
+                              await buildTxScillaCompleteWithdrawal(
+                            walletIndex: BigInt.from(appState.selectedWallet),
+                            accountIndex: accountIndex,
+                            stake: stake,
+                          );
+                          if (!mounted) return;
+                          showConfirmTransactionModal(
+                            context: context,
+                            tx: tx,
+                            to: stake.address,
+                            token: nativeToken!,
+                            amount: "0",
+                            onConfirm: (_) {
+                              Navigator.of(context).pushNamed('/', arguments: {
+                                'selectedIndex': 1,
+                              });
+                            },
+                          );
+                        } catch (e) {
+                          if (!mounted) return;
+
+                          String errorMessage = e.toString();
+
+                          showDialog(
+                            context: context,
+                            builder: (context) => AlertDialog(
+                              backgroundColor:
+                                  appState.currentTheme.cardBackground,
+                              title: Text(
+                                "Error",
+                                style: TextStyle(
+                                    color: appState.currentTheme.textPrimary),
+                              ),
+                              content: Text(
+                                errorMessage,
+                                style: TextStyle(
+                                    color: appState.currentTheme.danger),
+                              ),
+                              actions: [],
+                            ),
+                          );
+                        }
                       }
                     : null,
                 style: ElevatedButton.styleFrom(
