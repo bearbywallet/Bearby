@@ -279,12 +279,7 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
                     rightIconPath: 'assets/icons/close.svg',
                     onChanged: (value) {
                       setState(() => _searchQuery = value);
-                      if (_debounce?.isActive ?? false) _debounce!.cancel();
-                      _debounce = Timer(const Duration(milliseconds: 500), () {
-                        if (value.length == 42) {
-                          _fetchTokenByAddress(value);
-                        }
-                      });
+                      _fetchTokenByAddress(value);
                     },
                     onRightIconTap: () {
                       _searchController.text = "";

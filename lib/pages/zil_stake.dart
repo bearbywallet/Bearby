@@ -12,6 +12,7 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -272,8 +273,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
     FTokenInfo? nativeToken;
 
     try {
-      nativeToken = appState.wallet?.tokens
-          .firstWhere((t) => t.native && t.addrType == 0);
+      nativeToken = appState.wallet?.tokens.firstWhere((t) => t.native);
 
       if (nativeToken != null) {
         symbol = nativeToken.symbol;
@@ -329,11 +329,24 @@ class _ZilStakePageState extends State<ZilStakePage> {
                 onPressed: isClaimable
                     ? () async {
                         try {
-                          BigInt accountIndex =
-                              appState.wallet!.selectedAccount;
+                          final walletIndex =
+                              BigInt.from(appState.selectedWallet);
+                          final accountIndex = appState.wallet!.selectedAccount;
+
+                          if (stake.tag == 'withdrawal' &&
+                              appState.account!.addrType == 1) {
+                            await zilliqaSwapChain(
+                              walletIndex: walletIndex,
+                              accountIndex: accountIndex,
+                            );
+                          }
+
+                          nativeToken = appState.wallet?.tokens
+                              .firstWhere((t) => t.native);
+
                           TransactionRequestInfo tx =
                               await buildTxScillaCompleteWithdrawal(
-                            walletIndex: BigInt.from(appState.selectedWallet),
+                            walletIndex: walletIndex,
                             accountIndex: accountIndex,
                           );
                           if (!mounted) return;

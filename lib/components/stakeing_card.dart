@@ -9,6 +9,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
+import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -469,10 +470,19 @@ class StakingPoolCard extends StatelessWidget {
         (t) => t.native && t.addrType == 0,
         orElse: () => throw Exception('Native token not found'),
       );
+      final walletIndex = BigInt.from(appState.selectedWallet);
+      final accountIndex = appState.wallet!.selectedAccount;
+
+      if (stake.tag == 'scilla' && appState.account!.addrType == 1) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      }
 
       final tx = await buildTxScillaInitUnstake(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
         stake: stake,
       );
 
@@ -513,10 +523,19 @@ class StakingPoolCard extends StatelessWidget {
         (t) => t.native && t.addrType == 0,
         orElse: () => throw Exception('Native token not found'),
       );
+      final walletIndex = BigInt.from(appState.selectedWallet);
+      final accountIndex = appState.wallet!.selectedAccount;
+
+      if (stake.tag == 'scilla' && appState.account!.addrType == 1) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      }
 
       final tx = await buildClaimScillaStakingRewardsTx(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
         stake: stake,
       );
 

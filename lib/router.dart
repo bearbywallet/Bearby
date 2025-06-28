@@ -91,7 +91,6 @@ class AppRouter {
       '/networks',
       '/send',
       '/receive',
-      '/add_token',
       '/reveal_sk',
       '/reveal_bip39',
       '/add_account',
