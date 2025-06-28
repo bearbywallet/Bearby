@@ -594,13 +594,13 @@
   "aprSort": "APR",
   "commissionSort": "Комиссия",
   "tvlSort": "TVL",
-  "claimButton": "Забрать",
-  "stakeButton": "Стейкать",
-  "unstakeButton": "Анстейк",
+  "claimButton": "Награды",
+  "stakeButton": "Вкладывать",
+  "unstakeButton": "Забрать",
   "aprLabel": "APR",
   "commissionLabel": "Комиссия",
   "tvlLabel": "TVL",
-  "lpStakingBadge": "LP Стейкинг",
+  "lpStakingBadge": "Ликвид",
   "stakedAmount": "В стейке",
   "rewardsAvailable": "Награды"
 }

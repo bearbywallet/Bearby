@@ -470,7 +470,7 @@ class StakingPoolCard extends StatelessWidget {
   Future<void> _initUnstake(BuildContext context, AppState appState) async {
     try {
       final nativeToken = appState.wallet?.tokens.firstWhere(
-        (t) => t.native && t.addrType == 0,
+        (t) => t.native,
         orElse: () => throw Exception('Native token not found'),
       );
       final walletIndex = BigInt.from(appState.selectedWallet);
@@ -479,6 +479,11 @@ class StakingPoolCard extends StatelessWidget {
 
       if ((stake.tag == 'scilla' || stake.tag == 'avely') &&
           appState.account!.addrType == 1) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      } else if (stake.tag == 'evm' && appState.account!.addrType == 0) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
@@ -496,6 +501,13 @@ class StakingPoolCard extends StatelessWidget {
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           stake: stake,
+        );
+      } else if (stake.tag == 'evm') {
+        tx = await buildTxEvmUnstakeRequest(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          stake: stake,
+          amountToUnstake: stake.delegAmt,
         );
       } else {
         throw "invalid tx type";
@@ -543,24 +555,40 @@ class StakingPoolCard extends StatelessWidget {
   Future<void> _claimRewards(BuildContext context, AppState appState) async {
     try {
       final nativeToken = appState.wallet?.tokens.firstWhere(
-        (t) => t.native && t.addrType == 0,
+        (t) => t.native,
         orElse: () => throw Exception('Native token not found'),
       );
       final walletIndex = BigInt.from(appState.selectedWallet);
       final accountIndex = appState.wallet!.selectedAccount;
+      TransactionRequestInfo tx;
 
       if (stake.tag == 'scilla' && appState.account!.addrType == 1) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
         );
+      } else if (stake.tag == 'evm' && appState.account!.addrType == 0) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
       }
 
-      final tx = await buildClaimScillaStakingRewardsTx(
-        walletIndex: walletIndex,
-        accountIndex: accountIndex,
-        stake: stake,
-      );
+      if (stake.tag == 'scilla') {
+        tx = await buildClaimScillaStakingRewardsTx(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          stake: stake,
+        );
+      } else if (stake.tag == 'evm') {
+        tx = await buildTxClaimRewardRequest(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          stake: stake,
+        );
+      } else {
+        throw "Invlid stake type";
+      }
 
       showConfirmTransactionModal(
         context: context,

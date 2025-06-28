@@ -182,7 +182,7 @@ pub async fn build_tx_scilla_complete_withdrawal_avely(
     .map_err(Into::into)
 }
 
-pub async fn build_tx_evm_build_stake_request(
+pub async fn build_tx_evm_stake_request(
     wallet_index: usize,
     account_index: usize,
     stake: FinalOutputInfo,
@@ -213,7 +213,7 @@ pub async fn build_tx_evm_build_stake_request(
     .map_err(Into::into)
 }
 
-pub async fn build_tx_evm_build_unstake_request(
+pub async fn build_tx_evm_unstake_request(
     wallet_index: usize,
     account_index: usize,
     stake: FinalOutputInfo,
@@ -244,7 +244,7 @@ pub async fn build_tx_evm_build_unstake_request(
     .map_err(Into::into)
 }
 
-pub async fn build_tx_build_claim_unstake_request(
+pub async fn build_tx_claim_unstake_request(
     wallet_index: usize,
     account_index: usize,
     stake: FinalOutputInfo,
@@ -273,7 +273,7 @@ pub async fn build_tx_build_claim_unstake_request(
     .map_err(Into::into)
 }
 
-pub async fn build_tx_build_build_claim_reward_request(
+pub async fn build_tx_claim_reward_request(
     wallet_index: usize,
     account_index: usize,
     stake: FinalOutputInfo,

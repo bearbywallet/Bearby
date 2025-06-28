@@ -160,9 +160,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
                       const SizedBox(height: 16),
                       _buildPercentageButtons(theme),
                       const SizedBox(height: 16),
-                      _buildBalanceInfo(
-                          theme, l10n, balanceAmount, balanceConverted),
-                      const SizedBox(height: 24),
                       _buildStakeButton(appState, l10n),
                       const SizedBox(height: 16),
                     ],
@@ -393,51 +390,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
   }
 
-  Widget _buildBalanceInfo(AppTheme theme, AppLocalizations l10n,
-      String balanceAmount, String balanceConverted) {
-    return Container(
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: theme.textSecondary.withValues(alpha: 0.05),
-        borderRadius: BorderRadius.circular(12),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            "l10n.sendPageAvailableBalance",
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(
-                balanceAmount,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              if (balanceConverted.isNotEmpty)
-                Text(
-                  balanceConverted,
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildStakeButton(AppState appState, AppLocalizations l10n) {
     final theme = appState.currentTheme;
 
@@ -468,7 +420,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
             );
 
             if (widget.stake.tag == 'evm') {
-              tx = await buildTxEvmBuildStakeRequest(
+              tx = await buildTxEvmStakeRequest(
                 walletIndex: walletIndex,
                 accountIndex: accountIndex,
                 stake: widget.stake,

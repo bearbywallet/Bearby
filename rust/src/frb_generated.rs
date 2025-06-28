@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.10.0";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -285788328;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1420859275;
 
 // Section: executor
 
@@ -452,7 +452,7 @@ fn wire__crate__api__stake__build_claim_scilla_staking_rewards_tx_impl(
         },
     )
 }
-fn wire__crate__api__stake__build_tx_build_build_claim_reward_request_impl(
+fn wire__crate__api__stake__build_tx_claim_reward_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -460,7 +460,7 @@ fn wire__crate__api__stake__build_tx_build_build_claim_reward_request_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "build_tx_build_build_claim_reward_request",
+            debug_name: "build_tx_claim_reward_request",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -481,51 +481,7 @@ fn wire__crate__api__stake__build_tx_build_build_claim_reward_request_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok =
-                            crate::api::stake::build_tx_build_build_claim_reward_request(
-                                api_wallet_index,
-                                api_account_index,
-                                api_stake,
-                            )
-                            .await?;
-                        Ok(output_ok)
-                    })()
-                    .await,
-                )
-            }
-        },
-    )
-}
-fn wire__crate__api__stake__build_tx_build_claim_unstake_request_impl(
-    port_: flutter_rust_bridge::for_generated::MessagePort,
-    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
-    rust_vec_len_: i32,
-    data_len_: i32,
-) {
-    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
-        flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "build_tx_build_claim_unstake_request",
-            port: Some(port_),
-            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
-        },
-        move || {
-            let message = unsafe {
-                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
-                    ptr_,
-                    rust_vec_len_,
-                    data_len_,
-                )
-            };
-            let mut deserializer =
-                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
-            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
-            deserializer.end();
-            move |context| async move {
-                transform_result_sse::<_, String>(
-                    (move || async move {
-                        let output_ok = crate::api::stake::build_tx_build_claim_unstake_request(
+                        let output_ok = crate::api::stake::build_tx_claim_reward_request(
                             api_wallet_index,
                             api_account_index,
                             api_stake,
@@ -539,7 +495,7 @@ fn wire__crate__api__stake__build_tx_build_claim_unstake_request_impl(
         },
     )
 }
-fn wire__crate__api__stake__build_tx_evm_build_stake_request_impl(
+fn wire__crate__api__stake__build_tx_claim_unstake_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -547,7 +503,50 @@ fn wire__crate__api__stake__build_tx_evm_build_stake_request_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "build_tx_evm_build_stake_request",
+            debug_name: "build_tx_claim_unstake_request",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_wallet_index = <usize>::sse_decode(&mut deserializer);
+            let api_account_index = <usize>::sse_decode(&mut deserializer);
+            let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok = crate::api::stake::build_tx_claim_unstake_request(
+                            api_wallet_index,
+                            api_account_index,
+                            api_stake,
+                        )
+                        .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
+fn wire__crate__api__stake__build_tx_evm_stake_request_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "build_tx_evm_stake_request",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -569,7 +568,7 @@ fn wire__crate__api__stake__build_tx_evm_build_stake_request_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::stake::build_tx_evm_build_stake_request(
+                        let output_ok = crate::api::stake::build_tx_evm_stake_request(
                             api_wallet_index,
                             api_account_index,
                             api_stake,
@@ -584,7 +583,7 @@ fn wire__crate__api__stake__build_tx_evm_build_stake_request_impl(
         },
     )
 }
-fn wire__crate__api__stake__build_tx_evm_build_unstake_request_impl(
+fn wire__crate__api__stake__build_tx_evm_unstake_request_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
     rust_vec_len_: i32,
@@ -592,7 +591,7 @@ fn wire__crate__api__stake__build_tx_evm_build_unstake_request_impl(
 ) {
     FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
         flutter_rust_bridge::for_generated::TaskInfo {
-            debug_name: "build_tx_evm_build_unstake_request",
+            debug_name: "build_tx_evm_unstake_request",
             port: Some(port_),
             mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
         },
@@ -614,7 +613,7 @@ fn wire__crate__api__stake__build_tx_evm_build_unstake_request_impl(
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::stake::build_tx_evm_build_unstake_request(
+                        let output_ok = crate::api::stake::build_tx_evm_unstake_request(
                             api_wallet_index,
                             api_account_index,
                             api_stake,
@@ -5754,25 +5753,25 @@ fn pde_ffi_dispatcher_primary_impl(
             rust_vec_len,
             data_len,
         ),
-        11 => wire__crate__api__stake__build_tx_build_build_claim_reward_request_impl(
+        11 => wire__crate__api__stake__build_tx_claim_reward_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        12 => wire__crate__api__stake__build_tx_build_claim_unstake_request_impl(
+        12 => wire__crate__api__stake__build_tx_claim_unstake_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        13 => wire__crate__api__stake__build_tx_evm_build_stake_request_impl(
+        13 => wire__crate__api__stake__build_tx_evm_stake_request_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        14 => wire__crate__api__stake__build_tx_evm_build_unstake_request_impl(
+        14 => wire__crate__api__stake__build_tx_evm_unstake_request_impl(
             port,
             ptr,
             rust_vec_len,

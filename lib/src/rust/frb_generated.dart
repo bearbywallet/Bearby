@@ -100,7 +100,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.10.0';
 
   @override
-  int get rustContentHash => -285788328;
+  int get rustContentHash => 1420859275;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -151,24 +151,23 @@ abstract class RustLibApi extends BaseApi {
       required BigInt accountIndex,
       required FinalOutputInfo stake});
 
-  Future<TransactionRequestInfo>
-      crateApiStakeBuildTxBuildBuildClaimRewardRequest(
-          {required BigInt walletIndex,
-          required BigInt accountIndex,
-          required FinalOutputInfo stake});
-
-  Future<TransactionRequestInfo> crateApiStakeBuildTxBuildClaimUnstakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake});
 
-  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmBuildStakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake});
+
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake,
       required String amount});
 
-  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmBuildUnstakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake,
@@ -792,11 +791,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
-  Future<TransactionRequestInfo>
-      crateApiStakeBuildTxBuildBuildClaimRewardRequest(
-          {required BigInt walletIndex,
-          required BigInt accountIndex,
-          required FinalOutputInfo stake}) {
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimRewardRequest(
+      {required BigInt walletIndex,
+      required BigInt accountIndex,
+      required FinalOutputInfo stake}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
@@ -810,21 +808,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiStakeBuildTxBuildBuildClaimRewardRequestConstMeta,
+      constMeta: kCrateApiStakeBuildTxClaimRewardRequestConstMeta,
       argValues: [walletIndex, accountIndex, stake],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta
-      get kCrateApiStakeBuildTxBuildBuildClaimRewardRequestConstMeta =>
-          const TaskConstMeta(
-            debugName: "build_tx_build_build_claim_reward_request",
-            argNames: ["walletIndex", "accountIndex", "stake"],
-          );
+  TaskConstMeta get kCrateApiStakeBuildTxClaimRewardRequestConstMeta =>
+      const TaskConstMeta(
+        debugName: "build_tx_claim_reward_request",
+        argNames: ["walletIndex", "accountIndex", "stake"],
+      );
 
   @override
-  Future<TransactionRequestInfo> crateApiStakeBuildTxBuildClaimUnstakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxClaimUnstakeRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake}) {
@@ -841,20 +838,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiStakeBuildTxBuildClaimUnstakeRequestConstMeta,
+      constMeta: kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta,
       argValues: [walletIndex, accountIndex, stake],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiStakeBuildTxBuildClaimUnstakeRequestConstMeta =>
+  TaskConstMeta get kCrateApiStakeBuildTxClaimUnstakeRequestConstMeta =>
       const TaskConstMeta(
-        debugName: "build_tx_build_claim_unstake_request",
+        debugName: "build_tx_claim_unstake_request",
         argNames: ["walletIndex", "accountIndex", "stake"],
       );
 
   @override
-  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmBuildStakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmStakeRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake,
@@ -873,20 +870,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiStakeBuildTxEvmBuildStakeRequestConstMeta,
+      constMeta: kCrateApiStakeBuildTxEvmStakeRequestConstMeta,
       argValues: [walletIndex, accountIndex, stake, amount],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiStakeBuildTxEvmBuildStakeRequestConstMeta =>
+  TaskConstMeta get kCrateApiStakeBuildTxEvmStakeRequestConstMeta =>
       const TaskConstMeta(
-        debugName: "build_tx_evm_build_stake_request",
+        debugName: "build_tx_evm_stake_request",
         argNames: ["walletIndex", "accountIndex", "stake", "amount"],
       );
 
   @override
-  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmBuildUnstakeRequest(
+  Future<TransactionRequestInfo> crateApiStakeBuildTxEvmUnstakeRequest(
       {required BigInt walletIndex,
       required BigInt accountIndex,
       required FinalOutputInfo stake,
@@ -905,15 +902,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeSuccessData: sse_decode_transaction_request_info,
         decodeErrorData: sse_decode_String,
       ),
-      constMeta: kCrateApiStakeBuildTxEvmBuildUnstakeRequestConstMeta,
+      constMeta: kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta,
       argValues: [walletIndex, accountIndex, stake, amountToUnstake],
       apiImpl: this,
     ));
   }
 
-  TaskConstMeta get kCrateApiStakeBuildTxEvmBuildUnstakeRequestConstMeta =>
+  TaskConstMeta get kCrateApiStakeBuildTxEvmUnstakeRequestConstMeta =>
       const TaskConstMeta(
-        debugName: "build_tx_evm_build_unstake_request",
+        debugName: "build_tx_evm_unstake_request",
         argNames: ["walletIndex", "accountIndex", "stake", "amountToUnstake"],
       );
 
