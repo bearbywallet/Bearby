@@ -335,7 +335,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
                               await buildTxScillaCompleteWithdrawal(
                             walletIndex: BigInt.from(appState.selectedWallet),
                             accountIndex: accountIndex,
-                            stake: stake,
                           );
                           if (!mounted) return;
                           showConfirmTransactionModal(

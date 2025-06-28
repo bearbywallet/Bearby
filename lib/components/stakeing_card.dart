@@ -7,6 +7,8 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/modals/transfer.dart';
+import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -65,7 +67,8 @@ class StakingPoolCard extends StatelessWidget {
               ),
             ),
             padding: const EdgeInsets.all(20),
-            child: _buildActionButtons(theme, l10n, hasRewards, hasDelegation),
+            child: _buildActionButtons(
+                context, appState, l10n, hasRewards, hasDelegation),
           ),
         ],
       ),
@@ -377,11 +380,14 @@ class StakingPoolCard extends StatelessWidget {
   }
 
   Widget _buildActionButtons(
-    AppTheme theme,
+    BuildContext context,
+    AppState appState,
     AppLocalizations l10n,
     bool hasRewards,
     bool hasDelegation,
   ) {
+    final theme = appState.currentTheme;
+
     return Row(
       children: [
         if (hasRewards) ...[
@@ -400,7 +406,7 @@ class StakingPoolCard extends StatelessWidget {
         Expanded(
           child: CustomButton(
             text: hasDelegation ? l10n.unstakeButton : l10n.stakeButton,
-            onPressed: () {},
+            onPressed: () => _initUnstake(context, appState),
             textColor: theme.buttonText,
             backgroundColor: hasDelegation ? theme.danger : theme.primaryPurple,
             borderRadius: 16,
@@ -455,5 +461,49 @@ class StakingPoolCard extends StatelessWidget {
     );
 
     return formattedValue.split(' ')[0];
+  }
+
+  Future<void> _initUnstake(BuildContext context, AppState appState) async {
+    try {
+      final nativeToken = appState.wallet?.tokens.firstWhere(
+        (t) => t.native && t.addrType == 0,
+        orElse: () => throw Exception('Native token not found'),
+      );
+
+      final tx = await buildTxScillaInitUnstake(
+        walletIndex: BigInt.from(appState.selectedWallet),
+        accountIndex: appState.wallet!.selectedAccount,
+        stake: stake,
+      );
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: stake.address,
+        token: nativeToken!,
+        amount: "0",
+        onConfirm: (_) {
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (e) {
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: appState.currentTheme.cardBackground,
+          title: Text(
+            "Error",
+            style: TextStyle(color: appState.currentTheme.textPrimary),
+          ),
+          content: Text(
+            e.toString(),
+            style: TextStyle(color: appState.currentTheme.danger),
+          ),
+          actions: [],
+        ),
+      );
+    }
   }
 }

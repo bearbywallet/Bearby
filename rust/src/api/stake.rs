@@ -102,7 +102,6 @@ pub async fn build_tx_scilla_init_unstake(
 pub async fn build_tx_scilla_complete_withdrawal(
     wallet_index: usize,
     account_index: usize,
-    stake: FinalOutputInfo,
 ) -> Result<TransactionRequestInfo, String> {
     with_service(|core| {
         let wallet = core
@@ -119,7 +118,7 @@ pub async fn build_tx_scilla_complete_withdrawal(
         let provider = core
             .get_provider(account.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
-        let tx = provider.build_tx_scilla_complete_withdrawal(&stake.into())?;
+        let tx = provider.build_tx_scilla_complete_withdrawal()?;
 
         Ok(tx.into())
     })

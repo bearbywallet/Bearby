@@ -476,7 +476,6 @@ fn wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
             let api_account_index = <usize>::sse_decode(&mut deserializer);
-            let api_stake = <crate::models::stake::FinalOutputInfo>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -484,7 +483,6 @@ fn wire__crate__api__stake__build_tx_scilla_complete_withdrawal_impl(
                         let output_ok = crate::api::stake::build_tx_scilla_complete_withdrawal(
                             api_wallet_index,
                             api_account_index,
-                            api_stake,
                         )
                         .await?;
                         Ok(output_ok)

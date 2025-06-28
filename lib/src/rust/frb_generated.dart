@@ -152,9 +152,7 @@ abstract class RustLibApi extends BaseApi {
       required FinalOutputInfo stake});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake});
+      {required BigInt walletIndex, required BigInt accountIndex});
 
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaInitUnstake(
       {required BigInt walletIndex,
@@ -763,15 +761,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<TransactionRequestInfo> crateApiStakeBuildTxScillaCompleteWithdrawal(
-      {required BigInt walletIndex,
-      required BigInt accountIndex,
-      required FinalOutputInfo stake}) {
+      {required BigInt walletIndex, required BigInt accountIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
-        sse_encode_box_autoadd_final_output_info(stake, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 11, port: port_);
       },
@@ -780,7 +775,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta,
-      argValues: [walletIndex, accountIndex, stake],
+      argValues: [walletIndex, accountIndex],
       apiImpl: this,
     ));
   }
@@ -788,7 +783,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiStakeBuildTxScillaCompleteWithdrawalConstMeta =>
       const TaskConstMeta(
         debugName: "build_tx_scilla_complete_withdrawal",
-        argNames: ["walletIndex", "accountIndex", "stake"],
+        argNames: ["walletIndex", "accountIndex"],
       );
 
   @override
