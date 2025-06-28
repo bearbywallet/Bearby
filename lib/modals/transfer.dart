@@ -745,9 +745,6 @@ class _ConfirmTransactionContentState
                               throw "ERC20 for ledger is not working for now.";
                             }
 
-                            print(
-                                "${widget.token.addrType} ,${widget.to.startsWith("0x")}");
-
                             if (widget.token.addrType == 0 &&
                                 widget.to.startsWith("0x") &&
                                 !widget.token.native) {
