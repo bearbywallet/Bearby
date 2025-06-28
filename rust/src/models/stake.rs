@@ -1,4 +1,4 @@
-use zilpay::network::zil_stake_parse::FinalOutput;
+use zilpay::{network::zil_stake_parse::FinalOutput, proto::U256};
 
 pub struct FinalOutputInfo {
     pub name: String,
@@ -25,6 +25,26 @@ impl From<FinalOutput> for FinalOutputInfo {
             token_address: stake.token_address,
             deleg_amt: stake.deleg_amt.to_string(),
             rewards: stake.rewards.to_string(),
+            tvl: stake.tvl,
+            vote_power: stake.vote_power,
+            apr: stake.apr,
+            commission: stake.commission,
+            tag: stake.tag,
+            withdrawal_block: stake.withdrawal_block,
+            current_block: stake.current_block,
+        }
+    }
+}
+
+impl From<FinalOutputInfo> for FinalOutput {
+    fn from(stake: FinalOutputInfo) -> Self {
+        FinalOutput {
+            name: stake.name,
+            url: stake.url,
+            address: stake.address,
+            token_address: stake.token_address,
+            deleg_amt: stake.deleg_amt.parse().unwrap_or_default(),
+            rewards: stake.rewards.parse().unwrap_or_default(),
             tvl: stake.tvl,
             vote_power: stake.vote_power,
             apr: stake.apr,

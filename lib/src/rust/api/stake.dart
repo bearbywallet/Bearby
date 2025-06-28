@@ -5,9 +5,36 @@
 
 import '../frb_generated.dart';
 import '../models/stake.dart';
+import '../models/transactions/access_list.dart';
+import '../models/transactions/base_token.dart';
+import '../models/transactions/evm.dart';
+import '../models/transactions/request.dart';
+import '../models/transactions/scilla.dart';
+import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 Future<List<FinalOutputInfo>> getStakes(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
     RustLib.instance.api.crateApiStakeGetStakes(
         walletIndex: walletIndex, accountIndex: accountIndex);
+
+Future<TransactionRequestInfo> buildClaimScillaStakingRewardsTx(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildClaimScillaStakingRewardsTx(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+
+Future<TransactionRequestInfo> buildTxScillaInitUnstake(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxScillaInitUnstake(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
+
+Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawal(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawal(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);

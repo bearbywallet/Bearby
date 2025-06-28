@@ -8,8 +8,9 @@ use zilpay::{
 };
 
 use crate::{
-    models::stake::FinalOutputInfo, service::service::BACKGROUND_SERVICE,
-    utils::errors::ServiceError,
+    models::{stake::FinalOutputInfo, transactions::request::TransactionRequestInfo},
+    service::service::BACKGROUND_SERVICE,
+    utils::{errors::ServiceError, utils::with_service},
 };
 
 pub async fn get_stakes(
@@ -40,4 +41,88 @@ pub async fn get_stakes(
         .map_err(ServiceError::NetworkErrors)?;
 
     Ok(stakes.into_iter().map(|v| v.into()).collect())
+}
+
+pub async fn build_claim_scilla_staking_rewards_tx(
+    wallet_index: usize,
+    account_index: usize,
+    stake: FinalOutputInfo,
+) -> Result<TransactionRequestInfo, String> {
+    with_service(|core| {
+        let wallet = core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .accounts
+            .get(account_index)
+            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let provider = core
+            .get_provider(account.chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
+        let tx = provider.build_tx_scilla_claim(&stake.into())?;
+
+        Ok(tx.into())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn build_tx_scilla_init_unstake(
+    wallet_index: usize,
+    account_index: usize,
+    stake: FinalOutputInfo,
+) -> Result<TransactionRequestInfo, String> {
+    with_service(|core| {
+        let wallet = core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .accounts
+            .get(account_index)
+            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let provider = core
+            .get_provider(account.chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
+        let tx = provider.build_tx_scilla_init_unstake(&stake.into())?;
+
+        Ok(tx.into())
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn build_tx_scilla_complete_withdrawal(
+    wallet_index: usize,
+    account_index: usize,
+    stake: FinalOutputInfo,
+) -> Result<TransactionRequestInfo, String> {
+    with_service(|core| {
+        let wallet = core
+            .get_wallet_by_index(wallet_index)
+            .map_err(ServiceError::BackgroundError)?;
+        let data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let account = data
+            .accounts
+            .get(account_index)
+            .ok_or(WalletErrors::InvalidAccountIndex(account_index))
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let provider = core
+            .get_provider(account.chain_hash)
+            .map_err(ServiceError::BackgroundError)?;
+        let tx = provider.build_tx_scilla_complete_withdrawal(&stake.into())?;
+
+        Ok(tx.into())
+    })
+    .await
+    .map_err(Into::into)
 }

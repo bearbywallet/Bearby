@@ -144,6 +144,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   FTokenInfo dco_decode_box_autoadd_f_token_info(dynamic raw);
 
   @protected
+  FinalOutputInfo dco_decode_box_autoadd_final_output_info(dynamic raw);
+
+  @protected
   LedgerParamsInput dco_decode_box_autoadd_ledger_params_input(dynamic raw);
 
   @protected
@@ -519,6 +522,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   FTokenInfo sse_decode_box_autoadd_f_token_info(SseDeserializer deserializer);
+
+  @protected
+  FinalOutputInfo sse_decode_box_autoadd_final_output_info(
+      SseDeserializer deserializer);
 
   @protected
   LedgerParamsInput sse_decode_box_autoadd_ledger_params_input(
@@ -934,6 +941,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_f_token_info(
       FTokenInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_final_output_info(
+      FinalOutputInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_ledger_params_input(
