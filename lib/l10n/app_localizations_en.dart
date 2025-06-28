@@ -1569,9 +1569,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get tvlSort => 'TVL';
 
   @override
-  String claimButton(String amount) {
-    return 'Claim ($amount ZIL)';
-  }
+  String get claimButton => 'Claim';
 
   @override
   String get stakeButton => 'Stake';

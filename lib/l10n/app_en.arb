@@ -2208,14 +2208,9 @@
   "@tvlSort": {
     "description": "Label for sorting by Total Value Locked"
   },
-  "claimButton": "Claim ({amount} ZIL)",
+  "claimButton": "Claim",
   "@claimButton": {
-    "description": "Text for the claim rewards button",
-    "placeholders": {
-      "amount": {
-        "type": "String"
-      }
-    }
+    "description": "Text for the claim rewards button"
   },
   "stakeButton": "Stake",
   "@stakeButton": {

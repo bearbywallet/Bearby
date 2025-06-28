@@ -1569,9 +1569,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tvlSort => 'TVL';
 
   @override
-  String claimButton(String amount) {
-    return 'Забрать ($amount ZIL)';
-  }
+  String get claimButton => 'Забрать';
 
   @override
   String get stakeButton => 'Стейкать';

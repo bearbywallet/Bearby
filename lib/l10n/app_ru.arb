@@ -594,7 +594,7 @@
   "aprSort": "APR",
   "commissionSort": "Комиссия",
   "tvlSort": "TVL",
-  "claimButton": "Забрать ({amount} ZIL)",
+  "claimButton": "Забрать",
   "stakeButton": "Стейкать",
   "unstakeButton": "Анстейк",
   "aprLabel": "APR",

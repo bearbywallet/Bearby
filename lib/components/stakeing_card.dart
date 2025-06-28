@@ -100,10 +100,14 @@ class StakingPoolCard extends StatelessWidget {
                   color: theme.danger.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(16),
                 ),
-                child: Icon(Icons.broken_image, color: theme.danger, size: 28),
+                child: SvgPicture.asset(
+                  'assets/icons/zil.svg',
+                  width: 28,
+                  height: 28,
+                  colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                ),
               ),
             ),
-            // SVG иконка в зависимости от tag
             Positioned(
               bottom: -2,
               right: -2,
@@ -119,12 +123,12 @@ class StakingPoolCard extends StatelessWidget {
                 ),
                 child: SvgPicture.asset(
                   stake.tag == 'scilla'
-                      ? "assets/icons/scilla.svg"
-                      : "assets/icons/solidity.svg",
+                      ? 'assets/icons/scilla.svg'
+                      : 'assets/icons/solidity.svg',
                   width: 16,
                   height: 16,
                   colorFilter: ColorFilter.mode(
-                    stake.tag == 'scilla' ? theme.success : theme.primaryPurple,
+                    theme.textPrimary,
                     BlendMode.srcIn,
                   ),
                 ),
@@ -164,9 +168,7 @@ class StakingPoolCard extends StatelessWidget {
                     child: Text(
                       stake.tag.toUpperCase(),
                       style: TextStyle(
-                        color: stake.tag == 'scilla'
-                            ? theme.success
-                            : theme.primaryPurple,
+                        color: theme.primaryPurple,
                         fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
@@ -205,9 +207,8 @@ class StakingPoolCard extends StatelessWidget {
 
   Widget _buildUserStakingInfo(
       AppTheme theme, AppLocalizations l10n, AppState appState) {
-    final hasRewards = double.tryParse(stake.rewards.replaceAll(',', ''))! > 0;
-    final hasDelegation =
-        double.tryParse(stake.delegAmt.replaceAll(',', ''))! > 0;
+    final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
+    final hasDelegation = (int.tryParse(stake.delegAmt) ?? 0) > 0;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -223,7 +224,6 @@ class StakingPoolCard extends StatelessWidget {
               l10n.stakedAmount,
               _formatAmount(stake.delegAmt, appState),
               hasDelegation ? theme.primaryPurple : theme.textSecondary,
-              Icons.account_balance_wallet_outlined,
             ),
           ),
           Container(
@@ -237,7 +237,6 @@ class StakingPoolCard extends StatelessWidget {
               l10n.rewardsAvailable,
               _formatAmount(stake.rewards, appState),
               hasRewards ? theme.success : theme.textSecondary,
-              Icons.stars_outlined,
             ),
           ),
         ],
@@ -245,16 +244,17 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildUserStatItem(AppTheme theme, String label, String value,
-      Color valueColor, IconData icon) {
+  Widget _buildUserStatItem(
+    AppTheme theme,
+    String label,
+    (String, String) values,
+    Color valueColor,
+  ) {
+    final primaryValue = values.$1;
+    final btcValue = values.$2;
+
     return Column(
       children: [
-        Icon(
-          icon,
-          size: 20,
-          color: valueColor,
-        ),
-        const SizedBox(height: 8),
         Text(
           label,
           style: TextStyle(
@@ -265,12 +265,27 @@ class StakingPoolCard extends StatelessWidget {
           textAlign: TextAlign.center,
         ),
         const SizedBox(height: 4),
-        Text(
-          value,
-          style: TextStyle(
-            color: valueColor,
-            fontSize: 16,
-            fontWeight: FontWeight.w700,
+        RichText(
+          text: TextSpan(
+            children: [
+              TextSpan(
+                text: primaryValue,
+                style: TextStyle(
+                  color: valueColor,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              if (btcValue.isNotEmpty)
+                TextSpan(
+                  text: '\n$btcValue',
+                  style: TextStyle(
+                    color: theme.textSecondary,
+                    fontSize: 9,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+            ],
           ),
           textAlign: TextAlign.center,
         ),
@@ -294,26 +309,38 @@ class StakingPoolCard extends StatelessWidget {
           _buildStatItem(
             theme,
             "VP",
-            '${stake.votePower?.toStringAsFixed(1) ?? 0}%',
-            theme.primaryPurple,
+            stake.votePower == null || stake.votePower == 0
+                ? 'N/A'
+                : '${stake.votePower?.toStringAsFixed(1)}%',
+            stake.votePower == null || stake.votePower == 0
+                ? theme.textSecondary
+                : theme.primaryPurple,
           ),
           _buildStatItem(
             theme,
             l10n.aprLabel,
-            '${stake.apr?.toStringAsFixed(1) ?? 0}%',
-            theme.success,
+            stake.apr == null || stake.apr == 0
+                ? 'N/A'
+                : '${stake.apr?.toStringAsFixed(1)}%',
+            stake.apr == null || stake.apr == 0
+                ? theme.textSecondary
+                : theme.success,
           ),
           _buildStatItem(
             theme,
             l10n.commissionLabel,
-            '${stake.commission?.toStringAsFixed(1) ?? 0}%',
-            theme.warning,
+            stake.commission == null || stake.commission == 0
+                ? 'N/A'
+                : '${stake.commission?.toStringAsFixed(1)}%',
+            stake.commission == null || stake.commission == 0
+                ? theme.textSecondary
+                : theme.warning,
           ),
           _buildStatItem(
             theme,
             l10n.tvlLabel,
-            _formatTvl(stake.tvl, appState),
-            theme.textPrimary,
+            stake.tvl == null ? 'N/A' : _formatTvl(stake.tvl, appState),
+            stake.tvl == null ? theme.textSecondary : theme.textPrimary,
           ),
         ],
       ),
@@ -349,14 +376,18 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(AppTheme theme, AppLocalizations l10n,
-      bool hasRewards, bool hasDelegation) {
+  Widget _buildActionButtons(
+    AppTheme theme,
+    AppLocalizations l10n,
+    bool hasRewards,
+    bool hasDelegation,
+  ) {
     return Row(
       children: [
         if (hasRewards) ...[
           Expanded(
             child: CustomButton(
-              text: l10n.claimButton(stake.rewards),
+              text: l10n.claimButton,
               onPressed: () {},
               textColor: theme.buttonText,
               backgroundColor: theme.success,
@@ -380,34 +411,22 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  String _formatAmount(String amount, AppState appState) {
-    final parsedAmount = double.tryParse(amount.replaceAll(',', '')) ?? 0.0;
-    if (parsedAmount == 0) return '0';
+  (String, String) _formatAmount(String amount, AppState appState) {
+    final parsedAmount = BigInt.tryParse(amount) ?? BigInt.zero;
 
     String symbol = "ZIL";
-    int decimals = 18;
+    int decimals = stake.tag == 'scilla' ? 12 : 18;
+    double rate = appState.wallet?.tokens.first.rate ?? 0;
 
-    try {
-      final nativeToken = appState.wallet?.tokens
-          .firstWhere((t) => t.native && t.addrType == 0);
-      if (nativeToken != null) {
-        symbol = nativeToken.symbol;
-        decimals = nativeToken.decimals;
-      }
-    } catch (_) {}
-
-    // Конвертируем в BigInt для форматирования
-    final bigIntAmount = BigInt.from(parsedAmount * 1e18);
-
-    final (formattedValue, _) = formatingAmount(
-      amount: bigIntAmount,
+    final (formattedValue, converted) = formatingAmount(
+      amount: parsedAmount,
       symbol: symbol,
       decimals: decimals,
-      rate: 0,
+      rate: rate,
       appState: appState,
     );
 
-    return formattedValue.split(' ')[0];
+    return (formattedValue, converted);
   }
 
   String _formatTvl(BigInt? tvl, AppState appState) {

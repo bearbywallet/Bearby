@@ -598,7 +598,7 @@
   "aprSort": "APR",
   "commissionSort": "手数料",
   "tvlSort": "TVL",
-  "claimButton": "請求 ({amount} ZIL)",
+  "claimButton": "請求",
   "stakeButton": "ステーク",
   "unstakeButton": "アンステーク",
   "aprLabel": "APR",

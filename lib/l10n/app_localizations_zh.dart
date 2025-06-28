@@ -1569,9 +1569,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get tvlSort => '总锁仓价值';
 
   @override
-  String claimButton(String amount) {
-    return '领取 ($amount ZIL)';
-  }
+  String get claimButton => '领取';
 
   @override
   String get stakeButton => '质押';

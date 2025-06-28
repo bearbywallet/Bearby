@@ -3162,8 +3162,8 @@ abstract class AppLocalizations {
   /// Text for the claim rewards button
   ///
   /// In en, this message translates to:
-  /// **'Claim ({amount} ZIL)'**
-  String claimButton(String amount);
+  /// **'Claim'**
+  String get claimButton;
 
   /// Text for the stake button
   ///
