@@ -484,7 +484,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
               tx: tx,
               to: widget.stake.address,
               token: nativeToken,
-              amount: amount,
+              amount: _amountController.text,
               onConfirm: (_) {
                 Navigator.of(context).pushNamed('/', arguments: {
                   'selectedIndex': 1,
