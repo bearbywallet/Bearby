@@ -60,10 +60,14 @@ class _ZilStakePageState extends State<ZilStakePage> {
       if (mounted) {
         setState(() {
           _stakes = list;
-          _withdrawalStakes =
-              _stakes.where((stake) => stake.tag == "withdrawal").toList();
-          _sortedStakes =
-              _stakes.where((stake) => stake.tag != "withdrawal").toList();
+          _withdrawalStakes = _stakes
+              .where((stake) =>
+                  stake.tag == "withdrawal" || stake.tag == "withdrawalEVM")
+              .toList();
+          _sortedStakes = _stakes
+              .where((stake) =>
+                  stake.tag != "withdrawal" && stake.tag != "withdrawalEVM")
+              .toList();
           _errorMessage = null;
         });
       }
@@ -351,6 +355,15 @@ class _ZilStakePageState extends State<ZilStakePage> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
+              stake.name,
+              style: TextStyle(
+                color: theme.textPrimary,
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
               amount,
               style: TextStyle(
                 color: theme.textSecondary,
@@ -389,6 +402,12 @@ class _ZilStakePageState extends State<ZilStakePage> {
                               walletIndex: walletIndex,
                               accountIndex: accountIndex,
                             );
+                          } else if (stake.tag == 'withdrawalEVM' &&
+                              appState.account!.addrType == 0) {
+                            await zilliqaSwapChain(
+                              walletIndex: walletIndex,
+                              accountIndex: accountIndex,
+                            );
                           }
 
                           nativeToken = appState.wallet?.tokens
@@ -403,6 +422,12 @@ class _ZilStakePageState extends State<ZilStakePage> {
                             tx = await buildTxScillaCompleteWithdrawal(
                               walletIndex: walletIndex,
                               accountIndex: accountIndex,
+                            );
+                          } else if (stake.tag == 'withdrawalEVM') {
+                            tx = await buildTxClaimUnstakeRequest(
+                              walletIndex: walletIndex,
+                              accountIndex: accountIndex,
+                              stake: stake,
                             );
                           } else {
                             throw "Invalid tx";

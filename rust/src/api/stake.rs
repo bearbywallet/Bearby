@@ -203,9 +203,9 @@ pub async fn build_tx_evm_stake_request(
         let provider = core
             .get_provider(account.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
-        let delegator_address = Address::from_eth_address(&stake.address)?;
+        let provider_address = Address::from_eth_address(&stake.address)?;
         let amount: U256 = amount.parse().unwrap_or_default();
-        let tx = provider.build_tx_evm_stake_request(amount, delegator_address)?;
+        let tx = provider.build_tx_evm_stake_request(amount, &provider_address, &account.addr)?;
 
         Ok(tx.into())
     })
@@ -234,9 +234,13 @@ pub async fn build_tx_evm_unstake_request(
         let provider = core
             .get_provider(account.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
-        let delegator_address = Address::from_eth_address(&stake.address)?;
+        let provider_address = Address::from_eth_address(&stake.address)?;
         let amount_to_unstake: U256 = amount_to_unstake.parse().unwrap_or_default();
-        let tx = provider.build_tx_evm_unstake_request(amount_to_unstake, delegator_address)?;
+        let tx = provider.build_tx_evm_unstake_request(
+            amount_to_unstake,
+            &provider_address,
+            &account.addr,
+        )?;
 
         Ok(tx.into())
     })
@@ -265,7 +269,7 @@ pub async fn build_tx_claim_unstake_request(
             .get_provider(account.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
         let delegator_address = Address::from_eth_address(&stake.address)?;
-        let tx = provider.build_tx_claim_unstake_request(delegator_address)?;
+        let tx = provider.build_tx_claim_unstake_request(&delegator_address, &account.addr)?;
 
         Ok(tx.into())
     })
@@ -293,8 +297,8 @@ pub async fn build_tx_claim_reward_request(
         let provider = core
             .get_provider(account.chain_hash)
             .map_err(ServiceError::BackgroundError)?;
-        let delegator_address = Address::from_eth_address(&stake.address)?;
-        let tx = provider.build_tx_build_claim_reward_request(delegator_address)?;
+        let provider_address = Address::from_eth_address(&stake.address)?;
+        let tx = provider.build_tx_build_claim_reward_request(&provider_address, &account.addr)?;
 
         Ok(tx.into())
     })
