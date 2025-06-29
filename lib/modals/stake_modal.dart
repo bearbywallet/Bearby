@@ -95,23 +95,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
   void _setPercentageAmount(double percentage) {
     final amount =
         (_availableBalance * BigInt.from((percentage * 100).toInt())) ~/
-            BigInt.from(10000);
+            BigInt.from(100);
+
     final formattedAmount = fromWei(
       value: amount.toString(),
       decimals: _balanceDecimals,
     );
-    _amountController.text = formattedAmount;
-  }
 
-  (String, String) _formatBalance() {
-    final appState = Provider.of<AppState>(context);
-    return formatingAmount(
-      amount: _availableBalance,
-      symbol: _balanceSymbol,
-      decimals: _balanceDecimals,
-      rate: _balanceRate,
-      appState: appState,
-    );
+    _amountController.text = formattedAmount;
   }
 
   @override
@@ -119,7 +110,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
-    final (balanceAmount, balanceConverted) = _formatBalance();
 
     return Container(
       constraints: BoxConstraints(
@@ -131,43 +121,54 @@ class _StakeModalContentState extends State<StakeModalContent> {
         border: Border.all(color: theme.modalBorder, width: 2),
       ),
       child: SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: theme.modalBorder,
-                borderRadius: BorderRadius.circular(2),
+        child: GestureDetector(
+          onTap: () {
+            FocusScope.of(context).unfocus();
+          },
+          behavior: HitTestBehavior.translucent,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 36,
+                height: 4,
+                margin: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  color: theme.modalBorder,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            Flexible(
-              child: SingleChildScrollView(
-                physics: const BouncingScrollPhysics(),
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      _buildHeader(theme, l10n),
-                      const SizedBox(height: 20),
-                      _buildStakeInfo(theme, l10n),
-                      const SizedBox(height: 20),
-                      _buildAmountInput(theme, l10n),
-                      const SizedBox(height: 16),
-                      _buildPercentageButtons(theme),
-                      const SizedBox(height: 16),
-                      _buildStakeButton(appState, l10n),
-                      const SizedBox(height: 16),
-                    ],
+              Flexible(
+                child: SingleChildScrollView(
+                  physics: const BouncingScrollPhysics(),
+                  child: Padding(
+                    padding: EdgeInsets.fromLTRB(
+                      16,
+                      0,
+                      16,
+                      16 + MediaQuery.of(context).viewInsets.bottom,
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        _buildHeader(theme, l10n),
+                        const SizedBox(height: 20),
+                        _buildStakeInfo(theme, l10n),
+                        const SizedBox(height: 20),
+                        _buildAmountInput(theme, l10n),
+                        const SizedBox(height: 16),
+                        _buildPercentageButtons(theme),
+                        const SizedBox(height: 16),
+                        _buildStakeButton(appState, l10n),
+                        const SizedBox(height: 16),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -464,9 +465,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
               ),
             );
           }
-
-          if (widget.stake.tag == 'evm') {}
-          // Navigator.pop(context);
         },
         backgroundColor: theme.primaryPurple,
         textColor: theme.buttonText,

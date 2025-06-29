@@ -178,6 +178,7 @@ class _ConfirmTransactionContentState
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
       );
+
       if (mounted) {
         setState(() => _txParamsInfo = gas);
       }

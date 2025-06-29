@@ -28,7 +28,7 @@ class StakingPoolCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final hasRewards = (double.tryParse(stake.rewards) ?? 0) > 0;
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
-    final isLP = stake.tokenAddress == null || stake.tokenAddress == zeroEVM;
+    final isLP = stake.tokenAddress != null && stake.tokenAddress != zeroEVM;
 
     return Container(
       decoration: BoxDecoration(
