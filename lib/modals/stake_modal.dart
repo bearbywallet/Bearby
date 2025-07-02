@@ -5,7 +5,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
-import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
@@ -50,9 +50,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
       GlobalKey<SmartInputState>();
 
   BigInt _availableBalance = BigInt.zero;
-  String _balanceSymbol = "ZIL";
   int _balanceDecimals = 12;
-  double _balanceRate = 0;
 
   @override
   void initState() {
@@ -79,7 +77,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
         _availableBalance =
             BigInt.tryParse(token.balances[selectedAccount] ?? '0') ??
                 BigInt.zero;
-        _balanceSymbol = token.symbol;
         _balanceDecimals = token.decimals;
         _balanceRate = token.rate;
       }
@@ -175,6 +172,12 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
+    String urlTemplate =
+        "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
+    final replacements = <String, String>{
+      'address': widget.stake.address.toLowerCase(),
+    };
+
     return Row(
       children: [
         Container(
@@ -190,7 +193,11 @@ class _StakeModalContentState extends State<StakeModalContent> {
           child: ClipRRect(
             borderRadius: BorderRadius.circular(14),
             child: AsyncImage(
-              url: widget.stake.url,
+              url: processUrlTemplate(
+                template: urlTemplate,
+                theme: theme.value,
+                replacements: replacements,
+              ),
               width: 56,
               height: 56,
               fit: BoxFit.contain,

@@ -6,8 +6,6 @@
     "rpc": [
       "https://api.zilliqa.com",
       "https://ssn.zilpay.io/api",
-      "https://zilliqa.avely.fi/api",
-      "https://ssn.zillet.io"
     ],
     "features": [],
     "ftokens": [

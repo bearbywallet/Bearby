@@ -21,6 +21,8 @@ BigInt toDecimalsWei(String amount, int decimals) {
   required int decimals,
   required double rate,
   required AppState appState,
+  double? threshold,
+  bool? compact,
 }) {
   String? convertedSymbolStr = appState.wallet?.settings.currencyConvert;
   double converted = 0;
@@ -39,8 +41,8 @@ BigInt toDecimalsWei(String amount, int decimals) {
     localeStr: appState.state.locale ?? "",
     nativeSymbolStr: symbol,
     convertedSymbolStr: convertedSymbolStr ?? '',
-    threshold: baseThreshold,
-    compact: appState.state.abbreviatedNumber,
+    threshold: threshold ?? baseThreshold,
+    compact: compact ?? appState.state.abbreviatedNumber,
     converted: converted,
   );
 }

@@ -928,9 +928,9 @@ dependencies = [
 
 [[package]]
 name = "aws-sdk-kms"
-version = "1.76.1"
+version = "1.77.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "ddea79bde6e73fdcba2f9f9640cb0402948d5679fd92ab49d3296a9ce5d1bfa9"
+checksum = "6cd57d0c1a5bd6c7eaa2b26462e046d5ca7b72189346718d2435dfc48bfa988b"
 dependencies = [
  "aws-credential-types",
  "aws-runtime",
@@ -1144,7 +1144,7 @@ dependencies = [
 [[package]]
 name = "background"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "async-trait",
@@ -1454,7 +1454,7 @@ dependencies = [
 [[package]]
 name = "cache"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "errors",
  "image",
@@ -1512,7 +1512,7 @@ dependencies = [
 [[package]]
 name = "cipher"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "aes-gcm",
  "config",
@@ -1571,7 +1571,7 @@ checksum = "3d7b894f5411737b7867f4827955924d7c254fc9f4d91a6aad6b097804b1018b"
 [[package]]
 name = "config"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 
 [[package]]
 name = "console_error_panic_hook"
@@ -1711,7 +1711,7 @@ checksum = "460fbee9c2c2f33933d720630a6a0bac33ba7053db5344fac858d4b8952d77d5"
 [[package]]
 name = "crypto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "config",
  "errors",
@@ -2038,7 +2038,7 @@ dependencies = [
 [[package]]
 name = "errors"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "bincode",
  "ntrulp",
@@ -2474,9 +2474,9 @@ dependencies = [
 
 [[package]]
 name = "h2"
-version = "0.4.10"
+version = "0.4.11"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "a9421a676d1b147b16b82c9225157dc629087ef8ec4d5e2960f9437a90dac0a5"
+checksum = "17da50a276f1e01e0ba6c029e47b7100754904ee8a278f886546e98575380785"
 dependencies = [
  "atomic-waker",
  "bytes",
@@ -2580,7 +2580,7 @@ dependencies = [
 [[package]]
 name = "history"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "errors",
@@ -2997,12 +2997,23 @@ dependencies = [
 [[package]]
 name = "intl"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "bigdecimal",
  "errors",
  "num-format",
+]
+
+[[package]]
+name = "io-uring"
+version = "0.7.8"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "b86e202f00093dcba4275d4636b93ef9dd75d025ae560d2521b45ea28ab49013"
+dependencies = [
+ "bitflags 2.9.1",
+ "cfg-if",
+ "libc",
 ]
 
 [[package]]
@@ -3372,7 +3383,7 @@ dependencies = [
 [[package]]
 name = "network"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "async-trait",
@@ -3961,7 +3972,7 @@ dependencies = [
 [[package]]
 name = "proto"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "bech32",
@@ -3994,7 +4005,7 @@ dependencies = [
 [[package]]
 name = "qrcodes"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "errors",
@@ -4314,9 +4325,9 @@ checksum = "2b15c43186be67a4fd63bee50d0303afffcef381492ebe2c5d87f324e1b8815c"
 
 [[package]]
 name = "reqwest"
-version = "0.12.20"
+version = "0.12.22"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "eabf4c97d9130e2bf606614eb937e86edac8292eaa6f422f995d7e8de1eb1813"
+checksum = "cbc931937e6ca3a06e3b6c0aa7841849b160a90351d6ab467a8b9b9959767531"
 dependencies = [
  "async-compression",
  "base64 0.22.1",
@@ -4445,7 +4456,7 @@ checksum = "6c20b6793b5c2fa6553b250154b78d6d0db37e72700ae35fad9387a46f487c97"
 [[package]]
 name = "rpc"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "async-trait",
@@ -4718,6 +4729,18 @@ dependencies = [
 ]
 
 [[package]]
+name = "schemars"
+version = "1.0.3"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1375ba8ef45a6f15d83fa8748f1079428295d403d6ea991d09ab100155fbc06d"
+dependencies = [
+ "dyn-clone",
+ "ref-cast",
+ "serde",
+ "serde_json",
+]
+
+[[package]]
 name = "scopeguard"
 version = "1.2.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -4874,16 +4897,17 @@ dependencies = [
 
 [[package]]
 name = "serde_with"
-version = "3.13.0"
+version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "bf65a400f8f66fb7b0552869ad70157166676db75ed8181f8104ea91cf9d0b42"
+checksum = "f2c45cd61fefa9db6f254525d46e392b852e0e61d9a1fd36e5bd183450a556d5"
 dependencies = [
  "base64 0.22.1",
  "chrono",
  "hex",
  "indexmap 1.9.3",
  "indexmap 2.10.0",
- "schemars",
+ "schemars 0.9.0",
+ "schemars 1.0.3",
  "serde",
  "serde_derive",
  "serde_json",
@@ -4893,9 +4917,9 @@ dependencies = [
 
 [[package]]
 name = "serde_with_macros"
-version = "3.13.0"
+version = "3.14.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "81679d9ed988d5e9a5e6531dc3f2c28efbd639cbd1dfb628df08edea6004da77"
+checksum = "de90945e6565ce0d9a25098082ed4ee4002e047cb59892c318d66821e14bb30f"
 dependencies = [
  "darling",
  "proc-macro2",
@@ -4916,7 +4940,7 @@ dependencies = [
 [[package]]
 name = "session"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -4929,7 +4953,7 @@ dependencies = [
 [[package]]
 name = "settings"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "cipher 0.1.0",
  "config",
@@ -5096,7 +5120,7 @@ checksum = "a2eb9349b6444b326872e140eb1cf5e7c522154d69e7a0ffb0fb81c06b37543f"
 [[package]]
 name = "storage"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "config",
  "directories",
@@ -5390,7 +5414,7 @@ checksum = "1f3ccbac311fea05f86f61904b462b55fb3df8837a366dfc601a0161d0532f20"
 [[package]]
 name = "token"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "bincode",
@@ -5404,7 +5428,7 @@ dependencies = [
 [[package]]
 name = "token_quotes"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "errors",
  "proto",
@@ -5417,15 +5441,17 @@ dependencies = [
 
 [[package]]
 name = "tokio"
-version = "1.45.1"
+version = "1.46.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "75ef51a33ef1da925cea3e4eb122833cb377c61439ca401b770f54902b806779"
+checksum = "1140bb80481756a8cbe10541f37433b459c5aa1e727b4c020fbfebdc25bf3ec4"
 dependencies = [
  "backtrace",
  "bytes",
+ "io-uring",
  "libc",
  "mio",
  "pin-project-lite",
+ "slab",
  "socket2",
  "tokio-macros",
  "windows-sys 0.52.0",
@@ -5870,7 +5896,7 @@ dependencies = [
 [[package]]
 name = "wallet"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "alloy",
  "async-trait",
@@ -6434,7 +6460,7 @@ dependencies = [
 [[package]]
 name = "zilpay"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "background",
  "cache",
@@ -6457,7 +6483,7 @@ dependencies = [
 [[package]]
 name = "zilpay_core"
 version = "0.1.0"
-source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#092484c2f9c3b7182bcbdd9d8bed8d4293b67299"
+source = "git+https://github.com/zilpay/zilpay-core.git?branch=master#646cfe5251b196da810a6b5fd14b3e0c2ab27b63"
 dependencies = [
  "background",
  "cache",

@@ -88,6 +88,16 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
   void _sortStakes() {
     _sortedStakes.sort((a, b) {
+      final aHasStake =
+          (BigInt.tryParse(a.delegAmt) ?? BigInt.zero) > BigInt.zero ||
+              (BigInt.tryParse(a.rewards) ?? BigInt.zero) > BigInt.zero;
+      final bHasStake =
+          (BigInt.tryParse(b.delegAmt) ?? BigInt.zero) > BigInt.zero ||
+              (BigInt.tryParse(b.rewards) ?? BigInt.zero) > BigInt.zero;
+
+      if (aHasStake && !bHasStake) return -1;
+      if (!aHasStake && bHasStake) return 1;
+
       final aIsAvely = a.name.toLowerCase().contains('avely');
       final bIsAvely = b.name.toLowerCase().contains('avely');
 
@@ -336,7 +346,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
     final (amount, converted) = formatingAmount(
       amount: BigInt.parse(stake.delegAmt),
       symbol: symbol,
-      decimals: stake.tokenAddress == null ? 12 : 18,
+      decimals: nativeToken!.decimals,
       rate: rate,
       appState: appState,
     );
