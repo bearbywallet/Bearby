@@ -594,13 +594,18 @@
   "aprSort": "APR",
   "commissionSort": "Комиссия",
   "tvlSort": "TVL",
-  "claimButton": "Награды",
-  "stakeButton": "Вкладывать",
-  "unstakeButton": "Забрать",
+  "claimButton": "Забрать",
+  "stakeButton": "Стейкать",
+  "unstakeButton": "Отозвать",
+  "reinvest": "Реинвест",
   "aprLabel": "APR",
   "commissionLabel": "Комиссия",
   "tvlLabel": "TVL",
-  "lpStakingBadge": "Ликвид",
+  "lpStakingBadge": "LP",
   "stakedAmount": "В стейке",
-  "rewardsAvailable": "Награды"
+  "rewardsAvailable": "Награды",
+  "pendingWithdrawals": "Ожидающие выводы",
+  "amount": "Сумма",
+  "claimableIn": "Доступно через",
+  "blocks": "блоков"
 }

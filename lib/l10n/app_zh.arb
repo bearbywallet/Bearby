@@ -577,14 +577,19 @@
   "noStakingPoolsFound": "未找到质押池",
   "aprSort": "年化率",
   "commissionSort": "佣金",
-  "tvlSort": "总锁仓价值",
+  "tvlSort": "总锁定价值",
   "claimButton": "领取",
   "stakeButton": "质押",
   "unstakeButton": "取消质押",
+  "reinvest": "再投资",
   "aprLabel": "年化率",
   "commissionLabel": "佣金",
-  "tvlLabel": "总锁仓价值",
+  "tvlLabel": "总锁定价值",
   "lpStakingBadge": "LP 质押",
   "stakedAmount": "已质押",
-  "rewardsAvailable": "奖励"
+  "rewardsAvailable": "可用奖励",
+  "pendingWithdrawals": "待处理提款",
+  "amount": "数量",
+  "claimableIn": "可领取于",
+  "blocks": "区块"
 }

@@ -2220,6 +2220,10 @@
   "@unstakeButton": {
     "description": "Text for the unstake button"
   },
+  "reinvest": "Reinvest",
+  "@reinvest": {
+    "description": "Text for the reinvest button"
+  },
   "aprLabel": "APR",
   "@aprLabel": {
     "description": "Label for APR in the staking pool card"
@@ -2243,5 +2247,21 @@
   "rewardsAvailable": "Rewards",
   "@rewardsAvailable": {
     "description": "Label for the rewards available to claim"
+  },
+  "pendingWithdrawals": "Pending Withdrawals",
+  "@pendingWithdrawals": {
+    "description": "Title for the pending withdrawals section"
+  },
+  "amount": "Amount",
+  "@amount": {
+    "description": "Label for the amount in a transaction or a list"
+  },
+  "claimableIn": "Claimable in",
+  "@claimableIn": {
+    "description": "Text indicating the time remaining until something is claimable"
+  },
+  "blocks": "blocks",
+  "@blocks": {
+    "description": "Plural form of the word block, used for blockchain blocks count"
   }
 }

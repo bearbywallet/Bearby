@@ -601,10 +601,15 @@
   "claimButton": "請求",
   "stakeButton": "ステーク",
   "unstakeButton": "アンステーク",
+  "reinvest": "再投資",
   "aprLabel": "APR",
   "commissionLabel": "手数料",
   "tvlLabel": "TVL",
   "lpStakingBadge": "LP ステーキング",
   "stakedAmount": "ステーク済み",
-  "rewardsAvailable": "報酬"
+  "rewardsAvailable": "報酬",
+  "pendingWithdrawals": "保留中の出金",
+  "amount": "量",
+  "claimableIn": "請求可能まで",
+  "blocks": "ブロック"
 }

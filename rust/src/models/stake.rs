@@ -1,6 +1,12 @@
-use zilpay::network::zil_stake_parse::{FinalOutput, LPToken};
+use zilpay::network::zil_stake_parse::{FinalOutput, LPToken, PendingWithdrawal};
 
 use super::ftoken::FTokenInfo;
+
+pub struct PendingWithdrawalInfo {
+    pub amount: String,
+    pub withdrawal_block: u64,
+    pub claimable: bool,
+}
 
 pub struct FinalOutputInfo {
     pub name: String,
@@ -14,8 +20,27 @@ pub struct FinalOutputInfo {
     pub price: Option<f64>,
     pub commission: Option<f64>,
     pub tag: String,
-    pub withdrawal_block: Option<u64>,
     pub current_block: Option<u64>,
+    pub pending_withdrawals: Vec<PendingWithdrawalInfo>,
+}
+
+impl From<PendingWithdrawal> for PendingWithdrawalInfo {
+    fn from(value: PendingWithdrawal) -> Self {
+        Self {
+            amount: value.amount.to_string(),
+            withdrawal_block: value.withdrawal_block,
+            claimable: value.claimable,
+        }
+    }
+}
+impl From<PendingWithdrawalInfo> for PendingWithdrawal {
+    fn from(value: PendingWithdrawalInfo) -> Self {
+        Self {
+            amount: value.amount.parse().unwrap_or_default(),
+            withdrawal_block: value.withdrawal_block,
+            claimable: value.claimable,
+        }
+    }
 }
 
 impl From<FinalOutput> for FinalOutputInfo {
@@ -45,9 +70,13 @@ impl From<FinalOutput> for FinalOutputInfo {
             apr: stake.apr,
             commission: stake.commission,
             tag: stake.tag,
-            withdrawal_block: stake.withdrawal_block,
             current_block: stake.current_block,
             price: stake.price,
+            pending_withdrawals: stake
+                .pending_withdrawals
+                .into_iter()
+                .map(|v| v.into())
+                .collect(),
         }
     }
 }
@@ -72,9 +101,13 @@ impl From<FinalOutputInfo> for FinalOutput {
             apr: stake.apr,
             commission: stake.commission,
             tag: stake.tag,
-            withdrawal_block: stake.withdrawal_block,
             current_block: stake.current_block,
             price: stake.price,
+            pending_withdrawals: stake
+                .pending_withdrawals
+                .into_iter()
+                .map(|v| v.into())
+                .collect(),
         }
     }
 }

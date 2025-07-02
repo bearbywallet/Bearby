@@ -1569,13 +1569,16 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tvlSort => 'TVL';
 
   @override
-  String get claimButton => 'Награды';
+  String get claimButton => 'Забрать';
 
   @override
-  String get stakeButton => 'Вкладывать';
+  String get stakeButton => 'Стейкать';
 
   @override
-  String get unstakeButton => 'Забрать';
+  String get unstakeButton => 'Отозвать';
+
+  @override
+  String get reinvest => 'Реинвест';
 
   @override
   String get aprLabel => 'APR';
@@ -1587,11 +1590,23 @@ class AppLocalizationsRu extends AppLocalizations {
   String get tvlLabel => 'TVL';
 
   @override
-  String get lpStakingBadge => 'Ликвид';
+  String get lpStakingBadge => 'LP';
 
   @override
   String get stakedAmount => 'В стейке';
 
   @override
   String get rewardsAvailable => 'Награды';
+
+  @override
+  String get pendingWithdrawals => 'Ожидающие выводы';
+
+  @override
+  String get amount => 'Сумма';
+
+  @override
+  String get claimableIn => 'Доступно через';
+
+  @override
+  String get blocks => 'блоков';
 }

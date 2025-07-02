@@ -4051,8 +4051,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       price: dco_decode_opt_box_autoadd_f_64(arr[8]),
       commission: dco_decode_opt_box_autoadd_f_64(arr[9]),
       tag: dco_decode_String(arr[10]),
-      withdrawalBlock: dco_decode_opt_box_autoadd_u_64(arr[11]),
-      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
+      currentBlock: dco_decode_opt_box_autoadd_u_64(arr[11]),
+      pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[12]),
     );
   }
 
@@ -4217,6 +4217,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_network_config_info).toList();
+  }
+
+  @protected
+  List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>)
+        .map(dco_decode_pending_withdrawal_info)
+        .toList();
   }
 
   @protected
@@ -4405,6 +4414,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
+  }
+
+  @protected
+  PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return PendingWithdrawalInfo(
+      amount: dco_decode_String(arr[0]),
+      withdrawalBlock: dco_decode_u_64(arr[1]),
+      claimable: dco_decode_bool(arr[2]),
+    );
   }
 
   @protected
@@ -5255,8 +5277,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_price = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_tag = sse_decode_String(deserializer);
-    var var_withdrawalBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
+    var var_pendingWithdrawals =
+        sse_decode_list_pending_withdrawal_info(deserializer);
     return FinalOutputInfo(
         name: var_name,
         address: var_address,
@@ -5269,8 +5292,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         price: var_price,
         commission: var_commission,
         tag: var_tag,
-        withdrawalBlock: var_withdrawalBlock,
-        currentBlock: var_currentBlock);
+        currentBlock: var_currentBlock,
+        pendingWithdrawals: var_pendingWithdrawals);
   }
 
   @protected
@@ -5526,6 +5549,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <NetworkConfigInfo>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_network_config_info(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <PendingWithdrawalInfo>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_pending_withdrawal_info(deserializer));
     }
     return ans_;
   }
@@ -5842,6 +5878,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     } else {
       return null;
     }
+  }
+
+  @protected
+  PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_amount = sse_decode_String(deserializer);
+    var var_withdrawalBlock = sse_decode_u_64(deserializer);
+    var var_claimable = sse_decode_bool(deserializer);
+    return PendingWithdrawalInfo(
+        amount: var_amount,
+        withdrawalBlock: var_withdrawalBlock,
+        claimable: var_claimable);
   }
 
   @protected
@@ -6615,8 +6664,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_f_64(self.price, serializer);
     sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
     sse_encode_String(self.tag, serializer);
-    sse_encode_opt_box_autoadd_u_64(self.withdrawalBlock, serializer);
     sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
+    sse_encode_list_pending_withdrawal_info(
+        self.pendingWithdrawals, serializer);
   }
 
   @protected
@@ -6800,6 +6850,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_network_config_info(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_pending_withdrawal_info(
+      List<PendingWithdrawalInfo> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_pending_withdrawal_info(item, serializer);
     }
   }
 
@@ -7073,6 +7133,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     if (self != null) {
       sse_encode_list_prim_u_8_strict(self, serializer);
     }
+  }
+
+  @protected
+  void sse_encode_pending_withdrawal_info(
+      PendingWithdrawalInfo self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.amount, serializer);
+    sse_encode_u_64(self.withdrawalBlock, serializer);
+    sse_encode_bool(self.claimable, serializer);
   }
 
   @protected

@@ -1566,7 +1566,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get commissionSort => '佣金';
 
   @override
-  String get tvlSort => '总锁仓价值';
+  String get tvlSort => '总锁定价值';
 
   @override
   String get claimButton => '领取';
@@ -1578,13 +1578,16 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unstakeButton => '取消质押';
 
   @override
+  String get reinvest => '再投资';
+
+  @override
   String get aprLabel => '年化率';
 
   @override
   String get commissionLabel => '佣金';
 
   @override
-  String get tvlLabel => '总锁仓价值';
+  String get tvlLabel => '总锁定价值';
 
   @override
   String get lpStakingBadge => 'LP 质押';
@@ -1593,5 +1596,17 @@ class AppLocalizationsZh extends AppLocalizations {
   String get stakedAmount => '已质押';
 
   @override
-  String get rewardsAvailable => '奖励';
+  String get rewardsAvailable => '可用奖励';
+
+  @override
+  String get pendingWithdrawals => '待处理提款';
+
+  @override
+  String get amount => '数量';
+
+  @override
+  String get claimableIn => '可领取于';
+
+  @override
+  String get blocks => '区块';
 }

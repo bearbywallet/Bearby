@@ -265,6 +265,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<NetworkConfigInfo> dco_decode_list_network_config_info(dynamic raw);
 
   @protected
+  List<PendingWithdrawalInfo> dco_decode_list_pending_withdrawal_info(
+      dynamic raw);
+
+  @protected
   Uint16List dco_decode_list_prim_u_16_strict(dynamic raw);
 
   @protected
@@ -345,6 +349,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw);
+
+  @protected
+  PendingWithdrawalInfo dco_decode_pending_withdrawal_info(dynamic raw);
 
   @protected
   QRcodeScanResultInfo dco_decode_q_rcode_scan_result_info(dynamic raw);
@@ -662,6 +669,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  List<PendingWithdrawalInfo> sse_decode_list_pending_withdrawal_info(
+      SseDeserializer deserializer);
+
+  @protected
   Uint16List sse_decode_list_prim_u_16_strict(SseDeserializer deserializer);
 
   @protected
@@ -752,6 +763,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer);
+
+  @protected
+  PendingWithdrawalInfo sse_decode_pending_withdrawal_info(
+      SseDeserializer deserializer);
 
   @protected
   QRcodeScanResultInfo sse_decode_q_rcode_scan_result_info(
@@ -1089,6 +1104,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<NetworkConfigInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_pending_withdrawal_info(
+      List<PendingWithdrawalInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_16_strict(
       Uint16List self, SseSerializer serializer);
 
@@ -1184,6 +1203,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_list_prim_u_8_strict(
       Uint8List? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_pending_withdrawal_info(
+      PendingWithdrawalInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_q_rcode_scan_result_info(

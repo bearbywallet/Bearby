@@ -1578,6 +1578,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unstakeButton => 'Unstake';
 
   @override
+  String get reinvest => 'Reinvest';
+
+  @override
   String get aprLabel => 'APR';
 
   @override
@@ -1594,4 +1597,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rewardsAvailable => 'Rewards';
+
+  @override
+  String get pendingWithdrawals => 'Pending Withdrawals';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get claimableIn => 'Claimable in';
+
+  @override
+  String get blocks => 'blocks';
 }

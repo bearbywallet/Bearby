@@ -11,6 +11,7 @@ import 'package:zilpay/modals/stake_modal.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -34,6 +35,7 @@ class StakingPoolCard extends StatelessWidget {
     final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
     final showStakingInfo = hasRewards || hasDelegation;
+    final hasPendingWithdrawals = stake.pendingWithdrawals.isNotEmpty;
 
     return Container(
       decoration: BoxDecoration(
@@ -61,6 +63,10 @@ class StakingPoolCard extends StatelessWidget {
                 if (showStakingInfo) ...[
                   const SizedBox(height: 20),
                   _buildUserStakingInfo(theme, l10n, appState),
+                  if (hasPendingWithdrawals) ...[
+                    const SizedBox(height: 16),
+                    _buildPendingWithdrawals(context, theme, l10n, appState),
+                  ],
                   const SizedBox(height: 16),
                   _buildStatsRow(theme, l10n, appState),
                   if (isLiquidStaking) ...[
@@ -391,6 +397,135 @@ class StakingPoolCard extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+
+  Widget _buildPendingWithdrawals(
+    BuildContext context,
+    AppTheme theme,
+    AppLocalizations l10n,
+    AppState appState,
+  ) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Padding(
+          padding: const EdgeInsets.only(bottom: 8),
+          child: Text(
+            l10n.pendingWithdrawals,
+            style: TextStyle(
+              color: theme.textSecondary,
+              fontWeight: FontWeight.w600,
+              fontSize: 14,
+            ),
+          ),
+        ),
+        ...stake.pendingWithdrawals.map(
+          (item) =>
+              _buildPendingWithdrawalItem(context, theme, l10n, appState, item),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildPendingWithdrawalItem(
+    BuildContext context,
+    AppTheme theme,
+    AppLocalizations l10n,
+    AppState appState,
+    PendingWithdrawalInfo item,
+  ) {
+    final currentBlock = stake.currentBlock ?? BigInt.zero;
+    final withdrawalBlock = item.withdrawalBlock;
+    final startBlock =
+        withdrawalBlock > currentBlock ? currentBlock : withdrawalBlock;
+    final blocksRemaining = withdrawalBlock > currentBlock
+        ? withdrawalBlock - currentBlock
+        : BigInt.zero;
+    final totalBlocks = withdrawalBlock > startBlock
+        ? withdrawalBlock - startBlock
+        : BigInt.one;
+    final progress =
+        (currentBlock - startBlock).toDouble() / totalBlocks.toDouble();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.textSecondary.withValues(alpha: 0.08),
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.amount,
+                      style: TextStyle(
+                        color: theme.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatTokenAmount(item.amount, appState).$1,
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (item.claimable)
+                CustomButton(
+                  text: l10n.claimButton,
+                  onPressed: () => _claimWithdrawal(context, appState, item),
+                  backgroundColor: theme.success,
+                  textColor: theme.buttonText,
+                  height: 40,
+                  width: 90,
+                  borderRadius: 12,
+                )
+            ],
+          ),
+          if (!item.claimable && blocksRemaining > BigInt.zero) ...[
+            const SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '${l10n.claimableIn} ${blocksRemaining.toString()} ${l10n.blocks}',
+                    style: TextStyle(
+                      color: theme.textSecondary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(10),
+              child: LinearProgressIndicator(
+                value: progress.isNaN || progress.isInfinite ? 0 : progress,
+                backgroundColor: theme.textSecondary.withValues(alpha: 0.1),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+                minHeight: 8,
+              ),
+            ),
+          ]
+        ],
+      ),
     );
   }
 
@@ -727,6 +862,17 @@ class StakingPoolCard extends StatelessWidget {
     } else {
       final nativeToken = appState.wallet?.tokens.firstWhere(
         (t) => t.native,
+        orElse: () => FTokenInfo(
+            name: 'Zilliqa',
+            symbol: 'ZIL',
+            decimals: 12,
+            addr: '',
+            addrType: 0,
+            balances: {},
+            rate: 0,
+            default_: true,
+            native: true,
+            chainHash: BigInt.zero),
       );
 
       if (stake.token != null) {
@@ -815,6 +961,33 @@ class StakingPoolCard extends StatelessWidget {
     }
   }
 
+  Future<void> _showErrorDialog(
+      BuildContext context, AppState appState, Object e) async {
+    return showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: appState.currentTheme.cardBackground,
+        title: Text(
+          "Error",
+          style: TextStyle(color: appState.currentTheme.textPrimary),
+        ),
+        content: Text(
+          e.toString(),
+          style: TextStyle(color: appState.currentTheme.danger),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: Text(
+              "OK",
+              style: TextStyle(color: appState.currentTheme.primaryPurple),
+            ),
+          )
+        ],
+      ),
+    );
+  }
+
   Future<void> _initUnstake(BuildContext context, AppState appState) async {
     try {
       final nativeToken = appState.wallet?.tokens.firstWhere(
@@ -873,21 +1046,7 @@ class StakingPoolCard extends StatelessWidget {
         },
       );
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: appState.currentTheme.cardBackground,
-          title: Text(
-            "Error",
-            style: TextStyle(color: appState.currentTheme.textPrimary),
-          ),
-          content: Text(
-            e.toString(),
-            style: TextStyle(color: appState.currentTheme.danger),
-          ),
-          actions: [],
-        ),
-      );
+      _showErrorDialog(context, appState, e);
     }
   }
 
@@ -899,6 +1058,64 @@ class StakingPoolCard extends StatelessWidget {
   }
 
   void _reinvest(BuildContext context, AppState appState) {}
+
+  Future<void> _claimWithdrawal(
+    BuildContext context,
+    AppState appState,
+    PendingWithdrawalInfo item,
+  ) async {
+    try {
+      final nativeToken = appState.wallet?.tokens.firstWhere(
+        (t) => t.native,
+        orElse: () => throw Exception('Native token not found'),
+      );
+      final walletIndex = BigInt.from(appState.selectedWallet);
+      final accountIndex = appState.wallet!.selectedAccount;
+      TransactionRequestInfo tx;
+
+      if (isScilla && appState.account!.addrType == 1) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      } else if (isEVM && appState.account!.addrType == 0) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      }
+
+      if (isScilla) {
+        tx = await buildTxScillaCompleteWithdrawal(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      } else if (isEVM) {
+        tx = await buildTxClaimUnstakeRequest(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          stake: stake,
+        );
+      } else {
+        throw "Invalid stake type for claiming withdrawal";
+      }
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: stake.address,
+        token: nativeToken!,
+        amount: "0",
+        onConfirm: (_) {
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (e) {
+      _showErrorDialog(context, appState, e);
+    }
+  }
 
   Future<void> _claimRewards(BuildContext context, AppState appState) async {
     try {
@@ -951,21 +1168,7 @@ class StakingPoolCard extends StatelessWidget {
         },
       );
     } catch (e) {
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          backgroundColor: appState.currentTheme.cardBackground,
-          title: Text(
-            "Error",
-            style: TextStyle(color: appState.currentTheme.textPrimary),
-          ),
-          content: Text(
-            e.toString(),
-            style: TextStyle(color: appState.currentTheme.danger),
-          ),
-          actions: [],
-        ),
-      );
+      _showErrorDialog(context, appState, e);
     }
   }
 }

@@ -4722,8 +4722,9 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
         let mut var_price = <Option<f64>>::sse_decode(deserializer);
         let mut var_commission = <Option<f64>>::sse_decode(deserializer);
         let mut var_tag = <String>::sse_decode(deserializer);
-        let mut var_withdrawalBlock = <Option<u64>>::sse_decode(deserializer);
         let mut var_currentBlock = <Option<u64>>::sse_decode(deserializer);
+        let mut var_pendingWithdrawals =
+            <Vec<crate::models::stake::PendingWithdrawalInfo>>::sse_decode(deserializer);
         return crate::models::stake::FinalOutputInfo {
             name: var_name,
             address: var_address,
@@ -4736,8 +4737,8 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
             price: var_price,
             commission: var_commission,
             tag: var_tag,
-            withdrawal_block: var_withdrawalBlock,
             current_block: var_currentBlock,
+            pending_withdrawals: var_pendingWithdrawals,
         };
     }
 }
@@ -5020,6 +5021,20 @@ impl SseDecode for Vec<crate::models::provider::NetworkConfigInfo> {
         let mut ans_ = vec![];
         for idx_ in 0..len_ {
             ans_.push(<crate::models::provider::NetworkConfigInfo>::sse_decode(
+                deserializer,
+            ));
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<crate::models::stake::PendingWithdrawalInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<crate::models::stake::PendingWithdrawalInfo>::sse_decode(
                 deserializer,
             ));
         }
@@ -5363,6 +5378,20 @@ impl SseDecode for Option<Vec<u8>> {
         } else {
             return None;
         }
+    }
+}
+
+impl SseDecode for crate::models::stake::PendingWithdrawalInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_amount = <String>::sse_decode(deserializer);
+        let mut var_withdrawalBlock = <u64>::sse_decode(deserializer);
+        let mut var_claimable = <bool>::sse_decode(deserializer);
+        return crate::models::stake::PendingWithdrawalInfo {
+            amount: var_amount,
+            withdrawal_block: var_withdrawalBlock,
+            claimable: var_claimable,
+        };
     }
 }
 
@@ -6533,8 +6562,8 @@ impl flutter_rust_bridge::IntoDart for crate::models::stake::FinalOutputInfo {
             self.price.into_into_dart().into_dart(),
             self.commission.into_into_dart().into_dart(),
             self.tag.into_into_dart().into_dart(),
-            self.withdrawal_block.into_into_dart().into_dart(),
             self.current_block.into_into_dart().into_dart(),
+            self.pending_withdrawals.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -6700,6 +6729,28 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::provider::NetworkConfigInf
     for crate::models::provider::NetworkConfigInfo
 {
     fn into_into_dart(self) -> crate::models::provider::NetworkConfigInfo {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::models::stake::PendingWithdrawalInfo {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.amount.into_into_dart().into_dart(),
+            self.withdrawal_block.into_into_dart().into_dart(),
+            self.claimable.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::models::stake::PendingWithdrawalInfo
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::stake::PendingWithdrawalInfo>
+    for crate::models::stake::PendingWithdrawalInfo
+{
+    fn into_into_dart(self) -> crate::models::stake::PendingWithdrawalInfo {
         self
     }
 }
@@ -7324,8 +7375,11 @@ impl SseEncode for crate::models::stake::FinalOutputInfo {
         <Option<f64>>::sse_encode(self.price, serializer);
         <Option<f64>>::sse_encode(self.commission, serializer);
         <String>::sse_encode(self.tag, serializer);
-        <Option<u64>>::sse_encode(self.withdrawal_block, serializer);
         <Option<u64>>::sse_encode(self.current_block, serializer);
+        <Vec<crate::models::stake::PendingWithdrawalInfo>>::sse_encode(
+            self.pending_withdrawals,
+            serializer,
+        );
     }
 }
 
@@ -7524,6 +7578,16 @@ impl SseEncode for Vec<crate::models::provider::NetworkConfigInfo> {
         <i32>::sse_encode(self.len() as _, serializer);
         for item in self {
             <crate::models::provider::NetworkConfigInfo>::sse_encode(item, serializer);
+        }
+    }
+}
+
+impl SseEncode for Vec<crate::models::stake::PendingWithdrawalInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <crate::models::stake::PendingWithdrawalInfo>::sse_encode(item, serializer);
         }
     }
 }
@@ -7801,6 +7865,15 @@ impl SseEncode for Option<Vec<u8>> {
         if let Some(value) = self {
             <Vec<u8>>::sse_encode(value, serializer);
         }
+    }
+}
+
+impl SseEncode for crate::models::stake::PendingWithdrawalInfo {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <String>::sse_encode(self.amount, serializer);
+        <u64>::sse_encode(self.withdrawal_block, serializer);
+        <bool>::sse_encode(self.claimable, serializer);
     }
 }
 

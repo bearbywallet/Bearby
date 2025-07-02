@@ -1578,6 +1578,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unstakeButton => 'アンステーク';
 
   @override
+  String get reinvest => '再投資';
+
+  @override
   String get aprLabel => 'APR';
 
   @override
@@ -1594,4 +1597,16 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get rewardsAvailable => '報酬';
+
+  @override
+  String get pendingWithdrawals => '保留中の出金';
+
+  @override
+  String get amount => '量';
+
+  @override
+  String get claimableIn => '請求可能まで';
+
+  @override
+  String get blocks => 'ブロック';
 }

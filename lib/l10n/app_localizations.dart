@@ -3177,6 +3177,12 @@ abstract class AppLocalizations {
   /// **'Unstake'**
   String get unstakeButton;
 
+  /// Text for the reinvest button
+  ///
+  /// In en, this message translates to:
+  /// **'Reinvest'**
+  String get reinvest;
+
   /// Label for APR in the staking pool card
   ///
   /// In en, this message translates to:
@@ -3212,6 +3218,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rewards'**
   String get rewardsAvailable;
+
+  /// Title for the pending withdrawals section
+  ///
+  /// In en, this message translates to:
+  /// **'Pending Withdrawals'**
+  String get pendingWithdrawals;
+
+  /// Label for the amount in a transaction or a list
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// Text indicating the time remaining until something is claimable
+  ///
+  /// In en, this message translates to:
+  /// **'Claimable in'**
+  String get claimableIn;
+
+  /// Plural form of the word block, used for blockchain blocks count
+  ///
+  /// In en, this message translates to:
+  /// **'blocks'**
+  String get blocks;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
