@@ -58,7 +58,7 @@ impl From<FinalOutput> for FinalOutputInfo {
                     chain_hash: 0,
                     native: false,
                     default: false,
-                    logo: None,
+                    logo: Some("https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp".to_string()),
                     rate: stake.price.unwrap_or(0.0),
                     balances: Default::default(),
                 })
