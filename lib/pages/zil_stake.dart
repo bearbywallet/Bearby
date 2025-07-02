@@ -9,13 +9,8 @@ import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/stakeing_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/amount.dart';
-import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
-import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
-import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -30,8 +25,6 @@ class ZilStakePage extends StatefulWidget {
 
 class _ZilStakePageState extends State<ZilStakePage> {
   List<FinalOutputInfo> _stakes = [];
-  List<FinalOutputInfo> _withdrawalStakes = [];
-  List<FinalOutputInfo> _sortedStakes = [];
   bool _isLoading = true;
   String? _errorMessage;
   SortType _sortType = SortType.apr;
@@ -60,14 +53,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
       if (mounted) {
         setState(() {
           _stakes = list;
-          _withdrawalStakes = _stakes
-              .where((stake) =>
-                  stake.tag == "withdrawal" || stake.tag == "withdrawalEVM")
-              .toList();
-          _sortedStakes = _stakes
-              .where((stake) =>
-                  stake.tag != "withdrawal" && stake.tag != "withdrawalEVM")
-              .toList();
           _errorMessage = null;
         });
       }
@@ -87,7 +72,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
   }
 
   void _sortStakes() {
-    _sortedStakes.sort((a, b) {
+    _stakes.sort((a, b) {
       final aHasStake =
           (BigInt.tryParse(a.delegAmt) ?? BigInt.zero) > BigInt.zero ||
               (BigInt.tryParse(a.rewards) ?? BigInt.zero) > BigInt.zero;
@@ -178,8 +163,7 @@ class _ZilStakePageState extends State<ZilStakePage> {
   }
 
   Widget _buildStakeList() {
-    final appState = Provider.of<AppState>(context);
-    final theme = appState.currentTheme;
+    final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
@@ -215,31 +199,10 @@ class _ZilStakePageState extends State<ZilStakePage> {
             child: _buildSortButtons(theme, l10n),
           ),
         ),
-        if (_withdrawalStakes.isNotEmpty)
-          SliverPadding(
-            padding: EdgeInsets.fromLTRB(
-              adaptivePadding,
-              8,
-              adaptivePadding,
-              12,
-            ),
-            sliver: SliverList(
-              delegate: SliverChildBuilderDelegate(
-                (context, index) {
-                  return Padding(
-                    padding: const EdgeInsets.only(bottom: 12),
-                    child: _buildWithdrawalCard(
-                        _withdrawalStakes[index], theme, appState, l10n),
-                  );
-                },
-                childCount: _withdrawalStakes.length,
-              ),
-            ),
-          ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             adaptivePadding,
-            _withdrawalStakes.isNotEmpty ? 0 : 8,
+            8,
             adaptivePadding,
             adaptivePadding,
           ),
@@ -248,10 +211,10 @@ class _ZilStakePageState extends State<ZilStakePage> {
               (context, index) {
                 return Padding(
                   padding: const EdgeInsets.only(bottom: 12),
-                  child: StakingPoolCard(stake: _sortedStakes[index]),
+                  child: StakingPoolCard(stake: _stakes[index]),
                 );
               },
-              childCount: _sortedStakes.length,
+              childCount: _stakes.length,
             ),
           ),
         ),
@@ -315,188 +278,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildWithdrawalCard(
-    FinalOutputInfo stake,
-    AppTheme theme,
-    AppState appState,
-    AppLocalizations l10n,
-  ) {
-    final isClaimable = stake.currentBlock != null &&
-        stake.withdrawalBlock != null &&
-        stake.currentBlock! >= stake.withdrawalBlock!;
-    final progress = isClaimable ? 1.0 : 0.0;
-
-    double rate = 0;
-    String symbol = "ZIL";
-    FTokenInfo? nativeToken;
-
-    try {
-      nativeToken = appState.wallet?.tokens.firstWhere((t) => t.native);
-
-      if (nativeToken != null) {
-        symbol = nativeToken.symbol;
-        rate = nativeToken.rate;
-      }
-    } catch (_) {}
-
-    final (amount, converted) = formatingAmount(
-      amount: BigInt.parse(stake.delegAmt),
-      symbol: symbol,
-      decimals: nativeToken!.decimals,
-      rate: rate,
-      appState: appState,
-    );
-
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.1),
-        ),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              stake.name,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              amount,
-              style: TextStyle(
-                color: theme.textSecondary,
-                fontSize: 14,
-              ),
-            ),
-            Text(
-              converted,
-              style: TextStyle(
-                color: theme.textSecondary.withValues(alpha: 0.7),
-                fontSize: 12,
-              ),
-            ),
-            const SizedBox(height: 16),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: theme.textSecondary.withValues(alpha: 0.2),
-              valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
-            ),
-            const SizedBox(height: 16),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isClaimable
-                    ? () async {
-                        try {
-                          final walletIndex =
-                              BigInt.from(appState.selectedWallet);
-                          final accountIndex = appState.wallet!.selectedAccount;
-                          TransactionRequestInfo tx;
-
-                          if ((stake.tag == 'withdrawalAvely' ||
-                                  stake.tag == 'withdrawal') &&
-                              appState.account!.addrType == 1) {
-                            await zilliqaSwapChain(
-                              walletIndex: walletIndex,
-                              accountIndex: accountIndex,
-                            );
-                          } else if (stake.tag == 'withdrawalEVM' &&
-                              appState.account!.addrType == 0) {
-                            await zilliqaSwapChain(
-                              walletIndex: walletIndex,
-                              accountIndex: accountIndex,
-                            );
-                          }
-
-                          nativeToken = appState.wallet?.tokens
-                              .firstWhere((t) => t.native);
-
-                          if (stake.tag == 'withdrawalAvely') {
-                            tx = await buildTxScillaCompleteWithdrawalAvely(
-                              walletIndex: walletIndex,
-                              accountIndex: accountIndex,
-                            );
-                          } else if (stake.tag == 'withdrawal') {
-                            tx = await buildTxScillaCompleteWithdrawal(
-                              walletIndex: walletIndex,
-                              accountIndex: accountIndex,
-                            );
-                          } else if (stake.tag == 'withdrawalEVM') {
-                            tx = await buildTxClaimUnstakeRequest(
-                              walletIndex: walletIndex,
-                              accountIndex: accountIndex,
-                              stake: stake,
-                            );
-                          } else {
-                            throw "Invalid tx";
-                          }
-
-                          if (!mounted) return;
-                          showConfirmTransactionModal(
-                            context: context,
-                            tx: tx,
-                            to: stake.address,
-                            token: nativeToken!,
-                            amount: "0",
-                            onConfirm: (_) {
-                              Navigator.of(context).pushNamed('/', arguments: {
-                                'selectedIndex': 1,
-                              });
-                            },
-                          );
-                        } catch (e) {
-                          if (!mounted) return;
-
-                          String errorMessage = e.toString();
-
-                          showDialog(
-                            context: context,
-                            builder: (context) => AlertDialog(
-                              backgroundColor:
-                                  appState.currentTheme.cardBackground,
-                              title: Text(
-                                "Error",
-                                style: TextStyle(
-                                    color: appState.currentTheme.textPrimary),
-                              ),
-                              content: Text(
-                                errorMessage,
-                                style: TextStyle(
-                                    color: appState.currentTheme.danger),
-                              ),
-                              actions: [],
-                            ),
-                          );
-                        }
-                      }
-                    : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: theme.primaryPurple,
-                  foregroundColor: theme.buttonText,
-                  disabledBackgroundColor:
-                      theme.textSecondary.withValues(alpha: 0.2),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                ),
-                child: Text(l10n.claimButton),
-              ),
-            ),
-          ],
-        ),
       ),
     );
   }

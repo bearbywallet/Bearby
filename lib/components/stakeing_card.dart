@@ -24,6 +24,7 @@ class StakingPoolCard extends StatelessWidget {
   bool get isLiquidStaking => stake.token != null;
   bool get isScilla => stake.tag == "scilla";
   bool get isOldAvely => stake.tag == 'avely';
+  bool get isEVM => stake.tag == 'evm';
 
   @override
   Widget build(BuildContext context) {
@@ -191,7 +192,7 @@ class StakingPoolCard extends StatelessWidget {
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
-                      color: stake.tag == 'scilla'
+                      color: isScilla
                           ? theme.success.withValues(alpha: 0.1)
                           : theme.primaryPurple.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -824,32 +825,31 @@ class StakingPoolCard extends StatelessWidget {
       final accountIndex = appState.wallet!.selectedAccount;
       TransactionRequestInfo tx;
 
-      if ((stake.tag == 'scilla' || stake.tag == 'avely') &&
-          appState.account!.addrType == 1) {
+      if ((isScilla || isOldAvely) && appState.account!.addrType == 1) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
         );
-      } else if (stake.tag == 'evm' && appState.account!.addrType == 0) {
+      } else if (isEVM && appState.account!.addrType == 0) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
         );
       }
 
-      if (stake.tag == 'scilla') {
+      if (isScilla) {
         tx = await buildTxScillaInitUnstake(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           stake: stake,
         );
-      } else if (stake.tag == 'avely') {
+      } else if (isOldAvely) {
         tx = await buildTxScillaWithdrawStakeAvely(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           stake: stake,
         );
-      } else if (stake.tag == 'evm') {
+      } else if (isEVM) {
         tx = await buildTxEvmUnstakeRequest(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
@@ -910,25 +910,25 @@ class StakingPoolCard extends StatelessWidget {
       final accountIndex = appState.wallet!.selectedAccount;
       TransactionRequestInfo tx;
 
-      if (stake.tag == 'scilla' && appState.account!.addrType == 1) {
+      if (isScilla && appState.account!.addrType == 1) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
         );
-      } else if (stake.tag == 'evm' && appState.account!.addrType == 0) {
+      } else if (isEVM && appState.account!.addrType == 0) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
         );
       }
 
-      if (stake.tag == 'scilla') {
+      if (isScilla) {
         tx = await buildClaimScillaStakingRewardsTx(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           stake: stake,
         );
-      } else if (stake.tag == 'evm') {
+      } else if (isEVM) {
         tx = await buildTxClaimRewardRequest(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
