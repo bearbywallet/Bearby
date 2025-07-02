@@ -4,7 +4,6 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -22,6 +21,10 @@ class StakingPoolCard extends StatelessWidget {
 
   const StakingPoolCard({super.key, required this.stake});
 
+  bool get isLiquidStaking => stake.token != null;
+  bool get isScilla => stake.tag == "scilla";
+  bool get isOldAvely => stake.tag == 'avely';
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
@@ -29,8 +32,6 @@ class StakingPoolCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
-    final isLiquidStaking =
-        stake.tokenAddress != null && stake.tokenAddress != zeroEVM;
     final showStakingInfo = hasRewards || hasDelegation;
 
     return Container(
@@ -55,12 +56,12 @@ class StakingPoolCard extends StatelessWidget {
             padding: const EdgeInsets.all(20),
             child: Column(
               children: [
-                _buildCardHeader(theme, isLiquidStaking, l10n),
+                _buildCardHeader(theme, l10n),
                 if (showStakingInfo) ...[
                   const SizedBox(height: 20),
-                  _buildUserStakingInfo(theme, l10n, appState, isLiquidStaking),
+                  _buildUserStakingInfo(theme, l10n, appState),
                   const SizedBox(height: 16),
-                  _buildStatsRow(theme, l10n, appState, isLiquidStaking),
+                  _buildStatsRow(theme, l10n, appState),
                   if (isLiquidStaking) ...[
                     const SizedBox(height: 16),
                     _buildLiquidStakingInfo(theme, l10n, appState),
@@ -71,7 +72,7 @@ class StakingPoolCard extends StatelessWidget {
                   ],
                 ] else ...[
                   const SizedBox(height: 16),
-                  _buildStatsRow(theme, l10n, appState, isLiquidStaking),
+                  _buildStatsRow(theme, l10n, appState),
                 ],
               ],
             ),
@@ -85,16 +86,14 @@ class StakingPoolCard extends StatelessWidget {
               ),
             ),
             padding: const EdgeInsets.all(20),
-            child: _buildActionButtons(
-                context, appState, l10n, hasDelegation, isLiquidStaking),
+            child: _buildActionButtons(context, appState, l10n, hasDelegation),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCardHeader(
-      AppTheme theme, bool isLiquidStaking, AppLocalizations l10n) {
+  Widget _buildCardHeader(AppTheme theme, AppLocalizations l10n) {
     String urlTemplate =
         "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
     final replacements = <String, String>{
@@ -154,7 +153,7 @@ class StakingPoolCard extends StatelessWidget {
                   ),
                 ),
                 child: SvgPicture.asset(
-                  stake.tag == 'scilla'
+                  isScilla || isOldAvely
                       ? 'assets/icons/scilla.svg'
                       : 'assets/icons/solidity.svg',
                   width: 16,
@@ -246,7 +245,6 @@ class StakingPoolCard extends StatelessWidget {
     AppTheme theme,
     AppLocalizations l10n,
     AppState appState,
-    bool isLiquidStaking,
   ) {
     final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
     final hasDelegation = (int.tryParse(stake.delegAmt) ?? 0) > 0;
@@ -287,7 +285,9 @@ class StakingPoolCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        isLiquidStaking ? 'LST Tokens' : l10n.stakedAmount,
+                        isLiquidStaking
+                            ? stake.token?.symbol ?? ""
+                            : l10n.stakedAmount,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 12,
@@ -301,8 +301,9 @@ class StakingPoolCard extends StatelessWidget {
                 _buildAmountDisplay(
                   theme,
                   isLiquidStaking
-                      ? _formatLSTAmount(stake.delegAmt, appState)
-                      : _formatAmount(stake.delegAmt, appState),
+                      ? _formatTokenAmount(stake.delegAmt, appState,
+                          isLSTToken: true)
+                      : _formatTokenAmount(stake.delegAmt, appState),
                   hasDelegation ? theme.primaryPurple : theme.textSecondary,
                 ),
               ],
@@ -360,7 +361,9 @@ class StakingPoolCard extends StatelessWidget {
                     const SizedBox(width: 8),
                     Expanded(
                       child: Text(
-                        isLiquidStaking ? 'Total Value' : l10n.rewardsAvailable,
+                        isLiquidStaking
+                            ? 'Yield ${stake.token?.symbol ?? ""}'
+                            : l10n.rewardsAvailable,
                         style: TextStyle(
                           color: theme.textSecondary,
                           fontSize: 12,
@@ -375,7 +378,7 @@ class StakingPoolCard extends StatelessWidget {
                   theme,
                   isLiquidStaking
                       ? _calculateLSTValue(appState)
-                      : _formatAmount(stake.rewards, appState),
+                      : _formatTokenAmount(stake.rewards, appState),
                   isLiquidStaking
                       ? theme.primaryPurple
                       : hasRewards
@@ -429,7 +432,7 @@ class StakingPoolCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'LST Token Price',
+                      stake.token?.symbol ?? "",
                       style: TextStyle(
                         color: theme.textSecondary,
                         fontSize: 12,
@@ -499,8 +502,8 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildStatsRow(AppTheme theme, AppLocalizations l10n,
-      AppState appState, bool isLiquidStaking) {
+  Widget _buildStatsRow(
+      AppTheme theme, AppLocalizations l10n, AppState appState) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -524,7 +527,7 @@ class StakingPoolCard extends StatelessWidget {
           ),
           _buildStatItem(
             theme,
-            isLiquidStaking ? 'Price APR' : l10n.aprLabel,
+            isLiquidStaking ? 'APR' : l10n.aprLabel,
             stake.apr == null || stake.apr == 0
                 ? 'N/A'
                 : '${stake.apr?.toStringAsFixed(1)}%',
@@ -622,7 +625,7 @@ class StakingPoolCard extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  _formatAmount(stake.rewards, appState).$1,
+                  _formatTokenAmount(stake.rewards, appState).$1,
                   style: TextStyle(
                     color: theme.success,
                     fontSize: 14,
@@ -651,20 +654,16 @@ class StakingPoolCard extends StatelessWidget {
     AppState appState,
     AppLocalizations l10n,
     bool hasDelegation,
-    bool isLiquidStaking,
   ) {
     final theme = appState.currentTheme;
-    final isScilla = stake.tag == 'scilla';
 
-    // Для scilla без делегирования не показываем кнопки стейкинга
     if (isScilla && !hasDelegation) {
       return const SizedBox.shrink();
     }
 
     return Row(
       children: [
-        // Кнопка Reinvest для non-liquid с делегированием
-        if (hasDelegation && !isLiquidStaking) ...[
+        if (!isOldAvely && !isScilla && hasDelegation && !isLiquidStaking) ...[
           Expanded(
             child: CustomButton(
               text: "Reinvest",
@@ -677,9 +676,7 @@ class StakingPoolCard extends StatelessWidget {
           ),
           const SizedBox(width: 12),
         ],
-
-        // Для LP и Non-LP (не scilla) всегда показываем кнопку Stake
-        if (!isScilla) ...[
+        if (!isOldAvely && !isScilla) ...[
           Expanded(
             child: CustomButton(
               text: l10n.stakeButton,
@@ -692,28 +689,10 @@ class StakingPoolCard extends StatelessWidget {
           ),
           if (hasDelegation) const SizedBox(width: 12),
         ],
-
-        // Кнопка Unstake/Redeem при наличии делегирования
         if (hasDelegation) ...[
           Expanded(
             child: CustomButton(
-              text: isLiquidStaking ? 'Redeem' : l10n.unstakeButton,
-              onPressed: () => _initUnstake(context, appState),
-              textColor: theme.buttonText,
-              backgroundColor: theme.danger,
-              borderRadius: 16,
-              height: 48.0,
-            ),
-          ),
-        ],
-
-        // Для scilla с делегированием показываем только Unstake
-        if (isScilla &&
-            hasDelegation &&
-            (!hasDelegation || isLiquidStaking)) ...[
-          Expanded(
-            child: CustomButton(
-              text: isLiquidStaking ? 'Redeem' : l10n.unstakeButton,
+              text: l10n.unstakeButton,
               onPressed: () => _initUnstake(context, appState),
               textColor: theme.buttonText,
               backgroundColor: theme.danger,
@@ -726,75 +705,112 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  (String, String) _formatAmount(String amount, AppState appState) {
+  (String, String) _formatTokenAmount(
+    String amount,
+    AppState appState, {
+    bool isLSTToken = false,
+  }) {
     final parsedAmount = BigInt.tryParse(amount) ?? BigInt.zero;
 
-    String symbol = "ZIL";
-    int decimals = stake.tag == 'scilla' ? 12 : 18;
+    if (isLSTToken && stake.token != null) {
+      final token = stake.token!;
+      final (formattedValue, converted) = formatingAmount(
+        amount: parsedAmount,
+        symbol: token.symbol,
+        decimals: token.decimals,
+        rate: token.rate,
+        appState: appState,
+        compact: true,
+      );
+      return (formattedValue, converted);
+    } else {
+      final nativeToken = appState.wallet?.tokens.firstWhere(
+        (t) => t.native,
+      );
 
-    final (formattedValue, converted) = formatingAmount(
-      amount: parsedAmount,
-      symbol: symbol,
-      decimals: decimals,
-      rate: 0,
-      appState: appState,
-      compact: true,
-    );
+      if (stake.token != null) {
+        final (formattedValue, converted) = formatingAmount(
+          amount: parsedAmount,
+          symbol: stake.token!.symbol,
+          decimals: stake.token!.decimals,
+          rate: 0.0,
+          appState: appState,
+          compact: true,
+        );
+        return (formattedValue, converted);
+      } else if (nativeToken != null) {
+        int decimals = stake.tag == 'scilla' ? 12 : 18;
 
-    return (formattedValue, converted);
-  }
+        final (formattedValue, converted) = formatingAmount(
+          amount: parsedAmount,
+          symbol: nativeToken.symbol,
+          decimals: decimals,
+          rate: 0,
+          appState: appState,
+          compact: true,
+        );
+        return (formattedValue, converted);
+      }
+    }
 
-  (String, String) _formatLSTAmount(String amount, AppState appState) {
-    final parsedAmount = BigInt.tryParse(amount) ?? BigInt.zero;
-
-    String symbol = "LST"; // TODO: replace with staking token symbol.
-    int decimals = 18;
-    double rate = 0;
-
-    final (formattedValue, _) = formatingAmount(
-      amount: parsedAmount,
-      symbol: symbol,
-      decimals: decimals,
-      rate: rate,
-      appState: appState,
-      compact: true,
-      threshold: 0.1,
-    );
-
-    final lstAmountDouble = parsedAmount.toDouble() / 1e18;
-    final lstDisplay = '${lstAmountDouble.toStringAsFixed(4)} LST';
-
-    return (formattedValue, lstDisplay);
+    return ("0", "0");
   }
 
   (String, String) _calculateLSTValue(AppState appState) {
+    if (stake.token == null) return ("0", "0");
+
     final lstAmount = BigInt.tryParse(stake.delegAmt) ?? BigInt.zero;
     final lstPrice = stake.price ?? 1.0;
+    final token = stake.token!;
 
-    final lstAmountDouble = lstAmount.toDouble() / 1e18;
+    final lstAmountDouble =
+        lstAmount.toDouble() / BigInt.from(10).pow(token.decimals).toDouble();
     final totalValueDouble = lstAmountDouble * lstPrice;
-    final totalValue = BigInt.from((totalValueDouble * 1e18).toInt());
 
-    final (formattedValue, converted) = formatingAmount(
-      amount: totalValue,
-      symbol: "ZIL",
-      decimals: 18,
-      rate: appState.wallet?.tokens.first.rate ?? 0,
-      appState: appState,
+    final nativeToken = appState.wallet?.tokens.firstWhere(
+      (t) => t.native,
     );
 
-    return (formattedValue, converted);
+    if (nativeToken != null) {
+      final totalValue = BigInt.from((totalValueDouble *
+              BigInt.from(10).pow(nativeToken.decimals).toDouble())
+          .toInt());
+
+      final (formattedValue, converted) = formatingAmount(
+        amount: totalValue,
+        symbol: nativeToken.symbol,
+        decimals: nativeToken.decimals,
+        rate: nativeToken.rate,
+        appState: appState,
+      );
+      return (formattedValue, converted);
+    } else {
+      final totalValue = BigInt.from((totalValueDouble * 1e18).toInt());
+      final (formattedValue, converted) = formatingAmount(
+        amount: totalValue,
+        symbol: "ZIL",
+        decimals: 18,
+        rate: 0,
+        appState: appState,
+      );
+      return (formattedValue, converted);
+    }
   }
 
   String _formatLSTPrice(AppState appState) {
     final price = stake.price ?? 1.0;
+    final nativeToken = appState.wallet?.tokens.firstWhere(
+      (t) => t.native,
+    );
+
+    final symbol = nativeToken?.symbol ?? "ZIL";
 
     if (price >= 1000) {
-      return '${(price / 1000).toStringAsFixed(2)}K ZIL';
+      return '${(price / 1000).toStringAsFixed(2)}K $symbol';
     } else if (price >= 1) {
-      return '${price.toStringAsFixed(4)} ZIL';
+      return '${price.toStringAsFixed(4)} $symbol';
     } else {
-      return '${price.toStringAsFixed(6)} ZIL';
+      return '${price.toStringAsFixed(6)} $symbol';
     }
   }
 
@@ -926,7 +942,7 @@ class StakingPoolCard extends StatelessWidget {
         context: context,
         tx: tx,
         to: stake.address,
-        token: nativeToken!,
+        token: stake.token ?? nativeToken!,
         amount: "0",
         onConfirm: (_) {
           Navigator.of(context).pushNamed('/', arguments: {

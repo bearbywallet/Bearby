@@ -78,7 +78,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
             BigInt.tryParse(token.balances[selectedAccount] ?? '0') ??
                 BigInt.zero;
         _balanceDecimals = token.decimals;
-        _balanceRate = token.rate;
       }
     } catch (e) {
       debugPrint('Error loading balance: $e');
