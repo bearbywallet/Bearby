@@ -321,6 +321,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
 
   @protected
+  FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw);
+
+  @protected
   TransactionRequestEVM? dco_decode_opt_box_autoadd_transaction_request_evm(
       dynamic raw);
 
@@ -720,6 +723,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
+
+  @protected
+  FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
+      SseDeserializer deserializer);
 
   @protected
   TransactionRequestEVM? sse_decode_opt_box_autoadd_transaction_request_evm(
@@ -1148,6 +1155,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_token_info(
+      FTokenInfo? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_transaction_request_evm(

@@ -4037,23 +4037,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FinalOutputInfo dco_decode_final_output_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 14)
-      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
+    if (arr.length != 13)
+      throw Exception('unexpected arr length: expect 13 but see ${arr.length}');
     return FinalOutputInfo(
       name: dco_decode_String(arr[0]),
-      url: dco_decode_String(arr[1]),
-      address: dco_decode_String(arr[2]),
-      tokenAddress: dco_decode_opt_String(arr[3]),
-      delegAmt: dco_decode_String(arr[4]),
-      rewards: dco_decode_String(arr[5]),
-      tvl: dco_decode_opt_U128(arr[6]),
-      votePower: dco_decode_opt_box_autoadd_f_64(arr[7]),
-      apr: dco_decode_opt_box_autoadd_f_64(arr[8]),
+      address: dco_decode_String(arr[1]),
+      token: dco_decode_opt_box_autoadd_f_token_info(arr[2]),
+      delegAmt: dco_decode_String(arr[3]),
+      rewards: dco_decode_String(arr[4]),
+      tvl: dco_decode_opt_U128(arr[5]),
+      votePower: dco_decode_opt_box_autoadd_f_64(arr[6]),
+      apr: dco_decode_opt_box_autoadd_f_64(arr[7]),
+      price: dco_decode_opt_box_autoadd_f_64(arr[8]),
       commission: dco_decode_opt_box_autoadd_f_64(arr[9]),
       tag: dco_decode_String(arr[10]),
       withdrawalBlock: dco_decode_opt_box_autoadd_u_64(arr[11]),
       currentBlock: dco_decode_opt_box_autoadd_u_64(arr[12]),
-      price: dco_decode_opt_box_autoadd_f_64(arr[13]),
     );
   }
 
@@ -4352,6 +4351,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   double? dco_decode_opt_box_autoadd_f_64(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_f_64(raw);
+  }
+
+  @protected
+  FTokenInfo? dco_decode_opt_box_autoadd_f_token_info(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_f_token_info(raw);
   }
 
   @protected
@@ -5240,34 +5245,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   FinalOutputInfo sse_decode_final_output_info(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_name = sse_decode_String(deserializer);
-    var var_url = sse_decode_String(deserializer);
     var var_address = sse_decode_String(deserializer);
-    var var_tokenAddress = sse_decode_opt_String(deserializer);
+    var var_token = sse_decode_opt_box_autoadd_f_token_info(deserializer);
     var var_delegAmt = sse_decode_String(deserializer);
     var var_rewards = sse_decode_String(deserializer);
     var var_tvl = sse_decode_opt_U128(deserializer);
     var var_votePower = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_apr = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_price = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_commission = sse_decode_opt_box_autoadd_f_64(deserializer);
     var var_tag = sse_decode_String(deserializer);
     var var_withdrawalBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
-    var var_price = sse_decode_opt_box_autoadd_f_64(deserializer);
     return FinalOutputInfo(
         name: var_name,
-        url: var_url,
         address: var_address,
-        tokenAddress: var_tokenAddress,
+        token: var_token,
         delegAmt: var_delegAmt,
         rewards: var_rewards,
         tvl: var_tvl,
         votePower: var_votePower,
         apr: var_apr,
+        price: var_price,
         commission: var_commission,
         tag: var_tag,
         withdrawalBlock: var_withdrawalBlock,
-        currentBlock: var_currentBlock,
-        price: var_price);
+        currentBlock: var_currentBlock);
   }
 
   @protected
@@ -5743,6 +5746,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_f_64(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  FTokenInfo? sse_decode_opt_box_autoadd_f_token_info(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_f_token_info(deserializer));
     } else {
       return null;
     }
@@ -6590,19 +6605,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       FinalOutputInfo self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_String(self.name, serializer);
-    sse_encode_String(self.url, serializer);
     sse_encode_String(self.address, serializer);
-    sse_encode_opt_String(self.tokenAddress, serializer);
+    sse_encode_opt_box_autoadd_f_token_info(self.token, serializer);
     sse_encode_String(self.delegAmt, serializer);
     sse_encode_String(self.rewards, serializer);
     sse_encode_opt_U128(self.tvl, serializer);
     sse_encode_opt_box_autoadd_f_64(self.votePower, serializer);
     sse_encode_opt_box_autoadd_f_64(self.apr, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.price, serializer);
     sse_encode_opt_box_autoadd_f_64(self.commission, serializer);
     sse_encode_String(self.tag, serializer);
     sse_encode_opt_box_autoadd_u_64(self.withdrawalBlock, serializer);
     sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
-    sse_encode_opt_box_autoadd_f_64(self.price, serializer);
   }
 
   @protected
@@ -6972,6 +6986,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_f_64(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_f_token_info(
+      FTokenInfo? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_f_token_info(self, serializer);
     }
   }
 

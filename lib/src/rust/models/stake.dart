@@ -4,57 +4,55 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import 'ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
 class FinalOutputInfo {
   final String name;
-  final String url;
   final String address;
-  final String? tokenAddress;
+  final FTokenInfo? token;
   final String delegAmt;
   final String rewards;
   final BigInt? tvl;
   final double? votePower;
   final double? apr;
+  final double? price;
   final double? commission;
   final String tag;
   final BigInt? withdrawalBlock;
   final BigInt? currentBlock;
-  final double? price;
 
   const FinalOutputInfo({
     required this.name,
-    required this.url,
     required this.address,
-    this.tokenAddress,
+    this.token,
     required this.delegAmt,
     required this.rewards,
     this.tvl,
     this.votePower,
     this.apr,
+    this.price,
     this.commission,
     required this.tag,
     this.withdrawalBlock,
     this.currentBlock,
-    this.price,
   });
 
   @override
   int get hashCode =>
       name.hashCode ^
-      url.hashCode ^
       address.hashCode ^
-      tokenAddress.hashCode ^
+      token.hashCode ^
       delegAmt.hashCode ^
       rewards.hashCode ^
       tvl.hashCode ^
       votePower.hashCode ^
       apr.hashCode ^
+      price.hashCode ^
       commission.hashCode ^
       tag.hashCode ^
       withdrawalBlock.hashCode ^
-      currentBlock.hashCode ^
-      price.hashCode;
+      currentBlock.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -62,17 +60,16 @@ class FinalOutputInfo {
       other is FinalOutputInfo &&
           runtimeType == other.runtimeType &&
           name == other.name &&
-          url == other.url &&
           address == other.address &&
-          tokenAddress == other.tokenAddress &&
+          token == other.token &&
           delegAmt == other.delegAmt &&
           rewards == other.rewards &&
           tvl == other.tvl &&
           votePower == other.votePower &&
           apr == other.apr &&
+          price == other.price &&
           commission == other.commission &&
           tag == other.tag &&
           withdrawalBlock == other.withdrawalBlock &&
-          currentBlock == other.currentBlock &&
-          price == other.price;
+          currentBlock == other.currentBlock;
 }

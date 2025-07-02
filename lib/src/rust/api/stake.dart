@@ -4,6 +4,7 @@
 // ignore_for_file: invalid_use_of_internal_member, unused_import, unnecessary_import
 
 import '../frb_generated.dart';
+import '../models/ftoken.dart';
 import '../models/stake.dart';
 import '../models/transactions/access_list.dart';
 import '../models/transactions/base_token.dart';

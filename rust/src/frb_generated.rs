@@ -4712,34 +4712,32 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         let mut var_name = <String>::sse_decode(deserializer);
-        let mut var_url = <String>::sse_decode(deserializer);
         let mut var_address = <String>::sse_decode(deserializer);
-        let mut var_tokenAddress = <Option<String>>::sse_decode(deserializer);
+        let mut var_token = <Option<crate::models::ftoken::FTokenInfo>>::sse_decode(deserializer);
         let mut var_delegAmt = <String>::sse_decode(deserializer);
         let mut var_rewards = <String>::sse_decode(deserializer);
         let mut var_tvl = <Option<u128>>::sse_decode(deserializer);
         let mut var_votePower = <Option<f64>>::sse_decode(deserializer);
         let mut var_apr = <Option<f64>>::sse_decode(deserializer);
+        let mut var_price = <Option<f64>>::sse_decode(deserializer);
         let mut var_commission = <Option<f64>>::sse_decode(deserializer);
         let mut var_tag = <String>::sse_decode(deserializer);
         let mut var_withdrawalBlock = <Option<u64>>::sse_decode(deserializer);
         let mut var_currentBlock = <Option<u64>>::sse_decode(deserializer);
-        let mut var_price = <Option<f64>>::sse_decode(deserializer);
         return crate::models::stake::FinalOutputInfo {
             name: var_name,
-            url: var_url,
             address: var_address,
-            token_address: var_tokenAddress,
+            token: var_token,
             deleg_amt: var_delegAmt,
             rewards: var_rewards,
             tvl: var_tvl,
             vote_power: var_votePower,
             apr: var_apr,
+            price: var_price,
             commission: var_commission,
             tag: var_tag,
             withdrawal_block: var_withdrawalBlock,
             current_block: var_currentBlock,
-            price: var_price,
         };
     }
 }
@@ -5264,6 +5262,19 @@ impl SseDecode for Option<f64> {
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
         if (<bool>::sse_decode(deserializer)) {
             return Some(<f64>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
+impl SseDecode for Option<crate::models::ftoken::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<crate::models::ftoken::FTokenInfo>::sse_decode(
+                deserializer,
+            ));
         } else {
             return None;
         }
@@ -6512,19 +6523,18 @@ impl flutter_rust_bridge::IntoDart for crate::models::stake::FinalOutputInfo {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
             self.name.into_into_dart().into_dart(),
-            self.url.into_into_dart().into_dart(),
             self.address.into_into_dart().into_dart(),
-            self.token_address.into_into_dart().into_dart(),
+            self.token.into_into_dart().into_dart(),
             self.deleg_amt.into_into_dart().into_dart(),
             self.rewards.into_into_dart().into_dart(),
             self.tvl.into_into_dart().into_dart(),
             self.vote_power.into_into_dart().into_dart(),
             self.apr.into_into_dart().into_dart(),
+            self.price.into_into_dart().into_dart(),
             self.commission.into_into_dart().into_dart(),
             self.tag.into_into_dart().into_dart(),
             self.withdrawal_block.into_into_dart().into_dart(),
             self.current_block.into_into_dart().into_dart(),
-            self.price.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7304,19 +7314,18 @@ impl SseEncode for crate::models::stake::FinalOutputInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
         <String>::sse_encode(self.name, serializer);
-        <String>::sse_encode(self.url, serializer);
         <String>::sse_encode(self.address, serializer);
-        <Option<String>>::sse_encode(self.token_address, serializer);
+        <Option<crate::models::ftoken::FTokenInfo>>::sse_encode(self.token, serializer);
         <String>::sse_encode(self.deleg_amt, serializer);
         <String>::sse_encode(self.rewards, serializer);
         <Option<u128>>::sse_encode(self.tvl, serializer);
         <Option<f64>>::sse_encode(self.vote_power, serializer);
         <Option<f64>>::sse_encode(self.apr, serializer);
+        <Option<f64>>::sse_encode(self.price, serializer);
         <Option<f64>>::sse_encode(self.commission, serializer);
         <String>::sse_encode(self.tag, serializer);
         <Option<u64>>::sse_encode(self.withdrawal_block, serializer);
         <Option<u64>>::sse_encode(self.current_block, serializer);
-        <Option<f64>>::sse_encode(self.price, serializer);
     }
 }
 
@@ -7705,6 +7714,16 @@ impl SseEncode for Option<f64> {
         <bool>::sse_encode(self.is_some(), serializer);
         if let Some(value) = self {
             <f64>::sse_encode(value, serializer);
+        }
+    }
+}
+
+impl SseEncode for Option<crate::models::ftoken::FTokenInfo> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <crate::models::ftoken::FTokenInfo>::sse_encode(value, serializer);
         }
     }
 }
