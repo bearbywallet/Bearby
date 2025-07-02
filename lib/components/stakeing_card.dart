@@ -1,3 +1,4 @@
+import 'package:blockies/blockies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -11,7 +12,6 @@ import 'package:zilpay/modals/stake_modal.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
-import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -60,13 +60,13 @@ class StakingPoolCard extends StatelessWidget {
             child: Column(
               children: [
                 _buildCardHeader(theme, l10n),
+                if (hasPendingWithdrawals) ...[
+                  const SizedBox(height: 20),
+                  _buildPendingWithdrawals(context, theme, l10n, appState),
+                ],
                 if (showStakingInfo) ...[
                   const SizedBox(height: 20),
                   _buildUserStakingInfo(theme, l10n, appState),
-                  if (hasPendingWithdrawals) ...[
-                    const SizedBox(height: 16),
-                    _buildPendingWithdrawals(context, theme, l10n, appState),
-                  ],
                   const SizedBox(height: 16),
                   _buildStatsRow(theme, l10n, appState),
                   if (isLiquidStaking) ...[
@@ -248,6 +248,187 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
+  Widget _buildPendingWithdrawals(
+    BuildContext context,
+    AppTheme theme,
+    AppLocalizations l10n,
+    AppState appState,
+  ) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.warning.withValues(alpha: 0.06),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: theme.warning.withValues(alpha: 0.2),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  color: theme.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: SvgPicture.asset(
+                  'assets/icons/clock.svg',
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                ),
+              ),
+              const SizedBox(width: 8),
+              Expanded(
+                child: Text(
+                  l10n.pendingWithdrawals,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 14,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                decoration: BoxDecoration(
+                  color: theme.warning.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  '${stake.pendingWithdrawals.length}',
+                  style: TextStyle(
+                    color: theme.warning,
+                    fontSize: 12,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 16),
+          ...stake.pendingWithdrawals.asMap().entries.map(
+                (entry) => Padding(
+                  padding: EdgeInsets.only(
+                      bottom: entry.key < stake.pendingWithdrawals.length - 1
+                          ? 12
+                          : 0),
+                  child: _buildPendingWithdrawalItem(
+                      context, theme, l10n, appState, entry.value),
+                ),
+              ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPendingWithdrawalItem(
+    BuildContext context,
+    AppTheme theme,
+    AppLocalizations l10n,
+    AppState appState,
+    PendingWithdrawalInfo item,
+  ) {
+    final currentBlock = stake.currentBlock ?? BigInt.zero;
+    final withdrawalBlock = item.withdrawalBlock;
+    final blocksRemaining = withdrawalBlock > currentBlock
+        ? withdrawalBlock - currentBlock
+        : BigInt.zero;
+
+    final isClaimable = item.claimable || blocksRemaining == BigInt.zero;
+    final progress = blocksRemaining == BigInt.zero
+        ? 1.0
+        : withdrawalBlock > currentBlock
+            ? 0.0
+            : 1.0;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isClaimable
+              ? theme.success.withValues(alpha: 0.2)
+              : theme.textSecondary.withValues(alpha: 0.1),
+          width: 1,
+        ),
+      ),
+      child: Column(
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      l10n.amount,
+                      style: TextStyle(
+                        color: theme.textSecondary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _formatTokenAmount(item.amount, appState).$1,
+                      style: TextStyle(
+                        color: theme.textPrimary,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              if (isClaimable) ...[
+                CustomButton(
+                  text: l10n.claimButton,
+                  onPressed: () => _claimWithdrawal(context, appState, item),
+                  backgroundColor: theme.success,
+                  textColor: theme.buttonText,
+                  height: 36,
+                  width: 80,
+                  borderRadius: 12,
+                ),
+              ],
+            ],
+          ),
+          if (!isClaimable && blocksRemaining > BigInt.zero) ...[
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Text(
+                  '${l10n.claimableIn} ${withdrawalBlock - currentBlock} ${l10n.blocks}',
+                  style: TextStyle(
+                    color: theme.warning,
+                    fontSize: 12,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: LinearProgressIndicator(
+                value: progress,
+                backgroundColor: theme.textSecondary.withValues(alpha: 0.1),
+                valueColor: AlwaysStoppedAnimation<Color>(theme.warning),
+                minHeight: 6,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+
   Widget _buildUserStakingInfo(
     AppTheme theme,
     AppLocalizations l10n,
@@ -400,135 +581,6 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  Widget _buildPendingWithdrawals(
-    BuildContext context,
-    AppTheme theme,
-    AppLocalizations l10n,
-    AppState appState,
-  ) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Padding(
-          padding: const EdgeInsets.only(bottom: 8),
-          child: Text(
-            l10n.pendingWithdrawals,
-            style: TextStyle(
-              color: theme.textSecondary,
-              fontWeight: FontWeight.w600,
-              fontSize: 14,
-            ),
-          ),
-        ),
-        ...stake.pendingWithdrawals.map(
-          (item) =>
-              _buildPendingWithdrawalItem(context, theme, l10n, appState, item),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildPendingWithdrawalItem(
-    BuildContext context,
-    AppTheme theme,
-    AppLocalizations l10n,
-    AppState appState,
-    PendingWithdrawalInfo item,
-  ) {
-    final currentBlock = stake.currentBlock ?? BigInt.zero;
-    final withdrawalBlock = item.withdrawalBlock;
-    final startBlock =
-        withdrawalBlock > currentBlock ? currentBlock : withdrawalBlock;
-    final blocksRemaining = withdrawalBlock > currentBlock
-        ? withdrawalBlock - currentBlock
-        : BigInt.zero;
-    final totalBlocks = withdrawalBlock > startBlock
-        ? withdrawalBlock - startBlock
-        : BigInt.one;
-    final progress =
-        (currentBlock - startBlock).toDouble() / totalBlocks.toDouble();
-
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.08),
-        ),
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      l10n.amount,
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                    const SizedBox(height: 4),
-                    Text(
-                      _formatTokenAmount(item.amount, appState).$1,
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              if (item.claimable)
-                CustomButton(
-                  text: l10n.claimButton,
-                  onPressed: () => _claimWithdrawal(context, appState, item),
-                  backgroundColor: theme.success,
-                  textColor: theme.buttonText,
-                  height: 40,
-                  width: 90,
-                  borderRadius: 12,
-                )
-            ],
-          ),
-          if (!item.claimable && blocksRemaining > BigInt.zero) ...[
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: Text(
-                    '${l10n.claimableIn} ${blocksRemaining.toString()} ${l10n.blocks}',
-                    style: TextStyle(
-                      color: theme.textSecondary,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(10),
-              child: LinearProgressIndicator(
-                value: progress.isNaN || progress.isInfinite ? 0 : progress,
-                backgroundColor: theme.textSecondary.withValues(alpha: 0.1),
-                valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
-                minHeight: 8,
-              ),
-            ),
-          ]
-        ],
-      ),
-    );
-  }
-
   Widget _buildLiquidStakingInfo(
     AppTheme theme,
     AppLocalizations l10n,
@@ -554,12 +606,24 @@ class StakingPoolCard extends StatelessWidget {
                   color: theme.primaryPurple.withValues(alpha: 0.1),
                   borderRadius: BorderRadius.circular(10),
                 ),
-                child: SvgPicture.asset(
-                  'assets/icons/currency.svg',
-                  width: 20,
-                  height: 20,
-                  colorFilter:
-                      ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+                child: AsyncImage(
+                  url: processTokenLogo(
+                    token: stake.token!,
+                    shortName: appState.chain?.shortName ?? '',
+                    theme: theme.value,
+                  ),
+                  width: 24,
+                  height: 24,
+                  fit: BoxFit.contain,
+                  errorWidget: Blockies(
+                    seed: stake.token!.addr,
+                    color: theme.secondaryPurple,
+                    bgColor: theme.primaryPurple,
+                    spotColor: theme.background,
+                    size: 8,
+                  ),
+                  loadingWidget: const Center(
+                      child: CircularProgressIndicator(strokeWidth: 2)),
                 ),
               ),
               const SizedBox(width: 12),
@@ -568,7 +632,7 @@ class StakingPoolCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      stake.token?.symbol ?? "",
+                      "${stake.token?.symbol ?? ""} (${stake.token?.name ?? ""})",
                       style: TextStyle(
                         color: theme.textSecondary,
                         fontSize: 12,
@@ -586,28 +650,6 @@ class StakingPoolCard extends StatelessWidget {
                     ),
                   ],
                 ),
-              ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Yield via Price',
-                    style: TextStyle(
-                      color: theme.textSecondary,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'Auto-compounding',
-                    style: TextStyle(
-                      color: theme.success,
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
               ),
             ],
           ),
@@ -630,7 +672,7 @@ class StakingPoolCard extends StatelessWidget {
           primaryValue,
           style: TextStyle(
             color: valueColor,
-            fontSize: 14,
+            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -862,31 +904,20 @@ class StakingPoolCard extends StatelessWidget {
     } else {
       final nativeToken = appState.wallet?.tokens.firstWhere(
         (t) => t.native,
-        orElse: () => FTokenInfo(
-            name: 'Zilliqa',
-            symbol: 'ZIL',
-            decimals: 12,
-            addr: '',
-            addrType: 0,
-            balances: {},
-            rate: 0,
-            default_: true,
-            native: true,
-            chainHash: BigInt.zero),
       );
 
       if (stake.token != null) {
         final (formattedValue, converted) = formatingAmount(
           amount: parsedAmount,
           symbol: stake.token!.symbol,
-          decimals: stake.token!.decimals,
+          decimals: isOldAvely ? 12 : stake.token!.decimals,
           rate: 0.0,
           appState: appState,
           compact: true,
         );
         return (formattedValue, converted);
       } else if (nativeToken != null) {
-        int decimals = stake.tag == 'scilla' ? 12 : 18;
+        int decimals = isOldAvely || isScilla ? 12 : 18;
 
         final (formattedValue, converted) = formatingAmount(
           amount: parsedAmount,
