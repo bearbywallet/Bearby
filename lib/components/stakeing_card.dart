@@ -95,7 +95,7 @@ class StakingPoolCard extends StatelessWidget {
 
   Widget _buildCardHeader(AppTheme theme, AppLocalizations l10n) {
     String urlTemplate =
-        "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
+        "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
     final replacements = <String, String>{
       'address': stake.address.toLowerCase(),
     };

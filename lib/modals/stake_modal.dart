@@ -172,7 +172,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
   Widget _buildHeader(AppTheme theme, AppLocalizations l10n) {
     String urlTemplate =
-        "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
+        "https://raw.githubusercontent.com/zilpay/zilpay-cdn/refs/heads/main/stakeing/zilliqa/icons/%{address}%/%{dark,light}%.webp";
     final replacements = <String, String>{
       'address': widget.stake.address.toLowerCase(),
     };
