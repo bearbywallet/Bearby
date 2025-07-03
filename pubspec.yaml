@@ -1,6 +1,6 @@
 name: zilpay
 description: "ZilPay wallet IOS, Android"
-version: 3.8.12+900
+version: 3.8.13+901
 
 environment:
   sdk: ^3.5.1

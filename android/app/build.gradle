@@ -10,6 +10,7 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     namespace = "com.zilpaymobile"
+    compileSdkVersion 35
     // compileSdk = flutter.compileSdkVersion
     // ndkVersion = flutter.ndkVersion
     ndkVersion = "29.0.13113456"
@@ -34,6 +35,7 @@ android {
         applicationId = "com.zilpaymobile"
         minSdk = 24
         targetSdk = 35
+        targetSdkVersion 35
 
         // minSdk = flutter.minSdkVersion
         // targetSdk = flutter.targetSdkVersion
