@@ -44,6 +44,12 @@
         "standard": "EIP3091"
       },
       {
+        "name": "blockscout",
+        "url": "https://zq2-mainnet.blockscout.com/",
+        "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      },
+      {
         "name": "Otterscan",
         "icon": "https://otterscan.zilliqa.com/assets/otter-DYFeLtFi.png",
         "url": "https://otterscan.zilliqa.com/",
