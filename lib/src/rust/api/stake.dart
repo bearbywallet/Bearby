@@ -34,9 +34,11 @@ Future<TransactionRequestInfo> buildTxScillaInitUnstake(
         walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawal(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawal(
-        walletIndex: walletIndex, accountIndex: accountIndex);
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
 Future<TransactionRequestInfo> buildTxScillaWithdrawStakeAvely(
         {required BigInt walletIndex,
@@ -44,11 +46,6 @@ Future<TransactionRequestInfo> buildTxScillaWithdrawStakeAvely(
         required FinalOutputInfo stake}) =>
     RustLib.instance.api.crateApiStakeBuildTxScillaWithdrawStakeAvely(
         walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
-
-Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawalAvely(
-        {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawalAvely(
-        walletIndex: walletIndex, accountIndex: accountIndex);
 
 Future<TransactionRequestInfo> buildTxEvmStakeRequest(
         {required BigInt walletIndex,

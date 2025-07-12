@@ -21,6 +21,9 @@ class FinalOutputInfo {
   final String tag;
   final BigInt? currentBlock;
   final List<PendingWithdrawalInfo> pendingWithdrawals;
+  final bool hide_;
+  final int uptime;
+  final bool canStake;
 
   const FinalOutputInfo({
     required this.name,
@@ -36,6 +39,9 @@ class FinalOutputInfo {
     required this.tag,
     this.currentBlock,
     required this.pendingWithdrawals,
+    required this.hide_,
+    required this.uptime,
+    required this.canStake,
   });
 
   @override
@@ -52,7 +58,10 @@ class FinalOutputInfo {
       commission.hashCode ^
       tag.hashCode ^
       currentBlock.hashCode ^
-      pendingWithdrawals.hashCode;
+      pendingWithdrawals.hashCode ^
+      hide_.hashCode ^
+      uptime.hashCode ^
+      canStake.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -71,7 +80,10 @@ class FinalOutputInfo {
           commission == other.commission &&
           tag == other.tag &&
           currentBlock == other.currentBlock &&
-          pendingWithdrawals == other.pendingWithdrawals;
+          pendingWithdrawals == other.pendingWithdrawals &&
+          hide_ == other.hide_ &&
+          uptime == other.uptime &&
+          canStake == other.canStake;
 }
 
 class PendingWithdrawalInfo {

@@ -22,6 +22,9 @@ pub struct FinalOutputInfo {
     pub tag: String,
     pub current_block: Option<u64>,
     pub pending_withdrawals: Vec<PendingWithdrawalInfo>,
+    pub hide: bool,
+    pub uptime: u8,
+    pub can_stake: bool,
 }
 
 impl From<PendingWithdrawal> for PendingWithdrawalInfo {
@@ -77,6 +80,9 @@ impl From<FinalOutput> for FinalOutputInfo {
                 .into_iter()
                 .map(|v| v.into())
                 .collect(),
+            hide: stake.hide,
+            uptime: stake.uptime,
+            can_stake: stake.can_stake,
         }
     }
 }
@@ -108,6 +114,9 @@ impl From<FinalOutputInfo> for FinalOutput {
                 .into_iter()
                 .map(|v| v.into())
                 .collect(),
+            hide: stake.hide,
+            uptime: stake.uptime,
+            can_stake: stake.can_stake,
         }
     }
 }
