@@ -404,7 +404,7 @@ class StakingPoolCard extends StatelessWidget {
             Row(
               children: [
                 Text(
-                  '${l10n.claimableIn} ${withdrawalBlock - currentBlock} ${l10n.blocks}',
+                  '${l10n.claimableIn} ${_formatTime(blocksRemaining)}',
                   style: TextStyle(
                     color: theme.warning,
                     fontSize: 12,
@@ -427,6 +427,18 @@ class StakingPoolCard extends StatelessWidget {
         ],
       ),
     );
+  }
+
+  String _formatTime(BigInt blocks) {
+    final seconds = (blocks.toDouble() * 1.5).round();
+    final duration = Duration(seconds: seconds);
+    if (duration.inHours > 0) {
+      return '~${duration.inHours} h ${duration.inMinutes % 60} min';
+    } else if (duration.inMinutes > 0) {
+      return '~${duration.inMinutes} min ${duration.inSeconds % 60} sec';
+    } else {
+      return '~${duration.inSeconds} sec';
+    }
   }
 
   Widget _buildUserStakingInfo(
@@ -672,7 +684,7 @@ class StakingPoolCard extends StatelessWidget {
           primaryValue,
           style: TextStyle(
             color: valueColor,
-            fontSize: 12,
+            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -813,15 +825,19 @@ class StakingPoolCard extends StatelessWidget {
               ],
             ),
           ),
-          CustomButton(
-            text: l10n.claimButton,
-            onPressed: () => _claimRewards(context, appState),
-            textColor: theme.buttonText,
-            backgroundColor: theme.success,
-            borderRadius: 12,
-            height: 40.0,
-            width: 80,
-          ),
+          ...(isEVM
+              ? [
+                  CustomButton(
+                    text: l10n.claimButton,
+                    onPressed: () => _claimRewards(context, appState),
+                    textColor: theme.buttonText,
+                    backgroundColor: theme.success,
+                    borderRadius: 12,
+                    height: 40.0,
+                    width: 80,
+                  ),
+                ]
+              : []),
         ],
       ),
     );
