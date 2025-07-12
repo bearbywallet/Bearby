@@ -24,7 +24,6 @@ class StakingPoolCard extends StatelessWidget {
 
   bool get isLiquidStaking => stake.token != null;
   bool get isScilla => stake.tag == "scilla";
-  bool get isOldAvely => stake.tag == 'avely';
   bool get isEVM => stake.tag == 'evm';
 
   @override
@@ -160,7 +159,7 @@ class StakingPoolCard extends StatelessWidget {
                   ),
                 ),
                 child: SvgPicture.asset(
-                  isScilla || isOldAvely
+                  isScilla
                       ? 'assets/icons/scilla.svg'
                       : 'assets/icons/solidity.svg',
                   width: 16,
@@ -707,10 +706,8 @@ class StakingPoolCard extends StatelessWidget {
         children: [
           _buildStatItem(
             theme,
-            "VP",
-            stake.votePower == null || stake.votePower == 0
-                ? 'N/A'
-                : '${stake.votePower?.toStringAsFixed(1)}%',
+            "UPTIME",
+            "${stake.uptime}%",
             stake.votePower == null || stake.votePower == 0
                 ? theme.textSecondary
                 : theme.primaryPurple,
@@ -857,10 +854,11 @@ class StakingPoolCard extends StatelessWidget {
 
     return Row(
       children: [
-        if (!isOldAvely && !isScilla) ...[
+        if (!isScilla) ...[
           Expanded(
             child: CustomButton(
               text: l10n.stakeButton,
+              disabled: !stake.canStake,
               onPressed: () => _stake(context),
               textColor: theme.buttonText,
               backgroundColor: theme.primaryPurple,
@@ -913,14 +911,14 @@ class StakingPoolCard extends StatelessWidget {
         final (formattedValue, converted) = formatingAmount(
           amount: parsedAmount,
           symbol: stake.token!.symbol,
-          decimals: isOldAvely ? 12 : stake.token!.decimals,
+          decimals: stake.token!.decimals,
           rate: 0.0,
           appState: appState,
           compact: true,
         );
         return (formattedValue, converted);
       } else if (nativeToken != null) {
-        int decimals = isOldAvely || isScilla ? 12 : 18;
+        int decimals = isScilla ? 12 : 18;
 
         final (formattedValue, converted) = formatingAmount(
           amount: parsedAmount,
@@ -1032,7 +1030,7 @@ class StakingPoolCard extends StatelessWidget {
       final accountIndex = appState.wallet!.selectedAccount;
       TransactionRequestInfo tx;
 
-      if ((isScilla || isOldAvely) && appState.account!.addrType == 1) {
+      if ((isScilla) && appState.account!.addrType == 1) {
         await zilliqaSwapChain(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
@@ -1046,12 +1044,6 @@ class StakingPoolCard extends StatelessWidget {
 
       if (isScilla) {
         tx = await buildTxScillaInitUnstake(
-          walletIndex: walletIndex,
-          accountIndex: accountIndex,
-          stake: stake,
-        );
-      } else if (isOldAvely) {
-        tx = await buildTxScillaWithdrawStakeAvely(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
           stake: stake,
