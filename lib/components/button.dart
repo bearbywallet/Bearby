@@ -64,13 +64,16 @@ class _CustomButtonState extends State<CustomButton> {
               : Matrix4.identity(),
           transformAlignment: Alignment.center,
           child: Center(
-            child: Text(
-              widget.text,
-              style: theme.subtitle1.copyWith(
-                color: widget.disabled
-                    ? widget.textColor.withAlpha(128)
-                    : widget.textColor,
-                fontWeight: FontWeight.bold,
+            child: FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                widget.text,
+                style: theme.subtitle1.copyWith(
+                  color: widget.disabled
+                      ? widget.textColor.withAlpha(128)
+                      : widget.textColor,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
           ),

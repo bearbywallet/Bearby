@@ -841,19 +841,6 @@ class StakingPoolCard extends StatelessWidget {
 
     return Row(
       children: [
-        if (!isOldAvely && !isScilla && hasDelegation && !isLiquidStaking) ...[
-          Expanded(
-            child: CustomButton(
-              text: "Reinvest",
-              onPressed: () => _reinvest(context, appState),
-              textColor: theme.buttonText,
-              backgroundColor: theme.primaryPurple,
-              borderRadius: 16,
-              height: 48.0,
-            ),
-          ),
-          const SizedBox(width: 12),
-        ],
         if (!isOldAvely && !isScilla) ...[
           Expanded(
             child: CustomButton(
@@ -1088,8 +1075,6 @@ class StakingPoolCard extends StatelessWidget {
     );
   }
 
-  void _reinvest(BuildContext context, AppState appState) {}
-
   Future<void> _claimWithdrawal(
     BuildContext context,
     AppState appState,
@@ -1120,6 +1105,7 @@ class StakingPoolCard extends StatelessWidget {
         tx = await buildTxScillaCompleteWithdrawal(
           walletIndex: walletIndex,
           accountIndex: accountIndex,
+          stake: stake,
         );
       } else if (isEVM) {
         tx = await buildTxClaimUnstakeRequest(
