@@ -8,8 +8,10 @@ import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
+import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
+import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -533,12 +535,33 @@ class _StakeModalContentState extends State<StakeModalContent> {
         }
 
         if (_isStaking) {
+          print(widget.stake.token?.chainHash);
           tx = await buildTxEvmStakeRequest(
             walletIndex: walletIndex,
             accountIndex: accountIndex,
             stake: widget.stake,
             amount: amount,
           );
+
+          if (widget.stake.token != null) {
+            final newToken = FTokenInfo(
+              name: widget.stake.token!.name,
+              symbol: widget.stake.token!.symbol,
+              decimals: widget.stake.token!.decimals,
+              addr: widget.stake.token!.addr,
+              addrType: widget.stake.token!.addrType,
+              balances: {},
+              rate: 0,
+              default_: false,
+              native: false,
+              chainHash: appState.chain!.chainHash,
+            );
+            await addFtoken(
+              meta: newToken,
+              walletIndex: BigInt.from(appState.selectedWallet),
+            );
+            await appState.syncData();
+          }
         } else {
           tx = await buildTxEvmUnstakeRequest(
             walletIndex: walletIndex,
