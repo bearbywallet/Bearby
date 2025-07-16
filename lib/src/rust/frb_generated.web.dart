@@ -306,6 +306,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> dco_decode_list_wallet_info(dynamic raw);
 
   @protected
+  List<ZilValidatorInfo> dco_decode_list_zil_validator_info(dynamic raw);
+
+  @protected
   NetworkConfigInfo dco_decode_network_config_info(dynamic raw);
 
   @protected
@@ -431,6 +434,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   WalletSettingsInfo dco_decode_wallet_settings_info(dynamic raw);
+
+  @protected
+  ZilValidatorInfo dco_decode_zil_validator_info(dynamic raw);
 
   @protected
   AnyhowException sse_decode_AnyhowException(SseDeserializer deserializer);
@@ -714,6 +720,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<WalletInfo> sse_decode_list_wallet_info(SseDeserializer deserializer);
 
   @protected
+  List<ZilValidatorInfo> sse_decode_list_zil_validator_info(
+      SseDeserializer deserializer);
+
+  @protected
   NetworkConfigInfo sse_decode_network_config_info(
       SseDeserializer deserializer);
 
@@ -859,6 +869,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   WalletSettingsInfo sse_decode_wallet_settings_info(
       SseDeserializer deserializer);
+
+  @protected
+  ZilValidatorInfo sse_decode_zil_validator_info(SseDeserializer deserializer);
 
   @protected
   void sse_encode_AnyhowException(
@@ -1154,6 +1167,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<WalletInfo> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_zil_validator_info(
+      List<ZilValidatorInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_network_config_info(
       NetworkConfigInfo self, SseSerializer serializer);
 
@@ -1301,6 +1318,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_wallet_settings_info(
       WalletSettingsInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_zil_validator_info(
+      ZilValidatorInfo self, SseSerializer serializer);
 }
 
 // Section: wire_class

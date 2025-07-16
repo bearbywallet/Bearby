@@ -14,9 +14,14 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<FinalOutputInfo>> getStakes(
+Future<List<FinalOutputInfo>> fetchEvmStake(
         {required BigInt walletIndex, required BigInt accountIndex}) =>
-    RustLib.instance.api.crateApiStakeGetStakes(
+    RustLib.instance.api.crateApiStakeFetchEvmStake(
+        walletIndex: walletIndex, accountIndex: accountIndex);
+
+Future<List<FinalOutputInfo>> fetchScillaStake(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiStakeFetchScillaStake(
         walletIndex: walletIndex, accountIndex: accountIndex);
 
 Future<TransactionRequestInfo> buildClaimScillaStakingRewardsTx(

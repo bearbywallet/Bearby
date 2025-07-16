@@ -13,14 +13,19 @@ class FinalOutputInfo {
   final FTokenInfo? token;
   final String delegAmt;
   final String rewards;
-  final BigInt? tvl;
+  final String claimableAmount;
   final double? votePower;
   final double? apr;
-  final double? price;
   final double? commission;
+  final String? totalRewards;
+  final String? totalStake;
+  final String? totalNetworkStake;
+  final String? version;
+  final String? unbondingPeriod;
   final String tag;
   final BigInt? currentBlock;
   final List<PendingWithdrawalInfo> pendingWithdrawals;
+  final List<ZilValidatorInfo> validators;
   final bool hide_;
   final int uptime;
   final bool canStake;
@@ -31,14 +36,19 @@ class FinalOutputInfo {
     this.token,
     required this.delegAmt,
     required this.rewards,
-    this.tvl,
+    required this.claimableAmount,
     this.votePower,
     this.apr,
-    this.price,
     this.commission,
+    this.totalRewards,
+    this.totalStake,
+    this.totalNetworkStake,
+    this.version,
+    this.unbondingPeriod,
     required this.tag,
     this.currentBlock,
     required this.pendingWithdrawals,
+    required this.validators,
     required this.hide_,
     required this.uptime,
     required this.canStake,
@@ -51,14 +61,19 @@ class FinalOutputInfo {
       token.hashCode ^
       delegAmt.hashCode ^
       rewards.hashCode ^
-      tvl.hashCode ^
+      claimableAmount.hashCode ^
       votePower.hashCode ^
       apr.hashCode ^
-      price.hashCode ^
       commission.hashCode ^
+      totalRewards.hashCode ^
+      totalStake.hashCode ^
+      totalNetworkStake.hashCode ^
+      version.hashCode ^
+      unbondingPeriod.hashCode ^
       tag.hashCode ^
       currentBlock.hashCode ^
       pendingWithdrawals.hashCode ^
+      validators.hashCode ^
       hide_.hashCode ^
       uptime.hashCode ^
       canStake.hashCode;
@@ -73,14 +88,19 @@ class FinalOutputInfo {
           token == other.token &&
           delegAmt == other.delegAmt &&
           rewards == other.rewards &&
-          tvl == other.tvl &&
+          claimableAmount == other.claimableAmount &&
           votePower == other.votePower &&
           apr == other.apr &&
-          price == other.price &&
           commission == other.commission &&
+          totalRewards == other.totalRewards &&
+          totalStake == other.totalStake &&
+          totalNetworkStake == other.totalNetworkStake &&
+          version == other.version &&
+          unbondingPeriod == other.unbondingPeriod &&
           tag == other.tag &&
           currentBlock == other.currentBlock &&
           pendingWithdrawals == other.pendingWithdrawals &&
+          validators == other.validators &&
           hide_ == other.hide_ &&
           uptime == other.uptime &&
           canStake == other.canStake;
@@ -109,4 +129,35 @@ class PendingWithdrawalInfo {
           amount == other.amount &&
           withdrawalBlock == other.withdrawalBlock &&
           claimable == other.claimable;
+}
+
+class ZilValidatorInfo {
+  final String futureStake;
+  final String pendingWithdrawals;
+  final String rewardAddress;
+  final bool status;
+
+  const ZilValidatorInfo({
+    required this.futureStake,
+    required this.pendingWithdrawals,
+    required this.rewardAddress,
+    required this.status,
+  });
+
+  @override
+  int get hashCode =>
+      futureStake.hashCode ^
+      pendingWithdrawals.hashCode ^
+      rewardAddress.hashCode ^
+      status.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ZilValidatorInfo &&
+          runtimeType == other.runtimeType &&
+          futureStake == other.futureStake &&
+          pendingWithdrawals == other.pendingWithdrawals &&
+          rewardAddress == other.rewardAddress &&
+          status == other.status;
 }
