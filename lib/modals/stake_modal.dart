@@ -15,9 +15,15 @@ import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
+enum StakeOperationType {
+  stake,
+  unstake,
+}
+
 void showStakeModal({
   required BuildContext context,
   required FinalOutputInfo stake,
+  required StakeOperationType opType,
   VoidCallback? onDismiss,
 }) {
   showModalBottomSheet<void>(
@@ -28,16 +34,21 @@ void showStakeModal({
     isDismissible: true,
     useSafeArea: true,
     barrierColor: Colors.black54,
-    builder: (context) => StakeModalContent(stake: stake),
+    builder: (context) => StakeModalContent(
+      stake: stake,
+      opType: opType,
+    ),
   ).then((_) => onDismiss?.call());
 }
 
 class StakeModalContent extends StatefulWidget {
   final FinalOutputInfo stake;
+  final StakeOperationType opType;
 
   const StakeModalContent({
     super.key,
     required this.stake,
+    required this.opType,
   });
 
   @override
@@ -49,12 +60,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
   final GlobalKey<SmartInputState> _amountInputKey =
       GlobalKey<SmartInputState>();
 
+  late final bool _isStaking;
   BigInt _availableBalance = BigInt.zero;
   int _balanceDecimals = 12;
 
   @override
   void initState() {
     super.initState();
+    _isStaking = widget.opType == StakeOperationType.stake;
     _loadBalance();
   }
 
@@ -72,15 +85,27 @@ class _StakeModalContentState extends State<StakeModalContent> {
         (t) => t.native && t.addrType == (widget.stake.tag == 'scilla' ? 0 : 1),
       );
 
-      if (token != null) {
+      if (token == null) {
+        throw Exception(
+            "Native token not found for stake type ${widget.stake.tag}");
+      }
+      _balanceDecimals = token.decimals;
+
+      if (_isStaking) {
         final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
         _availableBalance =
             BigInt.tryParse(token.balances[selectedAccount] ?? '0') ??
                 BigInt.zero;
-        _balanceDecimals = token.decimals;
+      } else {
+        // For unstaking, the available balance is the staked amount.
+        // NOTE: Assumes `widget.stake` contains a `stakedAmount` field.
+        // You may need to replace `stakedAmount` with the correct field from your `FinalOutputInfo` model.
+        _availableBalance =
+            BigInt.tryParse(widget.stake.delegAmt) ?? BigInt.zero;
       }
     } catch (e) {
       debugPrint('Error loading balance: $e');
+      _availableBalance = BigInt.zero;
     }
 
     if (mounted) {
@@ -89,8 +114,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   void _setPercentageAmount(double percentage) {
+    // This calculation is an approximation, for perfect precision use a different method.
     final amount =
-        (_availableBalance * BigInt.from((percentage * 100).toInt())) ~/
+        (_availableBalance * BigInt.from((percentage * 100).round())) ~/
             BigInt.from(100);
 
     final formattedAmount = fromWei(
@@ -99,6 +125,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
 
     _amountController.text = formattedAmount;
+    // Move cursor to the end
+    _amountController.selection = TextSelection.fromPosition(
+        TextPosition(offset: _amountController.text.length));
   }
 
   @override
@@ -118,9 +147,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
       ),
       child: SafeArea(
         child: GestureDetector(
-          onTap: () {
-            FocusScope.of(context).unfocus();
-          },
+          onTap: () => FocusScope.of(context).unfocus(),
           behavior: HitTestBehavior.translucent,
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -155,9 +182,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
                         _buildAmountInput(theme, l10n),
                         const SizedBox(height: 16),
                         _buildPercentageButtons(theme),
-                        const SizedBox(height: 16),
-                        _buildStakeButton(appState, l10n),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 24),
+                        _buildActionButton(appState, l10n),
                       ],
                     ),
                   ),
@@ -202,10 +228,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
               fit: BoxFit.contain,
               errorWidget: Container(
                 color: theme.danger.withValues(alpha: 0.1),
+                padding: const EdgeInsets.all(14),
                 child: SvgPicture.asset(
                   'assets/icons/zil.svg',
-                  width: 28,
-                  height: 28,
                   colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
                 ),
               ),
@@ -237,7 +262,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
                 child: Text(
                   widget.stake.tag.toUpperCase(),
                   style: TextStyle(
-                    color: theme.primaryPurple,
+                    color: widget.stake.tag == 'scilla'
+                        ? theme.success
+                        : theme.primaryPurple,
                     fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
@@ -331,7 +358,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          l10n.stakeButton,
+          _isStaking ? l10n.stakeButton : l10n.unstakeButton,
           style: TextStyle(
             color: theme.textPrimary,
             fontSize: 18,
@@ -397,86 +424,105 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
   }
 
-  Widget _buildStakeButton(AppState appState, AppLocalizations l10n) {
+  Widget _buildActionButton(AppState appState, AppLocalizations l10n) {
     final theme = appState.currentTheme;
 
     return SizedBox(
       width: double.infinity,
       child: CustomButton(
-        text: l10n.stakeButton,
-        onPressed: () async {
-          TransactionRequestInfo tx;
-
-          try {
-            final walletIndex = BigInt.from(appState.selectedWallet);
-            final accountIndex = appState.wallet!.selectedAccount;
-
-            if (widget.stake.tag == 'evm' && appState.account!.addrType == 0) {
-              await zilliqaSwapChain(
-                walletIndex: walletIndex,
-                accountIndex: accountIndex,
-              );
-            }
-
-            final nativeToken =
-                appState.wallet?.tokens.firstWhere((t) => t.native);
-
-            final (amount, _) = toWei(
-              value: _amountController.text,
-              decimals: nativeToken!.decimals,
-            );
-
-            if (widget.stake.tag == 'evm') {
-              tx = await buildTxEvmStakeRequest(
-                walletIndex: walletIndex,
-                accountIndex: accountIndex,
-                stake: widget.stake,
-                amount: amount,
-              );
-            } else {
-              throw "Invlid stake type";
-            }
-
-            if (!mounted) return;
-            showConfirmTransactionModal(
-              context: context,
-              tx: tx,
-              to: widget.stake.address,
-              token: nativeToken,
-              amount: _amountController.text,
-              onConfirm: (_) {
-                Navigator.of(context).pushNamed('/', arguments: {
-                  'selectedIndex': 1,
-                });
-              },
-            );
-          } catch (err) {
-            if (!mounted) return;
-
-            String errorMessage = err.toString();
-
-            showDialog(
-              context: context,
-              builder: (context) => AlertDialog(
-                backgroundColor: appState.currentTheme.cardBackground,
-                title: Text(
-                  "Error",
-                  style: TextStyle(color: appState.currentTheme.textPrimary),
-                ),
-                content: Text(
-                  errorMessage,
-                  style: TextStyle(color: appState.currentTheme.danger),
-                ),
-                actions: [],
-              ),
-            );
-          }
-        },
+        text: _isStaking ? l10n.stakeButton : l10n.unstakeButton,
+        onPressed: () => _onConfirm(appState),
         backgroundColor: theme.primaryPurple,
         textColor: theme.buttonText,
         height: 56,
         borderRadius: 16,
       ),
     );
+  }
+
+  Future<void> _onConfirm(AppState appState) async {
+    TransactionRequestInfo tx;
+
+    try {
+      final walletIndex = BigInt.from(appState.selectedWallet);
+      final accountIndex = appState.wallet!.selectedAccount;
+      final nativeToken = appState.wallet?.tokens.firstWhere((t) => t.native);
+
+      if (nativeToken == null) {
+        throw Exception("Native token not found.");
+      }
+
+      final (amount, _) = toWei(
+        value: _amountController.text,
+        decimals: _balanceDecimals,
+      );
+
+      if (widget.stake.tag == 'evm') {
+        if (_isStaking) {
+          if (appState.account!.addrType == 0) {
+            await zilliqaSwapChain(
+              walletIndex: walletIndex,
+              accountIndex: accountIndex,
+            );
+          }
+          tx = await buildTxEvmStakeRequest(
+            walletIndex: walletIndex,
+            accountIndex: accountIndex,
+            stake: widget.stake,
+            amount: amount,
+          );
+        } else {
+          tx = await buildTxEvmUnstakeRequest(
+            walletIndex: walletIndex,
+            accountIndex: accountIndex,
+            stake: widget.stake,
+            amountToUnstake: amount,
+          );
+        }
+      } else {
+        throw Exception("Invalid operation type: ${widget.stake.tag}");
+      }
+
+      if (!mounted) return;
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: widget.stake.address,
+        token: nativeToken,
+        amount: _amountController.text,
+        onConfirm: (_) {
+          // Pop modal and navigate
+          Navigator.of(context).pop();
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (err) {
+      if (!mounted) return;
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          backgroundColor: appState.currentTheme.cardBackground,
+          title: Text(
+            "Error",
+            style: TextStyle(color: appState.currentTheme.textPrimary),
+          ),
+          content: Text(
+            err.toString(),
+            style: TextStyle(color: appState.currentTheme.danger),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              child: Text(
+                "OK",
+                style: TextStyle(color: appState.currentTheme.primaryPurple),
+              ),
+            )
+          ],
+        ),
+      );
+    }
   }
 }

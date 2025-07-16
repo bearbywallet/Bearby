@@ -1045,12 +1045,13 @@ class StakingPoolCard extends StatelessWidget {
           stake: stake,
         );
       } else if (isEVM) {
-        tx = await buildTxEvmUnstakeRequest(
-          walletIndex: walletIndex,
-          accountIndex: accountIndex,
+        showStakeModal(
+          opType: StakeOperationType.unstake,
+          context: context,
           stake: stake,
-          amountToUnstake: stake.delegAmt,
         );
+
+        return;
       } else {
         throw "invalid tx type";
       }
@@ -1074,6 +1075,7 @@ class StakingPoolCard extends StatelessWidget {
 
   void _stake(BuildContext context) {
     showStakeModal(
+      opType: StakeOperationType.stake,
       context: context,
       stake: stake,
     );
