@@ -611,5 +611,14 @@
   "pendingWithdrawals": "保留中の出金",
   "amount": "量",
   "claimableIn": "請求可能まで",
-  "blocks": "ブロック"
+  "blocks": "ブロック",
+  "unbondingPeriod": "アンボンディング期間",
+  "currentBlock": "現在のブロック",
+  "version": "バージョン",
+
+  "durationDay": "日",
+  "durationHour": "時間",
+  "durationMinute": "分",
+  "durationLessThanAMinute": "< 1分",
+  "durationNotAvailable": "適用外"
 }

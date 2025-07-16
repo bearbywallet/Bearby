@@ -97,9 +97,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
             BigInt.tryParse(token.balances[selectedAccount] ?? '0') ??
                 BigInt.zero;
       } else {
-        // For unstaking, the available balance is the staked amount.
-        // NOTE: Assumes `widget.stake` contains a `stakedAmount` field.
-        // You may need to replace `stakedAmount` with the correct field from your `FinalOutputInfo` model.
         _availableBalance =
             BigInt.tryParse(widget.stake.delegAmt) ?? BigInt.zero;
       }
@@ -114,7 +111,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   void _setPercentageAmount(double percentage) {
-    // This calculation is an approximation, for perfect precision use a different method.
     final amount =
         (_availableBalance * BigInt.from((percentage * 100).round())) ~/
             BigInt.from(100);
@@ -125,7 +121,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
 
     _amountController.text = formattedAmount;
-    // Move cursor to the end
     _amountController.selection = TextSelection.fromPosition(
         TextPosition(offset: _amountController.text.length));
   }
@@ -178,6 +173,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
                         _buildHeader(theme, l10n),
                         const SizedBox(height: 20),
                         _buildStakeInfo(theme, l10n),
+                        const SizedBox(height: 12),
+                        _buildAdditionalInfo(theme, l10n),
                         const SizedBox(height: 20),
                         _buildAmountInput(theme, l10n),
                         const SizedBox(height: 16),
@@ -324,6 +321,76 @@ class _StakeModalContentState extends State<StakeModalContent> {
     );
   }
 
+  Widget _buildAdditionalInfo(AppTheme theme, AppLocalizations l10n) {
+    String unbondingPeriodText;
+
+    if (widget.stake.unbondingPeriod != null &&
+        widget.stake.unbondingPeriod! > BigInt.zero) {
+      final periodInBlocks = widget.stake.unbondingPeriod!;
+      final seconds = (periodInBlocks.toDouble() * 1.5).round();
+      final duration = Duration(seconds: seconds);
+      final formattedDuration = _formatDuration(duration, l10n);
+      unbondingPeriodText = '${periodInBlocks.toString()} ($formattedDuration)';
+    } else {
+      unbondingPeriodText = widget.stake.unbondingPeriod?.toString() ?? 'N/A';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: theme.textSecondary.withValues(alpha: 0.1),
+        ),
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        children: [
+          _buildInfoRow(
+            theme,
+            l10n.unbondingPeriod,
+            unbondingPeriodText,
+          ),
+          const SizedBox(height: 8),
+          _buildInfoRow(
+            theme,
+            l10n.currentBlock,
+            widget.stake.currentBlock?.toString() ?? 'N/A',
+          ),
+          const SizedBox(height: 8),
+          _buildInfoRow(
+            theme,
+            l10n.version,
+            widget.stake.version ?? 'N/A',
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildInfoRow(AppTheme theme, String label, String value) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        Text(
+          label,
+          style: TextStyle(
+            color: theme.textSecondary,
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+        Text(
+          value,
+          style: TextStyle(
+            color: theme.textPrimary,
+            fontSize: 14,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ],
+    );
+  }
+
   Widget _buildStatItem(
       AppTheme theme, String label, String value, Color valueColor) {
     return Expanded(
@@ -458,13 +525,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
       );
 
       if (widget.stake.tag == 'evm') {
+        if (appState.account!.addrType == 0) {
+          await zilliqaSwapChain(
+            walletIndex: walletIndex,
+            accountIndex: accountIndex,
+          );
+        }
+
         if (_isStaking) {
-          if (appState.account!.addrType == 0) {
-            await zilliqaSwapChain(
-              walletIndex: walletIndex,
-              accountIndex: accountIndex,
-            );
-          }
           tx = await buildTxEvmStakeRequest(
             walletIndex: walletIndex,
             accountIndex: accountIndex,
@@ -491,7 +559,6 @@ class _StakeModalContentState extends State<StakeModalContent> {
         token: nativeToken,
         amount: _amountController.text,
         onConfirm: (_) {
-          // Pop modal and navigate
           Navigator.of(context).pop();
           Navigator.of(context).pushNamed('/', arguments: {
             'selectedIndex': 1,
@@ -524,5 +591,32 @@ class _StakeModalContentState extends State<StakeModalContent> {
         ),
       );
     }
+  }
+
+  String _formatDuration(Duration duration, AppLocalizations l10n) {
+    final days = duration.inDays;
+    final hours = duration.inHours.remainder(24);
+    final minutes = duration.inMinutes.remainder(60);
+
+    final List<String> parts = [];
+    if (days > 0) {
+      parts.add('${days}${l10n.durationDay}');
+    }
+    if (hours > 0) {
+      parts.add('${hours}${l10n.durationHour}');
+    }
+    if (minutes > 0) {
+      parts.add('${minutes}${l10n.durationMinute}');
+    }
+
+    if (parts.isEmpty && duration.inSeconds > 0) {
+      return l10n.durationLessThanAMinute;
+    }
+
+    if (parts.isEmpty) {
+      return l10n.durationNotAvailable;
+    }
+
+    return '~${parts.take(2).join(' ')}';
   }
 }

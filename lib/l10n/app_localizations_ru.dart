@@ -1609,4 +1609,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get blocks => 'блоков';
+
+  @override
+  String get unbondingPeriod => 'Период отвязки';
+
+  @override
+  String get currentBlock => 'Текущий блок';
+
+  @override
+  String get version => 'Версия';
+
+  @override
+  String get durationDay => 'д';
+
+  @override
+  String get durationHour => 'ч';
+
+  @override
+  String get durationMinute => 'м';
+
+  @override
+  String get durationLessThanAMinute => '< 1м';
+
+  @override
+  String get durationNotAvailable => 'Н/Д';
 }

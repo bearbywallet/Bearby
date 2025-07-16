@@ -3242,6 +3242,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'blocks'**
   String get blocks;
+
+  /// Label for the unbonding period
+  ///
+  /// In en, this message translates to:
+  /// **'Unbonding Period'**
+  String get unbondingPeriod;
+
+  /// Label for the current blockchain block number
+  ///
+  /// In en, this message translates to:
+  /// **'Current Block'**
+  String get currentBlock;
+
+  /// Label for the contract or validator version
+  ///
+  /// In en, this message translates to:
+  /// **'Version'**
+  String get version;
+
+  /// No description provided for @durationDay.
+  ///
+  /// In en, this message translates to:
+  /// **'d'**
+  String get durationDay;
+
+  /// No description provided for @durationHour.
+  ///
+  /// In en, this message translates to:
+  /// **'h'**
+  String get durationHour;
+
+  /// No description provided for @durationMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'m'**
+  String get durationMinute;
+
+  /// No description provided for @durationLessThanAMinute.
+  ///
+  /// In en, this message translates to:
+  /// **'< 1m'**
+  String get durationLessThanAMinute;
+
+  /// No description provided for @durationNotAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'N/A'**
+  String get durationNotAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

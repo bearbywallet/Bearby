@@ -607,5 +607,14 @@
   "pendingWithdrawals": "Ожидающие выводы",
   "amount": "Сумма",
   "claimableIn": "Доступно через",
-  "blocks": "блоков"
+  "blocks": "блоков",
+  "unbondingPeriod": "Период отвязки",
+  "currentBlock": "Текущий блок",
+  "version": "Версия",
+
+  "durationDay": "д",
+  "durationHour": "ч",
+  "durationMinute": "м",
+  "durationLessThanAMinute": "< 1м",
+  "durationNotAvailable": "Н/Д"
 }

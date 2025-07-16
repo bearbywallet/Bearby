@@ -212,6 +212,19 @@ class _ZilStakePageState extends State<ZilStakePage> {
         if (isIOS)
           CupertinoSliverRefreshControl(
             onRefresh: () => _fetchStakes(isRefresh: true),
+            builder: (
+              BuildContext context,
+              RefreshIndicatorMode refreshState,
+              double pulledExtent,
+              double refreshTriggerPullDistance,
+              double refreshIndicatorExtent,
+            ) {
+              return LinearRefreshIndicator(
+                pulledExtent: pulledExtent,
+                refreshTriggerPullDistance: refreshTriggerPullDistance,
+                refreshIndicatorExtent: refreshIndicatorExtent,
+              );
+            },
           ),
         SliverFillRemaining(
           child: Center(
@@ -232,30 +245,59 @@ class _ZilStakePageState extends State<ZilStakePage> {
   Widget _buildEmptyState() {
     final theme = Provider.of<AppState>(context).currentTheme;
     final l10n = AppLocalizations.of(context)!;
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          SvgPicture.asset(
-            'assets/icons/anchor.svg',
-            width: 80,
-            height: 80,
-            colorFilter: ColorFilter.mode(
-              theme.textSecondary.withValues(alpha: 0.3),
-              BlendMode.srcIn,
-            ),
-          ),
-          const SizedBox(height: 24),
-          Text(
-            l10n.noStakingPoolsFound,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
+    final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
+
+    return CustomScrollView(
+      physics: const AlwaysScrollableScrollPhysics(
+        parent: BouncingScrollPhysics(),
       ),
+      slivers: [
+        if (isIOS)
+          CupertinoSliverRefreshControl(
+            onRefresh: () => _fetchStakes(isRefresh: true),
+            builder: (
+              BuildContext context,
+              RefreshIndicatorMode refreshState,
+              double pulledExtent,
+              double refreshTriggerPullDistance,
+              double refreshIndicatorExtent,
+            ) {
+              return LinearRefreshIndicator(
+                pulledExtent: pulledExtent,
+                refreshTriggerPullDistance: refreshTriggerPullDistance,
+                refreshIndicatorExtent: refreshIndicatorExtent,
+              );
+            },
+          ),
+        SliverFillRemaining(
+          child: Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SvgPicture.asset(
+                  'assets/icons/anchor.svg',
+                  width: 80,
+                  height: 80,
+                  colorFilter: ColorFilter.mode(
+                    theme.textSecondary.withValues(alpha: 0.3),
+                    BlendMode.srcIn,
+                  ),
+                ),
+                const SizedBox(height: 24),
+                Text(
+                  l10n.noStakingPoolsFound,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 

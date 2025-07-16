@@ -1609,4 +1609,28 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get blocks => 'ブロック';
+
+  @override
+  String get unbondingPeriod => 'アンボンディング期間';
+
+  @override
+  String get currentBlock => '現在のブロック';
+
+  @override
+  String get version => 'バージョン';
+
+  @override
+  String get durationDay => '日';
+
+  @override
+  String get durationHour => '時間';
+
+  @override
+  String get durationMinute => '分';
+
+  @override
+  String get durationLessThanAMinute => '< 1分';
+
+  @override
+  String get durationNotAvailable => '適用外';
 }

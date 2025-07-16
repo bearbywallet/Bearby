@@ -1609,4 +1609,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get blocks => '区块';
+
+  @override
+  String get unbondingPeriod => '解绑期';
+
+  @override
+  String get currentBlock => '当前区块';
+
+  @override
+  String get version => '版本';
+
+  @override
+  String get durationDay => '天';
+
+  @override
+  String get durationHour => '小时';
+
+  @override
+  String get durationMinute => '分钟';
+
+  @override
+  String get durationLessThanAMinute => '< 1分钟';
+
+  @override
+  String get durationNotAvailable => '不适用';
 }

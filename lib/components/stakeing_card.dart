@@ -472,9 +472,7 @@ class StakingPoolCard extends StatelessWidget {
                         borderRadius: BorderRadius.circular(8),
                       ),
                       child: SvgPicture.asset(
-                        isLiquidStaking
-                            ? 'assets/icons/piggy.svg'
-                            : 'assets/icons/wallet.svg',
+                        'assets/icons/piggy.svg',
                         width: 16,
                         height: 16,
                         colorFilter: ColorFilter.mode(
@@ -496,93 +494,16 @@ class StakingPoolCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                const SizedBox(height: 12),
                 _buildAmountDisplay(
                   theme,
                   isLiquidStaking
-                      ? _formatTokenAmount(stake.delegAmt, appState,
-                          isLSTToken: true)
+                      ? _formatTokenAmount(
+                          stake.delegAmt,
+                          appState,
+                          isLSTToken: true,
+                        )
                       : _formatTokenAmount(stake.delegAmt, appState),
                   hasDelegation ? theme.primaryPurple : theme.textSecondary,
-                ),
-              ],
-            ),
-          ),
-        ),
-        const SizedBox(width: 12),
-        Expanded(
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: isLiquidStaking
-                  ? theme.primaryPurple.withValues(alpha: 0.06)
-                  : hasRewards
-                      ? theme.success.withValues(alpha: 0.06)
-                      : theme.textSecondary.withValues(alpha: 0.04),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: isLiquidStaking
-                    ? theme.primaryPurple.withValues(alpha: 0.1)
-                    : hasRewards
-                        ? theme.success.withValues(alpha: 0.1)
-                        : theme.textSecondary.withValues(alpha: 0.08),
-                width: 1,
-              ),
-            ),
-            child: Column(
-              children: [
-                Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(6),
-                      decoration: BoxDecoration(
-                        color: isLiquidStaking
-                            ? theme.primaryPurple.withValues(alpha: 0.1)
-                            : hasRewards
-                                ? theme.success.withValues(alpha: 0.1)
-                                : theme.textSecondary.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: SvgPicture.asset(
-                        'assets/icons/trophy.svg',
-                        width: 16,
-                        height: 16,
-                        colorFilter: ColorFilter.mode(
-                          isLiquidStaking
-                              ? theme.primaryPurple
-                              : hasRewards
-                                  ? theme.success
-                                  : theme.textSecondary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        isLiquidStaking
-                            ? 'Yield ${stake.token?.symbol ?? ""}'
-                            : l10n.rewardsAvailable,
-                        style: TextStyle(
-                          color: theme.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                _buildAmountDisplay(
-                  theme,
-                  isLiquidStaking
-                      ? _calculateLSTValue(appState)
-                      : _formatTokenAmount(stake.rewards, appState),
-                  isLiquidStaking
-                      ? theme.primaryPurple
-                      : hasRewards
-                          ? theme.success
-                          : theme.textSecondary,
                 ),
               ],
             ),

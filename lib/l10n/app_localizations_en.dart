@@ -1609,4 +1609,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get blocks => 'blocks';
+
+  @override
+  String get unbondingPeriod => 'Unbonding Period';
+
+  @override
+  String get currentBlock => 'Current Block';
+
+  @override
+  String get version => 'Version';
+
+  @override
+  String get durationDay => 'd';
+
+  @override
+  String get durationHour => 'h';
+
+  @override
+  String get durationMinute => 'm';
+
+  @override
+  String get durationLessThanAMinute => '< 1m';
+
+  @override
+  String get durationNotAvailable => 'N/A';
 }

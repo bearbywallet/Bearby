@@ -2263,5 +2263,23 @@
   "blocks": "blocks",
   "@blocks": {
     "description": "Plural form of the word block, used for blockchain blocks count"
-  }
+  },
+  "unbondingPeriod": "Unbonding Period",
+  "@unbondingPeriod": {
+    "description": "Label for the unbonding period"
+  },
+  "currentBlock": "Current Block",
+  "@currentBlock": {
+    "description": "Label for the current blockchain block number"
+  },
+  "version": "Version",
+  "@version": {
+    "description": "Label for the contract or validator version"
+  },
+
+  "durationDay": "d",
+  "durationHour": "h",
+  "durationMinute": "m",
+  "durationLessThanAMinute": "< 1m",
+  "durationNotAvailable": "N/A"
 }

@@ -591,5 +591,14 @@
   "pendingWithdrawals": "待处理提款",
   "amount": "数量",
   "claimableIn": "可领取于",
-  "blocks": "区块"
+  "blocks": "区块",
+  "unbondingPeriod": "解绑期",
+  "currentBlock": "当前区块",
+  "version": "版本",
+
+  "durationDay": "天",
+  "durationHour": "小时",
+  "durationMinute": "分钟",
+  "durationLessThanAMinute": "< 1分钟",
+  "durationNotAvailable": "不适用"
 }
