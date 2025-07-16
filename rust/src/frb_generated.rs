@@ -4725,7 +4725,7 @@ impl SseDecode for crate::models::stake::FinalOutputInfo {
         let mut var_totalStake = <Option<String>>::sse_decode(deserializer);
         let mut var_totalNetworkStake = <Option<String>>::sse_decode(deserializer);
         let mut var_version = <Option<String>>::sse_decode(deserializer);
-        let mut var_unbondingPeriod = <Option<String>>::sse_decode(deserializer);
+        let mut var_unbondingPeriod = <Option<u64>>::sse_decode(deserializer);
         let mut var_tag = <String>::sse_decode(deserializer);
         let mut var_currentBlock = <Option<u64>>::sse_decode(deserializer);
         let mut var_pendingWithdrawals =
@@ -7451,7 +7451,7 @@ impl SseEncode for crate::models::stake::FinalOutputInfo {
         <Option<String>>::sse_encode(self.total_stake, serializer);
         <Option<String>>::sse_encode(self.total_network_stake, serializer);
         <Option<String>>::sse_encode(self.version, serializer);
-        <Option<String>>::sse_encode(self.unbonding_period, serializer);
+        <Option<u64>>::sse_encode(self.unbonding_period, serializer);
         <String>::sse_encode(self.tag, serializer);
         <Option<u64>>::sse_encode(self.current_block, serializer);
         <Vec<crate::models::stake::PendingWithdrawalInfo>>::sse_encode(

@@ -28,7 +28,7 @@ pub struct FinalOutputInfo {
     pub total_stake: Option<String>,
     pub total_network_stake: Option<String>,
     pub version: Option<String>,
-    pub unbonding_period: Option<String>,
+    pub unbonding_period: Option<u64>,
     pub tag: String,
     pub current_block: Option<u64>,
     pub pending_withdrawals: Vec<PendingWithdrawalInfo>,
@@ -114,7 +114,7 @@ impl From<FinalOutput> for FinalOutputInfo {
             total_stake: stake.total_stake.map(|v| v.to_string()),
             total_network_stake: stake.total_network_stake.map(|v| v.to_string()),
             version: stake.version,
-            unbonding_period: stake.unbonding_period.map(|v| v.to_string()),
+            unbonding_period: stake.unbonding_period,
             validators: stake.validators.into_iter().map(Into::into).collect(),
         }
     }
@@ -142,7 +142,7 @@ impl From<FinalOutputInfo> for FinalOutput {
             total_stake: stake.total_stake.and_then(|v| v.parse().ok()),
             total_network_stake: stake.total_network_stake.and_then(|v| v.parse().ok()),
             version: stake.version,
-            unbonding_period: stake.unbonding_period.and_then(|v| v.parse().ok()),
+            unbonding_period: stake.unbonding_period,
             tag: stake.tag,
             current_block: stake.current_block,
             pending_withdrawals: stake

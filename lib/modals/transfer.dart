@@ -353,7 +353,8 @@ class _ConfirmTransactionContentState
           chainId: widget.tx.scilla!.chainId,
           nonce: _txParamsInfo.nonce + BigInt.one,
           gasPrice: _gasPrice,
-          gasLimit: widget.tx.scilla!.gasLimit,
+          // gasLimit: widget.tx.scilla!.gasLimit,
+          gasLimit: _txParamsInfo.txEstimateGas,
           toAddr: widget.tx.scilla!.toAddr,
           amount: adjustedAmount,
           code: widget.tx.scilla!.code,
@@ -614,8 +615,11 @@ class _ConfirmTransactionContentState
                                               _maxPriorityFee,
                                           initialGasLimit:
                                               _txParamsInfo.txEstimateGas,
-                                          onSave: (gasPrice, maxPriorityFee,
-                                              gasLimit) {
+                                          onSave: (
+                                            gasPrice,
+                                            maxPriorityFee,
+                                            gasLimit,
+                                          ) {
                                             if (!mounted) return;
 
                                             setState(() {

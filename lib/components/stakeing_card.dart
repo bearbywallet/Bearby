@@ -803,7 +803,7 @@ class StakingPoolCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  "Available Rewards",
+                  l10n.rewardsAvailable,
                   style: TextStyle(
                     color: theme.textSecondary,
                     fontSize: 12,
@@ -822,19 +822,15 @@ class StakingPoolCard extends StatelessWidget {
               ],
             ),
           ),
-          ...(isEVM
-              ? [
-                  CustomButton(
-                    text: l10n.claimButton,
-                    onPressed: () => _claimRewards(context, appState),
-                    textColor: theme.buttonText,
-                    backgroundColor: theme.success,
-                    borderRadius: 12,
-                    height: 40.0,
-                    width: 80,
-                  ),
-                ]
-              : []),
+          CustomButton(
+            text: l10n.claimButton,
+            onPressed: () => _claimRewards(context, appState),
+            textColor: theme.buttonText,
+            backgroundColor: theme.success,
+            borderRadius: 12,
+            height: 40.0,
+            width: 80,
+          ),
         ],
       ),
     );
@@ -939,7 +935,7 @@ class StakingPoolCard extends StatelessWidget {
     if (stake.token == null) return ("0", "0");
 
     final lstAmount = BigInt.tryParse(stake.delegAmt) ?? BigInt.zero;
-    final lstPrice = stake.price ?? 1.0;
+    final lstPrice = stake.token?.rate ?? 1.0;
     final token = stake.token!;
 
     final lstAmountDouble =
@@ -977,7 +973,7 @@ class StakingPoolCard extends StatelessWidget {
   }
 
   String _formatLSTPrice(AppState appState) {
-    final price = stake.price ?? 1.0;
+    final price = stake.token?.rate ?? 1.0;
     final nativeToken = appState.wallet?.tokens.firstWhere(
       (t) => t.native,
     );

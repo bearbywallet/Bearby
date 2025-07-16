@@ -45,10 +45,19 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
     try {
       final appState = Provider.of<AppState>(context, listen: false);
-      final list = await getStakes(
-        walletIndex: BigInt.from(appState.selectedWallet),
-        accountIndex: appState.wallet!.selectedAccount,
-      );
+      List<FinalOutputInfo> list = [];
+
+      if (appState.account?.addrType == 0) {
+        list = await fetchScillaStake(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+      } else {
+        list = await fetchEvmStake(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+      }
 
       if (mounted) {
         setState(() {
@@ -71,40 +80,8 @@ class _ZilStakePageState extends State<ZilStakePage> {
     }
   }
 
-  void _sortStakes() {
-    _stakes.sort((a, b) {
-      final aHasStake =
-          (BigInt.tryParse(a.delegAmt) ?? BigInt.zero) > BigInt.zero ||
-              (BigInt.tryParse(a.rewards) ?? BigInt.zero) > BigInt.zero;
-      final bHasStake =
-          (BigInt.tryParse(b.delegAmt) ?? BigInt.zero) > BigInt.zero ||
-              (BigInt.tryParse(b.rewards) ?? BigInt.zero) > BigInt.zero;
-
-      if (aHasStake && !bHasStake) return -1;
-      if (!aHasStake && bHasStake) return 1;
-
-      final aIsAvely = a.name.toLowerCase().contains('avely');
-      final bIsAvely = b.name.toLowerCase().contains('avely');
-
-      if (aIsAvely && !bIsAvely) return -1;
-      if (!aIsAvely && bIsAvely) return 1;
-
-      switch (_sortType) {
-        case SortType.apr:
-          return (b.apr ?? 0).compareTo(a.apr ?? 0);
-        case SortType.commission:
-          return (a.commission ?? 0).compareTo(b.commission ?? 0);
-        case SortType.tvl:
-          return (b.tvl ?? BigInt.zero).compareTo(a.tvl ?? BigInt.zero);
-        case SortType.votePower:
-          return (b.votePower ?? 0).compareTo(a.votePower ?? 0);
-      }
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
-    _sortStakes();
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);

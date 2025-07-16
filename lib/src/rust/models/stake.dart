@@ -21,7 +21,7 @@ class FinalOutputInfo {
   final String? totalStake;
   final String? totalNetworkStake;
   final String? version;
-  final String? unbondingPeriod;
+  final BigInt? unbondingPeriod;
   final String tag;
   final BigInt? currentBlock;
   final List<PendingWithdrawalInfo> pendingWithdrawals;

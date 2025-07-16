@@ -4055,7 +4055,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       totalStake: dco_decode_opt_String(arr[10]),
       totalNetworkStake: dco_decode_opt_String(arr[11]),
       version: dco_decode_opt_String(arr[12]),
-      unbondingPeriod: dco_decode_opt_String(arr[13]),
+      unbondingPeriod: dco_decode_opt_box_autoadd_u_64(arr[13]),
       tag: dco_decode_String(arr[14]),
       currentBlock: dco_decode_opt_box_autoadd_u_64(arr[15]),
       pendingWithdrawals: dco_decode_list_pending_withdrawal_info(arr[16]),
@@ -5309,7 +5309,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_totalStake = sse_decode_opt_String(deserializer);
     var var_totalNetworkStake = sse_decode_opt_String(deserializer);
     var var_version = sse_decode_opt_String(deserializer);
-    var var_unbondingPeriod = sse_decode_opt_String(deserializer);
+    var var_unbondingPeriod = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_tag = sse_decode_String(deserializer);
     var var_currentBlock = sse_decode_opt_box_autoadd_u_64(deserializer);
     var var_pendingWithdrawals =
@@ -6739,7 +6739,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.totalStake, serializer);
     sse_encode_opt_String(self.totalNetworkStake, serializer);
     sse_encode_opt_String(self.version, serializer);
-    sse_encode_opt_String(self.unbondingPeriod, serializer);
+    sse_encode_opt_box_autoadd_u_64(self.unbondingPeriod, serializer);
     sse_encode_String(self.tag, serializer);
     sse_encode_opt_box_autoadd_u_64(self.currentBlock, serializer);
     sse_encode_list_pending_withdrawal_info(
