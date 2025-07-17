@@ -1593,7 +1593,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get lpStakingBadge => 'LP';
 
   @override
-  String get stakedAmount => 'В стейке';
+  String get stakedAmount => 'Заблокировано';
 
   @override
   String get rewardsAvailable => 'Награды';
@@ -1618,6 +1618,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get version => 'Версия';
+
+  @override
+  String get rewardsProgressTitle => 'Прогресс награждения';
 
   @override
   String get durationDay => 'д';

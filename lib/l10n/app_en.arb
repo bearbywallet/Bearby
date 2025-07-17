@@ -2276,6 +2276,10 @@
   "@version": {
     "description": "Label for the contract or validator version"
   },
+  "rewardsProgressTitle": "Rewards Progress",
+  "@rewardsProgressTitle": {
+    "description": "This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake."
+  },
 
   "durationDay": "d",
   "durationHour": "h",

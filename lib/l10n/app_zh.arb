@@ -600,5 +600,6 @@
   "durationHour": "小时",
   "durationMinute": "分钟",
   "durationLessThanAMinute": "< 1分钟",
-  "durationNotAvailable": "不适用"
+  "durationNotAvailable": "不适用",
+  "rewardsProgressTitle": "收益进度"
 }

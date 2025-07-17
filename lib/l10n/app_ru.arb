@@ -602,7 +602,7 @@
   "commissionLabel": "Комиссия",
   "tvlLabel": "TVL",
   "lpStakingBadge": "LP",
-  "stakedAmount": "В стейке",
+  "stakedAmount": "Заблокировано",
   "rewardsAvailable": "Награды",
   "pendingWithdrawals": "Ожидающие выводы",
   "amount": "Сумма",
@@ -616,5 +616,6 @@
   "durationHour": "ч",
   "durationMinute": "м",
   "durationLessThanAMinute": "< 1м",
-  "durationNotAvailable": "Н/Д"
+  "durationNotAvailable": "Н/Д",
+  "rewardsProgressTitle": "Прогресс награждения"
 }

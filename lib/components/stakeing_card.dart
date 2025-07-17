@@ -67,7 +67,7 @@ class StakingPoolCard extends StatelessWidget {
                 ],
                 if (showStakingInfo) ...[
                   const SizedBox(height: 20),
-                  _buildUserStakingInfo(theme, l10n, appState),
+                  _buildUserStakingInfo(context, theme, l10n, appState),
                   const SizedBox(height: 16),
                   _buildStatsRow(theme, l10n, appState),
                   if (isLiquidStaking) ...[
@@ -443,6 +443,7 @@ class StakingPoolCard extends StatelessWidget {
   }
 
   Widget _buildUserStakingInfo(
+    BuildContext context,
     AppTheme theme,
     AppLocalizations l10n,
     AppState appState,
@@ -450,6 +451,8 @@ class StakingPoolCard extends StatelessWidget {
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
     final (liquidRewards, hasLiquidRewards) =
         _calculateLiquidStakingRewards(appState);
+    final hasClaimableAmount = isLiquidStaking &&
+        (BigInt.tryParse(stake.claimableAmount) ?? BigInt.zero) > BigInt.zero;
 
     return Row(
       children: [
@@ -549,7 +552,7 @@ class StakingPoolCard extends StatelessWidget {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Rewards Progress',
+                              l10n.rewardsProgressTitle,
                               style: TextStyle(
                                 color: theme.textSecondary,
                                 fontSize: 11,
@@ -588,6 +591,85 @@ class StakingPoolCard extends StatelessWidget {
                               ),
                             ),
                           ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+                if (hasClaimableAmount) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.warning.withValues(alpha: 0.1),
+                          theme.warning.withValues(alpha: 0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.warning.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Row(
+                      children: [
+                        Container(
+                          padding: const EdgeInsets.all(6),
+                          decoration: BoxDecoration(
+                            color: theme.warning.withValues(alpha: 0.15),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: SvgPicture.asset(
+                            'assets/icons/trophy.svg',
+                            width: 14,
+                            height: 14,
+                            colorFilter: ColorFilter.mode(
+                                theme.warning, BlendMode.srcIn),
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Claimable Amount',
+                                style: TextStyle(
+                                  color: theme.textSecondary,
+                                  fontSize: 11,
+                                  fontWeight: FontWeight.w600,
+                                  letterSpacing: 0.2,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                _formatTokenAmount(
+                                        stake.claimableAmount, appState,
+                                        isLSTToken: true)
+                                    .$1,
+                                style: TextStyle(
+                                  color: theme.warning,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        CustomButton(
+                          text: l10n.claimButton,
+                          onPressed: () =>
+                              _claimClaimableAmount(context, appState),
+                          backgroundColor: theme.warning,
+                          textColor: theme.buttonText,
+                          height: 32,
+                          width: 60,
+                          borderRadius: 8,
                         ),
                       ],
                     ),
@@ -1144,6 +1226,53 @@ class StakingPoolCard extends StatelessWidget {
         );
       } else {
         throw "Invlid stake type";
+      }
+
+      showConfirmTransactionModal(
+        context: context,
+        tx: tx,
+        to: stake.address,
+        token: stake.token ?? nativeToken!,
+        amount: "0",
+        onConfirm: (_) {
+          Navigator.of(context).pushNamed('/', arguments: {
+            'selectedIndex': 1,
+          });
+        },
+      );
+    } catch (e) {
+      _showErrorDialog(context, appState, e);
+    }
+  }
+
+  Future<void> _claimClaimableAmount(
+    BuildContext context,
+    AppState appState,
+  ) async {
+    try {
+      final nativeToken = appState.wallet?.tokens.firstWhere(
+        (t) => t.native,
+        orElse: () => throw Exception('Native token not found'),
+      );
+      final walletIndex = BigInt.from(appState.selectedWallet);
+      final accountIndex = appState.wallet!.selectedAccount;
+      TransactionRequestInfo tx;
+
+      if (isEVM && appState.account!.addrType == 0) {
+        await zilliqaSwapChain(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+        );
+      }
+
+      if (isEVM) {
+        tx = await buildTxClaimUnstakeRequest(
+          walletIndex: walletIndex,
+          accountIndex: accountIndex,
+          stake: stake,
+        );
+      } else {
+        throw "Invalid stake type for claiming claimable amount";
       }
 
       showConfirmTransactionModal(

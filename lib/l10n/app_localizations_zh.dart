@@ -1620,6 +1620,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get version => '版本';
 
   @override
+  String get rewardsProgressTitle => '收益进度';
+
+  @override
   String get durationDay => '天';
 
   @override

@@ -3261,6 +3261,12 @@ abstract class AppLocalizations {
   /// **'Version'**
   String get version;
 
+  /// This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake.
+  ///
+  /// In en, this message translates to:
+  /// **'Rewards Progress'**
+  String get rewardsProgressTitle;
+
   /// No description provided for @durationDay.
   ///
   /// In en, this message translates to:

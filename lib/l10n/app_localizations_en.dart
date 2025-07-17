@@ -1620,6 +1620,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get version => 'Version';
 
   @override
+  String get rewardsProgressTitle => 'Rewards Progress';
+
+  @override
   String get durationDay => 'd';
 
   @override
