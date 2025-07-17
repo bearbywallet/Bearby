@@ -273,15 +273,18 @@ class TransactionDetailsModal extends StatelessWidget {
           top: BorderSide(color: theme.modalBorder, width: 1),
         ),
       ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: explorers.isEmpty
-            ? [
-                _buildDefaultExplorerButton(theme),
-              ]
-            : explorers
-                .map((explorer) => _buildExplorerButton(explorer, theme))
-                .toList(),
+      child: SafeArea(
+        bottom: true,
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: explorers.isEmpty
+              ? [
+                  _buildDefaultExplorerButton(theme),
+                ]
+              : explorers
+                  .map((explorer) => _buildExplorerButton(explorer, theme))
+                  .toList(),
+        ),
       ),
     );
   }
