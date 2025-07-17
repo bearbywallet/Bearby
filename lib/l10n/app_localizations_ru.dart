@@ -1636,4 +1636,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get durationNotAvailable => 'Н/Д';
+
+  @override
+  String get nodes => 'узлы';
 }

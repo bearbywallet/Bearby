@@ -1636,4 +1636,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get durationNotAvailable => '適用外';
+
+  @override
+  String get nodes => 'ノード';
 }

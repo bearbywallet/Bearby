@@ -783,7 +783,10 @@ class StakingPoolCard extends StatelessWidget {
   }
 
   Widget _buildStatsRow(
-      AppTheme theme, AppLocalizations l10n, AppState appState) {
+    AppTheme theme,
+    AppLocalizations l10n,
+    AppState appState,
+  ) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -805,9 +808,15 @@ class StakingPoolCard extends StatelessWidget {
           ),
           _buildStatItem(
             theme,
+            l10n.nodes,
+            stake.validators.length.toString(),
+            theme.primaryPurple,
+          ),
+          _buildStatItem(
+            theme,
             isLiquidStaking ? 'APR' : l10n.aprLabel,
             stake.apr == null || stake.apr == 0
-                ? 'N/A'
+                ? l10n.durationNotAvailable
                 : '${stake.apr?.toStringAsFixed(1)}%',
             stake.apr == null || stake.apr == 0
                 ? theme.textSecondary
@@ -817,7 +826,7 @@ class StakingPoolCard extends StatelessWidget {
             theme,
             l10n.commissionLabel,
             stake.commission == null || stake.commission == 0
-                ? 'N/A'
+                ? l10n.durationNotAvailable
                 : '${stake.commission?.toStringAsFixed(1)}%',
             stake.commission == null || stake.commission == 0
                 ? theme.textSecondary

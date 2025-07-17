@@ -621,5 +621,6 @@
   "durationMinute": "分",
   "durationLessThanAMinute": "< 1分",
   "durationNotAvailable": "適用外",
-  "rewardsProgressTitle": "報酬の進捗"
+  "rewardsProgressTitle": "報酬の進捗",
+  "nodes": "ノード"
 }

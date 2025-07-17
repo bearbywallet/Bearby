@@ -617,5 +617,6 @@
   "durationMinute": "м",
   "durationLessThanAMinute": "< 1м",
   "durationNotAvailable": "Н/Д",
-  "rewardsProgressTitle": "Прогресс награждения"
+  "rewardsProgressTitle": "Прогресс награждения",
+  "nodes": "узлы"
 }

@@ -3296,6 +3296,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'N/A'**
   String get durationNotAvailable;
+
+  /// No description provided for @nodes.
+  ///
+  /// In en, this message translates to:
+  /// **'nodes'**
+  String get nodes;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

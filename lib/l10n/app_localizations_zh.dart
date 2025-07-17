@@ -1636,4 +1636,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get durationNotAvailable => '不适用';
+
+  @override
+  String get nodes => '节点';
 }
