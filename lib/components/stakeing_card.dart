@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:blockies/blockies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -445,8 +447,9 @@ class StakingPoolCard extends StatelessWidget {
     AppLocalizations l10n,
     AppState appState,
   ) {
-    final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
-    final hasDelegation = (int.tryParse(stake.delegAmt) ?? 0) > 0;
+    final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
+    final (liquidRewards, hasLiquidRewards) =
+        _calculateLiquidStakingRewards(appState);
 
     return Row(
       children: [
@@ -505,6 +508,91 @@ class StakingPoolCard extends StatelessWidget {
                       : _formatTokenAmount(stake.delegAmt, appState),
                   hasDelegation ? theme.primaryPurple : theme.textSecondary,
                 ),
+                if (isLiquidStaking && hasLiquidRewards) ...[
+                  const SizedBox(height: 16),
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      gradient: LinearGradient(
+                        colors: [
+                          theme.success.withValues(alpha: 0.1),
+                          theme.success.withValues(alpha: 0.05),
+                        ],
+                        begin: Alignment.topLeft,
+                        end: Alignment.bottomRight,
+                      ),
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(
+                        color: theme.success.withValues(alpha: 0.2),
+                        width: 1,
+                      ),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.all(6),
+                              decoration: BoxDecoration(
+                                color: theme.success.withValues(alpha: 0.15),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: SvgPicture.asset(
+                                'assets/icons/trophy.svg',
+                                width: 14,
+                                height: 14,
+                                colorFilter: ColorFilter.mode(
+                                    theme.success, BlendMode.srcIn),
+                              ),
+                            ),
+                            const SizedBox(width: 8),
+                            Text(
+                              'Rewards Progress',
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w600,
+                                letterSpacing: 0.2,
+                              ),
+                            ),
+                          ],
+                        ),
+                        const SizedBox(height: 8),
+                        Row(
+                          children: [
+                            Text(
+                              '+',
+                              style: TextStyle(
+                                color: theme.success,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              liquidRewards,
+                              style: TextStyle(
+                                color: theme.success,
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              'backed ZIL',
+                              style: TextStyle(
+                                color: theme.textSecondary,
+                                fontSize: 11,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -852,47 +940,6 @@ class StakingPoolCard extends StatelessWidget {
     return ("0", "0");
   }
 
-  (String, String) _calculateLSTValue(AppState appState) {
-    if (stake.token == null) return ("0", "0");
-
-    final lstAmount = BigInt.tryParse(stake.delegAmt) ?? BigInt.zero;
-    final lstPrice = stake.token?.rate ?? 1.0;
-    final token = stake.token!;
-
-    final lstAmountDouble =
-        lstAmount.toDouble() / BigInt.from(10).pow(token.decimals).toDouble();
-    final totalValueDouble = lstAmountDouble * lstPrice;
-
-    final nativeToken = appState.wallet?.tokens.firstWhere(
-      (t) => t.native,
-    );
-
-    if (nativeToken != null) {
-      final totalValue = BigInt.from((totalValueDouble *
-              BigInt.from(10).pow(nativeToken.decimals).toDouble())
-          .toInt());
-
-      final (formattedValue, converted) = formatingAmount(
-        amount: totalValue,
-        symbol: nativeToken.symbol,
-        decimals: nativeToken.decimals,
-        rate: nativeToken.rate,
-        appState: appState,
-      );
-      return (formattedValue, converted);
-    } else {
-      final totalValue = BigInt.from((totalValueDouble * 1e18).toInt());
-      final (formattedValue, converted) = formatingAmount(
-        amount: totalValue,
-        symbol: "ZIL",
-        decimals: 18,
-        rate: 0,
-        appState: appState,
-      );
-      return (formattedValue, converted);
-    }
-  }
-
   String _formatLSTPrice(AppState appState) {
     final price = stake.token?.rate ?? 1.0;
     final nativeToken = appState.wallet?.tokens.firstWhere(
@@ -1114,5 +1161,44 @@ class StakingPoolCard extends StatelessWidget {
     } catch (e) {
       _showErrorDialog(context, appState, e);
     }
+  }
+
+  (String, bool) _calculateLiquidStakingRewards(AppState appState) {
+    if (!isLiquidStaking || stake.token?.rate == null) {
+      return ("0", false);
+    }
+
+    final lstAmount = BigInt.tryParse(stake.delegAmt) ?? BigInt.zero;
+    if (lstAmount == BigInt.zero) {
+      return ("0", false);
+    }
+
+    final lstPrice = stake.token!.rate;
+    final decimals = stake.token!.decimals;
+
+    final lstAmountDouble = lstAmount.toDouble() / pow(10, decimals);
+    final zilBackedDouble = lstAmountDouble * lstPrice;
+    final rewardsEarnedDouble = zilBackedDouble - lstAmountDouble;
+
+    if (rewardsEarnedDouble <= 0) {
+      return ("0", false);
+    }
+
+    final nativeToken = appState.wallet?.tokens.firstWhere((t) => t.native);
+    final nativeDecimals = nativeToken?.decimals ?? 18;
+
+    final rewardsBigInt =
+        BigInt.from(rewardsEarnedDouble * pow(10, nativeDecimals));
+
+    final (formattedRewards, _) = formatingAmount(
+      amount: rewardsBigInt,
+      symbol: nativeToken?.symbol ?? 'ZIL',
+      decimals: nativeDecimals,
+      rate: 0,
+      appState: appState,
+      compact: true,
+    );
+
+    return (formattedRewards, true);
   }
 }
