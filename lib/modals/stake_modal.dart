@@ -64,7 +64,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
   late final bool _isStaking;
   BigInt _availableBalance = BigInt.zero;
-  int _balanceDecimals = 12;
+  int _balanceDecimals = 18;
 
   @override
   void initState() {
@@ -580,7 +580,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
         tx: tx,
         to: widget.stake.address,
         token: nativeToken,
-        amount: _amountController.text,
+        amount: "0",
         onConfirm: (_) {
           Navigator.of(context).pop();
           Navigator.of(context).pushNamed('/', arguments: {
