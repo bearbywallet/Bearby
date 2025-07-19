@@ -33,7 +33,8 @@ class StakingPoolCard extends StatelessWidget {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
-    final hasRewards = (int.tryParse(stake.rewards) ?? 0) > 0;
+    final hasRewards =
+        (BigInt.tryParse(stake.rewards) ?? BigInt.zero) > BigInt.zero;
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
     final showStakingInfo = hasRewards || hasDelegation;
     final hasPendingWithdrawals = stake.pendingWithdrawals.isNotEmpty;
