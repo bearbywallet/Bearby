@@ -553,6 +553,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
               decimals: widget.stake.token!.decimals,
               addr: widget.stake.token!.addr,
               addrType: widget.stake.token!.addrType,
+              logo: widget.stake.token!.logo,
               balances: {},
               rate: 0,
               default_: false,
