@@ -543,7 +543,10 @@ class _StakeModalContentState extends State<StakeModalContent> {
             amount: amount,
           );
 
-          if (widget.stake.token != null) {
+          if (widget.stake.token != null &&
+              !appState.wallet!.tokens.any((token) =>
+                  token.addr.toLowerCase() ==
+                  widget.stake.address.toLowerCase())) {
             final newToken = FTokenInfo(
               name: widget.stake.token!.name,
               symbol: widget.stake.token!.symbol,

@@ -35,8 +35,11 @@ class StakingPoolCard extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final hasRewards =
         (BigInt.tryParse(stake.rewards) ?? BigInt.zero) > BigInt.zero;
-    final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
-    final showStakingInfo = hasRewards || hasDelegation;
+    final hasDelegation =
+        (BigInt.tryParse(stake.delegAmt) ?? BigInt.zero) > BigInt.zero;
+    final hasClaimAmount =
+        (BigInt.tryParse(stake.claimableAmount) ?? BigInt.zero) > BigInt.zero;
+    final showStakingInfo = hasRewards || hasDelegation || hasClaimAmount;
     final hasPendingWithdrawals = stake.pendingWithdrawals.isNotEmpty;
 
     return Container(
@@ -113,38 +116,42 @@ class StakingPoolCard extends StatelessWidget {
       children: [
         Stack(
           children: [
-            AsyncImage(
-              url: processUrlTemplate(
-                template: urlTemplate,
-                theme: theme.value,
-                replacements: replacements,
-              ),
-              width: 56,
-              height: 56,
-              fit: BoxFit.contain,
-              loadingWidget: Container(
+            ClipRRect(
+              borderRadius: BorderRadius.circular(16.0),
+              child: AsyncImage(
+                url: processUrlTemplate(
+                  template: urlTemplate,
+                  theme: theme.value,
+                  replacements: replacements,
+                ),
                 width: 56,
                 height: 56,
-                decoration: BoxDecoration(
-                  color: theme.textSecondary.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
+                fit: BoxFit.contain,
+                loadingWidget: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: theme.textSecondary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: const Center(
+                    child: CupertinoActivityIndicator(radius: 12.0),
+                  ),
                 ),
-                child: const Center(
-                  child: CupertinoActivityIndicator(radius: 12.0),
-                ),
-              ),
-              errorWidget: Container(
-                width: 56,
-                height: 56,
-                decoration: BoxDecoration(
-                  color: theme.danger.withValues(alpha: 0.1),
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                child: SvgPicture.asset(
-                  'assets/icons/zil.svg',
-                  width: 28,
-                  height: 28,
-                  colorFilter: ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                errorWidget: Container(
+                  width: 56,
+                  height: 56,
+                  decoration: BoxDecoration(
+                    color: theme.danger.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(16),
+                  ),
+                  child: SvgPicture.asset(
+                    'assets/icons/zil.svg',
+                    width: 28,
+                    height: 28,
+                    colorFilter:
+                        ColorFilter.mode(theme.warning, BlendMode.srcIn),
+                  ),
                 ),
               ),
             ),
