@@ -84,7 +84,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
     try {
       final token = appState.wallet?.tokens.firstWhere(
-        (t) => t.native && t.addrType == (widget.stake.tag == 'scilla' ? 0 : 1),
+        (t) => t.native && t.addrType == 1,
       );
 
       if (token == null) {
@@ -96,7 +96,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
       if (_isStaking) {
         final selectedAccount = appState.wallet?.selectedAccount ?? BigInt.zero;
         _availableBalance =
-            BigInt.tryParse(token.balances[selectedAccount] ?? '0') ??
+            BigInt.tryParse(token.balances[selectedAccount] ?? "0") ??
                 BigInt.zero;
       } else {
         _availableBalance =
@@ -113,9 +113,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   void _setPercentageAmount(double percentage) {
-    final amount =
+    BigInt amount =
         (_availableBalance * BigInt.from((percentage * 100).round())) ~/
             BigInt.from(100);
+
+    if (percentage >= 1.0) {
+      final (value, _) = toWei(value: '100', decimals: _balanceDecimals);
+      amount -= BigInt.parse(value);
+    }
 
     final formattedAmount = fromWei(
       value: amount.toString(),
@@ -535,37 +540,12 @@ class _StakeModalContentState extends State<StakeModalContent> {
         }
 
         if (_isStaking) {
-          print(widget.stake.token?.chainHash);
           tx = await buildTxEvmStakeRequest(
             walletIndex: walletIndex,
             accountIndex: accountIndex,
             stake: widget.stake,
             amount: amount,
           );
-
-          if (widget.stake.token != null &&
-              !appState.wallet!.tokens.any((token) =>
-                  token.addr.toLowerCase() ==
-                  widget.stake.address.toLowerCase())) {
-            final newToken = FTokenInfo(
-              name: widget.stake.token!.name,
-              symbol: widget.stake.token!.symbol,
-              decimals: widget.stake.token!.decimals,
-              addr: widget.stake.token!.addr,
-              addrType: widget.stake.token!.addrType,
-              logo: widget.stake.token!.logo,
-              balances: {},
-              rate: 0,
-              default_: false,
-              native: false,
-              chainHash: appState.chain!.chainHash,
-            );
-            await addFtoken(
-              meta: newToken,
-              walletIndex: BigInt.from(appState.selectedWallet),
-            );
-            await appState.syncData();
-          }
         } else {
           tx = await buildTxEvmUnstakeRequest(
             walletIndex: walletIndex,
@@ -584,8 +564,32 @@ class _StakeModalContentState extends State<StakeModalContent> {
         tx: tx,
         to: widget.stake.address,
         token: nativeToken,
-        amount: "0",
-        onConfirm: (_) {
+        amount: _isStaking ? _amountController.text : "0",
+        onConfirm: (_) async {
+          if (_isStaking) {
+            try {
+              final newToken = FTokenInfo(
+                name: widget.stake.token!.name,
+                symbol: widget.stake.token!.symbol,
+                decimals: widget.stake.token!.decimals,
+                addr: widget.stake.token!.addr,
+                addrType: widget.stake.token!.addrType,
+                logo: widget.stake.token!.logo,
+                balances: {},
+                rate: 0,
+                default_: false,
+                native: false,
+                chainHash: appState.chain!.chainHash,
+              );
+              await addFtoken(
+                meta: newToken,
+                walletIndex: BigInt.from(appState.selectedWallet),
+              );
+              await appState.syncData();
+            } catch (err) {
+              //
+            }
+          }
           Navigator.of(context).pop();
           Navigator.of(context).pushNamed('/', arguments: {
             'selectedIndex': 1,
