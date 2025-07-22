@@ -78,7 +78,7 @@ class StakingPoolCard extends StatelessWidget {
                     const SizedBox(height: 16),
                     _buildLiquidStakingInfo(theme, l10n, appState),
                   ],
-                  if (hasRewards && !isLiquidStaking) ...[
+                  if (hasRewards) ...[
                     const SizedBox(height: 16),
                     _buildClaimRewardsButton(context, theme, l10n, appState),
                   ],
@@ -459,7 +459,7 @@ class StakingPoolCard extends StatelessWidget {
     final hasDelegation = (double.tryParse(stake.delegAmt) ?? 0) > 0;
     final (liquidRewards, hasLiquidRewards) =
         _calculateLiquidStakingRewards(appState);
-    final hasClaimableAmount = isLiquidStaking &&
+    final hasClaimableAmount =
         (BigInt.tryParse(stake.claimableAmount) ?? BigInt.zero) > BigInt.zero;
 
     return Row(
