@@ -287,24 +287,31 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       }
 
       setState(() {
-        final existingPubKeys =
-            _accounts.map((acc) => acc.publicKey.toLowerCase()).toSet();
-        final uniqueNewAccounts = newAccounts
-            .where(
-                (acc) => !existingPubKeys.contains(acc.publicKey.toLowerCase()))
-            .toList();
+        final uniqueAccountsMap = <String, LedgerAccount>{};
 
-        if (_createWallet) {
-          _accounts = uniqueNewAccounts
-            ..sort((a, b) => a.index.compareTo(b.index));
-          _selectedAccounts = {for (var account in _accounts) account: true};
-        } else {
-          _accounts.addAll(uniqueNewAccounts);
-          _accounts.sort((a, b) => a.index.compareTo(b.index));
-          for (var acc in uniqueNewAccounts) {
-            _selectedAccounts[acc] = true;
-          }
+        for (final acc in _accounts) {
+          uniqueAccountsMap[acc.address] = acc;
         }
+
+        for (final acc in newAccounts) {
+          uniqueAccountsMap[acc.address] = acc;
+        }
+
+        final uniqueAccountsList = uniqueAccountsMap.values.toList();
+        uniqueAccountsList.sort((a, b) => a.index.compareTo(b.index));
+
+        _accounts = uniqueAccountsList;
+
+        final updatedSelectedAccounts = <LedgerAccount, bool>{};
+        for (var account in _accounts) {
+          final oldAccount = _selectedAccounts.keys.firstWhere(
+            (k) => k.address == account.address,
+            orElse: () => account,
+          );
+          updatedSelectedAccounts[account] =
+              _selectedAccounts[oldAccount] ?? true;
+        }
+        _selectedAccounts = updatedSelectedAccounts;
         _accountsLoaded = true;
       });
 
