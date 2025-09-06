@@ -1,6 +1,6 @@
 [
   {
-    "name": "Zilliqa",
+    "name": "Zilliqa Test",
     "chain": "ZIL",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
@@ -43,7 +43,7 @@
     ]
   },
   {
-    "name": "Binance",
+    "name": "BSC Test",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [

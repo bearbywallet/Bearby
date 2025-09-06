@@ -127,8 +127,7 @@ class _NetworkPageState extends State<NetworkPage> {
     } catch (e) {
       setState(() {
         isLoading = false;
-        errorMessage =
-            AppLocalizations.of(context)!.networkPageLoadError + '$e';
+        errorMessage = e.toString();
       });
     }
   }
