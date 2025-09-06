@@ -253,9 +253,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 textColor: theme.primaryPurple,
               ),
               if (appState.account != null &&
-                  appState.chain?.slip44 == 313 &&
-                  !appState.wallet!.walletType
-                      .contains(WalletType.ledger.name)) ...[
+                  appState.chain?.slip44 == 313) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
@@ -272,6 +270,11 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   backgroundColor: theme.cardBackground,
                   textColor: theme.primaryPurple,
                 ),
+              ],
+              if (appState.account != null &&
+                  appState.chain?.slip44 == 313 &&
+                  !appState.wallet!.walletType
+                      .contains(WalletType.ledger.name)) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
@@ -302,7 +305,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   backgroundColor: theme.cardBackground,
                   textColor: theme.primaryPurple,
                 ),
-              ],
+              ]
             ],
           ),
         ),

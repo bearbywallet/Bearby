@@ -750,12 +750,6 @@ class _ConfirmTransactionContentState
                               throw "ERC20 for ledger is not working for now.";
                             }
 
-                            if (widget.token.addrType == 0 &&
-                                widget.to.startsWith("0x") &&
-                                !widget.token.native) {
-                              throw "Cannot transfer ZRC2 to evm address, use migration";
-                            }
-
                             if (isNativeTx && amount == balance) {
                               adjustedTokenValue = amount - fee;
                             }
