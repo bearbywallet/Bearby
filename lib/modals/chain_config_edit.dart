@@ -370,7 +370,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
               });
               await createOrUpdateChain(providerConfig: _config);
             },
-            activeColor: theme.primaryPurple,
+            activeThumbColor: theme.primaryPurple,
           ),
           theme: theme,
         ),

@@ -274,7 +274,7 @@ class _NetworkPageState extends State<NetworkPage> {
                                   isTestnet = value;
                                   _loadNetworks();
                                 }),
-                            activeColor: theme.primaryPurple),
+                            activeThumbColor: theme.primaryPurple),
                       ],
                     ),
                   ),

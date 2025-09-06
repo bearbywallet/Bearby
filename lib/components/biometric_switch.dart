@@ -99,7 +99,7 @@ class BiometricSwitch extends StatelessWidget {
               : Switch(
                   value: value,
                   onChanged: disabled ? null : onChanged,
-                  activeColor: theme.primaryPurple,
+                  activeThumbColor: theme.primaryPurple,
                   activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
                 ),
         ],

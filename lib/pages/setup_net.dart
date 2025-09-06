@@ -284,7 +284,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
                             selectedNetworkIndex = 0;
                           });
                         },
-                        activeColor: theme.primaryPurple,
+                        activeThumbColor: theme.primaryPurple,
                       ),
                     ],
                   ),

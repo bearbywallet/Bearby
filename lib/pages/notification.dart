@@ -218,7 +218,7 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
               );
               await state.syncData();
             },
-            activeColor: theme.primaryPurple,
+            activeThumbColor: theme.primaryPurple,
             activeTrackColor: theme.primaryPurple.withValues(alpha: 0.5),
           ),
         ],

@@ -78,7 +78,8 @@ class EnableCard extends StatelessWidget {
           Switch(
             value: isDefault ? true : isEnabled,
             onChanged: isDefault ? null : onToggle,
-            activeColor: isDefault ? theme.textSecondary : theme.primaryPurple,
+            activeThumbColor:
+                isDefault ? theme.textSecondary : theme.primaryPurple,
           ),
         ],
       ),

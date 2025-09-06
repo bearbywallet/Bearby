@@ -433,7 +433,7 @@ class _AddAccountState extends State<AddAccount> {
                                             _zilliqaLegacy = value;
                                           });
                                         },
-                                  activeColor: theme.primaryPurple,
+                                  activeThumbColor: theme.primaryPurple,
                                   activeTrackColor: theme.primaryPurple
                                       .withValues(alpha: 0.5),
                                 ),

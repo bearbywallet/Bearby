@@ -53,7 +53,7 @@ class SwitchSettingItem extends StatelessWidget {
               Switch(
                 value: value,
                 onChanged: onChanged,
-                activeColor: theme.primaryPurple,
+                activeThumbColor: theme.primaryPurple,
               ),
             ],
           ),

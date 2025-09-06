@@ -477,7 +477,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
                                               _zilLegacy = value;
                                             });
                                           },
-                                    activeColor: theme.primaryPurple,
+                                    activeThumbColor: theme.primaryPurple,
                                     activeTrackColor: theme.primaryPurple
                                         .withValues(alpha: 0.4),
                                   ),

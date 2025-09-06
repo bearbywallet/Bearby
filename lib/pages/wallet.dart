@@ -490,7 +490,7 @@ class _WalletPageState extends State<WalletPage> {
               Switch(
                 value: item.switchValue,
                 onChanged: item.switchEnabled ? item.onChanged : null,
-                activeColor: theme.primaryPurple,
+                activeThumbColor: theme.primaryPurple,
               )
             else if (item.title ==
                 AppLocalizations.of(context)!.walletPageManageConnections)

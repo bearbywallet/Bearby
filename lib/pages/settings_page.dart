@@ -134,7 +134,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                             await appState.syncData();
                                           } catch (_) {}
                                         },
-                                        activeColor: theme.primaryPurple,
+                                        activeThumbColor: theme.primaryPurple,
                                         activeTrackColor: theme.primaryPurple
                                             .withValues(alpha: 0.5),
                                       ),

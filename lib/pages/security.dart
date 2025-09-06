@@ -237,7 +237,7 @@ class _SecurityPageState extends State<SecurityPage> {
                   Switch(
                     value: value,
                     onChanged: onChanged,
-                    activeColor: theme.primaryPurple,
+                    activeThumbColor: theme.primaryPurple,
                   )
               ],
             ),

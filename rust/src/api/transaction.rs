@@ -59,6 +59,8 @@ pub async fn send_signed_transactions(
         .with_signature(sig, &sender_account.pub_key)
         .map_err(ServiceError::TransactionErrors)?;
 
+    dbg!(&signed_tx);
+
     let tx = core
         .broadcast_signed_transactions(
             wallet_index as usize,
