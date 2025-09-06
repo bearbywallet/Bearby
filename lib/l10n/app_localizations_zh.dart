@@ -1623,6 +1623,182 @@ class AppLocalizationsZh extends AppLocalizations {
   String get rewardsProgressTitle => '收益进度';
 
   @override
+  String get ledgerConnectPageTitle => '连接 Ledger';
+
+  @override
+  String get ledgerConnectPageInitializing => '正在初始化...';
+
+  @override
+  String get ledgerConnectPageReadyToScan => '准备扫描。请按刷新按钮。';
+
+  @override
+  String ledgerConnectPageInitializationError(String error) {
+    return '初始化 Ledger 时出错: $error';
+  }
+
+  @override
+  String get ledgerConnectPageInitErrorTitle => '初始化错误';
+
+  @override
+  String ledgerConnectPageInitErrorContent(String error) {
+    return '初始化 Ledger 接口失败: $error';
+  }
+
+  @override
+  String get ledgerConnectPageBluetoothOffStatus => '蓝牙已关闭。请在您的设备上启用蓝牙。';
+
+  @override
+  String get ledgerConnectPageBluetoothOffTitle => '蓝牙已关闭';
+
+  @override
+  String get ledgerConnectPageBluetoothOffContent => '请在您的设备设置中打开蓝牙，然后重试。';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedStatus => '蓝牙权限被拒绝。请在设置中启用。';
+
+  @override
+  String get ledgerConnectPagePermissionRequiredTitle => '需要权限';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedTitle => '权限被拒绝';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContent => '扫描 Ledger 设备需要蓝牙权限。请在设置中授予权限。';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContentIOS => '此应用需要蓝牙权限才能扫描 Ledger 设备。请在您的设备设置中启用蓝牙权限。';
+
+  @override
+  String get ledgerConnectPageUnsupportedStatus => '此设备不支持低功耗蓝牙（Bluetooth LE）。';
+
+  @override
+  String get ledgerConnectPageUnsupportedTitle => '不支持的设备';
+
+  @override
+  String get ledgerConnectPageUnsupportedContent => '此设备不支持无线连接 Ledger 设备所需的低功耗蓝牙。';
+
+  @override
+  String get ledgerConnectPageScanningStatus => '正在扫描 Ledger 设备...';
+
+  @override
+  String ledgerConnectPageFoundDevicesStatus(int count) {
+    return '已找到 $count 个设备...';
+  }
+
+  @override
+  String ledgerConnectPageScanErrorStatus(String error) {
+    return '扫描错误: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanErrorTitle => '扫描错误';
+
+  @override
+  String get ledgerConnectPageScanFinishedNoDevices => '扫描完成。未找到任何设备。';
+
+  @override
+  String ledgerConnectPageScanFinishedWithDevices(int count) {
+    return '扫描完成。找到 $count 个设备。请选择一个进行连接。';
+  }
+
+  @override
+  String ledgerConnectPageFailedToStartScan(String error) {
+    return '启动扫描失败: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanStopped => '扫描已停止。';
+
+  @override
+  String ledgerConnectPageScanStoppedWithDevices(int count) {
+    return '扫描已停止。找到 $count 个设备。';
+  }
+
+  @override
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
+    return '正在连接到 $deviceName ($connectionType)...';
+  }
+
+  @override
+  String ledgerConnectPageConnectionTimeoutError(int seconds) {
+    return '连接在 $seconds 秒后超时';
+  }
+
+  @override
+  String get ledgerConnectPageInterfaceUnavailableError => '没有可用的 Ledger 接口。';
+
+  @override
+  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
+    return '成功连接到 $deviceName！';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
+    return '连接失败：尝试 $count 次后超时';
+  }
+
+  @override
+  String get ledgerConnectPageConnectionFailedTitle => '连接失败';
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
+    return '尝试 $count 次后连接超时。请确保设备已解锁，然后重试。';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedErrorStatus(String error) {
+    return '连接失败: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
+    return 'Ledger 错误: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
+    return '无法连接到 $deviceName。\n错误: $error';
+  }
+
+  @override
+  String get ledgerConnectPageDeviceDisconnected => '设备已断开连接。';
+
+  @override
+  String get ledgerConnectPageListenerStopped => '监听器已停止。';
+
+  @override
+  String get ledgerConnectPageFailedToMonitorDisconnects => '监控断开连接失败。';
+
+  @override
+  String ledgerConnectPageDisconnectingStatus(String deviceName) {
+    return '正在从 $deviceName 断开连接...';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectedStatus(String deviceName) {
+    return '已从 $deviceName 断开连接。';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
+    return '从 $deviceName 断开连接时出错。';
+  }
+
+  @override
+  String get ledgerConnectPageGoToSettings => '前往设置';
+
+  @override
+  String get ledgerConnectPageNoDevicesFound => '未找到设备。请确保 Ledger 已开机、解锁，并启用了蓝牙/USB。\n下拉或使用刷新图标再次扫描。';
+
+  @override
+  String ledgerConnectPageDisconnectButton(String deviceName) {
+    return '与 $deviceName 断开连接';
+  }
+
+  @override
+  String get unknownDevice => '未知';
+
+  @override
   String get durationDay => '天';
 
   @override

@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
@@ -26,13 +27,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   bool _isConnecting = false;
   LedgerDevice? _connectingDevice;
   LedgerConnection? _ledgerConnection;
-  String _statusText = 'Initializing...';
+  String? _statusText;
   StreamSubscription? _disconnectionSubscription;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
+      _statusText = AppLocalizations.of(context)!.ledgerConnectPageInitializing;
       _initLedger();
       Future.delayed(const Duration(milliseconds: 500), _startScanning);
     });
@@ -56,6 +58,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   void _initLedger() {
     if (!mounted) return;
+    final localizations = AppLocalizations.of(context)!;
     try {
       _ledgerBle = LedgerInterface.ble(
         onPermissionRequest: _handlePermissionRequest,
@@ -65,40 +68,41 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       );
       _ledgerUsb = Platform.isAndroid ? LedgerInterface.usb() : null;
       setState(() {
-        _statusText = 'Ready to scan. Press refresh button.';
+        _statusText = localizations.ledgerConnectPageReadyToScan;
       });
     } catch (e) {
       debugPrint('Error initializing Ledger: $e');
       if (!mounted) return;
       setState(() {
-        _statusText = 'Error initializing Ledger: $e';
+        _statusText =
+            localizations.ledgerConnectPageInitializationError(e.toString());
       });
-      _showErrorDialog(
-          'Initialization Error', 'Failed to initialize Ledger interfaces: $e');
+      _showErrorDialog(localizations.ledgerConnectPageInitErrorTitle,
+          localizations.ledgerConnectPageInitErrorContent(e.toString()));
     }
   }
 
   Future<bool> _handlePermissionRequest(AvailabilityState status) async {
     if (!mounted) return false;
+    final localizations = AppLocalizations.of(context)!;
 
     if (status == AvailabilityState.poweredOff) {
       setState(() {
-        _statusText =
-            'Bluetooth is turned off. Please enable Bluetooth on your device.';
+        _statusText = localizations.ledgerConnectPageBluetoothOffStatus;
       });
-      _showErrorDialog('Bluetooth Off',
-          'Please turn on Bluetooth in your device settings and try again.');
+      _showErrorDialog(localizations.ledgerConnectPageBluetoothOffTitle,
+          localizations.ledgerConnectPageBluetoothOffContent);
       return false;
     }
 
     if (status == AvailabilityState.unauthorized) {
       setState(() {
-        _statusText = 'Bluetooth permission denied. Please enable in settings.';
+        _statusText = localizations.ledgerConnectPagePermissionDeniedStatus;
       });
 
       if (Platform.isIOS) {
-        _showErrorDialog('Permission Required',
-            'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.',
+        _showErrorDialog(localizations.ledgerConnectPagePermissionRequiredTitle,
+            localizations.ledgerConnectPagePermissionDeniedContentIOS,
             showSettingsButton: true);
       } else {
         final statuses = await [
@@ -109,8 +113,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
         final allGranted = statuses.values.every((s) => s.isGranted);
         if (!allGranted && mounted) {
-          _showErrorDialog('Permission Denied',
-              'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.',
+          _showErrorDialog(localizations.ledgerConnectPagePermissionDeniedTitle,
+              localizations.ledgerConnectPagePermissionDeniedContent,
               showSettingsButton: true);
           return false;
         }
@@ -120,10 +124,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     if (status == AvailabilityState.unsupported) {
       setState(() {
-        _statusText = 'Bluetooth LE is not supported on this device.';
+        _statusText = localizations.ledgerConnectPageUnsupportedStatus;
       });
-      _showErrorDialog('Unsupported Device',
-          'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.');
+      _showErrorDialog(localizations.ledgerConnectPageUnsupportedTitle,
+          localizations.ledgerConnectPageUnsupportedContent);
       return false;
     }
 
@@ -141,11 +145,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
     if (!allGranted && mounted) {
       setState(() {
-        _statusText = 'Permissions denied. Cannot scan via BLE.';
+        _statusText = localizations.ledgerConnectPagePermissionDeniedStatus;
       });
 
-      _showErrorDialog('Permission Denied',
-          'Bluetooth permissions are required to scan for Ledger devices via BLE. Please grant permissions in settings.',
+      _showErrorDialog(localizations.ledgerConnectPagePermissionDeniedTitle,
+          localizations.ledgerConnectPagePermissionDeniedContent,
           showSettingsButton: true);
       return false;
     }
@@ -154,7 +158,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _startScanning() async {
-    if (_isScanning || _isConnecting || _ledgerBle == null) return;
+    if (_isScanning || _isConnecting || _ledgerBle == null || !mounted) return;
+    final localizations = AppLocalizations.of(context)!;
 
     await _disconnectDevice();
     if (!mounted) return;
@@ -162,7 +167,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     setState(() {
       _isScanning = true;
       _discoveredDevices.clear();
-      _statusText = 'Scanning for Ledger devices...';
+      _statusText = localizations.ledgerConnectPageScanningStatus;
     });
 
     await _scanSubscription?.cancel();
@@ -196,7 +201,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           if (!mounted) return;
           setState(() {
             _discoveredDevices.add(device);
-            _statusText = 'Found ${_discoveredDevices.length} device(s)...';
+            _statusText = localizations
+                .ledgerConnectPageFoundDevicesStatus(_discoveredDevices.length);
           });
         },
         onError: (error) {
@@ -204,17 +210,20 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
           debugPrint('[Scan] Scan Error: $error');
           setState(() {
             _isScanning = false;
-            _statusText = 'Scan Error: $error';
+            _statusText = localizations
+                .ledgerConnectPageScanErrorStatus(error.toString());
           });
-          _showErrorDialog('Scan Error', 'Scan Error: $error');
+          _showErrorDialog(localizations.ledgerConnectPageScanErrorTitle,
+              localizations.ledgerConnectPageScanErrorStatus(error.toString()));
         },
         onDone: () {
           if (!mounted) return;
           setState(() {
             _isScanning = false;
             _statusText = _discoveredDevices.isEmpty
-                ? 'Scan finished. No devices found.'
-                : 'Scan finished. Found ${_discoveredDevices.length} device(s). Select one to connect.';
+                ? localizations.ledgerConnectPageScanFinishedNoDevices
+                : localizations.ledgerConnectPageScanFinishedWithDevices(
+                    _discoveredDevices.length);
           });
         },
       );
@@ -229,9 +238,11 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       if (!mounted) return;
       setState(() {
         _isScanning = false;
-        _statusText = 'Failed to start scan: $e';
+        _statusText =
+            localizations.ledgerConnectPageFailedToStartScan(e.toString());
       });
-      _showErrorDialog('Scan Error', 'Failed to start scan: $e');
+      _showErrorDialog(localizations.ledgerConnectPageScanErrorTitle,
+          localizations.ledgerConnectPageFailedToStartScan(e.toString()));
     }
   }
 
@@ -240,12 +251,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     await _scanSubscription?.cancel();
     _scanSubscription = null;
     if (mounted && _isScanning) {
+      final localizations = AppLocalizations.of(context)!;
       setState(() {
         _isScanning = false;
         if (!_isConnecting && _ledgerConnection == null) {
           _statusText = _discoveredDevices.isEmpty
-              ? 'Scan stopped.'
-              : 'Scan stopped. Found ${_discoveredDevices.length} device(s).';
+              ? localizations.ledgerConnectPageScanStopped
+              : localizations.ledgerConnectPageScanStoppedWithDevices(
+                  _discoveredDevices.length);
         }
       });
       debugPrint("[Scan] Scan stopped and state updated.");
@@ -253,10 +266,12 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _connectToDevice(LedgerDevice device, {int retries = 2}) async {
-    if (_isConnecting || _ledgerConnection != null) {
+    if (_isConnecting || _ledgerConnection != null || !mounted) {
       debugPrint('[Connect] Attempt aborted: Already connecting or connected.');
       return;
     }
+    final localizations = AppLocalizations.of(context)!;
+
     if (_isScanning) {
       await _stopScan();
     }
@@ -266,8 +281,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     setState(() {
       _isConnecting = true;
       _connectingDevice = device;
-      _statusText =
-          'Connecting to ${device.name} (${device.connectionType.name.toUpperCase()})...';
+      _statusText = localizations.ledgerConnectPageConnectingStatus(
+          device.name, device.connectionType.name.toUpperCase());
     });
     LedgerConnection? tempConnection;
     const connectionTimeout = Duration(seconds: 30);
@@ -283,7 +298,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             onTimeout: () {
               debugPrint('[Connect] BLE connection timed out.');
               throw TimeoutException(
-                  'Connection timed out after ${connectionTimeout.inSeconds} seconds');
+                  localizations.ledgerConnectPageConnectionTimeoutError(
+                      connectionTimeout.inSeconds));
             },
           );
         } else if (device.connectionType == ConnectionType.usb &&
@@ -293,11 +309,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             onTimeout: () {
               debugPrint('[Connect] USB connection timed out.');
               throw TimeoutException(
-                  'Connection timed out after ${connectionTimeout.inSeconds} seconds');
+                  localizations.ledgerConnectPageConnectionTimeoutError(
+                      connectionTimeout.inSeconds));
             },
           );
         } else {
-          throw Exception('Appropriate Ledger interface not available.');
+          throw Exception(
+              localizations.ledgerConnectPageInterfaceUnavailableError);
         }
         debugPrint(
             '[Connect] Connection call successful for ${device.id}. Connection object present:');
@@ -311,7 +329,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         _ledgerConnection = tempConnection;
         setState(() {
           debugPrint('[Connect] Setting state to connected.');
-          _statusText = 'Successfully connected to ${device.name}!';
+          _statusText = localizations
+              .ledgerConnectPageConnectionSuccessStatus(device.name);
         });
         Navigator.of(context).pushNamed(
           '/net_setup',
@@ -329,12 +348,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         if (attempt >= retries) {
           if (!mounted) return;
           setState(() {
-            _statusText =
-                'Connection Failed: Timed out after $attempt attempts';
+            _statusText = localizations
+                .ledgerConnectPageConnectionFailedTimeoutStatus(attempt);
             _ledgerConnection = null;
           });
-          _showErrorDialog('Connection Failed',
-              'Connection timed out after $attempt attempts. Please ensure the device is unlocked and try again.');
+          _showErrorDialog(
+              localizations.ledgerConnectPageConnectionFailedTitle,
+              localizations
+                  .ledgerConnectPageConnectionFailedTimeoutContent(attempt));
         } else {
           debugPrint(
               '[Connect] Retrying connection (attempt ${attempt + 1} of $retries)');
@@ -344,20 +365,27 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         debugPrint('[Connect] LedgerException caught: $e');
         if (!mounted) return;
         setState(() {
-          _statusText = 'Connection Failed: $e';
+          _statusText = localizations
+              .ledgerConnectPageConnectionFailedErrorStatus(e.toString());
           _ledgerConnection = null;
         });
-        _showErrorDialog('Connection Failed', 'Ledger Error: $e');
+        _showErrorDialog(
+            localizations.ledgerConnectPageConnectionFailedTitle,
+            localizations.ledgerConnectPageConnectionFailedLedgerErrorContent(
+                e.toString()));
         return;
       } catch (e, s) {
         debugPrint('[Connect] Generic Exception caught: $e\n$s');
         if (!mounted) return;
         setState(() {
-          _statusText = 'Connection Failed: $e';
+          _statusText = localizations
+              .ledgerConnectPageConnectionFailedErrorStatus(e.toString());
           _ledgerConnection = null;
         });
-        _showErrorDialog('Connection Failed',
-            'Could not connect to ${device.name}.\nError: $e');
+        _showErrorDialog(
+            localizations.ledgerConnectPageConnectionFailedTitle,
+            localizations.ledgerConnectPageConnectionFailedGenericContent(
+                device.name, e.toString()));
         return;
       } finally {
         if (mounted && attempt >= retries) {
@@ -376,11 +404,12 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     final manager = (_ledgerConnection?.connectionType == ConnectionType.ble)
         ? _ledgerBle
         : _ledgerUsb;
-    if (manager == null || _ledgerConnection == null) {
+    if (manager == null || _ledgerConnection == null || !mounted) {
       debugPrint(
           "[Disconnect Listener] Cannot listen: Manager or connection is null.");
       return;
     }
+    final localizations = AppLocalizations.of(context)!;
     debugPrint("[Disconnect Listener] Setting up listener for $deviceId");
     try {
       _disconnectionSubscription =
@@ -395,15 +424,16 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
             _ledgerConnection?.device.id == deviceId) {
           debugPrint(
               '[Disconnect Listener] Device $deviceId disconnected externally.');
-          _handleDisconnectionUI('Device disconnected.');
+          _handleDisconnectionUI(
+              localizations.ledgerConnectPageDeviceDisconnected);
         }
       }, onError: (e) {
         debugPrint('[Disconnect Listener] Error in stream for $deviceId: $e');
-        if (mounted) {}
       }, onDone: () {
         debugPrint('[Disconnect Listener] Stream done for $deviceId.');
         if (mounted && _ledgerConnection?.device.id == deviceId) {
-          _handleDisconnectionUI('Listener stopped.');
+          _handleDisconnectionUI(
+              localizations.ledgerConnectPageListenerStopped);
         }
       });
     } catch (e) {
@@ -412,7 +442,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       if (mounted) {
         setState(() {
           if (_ledgerConnection != null) {
-            _statusText = 'Failed to monitor disconnects.';
+            _statusText =
+                localizations.ledgerConnectPageFailedToMonitorDisconnects;
           }
         });
       }
@@ -420,6 +451,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _disconnectDevice() async {
+    if (!mounted) return;
+    final localizations = AppLocalizations.of(context)!;
+
     debugPrint("[Disconnect] Initiating disconnection...");
     await _disconnectionSubscription?.cancel();
     _disconnectionSubscription = null;
@@ -427,24 +461,28 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       debugPrint("[Disconnect] No active connection to disconnect.");
       return;
     }
-    final deviceName = _ledgerConnection?.device.name ?? 'Ledger';
+    final deviceName =
+        _ledgerConnection?.device.name ?? localizations.unknownDevice;
     final deviceId = _ledgerConnection?.device.id ?? 'unknown';
     debugPrint("[Disconnect] Disconnecting from $deviceName ($deviceId)");
     final connectionToClose = _ledgerConnection;
     _ledgerConnection = null;
     if (mounted) {
-      _handleDisconnectionUI('Disconnecting from $deviceName...');
+      _handleDisconnectionUI(
+          localizations.ledgerConnectPageDisconnectingStatus(deviceName));
     }
     try {
       await connectionToClose!.disconnect();
       debugPrint('[Disconnect] Successfully disconnected from $deviceName.');
       if (mounted) {
-        _handleDisconnectionUI('Disconnected from $deviceName.');
+        _handleDisconnectionUI(
+            localizations.ledgerConnectPageDisconnectedStatus(deviceName));
       }
     } catch (e) {
       debugPrint('[Disconnect] Error during disconnect: $e');
       if (mounted) {
-        _handleDisconnectionUI('Error disconnecting from $deviceName.');
+        _handleDisconnectionUI(
+            localizations.ledgerConnectPageDisconnectErrorStatus(deviceName));
       }
     }
   }
@@ -467,6 +505,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       {bool showSettingsButton = false}) {
     if (!mounted) return;
     final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final localizations = AppLocalizations.of(context)!;
 
     showDialog(
       context: context,
@@ -478,7 +517,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         actions: [
           TextButton(
             onPressed: Navigator.of(context).pop,
-            child: Text('Cancel', style: TextStyle(color: theme.primaryPurple)),
+            child: Text(localizations.cancel,
+                style: TextStyle(color: theme.primaryPurple)),
           ),
           if (showSettingsButton)
             TextButton(
@@ -486,7 +526,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                 Navigator.of(context).pop();
                 await openAppSettings();
               },
-              child: Text('Go to Settings',
+              child: Text(localizations.ledgerConnectPageGoToSettings,
                   style: TextStyle(color: theme.primaryPurple)),
             ),
         ],
@@ -498,8 +538,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   Widget build(BuildContext context) {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 20);
     final theme = Provider.of<AppState>(context).currentTheme;
+    final localizations = AppLocalizations.of(context)!;
     final bool isConnected = _ledgerConnection != null;
-    final String pageTitle = "Connect Ledger";
+
+    final String pageTitle = localizations.ledgerConnectPageTitle;
 
     return Scaffold(
       backgroundColor: theme.background,
@@ -533,7 +575,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                     crossAxisAlignment: CrossAxisAlignment.center,
                     children: [
                       Text(
-                        _statusText,
+                        _statusText ??
+                            localizations.ledgerConnectPageInitializing,
                         textAlign: TextAlign.center,
                         style: TextStyle(
                           color: theme.textSecondary,
@@ -582,7 +625,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                     padding: const EdgeInsets.symmetric(
                                         horizontal: 30.0),
                                     child: Text(
-                                      'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.',
+                                      localizations
+                                          .ledgerConnectPageNoDevicesFound,
                                       textAlign: TextAlign.center,
                                       style: TextStyle(
                                           color: theme.textSecondary,
@@ -634,7 +678,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                             ColorFilter.mode(theme.buttonText, BlendMode.srcIn),
                       ),
                       label: Text(
-                          'Disconnect from ${_ledgerConnection?.device.name ?? 'Unknown'}',
+                          localizations.ledgerConnectPageDisconnectButton(
+                              _ledgerConnection?.device.name ??
+                                  localizations.unknownDevice),
                           style: TextStyle(color: theme.buttonText)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: theme.danger,

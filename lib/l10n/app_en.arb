@@ -1507,7 +1507,7 @@
   "@deleteWalletModalPasswordHint": {
     "description": "Hint text for the password input field in the DeleteWalletModal modal."
   },
-  "deleteWalletModalSubmit": "Submit",
+  "deleteWalletModalSubmit": "Destroy",
   "@deleteWalletModalSubmit": {
     "description": "Text on the button to confirm wallet deletion in the DeleteWalletModal modal."
   },
@@ -2279,6 +2279,293 @@
   "rewardsProgressTitle": "Rewards Progress",
   "@rewardsProgressTitle": {
     "description": "This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake."
+  },
+
+   "ledgerConnectPageTitle": "Connect Ledger",
+  "@ledgerConnectPageTitle": {
+    "description": "The title of the Ledger Connect page."
+  },
+  "ledgerConnectPageInitializing": "Initializing...",
+  "@ledgerConnectPageInitializing": {
+    "description": "Initial status text shown when the page is loading."
+  },
+  "ledgerConnectPageReadyToScan": "Ready to scan. Press refresh button.",
+  "@ledgerConnectPageReadyToScan": {
+    "description": "Status text indicating that the Ledger interface is initialized and ready for scanning."
+  },
+  "ledgerConnectPageInitializationError": "Error initializing Ledger: {error}",
+  "@ledgerConnectPageInitializationError": {
+    "description": "Status text shown when Ledger initialization fails.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageInitErrorTitle": "Initialization Error",
+  "@ledgerConnectPageInitErrorTitle": {
+    "description": "Title for the dialog when Ledger initialization fails."
+  },
+  "ledgerConnectPageInitErrorContent": "Failed to initialize Ledger interfaces: {error}",
+  "@ledgerConnectPageInitErrorContent": {
+    "description": "Content for the dialog when Ledger initialization fails.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageBluetoothOffStatus": "Bluetooth is turned off. Please enable Bluetooth on your device.",
+  "@ledgerConnectPageBluetoothOffStatus": {
+    "description": "Status text shown when Bluetooth is detected as powered off."
+  },
+  "ledgerConnectPageBluetoothOffTitle": "Bluetooth Off",
+  "@ledgerConnectPageBluetoothOffTitle": {
+    "description": "Title for the dialog shown when Bluetooth is off."
+  },
+  "ledgerConnectPageBluetoothOffContent": "Please turn on Bluetooth in your device settings and try again.",
+  "@ledgerConnectPageBluetoothOffContent": {
+    "description": "Content for the dialog shown when Bluetooth is off."
+  },
+  "ledgerConnectPagePermissionDeniedStatus": "Bluetooth permission denied. Please enable in settings.",
+  "@ledgerConnectPagePermissionDeniedStatus": {
+    "description": "Status text shown when necessary Bluetooth permissions have been denied by the user."
+  },
+  "ledgerConnectPagePermissionRequiredTitle": "Permission Required",
+  "@ledgerConnectPagePermissionRequiredTitle": {
+    "description": "Title for the dialog requesting the user to grant permissions."
+  },
+  "ledgerConnectPagePermissionDeniedTitle": "Permission Denied",
+  "@ledgerConnectPagePermissionDeniedTitle": {
+    "description": "Title for the dialog informing the user that permissions were denied."
+  },
+  "ledgerConnectPagePermissionDeniedContent": "Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.",
+  "@ledgerConnectPagePermissionDeniedContent": {
+    "description": "Content for the dialog when Bluetooth permissions are denied, prompting the user to go to settings. Common for Android."
+  },
+  "ledgerConnectPagePermissionDeniedContentIOS": "This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.",
+  "@ledgerConnectPagePermissionDeniedContentIOS": {
+    "description": "Content for the permissions dialog specific to iOS."
+  },
+  "ledgerConnectPageUnsupportedStatus": "Bluetooth LE is not supported on this device.",
+  "@ledgerConnectPageUnsupportedStatus": {
+    "description": "Status text when the device does not support Bluetooth Low Energy."
+  },
+  "ledgerConnectPageUnsupportedTitle": "Unsupported Device",
+  "@ledgerConnectPageUnsupportedTitle": {
+    "description": "Title for the dialog shown when the device is unsupported."
+  },
+  "ledgerConnectPageUnsupportedContent": "This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.",
+  "@ledgerConnectPageUnsupportedContent": {
+    "description": "Content for the dialog explaining why the device is unsupported."
+  },
+  "ledgerConnectPageScanningStatus": "Scanning for Ledger devices...",
+  "@ledgerConnectPageScanningStatus": {
+    "description": "Status text shown when a scan for Ledger devices is in progress."
+  },
+  "ledgerConnectPageFoundDevicesStatus": "Found {count} device(s)...",
+  "@ledgerConnectPageFoundDevicesStatus": {
+    "description": "Status text shown during scanning when one or more devices have been discovered.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageScanErrorStatus": "Scan Error: {error}",
+  "@ledgerConnectPageScanErrorStatus": {
+    "description": "Status text shown when an error occurs during the scan.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageScanErrorTitle": "Scan Error",
+  "@ledgerConnectPageScanErrorTitle": {
+    "description": "Title for the dialog shown when a scan error occurs."
+  },
+  "ledgerConnectPageScanFinishedNoDevices": "Scan finished. No devices found.",
+  "@ledgerConnectPageScanFinishedNoDevices": {
+    "description": "Status text shown when the scan completes and no devices were found."
+  },
+  "ledgerConnectPageScanFinishedWithDevices": "Scan finished. Found {count} device(s). Select one to connect.",
+  "@ledgerConnectPageScanFinishedWithDevices": {
+    "description": "Status text shown when the scan completes and devices were found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageFailedToStartScan": "Failed to start scan: {error}",
+  "@ledgerConnectPageFailedToStartScan": {
+    "description": "Status text shown when initiating a scan fails.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageScanStopped": "Scan stopped.",
+  "@ledgerConnectPageScanStopped": {
+    "description": "Status text shown when the scan is manually stopped and no devices were found."
+  },
+  "ledgerConnectPageScanStoppedWithDevices": "Scan stopped. Found {count} device(s).",
+  "@ledgerConnectPageScanStoppedWithDevices": {
+    "description": "Status text shown when the scan is manually stopped and devices have been found.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageConnectingStatus": "Connecting to {deviceName} ({connectionType})...",
+  "@ledgerConnectPageConnectingStatus": {
+    "description": "Status text shown while attempting to connect to a specific Ledger device.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      },
+      "connectionType": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionTimeoutError": "Connection timed out after {seconds} seconds",
+  "@ledgerConnectPageConnectionTimeoutError": {
+    "description": "Error message for when a connection attempt times out.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageInterfaceUnavailableError": "Appropriate Ledger interface not available.",
+  "@ledgerConnectPageInterfaceUnavailableError": {
+    "description": "Error message for when the required connection interface (BLE/USB) is not available."
+  },
+  "ledgerConnectPageConnectionSuccessStatus": "Successfully connected to {deviceName}!",
+  "@ledgerConnectPageConnectionSuccessStatus": {
+    "description": "Status text shown upon a successful connection to a Ledger device.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionFailedTimeoutStatus": "Connection Failed: Timed out after {count} attempts",
+  "@ledgerConnectPageConnectionFailedTimeoutStatus": {
+    "description": "Status text for a connection failure due to a timeout.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionFailedTitle": "Connection Failed",
+  "@ledgerConnectPageConnectionFailedTitle": {
+    "description": "Title for the dialog shown when a connection attempt fails."
+  },
+  "ledgerConnectPageConnectionFailedTimeoutContent": "Connection timed out after {count} attempts. Please ensure the device is unlocked and try again.",
+  "@ledgerConnectPageConnectionFailedTimeoutContent": {
+    "description": "Content for the dialog when a connection fails due to a timeout.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionFailedErrorStatus": "Connection Failed: {error}",
+  "@ledgerConnectPageConnectionFailedErrorStatus": {
+    "description": "Generic status text for a connection failure.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionFailedLedgerErrorContent": "Ledger Error: {error}",
+  "@ledgerConnectPageConnectionFailedLedgerErrorContent": {
+    "description": "Content for the dialog when a connection fails due to a specific LedgerException.",
+    "placeholders": {
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageConnectionFailedGenericContent": "Could not connect to {deviceName}.\nError: {error}",
+  "@ledgerConnectPageConnectionFailedGenericContent": {
+    "description": "Content for the dialog for a generic connection failure.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      },
+      "error": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageDeviceDisconnected": "Device disconnected.",
+  "@ledgerConnectPageDeviceDisconnected": {
+    "description": "Status message when the connected device disconnects."
+  },
+  "ledgerConnectPageListenerStopped": "Listener stopped.",
+  "@ledgerConnectPageListenerStopped": {
+    "description": "Status message when the disconnection listener stream is closed."
+  },
+  "ledgerConnectPageFailedToMonitorDisconnects": "Failed to monitor disconnects.",
+  "@ledgerConnectPageFailedToMonitorDisconnects": {
+    "description": "Status message when setting up the disconnection listener fails."
+  },
+  "ledgerConnectPageDisconnectingStatus": "Disconnecting from {deviceName}...",
+  "@ledgerConnectPageDisconnectingStatus": {
+    "description": "Status text shown while the app is actively disconnecting from a device.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageDisconnectedStatus": "Disconnected from {deviceName}.",
+  "@ledgerConnectPageDisconnectedStatus": {
+    "description": "Status text shown after a successful disconnection.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageDisconnectErrorStatus": "Error disconnecting from {deviceName}.",
+  "@ledgerConnectPageDisconnectErrorStatus": {
+    "description": "Status text shown when an error occurs during disconnection.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String"
+      }
+    }
+  },
+  "ledgerConnectPageGoToSettings": "Go to Settings",
+  "@ledgerConnectPageGoToSettings": {
+    "description": "Button text in a dialog that opens the device's application settings."
+  },
+  "ledgerConnectPageNoDevicesFound": "No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.",
+  "@ledgerConnectPageNoDevicesFound": {
+    "description": "Message displayed in the center of the screen when no Ledger devices are found after a scan."
+  },
+  "ledgerConnectPageDisconnectButton": "Disconnect from {deviceName}",
+  "@ledgerConnectPageDisconnectButton": {
+    "description": "Text for the button to disconnect from the currently connected Ledger device.",
+    "placeholders": {
+      "deviceName": {
+        "type": "String",
+        "example": "Ledger Nano X"
+      }
+    }
+  },
+  "unknownDevice": "Unknown",
+  "@unknownDevice": {
+    "description": "Fallback text for a device name when it cannot be determined."
   },
 
   "durationDay": "d",

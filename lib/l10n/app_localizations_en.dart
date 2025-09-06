@@ -1055,7 +1055,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get deleteWalletModalPasswordHint => 'Enter Password';
 
   @override
-  String get deleteWalletModalSubmit => 'Submit';
+  String get deleteWalletModalSubmit => 'Destroy';
 
   @override
   String get manageTokensModalContentSearchHint => 'Search';
@@ -1621,6 +1621,182 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rewardsProgressTitle => 'Rewards Progress';
+
+  @override
+  String get ledgerConnectPageTitle => 'Connect Ledger';
+
+  @override
+  String get ledgerConnectPageInitializing => 'Initializing...';
+
+  @override
+  String get ledgerConnectPageReadyToScan => 'Ready to scan. Press refresh button.';
+
+  @override
+  String ledgerConnectPageInitializationError(String error) {
+    return 'Error initializing Ledger: $error';
+  }
+
+  @override
+  String get ledgerConnectPageInitErrorTitle => 'Initialization Error';
+
+  @override
+  String ledgerConnectPageInitErrorContent(String error) {
+    return 'Failed to initialize Ledger interfaces: $error';
+  }
+
+  @override
+  String get ledgerConnectPageBluetoothOffStatus => 'Bluetooth is turned off. Please enable Bluetooth on your device.';
+
+  @override
+  String get ledgerConnectPageBluetoothOffTitle => 'Bluetooth Off';
+
+  @override
+  String get ledgerConnectPageBluetoothOffContent => 'Please turn on Bluetooth in your device settings and try again.';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedStatus => 'Bluetooth permission denied. Please enable in settings.';
+
+  @override
+  String get ledgerConnectPagePermissionRequiredTitle => 'Permission Required';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedTitle => 'Permission Denied';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContent => 'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContentIOS => 'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.';
+
+  @override
+  String get ledgerConnectPageUnsupportedStatus => 'Bluetooth LE is not supported on this device.';
+
+  @override
+  String get ledgerConnectPageUnsupportedTitle => 'Unsupported Device';
+
+  @override
+  String get ledgerConnectPageUnsupportedContent => 'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.';
+
+  @override
+  String get ledgerConnectPageScanningStatus => 'Scanning for Ledger devices...';
+
+  @override
+  String ledgerConnectPageFoundDevicesStatus(int count) {
+    return 'Found $count device(s)...';
+  }
+
+  @override
+  String ledgerConnectPageScanErrorStatus(String error) {
+    return 'Scan Error: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanErrorTitle => 'Scan Error';
+
+  @override
+  String get ledgerConnectPageScanFinishedNoDevices => 'Scan finished. No devices found.';
+
+  @override
+  String ledgerConnectPageScanFinishedWithDevices(int count) {
+    return 'Scan finished. Found $count device(s). Select one to connect.';
+  }
+
+  @override
+  String ledgerConnectPageFailedToStartScan(String error) {
+    return 'Failed to start scan: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanStopped => 'Scan stopped.';
+
+  @override
+  String ledgerConnectPageScanStoppedWithDevices(int count) {
+    return 'Scan stopped. Found $count device(s).';
+  }
+
+  @override
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
+    return 'Connecting to $deviceName ($connectionType)...';
+  }
+
+  @override
+  String ledgerConnectPageConnectionTimeoutError(int seconds) {
+    return 'Connection timed out after $seconds seconds';
+  }
+
+  @override
+  String get ledgerConnectPageInterfaceUnavailableError => 'Appropriate Ledger interface not available.';
+
+  @override
+  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
+    return 'Successfully connected to $deviceName!';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
+    return 'Connection Failed: Timed out after $count attempts';
+  }
+
+  @override
+  String get ledgerConnectPageConnectionFailedTitle => 'Connection Failed';
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
+    return 'Connection timed out after $count attempts. Please ensure the device is unlocked and try again.';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedErrorStatus(String error) {
+    return 'Connection Failed: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
+    return 'Ledger Error: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
+    return 'Could not connect to $deviceName.\nError: $error';
+  }
+
+  @override
+  String get ledgerConnectPageDeviceDisconnected => 'Device disconnected.';
+
+  @override
+  String get ledgerConnectPageListenerStopped => 'Listener stopped.';
+
+  @override
+  String get ledgerConnectPageFailedToMonitorDisconnects => 'Failed to monitor disconnects.';
+
+  @override
+  String ledgerConnectPageDisconnectingStatus(String deviceName) {
+    return 'Disconnecting from $deviceName...';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectedStatus(String deviceName) {
+    return 'Disconnected from $deviceName.';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
+    return 'Error disconnecting from $deviceName.';
+  }
+
+  @override
+  String get ledgerConnectPageGoToSettings => 'Go to Settings';
+
+  @override
+  String get ledgerConnectPageNoDevicesFound => 'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.';
+
+  @override
+  String ledgerConnectPageDisconnectButton(String deviceName) {
+    return 'Disconnect from $deviceName';
+  }
+
+  @override
+  String get unknownDevice => 'Unknown';
 
   @override
   String get durationDay => 'd';

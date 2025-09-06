@@ -2142,7 +2142,7 @@ abstract class AppLocalizations {
   /// Text on the button to confirm wallet deletion in the DeleteWalletModal modal.
   ///
   /// In en, this message translates to:
-  /// **'Submit'**
+  /// **'Destroy'**
   String get deleteWalletModalSubmit;
 
   /// Hint text for the search input field in the ManageTokensModalContent modal.
@@ -3266,6 +3266,282 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Rewards Progress'**
   String get rewardsProgressTitle;
+
+  /// The title of the Ledger Connect page.
+  ///
+  /// In en, this message translates to:
+  /// **'Connect Ledger'**
+  String get ledgerConnectPageTitle;
+
+  /// Initial status text shown when the page is loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Initializing...'**
+  String get ledgerConnectPageInitializing;
+
+  /// Status text indicating that the Ledger interface is initialized and ready for scanning.
+  ///
+  /// In en, this message translates to:
+  /// **'Ready to scan. Press refresh button.'**
+  String get ledgerConnectPageReadyToScan;
+
+  /// Status text shown when Ledger initialization fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Error initializing Ledger: {error}'**
+  String ledgerConnectPageInitializationError(String error);
+
+  /// Title for the dialog when Ledger initialization fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Initialization Error'**
+  String get ledgerConnectPageInitErrorTitle;
+
+  /// Content for the dialog when Ledger initialization fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to initialize Ledger interfaces: {error}'**
+  String ledgerConnectPageInitErrorContent(String error);
+
+  /// Status text shown when Bluetooth is detected as powered off.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth is turned off. Please enable Bluetooth on your device.'**
+  String get ledgerConnectPageBluetoothOffStatus;
+
+  /// Title for the dialog shown when Bluetooth is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth Off'**
+  String get ledgerConnectPageBluetoothOffTitle;
+
+  /// Content for the dialog shown when Bluetooth is off.
+  ///
+  /// In en, this message translates to:
+  /// **'Please turn on Bluetooth in your device settings and try again.'**
+  String get ledgerConnectPageBluetoothOffContent;
+
+  /// Status text shown when necessary Bluetooth permissions have been denied by the user.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permission denied. Please enable in settings.'**
+  String get ledgerConnectPagePermissionDeniedStatus;
+
+  /// Title for the dialog requesting the user to grant permissions.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Required'**
+  String get ledgerConnectPagePermissionRequiredTitle;
+
+  /// Title for the dialog informing the user that permissions were denied.
+  ///
+  /// In en, this message translates to:
+  /// **'Permission Denied'**
+  String get ledgerConnectPagePermissionDeniedTitle;
+
+  /// Content for the dialog when Bluetooth permissions are denied, prompting the user to go to settings. Common for Android.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.'**
+  String get ledgerConnectPagePermissionDeniedContent;
+
+  /// Content for the permissions dialog specific to iOS.
+  ///
+  /// In en, this message translates to:
+  /// **'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.'**
+  String get ledgerConnectPagePermissionDeniedContentIOS;
+
+  /// Status text when the device does not support Bluetooth Low Energy.
+  ///
+  /// In en, this message translates to:
+  /// **'Bluetooth LE is not supported on this device.'**
+  String get ledgerConnectPageUnsupportedStatus;
+
+  /// Title for the dialog shown when the device is unsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported Device'**
+  String get ledgerConnectPageUnsupportedTitle;
+
+  /// Content for the dialog explaining why the device is unsupported.
+  ///
+  /// In en, this message translates to:
+  /// **'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.'**
+  String get ledgerConnectPageUnsupportedContent;
+
+  /// Status text shown when a scan for Ledger devices is in progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Scanning for Ledger devices...'**
+  String get ledgerConnectPageScanningStatus;
+
+  /// Status text shown during scanning when one or more devices have been discovered.
+  ///
+  /// In en, this message translates to:
+  /// **'Found {count} device(s)...'**
+  String ledgerConnectPageFoundDevicesStatus(int count);
+
+  /// Status text shown when an error occurs during the scan.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Error: {error}'**
+  String ledgerConnectPageScanErrorStatus(String error);
+
+  /// Title for the dialog shown when a scan error occurs.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan Error'**
+  String get ledgerConnectPageScanErrorTitle;
+
+  /// Status text shown when the scan completes and no devices were found.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan finished. No devices found.'**
+  String get ledgerConnectPageScanFinishedNoDevices;
+
+  /// Status text shown when the scan completes and devices were found.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan finished. Found {count} device(s). Select one to connect.'**
+  String ledgerConnectPageScanFinishedWithDevices(int count);
+
+  /// Status text shown when initiating a scan fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to start scan: {error}'**
+  String ledgerConnectPageFailedToStartScan(String error);
+
+  /// Status text shown when the scan is manually stopped and no devices were found.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan stopped.'**
+  String get ledgerConnectPageScanStopped;
+
+  /// Status text shown when the scan is manually stopped and devices have been found.
+  ///
+  /// In en, this message translates to:
+  /// **'Scan stopped. Found {count} device(s).'**
+  String ledgerConnectPageScanStoppedWithDevices(int count);
+
+  /// Status text shown while attempting to connect to a specific Ledger device.
+  ///
+  /// In en, this message translates to:
+  /// **'Connecting to {deviceName} ({connectionType})...'**
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType);
+
+  /// Error message for when a connection attempt times out.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out after {seconds} seconds'**
+  String ledgerConnectPageConnectionTimeoutError(int seconds);
+
+  /// Error message for when the required connection interface (BLE/USB) is not available.
+  ///
+  /// In en, this message translates to:
+  /// **'Appropriate Ledger interface not available.'**
+  String get ledgerConnectPageInterfaceUnavailableError;
+
+  /// Status text shown upon a successful connection to a Ledger device.
+  ///
+  /// In en, this message translates to:
+  /// **'Successfully connected to {deviceName}!'**
+  String ledgerConnectPageConnectionSuccessStatus(String deviceName);
+
+  /// Status text for a connection failure due to a timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Failed: Timed out after {count} attempts'**
+  String ledgerConnectPageConnectionFailedTimeoutStatus(int count);
+
+  /// Title for the dialog shown when a connection attempt fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Failed'**
+  String get ledgerConnectPageConnectionFailedTitle;
+
+  /// Content for the dialog when a connection fails due to a timeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out after {count} attempts. Please ensure the device is unlocked and try again.'**
+  String ledgerConnectPageConnectionFailedTimeoutContent(int count);
+
+  /// Generic status text for a connection failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection Failed: {error}'**
+  String ledgerConnectPageConnectionFailedErrorStatus(String error);
+
+  /// Content for the dialog when a connection fails due to a specific LedgerException.
+  ///
+  /// In en, this message translates to:
+  /// **'Ledger Error: {error}'**
+  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error);
+
+  /// Content for the dialog for a generic connection failure.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not connect to {deviceName}.\nError: {error}'**
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error);
+
+  /// Status message when the connected device disconnects.
+  ///
+  /// In en, this message translates to:
+  /// **'Device disconnected.'**
+  String get ledgerConnectPageDeviceDisconnected;
+
+  /// Status message when the disconnection listener stream is closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Listener stopped.'**
+  String get ledgerConnectPageListenerStopped;
+
+  /// Status message when setting up the disconnection listener fails.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to monitor disconnects.'**
+  String get ledgerConnectPageFailedToMonitorDisconnects;
+
+  /// Status text shown while the app is actively disconnecting from a device.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnecting from {deviceName}...'**
+  String ledgerConnectPageDisconnectingStatus(String deviceName);
+
+  /// Status text shown after a successful disconnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnected from {deviceName}.'**
+  String ledgerConnectPageDisconnectedStatus(String deviceName);
+
+  /// Status text shown when an error occurs during disconnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Error disconnecting from {deviceName}.'**
+  String ledgerConnectPageDisconnectErrorStatus(String deviceName);
+
+  /// Button text in a dialog that opens the device's application settings.
+  ///
+  /// In en, this message translates to:
+  /// **'Go to Settings'**
+  String get ledgerConnectPageGoToSettings;
+
+  /// Message displayed in the center of the screen when no Ledger devices are found after a scan.
+  ///
+  /// In en, this message translates to:
+  /// **'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.'**
+  String get ledgerConnectPageNoDevicesFound;
+
+  /// Text for the button to disconnect from the currently connected Ledger device.
+  ///
+  /// In en, this message translates to:
+  /// **'Disconnect from {deviceName}'**
+  String ledgerConnectPageDisconnectButton(String deviceName);
+
+  /// Fallback text for a device name when it cannot be determined.
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get unknownDevice;
 
   /// No description provided for @durationDay.
   ///

@@ -1055,7 +1055,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get deleteWalletModalPasswordHint => 'Введите пароль';
 
   @override
-  String get deleteWalletModalSubmit => 'Отправить';
+  String get deleteWalletModalSubmit => 'Удалить';
 
   @override
   String get manageTokensModalContentSearchHint => 'Поиск';
@@ -1621,6 +1621,182 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get rewardsProgressTitle => 'Прогресс награждения';
+
+  @override
+  String get ledgerConnectPageTitle => 'Подключить Ledger';
+
+  @override
+  String get ledgerConnectPageInitializing => 'Инициализация...';
+
+  @override
+  String get ledgerConnectPageReadyToScan => 'Готово к сканированию. Нажмите кнопку обновления.';
+
+  @override
+  String ledgerConnectPageInitializationError(String error) {
+    return 'Ошибка инициализации Ledger: $error';
+  }
+
+  @override
+  String get ledgerConnectPageInitErrorTitle => 'Ошибка инициализации';
+
+  @override
+  String ledgerConnectPageInitErrorContent(String error) {
+    return 'Не удалось инициализировать интерфейсы Ledger: $error';
+  }
+
+  @override
+  String get ledgerConnectPageBluetoothOffStatus => 'Bluetooth выключен. Пожалуйста, включите Bluetooth на вашем устройстве.';
+
+  @override
+  String get ledgerConnectPageBluetoothOffTitle => 'Bluetooth выключен';
+
+  @override
+  String get ledgerConnectPageBluetoothOffContent => 'Пожалуйста, включите Bluetooth в настройках вашего устройства и попробуйте снова.';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedStatus => 'В разрешении на использование Bluetooth отказано. Пожалуйста, включите в настройках.';
+
+  @override
+  String get ledgerConnectPagePermissionRequiredTitle => 'Требуется разрешение';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedTitle => 'В разрешении отказано';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContent => 'Для сканирования устройств Ledger требуются разрешения Bluetooth. Пожалуйста, предоставьте разрешения в настройках.';
+
+  @override
+  String get ledgerConnectPagePermissionDeniedContentIOS => 'Этому приложению требуется разрешение на использование Bluetooth для поиска устройств Ledger. Пожалуйста, включите разрешение Bluetooth в настройках вашего устройства.';
+
+  @override
+  String get ledgerConnectPageUnsupportedStatus => 'Bluetooth LE не поддерживается на этом устройстве.';
+
+  @override
+  String get ledgerConnectPageUnsupportedTitle => 'Неподдерживаемое устройство';
+
+  @override
+  String get ledgerConnectPageUnsupportedContent => 'Это устройство не поддерживает Bluetooth Low Energy, который необходим для беспроводного подключения к устройствам Ledger.';
+
+  @override
+  String get ledgerConnectPageScanningStatus => 'Поиск устройств Ledger...';
+
+  @override
+  String ledgerConnectPageFoundDevicesStatus(int count) {
+    return 'Найдено устройств: $count...';
+  }
+
+  @override
+  String ledgerConnectPageScanErrorStatus(String error) {
+    return 'Ошибка сканирования: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanErrorTitle => 'Ошибка сканирования';
+
+  @override
+  String get ledgerConnectPageScanFinishedNoDevices => 'Сканирование завершено. Устройства не найдены.';
+
+  @override
+  String ledgerConnectPageScanFinishedWithDevices(int count) {
+    return 'Сканирование завершено. Найдено устройств: $count. Выберите одно для подключения.';
+  }
+
+  @override
+  String ledgerConnectPageFailedToStartScan(String error) {
+    return 'Не удалось начать сканирование: $error';
+  }
+
+  @override
+  String get ledgerConnectPageScanStopped => 'Сканирование остановлено.';
+
+  @override
+  String ledgerConnectPageScanStoppedWithDevices(int count) {
+    return 'Сканирование остановлено. Найдено устройств: $count.';
+  }
+
+  @override
+  String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
+    return 'Подключение к $deviceName ($connectionType)...';
+  }
+
+  @override
+  String ledgerConnectPageConnectionTimeoutError(int seconds) {
+    return 'Время подключения истекло через $seconds секунд';
+  }
+
+  @override
+  String get ledgerConnectPageInterfaceUnavailableError => 'Соответствующий интерфейс Ledger недоступен.';
+
+  @override
+  String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
+    return 'Успешное подключение к $deviceName!';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
+    return 'Сбой подключения: время ожидания истекло после $count попыток';
+  }
+
+  @override
+  String get ledgerConnectPageConnectionFailedTitle => 'Сбой подключения';
+
+  @override
+  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
+    return 'Время подключения истекло после $count попыток. Убедитесь, что устройство разблокировано, и попробуйте снова.';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedErrorStatus(String error) {
+    return 'Сбой подключения: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
+    return 'Ошибка Ledger: $error';
+  }
+
+  @override
+  String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error) {
+    return 'Не удалось подключиться к $deviceName.\nОшибка: $error';
+  }
+
+  @override
+  String get ledgerConnectPageDeviceDisconnected => 'Устройство отключено.';
+
+  @override
+  String get ledgerConnectPageListenerStopped => 'Прослушиватель остановлен.';
+
+  @override
+  String get ledgerConnectPageFailedToMonitorDisconnects => 'Не удалось отследить отключения.';
+
+  @override
+  String ledgerConnectPageDisconnectingStatus(String deviceName) {
+    return 'Отключение от $deviceName...';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectedStatus(String deviceName) {
+    return 'Отключено от $deviceName.';
+  }
+
+  @override
+  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
+    return 'Ошибка при отключении от $deviceName.';
+  }
+
+  @override
+  String get ledgerConnectPageGoToSettings => 'Перейти в настройки';
+
+  @override
+  String get ledgerConnectPageNoDevicesFound => 'Устройства не найдены. Убедитесь, что Ledger включен, разблокирован и Bluetooth/USB активен.\nПотяните вниз или используйте значок обновления для повторного сканирования.';
+
+  @override
+  String ledgerConnectPageDisconnectButton(String deviceName) {
+    return 'Отключиться от $deviceName';
+  }
+
+  @override
+  String get unknownDevice => 'Неизвестно';
 
   @override
   String get durationDay => 'д';
