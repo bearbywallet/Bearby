@@ -16,11 +16,7 @@ class TransactionRequestInfo {
   final TransactionRequestScilla? scilla;
   final TransactionRequestEVM? evm;
 
-  const TransactionRequestInfo({
-    required this.metadata,
-    this.scilla,
-    this.evm,
-  });
+  const TransactionRequestInfo({required this.metadata, this.scilla, this.evm});
 
   @override
   int get hashCode => metadata.hashCode ^ scilla.hashCode ^ evm.hashCode;

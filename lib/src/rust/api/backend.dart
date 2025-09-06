@@ -21,10 +21,13 @@ Future<(String, String)> loadOldDatabaseAndroid() =>
 Future<(String, String)> loadOldDatabaseIos({required String baseDir}) =>
     RustLib.instance.api.crateApiBackendLoadOldDatabaseIos(baseDir: baseDir);
 
-Future<String> tryRestoreRkstorage(
-        {required String vaultJson, required String password}) =>
-    RustLib.instance.api.crateApiBackendTryRestoreRkstorage(
-        vaultJson: vaultJson, password: password);
+Future<String> tryRestoreRkstorage({
+  required String vaultJson,
+  required String password,
+}) => RustLib.instance.api.crateApiBackendTryRestoreRkstorage(
+  vaultJson: vaultJson,
+  password: password,
+);
 
 Future<BackgroundState> loadService({required String path}) =>
     RustLib.instance.api.crateApiBackendLoadService(path: path);
@@ -37,9 +40,10 @@ Future<bool> isServiceRunning() =>
 Future<void> stopBlockWorker() =>
     RustLib.instance.api.crateApiBackendStopBlockWorker();
 
-Stream<BlockEvent> startBlockWorker({required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiBackendStartBlockWorker(walletIndex: walletIndex);
+Stream<BlockEvent> startBlockWorker({required BigInt walletIndex}) => RustLib
+    .instance
+    .api
+    .crateApiBackendStartBlockWorker(walletIndex: walletIndex);
 
 Future<BackgroundState> getData() =>
     RustLib.instance.api.crateApiBackendGetData();
@@ -48,10 +52,7 @@ class BlockEvent {
   final BigInt? blockNumber;
   final String? error;
 
-  const BlockEvent({
-    this.blockNumber,
-    this.error,
-  });
+  const BlockEvent({this.blockNumber, this.error});
 
   @override
   int get hashCode => blockNumber.hashCode ^ error.hashCode;

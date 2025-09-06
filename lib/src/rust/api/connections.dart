@@ -7,17 +7,24 @@ import '../frb_generated.dart';
 import '../models/connection.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> createUpdateConnection(
-        {required BigInt walletIndex, required ConnectionInfo conn}) =>
-    RustLib.instance.api.crateApiConnectionsCreateUpdateConnection(
-        walletIndex: walletIndex, conn: conn);
+Future<void> createUpdateConnection({
+  required BigInt walletIndex,
+  required ConnectionInfo conn,
+}) => RustLib.instance.api.crateApiConnectionsCreateUpdateConnection(
+  walletIndex: walletIndex,
+  conn: conn,
+);
 
-Future<void> removeConnections(
-        {required BigInt walletIndex, required String domain}) =>
-    RustLib.instance.api.crateApiConnectionsRemoveConnections(
-        walletIndex: walletIndex, domain: domain);
+Future<void> removeConnections({
+  required BigInt walletIndex,
+  required String domain,
+}) => RustLib.instance.api.crateApiConnectionsRemoveConnections(
+  walletIndex: walletIndex,
+  domain: domain,
+);
 
-Future<List<ConnectionInfo>> getConnectionsList(
-        {required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiConnectionsGetConnectionsList(walletIndex: walletIndex);
+Future<List<ConnectionInfo>> getConnectionsList({
+  required BigInt walletIndex,
+}) => RustLib.instance.api.crateApiConnectionsGetConnectionsList(
+  walletIndex: walletIndex,
+);

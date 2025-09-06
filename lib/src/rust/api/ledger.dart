@@ -8,21 +8,25 @@ import '../models/ftoken.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<(String, String)> addLedgerWallet(
-        {required LedgerParamsInput params,
-        required WalletSettingsInfo walletSettings,
-        required List<FTokenInfo> ftokens}) =>
-    RustLib.instance.api.crateApiLedgerAddLedgerWallet(
-        params: params, walletSettings: walletSettings, ftokens: ftokens);
+Future<(String, String)> addLedgerWallet({
+  required LedgerParamsInput params,
+  required WalletSettingsInfo walletSettings,
+  required List<FTokenInfo> ftokens,
+}) => RustLib.instance.api.crateApiLedgerAddLedgerWallet(
+  params: params,
+  walletSettings: walletSettings,
+  ftokens: ftokens,
+);
 
-Future<void> updateLedgerAccounts(
-        {required BigInt walletIndex,
-        required List<(int, String, String)> accounts,
-        required bool zilliqaLegacy}) =>
-    RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
-        walletIndex: walletIndex,
-        accounts: accounts,
-        zilliqaLegacy: zilliqaLegacy);
+Future<void> updateLedgerAccounts({
+  required BigInt walletIndex,
+  required List<(int, String, String)> accounts,
+  required bool zilliqaLegacy,
+}) => RustLib.instance.api.crateApiLedgerUpdateLedgerAccounts(
+  walletIndex: walletIndex,
+  accounts: accounts,
+  zilliqaLegacy: zilliqaLegacy,
+);
 
 class LedgerParamsInput {
   final List<(int, String)> pubKeys;

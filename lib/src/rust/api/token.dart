@@ -13,27 +13,42 @@ Future<void> syncBalances({required BigInt walletIndex}) =>
 Future<void> updateRates({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
 
-Future<FTokenInfo> fetchTokenMeta(
-        {required String addr, required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
+Future<FTokenInfo> fetchTokenMeta({
+  required String addr,
+  required BigInt walletIndex,
+}) => RustLib.instance.api.crateApiTokenFetchTokenMeta(
+  addr: addr,
+  walletIndex: walletIndex,
+);
 
-Future<List<FTokenInfo>> fetchTokensListZilliqaLegacy(
-        {required int limit, required int offset}) =>
-    RustLib.instance.api.crateApiTokenFetchTokensListZilliqaLegacy(
-        limit: limit, offset: offset);
+Future<List<FTokenInfo>> fetchTokensListZilliqaLegacy({
+  required int limit,
+  required int offset,
+}) => RustLib.instance.api.crateApiTokenFetchTokensListZilliqaLegacy(
+  limit: limit,
+  offset: offset,
+);
 
-Future<List<FTokenInfo>> fetchTokensEvmList(
-        {required String chainName, required int chainId}) =>
-    RustLib.instance.api.crateApiTokenFetchTokensEvmList(
-        chainName: chainName, chainId: chainId);
+Future<List<FTokenInfo>> fetchTokensEvmList({
+  required String chainName,
+  required int chainId,
+}) => RustLib.instance.api.crateApiTokenFetchTokensEvmList(
+  chainName: chainName,
+  chainId: chainId,
+);
 
-Future<List<FTokenInfo>> addFtoken(
-        {required FTokenInfo meta, required BigInt walletIndex}) =>
-    RustLib.instance.api
-        .crateApiTokenAddFtoken(meta: meta, walletIndex: walletIndex);
+Future<List<FTokenInfo>> addFtoken({
+  required FTokenInfo meta,
+  required BigInt walletIndex,
+}) => RustLib.instance.api.crateApiTokenAddFtoken(
+  meta: meta,
+  walletIndex: walletIndex,
+);
 
-Future<void> rmFtoken(
-        {required BigInt walletIndex, required String tokenAddress}) =>
-    RustLib.instance.api.crateApiTokenRmFtoken(
-        walletIndex: walletIndex, tokenAddress: tokenAddress);
+Future<void> rmFtoken({
+  required BigInt walletIndex,
+  required String tokenAddress,
+}) => RustLib.instance.api.crateApiTokenRmFtoken(
+  walletIndex: walletIndex,
+  tokenAddress: tokenAddress,
+);

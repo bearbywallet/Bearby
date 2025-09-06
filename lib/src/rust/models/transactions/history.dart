@@ -118,9 +118,4 @@ class HistoricalTransactionInfo {
           chainHash == other.chainHash;
 }
 
-enum TransactionStatusInfo {
-  pending,
-  confirmed,
-  rejected,
-  ;
-}
+enum TransactionStatusInfo { pending, confirmed, rejected }

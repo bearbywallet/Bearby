@@ -7,61 +7,84 @@ import '../frb_generated.dart';
 import '../models/settings.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> setTheme(
-        {required int appearancesCode, required bool compactNumbers}) =>
-    RustLib.instance.api.crateApiSettingsSetTheme(
-        appearancesCode: appearancesCode, compactNumbers: compactNumbers);
+Future<void> setTheme({
+  required int appearancesCode,
+  required bool compactNumbers,
+}) => RustLib.instance.api.crateApiSettingsSetTheme(
+  appearancesCode: appearancesCode,
+  compactNumbers: compactNumbers,
+);
 
-Future<void> setWalletNotifications(
-        {required BigInt walletIndex,
-        required bool transactions,
-        required bool price,
-        required bool security,
-        required bool balance}) =>
-    RustLib.instance.api.crateApiSettingsSetWalletNotifications(
-        walletIndex: walletIndex,
-        transactions: transactions,
-        price: price,
-        security: security,
-        balance: balance);
+Future<void> setWalletNotifications({
+  required BigInt walletIndex,
+  required bool transactions,
+  required bool price,
+  required bool security,
+  required bool balance,
+}) => RustLib.instance.api.crateApiSettingsSetWalletNotifications(
+  walletIndex: walletIndex,
+  transactions: transactions,
+  price: price,
+  security: security,
+  balance: balance,
+);
 
-Future<void> setGlobalNotifications({required bool globalEnabled}) =>
-    RustLib.instance.api
-        .crateApiSettingsSetGlobalNotifications(globalEnabled: globalEnabled);
+Future<void> setGlobalNotifications({required bool globalEnabled}) => RustLib
+    .instance
+    .api
+    .crateApiSettingsSetGlobalNotifications(globalEnabled: globalEnabled);
 
 Future<void> setDefaultLocale({String? locale}) =>
     RustLib.instance.api.crateApiSettingsSetDefaultLocale(locale: locale);
 
-Future<void> setRateFetcher(
-        {required BigInt walletIndex, required String currency}) =>
-    RustLib.instance.api.crateApiSettingsSetRateFetcher(
-        walletIndex: walletIndex, currency: currency);
+Future<void> setRateFetcher({
+  required BigInt walletIndex,
+  required String currency,
+}) => RustLib.instance.api.crateApiSettingsSetRateFetcher(
+  walletIndex: walletIndex,
+  currency: currency,
+);
 
-Future<void> setRateEngine(
-        {required BigInt walletIndex, required int engineCode}) =>
-    RustLib.instance.api.crateApiSettingsSetRateEngine(
-        walletIndex: walletIndex, engineCode: engineCode);
+Future<void> setRateEngine({
+  required BigInt walletIndex,
+  required int engineCode,
+}) => RustLib.instance.api.crateApiSettingsSetRateEngine(
+  walletIndex: walletIndex,
+  engineCode: engineCode,
+);
 
-Future<void> setWalletEns(
-        {required BigInt walletIndex, required bool ensEnabled}) =>
-    RustLib.instance.api.crateApiSettingsSetWalletEns(
-        walletIndex: walletIndex, ensEnabled: ensEnabled);
+Future<void> setWalletEns({
+  required BigInt walletIndex,
+  required bool ensEnabled,
+}) => RustLib.instance.api.crateApiSettingsSetWalletEns(
+  walletIndex: walletIndex,
+  ensEnabled: ensEnabled,
+);
 
 Future<void> setWalletIpfsNode({required BigInt walletIndex, String? node}) =>
     RustLib.instance.api.crateApiSettingsSetWalletIpfsNode(
-        walletIndex: walletIndex, node: node);
+      walletIndex: walletIndex,
+      node: node,
+    );
 
-Future<void> setTokensListFetcher(
-        {required BigInt walletIndex, required bool enabled}) =>
-    RustLib.instance.api.crateApiSettingsSetTokensListFetcher(
-        walletIndex: walletIndex, enabled: enabled);
+Future<void> setTokensListFetcher({
+  required BigInt walletIndex,
+  required bool enabled,
+}) => RustLib.instance.api.crateApiSettingsSetTokensListFetcher(
+  walletIndex: walletIndex,
+  enabled: enabled,
+);
 
-Future<void> setWalletNodeRanking(
-        {required BigInt walletIndex, required bool enabled}) =>
-    RustLib.instance.api.crateApiSettingsSetWalletNodeRanking(
-        walletIndex: walletIndex, enabled: enabled);
+Future<void> setWalletNodeRanking({
+  required BigInt walletIndex,
+  required bool enabled,
+}) => RustLib.instance.api.crateApiSettingsSetWalletNodeRanking(
+  walletIndex: walletIndex,
+  enabled: enabled,
+);
 
-Future<void> setBrowserSettings(
-        {required BrowserSettingsInfo browserSettings}) =>
-    RustLib.instance.api
-        .crateApiSettingsSetBrowserSettings(browserSettings: browserSettings);
+Future<void> setBrowserSettings({
+  required BrowserSettingsInfo browserSettings,
+}) => RustLib.instance.api.crateApiSettingsSetBrowserSettings(
+  browserSettings: browserSettings,
+);
