@@ -610,6 +610,7 @@ class _ConfirmTransactionContentState
                                         builder: (context) => EditGasDialog(
                                           txParamsInfo: _txParamsInfo,
                                           initialGasPrice: _gasPrice,
+                                          initialNonce: _txParamsInfo.nonce,
                                           initialMaxPriorityFee:
                                               _maxPriorityFee,
                                           initialGasLimit:
@@ -618,6 +619,7 @@ class _ConfirmTransactionContentState
                                             gasPrice,
                                             maxPriorityFee,
                                             gasLimit,
+                                            nonce,
                                           ) {
                                             if (!mounted) return;
 

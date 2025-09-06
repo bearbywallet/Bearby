@@ -13,7 +13,9 @@ class EditGasDialog extends StatefulWidget {
   final BigInt initialGasPrice;
   final BigInt initialMaxPriorityFee;
   final BigInt initialGasLimit;
-  final Function(BigInt gasPrice, BigInt maxPriorityFee, BigInt gasLimit)
+  final BigInt initialNonce;
+  final Function(
+          BigInt gasPrice, BigInt maxPriorityFee, BigInt gasLimit, BigInt nonce)
       onSave;
   final Color? primaryColor;
   final Color? textColor;
@@ -25,6 +27,7 @@ class EditGasDialog extends StatefulWidget {
     required this.initialGasPrice,
     required this.initialMaxPriorityFee,
     required this.initialGasLimit,
+    required this.initialNonce,
     required this.onSave,
     this.primaryColor,
     this.textColor,
@@ -39,6 +42,7 @@ class _EditGasDialogState extends State<EditGasDialog> {
   late TextEditingController _gasPriceController;
   late TextEditingController _maxPriorityFeeController;
   late TextEditingController _gasLimitController;
+  late TextEditingController _nonceController;
   late bool _isLegacy;
 
   @override
@@ -56,6 +60,9 @@ class _EditGasDialogState extends State<EditGasDialog> {
     _gasLimitController = TextEditingController(
       text: widget.initialGasLimit.toString(),
     );
+    _nonceController = TextEditingController(
+      text: widget.initialNonce.toString(),
+    );
   }
 
   @override
@@ -63,6 +70,7 @@ class _EditGasDialogState extends State<EditGasDialog> {
     _gasPriceController.dispose();
     _maxPriorityFeeController.dispose();
     _gasLimitController.dispose();
+    _nonceController.dispose();
     super.dispose();
   }
 
@@ -73,6 +81,7 @@ class _EditGasDialogState extends State<EditGasDialog> {
       final gasPriceWei = BigInt.parse(gasPriceWeiStr);
 
       final gasLimit = BigInt.parse(_gasLimitController.text);
+      final nonce = BigInt.parse(_nonceController.text);
 
       BigInt maxPriorityFeeWei;
       if (!_isLegacy) {
@@ -85,7 +94,8 @@ class _EditGasDialogState extends State<EditGasDialog> {
 
       if (gasPriceWei < BigInt.zero ||
           maxPriorityFeeWei < BigInt.zero ||
-          gasLimit <= BigInt.zero) {
+          gasLimit <= BigInt.zero ||
+          nonce < BigInt.zero) {
         throw ArgumentError(
             "Gas values cannot be negative or zero (for limit)");
       }
@@ -98,6 +108,7 @@ class _EditGasDialogState extends State<EditGasDialog> {
         gasPriceWei,
         maxPriorityFeeWei,
         gasLimit,
+        nonce,
       );
       Navigator.of(context).pop();
     } catch (e) {
@@ -202,6 +213,17 @@ class _EditGasDialogState extends State<EditGasDialog> {
                 label: l10n.editGasDialogGasLimit,
                 controller: _gasLimitController,
                 hint: '21000',
+                effectiveTextColor: effectiveTextColor,
+                effectiveSecondaryColor: effectiveSecondaryColor,
+                theme: theme,
+                readOnly: false,
+                isIntegerInput: true,
+              ),
+              const SizedBox(height: 12),
+              _buildInputField(
+                label: l10n.transactionDetailsModal_nonce,
+                controller: _nonceController,
+                hint: '0',
                 effectiveTextColor: effectiveTextColor,
                 effectiveSecondaryColor: effectiveSecondaryColor,
                 theme: theme,
