@@ -45,6 +45,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _loading = false;
   String _errorMessage = '';
   bool _createWallet = true;
+  bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
   List<LedgerDevice> _ledgers = [];
   List<LedgerAccount> _accounts = [];
@@ -275,11 +276,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final connection = await ledgerInterface.connect(_selectedDevice!);
       List<LedgerAccount> newAccounts = [];
 
-      if (_network?.slip44 == 60) {
+      if (!_zilliqaLegacy) {
         final ethereumApp = EthereumLedgerApp(connection, transformer: null);
         newAccounts = await ethereumApp
             .getAccounts(List<int>.generate(_accountCount, (i) => i));
-      } else if (_network?.slip44 == 313) {
+      } else if (_zilliqaLegacy) {
         final zilliqaApp = ZilliqaLedgerApp(connection, transformer: null);
         newAccounts = await zilliqaApp
             .getPublicAddress(List<int>.generate(_accountCount, (i) => i));
@@ -800,6 +801,58 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     );
   }
 
+  Widget _buildLegacySwitch(AppTheme theme, AppLocalizations l10n) {
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: theme.textSecondary.withValues(alpha: 0.3),
+          width: 1.5,
+        ),
+      ),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              SvgPicture.asset(
+                "assets/icons/scilla.svg",
+                width: 24,
+                height: 24,
+                colorFilter: ColorFilter.mode(
+                  theme.textPrimary,
+                  BlendMode.srcIn,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Text(
+                l10n.settingsPageZilliqaLegacy,
+                style: TextStyle(
+                  color: theme.textPrimary,
+                  fontSize: 16,
+                ),
+              ),
+            ],
+          ),
+          Switch(
+            value: _zilliqaLegacy,
+            onChanged: _loading
+                ? null
+                : (value) {
+                    setState(() {
+                      _zilliqaLegacy = value;
+                    });
+                  },
+            activeThumbColor: theme.primaryPurple,
+            activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -879,6 +932,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                   ],
                                   const SizedBox(height: 16),
                                   _buildWalletInfoCard(theme, l10n),
+                                  if (_network?.slip44 == 313) ...[
+                                    const SizedBox(height: 16),
+                                    _buildLegacySwitch(theme, l10n),
+                                  ],
                                   if (_accountsLoaded &&
                                       _accounts.isNotEmpty) ...[
                                     const SizedBox(height: 16),

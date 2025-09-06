@@ -413,10 +413,9 @@ class _ConfirmTransactionContentState
           status == AvailabilityState.poweredOn,
     );
     final connection = await ledgerInterface.connect(_selectedDevice!);
-    final chain = appState.getChain(appState.wallet!.defaultChainHash);
     Uint8List sig;
 
-    if (chain?.slip44 == 60) {
+    if (tx.evm != null) {
       final ethLedgerApp = EthereumLedgerApp(connection);
       final signature = await ethLedgerApp.signTransaction(
         tx,
@@ -424,7 +423,7 @@ class _ConfirmTransactionContentState
         accountIndex,
       );
       sig = signature.toBytes();
-    } else if (chain?.slip44 == 313) {
+    } else if (tx.scilla != null) {
       final zilLedgerApp = ZilliqaLedgerApp(connection);
       sig = await zilLedgerApp.signTransaction(
         tx,
