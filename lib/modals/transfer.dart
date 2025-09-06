@@ -601,69 +601,60 @@ class _ConfirmTransactionContentState
                             child: InkWell(
                               splashFactory: NoSplash.splashFactory,
                               highlightColor: Colors.transparent,
-                              onTap: _isDisabled
-                                  ? null
-                                  : () {
-                                      showDialog<void>(
-                                        context: context,
-                                        barrierDismissible: false,
-                                        builder: (context) => EditGasDialog(
-                                          txParamsInfo: _txParamsInfo,
-                                          initialGasPrice: _gasPrice,
-                                          initialNonce: _txParamsInfo.nonce,
-                                          initialMaxPriorityFee:
-                                              _maxPriorityFee,
-                                          initialGasLimit:
-                                              _txParamsInfo.txEstimateGas,
-                                          onSave: (
-                                            gasPrice,
-                                            maxPriorityFee,
-                                            gasLimit,
-                                            nonce,
-                                          ) {
-                                            if (!mounted) return;
+                              onTap: () {
+                                showDialog<void>(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (context) => EditGasDialog(
+                                    txParamsInfo: _txParamsInfo,
+                                    initialGasPrice: _gasPrice,
+                                    initialNonce: _txParamsInfo.nonce,
+                                    initialMaxPriorityFee: _maxPriorityFee,
+                                    initialGasLimit:
+                                        _txParamsInfo.txEstimateGas,
+                                    onSave: (
+                                      gasPrice,
+                                      maxPriorityFee,
+                                      gasLimit,
+                                      nonce,
+                                    ) {
+                                      if (!mounted) return;
 
-                                            setState(() {
-                                              _gasPrice = gasPrice;
-                                              _maxPriorityFee = maxPriorityFee;
+                                      setState(() {
+                                        _gasPrice = gasPrice;
+                                        _maxPriorityFee = maxPriorityFee;
 
-                                              _txParamsInfo =
-                                                  RequiredTxParamsInfo(
-                                                gasPrice:
-                                                    _txParamsInfo.gasPrice,
-                                                maxPriorityFee: _txParamsInfo
-                                                    .maxPriorityFee,
-                                                feeHistory:
-                                                    _txParamsInfo.feeHistory,
-                                                txEstimateGas: gasLimit,
-                                                blobBaseFee:
-                                                    _txParamsInfo.blobBaseFee,
-                                                nonce: _txParamsInfo.nonce,
-                                              );
+                                        _txParamsInfo = RequiredTxParamsInfo(
+                                          gasPrice: _txParamsInfo.gasPrice,
+                                          maxPriorityFee:
+                                              _txParamsInfo.maxPriorityFee,
+                                          feeHistory: _txParamsInfo.feeHistory,
+                                          txEstimateGas: gasLimit,
+                                          blobBaseFee:
+                                              _txParamsInfo.blobBaseFee,
+                                          nonce: _txParamsInfo.nonce,
+                                        );
 
-                                              final BigInt baseFee =
-                                                  _txParamsInfo
-                                                      .feeHistory.baseFee;
-                                              BigInt newTotalFee;
+                                        final BigInt baseFee =
+                                            _txParamsInfo.feeHistory.baseFee;
+                                        BigInt newTotalFee;
 
-                                              if (baseFee != BigInt.zero) {
-                                                final maxFeePerGas =
-                                                    baseFee + maxPriorityFee;
-                                                newTotalFee =
-                                                    gasLimit * maxFeePerGas;
-                                              } else {
-                                                newTotalFee =
-                                                    gasLimit * gasPrice;
-                                              }
-                                              _totalFee = newTotalFee;
-                                            });
-                                          },
-                                          primaryColor: primaryColor,
-                                          textColor: textColor,
-                                          secondaryColor: secondaryColor,
-                                        ),
-                                      );
+                                        if (baseFee != BigInt.zero) {
+                                          final maxFeePerGas =
+                                              baseFee + maxPriorityFee;
+                                          newTotalFee = gasLimit * maxFeePerGas;
+                                        } else {
+                                          newTotalFee = gasLimit * gasPrice;
+                                        }
+                                        _totalFee = newTotalFee;
+                                      });
                                     },
+                                    primaryColor: primaryColor,
+                                    textColor: textColor,
+                                    secondaryColor: secondaryColor,
+                                  ),
+                                );
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.only(
                                     top: 8, right: 8, bottom: 8),
