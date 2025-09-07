@@ -49,13 +49,14 @@ class EthLedgerSignature {
   }
 
   static EthLedgerSignature fromLedgerResponse(Uint8List bytes) {
-    if (bytes.length < 65) {
-      throw FormatException('Response too short to contain valid signature');
+    if (bytes.length != 65) {
+      throw FormatException(
+          'Response must be exactly 65 bytes, got ${bytes.length}');
     }
 
     int v = bytes[0];
-    Uint8List r = Uint8List.sublistView(bytes, 1, 1 + 32);
-    Uint8List s = Uint8List.sublistView(bytes, 1 + 32, 1 + 32 + 32);
+    Uint8List r = Uint8List.fromList(bytes.sublist(1, 33));
+    Uint8List s = Uint8List.fromList(bytes.sublist(33, 65));
 
     return EthLedgerSignature(v: v, r: r, s: s);
   }

@@ -1,5 +1,4 @@
-import 'dart:typed_data';
-
+import 'package:flutter/foundation.dart';
 import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_eip712_hashed_message_operation.dart';
@@ -72,38 +71,67 @@ class EthereumLedgerApp {
     int walletIndex,
     int accountIndex,
   ) async {
-    final EncodedRLPTx txRLP = await encodeTxRlp(
-      tx: transaction,
-      walletIndex: BigInt.from(walletIndex),
-      accountIndex: BigInt.from(accountIndex),
-    );
+    try {
+      debugPrint('[LEDGER_DEBUG] Starting transaction signing process...');
+      debugPrint(
+          '[LEDGER_DEBUG] Wallet index: $walletIndex, Account index: $accountIndex');
 
-    print(
-        '[LEDGER_DEBUG] Raw TX RLP to sign (${txRLP.bytes.length} bytes): ${bytesToHex(txRLP.bytes)}');
+      final EncodedRLPTx txRLP = await encodeTxRlp(
+        tx: transaction,
+        walletIndex: BigInt.from(walletIndex),
+        accountIndex: BigInt.from(accountIndex),
+      );
 
-    final signatureBytes = await ledger.sendOperation<Uint8List>(
-      EthereumTransactionOperation(
-        accountIndex: accountIndex,
-        transactionRlp: txRLP.bytes,
-        connectionType: ledger.connectionType,
-      ),
-      transformer: transformer,
-    );
+      debugPrint(
+          '[LEDGER_DEBUG] Raw TX RLP (${txRLP.bytes.length} bytes): ${bytesToHex(txRLP.bytes)}');
+      debugPrint('[LEDGER_DEBUG] Chunks count: ${txRLP.chunksBytes.length}');
 
-    print(
-        '[LEDGER_DEBUG] Received signature bytes (${signatureBytes.length} bytes): ${bytesToHex(signatureBytes)}');
+      final signatureBytes = await ledger.sendOperation<Uint8List>(
+        EthereumTransactionOperation(
+          accountIndex: accountIndex,
+          transactionRlp: txRLP.bytes,
+          transactionChunks: txRLP.chunksBytes,
+          connectionType: ledger.connectionType,
+        ),
+        transformer: transformer,
+      );
 
-    _checkResult(signatureBytes);
+      debugPrint(
+          '[LEDGER_DEBUG] Received signature bytes (${signatureBytes.length} bytes): ${bytesToHex(signatureBytes)}');
 
-    return EthLedgerSignature.fromLedgerResponse(signatureBytes);
+      final signature = EthLedgerSignature.fromLedgerResponse(signatureBytes);
+
+      debugPrint('[LEDGER_DEBUG] Parsed signature:');
+      debugPrint(
+          '[LEDGER_DEBUG]   v: ${signature.v} (0x${signature.v.toRadixString(16)})');
+      debugPrint('[LEDGER_DEBUG]   r: ${bytesToHex(signature.r)}');
+      debugPrint('[LEDGER_DEBUG]   s: ${bytesToHex(signature.s)}');
+      debugPrint(
+          '[LEDGER_DEBUG] Full signature hex: ${signature.toHexString()}');
+
+      return signature;
+    } catch (e) {
+      debugPrint('[LEDGER_ERROR] Transaction signing failed: $e');
+
+      final errorStr = e.toString().toLowerCase();
+      if (errorStr.contains('0x6a80') ||
+          errorStr.contains('0x6985') ||
+          errorStr.contains('contract data') ||
+          errorStr.contains('blind signing')) {
+        debugPrint(
+            '[LEDGER_INFO] Transaction requires app settings change or is too complex');
+      }
+
+      rethrow;
+    }
   }
 
   static void _checkResult(Uint8List result) {
-    if (result.length != 2) {
+    if (result.length < 2) {
       return;
     }
 
-    int status = (result[0] << 8) | result[1];
+    int status = (result[result.length - 2] << 8) | result[result.length - 1];
 
     switch (status) {
       case 0x9000:
@@ -113,10 +141,11 @@ class EthereumLedgerApp {
         throw Exception('Device is locked');
 
       case 0x6967:
-        throw Exception('Operation rejected');
+        throw Exception('Operation rejected by user');
 
       case 0x6985:
-        throw Exception('Condition not satisfied (possibly rejected by user)');
+        throw Exception(
+            'Transaction rejected by user or requires plugin/clear signing setup');
 
       case 0x0000:
         throw Exception('No response from device');
@@ -146,7 +175,8 @@ class EthereumLedgerApp {
         throw Exception('Error with no additional information');
 
       case 0x6a80:
-        throw Exception('Invalid data');
+        throw Exception(
+            'Invalid data. Enable "Blind signing" or "Contract data" in Ethereum app settings');
 
       case 0x6a84:
         throw Exception('Insufficient memory');
@@ -170,8 +200,12 @@ class EthereumLedgerApp {
         throw Exception('Command code not supported');
 
       default:
-        throw Exception(
-            'Unknown status code: 0x${status.toRadixString(16).padLeft(4, '0')}');
+        String hexStatus = status.toRadixString(16).padLeft(4, '0');
+        if (status == 0x6985 || status == 0x6a80) {
+          throw Exception(
+              'Transaction rejected (0x$hexStatus). Enable "Blind signing" or "Contract data" in Ethereum app settings');
+        }
+        throw Exception('Unknown status code: 0x$hexStatus');
     }
   }
 }

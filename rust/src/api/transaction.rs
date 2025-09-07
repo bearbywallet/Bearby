@@ -177,24 +177,29 @@ pub async fn encode_tx_rlp(
                 wallet_index,
                 zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
             ))?;
-        let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
-        match &tx {
+        let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+        match tx {
             TransactionRequest::Zilliqa(_) => Ok(EncodedRLPTx {
                 bytes: tx
                     .to_rlp_encode(&account.pub_key)
                     .map_err(ServiceError::TransactionErrors)?,
                 chunks_bytes: Vec::new(),
             }),
-            TransactionRequest::Ethereum((tx_eth, _)) => {
+            TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
+                tx_eth.chain_id = Some(account.chain_id);
                 let derivation_path =
                     DerivationPath::new(account.slip_44, account.account_type.value());
                 let derivation_path = split_path(&derivation_path.get_path()).unwrap_or_default();
                 let derivation_bytes = components_to_derivation_path(&derivation_path);
+                let transaction_type = tx_eth.preferred_type();
+                dbg!(transaction_type, &tx_eth);
+
                 let rlp = tx
                     .to_rlp_encode(&account.pub_key)
                     .map_err(ServiceError::TransactionErrors)?;
+
                 let chunks_bytes =
-                    safe_chunk_transaction(&rlp, &derivation_bytes, tx_eth.transaction_type)
+                    safe_chunk_transaction(&rlp, &derivation_bytes, transaction_type)
                         .map_err(|e| ServiceError::TransactionErrors(e))?;
 
                 Ok(EncodedRLPTx {
