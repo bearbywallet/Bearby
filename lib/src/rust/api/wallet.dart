@@ -14,176 +14,140 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 Future<List<WalletInfo>> getWallets() =>
     RustLib.instance.api.crateApiWalletGetWallets();
 
-Future<(String, String)> addBip39Wallet({
-  required Bip39AddWalletParams params,
-  required WalletSettingsInfo walletSettings,
-  required List<FTokenInfo> ftokens,
-}) => RustLib.instance.api.crateApiWalletAddBip39Wallet(
-  params: params,
-  walletSettings: walletSettings,
-  ftokens: ftokens,
-);
+Future<(String, String)> addBip39Wallet(
+        {required Bip39AddWalletParams params,
+        required WalletSettingsInfo walletSettings,
+        required List<FTokenInfo> ftokens}) =>
+    RustLib.instance.api.crateApiWalletAddBip39Wallet(
+        params: params, walletSettings: walletSettings, ftokens: ftokens);
 
-Future<(String, String)> addSkWallet({
-  required AddSKWalletParams params,
-  required WalletSettingsInfo walletSettings,
-  required List<FTokenInfo> ftokens,
-}) => RustLib.instance.api.crateApiWalletAddSkWallet(
-  params: params,
-  walletSettings: walletSettings,
-  ftokens: ftokens,
-);
+Future<(String, String)> addSkWallet(
+        {required AddSKWalletParams params,
+        required WalletSettingsInfo walletSettings,
+        required List<FTokenInfo> ftokens}) =>
+    RustLib.instance.api.crateApiWalletAddSkWallet(
+        params: params, walletSettings: walletSettings, ftokens: ftokens);
 
 Future<void> addNextBip39Account({required AddNextBip39AccountParams params}) =>
     RustLib.instance.api.crateApiWalletAddNextBip39Account(params: params);
 
-Future<void> selectAccount({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiWalletSelectAccount(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<void> selectAccount(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletSelectAccount(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<void> changeAccountName({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required String newName,
-}) => RustLib.instance.api.crateApiWalletChangeAccountName(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  newName: newName,
-);
+Future<void> changeAccountName(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required String newName}) =>
+    RustLib.instance.api.crateApiWalletChangeAccountName(
+        walletIndex: walletIndex, accountIndex: accountIndex, newName: newName);
 
-Future<void> changeWalletName({
-  required BigInt walletIndex,
-  required String newName,
-}) => RustLib.instance.api.crateApiWalletChangeWalletName(
-  walletIndex: walletIndex,
-  newName: newName,
-);
+Future<void> changeWalletName(
+        {required BigInt walletIndex, required String newName}) =>
+    RustLib.instance.api.crateApiWalletChangeWalletName(
+        walletIndex: walletIndex, newName: newName);
 
-Future<void> deleteWallet({
-  required BigInt walletIndex,
-  required List<String> identifiers,
-  String? password,
-  String? sessionCipher,
-}) => RustLib.instance.api.crateApiWalletDeleteWallet(
-  walletIndex: walletIndex,
-  identifiers: identifiers,
-  password: password,
-  sessionCipher: sessionCipher,
-);
+Future<void> deleteWallet(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        String? password,
+        String? sessionCipher}) =>
+    RustLib.instance.api.crateApiWalletDeleteWallet(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        sessionCipher: sessionCipher);
 
-Future<void> deleteAccount({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiWalletDeleteAccount(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<void> deleteAccount(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletDeleteAccount(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<String?> setBiometric({
-  required BigInt walletIndex,
-  required List<String> identifiers,
-  required String password,
-  String? sessionCipher,
-  required String newBiometricType,
-}) => RustLib.instance.api.crateApiWalletSetBiometric(
-  walletIndex: walletIndex,
-  identifiers: identifiers,
-  password: password,
-  sessionCipher: sessionCipher,
-  newBiometricType: newBiometricType,
-);
+Future<String?> setBiometric(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        required String password,
+        String? sessionCipher,
+        required String newBiometricType}) =>
+    RustLib.instance.api.crateApiWalletSetBiometric(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        sessionCipher: sessionCipher,
+        newBiometricType: newBiometricType);
 
-Future<KeyPairInfo> revealKeypair({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required List<String> identifiers,
-  required String password,
-  String? passphrase,
-}) => RustLib.instance.api.crateApiWalletRevealKeypair(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  identifiers: identifiers,
-  password: password,
-  passphrase: passphrase,
-);
+Future<KeyPairInfo> revealKeypair(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required List<String> identifiers,
+        required String password,
+        String? passphrase}) =>
+    RustLib.instance.api.crateApiWalletRevealKeypair(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        identifiers: identifiers,
+        password: password,
+        passphrase: passphrase);
 
-Future<String> revealBip39Phrase({
-  required BigInt walletIndex,
-  required List<String> identifiers,
-  required String password,
-  String? passphrase,
-}) => RustLib.instance.api.crateApiWalletRevealBip39Phrase(
-  walletIndex: walletIndex,
-  identifiers: identifiers,
-  password: password,
-  passphrase: passphrase,
-);
+Future<String> revealBip39Phrase(
+        {required BigInt walletIndex,
+        required List<String> identifiers,
+        required String password,
+        String? passphrase}) =>
+    RustLib.instance.api.crateApiWalletRevealBip39Phrase(
+        walletIndex: walletIndex,
+        identifiers: identifiers,
+        password: password,
+        passphrase: passphrase);
 
-Future<void> zilliqaSwapChain({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiWalletZilliqaSwapChain(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<void> zilliqaSwapChain(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletZilliqaSwapChain(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<(String, String)> zilliqaGetBech32Base16Address({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<(String, String)> zilliqaGetBech32Base16Address(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletZilliqaGetBech32Base16Address(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<List<String>> getZilEthChecksumAddresses({
-  required BigInt walletIndex,
-}) => RustLib.instance.api.crateApiWalletGetZilEthChecksumAddresses(
-  walletIndex: walletIndex,
-);
+Future<List<String>> getZilEthChecksumAddresses(
+        {required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiWalletGetZilEthChecksumAddresses(walletIndex: walletIndex);
 
 Future<List<String>> getZilBech32Addresses({required BigInt walletIndex}) =>
-    RustLib.instance.api.crateApiWalletGetZilBech32Addresses(
-      walletIndex: walletIndex,
-    );
+    RustLib.instance.api
+        .crateApiWalletGetZilBech32Addresses(walletIndex: walletIndex);
 
-Future<String> zilliqaLegacyBase16ToBech32({required String base16}) => RustLib
-    .instance
-    .api
-    .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
+Future<String> zilliqaLegacyBase16ToBech32({required String base16}) =>
+    RustLib.instance.api
+        .crateApiWalletZilliqaLegacyBase16ToBech32(base16: base16);
 
-Future<String> zilliqaGetNFormat({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiWalletZilliqaGetNFormat(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<String> zilliqaGetNFormat(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiWalletZilliqaGetNFormat(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<Uint8List> makeKeystoreFile({
-  required BigInt walletIndex,
-  required String password,
-  required List<String> deviceIndicators,
-}) => RustLib.instance.api.crateApiWalletMakeKeystoreFile(
-  walletIndex: walletIndex,
-  password: password,
-  deviceIndicators: deviceIndicators,
-);
+Future<Uint8List> makeKeystoreFile(
+        {required BigInt walletIndex,
+        required String password,
+        required List<String> deviceIndicators}) =>
+    RustLib.instance.api.crateApiWalletMakeKeystoreFile(
+        walletIndex: walletIndex,
+        password: password,
+        deviceIndicators: deviceIndicators);
 
-Future<(String, String)> restoreFromKeystore({
-  required List<int> keystoreBytes,
-  required List<String> deviceIndicators,
-  required String password,
-  required String biometricType,
-}) => RustLib.instance.api.crateApiWalletRestoreFromKeystore(
-  keystoreBytes: keystoreBytes,
-  deviceIndicators: deviceIndicators,
-  password: password,
-  biometricType: biometricType,
-);
+Future<(String, String)> restoreFromKeystore(
+        {required List<int> keystoreBytes,
+        required List<String> deviceIndicators,
+        required String password,
+        required String biometricType}) =>
+    RustLib.instance.api.crateApiWalletRestoreFromKeystore(
+        keystoreBytes: keystoreBytes,
+        deviceIndicators: deviceIndicators,
+        password: password,
+        biometricType: biometricType);
 
 class AddNextBip39AccountParams {
   final BigInt walletIndex;

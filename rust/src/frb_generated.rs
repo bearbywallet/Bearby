@@ -4635,6 +4635,18 @@ impl SseDecode for crate::api::transaction::Eip712Hashes {
     }
 }
 
+impl SseDecode for crate::api::transaction::EncodedRLPTx {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut var_bytes = <Vec<u8>>::sse_decode(deserializer);
+        let mut var_chunksBytes = <Vec<Vec<u8>>>::sse_decode(deserializer);
+        return crate::api::transaction::EncodedRLPTx {
+            bytes: var_bytes,
+            chunks_bytes: var_chunksBytes,
+        };
+    }
+}
+
 impl SseDecode for crate::api::book::Entry {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5027,6 +5039,18 @@ impl SseDecode for Vec<crate::models::transactions::history::HistoricalTransacti
                     deserializer,
                 ),
             );
+        }
+        return ans_;
+    }
+}
+
+impl SseDecode for Vec<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ {
+            ans_.push(<Vec<u8>>::sse_decode(deserializer));
         }
         return ans_;
     }
@@ -6521,6 +6545,27 @@ impl flutter_rust_bridge::IntoIntoDart<crate::api::transaction::Eip712Hashes>
     }
 }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+impl flutter_rust_bridge::IntoDart for crate::api::transaction::EncodedRLPTx {
+    fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+        [
+            self.bytes.into_into_dart().into_dart(),
+            self.chunks_bytes.into_into_dart().into_dart(),
+        ]
+        .into_dart()
+    }
+}
+impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive
+    for crate::api::transaction::EncodedRLPTx
+{
+}
+impl flutter_rust_bridge::IntoIntoDart<crate::api::transaction::EncodedRLPTx>
+    for crate::api::transaction::EncodedRLPTx
+{
+    fn into_into_dart(self) -> crate::api::transaction::EncodedRLPTx {
+        self
+    }
+}
+// Codec=Dco (DartCObject based), see doc to use other codecs
 impl flutter_rust_bridge::IntoDart for crate::api::book::Entry {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
@@ -7385,6 +7430,14 @@ impl SseEncode for crate::api::transaction::Eip712Hashes {
     }
 }
 
+impl SseEncode for crate::api::transaction::EncodedRLPTx {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <Vec<u8>>::sse_encode(self.bytes, serializer);
+        <Vec<Vec<u8>>>::sse_encode(self.chunks_bytes, serializer);
+    }
+}
+
 impl SseEncode for crate::api::book::Entry {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -7650,6 +7703,16 @@ impl SseEncode for Vec<crate::models::transactions::history::HistoricalTransacti
             <crate::models::transactions::history::HistoricalTransactionInfo>::sse_encode(
                 item, serializer,
             );
+        }
+    }
+}
+
+impl SseEncode for Vec<Vec<u8>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <i32>::sse_encode(self.len() as _, serializer);
+        for item in self {
+            <Vec<u8>>::sse_encode(item, serializer);
         }
     }
 }

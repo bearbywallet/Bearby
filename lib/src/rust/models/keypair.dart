@@ -10,7 +10,10 @@ class KeyPairInfo {
   final String sk;
   final String pk;
 
-  const KeyPairInfo({required this.sk, required this.pk});
+  const KeyPairInfo({
+    required this.sk,
+    required this.pk,
+  });
 
   @override
   int get hashCode => sk.hashCode ^ pk.hashCode;

@@ -14,102 +14,76 @@ import '../models/transactions/scilla.dart';
 import '../models/transactions/transaction_metadata.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<List<FinalOutputInfo>> fetchEvmStake({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiStakeFetchEvmStake(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<List<FinalOutputInfo>> fetchEvmStake(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiStakeFetchEvmStake(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<List<FinalOutputInfo>> fetchScillaStake({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-}) => RustLib.instance.api.crateApiStakeFetchScillaStake(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-);
+Future<List<FinalOutputInfo>> fetchScillaStake(
+        {required BigInt walletIndex, required BigInt accountIndex}) =>
+    RustLib.instance.api.crateApiStakeFetchScillaStake(
+        walletIndex: walletIndex, accountIndex: accountIndex);
 
-Future<TransactionRequestInfo> buildClaimScillaStakingRewardsTx({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildClaimScillaStakingRewardsTx(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildClaimScillaStakingRewardsTx(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildClaimScillaStakingRewardsTx(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
-Future<TransactionRequestInfo> buildTxScillaInitUnstake({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildTxScillaInitUnstake(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildTxScillaInitUnstake(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxScillaInitUnstake(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
-Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawal({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawal(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildTxScillaCompleteWithdrawal(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxScillaCompleteWithdrawal(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
-Future<TransactionRequestInfo> buildTxScillaWithdrawStakeAvely({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildTxScillaWithdrawStakeAvely(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildTxScillaWithdrawStakeAvely(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxScillaWithdrawStakeAvely(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
-Future<TransactionRequestInfo> buildTxEvmStakeRequest({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-  required String amount,
-}) => RustLib.instance.api.crateApiStakeBuildTxEvmStakeRequest(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-  amount: amount,
-);
+Future<TransactionRequestInfo> buildTxEvmStakeRequest(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake,
+        required String amount}) =>
+    RustLib.instance.api.crateApiStakeBuildTxEvmStakeRequest(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        stake: stake,
+        amount: amount);
 
-Future<TransactionRequestInfo> buildTxEvmUnstakeRequest({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-  required String amountToUnstake,
-}) => RustLib.instance.api.crateApiStakeBuildTxEvmUnstakeRequest(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-  amountToUnstake: amountToUnstake,
-);
+Future<TransactionRequestInfo> buildTxEvmUnstakeRequest(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake,
+        required String amountToUnstake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxEvmUnstakeRequest(
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        stake: stake,
+        amountToUnstake: amountToUnstake);
 
-Future<TransactionRequestInfo> buildTxClaimUnstakeRequest({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildTxClaimUnstakeRequest(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildTxClaimUnstakeRequest(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxClaimUnstakeRequest(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);
 
-Future<TransactionRequestInfo> buildTxClaimRewardRequest({
-  required BigInt walletIndex,
-  required BigInt accountIndex,
-  required FinalOutputInfo stake,
-}) => RustLib.instance.api.crateApiStakeBuildTxClaimRewardRequest(
-  walletIndex: walletIndex,
-  accountIndex: accountIndex,
-  stake: stake,
-);
+Future<TransactionRequestInfo> buildTxClaimRewardRequest(
+        {required BigInt walletIndex,
+        required BigInt accountIndex,
+        required FinalOutputInfo stake}) =>
+    RustLib.instance.api.crateApiStakeBuildTxClaimRewardRequest(
+        walletIndex: walletIndex, accountIndex: accountIndex, stake: stake);

@@ -10,7 +10,10 @@ class AccessListItem {
   final String address;
   final List<String> storageKeys;
 
-  const AccessListItem({required this.address, required this.storageKeys});
+  const AccessListItem({
+    required this.address,
+    required this.storageKeys,
+  });
 
   @override
   int get hashCode => address.hashCode ^ storageKeys.hashCode;

@@ -7,17 +7,13 @@ import '../frb_generated.dart';
 import '../models/book.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-Future<void> addNewBookAddress({
-  required String name,
-  required String addr,
-  required BigInt net,
-  required int slip44,
-}) => RustLib.instance.api.crateApiBookAddNewBookAddress(
-  name: name,
-  addr: addr,
-  net: net,
-  slip44: slip44,
-);
+Future<void> addNewBookAddress(
+        {required String name,
+        required String addr,
+        required BigInt net,
+        required int slip44}) =>
+    RustLib.instance.api.crateApiBookAddNewBookAddress(
+        name: name, addr: addr, net: net, slip44: slip44);
 
 Future<void> removeFromAddressBook({required String addr}) =>
     RustLib.instance.api.crateApiBookRemoveFromAddressBook(addr: addr);
@@ -25,19 +21,19 @@ Future<void> removeFromAddressBook({required String addr}) =>
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();
 
-Future<List<Category>> getCombineSortAddresses({
-  required BigInt walletIndex,
-  required bool history,
-}) => RustLib.instance.api.crateApiBookGetCombineSortAddresses(
-  walletIndex: walletIndex,
-  history: history,
-);
+Future<List<Category>> getCombineSortAddresses(
+        {required BigInt walletIndex, required bool history}) =>
+    RustLib.instance.api.crateApiBookGetCombineSortAddresses(
+        walletIndex: walletIndex, history: history);
 
 class Category {
   final String name;
   final List<Entry> entries;
 
-  const Category({required this.name, required this.entries});
+  const Category({
+    required this.name,
+    required this.entries,
+  });
 
   @override
   int get hashCode => name.hashCode ^ entries.hashCode;
@@ -56,7 +52,11 @@ class Entry {
   final String address;
   final String? tag;
 
-  const Entry({required this.name, required this.address, this.tag});
+  const Entry({
+    required this.name,
+    required this.address,
+    this.tag,
+  });
 
   @override
   int get hashCode => name.hashCode ^ address.hashCode ^ tag.hashCode;

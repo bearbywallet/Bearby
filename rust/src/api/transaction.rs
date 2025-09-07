@@ -14,6 +14,7 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
@@ -21,6 +22,7 @@ use zilpay::proto::pubkey::PubKey;
 use zilpay::proto::signature::Signature;
 pub use zilpay::proto::tx::TransactionReceipt;
 pub use zilpay::proto::tx::TransactionRequest;
+use zilpay::proto::utils::safe_chunk_transaction;
 pub use zilpay::proto::U256;
 use zilpay::token::ft::FToken;
 pub use zilpay::wallet::wallet_storage::StorageOperations;
@@ -153,11 +155,16 @@ pub async fn sign_send_transactions(
     Ok(tx)
 }
 
+pub struct EncodedRLPTx {
+    pub bytes: Vec<u8>,
+    pub chunks_bytes: Vec<Vec<u8>>,
+}
+
 pub async fn encode_tx_rlp(
     wallet_index: usize,
     account_index: usize,
     tx: TransactionRequestInfo,
-) -> Result<Vec<u8>, String> {
+) -> Result<EncodedRLPTx, String> {
     with_wallet(wallet_index, |wallet| {
         let walelt_data = wallet
             .get_wallet_data()
@@ -171,10 +178,31 @@ pub async fn encode_tx_rlp(
                 zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
             ))?;
         let tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+        match &tx {
+            TransactionRequest::Zilliqa(_) => Ok(EncodedRLPTx {
+                bytes: tx
+                    .to_rlp_encode(&account.pub_key)
+                    .map_err(ServiceError::TransactionErrors)?,
+                chunks_bytes: Vec::new(),
+            }),
+            TransactionRequest::Ethereum((tx_eth, _)) => {
+                let derivation_path =
+                    DerivationPath::new(account.slip_44, account.account_type.value());
+                let derivation_path = split_path(&derivation_path.get_path()).unwrap_or_default();
+                let derivation_bytes = components_to_derivation_path(&derivation_path);
+                let rlp = tx
+                    .to_rlp_encode(&account.pub_key)
+                    .map_err(ServiceError::TransactionErrors)?;
+                let chunks_bytes =
+                    safe_chunk_transaction(&rlp, &derivation_bytes, tx_eth.transaction_type)
+                        .map_err(|e| ServiceError::TransactionErrors(e))?;
 
-        Ok(tx
-            .to_rlp_encode(&account.pub_key)
-            .map_err(ServiceError::TransactionErrors)?)
+                Ok(EncodedRLPTx {
+                    chunks_bytes,
+                    bytes: rlp,
+                })
+            }
+        }
     })
     .await
     .map_err(Into::into)

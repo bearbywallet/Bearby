@@ -12,7 +12,12 @@ class ColorsInfo {
   final String? background;
   final String? text;
 
-  const ColorsInfo({this.primary, this.secondary, this.background, this.text});
+  const ColorsInfo({
+    this.primary,
+    this.secondary,
+    this.background,
+    this.text,
+  });
 
   @override
   int get hashCode =>
