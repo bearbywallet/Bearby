@@ -735,13 +735,6 @@ class _ConfirmTransactionContentState
                                     appState.wallet!.selectedAccount] ??
                                 '0');
 
-                            if (widget.token.addr != zeroEVM &&
-                                widget.token.addrType == 1 &&
-                                appState.wallet!.walletType
-                                    .contains(WalletType.ledger.name)) {
-                              throw "ERC20 for ledger is not working for now.";
-                            }
-
                             if (isNativeTx && amount == balance) {
                               adjustedTokenValue = amount - fee;
                             }

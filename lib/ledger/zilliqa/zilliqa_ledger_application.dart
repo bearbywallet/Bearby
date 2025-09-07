@@ -66,7 +66,7 @@ class ZilliqaLedgerApp {
     final signatureBytes = await ledger.sendOperation<Uint8List>(
       SignZilliqaTransactionOperation(
         keyIndex: accountIndex,
-        transactionBytes: protoBuf,
+        transactionBytes: protoBuf.bytes,
         connectionType: ledger.connectionType,
       ),
       transformer: transformer,

@@ -10,86 +10,62 @@ const int ETH_INS_SIGN = 0x04;
 const int P1_FIRST_CHUNK = 0x00;
 const int P1_MORE_CHUNKS = 0x80;
 const int P2_UNUSED = 0x00;
-const int MAX_APDU_PAYLOAD_SIZE = 250;
+const int MAX_CHUNK_SIZE = 255;
 const int ETH_SIGNATURE_LENGTH = 65;
 
 class EthereumTransactionOperation extends LedgerComplexOperation<Uint8List> {
   final int accountIndex;
-  final Uint8List transaction;
+  final Uint8List transactionRlp;
   final ConnectionType connectionType;
 
   const EthereumTransactionOperation({
     required this.accountIndex,
-    required this.transaction,
+    required this.transactionRlp,
     required this.connectionType,
   });
 
   @override
   Future<Uint8List> invoke(LedgerSendFct send) async {
     final List<int> paths = splitPath(getWalletDerivationPath(accountIndex));
-    if (paths.isEmpty) {
-      throw Exception('Derivation path is empty');
+    final derivationPathBuffer = ByteData(1 + paths.length * 4);
+    derivationPathBuffer.setUint8(0, paths.length);
+    for (int i = 0; i < paths.length; i++) {
+      derivationPathBuffer.setUint32(1 + 4 * i, paths[i], Endian.big);
     }
 
-    final pathWriter = ByteDataWriter();
-    pathWriter.writeUint8(paths.length);
-    for (var pathElement in paths) {
-      pathWriter.writeUint32(pathElement, Endian.big);
-    }
-    final pathBytes = pathWriter.toBytes();
+    final payload = Uint8List.fromList(
+      derivationPathBuffer.buffer.asUint8List() + transactionRlp,
+    );
 
-    int offset = 0;
+    debugPrint(
+        '[LEDGER_DEBUG] Full payload (path + rlp) length: ${payload.length}');
+    debugPrint('[LEDGER_DEBUG] Full payload (hex): ${bytesToHex(payload)}');
+
     ByteDataReader? responseReader;
+    int offset = 0;
 
-    final firstChunkSize = min(
-      transaction.length,
-      MAX_APDU_PAYLOAD_SIZE - pathBytes.length,
-    );
+    for (int i = 0; offset < payload.length; i++) {
+      final int chunkSize = min(MAX_CHUNK_SIZE, payload.length - offset);
+      final Uint8List chunk = payload.sublist(offset, offset + chunkSize);
+      offset += chunkSize;
 
-    if (firstChunkSize < 0) {
-      throw Exception(
-          'Transaction data is too small to fit with derivation path in the first chunk.');
-    }
+      final bool isFirstChunk = (i == 0);
+      final p1 = isFirstChunk ? P1_FIRST_CHUNK : P1_MORE_CHUNKS;
 
-    final firstPayloadWriter = ByteDataWriter();
-    firstPayloadWriter.write(pathBytes);
-    firstPayloadWriter
-        .write(transaction.sublist(offset, offset + firstChunkSize));
-    final firstPayload = firstPayloadWriter.toBytes();
-
-    responseReader = await send(
-      LedgerSimpleOperation(
-        cla: ETH_CLA,
-        ins: ETH_INS_SIGN,
-        p1: P1_FIRST_CHUNK,
-        p2: P2_UNUSED,
-        data: firstPayload,
-        prependDataLength: true,
-        debugName: 'Sign Ethereum Txn Chunk 1',
-      ),
-    );
-
-    offset += firstChunkSize;
-    while (offset < transaction.length) {
-      final remainingBytes = transaction.length - offset;
-      final currentChunkSize = min(remainingBytes, MAX_APDU_PAYLOAD_SIZE);
-
-      final nextPayload =
-          transaction.sublist(offset, offset + currentChunkSize);
+      debugPrint(
+          '[LEDGER_DEBUG] Sending chunk ${i + 1}: P1=0x${p1.toRadixString(16)}, size=${chunk.length}, data=${bytesToHex(chunk)}');
 
       responseReader = await send(
         LedgerSimpleOperation(
           cla: ETH_CLA,
           ins: ETH_INS_SIGN,
-          p1: P1_MORE_CHUNKS,
+          p1: p1,
           p2: P2_UNUSED,
-          data: nextPayload,
+          data: chunk,
           prependDataLength: true,
-          debugName: 'Sign Ethereum Txn Chunk N',
+          debugName: 'Sign Ethereum Txn Chunk ${i + 1}',
         ),
       );
-
-      offset += currentChunkSize;
     }
 
     if (responseReader == null) {
@@ -100,15 +76,32 @@ class EthereumTransactionOperation extends LedgerComplexOperation<Uint8List> {
       );
     }
 
-    if (responseReader.remainingLength < ETH_SIGNATURE_LENGTH) {
+    final rawResponseBytes =
+        responseReader.read(responseReader.remainingLength);
+    debugPrint(
+        '[LEDGER_DEBUG] Raw response from device: ${bytesToHex(rawResponseBytes)}');
+    debugPrint(
+        '[LEDGER_DEBUG] Length of rawResponseBytes array: ${rawResponseBytes.length}');
+
+    if (rawResponseBytes.length == 2) {
+      int status = (rawResponseBytes[0] << 8) | rawResponseBytes[1];
+      if (status == 0x6985 || status == 0x6a80) {
+        throw Exception(
+            'Transaction rejected by device. Please enable "Blind Signing" in the Ethereum application settings on your Ledger and try again.');
+      }
+    }
+
+    if (rawResponseBytes.length < ETH_SIGNATURE_LENGTH) {
       throw LedgerDeviceException(
         message:
-            'Signature response too short. Expected $ETH_SIGNATURE_LENGTH bytes, got ${responseReader.remainingLength}',
+            'Signature response too short. Expected $ETH_SIGNATURE_LENGTH bytes, got ${rawResponseBytes.length}',
         connectionType: connectionType,
       );
     }
 
-    final signatureBytes = responseReader.read(ETH_SIGNATURE_LENGTH);
+    final signatureBytes = rawResponseBytes.sublist(0, ETH_SIGNATURE_LENGTH);
+    debugPrint(
+        '[LEDGER_DEBUG] Parsed signature from device: ${bytesToHex(signatureBytes)}');
 
     return signatureBytes;
   }
