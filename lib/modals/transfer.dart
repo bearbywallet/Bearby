@@ -14,6 +14,7 @@ import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
 import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
+import 'package:zilpay/ledger/ethereum/resolution_types.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -417,10 +418,16 @@ class _ConfirmTransactionContentState
 
     if (tx.evm != null) {
       final ethLedgerApp = EthereumLedgerApp(connection);
-      final signature = await ethLedgerApp.signTransaction(
+      final signature = await ethLedgerApp.clearSignTransaction(
         tx,
         appState.selectedWallet,
         accountIndex,
+        resolutionConfig: ResolutionConfig(
+          erc20: true,
+          externalPlugins: true,
+          nft: true,
+          uniswapV3: true,
+        ),
       );
       sig = signature.toBytes();
     } else if (tx.scilla != null) {
