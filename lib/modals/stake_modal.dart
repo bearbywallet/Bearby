@@ -634,10 +634,10 @@ class _StakeModalContentState extends State<StakeModalContent> {
       parts.add('${days}${l10n.durationDay}');
     }
     if (hours > 0) {
-      parts.add('${hours}${l10n.durationHour}');
+      parts.add('$hours${l10n.durationHour}');
     }
     if (minutes > 0) {
-      parts.add('${minutes}${l10n.durationMinute}');
+      parts.add('$minutes${l10n.durationMinute}');
     }
 
     if (parts.isEmpty && duration.inSeconds > 0) {

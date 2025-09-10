@@ -28,5 +28,7 @@
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSBluetoothAlwaysUsageDescription</key>
+	<string>Our app needs Bluetooth access to find and connect to peripheral devices.</string>
 </dict>
 </plist>
