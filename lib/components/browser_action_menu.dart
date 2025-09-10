@@ -15,14 +15,14 @@ class BrowserActionMenu extends StatelessWidget {
   final BuildContext parentContext;
 
   const BrowserActionMenu({
-    Key? key,
+    super.key,
     required this.onShare,
     required this.onCopyLink,
     required this.onClose,
     this.onBack,
     this.onForward,
     required this.parentContext,
-  }) : super(key: key);
+  });
 
   void _showMenu() {
     final appState = Provider.of<AppState>(parentContext, listen: false);
