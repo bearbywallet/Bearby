@@ -1,8 +1,8 @@
 import 'dart:async';
-import 'dart:typed_data';
 import 'package:flutter/services.dart';
-import 'device_model.dart';
-import 'exceptions.dart';
+import 'package:zilpay/ledger/models/device_model.dart';
+import 'package:zilpay/ledger/transport/exceptions.dart';
+import 'package:zilpay/ledger/transport/transport.dart';
 
 class DeviceInfo {
   final Map<String, dynamic> rawData;
@@ -23,11 +23,14 @@ class DescriptorEvent {
   DescriptorEvent(this.type, this.descriptor);
 }
 
-class HidTransport {
+class HidTransport extends Transport {
   final String _id;
+  @override
   final DeviceModel? deviceModel;
+
   Completer<void>? _exchangeBusyPromise;
   Timer? _unresponsiveTimer;
+  final _eventController = StreamController<TransportEvent>.broadcast();
 
   static const _channel = MethodChannel('ledger.com/hid');
   static const _eventChannel = EventChannel('ledger.com/hid/events');
@@ -42,6 +45,9 @@ class HidTransport {
 
   HidTransport._(this._id, int productId)
       : deviceModel = Devices.identifyUSBProductId(productId);
+
+  @override
+  Stream<TransportEvent> get events => _eventController.stream;
 
   static Future<bool> isSupported() async => true;
 
@@ -87,25 +93,7 @@ class HidTransport {
     }
   }
 
-  Future<Uint8List> send(int cla, int ins, int p1, int p2, Uint8List data,
-      [List<int> statusList = const [StatusCodes.ok]]) async {
-    if (data.length > 255) {
-      throw TransportException(
-          'data.length exceed 255 bytes limit', 'DataLengthTooBig');
-    }
-
-    final apdu = Uint8List.fromList([cla, ins, p1, p2, data.length, ...data]);
-    final response = await exchange(apdu);
-
-    final sw =
-        response.buffer.asByteData().getUint16(response.length - 2, Endian.big);
-    if (!statusList.contains(sw)) {
-      throw TransportStatusError(sw);
-    }
-
-    return response.sublist(0, response.length - 2);
-  }
-
+  @override
   Future<Uint8List> exchange(Uint8List apdu) async {
     return _exchangeAtomic(() async {
       try {
@@ -148,13 +136,13 @@ class HidTransport {
     bool unresponsiveReached = false;
     _unresponsiveTimer = Timer(const Duration(seconds: 15), () {
       unresponsiveReached = true;
-      // You can emit an event here if needed, e.g. using a StreamController
+      _eventController.add(TransportEvent.unresponsive);
     });
 
     try {
       final res = await f();
       if (unresponsiveReached) {
-        // Emit responsive event if needed
+        _eventController.add(TransportEvent.responsive);
       }
       return res;
     } finally {
@@ -164,10 +152,13 @@ class HidTransport {
     }
   }
 
+  @override
   Future<void> close() async {
     await _exchangeBusyPromise?.future;
     await _channel.invokeMethod('closeDevice', {'deviceId': _id});
+    await _eventController.close();
   }
 
+  @override
   void setScrambleKey(String key) {}
 }
