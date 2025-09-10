@@ -1,4 +1,4 @@
-package com.hid.java;
+package com.zilpaymobile;
 
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;

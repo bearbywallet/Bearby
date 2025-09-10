@@ -1,4 +1,4 @@
-package com.hid.java;
+package com.zilpaymobile;
 
 import android.hardware.usb.UsbConstants;
 import android.hardware.usb.UsbDevice;
