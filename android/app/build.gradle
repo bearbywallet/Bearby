@@ -10,8 +10,6 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 
 android {
     namespace = "com.zilpaymobile"
-    // compileSdk = flutter.compileSdkVersion
-    // ndkVersion = flutter.ndkVersion
     ndkVersion = "29.0.13113456"
     compileSdk = 36
 
@@ -35,9 +33,8 @@ android {
         minSdk = 24
         targetSdk = 36
         targetSdkVersion 36
+        multiDexEnabled true
 
-        // minSdk = flutter.minSdkVersion
-        // targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
 
@@ -69,9 +66,6 @@ android {
 
     buildTypes {
         release {
-            minifyEnabled true
-            shrinkResources true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
             // signingConfig = signingConfigs.debug
@@ -82,4 +76,7 @@ android {
 
 flutter {
     source = "../.."
+}
+dependencies {
+    implementation 'androidx.multidex:multidex:2.0.1'
 }

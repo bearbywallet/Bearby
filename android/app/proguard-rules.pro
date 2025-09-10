@@ -1,1 +1,2 @@
--keep class com.zilpaymobile.FlutterHidPlugin { *; }
+        -keep class com.zilpaymobile.** { *; }
+        -keep interface com.zilpaymobile.** { *; }
