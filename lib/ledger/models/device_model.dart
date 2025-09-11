@@ -1,5 +1,3 @@
-import 'package:collection/collection.dart';
-
 class BleSpec {
   final String serviceUuid;
   final String notifyUuid;
@@ -96,9 +94,13 @@ class Devices {
 
   static DeviceModel? identifyBluetoothServiceUuid(String uuid) {
     final lowerUuid = uuid.toLowerCase();
-    return _devicesList.firstWhereOrNull((d) =>
-        d.bluetoothSpec
-            ?.any((spec) => spec.serviceUuid.toLowerCase() == lowerUuid) ??
-        false);
+    try {
+      return _devicesList.firstWhere((d) =>
+          d.bluetoothSpec
+              ?.any((spec) => spec.serviceUuid.toLowerCase() == lowerUuid) ??
+          false);
+    } catch (_) {
+      return null;
+    }
   }
 }

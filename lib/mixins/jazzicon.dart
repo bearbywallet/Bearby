@@ -66,7 +66,7 @@ class _JazziconState extends State<Jazzicon> {
         child: CustomPaint(
           size: Size(widget.diameter, widget.diameter),
           painter: _painter,
-          isComplex: true, // Указывает Flutter, что отрисовка сложная
+          isComplex: true,
         ),
       ),
     );
@@ -125,14 +125,12 @@ class JazziconPainter extends CustomPainter {
     final shapes = <_ShapeConfig>[];
     final List<Color> remainingColors = List<Color>.from(_colors);
 
-    // Фоновый цвет
     final backgroundColor = _genColor(remainingColors);
     shapes.add(_ShapeConfig(
       color: backgroundColor,
       transform: Matrix4.identity(),
     ));
 
-    // Генерация остальных фигур
     for (var i = 0; i < shapeCount - 1; i++) {
       final shapeConfig = _genShape(i, shapeCount - 1, remainingColors);
       shapes.add(shapeConfig);
@@ -156,10 +154,10 @@ class JazziconPainter extends CustomPainter {
     final rot = (firstRot * 360) + secondRot * 180;
 
     final transform = Matrix4.identity()
-      ..translate(tx, ty)
-      ..translate(center, center)
+      ..translateByDouble(tx, ty, 0.0, 1.0)
+      ..translateByDouble(center, center, 0.0, 1.0)
       ..rotateZ(rot * pi / 180)
-      ..translate(-center, -center);
+      ..translateByDouble(-center, -center, 0.0, 1.0);
 
     return _ShapeConfig(
       color: _genColor(remainingColors),

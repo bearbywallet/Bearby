@@ -66,6 +66,7 @@ class _AddressBookPageState extends State<AddressBookPage> {
                   await state.syncData();
                 } catch (_) {
                 } finally {}
+                if (!dialogContext.mounted) return;
                 Navigator.of(dialogContext).pop();
               },
             ),

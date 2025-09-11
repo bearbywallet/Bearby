@@ -179,7 +179,7 @@ class _NetworkPageState extends State<NetworkPage> {
       await _loadNetworks();
     } catch (e) {
       setState(() {
-        errorMessage = AppLocalizations.of(context)!.networkPageAddError + '$e';
+        errorMessage = '${AppLocalizations.of(context)!.networkPageAddError}$e';
       });
     }
   }

@@ -22,7 +22,7 @@ class EditGasDialog extends StatefulWidget {
   final Color? secondaryColor;
 
   const EditGasDialog({
-    Key? key,
+    super.key,
     required this.txParamsInfo,
     required this.initialGasPrice,
     required this.initialMaxPriorityFee,
@@ -32,7 +32,7 @@ class EditGasDialog extends StatefulWidget {
     this.primaryColor,
     this.textColor,
     this.secondaryColor,
-  }) : super(key: key);
+  });
 
   @override
   State<EditGasDialog> createState() => _EditGasDialogState();

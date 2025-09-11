@@ -28,7 +28,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
   CookieManager? _cookieManager;
   bool _isLoading = false;
   bool _hasError = false;
-  String _errorMessage = '';
+  final String _errorMessage = '';
   String _currentUrl = '';
   double _progress = 0;
 
@@ -681,7 +681,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
                     // print(value);
                   },
                   onReceivedError: (_, __, error) {
-                    print("browser error: $error");
+                    debugPrint("browser error: $error");
                   },
                   shouldOverrideUrlLoading:
                       (controller, navigationAction) async {

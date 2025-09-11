@@ -17,10 +17,10 @@ class NetworkDownButton extends StatefulWidget {
   });
 
   @override
-  _NetworkDownButtonState createState() => _NetworkDownButtonState();
+  NetworkDownButtonState createState() => NetworkDownButtonState();
 }
 
-class _NetworkDownButtonState extends State<NetworkDownButton>
+class NetworkDownButtonState extends State<NetworkDownButton>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;

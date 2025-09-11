@@ -204,6 +204,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
       }
 
       if (_useDeviceAuth) {
+        if (!mounted) return;
         final authenticated = await _authService.authenticate(
           allowPinCode: true,
           reason: AppLocalizations.of(context)!.passwordSetupPageAuthReason,
@@ -529,7 +530,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
     final methods = await _authService.getAvailableAuthMethods();
     setState(() {
       _authMethods = methods;
-      if (_authMethods.length == 0 || _authMethods.first == AuthMethod.none) {
+      if (_authMethods.isEmpty || _authMethods.first == AuthMethod.none) {
         _useDeviceAuth = false;
       }
     });

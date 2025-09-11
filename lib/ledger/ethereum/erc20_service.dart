@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:zilpay/ledger/ethereum/resolution_types.dart';
 
@@ -23,10 +24,10 @@ class ERC20Service {
         }
       }
 
-      print('Error: could not fetch from $url: ${response.statusCode}');
+      debugPrint('Error: could not fetch from $url: ${response.statusCode}');
       return null;
     } catch (e) {
-      print('Error: could not fetch from $url: $e');
+      debugPrint('Error: could not fetch from $url: $e');
       return null;
     }
   }
@@ -42,7 +43,7 @@ class ERC20Service {
       return _parseSignatureBlob(erc20SignaturesBlob)
           .byContractAndChainId(_asContractAddress(contract), chainId);
     } catch (e) {
-      print('Error parsing ERC20 signatures blob: $e');
+      debugPrint('Error parsing ERC20 signatures blob: $e');
       return null;
     }
   }
@@ -74,7 +75,7 @@ class ERC20Service {
       i += 4;
 
       if (i + length > buf.length) {
-        print(
+        debugPrint(
             'Warning: Invalid length at position $i, expected $length bytes but only ${buf.length - i} available');
         break;
       }
@@ -123,7 +124,7 @@ class ERC20Service {
       i += length;
     }
 
-    print('Parsed ${entries.length} ERC20 token entries');
+    debugPrint('Parsed ${entries.length} ERC20 token entries');
     return _SignatureAPI(map, entries);
   }
 
@@ -151,11 +152,11 @@ class _SignatureAPI {
     final key = '$chainId:$contractAddress';
     final result = _map[key];
     if (result != null) {
-      print(
+      debugPrint(
           'Found token info for $contractAddress on chain $chainId: ${result.ticker}');
     } else {
-      print('No token info found for $contractAddress on chain $chainId');
-      print('Available keys: ${_map.keys.take(5).join(", ")}...');
+      debugPrint('No token info found for $contractAddress on chain $chainId');
+      debugPrint('Available keys: ${_map.keys.take(5).join(", ")}...');
     }
     return result;
   }

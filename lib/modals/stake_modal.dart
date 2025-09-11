@@ -590,6 +590,9 @@ class _StakeModalContentState extends State<StakeModalContent> {
               //
             }
           }
+
+          if (!mounted) return;
+
           Navigator.of(context).pop();
           Navigator.of(context).pushNamed('/', arguments: {
             'selectedIndex': 1,
@@ -631,7 +634,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
     final List<String> parts = [];
     if (days > 0) {
-      parts.add('${days}${l10n.durationDay}');
+      parts.add('$days${l10n.durationDay}');
     }
     if (hours > 0) {
       parts.add('$hours${l10n.durationHour}');

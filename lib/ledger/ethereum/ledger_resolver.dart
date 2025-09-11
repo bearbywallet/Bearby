@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:typed_data';
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:zilpay/ledger/ethereum/resolution_types.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -83,21 +84,22 @@ class LedgerTransactionResolver {
     if (shouldResolve.nft) {
       final nftInfo = await _getNFTInfo(contractAddress, chainId, loadConfig);
       if (nftInfo != null) {
-        print(
+        debugPrint(
             'Loaded NFT info for ${nftInfo.contractAddress} (${nftInfo.collectionName})');
         return resolution.copyWith(nfts: [nftInfo.data]);
       }
     }
 
     if (shouldResolve.token) {
-      print('[RESOLVER_DEBUG] Loading ERC20 signatures for chain $chainId...');
+      debugPrint(
+          '[RESOLVER_DEBUG] Loading ERC20 signatures for chain $chainId...');
       final erc20SignaturesBlob = await ERC20Service.findERC20SignaturesInfo(
         loadConfig,
         chainId,
       );
 
       if (erc20SignaturesBlob != null) {
-        print(
+        debugPrint(
             '[RESOLVER_DEBUG] ERC20 signatures blob loaded, length: ${erc20SignaturesBlob.length}');
 
         final erc20Info = ERC20Service.byContractAddressAndChainId(
@@ -107,24 +109,25 @@ class LedgerTransactionResolver {
         );
 
         if (erc20Info != null) {
-          print(
+          debugPrint(
               '[RESOLVER_DEBUG] Loaded ERC20 token info for ${erc20Info.contractAddress} (${erc20Info.ticker})');
-          print('[RESOLVER_DEBUG] Token decimals: ${erc20Info.decimals}');
-          print(
+          debugPrint('[RESOLVER_DEBUG] Token decimals: ${erc20Info.decimals}');
+          debugPrint(
               '[RESOLVER_DEBUG] Token data length: ${erc20Info.data.length} bytes');
 
           final hexData = erc20Info.data
               .map((b) => b.toRadixString(16).padLeft(2, '0'))
               .join();
-          print('[RESOLVER_DEBUG] Hex data: ${hexData.substring(0, 40)}...');
+          debugPrint(
+              '[RESOLVER_DEBUG] Hex data: ${hexData.substring(0, 40)}...');
 
           return resolution.copyWith(erc20Tokens: [hexData]);
         } else {
-          print(
+          debugPrint(
               '[RESOLVER_DEBUG] No ERC20 info found for contract $contractAddress on chain $chainId');
         }
       } else {
-        print('[RESOLVER_DEBUG] Failed to load ERC20 signatures blob');
+        debugPrint('[RESOLVER_DEBUG] Failed to load ERC20 signatures blob');
       }
     }
 
@@ -165,7 +168,7 @@ class LedgerTransactionResolver {
       if (contractMethodInfos != null) {
         final plugin = contractMethodInfos.plugin;
         if (plugin.isNotEmpty) {
-          print('Found plugin ($plugin) for selector: $selector');
+          debugPrint('Found plugin ($plugin) for selector: $selector');
           resolution = resolution.copyWith(
             externalPlugin: [
               ExternalPlugin(
@@ -217,11 +220,11 @@ class LedgerTransactionResolver {
         );
       }
 
-      print(
+      debugPrint(
           'Error: could not fetch NFT info from $url: ${response.statusCode}');
       return null;
     } catch (e) {
-      print('Error: could not fetch NFT info from $url: $e');
+      debugPrint('Error: could not fetch NFT info from $url: $e');
       return null;
     }
   }
@@ -248,7 +251,7 @@ class LedgerTransactionResolver {
 
       return null;
     } catch (e) {
-      print('Error: could not fetch NFT plugin from $url: $e');
+      debugPrint('Error: could not fetch NFT plugin from $url: $e');
       return null;
     }
   }
@@ -300,7 +303,7 @@ class LedgerTransactionResolver {
 
       return null;
     } catch (e) {
-      print('Error: could not fetch contract method info from $url: $e');
+      debugPrint('Error: could not fetch contract method info from $url: $e');
       return null;
     }
   }

@@ -31,11 +31,11 @@ class _LanguagePageState extends State<LanguagePage> {
   @override
   void initState() {
     super.initState();
-    final _appState = Provider.of<AppState>(context, listen: false);
+    final appState = Provider.of<AppState>(context, listen: false);
 
-    if (_appState.state.locale != null) {
+    if (appState.state.locale != null) {
       setState(() {
-        selectedLanguage = _appState.state.locale!;
+        selectedLanguage = appState.state.locale!;
       });
     }
   }

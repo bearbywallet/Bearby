@@ -9,7 +9,7 @@ BigInt toDecimalsWei(String amount, int decimals) {
 
     return BigInt.parse(value);
   } catch (e) {
-    debugPrint("fail to parse number ${amount}");
+    debugPrint("fail to parse number $amount");
 
     return BigInt.zero;
   }

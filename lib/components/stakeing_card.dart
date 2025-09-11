@@ -1105,6 +1105,8 @@ class StakingPoolCard extends StatelessWidget {
         );
       }
 
+      if (!context.mounted) return;
+
       if (isScilla) {
         tx = await buildTxScillaInitUnstake(
           walletIndex: walletIndex,
@@ -1122,6 +1124,8 @@ class StakingPoolCard extends StatelessWidget {
       } else {
         throw "invalid tx type";
       }
+
+      if (!context.mounted) return;
 
       showConfirmTransactionModal(
         context: context,
@@ -1190,6 +1194,8 @@ class StakingPoolCard extends StatelessWidget {
         throw "Invalid stake type for claiming withdrawal";
       }
 
+      if (!context.mounted) return;
+
       showConfirmTransactionModal(
         context: context,
         tx: tx,
@@ -1245,6 +1251,8 @@ class StakingPoolCard extends StatelessWidget {
         throw "Invlid stake type";
       }
 
+      if (!context.mounted) return;
+
       showConfirmTransactionModal(
         context: context,
         tx: tx,
@@ -1291,6 +1299,8 @@ class StakingPoolCard extends StatelessWidget {
       } else {
         throw "Invalid stake type for claiming claimable amount";
       }
+
+      if (!context.mounted) return;
 
       showConfirmTransactionModal(
         context: context,

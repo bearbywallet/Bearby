@@ -1,3 +1,5 @@
+// ignore_for_file: constant_identifier_names
+
 import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
@@ -532,14 +534,14 @@ class KeystoreFileCard extends StatelessWidget {
   final VoidCallback onPressed;
 
   const KeystoreFileCard({
-    Key? key,
+    super.key,
     required this.file,
     required this.isSelected,
     required this.formattedDate,
     required this.theme,
     required this.onPressed,
     this.disabled = false,
-  }) : super(key: key);
+  });
 
   String _formatFileSize() {
     final sizeInKB = (file.fileSize / 1024).toStringAsFixed(1);
@@ -662,13 +664,13 @@ class PressableCard extends StatefulWidget {
   final bool disabled;
 
   const PressableCard({
-    Key? key,
+    super.key,
     required this.child,
     required this.onPressed,
     required this.backgroundColor,
     required this.borderColor,
     this.disabled = false,
-  }) : super(key: key);
+  });
 
   @override
   State<PressableCard> createState() => _PressableCardState();

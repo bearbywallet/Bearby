@@ -1557,6 +1557,7 @@ class Web3EIP1193Handler {
         );
         _removeActiveRequest(method);
       } else {
+        if (!context.mounted) return;
         showSwitchChainNetworkModal(
           context: context,
           selectedChainId: chainId,

@@ -47,7 +47,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _createWallet = true;
   bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
-  List<LedgerDevice> _ledgers = [];
+  final List<LedgerDevice> _ledgers = [];
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
@@ -693,7 +693,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
               isEnabled: _selectedAccounts[account] ?? false,
               onToggle: (value) => _toggleAccount(account, value),
             );
-          }).toList(),
+          }),
         ],
       ),
     );

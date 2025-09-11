@@ -15,7 +15,7 @@ class NetworkCard extends StatefulWidget {
   final Function(NetworkConfigInfo) onNetworkAdd;
 
   const NetworkCard({
-    Key? key,
+    super.key,
     required this.configInfo,
     required this.isAdded,
     required this.isDefault,
@@ -26,7 +26,7 @@ class NetworkCard extends StatefulWidget {
     required this.onNetworkSelect,
     required this.onNetworkEdit,
     required this.onNetworkAdd,
-  }) : super(key: key);
+  });
 
   @override
   State<NetworkCard> createState() => _NetworkCardState();
