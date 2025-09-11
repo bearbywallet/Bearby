@@ -1,16 +1,10 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
-import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -81,249 +75,27 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   late final AuthService _authService = AuthService();
   late final AuthGuard _authGuard;
   bool _isLoading = false;
-  bool _isScanning = false;
   bool _obscurePassword = true;
   String? _error;
-  List<LedgerDevice> _ledgerDevices = [];
-  LedgerDevice? _selectedDevice;
-  StreamSubscription<LedgerDevice>? _scanSubscription;
   Timer? _scanTimeout;
-  int _scanRetries = 0;
-  static const _maxRetries = 2;
 
   @override
   void initState() {
     super.initState();
     _authGuard = context.read<AuthGuard>();
-    _checkLedgerDevices();
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
-    _scanSubscription?.cancel();
     _scanTimeout?.cancel();
     super.dispose();
-  }
-
-  Future<void> _checkLedgerDevices() async {
-    final appState = context.read<AppState>();
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
-
-    if (!isLedgerWallet) return;
-
-    final deviceId =
-        appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-    final ledgerBle = LedgerInterface.ble(
-      onPermissionRequest: (status) async =>
-          status == AvailabilityState.poweredOn,
-    );
-    final ledgerUsb = LedgerInterface.usb();
-
-    try {
-      final bleDevices = await ledgerBle.devices;
-      final usbDevices =
-          Platform.isAndroid ? await ledgerUsb.devices : <LedgerDevice>[];
-      final allDevices = [...bleDevices, ...usbDevices];
-
-      setState(() {
-        _ledgerDevices = allDevices;
-        if (deviceId != null && allDevices.isNotEmpty) {
-          _selectedDevice = allDevices.firstWhere(
-            (device) => device.id.contains(deviceId),
-          );
-        } else {
-          _selectedDevice = null;
-        }
-      });
-
-      if (_ledgerDevices.isEmpty) {
-        _startLedgerScan();
-      } else if (_selectedDevice != null) {
-        _verifyDeviceConnection();
-      }
-    } catch (e) {
-      setState(() {
-        _error = AppLocalizations.of(context)!
-            .signMessageModalContentFailedToScanLedger(e.toString());
-      });
-      _startLedgerScan();
-    }
-  }
-
-  Future<void> _verifyDeviceConnection() async {
-    if (_selectedDevice == null) return;
-    try {
-      final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (status) async =>
-            status == AvailabilityState.poweredOn,
-      );
-      await ledgerInterface.connect(_selectedDevice!);
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-      });
-      _startLedgerScan();
-    }
-  }
-
-  void _startLedgerScan() {
-    if (_scanRetries >= _maxRetries) {
-      setState(() {
-        _isScanning = false;
-        _error = AppLocalizations.of(context)!
-            .signMessageModalContentFailedToScanLedger('Max retries reached');
-      });
-      return;
-    }
-
-    setState(() {
-      _isScanning = true;
-      _scanRetries++;
-    });
-
-    final ledgerBle = LedgerInterface.ble(
-      onPermissionRequest: (status) async {
-        if (status != AvailabilityState.poweredOn) {
-          setState(() => _error = AppLocalizations.of(context)!
-              .signMessageModalContentBluetoothOff);
-          return false;
-        }
-        return true;
-      },
-    );
-
-    _scanSubscription = ledgerBle.scan().listen(
-      (device) {
-        if (mounted) {
-          setState(() {
-            if (!_ledgerDevices.any((d) => d.id == device.id)) {
-              _ledgerDevices.add(device);
-            }
-            final appState = context.read<AppState>();
-            final deviceId =
-                appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-            if (deviceId != null &&
-                device.id.contains(deviceId) &&
-                _selectedDevice == null) {
-              _selectedDevice = device;
-              _stopLedgerScan();
-              _verifyDeviceConnection();
-            }
-          });
-        }
-      },
-      onError: (e) {
-        if (mounted) {
-          setState(() {
-            _isScanning = false;
-            _error = AppLocalizations.of(context)!
-                .signMessageModalContentFailedToScanLedger(e.toString());
-          });
-          Future.delayed(const Duration(seconds: 2), () {
-            if (mounted && _ledgerDevices.isEmpty) {
-              _startLedgerScan();
-            }
-          });
-        }
-      },
-    );
-
-    _scanTimeout = Timer(const Duration(seconds: 15), () {
-      _stopLedgerScan();
-      if (mounted && _ledgerDevices.isEmpty) {
-        setState(() => _error = AppLocalizations.of(context)!
-            .signMessageModalContentNoLedgerDevices);
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            _startLedgerScan();
-          }
-        });
-      }
-    });
-  }
-
-  void _stopLedgerScan() {
-    _scanSubscription?.cancel();
-    _scanTimeout?.cancel();
-    setState(() => _isScanning = false);
   }
 
   Future<bool> _authenticate() async => _authService.authenticate(
         allowPinCode: true,
         reason: AppLocalizations.of(context)!.signMessageModalContentAuthReason,
       );
-
-  Future<void> _signMessageLedger(AppState appState) async {
-    try {
-      if (appState.wallet == null || appState.account == null) {
-        setState(() => _error = AppLocalizations.of(context)!
-            .signMessageModalContentWalletNotSelected);
-        return;
-      }
-      if (_selectedDevice == null) {
-        setState(() => _error = AppLocalizations.of(context)!
-            .signMessageModalContentLedgerNotSelected);
-        return;
-      }
-
-      final accountIndex = appState.wallet!.selectedAccount.toInt();
-      final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (status) async =>
-            status == AvailabilityState.poweredOn,
-      );
-      final connection = await ledgerInterface.connect(_selectedDevice!);
-
-      if (widget.typedData != null) {
-        final ethLedgerApp = EthereumLedgerApp(connection);
-        final typedDataJson = jsonEncode(widget.typedData!.toJson());
-        final eip712Hashes =
-            await prepareEip712Message(typedDataJson: typedDataJson);
-        final signature = await ethLedgerApp.signEIP712HashedMessage(
-          eip712Hashes,
-          appState.account!.index.toInt(),
-        );
-        final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-
-        widget.onMessageSigned(pubkey, signature.toHexString());
-      } else if (widget.message != null) {
-        final chain = appState.getChain(appState.wallet!.defaultChainHash);
-        Uint8List bytes = utf8.encode(widget.message!);
-        String? sig;
-
-        if (chain?.slip44 == 60) {
-          final ethLedgerApp = EthereumLedgerApp(connection);
-          final signature = await ethLedgerApp.signPersonalMessage(
-            bytes,
-            appState.account!.index.toInt(),
-          );
-          sig = signature.toHexString();
-        } else if (chain?.slip44 == 313) {
-          final zilLedgerApp = ZilliqaLedgerApp(connection);
-          final hashBytes = await prepareMessage(
-            walletIndex: BigInt.from(appState.selectedWallet),
-            accountIndex: BigInt.from(accountIndex),
-            message: widget.message!,
-          );
-          sig = await zilLedgerApp.signHash(
-            hashBytes,
-            appState.account!.index.toInt(),
-          );
-        } else {
-          throw "unsupported network";
-        }
-
-        final pubkey = appState.wallet!.accounts[accountIndex].pubKey;
-
-        widget.onMessageSigned(pubkey, sig);
-      }
-    } catch (e) {
-      setState(() => _error = AppLocalizations.of(context)!
-          .signMessageModalContentFailedToSignMessage(e.toString()));
-    }
-  }
 
   Future<void> _signMessageNative(AppState appState) async {
     try {
@@ -381,7 +153,6 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
     if (isLedgerWallet) {
-      await _signMessageLedger(appState);
     } else {
       await _signMessageNative(appState);
     }
@@ -445,55 +216,6 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                       borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  if (isLedgerWallet)
-                    Column(
-                      children: [
-                        if (_isScanning)
-                          Padding(
-                            padding: const EdgeInsets.all(16),
-                            child: Column(
-                              children: [
-                                LinearProgressIndicator(
-                                  backgroundColor:
-                                      secondaryColor.withValues(alpha: 0.3),
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      primaryColor),
-                                ),
-                                const SizedBox(height: 8),
-                                Text(
-                                  l10n.signMessageModalContentScanning,
-                                  style: TextStyle(color: secondaryColor),
-                                ),
-                              ],
-                            ),
-                          ),
-                        if (_ledgerDevices.isNotEmpty)
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 16),
-                            child: Column(
-                              children: _ledgerDevices
-                                  .map((device) => Padding(
-                                        padding:
-                                            const EdgeInsets.only(bottom: 8),
-                                        child: LedgerCard(
-                                          device: device,
-                                          isConnected:
-                                              device.id == _selectedDevice?.id,
-                                          isConnecting: false,
-                                          onTap: () {
-                                            if (!_isLoading) {
-                                              setState(() =>
-                                                  _selectedDevice = device);
-                                              _verifyDeviceConnection();
-                                            }
-                                          },
-                                        ),
-                                      ))
-                                  .toList(),
-                            ),
-                          ),
-                      ],
-                    ),
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Column(
@@ -766,9 +488,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                       text: _isLoading
                           ? l10n.signMessageModalContentProcessing
                           : l10n.signMessageModalContentSign,
-                      disabled: _isLoading ||
-                          (isLedgerWallet &&
-                              (_isScanning || _selectedDevice == null)),
+                      disabled: _isLoading,
                       backgroundColor: primaryColor,
                       textColor: theme.buttonText,
                       onSwipeComplete: () async => _handleSignMessage(appState),

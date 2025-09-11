@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -27,7 +27,7 @@ class SetupNetworkSettingsPage extends StatefulWidget {
 class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
-  LedgerDevice? _ledger;
+  DiscoveredDevice? _ledger;
   String? _errorMessage;
   String? _shortName;
   bool _bypassChecksumValidation = false;
@@ -61,7 +61,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final bip39 = args?['bip39'] as List<String>?;
     final keys = args?['keys'] as KeyPairInfo?;
     final shortName = args?['shortName'] as String?;
-    final ledger = args?['ledger'] as LedgerDevice?;
+    final ledger = args?['ledger'] as DiscoveredDevice?;
     final bypassChecksumValidation = args?['ignore_checksum'] as bool?;
 
     if (bip39 == null && keys == null && ledger == null) {

@@ -27,8 +27,8 @@ class DiscoveredDevice {
 
   factory DiscoveredDevice.fromHidDevice(DeviceInfo hidDevice) {
     return DiscoveredDevice(
-      id: hidDevice.rawData['path'],
-      name: hidDevice.deviceName,
+      id: hidDevice.devicePath,
+      name: hidDevice.name,
       connectionType: ConnectionType.usb,
       rawDevice: hidDevice,
     );

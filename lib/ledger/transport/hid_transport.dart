@@ -12,8 +12,13 @@ class DeviceInfo {
       : deviceModel = Devices.identifyUSBProductId(rawData['productId'] as int);
 
   int get vendorId => rawData['vendorId'] as int;
+  int get deviceId => rawData['deviceId'] as int;
   int get productId => rawData['productId'] as int;
-  String get deviceName => rawData['deviceName'] as String;
+  String get name => rawData['name'] as String;
+  String get devicePath => rawData['deviceName'] as String;
+  String get deviceModelId => rawData['deviceModel']['id'] as String;
+  String get deviceModelProducName =>
+      rawData['deviceModel']['productName'] as String;
 }
 
 class DescriptorEvent {

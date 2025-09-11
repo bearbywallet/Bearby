@@ -3,20 +3,16 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/ledger/common.dart';
-import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
-import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
-import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -47,13 +43,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _createWallet = true;
   bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
-  final List<LedgerDevice> _ledgers = [];
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
-  LedgerDevice? _selectedDevice;
   bool _isScanning = false;
-  StreamSubscription<LedgerDevice>? _scanSubscription;
   Timer? _scanTimeout;
   int _scanRetries = 0;
   static const _maxRetries = 2;
@@ -65,9 +58,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     super.initState();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _walletNameController.text = "";
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _checkLedgerDevices();
-    });
   }
 
   @override
@@ -83,7 +73,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     }
 
     final network = args['chain'] as NetworkConfigInfo?;
-    final ledger = args['ledger'] as LedgerDevice?;
+    final ledger = args['ledger'] as DiscoveredDevice?;
     final createWallet = args['createWallet'] as bool?;
 
     if (network == null) {
@@ -92,41 +82,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       });
       return;
     }
-
-    setState(() {
-      _network = network;
-      if (ledger != null) {
-        if (!_ledgers.any((d) => d.id == ledger.id)) {
-          _ledgers.add(ledger);
-        }
-        _selectedDevice = ledger;
-        _stopLedgerScan();
-      }
-      _createWallet = createWallet ?? true;
-      _walletNameController.text = _ledgers.isNotEmpty
-          ? "${_ledgers.first.name} (${network.name})"
-          : "Ledger (${network.name})";
-
-      final appState = context.read<AppState>();
-      final isLedgerWallet = appState.selectedWallet != -1 &&
-          appState.wallets.isNotEmpty &&
-          appState.wallets[appState.selectedWallet].walletType
-              .contains(WalletType.ledger.name);
-
-      if (isLedgerWallet && !_createWallet) {
-        final existingAccounts = appState.wallet?.accounts ?? [];
-        _accounts = existingAccounts
-            .map((account) => LedgerAccount(
-                  index: account.index.toInt(),
-                  address: account.addr,
-                  publicKey: account.pubKey,
-                ))
-            .toList()
-          ..sort((a, b) => a.index.compareTo(b.index));
-        _selectedAccounts = {for (var account in _accounts) account: true};
-        _accountsLoaded = true;
-      }
-    });
   }
 
   @override
@@ -134,30 +89,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.dispose();
     _btnController.dispose();
     _createBtnController.dispose();
-    _scanSubscription?.cancel();
     _scanTimeout?.cancel();
     super.dispose();
-  }
-
-  Future<void> _checkLedgerDevices() async {
-    final appState = context.read<AppState>();
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets.isNotEmpty &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
-
-    if (_selectedDevice != null) {
-      return;
-    }
-
-    if (!_createWallet || isLedgerWallet) {
-      _startLedgerScan();
-    } else if (_ledgers.isNotEmpty) {
-      setState(() {
-        _selectedDevice = _ledgers.first;
-        _stopLedgerScan();
-      });
-    }
   }
 
   Future<void> _startLedgerScan() async {
@@ -174,178 +107,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       _isScanning = true;
       _scanRetries++;
     });
-
-    final ledgerBle = LedgerInterface.ble(
-      onPermissionRequest: (status) async {
-        if (status != AvailabilityState.poweredOn) {
-          setState(() => _errorMessage = AppLocalizations.of(context)!
-              .addLedgerAccountPageBluetoothOffError);
-          return false;
-        }
-        return true;
-      },
-    );
-
-    _scanSubscription = ledgerBle.scan().listen(
-      (device) {
-        if (mounted) {
-          setState(() {
-            if (!_ledgers.any((d) => d.id == device.id)) {
-              _ledgers.add(device);
-            }
-            final appState = context.read<AppState>();
-            final deviceId =
-                appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-            if (deviceId != null &&
-                device.id.contains(deviceId) &&
-                _selectedDevice == null) {
-              _selectedDevice = device;
-              _stopLedgerScan();
-            }
-          });
-        }
-      },
-      onError: (e) {
-        if (mounted) {
-          setState(() {
-            _isScanning = false;
-            _errorMessage = AppLocalizations.of(context)!
-                .addLedgerAccountPageFailedToScanError(e.toString());
-          });
-          Future.delayed(const Duration(seconds: 2), () {
-            if (mounted && _ledgers.isEmpty && _selectedDevice == null) {
-              _startLedgerScan();
-            }
-          });
-        }
-      },
-    );
-
-    _scanTimeout = Timer(const Duration(seconds: 15), () {
-      _stopLedgerScan();
-      if (mounted && _ledgers.isEmpty && _selectedDevice == null) {
-        setState(() => _errorMessage =
-            AppLocalizations.of(context)!.addLedgerAccountPageNoDevicesMessage);
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted && _selectedDevice == null) {
-            _startLedgerScan();
-          }
-        });
-      }
-    });
   }
 
   void _stopLedgerScan() {
-    _scanSubscription?.cancel();
-    _scanTimeout?.cancel();
     setState(() => _isScanning = false);
-  }
-
-  Future<void> _onGetAccounts() async {
-    final l10n = AppLocalizations.of(context)!;
-
-    if (_walletNameController.text.trim().isEmpty && _createWallet) {
-      setState(
-          () => _errorMessage = l10n.addLedgerAccountPageEmptyWalletNameError);
-      _btnController.reset();
-      return;
-    }
-
-    if (_walletNameController.text.length > 100 && _createWallet) {
-      setState(() =>
-          _errorMessage = l10n.addLedgerAccountPageWalletNameTooLongError);
-      _btnController.reset();
-      return;
-    }
-
-    setState(() {
-      _loading = true;
-      _errorMessage = '';
-    });
-    _btnController.start();
-
-    try {
-      if (_network == null || _selectedDevice == null) {
-        throw Exception(l10n.addLedgerAccountPageNetworkOrLedgerMissingError);
-      }
-
-      final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (_) async => true,
-      );
-
-      final connection = await ledgerInterface.connect(_selectedDevice!);
-      List<LedgerAccount> newAccounts = [];
-
-      if (!_zilliqaLegacy) {
-        final ethereumApp = EthereumLedgerApp(connection, transformer: null);
-        newAccounts = await ethereumApp
-            .getAccounts(List<int>.generate(_accountCount, (i) => i));
-      } else if (_zilliqaLegacy) {
-        final zilliqaApp = ZilliqaLedgerApp(connection, transformer: null);
-        newAccounts = await zilliqaApp
-            .getPublicAddress(List<int>.generate(_accountCount, (i) => i));
-      }
-
-      setState(() {
-        final uniqueAccountsMap = <String, LedgerAccount>{};
-
-        for (final acc in _accounts) {
-          uniqueAccountsMap[acc.address] = acc;
-        }
-
-        for (final acc in newAccounts) {
-          uniqueAccountsMap[acc.address] = acc;
-        }
-
-        final uniqueAccountsList = uniqueAccountsMap.values.toList();
-        uniqueAccountsList.sort((a, b) => a.index.compareTo(b.index));
-
-        _accounts = uniqueAccountsList;
-
-        final updatedSelectedAccounts = <LedgerAccount, bool>{};
-        for (var account in _accounts) {
-          final oldAccount = _selectedAccounts.keys.firstWhere(
-            (k) => k.address == account.address,
-            orElse: () => account,
-          );
-          updatedSelectedAccounts[account] =
-              _selectedAccounts[oldAccount] ?? true;
-        }
-        _selectedAccounts = updatedSelectedAccounts;
-        _accountsLoaded = true;
-      });
-
-      _btnController.success();
-      Future.delayed(const Duration(seconds: 1),
-          () => mounted ? _btnController.reset() : null);
-    } on LedgerException catch (e) {
-      _handleLedgerError(e);
-    } catch (e) {
-      debugPrint("$e");
-      setState(() => _errorMessage = e.toString());
-      _btnController.error();
-      Future.delayed(const Duration(seconds: 2),
-          () => mounted ? _btnController.reset() : null);
-    } finally {
-      if (mounted && _loading) {
-        setState(() => _loading = false);
-      }
-    }
-  }
-
-  void _handleLedgerError(LedgerException e) {
-    String displayError = e.toString();
-    if (e is ConnectionLostException) {
-      displayError = "Connection to Ledger lost. Please reconnect.";
-    } else if (e is DeviceNotConnectedException) {
-      displayError = "Ledger device is not connected.";
-    } else if (e is LedgerDeviceException) {
-      displayError = "Ledger Error ${e.errorCode}: ${e.message}";
-    }
-    setState(() => _errorMessage = displayError);
-    _btnController.error();
-    Future.delayed(const Duration(seconds: 2),
-        () => mounted ? _btnController.reset() : null);
   }
 
   void _toggleAccount(LedgerAccount account, bool value) {
@@ -425,7 +190,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
             walletName: _walletNameController.text,
-            ledgerId: _selectedDevice!.id,
+            ledgerId: "",
             accountNames: accountNames,
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
@@ -500,32 +265,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         }
       });
     }
-  }
-
-  Widget _buildDeviceInfoCard(AppTheme theme, AppLocalizations l10n) {
-    if (_selectedDevice == null) return const SizedBox();
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.primaryPurple.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          LedgerCard(
-            device: _selectedDevice!,
-            isConnected: true,
-            isConnecting: false,
-            onTap: () {},
-          ),
-          _buildNetworkInfoRow(theme, l10n),
-        ],
-      ),
-    );
   }
 
   Widget _buildNetworkInfoRow(AppTheme theme, AppLocalizations l10n) {
@@ -642,7 +381,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 color: theme.primaryPurple,
                 valueColor: theme.buttonText,
                 controller: _btnController,
-                onPressed: _onGetAccounts,
+                onPressed: () {},
                 child: Text(
                   l10n.addLedgerAccountPageGetAccountsButton,
                   style: TextStyle(
@@ -730,80 +469,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildDeviceList(AppTheme theme, AppLocalizations l10n) {
-    if (_isScanning) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                LinearProgressIndicator(
-                  backgroundColor: theme.textSecondary.withValues(alpha: 0.3),
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(theme.primaryPurple),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  l10n.addLedgerAccountPageScanningMessage,
-                  style: TextStyle(color: theme.textSecondary),
-                ),
-              ],
-            ),
-          ),
-        ],
-      );
-    } else if (_ledgers.isEmpty) {
-      return Column(
-        mainAxisAlignment: MainAxisAlignment.start,
-        children: [
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Text(
-              l10n.addLedgerAccountPageNoDevicesMessage,
-              style: TextStyle(color: theme.textSecondary),
-            ),
-          ),
-        ],
-      );
-    }
-    return RefreshIndicator(
-      onRefresh: () async {
-        _stopLedgerScan();
-        setState(() {
-          _scanRetries = 0;
-          _ledgers.clear();
-          _selectedDevice = null;
-        });
-        await _startLedgerScan();
-      },
-      color: theme.primaryPurple,
-      backgroundColor: theme.cardBackground,
-      child: ListView.builder(
-        physics: const AlwaysScrollableScrollPhysics(),
-        itemCount: _ledgers.length,
-        itemBuilder: (context, index) {
-          final device = _ledgers[index];
-          return Padding(
-            padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-            child: LedgerCard(
-              device: device,
-              isConnected: device.id == _selectedDevice?.id,
-              isConnecting: false,
-              onTap: () {
-                setState(() {
-                  _selectedDevice = device;
-                  _stopLedgerScan();
-                });
-              },
-            ),
-          );
-        },
       ),
     );
   }
@@ -896,65 +561,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                           ],
                         ),
                       )
-                    else if (_selectedDevice == null &&
-                        (!_createWallet ||
-                            (Provider.of<AppState>(context).selectedWallet !=
-                                    -1 &&
-                                Provider.of<AppState>(context)
-                                    .wallets
-                                    .isNotEmpty &&
-                                Provider.of<AppState>(context)
-                                    .wallets[Provider.of<AppState>(context)
-                                        .selectedWallet]
-                                    .walletType
-                                    .contains(WalletType.ledger.name))))
-                      Expanded(
-                        child: _buildDeviceList(theme, l10n),
-                      )
-                    else
-                      Expanded(
-                        child: RefreshIndicator(
-                          onRefresh: () async {
-                            _stopLedgerScan();
-                            setState(() {
-                              _scanRetries = 0;
-                              _ledgers.clear();
-                              _selectedDevice = null;
-                            });
-                            await _startLedgerScan();
-                          },
-                          color: theme.primaryPurple,
-                          backgroundColor: theme.cardBackground,
-                          child: SingleChildScrollView(
-                            physics: const AlwaysScrollableScrollPhysics(),
-                            child: Padding(
-                              padding: EdgeInsets.all(adaptivePadding),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  _buildDeviceInfoCard(theme, l10n),
-                                  if (_errorMessage.isNotEmpty) ...[
-                                    const SizedBox(height: 16),
-                                    _buildErrorMessage(theme),
-                                  ],
-                                  const SizedBox(height: 16),
-                                  _buildWalletInfoCard(theme, l10n),
-                                  if (_network?.slip44 == 313) ...[
-                                    const SizedBox(height: 16),
-                                    _buildLegacySwitch(theme, l10n),
-                                  ],
-                                  if (_accountsLoaded &&
-                                      _accounts.isNotEmpty) ...[
-                                    const SizedBox(height: 16),
-                                    _buildAccountsCard(theme),
-                                  ],
-                                  const SizedBox(height: 80),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      ),
                   ],
                 ),
                 if (_accountsLoaded && _accounts.isNotEmpty && !_isScanning)

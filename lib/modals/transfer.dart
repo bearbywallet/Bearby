@@ -1,20 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dart';
 import 'package:flutter_svg/svg.dart';
-import 'package:ledger_flutter_plus/ledger_flutter_plus.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/gas_eip1559.dart';
 import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
-import 'package:zilpay/ledger/ethereum/ethereum_ledger_application.dart';
-import 'package:zilpay/ledger/ethereum/resolution_types.dart';
-import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_application.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
@@ -118,12 +111,7 @@ class _ConfirmTransactionContentState
   BigInt _totalFee = BigInt.zero;
   bool _obscurePassword = true;
   Timer? _timerPooling;
-  List<LedgerDevice> _ledgerDevices = [];
-  LedgerDevice? _selectedDevice;
-  StreamSubscription<LedgerDevice>? _scanSubscription;
   Timer? _scanTimeout;
-  int _scanRetries = 0;
-  static const _maxRetries = 2;
 
   bool get isEVM => widget.tx.evm != null;
   bool get isScilla => widget.tx.scilla != null;
@@ -133,14 +121,12 @@ class _ConfirmTransactionContentState
     super.initState();
     _authGuard = context.read<AuthGuard>();
     _initGasPolling();
-    _checkLedgerDevices();
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
     _timerPooling?.cancel();
-    _scanSubscription?.cancel();
     _scanTimeout?.cancel();
     super.dispose();
   }
@@ -187,141 +173,6 @@ class _ConfirmTransactionContentState
         setState(() => _error = e.toString());
       }
     }
-  }
-
-  Future<void> _checkLedgerDevices() async {
-    final appState = context.read<AppState>();
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType.contains("ledger");
-
-    if (!isLedgerWallet) return;
-
-    final deviceId =
-        appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-    final ledgerBle = LedgerInterface.ble(
-      onPermissionRequest: (status) async =>
-          status == AvailabilityState.poweredOn,
-    );
-    final ledgerUsb = LedgerInterface.usb();
-
-    try {
-      final bleDevices = await ledgerBle.devices;
-      final usbDevices =
-          Platform.isAndroid ? await ledgerUsb.devices : <LedgerDevice>[];
-      final allDevices = [...bleDevices, ...usbDevices];
-
-      setState(() {
-        _ledgerDevices = allDevices;
-        if (deviceId != null && allDevices.isNotEmpty) {
-          _selectedDevice = allDevices.firstWhere(
-            (device) => device.id.contains(deviceId),
-          );
-        } else {
-          _selectedDevice = null;
-        }
-      });
-
-      if (_ledgerDevices.isEmpty) {
-        _startLedgerScan();
-      } else if (_selectedDevice != null) {
-        _verifyDeviceConnection();
-      }
-    } catch (e) {
-      setState(() {
-        _error = "Failed to scan Ledger devices: $e";
-      });
-      _startLedgerScan();
-    }
-  }
-
-  Future<void> _verifyDeviceConnection() async {
-    if (_selectedDevice == null) return;
-    try {
-      final ledgerInterface = LedgerInterface.ble(
-        onPermissionRequest: (status) async =>
-            status == AvailabilityState.poweredOn,
-      );
-      await ledgerInterface.connect(_selectedDevice!);
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-      });
-      _startLedgerScan();
-    }
-  }
-
-  void _startLedgerScan() {
-    if (_scanRetries >= _maxRetries) {
-      setState(() {
-        _error = "Max retries reached for scanning Ledger devices";
-      });
-      return;
-    }
-
-    setState(() {
-      _scanRetries++;
-    });
-
-    final ledgerBle = LedgerInterface.ble(
-      onPermissionRequest: (status) async {
-        if (status != AvailabilityState.poweredOn) {
-          setState(() => _error = "Bluetooth is turned off");
-          return false;
-        }
-        return true;
-      },
-    );
-
-    _scanSubscription = ledgerBle.scan().listen(
-      (device) {
-        if (mounted) {
-          setState(() {
-            if (!_ledgerDevices.any((d) => d.id == device.id)) {
-              _ledgerDevices.add(device);
-            }
-            final appState = context.read<AppState>();
-            final deviceId =
-                appState.wallet?.walletType.split('.').last.replaceAll('"', '');
-            if (deviceId != null &&
-                device.id.contains(deviceId) &&
-                _selectedDevice == null) {
-              _selectedDevice = device;
-              _stopLedgerScan();
-              _verifyDeviceConnection();
-            }
-          });
-        }
-      },
-      onError: (e) {
-        if (mounted) {
-          setState(() {
-            _error = "Failed to scan Ledger devices: $e";
-          });
-          Future.delayed(const Duration(seconds: 2), () {
-            if (mounted && _ledgerDevices.isEmpty) {
-              _startLedgerScan();
-            }
-          });
-        }
-      },
-    );
-
-    _scanTimeout = Timer(const Duration(seconds: 15), () {
-      _stopLedgerScan();
-      if (mounted && _ledgerDevices.isEmpty) {
-        setState(() => _error = "No Ledger devices found");
-        Future.delayed(const Duration(seconds: 2), () {
-          if (mounted) {
-            _startLedgerScan();
-          }
-        });
-      }
-    });
-  }
-
-  void _stopLedgerScan() {
-    _scanSubscription?.cancel();
-    _scanTimeout?.cancel();
   }
 
   TransactionRequestInfo _prepareTx(BigInt adjustedAmount) {
@@ -398,55 +249,6 @@ class _ConfirmTransactionContentState
     }
   }
 
-  Future<HistoricalTransactionInfo> _signAndSendLedger(
-    AppState appState,
-    TransactionRequestInfo tx,
-  ) async {
-    if (appState.wallet == null || _selectedDevice == null) {
-      throw "Wallet or device not selected";
-    }
-
-    final accountIndex = appState.wallet!.selectedAccount.toInt();
-    final ledgerInterface = LedgerInterface.ble(
-      onPermissionRequest: (status) async =>
-          status == AvailabilityState.poweredOn,
-    );
-    final connection = await ledgerInterface.connect(_selectedDevice!);
-    Uint8List sig;
-
-    if (tx.evm != null) {
-      final ethLedgerApp = EthereumLedgerApp(connection);
-      final signature = await ethLedgerApp.clearSignTransaction(
-        tx,
-        appState.selectedWallet,
-        accountIndex,
-        resolutionConfig: ResolutionConfig(
-          erc20: true,
-          externalPlugins: true,
-          nft: true,
-          uniswapV3: true,
-        ),
-      );
-      sig = signature.toBytes();
-    } else if (tx.scilla != null) {
-      final zilLedgerApp = ZilliqaLedgerApp(connection);
-      sig = await zilLedgerApp.signTransaction(
-        tx,
-        appState.selectedWallet,
-        accountIndex,
-      );
-    } else {
-      throw "unsupported network";
-    }
-
-    return await sendSignedTransactions(
-      tx: tx,
-      sig: sig,
-      walletIndex: appState.selectedWallet,
-      accountIndex: accountIndex,
-    );
-  }
-
   Color? _parseColor(String? colorString) {
     if (colorString == null) return null;
     try {
@@ -502,56 +304,6 @@ class _ConfirmTransactionContentState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    if (isLedgerWallet)
-                      Column(
-                        children: [
-                          if (_scanSubscription != null)
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                children: [
-                                  LinearProgressIndicator(
-                                    backgroundColor:
-                                        secondaryColor.withValues(alpha: 0.3),
-                                    valueColor: AlwaysStoppedAnimation<Color>(
-                                        primaryColor),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    l10n.signMessageModalContentScanning,
-                                    style: TextStyle(color: secondaryColor),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          if (_ledgerDevices.isNotEmpty)
-                            Padding(
-                              padding:
-                                  const EdgeInsets.symmetric(horizontal: 16),
-                              child: Column(
-                                children: _ledgerDevices
-                                    .map((device) => Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 8),
-                                          child: LedgerCard(
-                                            device: device,
-                                            isConnected: device.id ==
-                                                _selectedDevice?.id,
-                                            isConnecting: false,
-                                            onTap: () {
-                                              if (!_loading) {
-                                                setState(() =>
-                                                    _selectedDevice = device);
-                                                _verifyDeviceConnection();
-                                              }
-                                            },
-                                          ),
-                                        ))
-                                    .toList(),
-                              ),
-                            ),
-                        ],
-                      ),
                     if (_error != null)
                       Container(
                         margin: const EdgeInsets.symmetric(
@@ -722,8 +474,7 @@ class _ConfirmTransactionContentState
                         text: _error != null
                             ? l10n.confirmTransactionContentUnableToConfirm
                             : l10n.confirmTransactionContentConfirm,
-                        disabled: _isDisabled ||
-                            (isLedgerWallet && _selectedDevice == null),
+                        disabled: _isDisabled || isLedgerWallet,
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
@@ -757,7 +508,7 @@ class _ConfirmTransactionContentState
                             HistoricalTransactionInfo? sendedTx;
 
                             if (isLedgerWallet) {
-                              sendedTx = await _signAndSendLedger(appState, tx);
+                              // sendedTx = await _signAndSendLedger(appState, tx);
                             } else {
                               sendedTx = await _signAndSend(appState, tx);
                             }

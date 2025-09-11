@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:io' show Platform;
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
@@ -23,6 +24,7 @@ class LedgerConnectPage extends StatefulWidget {
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
   final Set<DiscoveredDevice> _discoveredDevices = {};
   final List<StreamSubscription> _scanSubscriptions = [];
+  Timer? _hidPollingTimer;
   bool _isScanning = false;
   bool _isConnecting = false;
   String? _statusText;
@@ -48,6 +50,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   Future<void> _startScanning() async {
     if (_isScanning || _isConnecting) return;
     final localizations = AppLocalizations.of(context)!;
+
+    if (_connectedTransport != null) {
+      await _disconnectDevice();
+    }
 
     if (Platform.isAndroid || Platform.isIOS) {
       final permissionsGranted = await _requestPermissions();
@@ -81,26 +87,45 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     _scanSubscriptions.add(bleSub);
 
     if (Platform.isAndroid) {
-      final hidSub = HidTransport.listen().listen(
-        (event) {
-          if (!mounted) return;
-          setState(() {
-            _discoveredDevices
-                .add(DiscoveredDevice.fromHidDevice(event.descriptor));
-            _updateStatusText();
-          });
-        },
-        onError: (e) => _handleScanError(e, "USB"),
-      );
-      _scanSubscriptions.add(hidSub);
+      _startHidPolling();
     }
   }
 
+  void _startHidPolling() {
+    _hidPollingTimer?.cancel();
+    _hidPollingTimer = Timer.periodic(const Duration(seconds: 3), (_) async {
+      if (!_isScanning || !mounted) {
+        _hidPollingTimer?.cancel();
+        return;
+      }
+      try {
+        final hidDevices = await HidTransport.list();
+        final discoveredHid =
+            hidDevices.map(DiscoveredDevice.fromHidDevice).toSet();
+
+        setState(() {
+          _discoveredDevices.addAll(discoveredHid);
+          _updateStatusText();
+        });
+      } on PlatformException catch (e) {
+        _handleScanError(e, "USB Polling ${e.code}");
+      } catch (e) {
+        _handleScanError(e, "USB Polling");
+      } finally {
+        _hidPollingTimer?.cancel();
+      }
+    });
+  }
+
   void _stopScan() {
+    _hidPollingTimer?.cancel();
+    _hidPollingTimer = null;
+
     for (var sub in _scanSubscriptions) {
       sub.cancel();
     }
     _scanSubscriptions.clear();
+
     if (mounted && _isScanning) {
       setState(() {
         _isScanning = false;
@@ -110,16 +135,19 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   void _updateStatusText() {
+    if (!mounted) return;
     final localizations = AppLocalizations.of(context)!;
-    if (_isScanning) {
-      _statusText = localizations
-          .ledgerConnectPageFoundDevicesStatus(_discoveredDevices.length);
-    } else {
-      _statusText = _discoveredDevices.isEmpty
-          ? localizations.ledgerConnectPageScanFinishedNoDevices
-          : localizations.ledgerConnectPageScanFinishedWithDevices(
-              _discoveredDevices.length);
-    }
+    setState(() {
+      if (_isScanning) {
+        _statusText = localizations
+            .ledgerConnectPageFoundDevicesStatus(_discoveredDevices.length);
+      } else {
+        _statusText = _discoveredDevices.isEmpty
+            ? localizations.ledgerConnectPageScanFinishedNoDevices
+            : localizations.ledgerConnectPageScanFinishedWithDevices(
+                _discoveredDevices.length);
+      }
+    });
   }
 
   void _handleScanError(dynamic error, String type) {
@@ -191,12 +219,38 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         setState(() {
           _isConnecting = false;
           _connectingDevice = null;
+          if (_connectedTransport == null) {
+            _updateStatusText();
+          }
+        });
+      }
+    }
+  }
+
+  Future<void> _disconnectDevice() async {
+    if (_connectedTransport == null) return;
+    final localizations = AppLocalizations.of(context)!;
+    final deviceName =
+        _connectedTransport!.deviceModel?.productName ?? 'Ledger';
+
+    try {
+      await _connectedTransport!.close();
+    } catch (e) {
+      debugPrint("Error disconnecting: $e");
+    } finally {
+      if (mounted) {
+        setState(() {
+          _connectedTransport = null;
+          _statusText =
+              localizations.ledgerConnectPageDisconnectedStatus(deviceName);
         });
       }
     }
   }
 
   Future<bool> _requestPermissions() async {
+    if (Platform.isIOS) return true;
+
     final statuses = await [
       Permission.bluetoothScan,
       Permission.bluetoothConnect,
@@ -347,9 +401,10 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                                   _discoveredDevices.elementAt(index);
                               final isCurrentlyConnecting = _isConnecting &&
                                   _connectingDevice?.id == device.id;
+
                               final isCurrentlyConnected = isConnected &&
                                   _connectedTransport?.deviceModel?.id ==
-                                      device.rawDevice.deviceModel.id;
+                                      device.id;
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
@@ -366,6 +421,37 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                           ),
                   ),
                 ),
+                if (isConnected)
+                  Padding(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: ElevatedButton.icon(
+                      icon: SvgPicture.asset(
+                        'assets/icons/disconnect.svg',
+                        width: 20,
+                        height: 20,
+                        colorFilter: ColorFilter.mode(
+                          theme.buttonText,
+                          BlendMode.srcIn,
+                        ),
+                      ),
+                      label: Text(
+                        localizations.ledgerConnectPageDisconnectButton(
+                          _connectedTransport?.deviceModel?.productName ??
+                              'Ledger',
+                        ),
+                        style: TextStyle(color: theme.buttonText),
+                      ),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.danger,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 24, vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30.0),
+                        ),
+                      ),
+                      onPressed: _disconnectDevice,
+                    ),
+                  ),
               ],
             ),
           ),
