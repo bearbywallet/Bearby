@@ -28,7 +28,6 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   screen_protector: ^1.4.2+1
   file_picker: ^10.1.2
-  ledger_flutter_plus: ^1.5.4
   shared_preferences: ^2.5.3
   http: ^1.5.0
 
