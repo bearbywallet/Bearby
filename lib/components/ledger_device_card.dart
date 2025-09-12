@@ -31,7 +31,7 @@ class _LedgerCardState extends State<LedgerCard>
   void initState() {
     super.initState();
     _shimmerController = AnimationController.unbounded(vsync: this)
-      ..repeat(min: -0.5, max: 1.5, period: const Duration(milliseconds: 1000));
+      ..repeat(min: -1.0, max: 2.0, period: const Duration(milliseconds: 1200));
   }
 
   @override
@@ -41,7 +41,7 @@ class _LedgerCardState extends State<LedgerCard>
   }
 
   void _setPressed(bool pressed) {
-    if (widget.isConnecting) return;
+    if (widget.isConnecting || widget.isConnected) return;
     setState(() {
       _isPressed = pressed;
     });
@@ -52,6 +52,13 @@ class _LedgerCardState extends State<LedgerCard>
     final theme = Provider.of<AppState>(context).currentTheme;
     final scale = !_isPressed ? 1.0 : 0.97;
     final bool isDisabled = widget.isConnecting;
+
+    final cardColor = widget.isConnected
+        ? theme.success.withOpacity(0.15)
+        : theme.cardBackground;
+    final borderColor = widget.isConnected
+        ? theme.success.withOpacity(0.7)
+        : theme.cardBackground.withValues(alpha: 0.5);
 
     return GestureDetector(
       onTapDown: (_) => _setPressed(true),
@@ -72,16 +79,9 @@ class _LedgerCardState extends State<LedgerCard>
           clipBehavior: Clip.antiAlias,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16.0),
-            color: theme.cardBackground,
-            border: Border.all(
-              color: widget.isConnected
-                  ? theme.success.withValues(alpha: 0.7)
-                  : theme.cardBackground.withValues(alpha: 0.5),
-              width: 1.5,
-            ),
             boxShadow: [
               BoxShadow(
-                color: theme.cardBackground.withValues(alpha: 0.05),
+                color: Colors.black.withOpacity(0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -89,18 +89,28 @@ class _LedgerCardState extends State<LedgerCard>
           ),
           child: Stack(
             children: [
-              Padding(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                child: Row(
-                  children: [
-                    _buildDeviceIcon(theme),
-                    const SizedBox(width: 16),
-                    Expanded(child: _buildDeviceInfo(theme)),
-                    _buildStatusIndicator(theme),
-                  ],
+              // Base Card Content
+              AnimatedContainer(
+                duration: const Duration(milliseconds: 300),
+                decoration: BoxDecoration(
+                  color: cardColor,
+                  border: Border.all(color: borderColor, width: 1.5),
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                  child: Row(
+                    children: [
+                      _buildDeviceIcon(theme),
+                      const SizedBox(width: 16),
+                      Expanded(child: _buildDeviceInfo(theme)),
+                      _buildStatusIndicator(theme),
+                    ],
+                  ),
                 ),
               ),
+              // Shimmer Overlay for Connecting State
               if (widget.isConnecting)
                 Positioned.fill(
                   child: ClipRRect(
@@ -113,14 +123,13 @@ class _LedgerCardState extends State<LedgerCard>
                           shaderCallback: (bounds) {
                             return LinearGradient(
                               colors: [
-                                theme.primaryPurple.withValues(alpha: 0.0),
-                                theme.primaryPurple.withValues(alpha: 0.1),
-                                theme.primaryPurple.withValues(alpha: 0.0),
+                                theme.primaryPurple.withOpacity(0.0),
+                                theme.primaryPurple.withOpacity(0.1),
+                                theme.primaryPurple.withOpacity(0.2),
+                                theme.primaryPurple.withOpacity(0.1),
+                                theme.primaryPurple.withOpacity(0.0),
                               ],
-                              stops: const [0.4, 0.5, 0.6],
-                              begin: Alignment(-1.0, -0.3),
-                              end: Alignment(1.0, 0.3),
-                              tileMode: TileMode.clamp,
+                              stops: const [0.0, 0.4, 0.5, 0.6, 1.0],
                               transform: _ShimmerGradientTransform(
                                   percent: _shimmerController.value),
                             ).createShader(bounds);
@@ -130,7 +139,7 @@ class _LedgerCardState extends State<LedgerCard>
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.white.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(15.0),
                         ),
                       ),
@@ -150,8 +159,13 @@ class _LedgerCardState extends State<LedgerCard>
       height: 48,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        color: theme.background,
-        border: Border.all(color: theme.primaryPurple.withOpacity(0.2)),
+        color: widget.isConnected
+            ? theme.success.withOpacity(0.2)
+            : theme.background,
+        border: Border.all(
+            color: widget.isConnected
+                ? theme.success.withOpacity(0.3)
+                : theme.primaryPurple.withOpacity(0.2)),
       ),
       child: Center(
         child: SvgPicture.asset(
@@ -160,7 +174,9 @@ class _LedgerCardState extends State<LedgerCard>
               : 'assets/icons/usb.svg',
           width: 22,
           height: 22,
-          colorFilter: ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
+          colorFilter: ColorFilter.mode(
+              widget.isConnected ? theme.success : theme.primaryPurple,
+              BlendMode.srcIn),
         ),
       ),
     );
@@ -177,18 +193,22 @@ class _LedgerCardState extends State<LedgerCard>
           style: TextStyle(
             color: theme.textPrimary,
             fontWeight: FontWeight.w600,
-            fontSize: 16,
+            fontSize: 17,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 4),
-        Text(
-          widget.device.connectionType.name.toUpperCase(),
-          style: TextStyle(
-            color: theme.textSecondary.withOpacity(0.8),
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
+        const SizedBox(height: 6),
+        Chip(
+          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
+          backgroundColor: theme.background.withOpacity(0.5),
+          label: Text(
+            widget.device.connectionType.name.toUpperCase(),
+            style: TextStyle(
+              color: theme.textSecondary.withOpacity(0.8),
+              fontSize: 11,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
       ],
@@ -196,6 +216,36 @@ class _LedgerCardState extends State<LedgerCard>
   }
 
   Widget _buildStatusIndicator(dynamic theme) {
+    Widget icon;
+
+    if (widget.isConnecting) {
+      icon = SizedBox(
+        key: const ValueKey('connecting'),
+        width: 22,
+        height: 22,
+        child: CircularProgressIndicator(
+          strokeWidth: 2.5,
+          valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
+        ),
+      );
+    } else if (widget.isConnected) {
+      icon = SvgPicture.asset(
+        'assets/icons/check.svg',
+        key: const ValueKey('connected'),
+        width: 28,
+        height: 28,
+        colorFilter: ColorFilter.mode(theme.success, BlendMode.srcIn),
+      );
+    } else {
+      icon = SvgPicture.asset(
+        'assets/icons/chevron_right.svg',
+        key: const ValueKey('idle'),
+        width: 28,
+        height: 28,
+        colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+      );
+    }
+
     return SizedBox(
       width: 28,
       height: 28,
@@ -203,34 +253,13 @@ class _LedgerCardState extends State<LedgerCard>
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeIn,
         switchOutCurve: Curves.easeOut,
-        child: widget.isConnecting
-            ? SizedBox(
-                key: const ValueKey('connecting'),
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor:
-                      AlwaysStoppedAnimation<Color>(theme.primaryPurple),
-                ),
-              )
-            : widget.isConnected
-                ? SvgPicture.asset(
-                    'assets/icons/check.svg',
-                    key: const ValueKey('connected'),
-                    width: 28,
-                    height: 28,
-                    colorFilter:
-                        ColorFilter.mode(theme.success, BlendMode.srcIn),
-                  )
-                : SvgPicture.asset(
-                    'assets/icons/chevron_right.svg',
-                    key: const ValueKey('idle'),
-                    width: 28,
-                    height: 28,
-                    colorFilter:
-                        ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
-                  ),
+        transitionBuilder: (child, animation) {
+          return FadeTransition(
+            opacity: animation,
+            child: ScaleTransition(scale: animation, child: child),
+          );
+        },
+        child: icon,
       ),
     );
   }
@@ -243,6 +272,7 @@ class _ShimmerGradientTransform extends GradientTransform {
 
   @override
   Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
+    // Moves the gradient across the card horizontally
     return Matrix4.translationValues(bounds.width * percent, 0.0, 0.0);
   }
 }

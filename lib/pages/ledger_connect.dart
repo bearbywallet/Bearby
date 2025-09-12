@@ -97,7 +97,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     if (transport != null && mounted) {
       Navigator.of(context).pushNamed(
         '/net_setup',
-        arguments: {'transport': transport, 'device': device},
+        arguments: {'ledger': device},
       );
     }
   }
