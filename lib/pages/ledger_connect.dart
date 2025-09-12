@@ -73,23 +73,22 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       _statusText = localizations.ledgerConnectPageScanningStatus;
     });
 
+    if (Platform.isAndroid) {
+      _startHidPolling();
+    }
+
     final bleSub = BleTransport.listen().listen(
       (event) {
         if (!mounted) return;
         setState(() {
           _discoveredDevices
               .add(DiscoveredDevice.fromBleDevice(event.descriptor.rawDevice));
-          debugPrint("$_discoveredDevices");
           _updateStatusText();
         });
       },
       onError: (e) => _handleScanError(e, "BLE"),
     );
     _scanSubscriptions.add(bleSub);
-
-    if (Platform.isAndroid) {
-      _startHidPolling();
-    }
   }
 
   void _startHidPolling() {
@@ -110,8 +109,6 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         _handleScanError(e, "USB Polling ${e.code}");
       } catch (e) {
         _handleScanError(e, "USB Polling");
-      } finally {
-        _hidPollingTimer?.cancel();
       }
     });
   }

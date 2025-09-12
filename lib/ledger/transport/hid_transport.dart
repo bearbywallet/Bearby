@@ -45,7 +45,8 @@ class HidTransport extends Transport {
     final List<dynamic> devices = await _channel.invokeMethod('getDeviceList');
 
     return devices
-        .map((d) => DiscoveredDevice.fromHidDevice(d))
+        .map(
+            (d) => DiscoveredDevice.fromHidDevice(Map<String, dynamic>.from(d)))
         .where((d) => d.vendorId == _ledgerUSBVendorId)
         .toList();
   }
