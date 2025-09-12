@@ -78,7 +78,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         if (!mounted) return;
         setState(() {
           _discoveredDevices
-              .add(DiscoveredDevice.fromBleDevice(event.descriptor));
+              .add(DiscoveredDevice.fromBleDevice(event.descriptor.rawDevice));
           _updateStatusText();
         });
       },
@@ -99,9 +99,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         return;
       }
       try {
-        final hidDevices = await HidTransport.list();
-        final discoveredHid =
-            hidDevices.map(DiscoveredDevice.fromHidDevice).toSet();
+        final discoveredHid = await HidTransport.list();
 
         setState(() {
           _discoveredDevices.addAll(discoveredHid);
@@ -173,7 +171,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       _isConnecting = true;
       _connectingDevice = device;
       _statusText = localizations.ledgerConnectPageConnectingStatus(
-        device.name,
+        device.deviceModelProducName ??
+            device.name ??
+            device.deviceId.toString(),
         device.connectionType.name.toUpperCase(),
       );
     });
@@ -181,9 +181,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     try {
       Transport transport;
       if (device.connectionType == ConnectionType.ble) {
-        transport = await BleTransport.open(device.rawDevice as BleDeviceInfo);
+        transport = await BleTransport.open(device);
       } else {
-        transport = await HidTransport.open(device.rawDevice as DeviceInfo);
+        transport = await HidTransport.open(device);
       }
 
       if (!mounted) {
@@ -194,8 +194,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       _connectedTransport = transport;
 
       setState(() {
-        _statusText =
-            localizations.ledgerConnectPageConnectionSuccessStatus(device.name);
+        _statusText = localizations.ledgerConnectPageConnectionSuccessStatus(
+            device.deviceModelProducName ?? device.name ?? "");
       });
 
       Navigator.of(context).pushNamed(
@@ -206,7 +206,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
       _showErrorDialog(
         localizations.ledgerConnectPageConnectionFailedTitle,
         localizations.ledgerConnectPageConnectionFailedGenericContent(
-            device.name, e.toString()),
+            device.deviceModelProducName ?? device.name ?? "", e.toString()),
       );
       if (mounted) {
         setState(() {
@@ -400,17 +400,18 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                               final device =
                                   _discoveredDevices.elementAt(index);
                               final isCurrentlyConnecting = _isConnecting &&
-                                  _connectingDevice?.id == device.id;
+                                  _connectingDevice?.productId ==
+                                      device.productId;
 
                               final isCurrentlyConnected = isConnected &&
                                   _connectedTransport?.deviceModel?.id ==
-                                      device.id;
+                                      device.model?.id;
 
                               return Padding(
                                 padding: const EdgeInsets.symmetric(
                                     vertical: 6, horizontal: 4),
                                 child: LedgerCard(
-                                  key: ValueKey(device.id),
+                                  key: ValueKey(device.productId),
                                   device: device,
                                   isConnecting: isCurrentlyConnecting,
                                   isConnected: isCurrentlyConnected,

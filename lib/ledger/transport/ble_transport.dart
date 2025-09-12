@@ -1,25 +1,14 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 
-class BleDeviceInfo {
-  final Map<String, dynamic> rawData;
-  final DeviceModel? deviceModel;
-  final String id;
-  final String name;
-
-  BleDeviceInfo(this.rawData)
-      : id = rawData['id'] as String,
-        name = rawData['name'] as String,
-        deviceModel = Devices.identifyBluetoothServiceUuid(
-            rawData['serviceUUID'] as String);
-}
-
 class BleDescriptorEvent {
   final String type;
-  final BleDeviceInfo descriptor;
+  final DiscoveredDevice descriptor;
 
   BleDescriptorEvent(this.type, this.descriptor);
 }
@@ -47,15 +36,15 @@ class BleTransport extends Transport {
     return _eventChannel.receiveBroadcastStream().map((event) {
       final eventMap = Map<String, dynamic>.from(event);
       final descriptorMap = Map<String, dynamic>.from(eventMap['descriptor']);
-      final deviceInfo = BleDeviceInfo(descriptorMap);
+      final deviceInfo = DiscoveredDevice.fromBleDevice(descriptorMap);
       return BleDescriptorEvent(eventMap['type'] as String, deviceInfo);
     });
   }
 
-  static Future<BleTransport> open(BleDeviceInfo deviceInfo) async {
+  static Future<BleTransport> open(DiscoveredDevice deviceInfo) async {
     try {
       await _channel.invokeMethod('openDevice', deviceInfo.id);
-      return BleTransport._(deviceInfo.id, deviceInfo.deviceModel);
+      return BleTransport._(deviceInfo.id!, deviceInfo.model);
     } on PlatformException catch (e) {
       throw DisconnectedDeviceException(e.toString());
     }

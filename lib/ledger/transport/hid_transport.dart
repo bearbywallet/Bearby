@@ -1,29 +1,14 @@
 import 'dart:async';
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 
-class DeviceInfo {
-  final Map<String, dynamic> rawData;
-  final DeviceModel? deviceModel;
-
-  DeviceInfo(this.rawData)
-      : deviceModel = Devices.identifyUSBProductId(rawData['productId'] as int);
-
-  int get vendorId => rawData['vendorId'] as int;
-  int get deviceId => rawData['deviceId'] as int;
-  int get productId => rawData['productId'] as int;
-  String get name => rawData['name'] as String;
-  String get devicePath => rawData['deviceName'] as String;
-  String get deviceModelId => rawData['deviceModel']['id'] as String;
-  String get deviceModelProducName =>
-      rawData['deviceModel']['productName'] as String;
-}
-
 class DescriptorEvent {
   final String type;
-  final DeviceInfo descriptor;
+  final DiscoveredDevice descriptor;
 
   DescriptorEvent(this.type, this.descriptor);
 }
@@ -56,10 +41,11 @@ class HidTransport extends Transport {
 
   static Future<bool> isSupported() async => true;
 
-  static Future<List<DeviceInfo>> list() async {
+  static Future<List<DiscoveredDevice>> list() async {
     final List<dynamic> devices = await _channel.invokeMethod('getDeviceList');
+
     return devices
-        .map((d) => DeviceInfo(Map<String, dynamic>.from(d)))
+        .map((d) => DiscoveredDevice.fromHidDevice(d))
         .where((d) => d.vendorId == _ledgerUSBVendorId)
         .toList();
   }
@@ -76,18 +62,18 @@ class HidTransport extends Transport {
     _eventChannel.receiveBroadcastStream().listen((event) {
       final eventMap = Map<String, dynamic>.from(event);
       final descriptorMap = Map<String, dynamic>.from(eventMap['descriptor']);
-      final deviceInfo = DeviceInfo(descriptorMap);
+      final deviceInfo = DiscoveredDevice.fromHidDevice(descriptorMap);
       controller.add(DescriptorEvent(eventMap['type'] as String, deviceInfo));
     });
 
     return controller.stream;
   }
 
-  static Future<HidTransport> open(DeviceInfo deviceInfo) async {
+  static Future<HidTransport> open(DiscoveredDevice deviceInfo) async {
     try {
       final Map<dynamic, dynamic> nativeObj =
-          await _channel.invokeMethod('openDevice', deviceInfo.rawData);
-      return HidTransport._(nativeObj['id'] as String, deviceInfo.productId);
+          await _channel.invokeMethod('openDevice', deviceInfo.rawDevice);
+      return HidTransport._(nativeObj['id'] as String, deviceInfo.productId!);
     } on PlatformException catch (e) {
       if (_disconnectedErrors.contains(e.code) ||
           (_disconnectedErrors
