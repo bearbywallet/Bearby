@@ -54,10 +54,10 @@ class _LedgerCardState extends State<LedgerCard>
     final bool isDisabled = widget.isConnecting;
 
     final cardColor = widget.isConnected
-        ? theme.success.withOpacity(0.15)
+        ? theme.success.withValues(alpha: 0.15)
         : theme.cardBackground;
     final borderColor = widget.isConnected
-        ? theme.success.withOpacity(0.7)
+        ? theme.success.withValues(alpha: 0.7)
         : theme.cardBackground.withValues(alpha: 0.5);
 
     return GestureDetector(
@@ -81,7 +81,7 @@ class _LedgerCardState extends State<LedgerCard>
             borderRadius: BorderRadius.circular(16.0),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withOpacity(0.05),
+                color: Colors.black.withValues(alpha: 0.05),
                 blurRadius: 10,
                 offset: const Offset(0, 4),
               ),
@@ -123,11 +123,11 @@ class _LedgerCardState extends State<LedgerCard>
                           shaderCallback: (bounds) {
                             return LinearGradient(
                               colors: [
-                                theme.primaryPurple.withOpacity(0.0),
-                                theme.primaryPurple.withOpacity(0.1),
-                                theme.primaryPurple.withOpacity(0.2),
-                                theme.primaryPurple.withOpacity(0.1),
-                                theme.primaryPurple.withOpacity(0.0),
+                                theme.primaryPurple.withValues(alpha: 0.0),
+                                theme.primaryPurple.withValues(alpha: 0.1),
+                                theme.primaryPurple.withValues(alpha: 0.2),
+                                theme.primaryPurple.withValues(alpha: 0.1),
+                                theme.primaryPurple.withValues(alpha: 0.0),
                               ],
                               stops: const [0.0, 0.4, 0.5, 0.6, 1.0],
                               transform: _ShimmerGradientTransform(
@@ -139,7 +139,7 @@ class _LedgerCardState extends State<LedgerCard>
                       },
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.1),
+                          color: Colors.white.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(15.0),
                         ),
                       ),
