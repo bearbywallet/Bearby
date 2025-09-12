@@ -3,16 +3,19 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'ledger_view_controller.dart';
 
 class LedgerConnector extends StatelessWidget {
   final LedgerViewController controller;
+  final Function(DiscoveredDevice device)? onOpen;
 
   const LedgerConnector({
     super.key,
     required this.controller,
+    this.onOpen,
   });
 
   String _getStatusText(BuildContext context, LedgerStatus status) {
@@ -178,15 +181,7 @@ class LedgerConnector extends StatelessWidget {
             device: device,
             isConnecting: isCurrentlyConnecting,
             isConnected: isCurrentlyConnected,
-            onTap: () async {
-              final transport = await controller.open(device);
-              if (transport != null && context.mounted) {
-                Navigator.of(context).pushNamed(
-                  '/net_setup',
-                  arguments: {'transport': transport, 'device': device},
-                );
-              }
-            },
+            onTap: () => onOpen?.call(device),
           ),
         );
       },

@@ -5,6 +5,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -90,6 +91,17 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     );
   }
 
+  Future<void> _onDeviceOpen(DiscoveredDevice device) async {
+    final transport = await _ledgerViewController.open(device);
+
+    if (transport != null && mounted) {
+      Navigator.of(context).pushNamed(
+        '/net_setup',
+        arguments: {'transport': transport, 'device': device},
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
@@ -133,6 +145,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                         backgroundColor: theme.cardBackground,
                         child: LedgerConnector(
                           controller: _ledgerViewController,
+                          onOpen: _onDeviceOpen,
                         ),
                       ),
                     ),

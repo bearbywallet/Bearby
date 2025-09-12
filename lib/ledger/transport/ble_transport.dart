@@ -32,13 +32,32 @@ class BleTransport extends Transport {
   static Future<bool> isSupported() =>
       _channel.invokeMethod<bool>('isSupported').then((v) => v ?? false);
 
-  static Stream<BleDescriptorEvent> listen() {
-    return _eventChannel.receiveBroadcastStream().map((event) {
+  static Stream<DiscoveredDevice> listen() async* {
+    final Set<String> discoveredIds = {};
+
+    try {
+      final List<dynamic> connectedDevices =
+          await _channel.invokeMethod('getConnectedDevices');
+      for (final deviceData in connectedDevices) {
+        final map = Map<String, dynamic>.from(deviceData);
+        final device = DiscoveredDevice.fromBleDevice(map);
+        if (discoveredIds.add(device.id!)) {
+          yield device;
+        }
+      }
+    } on PlatformException catch (e) {
+      debugPrint("Error getting connected devices: ${e.message}");
+    }
+
+    await _channel.invokeMethod('startScan');
+    await for (final event in _eventChannel.receiveBroadcastStream()) {
       final eventMap = Map<String, dynamic>.from(event);
       final descriptorMap = Map<String, dynamic>.from(eventMap['descriptor']);
-      final deviceInfo = DiscoveredDevice.fromBleDevice(descriptorMap);
-      return BleDescriptorEvent(eventMap['type'] as String, deviceInfo);
-    });
+      final device = DiscoveredDevice.fromBleDevice(descriptorMap);
+      if (discoveredIds.add(device.id!)) {
+        yield device;
+      }
+    }
   }
 
   static Future<BleTransport> open(DiscoveredDevice deviceInfo) async {
@@ -46,6 +65,7 @@ class BleTransport extends Transport {
       await _channel.invokeMethod('openDevice', deviceInfo.id);
       return BleTransport._(deviceInfo.id!, deviceInfo.model);
     } on PlatformException catch (e) {
+      debugPrint("DisconnectedDeviceException $e");
       throw DisconnectedDeviceException(e.toString());
     }
   }

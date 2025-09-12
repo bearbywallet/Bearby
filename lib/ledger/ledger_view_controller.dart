@@ -66,8 +66,7 @@ class LedgerViewController extends ChangeNotifier {
 
     final bleSub = BleTransport.listen().listen(
       (event) {
-        _discoveredDevices
-            .add(DiscoveredDevice.fromBleDevice(event.descriptor.rawDevice));
+        _discoveredDevices.add(DiscoveredDevice.fromBleDevice(event.rawDevice));
         _updateStatus(LedgerStatus.foundDevices);
       },
       onError: (e) => _handleScanError(e, "BLE"),

@@ -1,14 +1,20 @@
 package ble
 
+import android.Manifest
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
+import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
+import android.bluetooth.BluetoothProfile
 import android.bluetooth.le.ScanCallback
 import android.bluetooth.le.ScanFilter
 import android.bluetooth.le.ScanResult
 import android.bluetooth.le.ScanSettings
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.ParcelUuid
+import androidx.core.content.ContextCompat
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
@@ -22,38 +28,69 @@ class BleManager(private val context: Context) {
     private val bleScanner by lazy { bluetoothAdapter?.bluetoothLeScanner }
     private val transports = ConcurrentHashMap<String, BleTransport>()
 
+    private fun checkPermissions(): Boolean {
+        val requiredPermissions = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            listOf(Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT)
+        } else {
+            listOf(Manifest.permission.BLUETOOTH, Manifest.permission.ACCESS_FINE_LOCATION)
+        }
+
+        return requiredPermissions.all {
+            ContextCompat.checkSelfPermission(context, it) == PackageManager.PERMISSION_GRANTED
+        }
+    }
+
+    private fun ensurePermissions() {
+        if (!checkPermissions()) {
+            throw PermissionException("Bluetooth permissions are not granted.")
+        }
+    }
+
+    fun getConnectedDevices(): List<BluetoothDevice> {
+        ensurePermissions()
+        val connectedBleDevices = bluetoothManager.getConnectedDevices(BluetoothProfile.GATT)
+
+        return connectedBleDevices
+            .filter { device ->
+                device.name?.contains("Ledger", ignoreCase = true) == true
+            }
+    }
+
     fun isSupported(): Boolean = bluetoothAdapter != null && context.packageManager
         .hasSystemFeature(android.content.pm.PackageManager.FEATURE_BLUETOOTH_LE)
 
-    fun listen(): Flow<ScanResult> = callbackFlow {
-        val scanCallback = object : ScanCallback() {
-            override fun onScanResult(callbackType: Int, result: ScanResult) {
-                super.onScanResult(callbackType, result)
-                trySend(result)
+    fun listen(): Flow<ScanResult> {
+        ensurePermissions()
+        return callbackFlow {
+            val scanCallback = object : ScanCallback() {
+                override fun onScanResult(callbackType: Int, result: ScanResult) {
+                    super.onScanResult(callbackType, result)
+                    trySend(result)
+                }
+
+                override fun onScanFailed(errorCode: Int) {
+                    super.onScanFailed(errorCode)
+                    close(BleScanException("Scan failed with error code $errorCode"))
+                }
             }
 
-            override fun onScanFailed(errorCode: Int) {
-                super.onScanFailed(errorCode)
-                close(BleScanException("Scan failed with error code $errorCode"))
+            val filters = Devices.getBluetoothServiceUuids().map {
+                ScanFilter.Builder().setServiceUuid(ParcelUuid(it)).build()
             }
-        }
+            val settings = ScanSettings.Builder()
+                .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
+                .build()
 
-        val filters = Devices.getBluetoothServiceUuids().map {
-            ScanFilter.Builder().setServiceUuid(ParcelUuid(it)).build()
+            bleScanner?.startScan(filters, settings, scanCallback)
+            awaitClose { bleScanner?.stopScan(scanCallback) }
         }
-        val settings = ScanSettings.Builder()
-            .setScanMode(ScanSettings.SCAN_MODE_LOW_LATENCY)
-            .build()
-
-        bleScanner?.startScan(filters, settings, scanCallback)
-        awaitClose { bleScanner?.stopScan(scanCallback) }
     }
 
     fun stopScan() {
-        // Active scan is stopped by the flow's awaitClose
     }
 
     suspend fun open(deviceId: String) {
+        ensurePermissions()
         if (transports.containsKey(deviceId)) {
             return
         }
@@ -101,3 +138,4 @@ class BleManager(private val context: Context) {
         transports.clear()
     }
 }
+

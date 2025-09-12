@@ -1,6 +1,7 @@
 package ble
 
 import android.annotation.SuppressLint
+import android.bluetooth.BluetoothDevice
 import android.content.Context
 import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
@@ -8,6 +9,7 @@ import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
 import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import kotlinx.coroutines.*
+import kotlinx.coroutines.flow.collect
 
 class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
     private lateinit var channel: MethodChannel
@@ -29,7 +31,6 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
         eventChannel.setStreamHandler(object : EventChannel.StreamHandler {
             override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
                 eventSink = events
-                startScan()
             }
 
             override fun onCancel(arguments: Any?) {
@@ -57,10 +58,28 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
     @SuppressLint("MissingPermission")
     private suspend fun handleMethodCall(call: MethodCall): Any? {
         return when (call.method) {
+            "getConnectedDevices" -> {
+                bleManager.getConnectedDevices().map { device ->
+                    mapOf(
+                        "id" to device.address,
+                        "name" to (device.name ?: "Unknown"),
+                        "serviceUUID" to ""
+                    )
+                }
+            }
+            "startScan" -> {
+                startScan()
+                null
+            }
+            "stopScan" -> {
+                stopScan()
+                null
+            }
             "isSupported" -> bleManager.isSupported()
             "openDevice" -> {
                 val deviceId = call.arguments as? String ?: throw IllegalArgumentException("Device ID must be a String")
                 bleManager.open(deviceId)
+                null
             }
             "exchange" -> {
                 val args = call.arguments as? Map<String, Any> ?: throw IllegalArgumentException("Arguments must be a Map")
@@ -71,6 +90,7 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
             "closeDevice" -> {
                 val deviceId = call.arguments as? String ?: throw IllegalArgumentException("Device ID must be a String")
                 bleManager.close(deviceId)
+                null
             }
             else -> throw NotImplementedError()
         }
@@ -108,7 +128,6 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
     private fun stopScan() {
         scanJob?.cancel()
         scanJob = null
-        bleManager.stopScan()
     }
 
     override fun onDetachedFromEngine(binding: FlutterPlugin.FlutterPluginBinding) {
@@ -118,3 +137,4 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
         bleManager.release()
     }
 }
+
