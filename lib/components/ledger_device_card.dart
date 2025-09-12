@@ -171,7 +171,9 @@ class _LedgerCardState extends State<LedgerCard>
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          widget.device.deviceModelProducName ?? '(Unknown Device)',
+          widget.device.deviceModelProducName ??
+              widget.device.name ??
+              '(Unknown Device)',
           style: TextStyle(
             color: theme.textPrimary,
             fontWeight: FontWeight.w600,

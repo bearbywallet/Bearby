@@ -79,6 +79,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
         setState(() {
           _discoveredDevices
               .add(DiscoveredDevice.fromBleDevice(event.descriptor.rawDevice));
+          debugPrint("$_discoveredDevices");
           _updateStatusText();
         });
       },
