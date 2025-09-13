@@ -497,6 +497,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                                 color: theme.primaryPurple,
                                 backgroundColor: theme.cardBackground,
                                 child: LedgerConnector(
+                                  disabled: _createWallet,
                                   controller: _ledgerViewController,
                                 ),
                               ),
