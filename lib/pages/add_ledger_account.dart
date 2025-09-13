@@ -9,6 +9,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/ledger/common.dart';
+import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -48,7 +49,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   DiscoveredDevice? _selectedDevice;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
-  bool _accountsLoaded = false;
 
   late AuthGuard _authGuard;
 
@@ -117,7 +117,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             .toList()
           ..sort((a, b) => a.index.compareTo(b.index));
         _selectedAccounts = {for (var account in _accounts) account: true};
-        _accountsLoaded = true;
       }
     });
   }
@@ -347,7 +346,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   }
 
   Widget _buildAccountsCard(AppTheme theme) {
-    if (!_accountsLoaded || _accounts.isEmpty) return const SizedBox();
+    if (_accounts.isEmpty) return const SizedBox();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -497,13 +496,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.start,
                           children: [
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: LinearProgressIndicator(
-                                backgroundColor:
-                                    theme.textSecondary.withValues(alpha: 0.3),
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                    theme.primaryPurple),
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: _ledgerViewController.scan,
+                                color: theme.primaryPurple,
+                                backgroundColor: theme.cardBackground,
+                                child: LedgerConnector(
+                                  controller: _ledgerViewController,
+                                ),
                               ),
                             ),
                           ],
@@ -511,9 +511,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       )
                   ],
                 ),
-                if (_accountsLoaded &&
-                    _accounts.isNotEmpty &&
-                    !_ledgerViewController.isScanning)
+                if (_accounts.isNotEmpty && !_ledgerViewController.isScanning)
                   Positioned(
                     bottom: 0,
                     left: 0,
