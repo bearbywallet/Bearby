@@ -10,12 +10,14 @@ import 'ledger_view_controller.dart';
 
 class LedgerConnector extends StatelessWidget {
   final LedgerViewController controller;
+  final bool disabled;
   final Function(DiscoveredDevice device)? onOpen;
 
   const LedgerConnector({
     super.key,
     required this.controller,
     this.onOpen,
+    this.disabled = false,
   });
 
   String _getStatusText(BuildContext context, LedgerStatus status) {
@@ -180,6 +182,7 @@ class LedgerConnector extends StatelessWidget {
           child: LedgerCard(
             key: ValueKey(device.productId),
             device: device,
+            disabled: disabled,
             isConnecting: isCurrentlyConnecting,
             isConnected: isCurrentlyConnected,
             onTap: () => onOpen?.call(device),

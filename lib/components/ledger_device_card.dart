@@ -6,6 +6,7 @@ import 'package:zilpay/state/app_state.dart';
 
 class LedgerCard extends StatefulWidget {
   final DiscoveredDevice device;
+  final bool disabled;
   final bool isConnected;
   final bool isConnecting;
   final VoidCallback onTap;
@@ -13,9 +14,10 @@ class LedgerCard extends StatefulWidget {
   const LedgerCard({
     super.key,
     required this.device,
+    required this.onTap,
     this.isConnected = false,
     this.isConnecting = false,
-    required this.onTap,
+    this.disabled = false,
   });
 
   @override
@@ -51,7 +53,7 @@ class _LedgerCardState extends State<LedgerCard>
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final scale = !_isPressed ? 1.0 : 0.97;
-    final bool isDisabled = widget.isConnecting;
+    final bool isDisabled = widget.isConnecting || widget.disabled;
 
     final cardColor = widget.isConnected
         ? theme.success.withValues(alpha: 0.15)
@@ -110,42 +112,6 @@ class _LedgerCardState extends State<LedgerCard>
                   ),
                 ),
               ),
-              // Shimmer Overlay for Connecting State
-              if (widget.isConnecting)
-                Positioned.fill(
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(15.0),
-                    child: AnimatedBuilder(
-                      animation: _shimmerController,
-                      builder: (context, child) {
-                        return ShaderMask(
-                          blendMode: BlendMode.srcATop,
-                          shaderCallback: (bounds) {
-                            return LinearGradient(
-                              colors: [
-                                theme.primaryPurple.withValues(alpha: 0.0),
-                                theme.primaryPurple.withValues(alpha: 0.1),
-                                theme.primaryPurple.withValues(alpha: 0.2),
-                                theme.primaryPurple.withValues(alpha: 0.1),
-                                theme.primaryPurple.withValues(alpha: 0.0),
-                              ],
-                              stops: const [0.0, 0.4, 0.5, 0.6, 1.0],
-                              transform: _ShimmerGradientTransform(
-                                  percent: _shimmerController.value),
-                            ).createShader(bounds);
-                          },
-                          child: child,
-                        );
-                      },
-                      child: Container(
-                        decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(15.0),
-                        ),
-                      ),
-                    ),
-                  ),
-                ),
             ],
           ),
         ),
@@ -262,17 +228,5 @@ class _LedgerCardState extends State<LedgerCard>
         child: icon,
       ),
     );
-  }
-}
-
-class _ShimmerGradientTransform extends GradientTransform {
-  final double percent;
-
-  const _ShimmerGradientTransform({required this.percent});
-
-  @override
-  Matrix4? transform(Rect bounds, {TextDirection? textDirection}) {
-    // Moves the gradient across the card horizontally
-    return Matrix4.translationValues(bounds.width * percent, 0.0, 0.0);
   }
 }
