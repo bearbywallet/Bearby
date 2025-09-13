@@ -486,50 +486,68 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       onBackPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Expanded(
-                            child: RefreshIndicator(
-                              onRefresh: _ledgerViewController.scan,
-                              color: theme.primaryPurple,
-                              backgroundColor: theme.cardBackground,
-                              child: LedgerConnector(
-                                controller: _ledgerViewController,
+                      child: Padding(
+                        padding: EdgeInsets.all(adaptivePadding),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Expanded(
+                              child: RefreshIndicator(
+                                onRefresh: _ledgerViewController.scan,
+                                color: theme.primaryPurple,
+                                backgroundColor: theme.cardBackground,
+                                child: LedgerConnector(
+                                  controller: _ledgerViewController,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                            if (_errorMessage.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              _buildErrorMessage(theme),
+                            ],
+                            const SizedBox(height: 16),
+                            _buildWalletInfoCard(theme, l10n),
+                            if (_network?.slip44 == 313) ...[
+                              const SizedBox(height: 16),
+                              _buildLegacySwitch(theme, l10n),
+                            ],
+                            if (_accounts.isNotEmpty) ...[
+                              const SizedBox(height: 16),
+                              _buildAccountsCard(theme),
+                            ],
+                            const SizedBox(height: 80),
+                          ],
+                        ),
                       ),
-                    )
+                    ),
                   ],
                 ),
-                if (_accounts.isNotEmpty && !_ledgerViewController.isScanning)
-                  Positioned(
-                    bottom: 0,
-                    left: 0,
-                    right: 0,
-                    child: Container(
-                      padding: EdgeInsets.all(adaptivePadding),
-                      child: RoundedLoadingButton(
-                        controller: _createBtnController,
-                        color: theme.primaryPurple,
-                        valueColor: theme.buttonText,
-                        onPressed: _saveSelectedAccounts,
-                        successIcon: "assets/icons/ok.svg",
-                        child: Text(
-                          _createWallet
-                              ? l10n.addLedgerAccountPageCreateButton
-                              : l10n.addLedgerAccountPageAddButton,
-                          style: TextStyle(
-                            color: theme.buttonText,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                // if (_accounts.isNotEmpty && !_ledgerViewController.isScanning)
+                Positioned(
+                  bottom: 0,
+                  left: 0,
+                  right: 0,
+                  child: Container(
+                    padding: EdgeInsets.all(adaptivePadding),
+                    child: RoundedLoadingButton(
+                      controller: _createBtnController,
+                      color: theme.primaryPurple,
+                      valueColor: theme.buttonText,
+                      onPressed: _saveSelectedAccounts,
+                      successIcon: "assets/icons/ok.svg",
+                      child: Text(
+                        _createWallet
+                            ? l10n.addLedgerAccountPageCreateButton
+                            : l10n.addLedgerAccountPageAddButton,
+                        style: TextStyle(
+                          color: theme.buttonText,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
                   ),
+                ),
               ],
             ),
           ),

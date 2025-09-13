@@ -69,6 +69,7 @@ class LedgerConnector extends StatelessWidget {
         final isConnected = controller.connectedTransport != null;
 
         return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
               padding: EdgeInsets.symmetric(
