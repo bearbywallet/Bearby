@@ -41,7 +41,7 @@ class LedgerViewController extends ChangeNotifier {
   LedgerStatus get status => _status;
   String? get errorDetails => _errorDetails;
 
-  Future<void> scan() async {
+  Future<void> scan({bool clean = true}) async {
     if (_isScanning || _isConnecting) return;
 
     if (_connectedTransport != null) {
@@ -57,7 +57,7 @@ class LedgerViewController extends ChangeNotifier {
     }
 
     _isScanning = true;
-    _discoveredDevices.clear();
+    if (clean) _discoveredDevices.clear();
     _updateStatus(LedgerStatus.scanning);
 
     if (Platform.isAndroid) {
@@ -72,6 +72,10 @@ class LedgerViewController extends ChangeNotifier {
       onError: (e) => _handleScanError(e, "BLE"),
     );
     _scanSubscriptions.add(bleSub);
+  }
+
+  void addDevice(DiscoveredDevice device) {
+    _discoveredDevices.add(device);
   }
 
   void _startHidPolling() {

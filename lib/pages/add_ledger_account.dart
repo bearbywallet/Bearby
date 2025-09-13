@@ -45,8 +45,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _createWallet = true;
   bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
-  List<DiscoveredDevice> _ledgers = [];
-  DiscoveredDevice? _selectedDevice;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
 
@@ -60,7 +58,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.text = "";
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ledgerViewController.scan();
+      _ledgerViewController.scan(clean: false);
     });
   }
 
@@ -90,15 +88,11 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     setState(() {
       _network = network;
       if (ledger != null) {
-        if (!_ledgers.any((d) => d.id == ledger.id)) {
-          _ledgers.add(ledger);
-        }
-        _selectedDevice = ledger;
+        _ledgerViewController.addDevice(ledger);
+        _walletNameController.text =
+            "${ledger.name ?? ledger.deviceModelProducName} (${network.name})";
       }
       _createWallet = createWallet ?? true;
-      _walletNameController.text = _ledgers.isNotEmpty
-          ? "${_ledgers.first.name} (${network.name})"
-          : "Ledger (${network.name})";
 
       final appState = context.read<AppState>();
       final isLedgerWallet = appState.selectedWallet != -1 &&
@@ -491,24 +485,23 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       title: l10n.addLedgerAccountPageAppBarTitle,
                       onBackPressed: () => Navigator.pop(context),
                     ),
-                    if (_network == null)
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: RefreshIndicator(
-                                onRefresh: _ledgerViewController.scan,
-                                color: theme.primaryPurple,
-                                backgroundColor: theme.cardBackground,
-                                child: LedgerConnector(
-                                  controller: _ledgerViewController,
-                                ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: RefreshIndicator(
+                              onRefresh: _ledgerViewController.scan,
+                              color: theme.primaryPurple,
+                              backgroundColor: theme.cardBackground,
+                              child: LedgerConnector(
+                                controller: _ledgerViewController,
                               ),
                             ),
-                          ],
-                        ),
-                      )
+                          ),
+                        ],
+                      ),
+                    )
                   ],
                 ),
                 if (_accounts.isNotEmpty && !_ledgerViewController.isScanning)
