@@ -7,12 +7,12 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
-import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/ledger/common.dart';
+import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -33,6 +33,7 @@ class AddLedgerAccountPage extends StatefulWidget {
 }
 
 class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
+  late final LedgerViewController _ledgerViewController;
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
   final _createBtnController = RoundedLoadingButtonController();
@@ -43,21 +44,24 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   bool _createWallet = true;
   bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
+  List<DiscoveredDevice> _ledgers = [];
+  DiscoveredDevice? _selectedDevice;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
   bool _accountsLoaded = false;
-  bool _isScanning = false;
-  Timer? _scanTimeout;
-  int _scanRetries = 0;
-  static const _maxRetries = 2;
 
   late AuthGuard _authGuard;
 
   @override
   void initState() {
     super.initState();
+    _ledgerViewController = LedgerViewController();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _walletNameController.text = "";
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _ledgerViewController.scan();
+    });
   }
 
   @override
@@ -82,6 +86,40 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       });
       return;
     }
+
+    setState(() {
+      _network = network;
+      if (ledger != null) {
+        if (!_ledgers.any((d) => d.id == ledger.id)) {
+          _ledgers.add(ledger);
+        }
+        _selectedDevice = ledger;
+      }
+      _createWallet = createWallet ?? true;
+      _walletNameController.text = _ledgers.isNotEmpty
+          ? "${_ledgers.first.name} (${network.name})"
+          : "Ledger (${network.name})";
+
+      final appState = context.read<AppState>();
+      final isLedgerWallet = appState.selectedWallet != -1 &&
+          appState.wallets.isNotEmpty &&
+          appState.wallets[appState.selectedWallet].walletType
+              .contains(WalletType.ledger.name);
+
+      if (isLedgerWallet && !_createWallet) {
+        final existingAccounts = appState.wallet?.accounts ?? [];
+        _accounts = existingAccounts
+            .map((account) => LedgerAccount(
+                  index: account.index.toInt(),
+                  address: account.addr,
+                  publicKey: account.pubKey,
+                ))
+            .toList()
+          ..sort((a, b) => a.index.compareTo(b.index));
+        _selectedAccounts = {for (var account in _accounts) account: true};
+        _accountsLoaded = true;
+      }
+    });
   }
 
   @override
@@ -89,28 +127,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.dispose();
     _btnController.dispose();
     _createBtnController.dispose();
-    _scanTimeout?.cancel();
+    _ledgerViewController.dispose();
     super.dispose();
-  }
-
-  Future<void> _startLedgerScan() async {
-    if (_scanRetries >= _maxRetries) {
-      setState(() {
-        _isScanning = false;
-        _errorMessage = AppLocalizations.of(context)!
-            .addLedgerAccountPageFailedToScanError('Max retries reached');
-      });
-      return;
-    }
-
-    setState(() {
-      _isScanning = true;
-      _scanRetries++;
-    });
-  }
-
-  void _stopLedgerScan() {
-    setState(() => _isScanning = false);
   }
 
   void _toggleAccount(LedgerAccount account, bool value) {
@@ -265,76 +283,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         }
       });
     }
-  }
-
-  Widget _buildNetworkInfoRow(AppTheme theme, AppLocalizations l10n) {
-    final isTestnet = _network!.testnet ?? false;
-    return Padding(
-      padding: const EdgeInsets.all(12),
-      child: Row(
-        children: [
-          SizedBox(
-            width: 32,
-            height: 32,
-            child: AsyncImage(
-              url: viewChain(network: _network!, theme: theme.value),
-              fit: BoxFit.contain,
-              errorWidget: const Icon(Icons.error),
-            ),
-          ),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        _network!.name,
-                        style: TextStyle(
-                          color: theme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: isTestnet
-                            ? theme.warning.withValues(alpha: 0.2)
-                            : theme.success.withValues(alpha: 0.2),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Text(
-                        isTestnet
-                            ? l10n.setupNetworkSettingsPageTestnetLabel
-                            : l10n.setupNetworkSettingsPageMainnetLabel,
-                        style: TextStyle(
-                          color: isTestnet ? theme.warning : theme.success,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  '${l10n.setupNetworkSettingsPageTokenLabel} ${_network!.chain} (Chain ID: ${_network!.chainId})',
-                  style: TextStyle(
-                    color: theme.textSecondary,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
   }
 
   Widget _buildWalletInfoCard(AppTheme theme, AppLocalizations l10n) {
@@ -563,7 +511,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       )
                   ],
                 ),
-                if (_accountsLoaded && _accounts.isNotEmpty && !_isScanning)
+                if (_accountsLoaded &&
+                    _accounts.isNotEmpty &&
+                    !_ledgerViewController.isScanning)
                   Positioned(
                     bottom: 0,
                     left: 0,

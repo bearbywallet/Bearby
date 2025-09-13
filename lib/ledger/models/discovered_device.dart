@@ -1,4 +1,3 @@
-import 'package:flutter/rendering.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
 
 enum ConnectionType { ble, usb }
