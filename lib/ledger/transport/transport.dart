@@ -24,7 +24,7 @@ abstract class Transport {
     int p1,
     int p2,
     Uint8List data, [
-    ApduStatusCodeChecker? exception,
+    void Function(int)? statusCodeChecker,
   ]) async {
     if (data.length > 255) {
       throw TransportException(
@@ -46,8 +46,8 @@ abstract class Transport {
     final sw =
         response.buffer.asByteData().getUint16(response.length - 2, Endian.big);
 
-    if (exception != null) {
-      exception.checkSw(sw);
+    if (statusCodeChecker != null) {
+      statusCodeChecker(sw);
     }
 
     return response.sublist(0, response.length - 2);

@@ -32,14 +32,13 @@ class ZilliqaLedgerApp {
     const p1 = 0x00;
     const p2 = 0x00;
 
-    ApduZilliqaCodes exception = ApduZilliqaCodes();
     final response = await transport.send(
       _cla,
       _ZilliqaIns.getVersion,
       p1,
       p2,
       Uint8List(0),
-      exception,
+      checkZilliqaSW,
     );
 
     if (response.isEmpty || (response[0] != 0 && response[0] != 1)) {
@@ -60,7 +59,7 @@ class ZilliqaLedgerApp {
       p1,
       p2,
       payload,
-      ApduZilliqaCodes(),
+      checkZilliqaSW,
     );
 
     return response.sublist(0, _pubKeyByteLen);
@@ -96,6 +95,7 @@ class ZilliqaLedgerApp {
       p1,
       p2,
       payload,
+      checkZilliqaSW,
     );
 
     final publicKey = bytesToHex(response.sublist(0, _pubKeyByteLen));
