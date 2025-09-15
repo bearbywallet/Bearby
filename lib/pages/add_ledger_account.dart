@@ -8,6 +8,7 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -50,8 +51,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   @override
   void initState() {
     super.initState();
+    final appState = context.read<AppState>();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
-    _walletNameController.text = "";
+    final productName = appState.ledgerViewController.connectedTransport
+            ?.deviceModel?.productName ??
+        "Ledger";
+    _walletNameController.text =
+        _createWallet ? productName : appState.wallet?.walletName ?? "";
   }
 
   @override
@@ -156,11 +162,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         requestTimeoutSecs: 30,
         ratesApiOptions: 1,
       );
-      final isLegacyZilliq = _network?.slip44 == 313 &&
-          _selectedAccounts.entries
-              .map((entry) => entry.key)
-              .every((a) => a.address.startsWith("zil1"));
-
       List<FTokenInfo> ftokens = [];
 
       if (_createWallet) {
@@ -191,7 +192,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
             chainHash: chainHash,
-            zilliqaLegacy: isLegacyZilliq,
+            zilliqaLegacy: _zilliqaLegacy,
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -233,7 +234,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         await updateLedgerAccounts(
           walletIndex: BigInt.from(walletIndex),
           accounts: accountsToUpdate,
-          zilliqaLegacy: isLegacyZilliq,
+          zilliqaLegacy: _zilliqaLegacy,
         );
 
         await appState.syncData();
@@ -279,6 +280,15 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          if (_createWallet) ...[
+            SmartInput(
+              controller: _walletNameController,
+              hint: l10n.walletPageWalletNameHint,
+              rightIconPath: "assets/icons/edit.svg",
+              disabled: _loading,
+            ),
+            const SizedBox(height: 16),
+          ],
           Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [

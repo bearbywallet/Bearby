@@ -43,12 +43,8 @@ class LedgerViewController extends ChangeNotifier {
   LedgerStatus get status => _status;
   String? get errorDetails => _errorDetails;
 
-  Future<void> scan({bool clean = true}) async {
+  Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
-
-    if (_connectedTransport != null && clean) {
-      await disconnect();
-    }
 
     if (Platform.isAndroid || Platform.isIOS) {
       final permissionsGranted = await _requestPermissions();
@@ -59,7 +55,6 @@ class LedgerViewController extends ChangeNotifier {
     }
 
     _isScanning = true;
-    if (clean) _discoveredDevices.clear();
     _updateStatus(LedgerStatus.scanning);
 
     if (Platform.isAndroid ||
