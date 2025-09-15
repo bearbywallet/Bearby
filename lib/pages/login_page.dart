@@ -313,7 +313,7 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget _buildLoginForm(AppState theme) {
     final isLedgerWallet = _selectedWallet != -1 &&
-        _appState.wallets.isNotEmpty &&
+        _selectedWallet < _appState.wallets.length &&
         _appState.wallets[_selectedWallet].walletType
             .contains(WalletType.ledger.name);
     final l10n = AppLocalizations.of(context)!;
