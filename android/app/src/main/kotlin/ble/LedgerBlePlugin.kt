@@ -88,7 +88,8 @@ class LedgerBlePlugin : FlutterPlugin, MethodCallHandler {
                 bleManager.exchange(deviceId, apdu)
             }
             "closeDevice" -> {
-                val deviceId = call.arguments as? String ?: throw IllegalArgumentException("Device ID must be a String")
+                val args = call.arguments as? Map<String, Any> ?: throw IllegalArgumentException("Arguments must be a Map")
+                val deviceId = args["deviceId"] as? String ?: throw IllegalArgumentException("Device ID must be a String")
                 bleManager.close(deviceId)
                 null
             }

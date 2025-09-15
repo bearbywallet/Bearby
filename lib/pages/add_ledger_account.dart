@@ -322,7 +322,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 color: theme.primaryPurple,
                 valueColor: theme.buttonText,
                 controller: _btnController,
-                onPressed: () {},
+                onPressed: () async {
+                  await _ledgerViewController.getAccounts(
+                    device: _ledgerViewController.discoveredDevices.first,
+                    slip44: _network!.slip44,
+                    count: _accountCount,
+                    zilliqaLegacy: _zilliqaLegacy,
+                  );
+                },
                 child: Text(
                   l10n.addLedgerAccountPageGetAccountsButton,
                   style: TextStyle(

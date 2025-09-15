@@ -5,6 +5,10 @@ List<int> hexToBytes(String hex) => [
         int.parse(hex.substring(i, i + 2), radix: 16)
     ];
 
+String bytesToHex(List<int> bytes) {
+  return bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join('');
+}
+
 String decodePersonalSignMessage(String dataToSign) {
   try {
     if (dataToSign.startsWith('0x')) {

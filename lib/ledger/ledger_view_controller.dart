@@ -3,10 +3,12 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/ledger/transport/ble_transport.dart';
 import 'package:zilpay/ledger/transport/hid_transport.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
+import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_app.dart';
 
 enum LedgerStatus {
   initializing,
@@ -121,6 +123,30 @@ class LedgerViewController extends ChangeNotifier {
           ? LedgerStatus.scanFinishedNoDevices
           : LedgerStatus.scanFinishedWithDevices);
     }
+  }
+
+  Future<List<LedgerAccount>> getAccounts({
+    required DiscoveredDevice device,
+    required int slip44,
+    required int count,
+    bool zilliqaLegacy = false,
+  }) async {
+    await open(device);
+
+    List<LedgerAccount> accounts = [];
+
+    if (zilliqaLegacy && slip44 == 313) {
+      final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
+      accounts = await zilliqaApp
+          .getPublicAddress(List<int>.generate(count, (i) => i));
+    } else {
+      await disconnect();
+
+      throw "slip44 not valid";
+    }
+
+    await disconnect();
+    return accounts;
   }
 
   Future<Transport?> open(DiscoveredDevice device) async {
