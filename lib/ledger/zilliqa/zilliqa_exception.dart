@@ -6,6 +6,9 @@ const int ok = 0x9000;
 // SW_USER_REJECTED     0x6985
 const int userRejected = 0x6985;
 
+// SW_USER_REJECTED     8
+const int userPubKeyRejected = 8;
+
 // SW_WRONG_DATA_LENGTH 0x6A87
 const int wrongDataLength = 0x6A87;
 
@@ -24,25 +27,27 @@ const int invalidParam = 0x6B01;
 // SW_IMPROPER_INIT     0x6B02
 const int improperInit = 0x6B02;
 
-void checkZilliqaSW(int sw) {
+TransportStatusError? checkZilliqaSW(int sw) {
   switch (sw) {
     case userRejected:
-      throw TransportStatusError(
+      return TransportStatusError(
           sw, 'User rejected the operation on the device.');
+    case userPubKeyRejected:
+      return TransportStatusError(sw, 'User rejected key reveal.');
     case wrongDataLength:
-      throw TransportStatusError(sw, 'Incorrect data length received.');
+      return TransportStatusError(sw, 'Incorrect data length received.');
     case insNotSupported:
-      throw TransportStatusError(
+      return TransportStatusError(
           sw, 'Instruction (INS) not supported by the app.');
     case claNotSupported:
-      throw TransportStatusError(sw, 'Instruction class (CLA) not supported.');
+      return TransportStatusError(sw, 'Instruction class (CLA) not supported.');
     case developerError:
-      throw TransportStatusError(sw, 'Wrong parameters (P1-P2).');
+      return TransportStatusError(sw, 'Wrong parameters (P1-P2).');
     case invalidParam:
-      throw TransportStatusError(sw, 'An invalid parameter was provided.');
+      return TransportStatusError(sw, 'An invalid parameter was provided.');
     case improperInit:
-      throw TransportStatusError(sw, 'Improper initialization or app state.');
+      return TransportStatusError(sw, 'Improper initialization or app state.');
     default:
-      break;
+      return null;
   }
 }

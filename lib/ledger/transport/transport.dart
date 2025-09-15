@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:typed_data';
 
-import 'package:zilpay/ledger/exception.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
 import 'package:zilpay/ledger/transport/exceptions.dart';
 
@@ -24,7 +23,7 @@ abstract class Transport {
     int p1,
     int p2,
     Uint8List data, [
-    void Function(int)? statusCodeChecker,
+    TransportStatusError? Function(int)? statusCodeChecker,
   ]) async {
     if (data.length > 255) {
       throw TransportException(
@@ -47,7 +46,11 @@ abstract class Transport {
         response.buffer.asByteData().getUint16(response.length - 2, Endian.big);
 
     if (statusCodeChecker != null) {
-      statusCodeChecker(sw);
+      final exception = statusCodeChecker(sw);
+
+      if (exception != null) {
+        throw exception;
+      }
     }
 
     return response.sublist(0, response.length - 2);

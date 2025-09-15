@@ -71,13 +71,9 @@ class ZilliqaLedgerApp {
     final List<LedgerAccount> accounts = [];
 
     for (final index in accountIndices) {
-      try {
-        final account = await getPublicAddres(index);
+      final account = await getPublicAddres(index);
 
-        accounts.add(account);
-      } catch (e) {
-        debugPrint("getPublicAddres: index: $index, error: $e");
-      }
+      accounts.add(account);
     }
 
     return accounts;
@@ -125,8 +121,13 @@ class ZilliqaLedgerApp {
     }
 
     final payload = Uint8List.fromList([...indexBytes, ...hashBytes]);
-    final response =
-        await transport.send(_cla, _ZilliqaIns.signHash, p1, p2, payload);
+    final response = await transport.send(
+      _cla,
+      _ZilliqaIns.signHash,
+      p1,
+      p2,
+      payload,
+    );
 
     return bytesToHex(response.sublist(0, _sigByteLen));
   }
@@ -164,7 +165,12 @@ class ZilliqaLedgerApp {
       ..write(firstChunk);
 
     response = await transport.send(
-        _cla, _ZilliqaIns.signTxn, p1, p2, initialWriter.toBytes());
+      _cla,
+      _ZilliqaIns.signTxn,
+      p1,
+      p2,
+      initialWriter.toBytes(),
+    );
 
     while (offset < txnBytes.length) {
       final chunkLen = (txnBytes.length - offset > streamLen)
@@ -179,7 +185,12 @@ class ZilliqaLedgerApp {
         ..write(chunk);
 
       response = await transport.send(
-          _cla, _ZilliqaIns.signTxn, p1, p2, subsequentWriter.toBytes());
+        _cla,
+        _ZilliqaIns.signTxn,
+        p1,
+        p2,
+        subsequentWriter.toBytes(),
+      );
     }
 
     return response.sublist(0, _sigByteLen);
