@@ -4,8 +4,8 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
-import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
+import 'package:zilpay/ledger/zilliqa/zilliqa_exception.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/utils/utils.dart';
@@ -32,13 +32,14 @@ class ZilliqaLedgerApp {
     const p1 = 0x00;
     const p2 = 0x00;
 
+    ApduZilliqaCodes exception = ApduZilliqaCodes();
     final response = await transport.send(
       _cla,
       _ZilliqaIns.getVersion,
       p1,
       p2,
       Uint8List(0),
-      [StatusCodes.zilAppVersion],
+      exception,
     );
 
     if (response.isEmpty || (response[0] != 0 && response[0] != 1)) {
@@ -53,8 +54,14 @@ class ZilliqaLedgerApp {
     const p2 = 0x00;
 
     final payload = _buildIndexPayload(index);
-    final response =
-        await transport.send(_cla, _ZilliqaIns.getPublicKey, p1, p2, payload);
+    final response = await transport.send(
+      _cla,
+      _ZilliqaIns.getPublicKey,
+      p1,
+      p2,
+      payload,
+      ApduZilliqaCodes(),
+    );
 
     return response.sublist(0, _pubKeyByteLen);
   }
@@ -89,7 +96,6 @@ class ZilliqaLedgerApp {
       p1,
       p2,
       payload,
-      [StatusCodes.zilAppPubKey],
     );
 
     final publicKey = bytesToHex(response.sublist(0, _pubKeyByteLen));

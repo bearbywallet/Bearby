@@ -25,13 +25,7 @@ class TransportRaceCondition extends TransportException {
 
 class TransportStatusError extends TransportException {
   final int statusCode;
-  TransportStatusError(this.statusCode, [String message = ''])
+  TransportStatusError(this.statusCode, String message)
       : super(message.isEmpty ? 'Status code: $statusCode' : message,
             'TransportStatusError');
-}
-
-class StatusCodes {
-  static const int ok = 0x9000;
-  static const int zilAppVersion = 5;
-  static const int zilAppPubKey = 27442;
 }

@@ -1,6 +1,4 @@
 import 'dart:typed_data';
-import 'package:zilpay/ledger/transport/transport.dart';
-import 'package:zilpay/ledger/transport/exceptions.dart';
 
 class ByteDataWriter {
   final List<int> _bytes = [];
@@ -30,23 +28,5 @@ class ByteDataWriter {
 
   Uint8List toBytes() {
     return Uint8List.fromList(_bytes);
-  }
-}
-
-abstract class LedgerOperation<T> {
-  Future<T> execute(Transport transport);
-
-  void checkStatus(Uint8List response, [int successCode = StatusCodes.ok]) {
-    if (response.length < 2) {
-      throw TransportException(
-          'Response is too short', 'InvalidResponseLength');
-    }
-
-    final sw =
-        response.buffer.asByteData().getUint16(response.length - 2, Endian.big);
-
-    if (sw != successCode) {
-      throw TransportStatusError(sw);
-    }
   }
 }
