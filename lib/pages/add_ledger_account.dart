@@ -10,7 +10,6 @@ import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
-import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -33,7 +32,6 @@ class AddLedgerAccountPage extends StatefulWidget {
 }
 
 class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
-  late final LedgerViewController _ledgerViewController;
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
   final _createBtnController = RoundedLoadingButtonController();
@@ -69,7 +67,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     }
 
     final network = args['chain'] as NetworkConfigInfo?;
-    final ledgerViewController = args['ledger'] as LedgerViewController?;
     final createWallet = args['createWallet'] as bool?;
 
     if (network == null) {
@@ -81,11 +78,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     setState(() {
       _network = network;
-      if (ledgerViewController != null) {
-        _ledgerViewController = ledgerViewController;
-        _walletNameController.text =
-            "${_ledgerViewController.connectedTransport!.deviceModel?.productName} (${network.name})";
-      }
       _createWallet = createWallet ?? true;
 
       final appState = context.read<AppState>();
@@ -114,7 +106,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.dispose();
     _btnController.dispose();
     _createBtnController.dispose();
-    // _ledgerViewController.dispose();
     super.dispose();
   }
 
@@ -272,7 +263,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     }
   }
 
-  Widget _buildWalletInfoCard(AppTheme theme, AppLocalizations l10n) {
+  Widget _buildWalletInfoCard(AppState appState, AppLocalizations l10n) {
+    final theme = appState.currentTheme;
+
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -324,8 +317,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                   _btnController.start();
 
                   try {
-                    final accounts = await _ledgerViewController.getAccounts(
-                      device: _ledgerViewController.discoveredDevices.first,
+                    final accounts =
+                        await appState.ledgerViewController.getAccounts(
+                      device:
+                          appState.ledgerViewController.discoveredDevices.first,
                       slip44: _network!.slip44,
                       count: _accountCount,
                       zilliqaLegacy: _zilliqaLegacy,
@@ -348,11 +343,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       _errorMessage = message;
                     });
                   } finally {
-                    Future.delayed(const Duration(seconds: 2), () {
-                      if (mounted) {
-                        _btnController.reset();
-                      }
-                    });
+                    _btnController.reset();
                   }
                 },
                 child: Text(
@@ -500,7 +491,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
   @override
   Widget build(context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final l10n = AppLocalizations.of(context)!;
 
@@ -519,7 +511,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                     ),
                     Expanded(
                       child: RefreshIndicator(
-                        onRefresh: _ledgerViewController.scan,
+                        onRefresh: appState.ledgerViewController.scan,
                         color: theme.primaryPurple,
                         backgroundColor: theme.cardBackground,
                         child: SingleChildScrollView(
@@ -531,14 +523,14 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                               children: [
                                 LedgerConnector(
                                   disabled: _createWallet,
-                                  controller: _ledgerViewController,
+                                  controller: appState.ledgerViewController,
                                 ),
                                 if (_errorMessage.isNotEmpty) ...[
                                   const SizedBox(height: 16),
                                   _buildErrorMessage(theme),
                                 ],
                                 const SizedBox(height: 16),
-                                _buildWalletInfoCard(theme, l10n),
+                                _buildWalletInfoCard(appState, l10n),
                                 if (_network?.slip44 == 313) ...[
                                   const SizedBox(height: 16),
                                   _buildLegacySwitch(theme, l10n),
@@ -566,7 +558,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       controller: _createBtnController,
                       color: theme.primaryPurple,
                       valueColor: theme.buttonText,
-                      onPressed: _saveSelectedAccounts,
+                      onPressed:
+                          _accounts.isNotEmpty ? _saveSelectedAccounts : null,
                       successIcon: "assets/icons/ok.svg",
                       child: Text(
                         _createWallet

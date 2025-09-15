@@ -3,6 +3,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
@@ -20,6 +21,8 @@ import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
 class AppState extends ChangeNotifier with WidgetsBindingObserver {
+  final LedgerViewController ledgerViewController = LedgerViewController();
+
   List<AddressBookEntryInfo> _book = [];
   List<ConnectionInfo> _connections = [];
   DateTime _lastRateUpdateTime = DateTime.fromMillisecondsSinceEpoch(0);

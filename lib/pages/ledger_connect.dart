@@ -17,30 +17,32 @@ class LedgerConnectPage extends StatefulWidget {
 }
 
 class _LedgerConnectPageState extends State<LedgerConnectPage> {
-  late final LedgerViewController _ledgerViewController;
-
   @override
   void initState() {
     super.initState();
-    _ledgerViewController = LedgerViewController();
-    _ledgerViewController.addListener(_handleControllerEvents);
+
+    final appState = context.read<AppState>();
+    appState.ledgerViewController.addListener(_handleControllerEvents);
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ledgerViewController.scan();
+      appState.ledgerViewController.scan();
     });
   }
 
   @override
   void dispose() {
-    _ledgerViewController.removeListener(_handleControllerEvents);
-    // _ledgerViewController.dispose();
+    final appState = context.read<AppState>();
+    appState.ledgerViewController.removeListener(_handleControllerEvents);
     super.dispose();
   }
 
   void _handleControllerEvents() {
-    if (_ledgerViewController.status == LedgerStatus.connectionFailed) {
-      final device = _ledgerViewController.connectingDevice;
-      final error = _ledgerViewController.errorDetails ?? 'Unknown error';
+    final appState = context.read<AppState>();
+
+    if (appState.ledgerViewController.status == LedgerStatus.connectionFailed) {
+      final device = appState.ledgerViewController.connectingDevice;
+      final error =
+          appState.ledgerViewController.errorDetails ?? 'Unknown error';
       final localizations = AppLocalizations.of(context)!;
 
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -59,7 +61,8 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   void _showErrorDialog(String title, String content,
       {bool showSettingsButton = false}) {
-    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final appState = Provider.of<AppState>(context, listen: false);
+    final theme = appState.currentTheme;
     final localizations = AppLocalizations.of(context)!;
 
     showDialog(
@@ -92,13 +95,14 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   }
 
   Future<void> _onDeviceOpen(DiscoveredDevice device) async {
-    final transport = await _ledgerViewController.open(device);
+    final appState = Provider.of<AppState>(context, listen: false);
+    final transport = await appState.ledgerViewController.open(device);
 
     if (transport != null && mounted) {
       Navigator.of(context).pushNamed(
         '/net_setup',
         arguments: {
-          'ledger': _ledgerViewController,
+          "ledger": device,
         },
       );
     }
@@ -106,14 +110,15 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Provider.of<AppState>(context).currentTheme;
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
     final localizations = AppLocalizations.of(context)!;
 
     return AnimatedBuilder(
-      animation: _ledgerViewController,
+      animation: appState.ledgerViewController,
       builder: (context, child) {
-        final isBusy = _ledgerViewController.isScanning ||
-            _ledgerViewController.isConnecting;
+        final isBusy = appState.ledgerViewController.isScanning ||
+            appState.ledgerViewController.isConnecting;
 
         return Scaffold(
           backgroundColor: theme.background,
@@ -138,15 +143,15 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                         ),
                       ),
                       onActionPressed:
-                          isBusy ? null : _ledgerViewController.scan,
+                          isBusy ? null : appState.ledgerViewController.scan,
                     ),
                     Expanded(
                       child: RefreshIndicator(
-                        onRefresh: _ledgerViewController.scan,
+                        onRefresh: appState.ledgerViewController.scan,
                         color: theme.primaryPurple,
                         backgroundColor: theme.cardBackground,
                         child: LedgerConnector(
-                          controller: _ledgerViewController,
+                          controller: appState.ledgerViewController,
                           onOpen: _onDeviceOpen,
                         ),
                       ),
