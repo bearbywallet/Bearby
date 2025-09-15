@@ -486,44 +486,44 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                       onBackPressed: () => Navigator.pop(context),
                     ),
                     Expanded(
-                      child: Padding(
-                        padding: EdgeInsets.all(adaptivePadding),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Expanded(
-                              child: RefreshIndicator(
-                                onRefresh: _ledgerViewController.scan,
-                                color: theme.primaryPurple,
-                                backgroundColor: theme.cardBackground,
-                                child: LedgerConnector(
+                      child: RefreshIndicator(
+                        onRefresh: _ledgerViewController.scan,
+                        color: theme.primaryPurple,
+                        backgroundColor: theme.cardBackground,
+                        child: SingleChildScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          child: Padding(
+                            padding: EdgeInsets.all(adaptivePadding),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                LedgerConnector(
                                   disabled: _createWallet,
                                   controller: _ledgerViewController,
                                 ),
-                              ),
+                                if (_errorMessage.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  _buildErrorMessage(theme),
+                                ],
+                                const SizedBox(height: 16),
+                                _buildWalletInfoCard(theme, l10n),
+                                if (_network?.slip44 == 313) ...[
+                                  const SizedBox(height: 16),
+                                  _buildLegacySwitch(theme, l10n),
+                                ],
+                                if (_accounts.isNotEmpty) ...[
+                                  const SizedBox(height: 16),
+                                  _buildAccountsCard(theme),
+                                ],
+                                const SizedBox(height: 80),
+                              ],
                             ),
-                            if (_errorMessage.isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              _buildErrorMessage(theme),
-                            ],
-                            const SizedBox(height: 16),
-                            _buildWalletInfoCard(theme, l10n),
-                            if (_network?.slip44 == 313) ...[
-                              const SizedBox(height: 16),
-                              _buildLegacySwitch(theme, l10n),
-                            ],
-                            if (_accounts.isNotEmpty) ...[
-                              const SizedBox(height: 16),
-                              _buildAccountsCard(theme),
-                            ],
-                            const SizedBox(height: 80),
-                          ],
+                          ),
                         ),
                       ),
                     ),
                   ],
                 ),
-                // if (_accounts.isNotEmpty && !_ledgerViewController.isScanning)
                 Positioned(
                   bottom: 0,
                   left: 0,

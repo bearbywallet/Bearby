@@ -60,7 +60,10 @@ class LedgerViewController extends ChangeNotifier {
     if (clean) _discoveredDevices.clear();
     _updateStatus(LedgerStatus.scanning);
 
-    if (Platform.isAndroid) {
+    if (Platform.isAndroid ||
+        Platform.isLinux ||
+        Platform.isMacOS ||
+        Platform.isWindows) {
       _startHidPolling();
     }
 

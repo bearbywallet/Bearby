@@ -71,6 +71,7 @@ class LedgerConnector extends StatelessWidget {
         final isConnected = controller.connectedTransport != null;
 
         return Column(
+          mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
@@ -104,9 +105,7 @@ class LedgerConnector extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 10),
-            Expanded(
-              child: _buildDeviceList(context),
-            ),
+            _buildDeviceList(context),
             if (isConnected)
               Padding(
                 padding: EdgeInsets.all(adaptivePadding),
@@ -144,29 +143,22 @@ class LedgerConnector extends StatelessWidget {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     if (controller.discoveredDevices.isEmpty && !controller.isScanning) {
-      return LayoutBuilder(
-        builder: (context, constraints) => SingleChildScrollView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          child: ConstrainedBox(
-            constraints: BoxConstraints(minHeight: constraints.maxHeight),
-            child: Center(
-              child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 30.0),
-                child: Text(
-                  AppLocalizations.of(context)!.ledgerConnectPageNoDevicesFound,
-                  textAlign: TextAlign.center,
-                  style: TextStyle(
-                      color: theme.textSecondary, fontSize: 16, height: 1.5),
-                ),
-              ),
-            ),
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
+          child: Text(
+            AppLocalizations.of(context)!.ledgerConnectPageNoDevicesFound,
+            textAlign: TextAlign.center,
+            style: TextStyle(
+                color: theme.textSecondary, fontSize: 16, height: 1.5),
           ),
         ),
       );
     }
 
     return ListView.builder(
-      physics: const AlwaysScrollableScrollPhysics(),
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
       padding: EdgeInsets.symmetric(
           horizontal: AdaptiveSize.getAdaptivePadding(context, 20) - 4),
       itemCount: controller.discoveredDevices.length,
