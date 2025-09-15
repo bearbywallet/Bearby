@@ -33,7 +33,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   @override
   void dispose() {
     _ledgerViewController.removeListener(_handleControllerEvents);
-    _ledgerViewController.dispose();
+    // _ledgerViewController.dispose();
     super.dispose();
   }
 
@@ -97,7 +97,9 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     if (transport != null && mounted) {
       Navigator.of(context).pushNamed(
         '/net_setup',
-        arguments: {'ledger': device},
+        arguments: {
+          'ledger': _ledgerViewController,
+        },
       );
     }
   }

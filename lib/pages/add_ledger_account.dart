@@ -11,7 +11,6 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
-import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -53,13 +52,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
   @override
   void initState() {
     super.initState();
-    _ledgerViewController = LedgerViewController();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
     _walletNameController.text = "";
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _ledgerViewController.scan(clean: false);
-    });
   }
 
   @override
@@ -75,7 +69,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     }
 
     final network = args['chain'] as NetworkConfigInfo?;
-    final ledger = args['ledger'] as DiscoveredDevice?;
+    final ledgerViewController = args['ledger'] as LedgerViewController?;
     final createWallet = args['createWallet'] as bool?;
 
     if (network == null) {
@@ -87,10 +81,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
     setState(() {
       _network = network;
-      if (ledger != null) {
-        _ledgerViewController.addDevice(ledger);
+      if (ledgerViewController != null) {
+        _ledgerViewController = ledgerViewController;
         _walletNameController.text =
-            "${ledger.name ?? ledger.deviceModelProducName} (${network.name})";
+            "${_ledgerViewController.connectedTransport!.deviceModel?.productName} (${network.name})";
       }
       _createWallet = createWallet ?? true;
 
@@ -120,7 +114,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     _walletNameController.dispose();
     _btnController.dispose();
     _createBtnController.dispose();
-    _ledgerViewController.dispose();
+    // _ledgerViewController.dispose();
     super.dispose();
   }
 
@@ -323,7 +317,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                 valueColor: theme.buttonText,
                 controller: _btnController,
                 onPressed: () async {
-                  await _ledgerViewController.getAccounts(
+                  _accounts = await _ledgerViewController.getAccounts(
                     device: _ledgerViewController.discoveredDevices.first,
                     slip44: _network!.slip44,
                     count: _accountCount,

@@ -1,8 +1,10 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
+import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
@@ -31,7 +33,13 @@ class ZilliqaLedgerApp {
     const p2 = 0x00;
 
     final response = await transport.send(
-        _cla, _ZilliqaIns.getVersion, p1, p2, Uint8List(0));
+      _cla,
+      _ZilliqaIns.getVersion,
+      p1,
+      p2,
+      Uint8List(0),
+      [StatusCodes.zilAppVersion],
+    );
 
     if (response.isEmpty || (response[0] != 0 && response[0] != 1)) {
       return null;
@@ -61,8 +69,8 @@ class ZilliqaLedgerApp {
         final account = await getPublicAddres(index);
 
         accounts.add(account);
-      } catch (_) {
-        //
+      } catch (e) {
+        debugPrint("getPublicAddres: index: $index, error: $e");
       }
     }
 
@@ -76,7 +84,13 @@ class ZilliqaLedgerApp {
 
     final payload = _buildIndexPayload(index);
     final response = await transport.send(
-        _cla, _ZilliqaIns.getPublicAddress, p1, p2, payload);
+      _cla,
+      _ZilliqaIns.getPublicAddress,
+      p1,
+      p2,
+      payload,
+      [StatusCodes.zilAppPubKey],
+    );
 
     final publicKey = bytesToHex(response.sublist(0, _pubKeyByteLen));
     final pubAddr = utf8.decode(

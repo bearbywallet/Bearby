@@ -21,7 +21,7 @@ class BleTransport(private val context: Context, private val device: BluetoothDe
     private var notifyCharacteristic: BluetoothGattCharacteristic? = null
     var serviceUuid: UUID? = null
 
-    private val notificationFlow = MutableSharedFlow<ByteArray>(replay = 10)
+    private val notificationFlow = MutableSharedFlow<ByteArray>(replay = 0, extraBufferCapacity = 10)
     private var mtuSize = 20
 
     private var connectContinuation: CancellableContinuation<Unit>? = null
@@ -259,4 +259,3 @@ class BleTransport(private val context: Context, private val device: BluetoothDe
         Log.d("BleTransport", "Connection closed.")
     }
 }
-

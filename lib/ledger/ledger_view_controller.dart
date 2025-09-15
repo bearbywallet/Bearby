@@ -46,7 +46,7 @@ class LedgerViewController extends ChangeNotifier {
   Future<void> scan({bool clean = true}) async {
     if (_isScanning || _isConnecting) return;
 
-    if (_connectedTransport != null) {
+    if (_connectedTransport != null && clean) {
       await disconnect();
     }
 
@@ -81,6 +81,12 @@ class LedgerViewController extends ChangeNotifier {
 
   void addDevice(DiscoveredDevice device) {
     _discoveredDevices.add(device);
+
+    if (device.connectionType == ConnectionType.ble && device.id != null) {
+      _connectedTransport = BleTransport(device.id!, device.model);
+    } else if (device.connectionType == ConnectionType.usb) {
+      // TODO: hid
+    }
   }
 
   void _startHidPolling() {
@@ -131,7 +137,9 @@ class LedgerViewController extends ChangeNotifier {
     required int count,
     bool zilliqaLegacy = false,
   }) async {
-    await open(device);
+    if (_connectedTransport == null) {
+      await open(device);
+    }
 
     List<LedgerAccount> accounts = [];
 
@@ -140,12 +148,9 @@ class LedgerViewController extends ChangeNotifier {
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
     } else {
-      await disconnect();
-
       throw "slip44 not valid";
     }
 
-    await disconnect();
     return accounts;
   }
 

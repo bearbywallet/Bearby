@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -68,7 +67,6 @@ class LedgerConnector extends StatelessWidget {
       animation: controller,
       builder: (context, child) {
         final isBusy = controller.isScanning || controller.isConnecting;
-        final isConnected = controller.connectedTransport != null;
 
         return Column(
           mainAxisSize: MainAxisSize.min,
@@ -106,33 +104,6 @@ class LedgerConnector extends StatelessWidget {
             ),
             const SizedBox(height: 10),
             _buildDeviceList(context),
-            if (isConnected)
-              Padding(
-                padding: EdgeInsets.all(adaptivePadding),
-                child: ElevatedButton.icon(
-                  icon: SvgPicture.asset('assets/icons/disconnect.svg',
-                      width: 20,
-                      height: 20,
-                      colorFilter:
-                          ColorFilter.mode(theme.buttonText, BlendMode.srcIn)),
-                  label: Text(
-                    AppLocalizations.of(context)!
-                        .ledgerConnectPageDisconnectButton(
-                      controller.connectedTransport?.deviceModel?.productName ??
-                          'Ledger',
-                    ),
-                    style: TextStyle(color: theme.buttonText),
-                  ),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: theme.danger,
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 24, vertical: 12),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30.0)),
-                  ),
-                  onPressed: controller.disconnect,
-                ),
-              ),
           ],
         );
       },

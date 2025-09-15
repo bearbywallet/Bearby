@@ -32,4 +32,6 @@ class TransportStatusError extends TransportException {
 
 class StatusCodes {
   static const int ok = 0x9000;
+  static const int zilAppVersion = 5;
+  static const int zilAppPubKey = 27442;
 }

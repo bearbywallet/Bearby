@@ -24,7 +24,7 @@ class BleTransport extends Transport {
   static const _channel = MethodChannel('ledger.com/ble');
   static const _eventChannel = EventChannel('ledger.com/ble/events');
 
-  BleTransport._(this._id, this.deviceModel);
+  BleTransport(this._id, this.deviceModel);
 
   @override
   Stream<TransportEvent> get events => _eventController.stream;
@@ -63,7 +63,7 @@ class BleTransport extends Transport {
   static Future<BleTransport> open(DiscoveredDevice deviceInfo) async {
     try {
       await _channel.invokeMethod('openDevice', deviceInfo.id);
-      return BleTransport._(deviceInfo.id!, deviceInfo.model);
+      return BleTransport(deviceInfo.id!, deviceInfo.model);
     } on PlatformException catch (e) {
       debugPrint("DisconnectedDeviceException $e");
       throw DisconnectedDeviceException(e.toString());
