@@ -6,6 +6,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -114,6 +115,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final localizations = AppLocalizations.of(context)!;
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 20);
 
     return AnimatedBuilder(
       animation: appState.ledgerViewController,
@@ -151,9 +153,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
                         onRefresh: appState.ledgerViewController.scan,
                         color: theme.primaryPurple,
                         backgroundColor: theme.cardBackground,
-                        child: LedgerConnector(
-                          controller: appState.ledgerViewController,
-                          onOpen: _onDeviceOpen,
+                        child: Padding(
+                          padding: EdgeInsets.symmetric(
+                              horizontal: adaptivePadding, vertical: 16),
+                          child: LedgerConnector(
+                            controller: appState.ledgerViewController,
+                            onOpen: _onDeviceOpen,
+                          ),
                         ),
                       ),
                     ),

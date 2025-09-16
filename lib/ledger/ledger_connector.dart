@@ -3,7 +3,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/ledger_device_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
-import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'ledger_view_controller.dart';
 
@@ -61,7 +60,6 @@ class LedgerConnector extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
-    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 20);
 
     return AnimatedBuilder(
       animation: controller,
@@ -72,35 +70,30 @@ class LedgerConnector extends StatelessWidget {
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: adaptivePadding, vertical: 16),
-              child: Column(
-                children: [
-                  Text(
-                    _getStatusText(context, controller.status),
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                        color: theme.textSecondary, fontSize: 15, height: 1.4),
+            Column(
+              children: [
+                Text(
+                  _getStatusText(context, controller.status),
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                      color: theme.textSecondary, fontSize: 15, height: 1.4),
+                ),
+                const SizedBox(height: 12),
+                AnimatedOpacity(
+                  opacity: isBusy ? 1.0 : 0.0,
+                  duration: const Duration(milliseconds: 300),
+                  child: SizedBox(
+                    height: 4,
+                    child: isBusy
+                        ? LinearProgressIndicator(
+                            backgroundColor: theme.primaryPurple.withAlpha(51),
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                theme.primaryPurple),
+                          )
+                        : Container(),
                   ),
-                  const SizedBox(height: 12),
-                  AnimatedOpacity(
-                    opacity: isBusy ? 1.0 : 0.0,
-                    duration: const Duration(milliseconds: 300),
-                    child: SizedBox(
-                      height: 4,
-                      child: isBusy
-                          ? LinearProgressIndicator(
-                              backgroundColor:
-                                  theme.primaryPurple.withAlpha(51),
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                  theme.primaryPurple),
-                            )
-                          : Container(),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 10),
             _buildDeviceList(context),
@@ -115,14 +108,11 @@ class LedgerConnector extends StatelessWidget {
 
     if (controller.discoveredDevices.isEmpty && !controller.isScanning) {
       return Center(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0),
-          child: Text(
-            AppLocalizations.of(context)!.ledgerConnectPageNoDevicesFound,
-            textAlign: TextAlign.center,
-            style: TextStyle(
-                color: theme.textSecondary, fontSize: 16, height: 1.5),
-          ),
+        child: Text(
+          AppLocalizations.of(context)!.ledgerConnectPageNoDevicesFound,
+          textAlign: TextAlign.center,
+          style:
+              TextStyle(color: theme.textSecondary, fontSize: 16, height: 1.5),
         ),
       );
     }
@@ -130,8 +120,7 @@ class LedgerConnector extends StatelessWidget {
     return ListView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: EdgeInsets.symmetric(
-          horizontal: AdaptiveSize.getAdaptivePadding(context, 20) - 4),
+      padding: EdgeInsets.zero,
       itemCount: controller.discoveredDevices.length,
       itemBuilder: (context, index) {
         final device = controller.discoveredDevices.elementAt(index);
@@ -141,7 +130,7 @@ class LedgerConnector extends StatelessWidget {
             controller.connectedTransport?.deviceModel?.id == device.model?.id;
 
         return Padding(
-          padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 4),
+          padding: const EdgeInsets.symmetric(vertical: 6),
           child: LedgerCard(
             key: ValueKey(device.productId),
             device: device,
