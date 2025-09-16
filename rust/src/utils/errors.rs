@@ -1,9 +1,9 @@
 use thiserror::Error;
-use zilpay::errors::keypair::PubKeyError;
 pub use zilpay::errors::{
     address::AddressError, background::BackgroundError, cache::CacheError, network::NetworkErrors,
     settings::SettingsErrors, token::TokenError, tx::TransactionErrors, wallet::WalletErrors,
 };
+use zilpay::errors::{bip32::Bip329Errors, keypair::PubKeyError};
 
 #[derive(Debug, Error)]
 pub enum ServiceError {
@@ -81,6 +81,15 @@ pub enum ServiceError {
 
     #[error("PubKey Error: {0}")]
     PubKeyError(PubKeyError),
+
+    #[error("Bip329 Error: {0}")]
+    Bip329Errors(Bip329Errors),
+}
+
+impl From<Bip329Errors> for ServiceError {
+    fn from(error: Bip329Errors) -> Self {
+        ServiceError::Bip329Errors(error)
+    }
 }
 
 impl From<BackgroundError> for ServiceError {
