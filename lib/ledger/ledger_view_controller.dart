@@ -10,6 +10,8 @@ import 'package:zilpay/ledger/transport/ble_transport.dart';
 import 'package:zilpay/ledger/transport/hid_transport.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_app.dart';
+import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/account.dart';
 
 enum LedgerStatus {
   initializing,
@@ -126,6 +128,31 @@ class LedgerViewController extends ChangeNotifier {
           ? LedgerStatus.scanFinishedNoDevices
           : LedgerStatus.scanFinishedWithDevices);
     }
+  }
+
+  Future<String> signMesage({
+    required String message,
+    required AccountInfo account,
+    required BigInt walletIndex,
+  }) async {
+    String? sig;
+
+    if (account.slip44 == 313 && account.addr.startsWith("zil1")) {
+      final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
+      final hashBytes = await prepareMessage(
+        walletIndex: walletIndex,
+        accountIndex: account.index,
+        message: message,
+      );
+      sig = await zilliqaApp.signHash(
+        account.index.toInt(),
+        hashBytes,
+      );
+    } else {
+      //
+    }
+
+    return sig!;
   }
 
   Future<List<LedgerAccount>> getAccounts({

@@ -153,6 +153,14 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
     if (isLedgerWallet) {
+      final wallet = appState.wallet!;
+      final account = wallet.accounts[wallet.selectedAccount.toInt()];
+      final sig = await appState.ledgerViewController.signMesage(
+        message: widget.message!,
+        account: account,
+        walletIndex: BigInt.from(appState.selectedWallet),
+      );
+      widget.onMessageSigned(account.pubKey, sig);
     } else {
       await _signMessageNative(appState);
     }
