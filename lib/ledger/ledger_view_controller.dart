@@ -150,6 +150,7 @@ class LedgerViewController extends ChangeNotifier {
         hashBytes,
       );
     } else {
+      // TODO: add slip44 = 60
       final evmApp = EthLedgerApp(_connectedTransport!);
       Uint8List bytes = utf8.encode(message);
       final personalSig = await evmApp.signPersonalMessage(
