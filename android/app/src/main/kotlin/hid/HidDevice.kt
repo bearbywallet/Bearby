@@ -4,6 +4,7 @@ import android.hardware.usb.*
 import java.io.ByteArrayOutputStream
 import java.nio.ByteBuffer
 import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 import kotlin.math.min
 
 class HidDevice(manager: UsbManager, device: UsbDevice) {
@@ -101,7 +102,8 @@ class HidDevice(manager: UsbManager, device: UsbDevice) {
 
             responseData
         }
-        return future.get()
+        // Вот изменение:
+        return future.get(15, TimeUnit.SECONDS)
     }
 
     fun close() {

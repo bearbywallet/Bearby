@@ -14,8 +14,11 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import io.flutter.plugin.common.EventChannel
 import io.flutter.plugin.common.MethodCall
 import io.flutter.plugin.common.MethodChannel
+import kotlinx.coroutines.*
 import java.util.*
 import kotlin.collections.HashMap
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
 
 class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.StreamHandler {
     private lateinit var channel: MethodChannel
@@ -25,7 +28,7 @@ class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.S
     private lateinit var usbManager: UsbManager
 
     private val hidDevices = HashMap<String, HidDevice>()
-    private var permissionPromise: MethodChannel.Result? = null
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     companion object {
         private const val TAG = "HidPlugin"
@@ -53,20 +56,21 @@ class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.S
         Log.d(TAG, "onDetachedFromEngine")
         channel.setMethodCallHandler(null)
         eventChannel.setStreamHandler(null)
+        scope.cancel()
     }
 
     override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-        Log.d(TAG, "onListen")
+        Log.d(TAG, "EventChannel: onListen")
         this.eventSink = events
     }
 
     override fun onCancel(arguments: Any?) {
-        Log.d(TAG, "onCancel")
+        Log.d(TAG, "EventChannel: onCancel")
         this.eventSink = null
     }
 
     private fun registerDeviceConnectionReceiver() {
-        Log.d(TAG, "registerDeviceConnectionReceiver")
+        Log.d(TAG, "Registering device connection receiver")
         val filter = IntentFilter()
         filter.addAction(UsbManager.ACTION_USB_DEVICE_ATTACHED)
         filter.addAction(UsbManager.ACTION_USB_DEVICE_DETACHED)
@@ -74,15 +78,12 @@ class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.S
         val receiver = object : BroadcastReceiver() {
             override fun onReceive(context: Context, intent: Intent) {
                 val action = intent.action
-                Log.d(TAG, "BroadcastReceiver onReceive: $action")
+                Log.d(TAG, "ConnectionReceiver: Received action: $action")
                 val device = intent.getParcelableExtra<UsbDevice>(UsbManager.EXTRA_DEVICE) ?: return
-                if (device.vendorId != LEDGER_USB_VENDOR_ID) {
-                    Log.d(TAG, "Ignoring non-Ledger device: vendorId=${device.vendorId}")
-                    return
-                }
+                if (device.vendorId != LEDGER_USB_VENDOR_ID) return
 
                 val eventType = if (action == UsbManager.ACTION_USB_DEVICE_ATTACHED) "add" else "remove"
-                Log.d(TAG, "Device event: $eventType, device: ${device.deviceName}")
+                Log.d(TAG, "ConnectionReceiver: Device event: $eventType for ${device.deviceName}")
 
                 val deviceMap = buildMapFromDevice(device)
                 val event = mapOf("type" to eventType, "descriptor" to deviceMap)
@@ -94,175 +95,164 @@ class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.S
 
     override fun onMethodCall(call: MethodCall, result: MethodChannel.Result) {
         Log.d(TAG, "onMethodCall: ${call.method}")
-        when (call.method) {
-            "getDeviceList" -> getDeviceList(result)
-            "openDevice" -> {
-                val deviceMap = call.arguments as? Map<String, Any>
-                if (deviceMap != null) {
-                    openDevice(deviceMap, result)
-                } else {
-                    Log.e(TAG, "openDevice error: Invalid argument, device map is null")
-                    result.error("INVALID_ARGUMENT", "Device map is null", null)
+        scope.launch {
+            try {
+                when (call.method) {
+                    "getDeviceList" -> {
+                        val deviceList = getDeviceList()
+                        withContext(Dispatchers.Main) { result.success(deviceList) }
+                    }
+                    "openDevice" -> {
+                        val deviceMap = call.arguments as? Map<String, Any>
+                        if (deviceMap != null) {
+                            val hid = openDevice(deviceMap)
+                            withContext(Dispatchers.Main) { result.success(hid) }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                result.error("INVALID_ARGUMENT", "Device map is null", null)
+                            }
+                        }
+                    }
+                    "exchange" -> {
+                        val deviceId = call.argument<String>("deviceId")
+                        val apduHex = call.argument<String>("apduHex")
+                        if (deviceId != null && apduHex != null) {
+                            val response = exchange(deviceId, apduHex)
+                            withContext(Dispatchers.Main) { result.success(response) }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                result.error("INVALID_ARGUMENT", "deviceId or apduHex is null", null)
+                            }
+                        }
+                    }
+                    "closeDevice" -> {
+                        val deviceId = call.argument<String>("deviceId")
+                        if (deviceId != null) {
+                            closeDevice(deviceId)
+                            withContext(Dispatchers.Main) { result.success(null) }
+                        } else {
+                            withContext(Dispatchers.Main) {
+                                result.error("INVALID_ARGUMENT", "deviceId is null", null)
+                            }
+                        }
+                    }
+                    else -> withContext(Dispatchers.Main) { result.notImplemented() }
                 }
-            }
-            "exchange" -> {
-                val deviceId = call.argument<String>("deviceId")
-                val apduHex = call.argument<String>("apduHex")
-                if (deviceId != null && apduHex != null) {
-                    exchange(deviceId, apduHex, result)
-                } else {
-                    Log.e(TAG, "exchange error: Invalid argument, deviceId or apduHex is null")
-                    result.error("INVALID_ARGUMENT", "deviceId or apduHex is null", null)
+            } catch (e: Exception) {
+                withContext(Dispatchers.Main) {
+                    val errorCode = when (e) {
+                        is TimeoutCancellationException -> "TIMEOUT_ERROR"
+                        is DisconnectedDeviceException -> "DISCONNECTED"
+                        else -> e.javaClass.simpleName
+                    }
+                    Log.e(TAG, "Error in onMethodCall for ${call.method}. Code: $errorCode", e)
+                    result.error(errorCode, e.message, null)
                 }
-            }
-            "closeDevice" -> {
-                val deviceId = call.argument<String>("deviceId")
-                if (deviceId != null) {
-                    closeDevice(deviceId, result)
-                } else {
-                    Log.e(TAG, "closeDevice error: Invalid argument, deviceId is null")
-                    result.error("INVALID_ARGUMENT", "deviceId is null", null)
-                }
-            }
-            else -> {
-                Log.w(TAG, "Method not implemented: ${call.method}")
-                result.notImplemented()
             }
         }
     }
 
-    private fun getDeviceList(result: MethodChannel.Result) {
-        Log.d(TAG, "getDeviceList")
+    private fun getDeviceList(): List<Map<String, Any>> {
+        Log.d(TAG, "Executing getDeviceList")
         val deviceList = usbManager.deviceList.values
             .filter { it.vendorId == LEDGER_USB_VENDOR_ID }
             .map { buildMapFromDevice(it) }
-        Log.d(TAG, "Found ${deviceList.size} Ledger devices")
-        result.success(deviceList)
+        Log.d(TAG, "Found ${deviceList.size} Ledger devices.")
+        return deviceList
     }
 
-    private fun openDevice(deviceMap: Map<String, Any>, result: MethodChannel.Result) {
-        val vendorId = deviceMap["vendorId"] as Int
-        val productId = deviceMap["productId"] as Int
-        Log.d(TAG, "openDevice: vendorId=$vendorId, productId=$productId")
+    private suspend fun openDevice(deviceMap: Map<String, Any>): Map<String, Any> {
+        Log.d(TAG, "Executing openDevice with timeout")
+        return withTimeout(5000L) {
+            val vendorId = deviceMap["vendorId"] as? Int ?: throw IllegalArgumentException("Missing vendorId")
+            val productId = deviceMap["productId"] as? Int ?: throw IllegalArgumentException("Missing productId")
+            Log.d(TAG, "Searching for device with vendorId=$vendorId, productId=$productId")
 
-        val device = usbManager.deviceList.values.find { it.vendorId == vendorId && it.productId == productId }
+            val device = usbManager.deviceList.values.find { it.vendorId == vendorId && it.productId == productId }
+                ?: throw DisconnectedDeviceException("Device not found")
+            Log.d(TAG, "Device found: ${device.deviceName}")
 
-        if (device == null) {
-            Log.e(TAG, "openDevice error: Device not found")
-            result.error("DEVICE_NOT_FOUND", "Device not found", null)
-            return
-        }
-
-        if (usbManager.hasPermission(device)) {
-            Log.d(TAG, "Device already has permission")
-            try {
-                val hid = createHIDDevice(device)
-                result.success(hid)
-            } catch (e: Exception) {
-                Log.e(TAG, "openDevice error: Failed to create HID device", e)
-                result.error("CONNECTION_ERROR", e.message, null)
+            if (usbManager.hasPermission(device)) {
+                Log.d(TAG, "Permission already granted for ${device.deviceName}")
+                return@withTimeout createHIDDevice(device)
             }
-        } else {
-            Log.d(TAG, "Requesting USB permission for device")
-            permissionPromise = result
-            val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-            } else {
-                PendingIntent.FLAG_UPDATE_CURRENT
-            }
-            val permIntent = PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+            Log.d(TAG, "Permission not granted, requesting for ${device.deviceName}")
 
-            val filter = IntentFilter(ACTION_USB_PERMISSION)
-            ContextCompat.registerReceiver(
-                context,
-                usbReceiver,
-                filter,
-                ContextCompat.RECEIVER_NOT_EXPORTED
-            )
+            suspendCancellableCoroutine { continuation ->
+                val filter = IntentFilter(ACTION_USB_PERMISSION)
 
-            this.usbManager.requestPermission(device, permIntent)
-        }
-    }
-
-    private val usbReceiver = object : BroadcastReceiver() {
-        override fun onReceive(context: Context, intent: Intent) {
-            Log.d(TAG, "usbReceiver onReceive: ${intent.action}")
-            if (ACTION_USB_PERMISSION == intent.action) {
-                synchronized(this) {
-                    context.unregisterReceiver(this)
-                    val device: UsbDevice? = intent.getParcelableExtra(UsbManager.EXTRA_DEVICE)
-                    if (intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)) {
-                        Log.d(TAG, "USB permission granted for device")
-                        if (device != null) {
-                            try {
-                                val hid = createHIDDevice(device)
-                                permissionPromise?.success(hid)
-                            } catch (e: Exception) {
-                                Log.e(TAG, "usbReceiver error: Failed to create HID device after permission grant", e)
-                                permissionPromise?.error("CONNECTION_ERROR", e.message, null)
+                val usbReceiver = object : BroadcastReceiver() {
+                    override fun onReceive(context: Context, intent: Intent) {
+                        Log.d(TAG, "PermissionReceiver: Received action: ${intent.action}")
+                        context.unregisterReceiver(this)
+                        if (ACTION_USB_PERMISSION == intent.action) {
+                            synchronized(this) {
+                                val permissionGranted = intent.getBooleanExtra(UsbManager.EXTRA_PERMISSION_GRANTED, false)
+                                if (permissionGranted) {
+                                    Log.d(TAG, "PermissionReceiver: Permission GRANTED by user")
+                                    try {
+                                        val hid = createHIDDevice(device)
+                                        if (continuation.isActive) continuation.resume(hid)
+                                    } catch (e: Exception) {
+                                        if (continuation.isActive) continuation.resumeWithException(e)
+                                    }
+                                } else {
+                                    Log.w(TAG, "PermissionReceiver: Permission DENIED by user")
+                                    if (continuation.isActive) continuation.resumeWithException(Exception("Permission denied by user for device"))
+                                }
                             }
-                        } else {
-                            Log.e(TAG, "usbReceiver error: Device is null after permission grant")
-                            permissionPromise?.error("CONNECTION_ERROR", "Device is null after permission grant", null)
                         }
-                    } else {
-                        Log.w(TAG, "USB permission denied by user for device")
-                        permissionPromise?.error("PERMISSION_DENIED", "Permission denied by user for device", null)
                     }
-                    permissionPromise = null
                 }
+
+                continuation.invokeOnCancellation {
+                    Log.d(TAG, "openDevice coroutine was cancelled (e.g., timeout)")
+                    try {
+                        context.unregisterReceiver(usbReceiver)
+                        Log.d(TAG, "PermissionReceiver unregistered due to cancellation.")
+                    } catch (e: IllegalArgumentException) {
+                        Log.w(TAG, "PermissionReceiver was already unregistered.")
+                    }
+                }
+
+                val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                } else {
+                    PendingIntent.FLAG_UPDATE_CURRENT
+                }
+                val permIntent = PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+
+                ContextCompat.registerReceiver(context, usbReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+                Log.d(TAG, "Requesting permission from UsbManager and waiting for user action...")
+                usbManager.requestPermission(device, permIntent)
             }
         }
     }
 
-    private fun exchange(deviceId: String, apduHex: String, result: MethodChannel.Result) {
-        Log.d(TAG, "exchange: deviceId=$deviceId, apduHex=$apduHex")
-        try {
-            val hid = hidDevices[deviceId]
-            if (hid == null) {
-                Log.e(TAG, "exchange error: No device opened for id '$deviceId'")
-                result.error("DEVICE_NOT_OPEN", "No device opened for the id '$deviceId'", null)
-                return
-            }
-            val apdu = hexToBin(apduHex)
-            val response = hid.exchange(apdu)
-            val responseHex = binToHex(response)
-            Log.d(TAG, "exchange successful, response: $responseHex")
-            result.success(responseHex)
-        } catch (e: DisconnectedDeviceException) {
-            Log.e(TAG, "exchange error: DisconnectedDeviceException", e)
-            result.error("DISCONNECTED", e.message, null)
-        } catch (e: Exception) {
-            Log.e(TAG, "exchange error: Exception", e)
-            result.error("EXCHANGE_ERROR", e.message, null)
-        }
+    private fun exchange(deviceId: String, apduHex: String): ByteArray {
+        Log.d(TAG, "Executing exchange for deviceId: $deviceId")
+        val hid = hidDevices[deviceId] ?: throw DisconnectedDeviceException("No device opened for the id '$deviceId'")
+        val apdu = hexToBin(apduHex)
+        Log.d(TAG, "=> APDU: $apduHex")
+        val response = hid.exchange(apdu)
+        val responseHex = binToHex(response)
+        Log.d(TAG, "<= Response: $responseHex")
+        return response
     }
 
-    private fun closeDevice(deviceId: String, result: MethodChannel.Result) {
-        Log.d(TAG, "closeDevice: deviceId=$deviceId")
-        try {
-            val hid = hidDevices[deviceId]
-            if (hid == null) {
-                Log.e(TAG, "closeDevice error: No device opened for id '$deviceId'")
-                result.error("DEVICE_NOT_OPEN", "No device opened for the id '$deviceId'", null)
-                return
-            }
-            hid.close()
-            hidDevices.remove(deviceId)
-            Log.d(TAG, "Device closed and removed")
-            result.success(null)
-        } catch (e: Exception) {
-            Log.e(TAG, "closeDevice error: Exception", e)
-            result.error("CLOSE_ERROR", e.message, null)
-        }
+    private fun closeDevice(deviceId: String) {
+        Log.d(TAG, "Executing closeDevice for deviceId: $deviceId")
+        val hid = hidDevices.remove(deviceId) ?: throw DisconnectedDeviceException("No device opened for the id '$deviceId'")
+        hid.close()
+        Log.d(TAG, "Device $deviceId closed and removed.")
     }
 
     private fun createHIDDevice(device: UsbDevice): Map<String, Any> {
-        Log.d(TAG, "createHIDDevice for ${device.deviceName}")
+        Log.d(TAG, "Creating HIDDevice instance for ${device.deviceName}")
         val hid = HidDevice(usbManager, device)
         val id = UUID.randomUUID().toString()
         hidDevices[id] = hid
-        Log.d(TAG, "HID device created with id: $id")
+        Log.d(TAG, "HIDDevice created with id: $id")
         return mapOf("id" to id)
     }
 

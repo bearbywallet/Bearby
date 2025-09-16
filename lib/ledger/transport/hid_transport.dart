@@ -93,21 +93,17 @@ class HidTransport extends Transport {
       try {
         final apduHex =
             apdu.map((b) => b.toRadixString(16).padLeft(2, '0')).join('');
-        final resultHex = await _channel.invokeMethod<String>('exchange', {
+        final Uint8List? result =
+            await _channel.invokeMethod<Uint8List>('exchange', {
           'deviceId': _id,
           'apduHex': apduHex,
         });
-        print(resultHex);
-        if (resultHex == null) {
+        if (result == null) {
           throw DisconnectedDeviceDuringOperationException(
               'Empty response from native');
         }
 
-        final res = Uint8List.fromList(List<int>.generate(
-          resultHex.length ~/ 2,
-          (i) => int.parse(resultHex.substring(i * 2, i * 2 + 2), radix: 16),
-        ));
-        return res;
+        return result;
       } on PlatformException catch (e) {
         debugPrint("PlatformException: $e");
         if (_disconnectedErrors.contains(e.code) ||
