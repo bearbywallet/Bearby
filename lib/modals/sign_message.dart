@@ -5,6 +5,9 @@ import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
+import 'package:zilpay/ledger/ledger_connector.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -74,6 +77,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   final _passwordInputKey = GlobalKey<SmartInputState>();
   late final AuthService _authService = AuthService();
   late final AuthGuard _authGuard;
+  late final bool _isLedgerWallet;
   bool _isLoading = false;
   bool _obscurePassword = true;
   String? _error;
@@ -82,14 +86,33 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   @override
   void initState() {
     super.initState();
+    final appState = context.read<AppState>();
     _authGuard = context.read<AuthGuard>();
+    _isLedgerWallet = appState.selectedWallet != -1 &&
+        appState.wallets[appState.selectedWallet].walletType
+            .contains(WalletType.ledger.name);
+
+    if (_isLedgerWallet) {
+      appState.ledgerViewController.scan();
+    }
   }
 
   @override
   void dispose() {
     _passwordController.dispose();
     _scanTimeout?.cancel();
+
+    if (_isLedgerWallet) {
+      final appState = context.read<AppState>();
+      appState.ledgerViewController.stopScan();
+    }
+
     super.dispose();
+  }
+
+  Future<void> _onDeviceOpen(DiscoveredDevice device) async {
+    final appState = context.read<AppState>();
+    await appState.ledgerViewController.open(device);
   }
 
   Future<bool> _authenticate() async => _authService.authenticate(
@@ -188,9 +211,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     final secondaryColor =
         _parseColor(widget.colors?.secondary) ?? theme.textSecondary;
     final textColor = _parseColor(widget.colors?.text) ?? theme.textPrimary;
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Container(
       constraints:
@@ -225,10 +246,17 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                     ),
                   ),
                   Padding(
-                    padding: const EdgeInsets.all(16),
+                    padding: EdgeInsets.all(adaptivePadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [
+                        if (_isLedgerWallet) ...[
+                          LedgerConnector(
+                            controller: appState.ledgerViewController,
+                            onOpen: _onDeviceOpen,
+                          ),
+                          const SizedBox(height: 16),
+                        ],
                         Text(
                           l10n.signMessageModalContentTitle,
                           style: TextStyle(
@@ -454,7 +482,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                             ),
                           ),
                         if (appState.wallet!.authType == AuthMethod.none.name &&
-                            !isLedgerWallet)
+                            !_isLedgerWallet)
                           Padding(
                             padding: const EdgeInsets.only(top: 16),
                             child: SmartInput(
