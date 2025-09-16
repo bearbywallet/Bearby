@@ -80,7 +80,8 @@ class LedgerViewController extends ChangeNotifier {
     if (device.connectionType == ConnectionType.ble && device.id != null) {
       _connectedTransport = BleTransport(device.id!, device.model);
     } else if (device.connectionType == ConnectionType.usb) {
-      // TODO: hid
+      _connectedTransport =
+          HidTransport(device.id!, device.productId!, device.model);
     }
   }
 
@@ -154,6 +155,10 @@ class LedgerViewController extends ChangeNotifier {
 
     if (_isScanning) {
       stopScan();
+    }
+
+    if (_connectedTransport != null) {
+      await disconnect();
     }
 
     _isConnecting = true;

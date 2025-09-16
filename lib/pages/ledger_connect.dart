@@ -33,6 +33,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
   void dispose() {
     final appState = context.read<AppState>();
     appState.ledgerViewController.removeListener(_handleControllerEvents);
+    appState.ledgerViewController.dispose();
     super.dispose();
   }
 

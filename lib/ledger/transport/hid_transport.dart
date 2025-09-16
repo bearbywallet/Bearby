@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
@@ -31,6 +32,8 @@ class HidTransport extends Transport {
     'PERMISSION_DENIED',
     'DEVICE_NOT_FOUND',
   ];
+
+  HidTransport(this._id, int productId, this.deviceModel);
 
   HidTransport._(this._id, int productId)
       : deviceModel = Devices.identifyUSBProductId(productId);
@@ -94,6 +97,7 @@ class HidTransport extends Transport {
           'deviceId': _id,
           'apduHex': apduHex,
         });
+        print(resultHex);
         if (resultHex == null) {
           throw DisconnectedDeviceDuringOperationException(
               'Empty response from native');
@@ -105,6 +109,7 @@ class HidTransport extends Transport {
         ));
         return res;
       } on PlatformException catch (e) {
+        debugPrint("PlatformException: $e");
         if (_disconnectedErrors.contains(e.code) ||
             (_disconnectedErrors
                 .any((msg) => e.message?.contains(msg) ?? false))) {

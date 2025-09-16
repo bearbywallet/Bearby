@@ -2,6 +2,7 @@ package hid
 
 import android.hardware.usb.*
 import java.io.ByteArrayOutputStream
+import java.nio.ByteBuffer
 import java.util.concurrent.Executors
 import kotlin.math.min
 
@@ -42,34 +43,66 @@ class HidDevice(manager: UsbManager, device: UsbDevice) {
             var offset = 0
             val wrappedCommand = LedgerHelper.wrapCommandAPDU(LEDGER_DEFAULT_CHANNEL, command, HID_BUFFER_SIZE)
 
-            while (offset != wrappedCommand.size) {
-                val blockSize = min(wrappedCommand.size - offset, HID_BUFFER_SIZE)
-                val buffer = ByteArray(blockSize)
-                System.arraycopy(wrappedCommand, offset, buffer, 0, blockSize)
-                val bytesSent = connection.bulkTransfer(endpointOut, buffer, blockSize, 5000)
-                if (bytesSent < 0) {
-                    throw DisconnectedDeviceException("I/O error on write")
+            val outRequest = UsbRequest()
+            try {
+                if (!outRequest.initialize(connection, endpointOut)) {
+                    throw DisconnectedDeviceException("Failed to initialize OUT request")
                 }
-                offset += blockSize
+                while (offset != wrappedCommand.size) {
+                    val blockSize = min(wrappedCommand.size - offset, HID_BUFFER_SIZE)
+                    val buffer = ByteBuffer.wrap(wrappedCommand, offset, blockSize)
+
+                    if (!outRequest.queue(buffer, blockSize)) {
+                        throw DisconnectedDeviceException("Failed to queue OUT request")
+                    }
+
+                    if (connection.requestWait() == null) {
+                        throw DisconnectedDeviceException("I/O error on write (requestWait failed)")
+                    }
+                    offset += blockSize
+                }
+            } finally {
+                outRequest.close()
             }
 
-            val transferBuffer = ByteArray(HID_BUFFER_SIZE)
-            while (true) {
-                val bytesRead = connection.bulkTransfer(endpointIn, transferBuffer, HID_BUFFER_SIZE, 5000)
-                if (bytesRead < 0) {
-                    throw DisconnectedDeviceException("I/O error on read")
+            val inRequest = UsbRequest()
+            try {
+                if (!inRequest.initialize(connection, endpointIn)) {
+                    throw DisconnectedDeviceException("Failed to initialize IN request")
                 }
-                response.write(transferBuffer, 0, bytesRead)
-                responseData = LedgerHelper.unwrapResponseAPDU(LEDGER_DEFAULT_CHANNEL, response.toByteArray(), HID_BUFFER_SIZE)
-                if (responseData != null) {
-                    break
+                val responseBuffer = ByteBuffer.allocate(HID_BUFFER_SIZE)
+
+                while (true) {
+                    responseBuffer.clear()
+                    if (!inRequest.queue(responseBuffer, HID_BUFFER_SIZE)) {
+                        throw DisconnectedDeviceException("Failed to queue IN request")
+                    }
+
+                    if (connection.requestWait() == null) {
+                        throw DisconnectedDeviceException("I/O error on read (requestWait failed)")
+                    }
+
+                    val bytesRead = responseBuffer.position()
+                    if (bytesRead > 0) {
+                        val chunk = ByteArray(bytesRead)
+                        responseBuffer.rewind()
+                        responseBuffer.get(chunk, 0, bytesRead)
+                        response.write(chunk)
+                    }
+
+                    responseData = LedgerHelper.unwrapResponseAPDU(LEDGER_DEFAULT_CHANNEL, response.toByteArray(), HID_BUFFER_SIZE)
+                    if (responseData != null) {
+                        break
+                    }
                 }
+            } finally {
+                inRequest.close()
             }
+
             responseData
         }
         return future.get()
     }
-
 
     fun close() {
         executor.submit {
