@@ -11,6 +11,7 @@ import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
+import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -58,6 +59,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
         "Ledger";
     _walletNameController.text =
         _createWallet ? productName : appState.wallet?.walletName ?? "";
+
+    if (appState.ledgerViewController.status == LedgerStatus.initializing) {
+      appState.ledgerViewController.scan();
+    }
   }
 
   @override
@@ -133,6 +138,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       final appState = Provider.of<AppState>(context, listen: false);
       final l10n = AppLocalizations.of(context)!;
       final BigInt? chainHash;
+      final model =
+          appState.ledgerViewController.connectedTransport?.deviceModel;
 
       List<NetworkConfigInfo> chains = await getProviders();
       final matches = chains
@@ -176,8 +183,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
 
         final pubKeys =
             selectedAccounts.map((a) => (a.index, a.publicKey)).toList();
-        final accountNames =
-            selectedAccounts.map((a) => "ledger ${a.index + 1}").toList();
+        final accountNames = selectedAccounts
+            .map((a) => "${model?.productName ?? 'ledger'} ${a.index + 1}")
+            .toList();
 
         DeviceInfoService device = DeviceInfoService();
         List<String> identifiers = await device.getDeviceIdentifiers();
@@ -187,7 +195,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
             pubKeys: pubKeys,
             walletIndex: BigInt.from(appState.wallets.length),
             walletName: _walletNameController.text,
-            ledgerId: "",
+            ledgerId: model?.id ?? "",
             accountNames: accountNames,
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,

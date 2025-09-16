@@ -145,7 +145,7 @@ class LedgerViewController extends ChangeNotifier {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
-    } else {
+    } else if (slip44 == 60 || slip44 == 313) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       accounts = await evmApp.getAccounts(
         chainId: chainId,
