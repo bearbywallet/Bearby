@@ -2,11 +2,13 @@ class LedgerAccount {
   final String publicKey;
   final String address;
   final int index;
+  final String? chainCode;
 
   LedgerAccount({
     required this.publicKey,
     required this.address,
     required this.index,
+    this.chainCode,
   });
 
   @override

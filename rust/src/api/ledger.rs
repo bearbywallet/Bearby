@@ -110,27 +110,6 @@ pub async fn update_ledger_accounts(
     .map_err(Into::into)
 }
 
-pub async fn ledger_split_path(
-    wallet_index: usize,
-    account_index: usize,
-) -> Result<Vec<u32>, String> {
-    with_wallet(wallet_index, |wallet| {
-        let walelt_data = wallet
-            .get_wallet_data()
-            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-        let account = walelt_data
-            .accounts
-            .get(account_index)
-            .ok_or(ServiceError::AccountError(
-                account_index,
-                wallet_index,
-                zilpay::errors::wallet::WalletErrors::InvalidAccountIndex(account_index),
-            ))?;
-        let derivation_path = DerivationPath::new(account.slip_44, account.account_type.value());
-        let derivation_path = split_path(&derivation_path.get_path())?;
-
-        Ok(derivation_path)
-    })
-    .await
-    .map_err(Into::into)
+pub async fn ledger_split_path(path: String) -> Result<Vec<u32>, String> {
+    split_path(&path).map_err(|e| e.to_string())
 }

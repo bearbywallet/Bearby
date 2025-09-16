@@ -1,12 +1,31 @@
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
-List<int> hexToBytes(String hex) => [
-      for (int i = 0; i < hex.length; i += 2)
-        int.parse(hex.substring(i, i + 2), radix: 16)
-    ];
+const _hexChars = '0123456789abcdef';
 
-String bytesToHex(List<int> bytes) {
-  return bytes.map((byte) => byte.toRadixString(16).padLeft(2, '0')).join('');
+String bytesToHex(Uint8List bytes) {
+  final buffer = StringBuffer();
+  for (final byte in bytes) {
+    buffer.write(_hexChars[(byte & 0xF0) >> 4]);
+    buffer.write(_hexChars[byte & 0x0F]);
+  }
+  return buffer.toString();
+}
+
+Uint8List hexToBytes(String hex) {
+  final hexWithoutPrefix = hex.startsWith('0x') ? hex.substring(2) : hex;
+
+  if (hexWithoutPrefix.length % 2 != 0) {
+    throw ArgumentError('Odd-length hex string.');
+  }
+
+  final result = Uint8List(hexWithoutPrefix.length ~/ 2);
+
+  for (int i = 0; i < result.length; i++) {
+    final hexPart = hexWithoutPrefix.substring(i * 2, i * 2 + 2);
+    result[i] = int.parse(hexPart, radix: 16);
+  }
+
+  return result;
 }
 
 String decodePersonalSignMessage(String dataToSign) {

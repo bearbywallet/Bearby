@@ -24,6 +24,9 @@ Future<void> updateLedgerAccounts(
         accounts: accounts,
         zilliqaLegacy: zilliqaLegacy);
 
+Future<Uint32List> ledgerSplitPath({required String path}) =>
+    RustLib.instance.api.crateApiLedgerLedgerSplitPath(path: path);
+
 class LedgerParamsInput {
   final List<(int, String)> pubKeys;
   final BigInt walletIndex;
