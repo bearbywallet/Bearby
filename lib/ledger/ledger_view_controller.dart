@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
@@ -149,10 +150,16 @@ class LedgerViewController extends ChangeNotifier {
         hashBytes,
       );
     } else {
-      //
+      final evmApp = EthLedgerApp(_connectedTransport!);
+      Uint8List bytes = utf8.encode(message);
+      final personalSig = await evmApp.signPersonalMessage(
+        index: account.index.toInt(),
+        message: bytes,
+      );
+      sig = personalSig.toHexString();
     }
 
-    return sig!;
+    return sig;
   }
 
   Future<List<LedgerAccount>> getAccounts({

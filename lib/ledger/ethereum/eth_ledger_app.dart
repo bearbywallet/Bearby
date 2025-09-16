@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:zilpay/ledger/common.dart';
+import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
@@ -99,5 +100,54 @@ class EthLedgerApp {
       chainCode: chainCode,
       index: index,
     );
+  }
+
+  Future<EthLedgerSignature> signPersonalMessage({
+    required int index,
+    required Uint8List message,
+    int slip44 = 60,
+  }) async {
+    final paths = await _getPaths(slip44: slip44, index: index);
+
+    int offset = 0;
+    late Uint8List response;
+
+    while (offset < message.length) {
+      final bool isFirstChunk = offset == 0;
+      final int maxChunkSize =
+          isFirstChunk ? 150 - 1 - (paths.length * 4) - 4 : 150;
+
+      final int chunkSize = (offset + maxChunkSize > message.length)
+          ? message.length - offset
+          : maxChunkSize;
+
+      final Uint8List chunkData = message.sublist(offset, offset + chunkSize);
+      late Uint8List buffer;
+
+      if (isFirstChunk) {
+        final writer = ByteDataWriter(endian: Endian.big);
+        writer.writeUint8(paths.length);
+        for (final element in paths) {
+          writer.writeUint32(element);
+        }
+        writer.writeUint32(message.length);
+        writer.write(chunkData);
+        buffer = writer.toBytes();
+      } else {
+        buffer = chunkData;
+      }
+
+      response = await transport.send(
+        0xe0,
+        0x08,
+        isFirstChunk ? 0x00 : 0x80,
+        0x00,
+        buffer,
+      );
+
+      offset += chunkSize;
+    }
+
+    return EthLedgerSignature.fromLedgerResponse(response);
   }
 }
