@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:zilpay/ledger/common.dart';
+import 'package:zilpay/ledger/ethereum/eth_ledger_app.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/ledger/transport/ble_transport.dart';
 import 'package:zilpay/ledger/transport/hid_transport.dart';
@@ -131,6 +132,7 @@ class LedgerViewController extends ChangeNotifier {
     required DiscoveredDevice device,
     required int slip44,
     required int count,
+    required int chainId,
     bool zilliqaLegacy = false,
   }) async {
     if (_connectedTransport == null) {
@@ -144,7 +146,11 @@ class LedgerViewController extends ChangeNotifier {
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
     } else {
-      throw "slip44 not valid";
+      final evmApp = EthLedgerApp(_connectedTransport!);
+      accounts = await evmApp.getAccounts(
+        chainId: chainId,
+        indices: List<int>.generate(count, (i) => i),
+      );
     }
 
     return accounts;

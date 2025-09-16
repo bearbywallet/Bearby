@@ -333,6 +333,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                           appState.ledgerViewController.discoveredDevices.first,
                       slip44: _network!.slip44,
                       count: _accountCount,
+                      chainId: _network!.chainId.toInt(),
                       zilliqaLegacy: _zilliqaLegacy,
                     );
 
@@ -346,6 +347,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
                     });
                     _btnController.success();
                   } catch (e) {
+                    debugPrint("getAccounts: $e");
                     _btnController.error();
                     String message;
                     message = e.toString();

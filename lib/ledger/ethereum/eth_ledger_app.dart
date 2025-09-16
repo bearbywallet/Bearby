@@ -12,15 +12,40 @@ class EthLedgerApp {
 
   EthLedgerApp(this.transport);
 
+  Future<List<int>> _getPaths({required int slip44, required int index}) async {
+    final String path = "44'/$slip44'/0'/0/$index";
+    final paths = await ledgerSplitPath(path: path);
+    return paths;
+  }
+
+  Future<List<LedgerAccount>> getAccounts({
+    required List<int> indices,
+    int slip44 = 60,
+    bool boolChaincode = false,
+    int? chainId,
+  }) async {
+    final List<LedgerAccount> accounts = [];
+    for (final int index in indices) {
+      final account = await getAddress(
+        index: index,
+        slip44: slip44,
+        boolDisplay: false,
+        boolChaincode: boolChaincode,
+        chainId: chainId,
+      );
+      accounts.add(account);
+    }
+    return accounts;
+  }
+
   Future<LedgerAccount> getAddress({
     required int index,
     int slip44 = 60,
     bool boolDisplay = false,
     bool boolChaincode = false,
-    int? chainId, // Изменен тип на int?
+    int? chainId,
   }) async {
-    final String path = "44'/$slip44'/0'/0/$index";
-    final paths = await ledgerSplitPath(path: path);
+    final paths = await _getPaths(slip44: slip44, index: index);
 
     final writer = ByteDataWriter(endian: Endian.big);
     writer.writeUint8(paths.length);
@@ -30,7 +55,6 @@ class EthLedgerApp {
     var buffer = writer.toBytes();
 
     if (chainId != null) {
-      // Прямое преобразование 64-битного числа в 8-байтовый буфер
       final byteData = ByteData(8);
       byteData.setUint64(0, chainId, Endian.big);
       final chainIdBuffer = byteData.buffer.asUint8List();
