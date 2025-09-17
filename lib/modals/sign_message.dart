@@ -6,7 +6,6 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
-import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/eip712.dart';

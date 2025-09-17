@@ -1516,7 +1516,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get addLedgerAccountPageCreateButton => 'Создать';
 
   @override
-  String get addLedgerAccountPageAddButton => 'Добавить';
+  String get addLedgerAccountPageAddButton => 'Обновить';
 
   @override
   String get addLedgerAccountPageScanningMessage => 'Сканирование устройств Ledger...';

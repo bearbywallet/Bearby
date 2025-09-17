@@ -3060,7 +3060,7 @@ abstract class AppLocalizations {
   /// Button text for adding accounts to an existing wallet in the AddLedgerAccountPage component
   ///
   /// In en, this message translates to:
-  /// **'Add'**
+  /// **'Update'**
   String get addLedgerAccountPageAddButton;
 
   /// Message displayed while scanning for Ledger devices in the AddLedgerAccountPage component

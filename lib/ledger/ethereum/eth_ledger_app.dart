@@ -1,11 +1,17 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:flutter/foundation.dart';
 import 'package:zilpay/ledger/common.dart';
+import 'package:zilpay/ledger/ethereum/ledger_resolver.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
+import 'package:zilpay/ledger/ethereum/resolution_types.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
+import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 import 'package:zilpay/src/rust/api/ledger.dart';
+import 'package:zilpay/src/rust/api/transaction.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/utils/utils.dart';
 
 class EthLedgerApp {
@@ -185,5 +191,167 @@ class EthLedgerApp {
     );
 
     return EthLedgerSignature.fromLedgerResponse(response);
+  }
+
+  Future<EthLedgerSignature> clearSignTransaction({
+    required TransactionRequestInfo transaction,
+    required int walletIndex,
+    required int accountIndex,
+    required int slip44,
+    required LoadConfig loadConfig,
+    ResolutionConfig? resolutionConfig,
+  }) async {
+    final config = resolutionConfig ??
+        const ResolutionConfig(
+          erc20: true,
+          externalPlugins: true,
+          nft: true,
+          uniswapV3: true,
+        );
+
+    LedgerEthTransactionResolution? resolution;
+    try {
+      resolution = await LedgerTransactionResolver.resolveTransaction(
+        transaction,
+        loadConfig,
+        config,
+      );
+    } catch (e) {
+      debugPrint(
+          '[LEDGER_ERROR] Resolution failed, falling back to blind signing: $e');
+    }
+
+    final EncodedRLPTx txRLP = await encodeTxRlp(
+      tx: transaction,
+      walletIndex: BigInt.from(walletIndex),
+      accountIndex: BigInt.from(accountIndex),
+    );
+
+    return await signTransaction(
+      index: accountIndex,
+      slip44: slip44,
+      transactionChunks: txRLP.chunksBytes,
+      resolution: resolution,
+    );
+  }
+
+  Future<EthLedgerSignature> signTransaction({
+    required int index,
+    required List<Uint8List> transactionChunks,
+    int slip44 = 60,
+    LedgerEthTransactionResolution? resolution,
+  }) async {
+    if (resolution != null) {
+      for (final plugin in resolution.plugin) {
+        await _setPlugin(plugin);
+      }
+      for (final extPlugin in resolution.externalPlugin) {
+        await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
+      }
+      for (final nft in resolution.nfts) {
+        await _provideNFTInformation(nft);
+      }
+      for (final token in resolution.erc20Tokens) {
+        await _provideERC20TokenInformation(token);
+      }
+    }
+
+    final paths = await _getPaths(slip44: slip44, index: index);
+    final writer = ByteDataWriter(endian: Endian.big);
+    writer.writeUint8(paths.length);
+    for (final element in paths) {
+      writer.writeUint32(element);
+    }
+    final derivationPathBuffer = writer.toBytes();
+
+    late Uint8List response;
+    try {
+      final firstPayload = Uint8List.fromList(
+          [...derivationPathBuffer, ...transactionChunks.first]);
+      response = await transport.send(
+        0xe0, // CLA
+        0x04, // INS
+        0x00, // P1
+        0x00, // P2
+        firstPayload,
+      );
+
+      for (int i = 1; i < transactionChunks.length; i++) {
+        response = await transport.send(
+          0xe0, // CLA
+          0x04, // INS
+          0x80, // P1
+          0x00, // P2
+          transactionChunks[i],
+        );
+      }
+    } on TransportStatusError catch (e) {
+      if (e.statusCode == 0x6a80) {
+        throw TransportException(
+          'Please enable Blind signing or Contract data in the Ethereum app Settings',
+          'ContractDataNotEnabled',
+        );
+      }
+      rethrow;
+    }
+
+    return EthLedgerSignature.fromLedgerResponse(response);
+  }
+
+  Future<void> _provideERC20TokenInformation(String dataHex) async {
+    try {
+      final buffer = hexToBytes(dataHex);
+      await transport.send(0xe0, 0x0a, 0x00, 0x00, buffer);
+    } on TransportStatusError catch (e) {
+      if (e.statusCode == 0x6d00) {
+        return;
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _provideNFTInformation(String dataHex) async {
+    try {
+      final buffer = hexToBytes(dataHex);
+      await transport.send(0xe0, 0x14, 0x00, 0x00, buffer);
+    } on TransportStatusError catch (e) {
+      if (e.statusCode == 0x6d00) {
+        throw TransportException(
+          'NFT resolution not supported by the app version',
+          'NftNotSupported',
+        );
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _setExternalPlugin(String payload, String signature) async {
+    try {
+      final payloadBuffer = hexToBytes(payload);
+      final signatureBuffer = hexToBytes(signature);
+      final buffer = Uint8List.fromList([...payloadBuffer, ...signatureBuffer]);
+      await transport.send(0xe0, 0x12, 0x00, 0x00, buffer);
+    } on TransportStatusError catch (e) {
+      if (e.statusCode == 0x6a80 ||
+          e.statusCode == 0x6984 ||
+          e.statusCode == 0x6d00) {
+        return;
+      }
+      rethrow;
+    }
+  }
+
+  Future<void> _setPlugin(String data) async {
+    try {
+      final buffer = hexToBytes(data);
+      await transport.send(0xe0, 0x16, 0x00, 0x00, buffer);
+    } on TransportStatusError catch (e) {
+      if (e.statusCode == 0x6a80 ||
+          e.statusCode == 0x6984 ||
+          e.statusCode == 0x6d00) {
+        return;
+      }
+      rethrow;
+    }
   }
 }
