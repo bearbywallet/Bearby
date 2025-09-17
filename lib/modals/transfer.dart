@@ -8,8 +8,12 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/components/token_transfer_amount.dart';
 import 'package:zilpay/components/transaction_amount_display.dart';
+import 'package:zilpay/ledger/ledger_connector.dart';
+import 'package:zilpay/ledger/models/discovered_device.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
@@ -88,6 +92,7 @@ class _ConfirmTransactionContent extends StatefulWidget {
 
 class _ConfirmTransactionContentState
     extends State<_ConfirmTransactionContent> {
+  late final bool _isLedgerWallet;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _authService = AuthService();
@@ -119,8 +124,16 @@ class _ConfirmTransactionContentState
   @override
   void initState() {
     super.initState();
+    final appState = context.read<AppState>();
     _authGuard = context.read<AuthGuard>();
     _initGasPolling();
+    _isLedgerWallet = appState.selectedWallet != -1 &&
+        appState.wallets[appState.selectedWallet].walletType
+            .contains(WalletType.ledger.name);
+
+    if (_isLedgerWallet) {
+      appState.ledgerViewController.scan();
+    }
   }
 
   @override
@@ -128,6 +141,12 @@ class _ConfirmTransactionContentState
     _passwordController.dispose();
     _timerPooling?.cancel();
     _scanTimeout?.cancel();
+
+    if (_isLedgerWallet && context.mounted) {
+      final appState = context.read<AppState>();
+      appState.ledgerViewController.stopScan();
+    }
+
     super.dispose();
   }
 
@@ -136,6 +155,12 @@ class _ConfirmTransactionContentState
             _txParamsInfo.maxPriorityFee == BigInt.zero &&
             _txParamsInfo.txEstimateGas == BigInt.zero) ||
         _loading;
+  }
+
+  Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
+    final appState = context.read<AppState>();
+    await appState.ledgerViewController.open(device);
+    setState(() {});
   }
 
   void _initGasPolling() {
@@ -219,8 +244,31 @@ class _ConfirmTransactionContentState
   Future<bool> _authenticate() async => _authService.authenticate(
       allowPinCode: true, reason: AppLocalizations.of(context)!.authReason);
 
+  Future<HistoricalTransactionInfo?> _signAndSendLedger(
+    AppState appState,
+    TransactionRequestInfo tx,
+  ) async {
+    final accountIndex = appState.wallet!.selectedAccount.toInt();
+    final account = appState.account;
+    final sig = await appState.ledgerViewController.signTransaction(
+      transaction: tx,
+      walletIndex: appState.selectedWallet,
+      accountIndex: accountIndex,
+      account: account!,
+    );
+
+    return await sendSignedTransactions(
+      tx: tx,
+      sig: sig,
+      walletIndex: appState.selectedWallet,
+      accountIndex: accountIndex,
+    );
+  }
+
   Future<HistoricalTransactionInfo?> _signAndSend(
-      AppState appState, TransactionRequestInfo tx) async {
+    AppState appState,
+    TransactionRequestInfo tx,
+  ) async {
     final device = DeviceInfoService();
     final identifiers = await device.getDeviceIdentifiers();
     final wallet = appState.wallet!;
@@ -272,8 +320,7 @@ class _ConfirmTransactionContentState
         theme.textSecondary.withValues(alpha: 0.5);
     final textColor = _parseColor(widget.colors?.text) ?? theme.textSecondary;
 
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType.contains("ledger");
+    final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Container(
       constraints:
@@ -304,6 +351,16 @@ class _ConfirmTransactionContentState
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
+                    if (_isLedgerWallet) ...[
+                      Padding(
+                        padding:
+                            EdgeInsets.symmetric(horizontal: adaptivePadding),
+                        child: LedgerConnector(
+                          controller: appState.ledgerViewController,
+                          onOpen: _onDeviceLedgerOpen,
+                        ),
+                      ),
+                    ],
                     if (_error != null)
                       Container(
                         margin: const EdgeInsets.symmetric(
@@ -445,7 +502,7 @@ class _ConfirmTransactionContentState
                       ),
                     ),
                     if (appState.wallet!.authType == AuthMethod.none.name &&
-                        !isLedgerWallet)
+                        !_isLedgerWallet)
                       Padding(
                         padding: const EdgeInsets.all(12),
                         child: SmartInput(
@@ -474,7 +531,11 @@ class _ConfirmTransactionContentState
                         text: _error != null
                             ? l10n.confirmTransactionContentUnableToConfirm
                             : l10n.confirmTransactionContentConfirm,
-                        disabled: _isDisabled || isLedgerWallet,
+                        disabled: _isDisabled ||
+                            (_isLedgerWallet &&
+                                appState.ledgerViewController
+                                        .connectedTransport ==
+                                    null),
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
@@ -507,8 +568,8 @@ class _ConfirmTransactionContentState
                             final tx = _prepareTx(adjustedTokenValue);
                             HistoricalTransactionInfo? sendedTx;
 
-                            if (isLedgerWallet) {
-                              // sendedTx = await _signAndSendLedger(appState, tx);
+                            if (_isLedgerWallet) {
+                              sendedTx = await _signAndSendLedger(appState, tx);
                             } else {
                               sendedTx = await _signAndSend(appState, tx);
                             }

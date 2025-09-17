@@ -173,12 +173,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
   void _handleSignMessage(AppState appState) async {
     setState(() => _isLoading = true);
-    final isLedgerWallet = appState.selectedWallet != -1 &&
-        appState.wallets[appState.selectedWallet].walletType
-            .contains(WalletType.ledger.name);
 
     try {
-      if (isLedgerWallet) {
+      if (_isLedgerWallet) {
         final wallet = appState.wallet!;
         final account = wallet.accounts[wallet.selectedAccount.toInt()];
 
@@ -272,7 +269,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                     ),
                   ),
                   Padding(
-                    padding: EdgeInsets.all(adaptivePadding),
+                    padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.center,
                       children: [

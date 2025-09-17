@@ -197,7 +197,6 @@ class EthLedgerApp {
     required int walletIndex,
     required int accountIndex,
     required int slip44,
-    required LoadConfig loadConfig,
     ResolutionConfig? resolutionConfig,
   }) async {
     final config = resolutionConfig ??
@@ -212,7 +211,7 @@ class EthLedgerApp {
     try {
       resolution = await LedgerTransactionResolver.resolveTransaction(
         transaction,
-        loadConfig,
+        const LoadConfig(),
         config,
       );
     } catch (e) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:typed_data';
 
+import 'package:flutter/material.dart';
 import 'package:zilpay/ledger/models/device_model.dart';
 import 'package:zilpay/ledger/transport/exceptions.dart';
 
@@ -36,6 +37,7 @@ abstract class Transport {
     final response = await exchange(apdu);
 
     if (response.length < 2) {
+      debugPrint("response: $response");
       throw TransportException(
         'Response is too short',
         'InvalidResponseLength',

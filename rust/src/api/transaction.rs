@@ -192,7 +192,6 @@ pub async fn encode_tx_rlp(
                 let derivation_path = split_path(&derivation_path.get_path()).unwrap_or_default();
                 let derivation_bytes = components_to_derivation_path(&derivation_path);
                 let transaction_type = tx_eth.preferred_type();
-                dbg!(transaction_type, &tx_eth);
 
                 let rlp = tx
                     .to_rlp_encode(&account.pub_key)

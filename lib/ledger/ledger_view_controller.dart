@@ -156,14 +156,35 @@ class LedgerViewController extends ChangeNotifier {
     }
   }
 
-  Future<String> signTransaction({
+  Future<Uint8List> signTransaction({
     required TransactionRequestInfo transaction,
     required int walletIndex,
     required int accountIndex,
+    required AccountInfo account,
   }) async {
-    // TODO: add sign tx
-    //
-    return "";
+    if (transaction.scilla != null) {
+      final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
+      final sig = await zilliqaApp.signTxn(
+        keyIndex: account.index.toInt(),
+        transaction: transaction,
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+      );
+
+      return sig;
+    } else if (transaction.evm != null) {
+      final evmApp = EthLedgerApp(_connectedTransport!);
+      final sig = await evmApp.clearSignTransaction(
+        transaction: transaction,
+        walletIndex: walletIndex,
+        accountIndex: account.index.toInt(),
+        slip44: account.slip44,
+      );
+
+      return sig.toBytes();
+    } else {
+      throw "invalid tx";
+    }
   }
 
   Future<String> signMesage({
