@@ -175,19 +175,44 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     final isLedgerWallet = appState.selectedWallet != -1 &&
         appState.wallets[appState.selectedWallet].walletType
             .contains(WalletType.ledger.name);
-    if (isLedgerWallet) {
-      final wallet = appState.wallet!;
-      final account = wallet.accounts[wallet.selectedAccount.toInt()];
-      final sig = await appState.ledgerViewController.signMesage(
-        message: widget.message!,
-        account: account,
-        walletIndex: BigInt.from(appState.selectedWallet),
-      );
-      widget.onMessageSigned(account.pubKey, sig);
-    } else {
-      await _signMessageNative(appState);
+
+    try {
+      if (isLedgerWallet) {
+        final wallet = appState.wallet!;
+        final account = wallet.accounts[wallet.selectedAccount.toInt()];
+
+        if (widget.message != null) {
+          final sig = await appState.ledgerViewController.signMesage(
+            message: widget.message!,
+            account: account,
+            walletIndex: BigInt.from(appState.selectedWallet),
+          );
+          widget.onMessageSigned(account.pubKey, sig);
+        } else if (widget.typedData != null) {
+          final sig =
+              await appState.ledgerViewController.signEIP712HashedMessage(
+            account: account,
+            walletIndex: BigInt.from(appState.selectedWallet),
+            typedData: widget.typedData!,
+          );
+          widget.onMessageSigned(account.pubKey, sig);
+        } else {
+          throw "invalid message";
+        }
+      } else {
+        await _signMessageNative(appState);
+      }
+    } catch (e) {
+      appState.ledgerViewController.stopScan();
+      appState.ledgerViewController.disconnect();
+      appState.ledgerViewController.scan();
+
+      setState(() {
+        _error = e.toString();
+      });
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
     }
-    if (mounted) setState(() => _isLoading = false);
   }
 
   Color? _parseColor(String? colorString) {
@@ -524,7 +549,11 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                       text: _isLoading
                           ? l10n.signMessageModalContentProcessing
                           : l10n.signMessageModalContentSign,
-                      disabled: _isLoading,
+                      disabled: _isLoading ||
+                          (_isLedgerWallet &&
+                              appState.ledgerViewController
+                                      .connectedTransport ==
+                                  null),
                       backgroundColor: primaryColor,
                       textColor: theme.buttonText,
                       onSwipeComplete: () async => _handleSignMessage(appState),

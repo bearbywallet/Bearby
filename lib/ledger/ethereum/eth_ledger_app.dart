@@ -150,4 +150,40 @@ class EthLedgerApp {
 
     return EthLedgerSignature.fromLedgerResponse(response);
   }
+
+  Future<EthLedgerSignature> signEIP712HashedMessage({
+    required int index,
+    required Uint8List domainSeparator,
+    required Uint8List hashStructMessage,
+    int slip44 = 60,
+  }) async {
+    final paths = await _getPaths(slip44: slip44, index: index);
+
+    if (domainSeparator.length != 32 || hashStructMessage.length != 32) {
+      throw ArgumentError(
+          'domainSeparator and hashStructMessage must be 32 bytes long');
+    }
+
+    final writer = ByteDataWriter(endian: Endian.big);
+
+    writer.writeUint8(paths.length);
+    for (final element in paths) {
+      writer.writeUint32(element);
+    }
+
+    writer.write(domainSeparator);
+    writer.write(hashStructMessage);
+
+    final buffer = writer.toBytes();
+
+    final response = await transport.send(
+      0xe0,
+      0x0c,
+      0x00,
+      0x00,
+      buffer,
+    );
+
+    return EthLedgerSignature.fromLedgerResponse(response);
+  }
 }

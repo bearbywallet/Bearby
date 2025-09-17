@@ -11,6 +11,7 @@ import 'package:zilpay/ledger/transport/ble_transport.dart';
 import 'package:zilpay/ledger/transport/hid_transport.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
 import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_app.dart';
+import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 
@@ -128,6 +129,29 @@ class LedgerViewController extends ChangeNotifier {
       _updateStatus(_discoveredDevices.isEmpty
           ? LedgerStatus.scanFinishedNoDevices
           : LedgerStatus.scanFinishedWithDevices);
+    }
+  }
+
+  Future<String> signEIP712HashedMessage({
+    required TypedDataEip712 typedData,
+    required AccountInfo account,
+    required BigInt walletIndex,
+  }) async {
+    if (account.slip44 == 60 || account.slip44 == 60) {
+      final evmApp = EthLedgerApp(_connectedTransport!);
+      final typedDataJson = jsonEncode(typedData.toJson());
+      final eip712Hashes =
+          await prepareEip712Message(typedDataJson: typedDataJson);
+
+      final sig = await evmApp.signEIP712HashedMessage(
+        index: account.index.toInt(),
+        domainSeparator: eip712Hashes.domainSeparator,
+        hashStructMessage: eip712Hashes.hashStructMessage,
+      );
+
+      return sig.toHexString();
+    } else {
+      throw "Invlid slip44";
     }
   }
 
