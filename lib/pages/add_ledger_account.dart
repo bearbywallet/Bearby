@@ -77,8 +77,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
       return;
     }
 
+    final appState = context.read<AppState>();
     final network = args['chain'] as NetworkConfigInfo?;
     final createWallet = args['createWallet'] as bool?;
+    if (_createWallet && appState.account?.addrType == 0) {
+      _zilliqaLegacy = true;
+    }
 
     if (network == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

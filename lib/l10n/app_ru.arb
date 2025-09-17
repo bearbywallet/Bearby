@@ -575,7 +575,7 @@
   "addLedgerAccountPageAppBarTitle": "Добавить аккаунт Ledger",
   "addLedgerAccountPageGetAccountsButton": "Получить аккаунты",
   "addLedgerAccountPageCreateButton": "Создать",
-  "addLedgerAccountPageAddButton": "Добавить",
+  "addLedgerAccountPageAddButton": "Обновить",
   "addLedgerAccountPageScanningMessage": "Сканирование устройств Ledger...",
   "addLedgerAccountPageNoDevicesMessage": "Устройства Ledger не найдены",
   "addLedgerAccountPageBluetoothOffError": "Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.",

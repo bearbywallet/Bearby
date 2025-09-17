@@ -138,7 +138,7 @@ class LedgerViewController extends ChangeNotifier {
   }) async {
     String? sig;
 
-    if (account.slip44 == 313 && account.addr.startsWith("zil1")) {
+    if (account.slip44 == 313 && account.addrType == 0) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       final hashBytes = await prepareMessage(
         walletIndex: walletIndex,
@@ -149,8 +149,7 @@ class LedgerViewController extends ChangeNotifier {
         account.index.toInt(),
         hashBytes,
       );
-    } else {
-      // TODO: add slip44 = 60
+    } else if (account.slip44 == 313 || account.slip44 == 60) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       Uint8List bytes = utf8.encode(message);
       final personalSig = await evmApp.signPersonalMessage(
@@ -158,6 +157,8 @@ class LedgerViewController extends ChangeNotifier {
         message: bytes,
       );
       sig = personalSig.toHexString();
+    } else {
+      throw "Invlid slip44";
     }
 
     return sig;

@@ -2135,7 +2135,7 @@
   "@addLedgerAccountPageCreateButton": {
     "description": "Button text for creating a new wallet in the AddLedgerAccountPage component"
   },
-  "addLedgerAccountPageAddButton": "Add",
+  "addLedgerAccountPageAddButton": "Update",
   "@addLedgerAccountPageAddButton": {
     "description": "Button text for adding accounts to an existing wallet in the AddLedgerAccountPage component"
   },
