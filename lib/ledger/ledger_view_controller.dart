@@ -14,6 +14,7 @@ import 'package:zilpay/ledger/zilliqa/zilliqa_ledger_app.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/account.dart';
+import 'package:zilpay/src/rust/models/transactions/request.dart';
 
 enum LedgerStatus {
   initializing,
@@ -153,6 +154,16 @@ class LedgerViewController extends ChangeNotifier {
     } else {
       throw "Invlid slip44";
     }
+  }
+
+  Future<String> signTransaction({
+    required TransactionRequestInfo transaction,
+    required int walletIndex,
+    required int accountIndex,
+  }) async {
+    // TODO: add sign tx
+    //
+    return "";
   }
 
   Future<String> signMesage({
