@@ -137,7 +137,7 @@ class LedgerViewController extends ChangeNotifier {
     required AccountInfo account,
     required BigInt walletIndex,
   }) async {
-    if (account.slip44 == 60 || account.slip44 == 60) {
+    if (account.slip44 == 60 || account.slip44 == 313) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       final typedDataJson = jsonEncode(typedData.toJson());
       final eip712Hashes =

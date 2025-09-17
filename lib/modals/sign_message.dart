@@ -134,6 +134,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
     final appState = context.read<AppState>();
     await appState.ledgerViewController.open(device);
+    setState(() {});
   }
 
   Future<bool> _authenticate() async => _authService.authenticate(
