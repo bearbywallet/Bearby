@@ -6,6 +6,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/swipe_button.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
+import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/eip712.dart';
@@ -94,6 +95,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();
+      appState.ledgerViewController.addListener(_handleControllerEvents);
     }
   }
 
@@ -105,12 +107,31 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     if (_isLedgerWallet) {
       final appState = context.read<AppState>();
       appState.ledgerViewController.stopScan();
+      appState.ledgerViewController.removeListener(_handleControllerEvents);
     }
 
     super.dispose();
   }
 
-  Future<void> _onDeviceOpen(DiscoveredDevice device) async {
+  void _handleControllerEvents() {
+    if (!mounted) {
+      return;
+    }
+
+    final appState = context.read<AppState>();
+
+    if (appState.ledgerViewController.status == LedgerStatus.foundDevices) {
+      final devices = appState.ledgerViewController.discoveredDevices;
+
+      for (final device in devices) {
+        if (device.model?.id == appState.wallet?.walletType) {
+          _onDeviceLedgerOpen(device);
+        }
+      }
+    }
+  }
+
+  Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {
     final appState = context.read<AppState>();
     await appState.ledgerViewController.open(device);
   }
@@ -278,7 +299,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                         if (_isLedgerWallet) ...[
                           LedgerConnector(
                             controller: appState.ledgerViewController,
-                            onOpen: _onDeviceOpen,
+                            onOpen: _onDeviceLedgerOpen,
                           ),
                           const SizedBox(height: 16),
                         ],
