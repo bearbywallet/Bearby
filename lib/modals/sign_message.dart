@@ -95,7 +95,6 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
 
     if (_isLedgerWallet) {
       appState.ledgerViewController.scan();
-      appState.ledgerViewController.addListener(_handleControllerEvents);
     }
   }
 
@@ -107,28 +106,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
     if (_isLedgerWallet) {
       final appState = context.read<AppState>();
       appState.ledgerViewController.stopScan();
-      appState.ledgerViewController.removeListener(_handleControllerEvents);
     }
 
     super.dispose();
-  }
-
-  void _handleControllerEvents() {
-    if (!mounted) {
-      return;
-    }
-
-    final appState = context.read<AppState>();
-
-    if (appState.ledgerViewController.status == LedgerStatus.foundDevices) {
-      final devices = appState.ledgerViewController.discoveredDevices;
-
-      for (final device in devices) {
-        if (device.model?.id == appState.wallet?.walletType) {
-          _onDeviceLedgerOpen(device);
-        }
-      }
-    }
   }
 
   Future<void> _onDeviceLedgerOpen(DiscoveredDevice device) async {

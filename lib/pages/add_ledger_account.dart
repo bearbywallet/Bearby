@@ -80,7 +80,10 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     final appState = context.read<AppState>();
     final network = args['chain'] as NetworkConfigInfo?;
     final createWallet = args['createWallet'] as bool?;
-    if (_createWallet && appState.account?.addrType == 0) {
+
+    if (appState.wallets.isNotEmpty &&
+        _createWallet &&
+        appState.account?.addrType == 0) {
       _zilliqaLegacy = true;
     }
 
