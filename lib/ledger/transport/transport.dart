@@ -36,8 +36,8 @@ abstract class Transport {
     final apdu = Uint8List.fromList([cla, ins, p1, p2, data.length, ...data]);
     final response = await exchange(apdu);
 
+    debugPrint("response: $response");
     if (response.length < 2) {
-      debugPrint("response: $response");
       throw TransportException(
         'Response is too short',
         'InvalidResponseLength',

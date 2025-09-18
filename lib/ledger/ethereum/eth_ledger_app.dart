@@ -235,10 +235,14 @@ class EthLedgerApp {
 
   Future<EthLedgerSignature> signTransaction({
     required int index,
+    required int slip44,
     required List<Uint8List> transactionChunks,
-    int slip44 = 60,
     LedgerEthTransactionResolution? resolution,
   }) async {
+    if (transactionChunks.isEmpty) {
+      throw ArgumentError('Transaction chunks cannot be empty.');
+    }
+
     if (resolution != null) {
       for (final plugin in resolution.plugin) {
         await _setPlugin(plugin);
@@ -254,24 +258,14 @@ class EthLedgerApp {
       }
     }
 
-    final paths = await _getPaths(slip44: slip44, index: index);
-    final writer = ByteDataWriter(endian: Endian.big);
-    writer.writeUint8(paths.length);
-    for (final element in paths) {
-      writer.writeUint32(element);
-    }
-    final derivationPathBuffer = writer.toBytes();
-
     late Uint8List response;
     try {
-      final firstPayload = Uint8List.fromList(
-          [...derivationPathBuffer, ...transactionChunks.first]);
       response = await transport.send(
         0xe0, // CLA
         0x04, // INS
         0x00, // P1
         0x00, // P2
-        firstPayload,
+        transactionChunks.first,
       );
 
       for (int i = 1; i < transactionChunks.length; i++) {
