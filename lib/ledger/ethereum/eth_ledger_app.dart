@@ -250,20 +250,20 @@ class EthLedgerApp {
       debugPrint('Chunk $i hex: ${bytesToHex(chunk)}...');
     }
 
-    // if (resolution != null) {
-    //   for (final plugin in resolution.plugin) {
-    //     await _setPlugin(plugin);
-    //   }
-    //   for (final extPlugin in resolution.externalPlugin) {
-    //     await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
-    //   }
-    //   for (final nft in resolution.nfts) {
-    //     await _provideNFTInformation(nft);
-    //   }
-    //   for (final token in resolution.erc20Tokens) {
-    //     await _provideERC20TokenInformation(token);
-    //   }
-    // }
+    if (resolution != null) {
+      for (final plugin in resolution.plugin) {
+        await _setPlugin(plugin);
+      }
+      for (final extPlugin in resolution.externalPlugin) {
+        await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
+      }
+      for (final nft in resolution.nfts) {
+        await _provideNFTInformation(nft);
+      }
+      for (final token in resolution.erc20Tokens) {
+        await _provideERC20TokenInformation(token);
+      }
+    }
 
     late Uint8List response;
 
