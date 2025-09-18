@@ -198,7 +198,6 @@ pub async fn encode_tx_rlp(
                 let derivation_bytes = components_to_derivation_path(&derivation_path);
                 let transaction_type = tx_eth.preferred_type();
 
-                dbg!(&tx, &transaction_type);
                 let rlp = tx
                     .to_rlp_encode(&account.pub_key)
                     .map_err(ServiceError::TransactionErrors)?;
