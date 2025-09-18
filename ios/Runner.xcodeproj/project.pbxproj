@@ -8,6 +8,12 @@
 
 /* Begin PBXBuildFile section */
 		1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */ = {isa = PBXBuildFile; fileRef = 1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */; };
+		15A6A5272E7BD81900D58C54 /* LedgerBlePlugin.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A5262E7BD81700D58C54 /* LedgerBlePlugin.swift */; };
+		15A6A5292E7BD82900D58C54 /* BleManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A5282E7BD82700D58C54 /* BleManager.swift */; };
+		15A6A52D2E7BD83900D58C54 /* BleTransport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A52C2E7BD83800D58C54 /* BleTransport.swift */; };
+		15A6A52F2E7BD84000D58C54 /* BleFraming.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A52E2E7BD83F00D58C54 /* BleFraming.swift */; };
+		15A6A5312E7BD84700D58C54 /* Devices.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A5302E7BD84600D58C54 /* Devices.swift */; };
+		15A6A5332E7BD84F00D58C54 /* Errors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 15A6A5322E7BD84E00D58C54 /* Errors.swift */; };
 		331C808B294A63AB00263BE5 /* RunnerTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 331C807B294A618700263BE5 /* RunnerTests.swift */; };
 		3B3967161E833CAA004F5970 /* AppFrameworkInfo.plist in Resources */ = {isa = PBXBuildFile; fileRef = 3B3967151E833CAA004F5970 /* AppFrameworkInfo.plist */; };
 		72AE2D6DC64CAF74661D469A /* Pods_Runner.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CD62646C801284DF700AB789 /* Pods_Runner.framework */; };
@@ -43,6 +49,12 @@
 /* Begin PBXFileReference section */
 		1498D2321E8E86230040F4C2 /* GeneratedPluginRegistrant.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = GeneratedPluginRegistrant.h; sourceTree = "<group>"; };
 		1498D2331E8E89220040F4C2 /* GeneratedPluginRegistrant.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GeneratedPluginRegistrant.m; sourceTree = "<group>"; };
+		15A6A5262E7BD81700D58C54 /* LedgerBlePlugin.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LedgerBlePlugin.swift; sourceTree = "<group>"; };
+		15A6A5282E7BD82700D58C54 /* BleManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleManager.swift; sourceTree = "<group>"; };
+		15A6A52C2E7BD83800D58C54 /* BleTransport.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleTransport.swift; sourceTree = "<group>"; };
+		15A6A52E2E7BD83F00D58C54 /* BleFraming.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BleFraming.swift; sourceTree = "<group>"; };
+		15A6A5302E7BD84600D58C54 /* Devices.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Devices.swift; sourceTree = "<group>"; };
+		15A6A5322E7BD84E00D58C54 /* Errors.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Errors.swift; sourceTree = "<group>"; };
 		2FFBE7344BCC0C2700D3749B /* Pods-Runner.profile.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Runner.profile.xcconfig"; path = "Target Support Files/Pods-Runner/Pods-Runner.profile.xcconfig"; sourceTree = "<group>"; };
 		331C807B294A618700263BE5 /* RunnerTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RunnerTests.swift; sourceTree = "<group>"; };
 		331C8081294A63A400263BE5 /* RunnerTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RunnerTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -81,6 +93,19 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		15A6A5252E7BD80500D58C54 /* ble */ = {
+			isa = PBXGroup;
+			children = (
+				15A6A5322E7BD84E00D58C54 /* Errors.swift */,
+				15A6A5302E7BD84600D58C54 /* Devices.swift */,
+				15A6A52E2E7BD83F00D58C54 /* BleFraming.swift */,
+				15A6A52C2E7BD83800D58C54 /* BleTransport.swift */,
+				15A6A5282E7BD82700D58C54 /* BleManager.swift */,
+				15A6A5262E7BD81700D58C54 /* LedgerBlePlugin.swift */,
+			);
+			path = ble;
+			sourceTree = "<group>";
+		};
 		2288118E94C2733C33CA5D44 /* Pods */ = {
 			isa = PBXGroup;
 			children = (
@@ -134,6 +159,7 @@
 		97C146F01CF9000F007C117D /* Runner */ = {
 			isa = PBXGroup;
 			children = (
+				15A6A5252E7BD80500D58C54 /* ble */,
 				97C146FA1CF9000F007C117D /* Main.storyboard */,
 				97C146FD1CF9000F007C117D /* Assets.xcassets */,
 				97C146FF1CF9000F007C117D /* LaunchScreen.storyboard */,
@@ -362,7 +388,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				74858FAF1ED2DC5600515810 /* AppDelegate.swift in Sources */,
+				15A6A5292E7BD82900D58C54 /* BleManager.swift in Sources */,
 				1498D2341E8E89220040F4C2 /* GeneratedPluginRegistrant.m in Sources */,
+				15A6A5272E7BD81900D58C54 /* LedgerBlePlugin.swift in Sources */,
+				15A6A5332E7BD84F00D58C54 /* Errors.swift in Sources */,
+				15A6A5312E7BD84700D58C54 /* Devices.swift in Sources */,
+				15A6A52F2E7BD84000D58C54 /* BleFraming.swift in Sources */,
+				15A6A52D2E7BD83900D58C54 /* BleTransport.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

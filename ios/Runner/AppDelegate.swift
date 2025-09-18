@@ -1,4 +1,3 @@
-import Flutter
 import UIKit
 
 @main
@@ -8,6 +7,7 @@ import UIKit
     didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?
   ) -> Bool {
     GeneratedPluginRegistrant.register(with: self)
+    LedgerBlePlugin.register(with: self.registrar(forPlugin: "LedgerBlePlugin")!)
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
 }
