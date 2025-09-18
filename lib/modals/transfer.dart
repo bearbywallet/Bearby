@@ -228,7 +228,6 @@ class _ConfirmTransactionContentState
           chainId: widget.tx.scilla!.chainId,
           nonce: _txParamsInfo.nonce + BigInt.one,
           gasPrice: _gasPrice,
-          // gasLimit: widget.tx.scilla!.gasLimit,
           gasLimit: _txParamsInfo.txEstimateGas,
           toAddr: widget.tx.scilla!.toAddr,
           amount: adjustedAmount,

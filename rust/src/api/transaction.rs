@@ -441,6 +441,11 @@ pub async fn cacl_gas_fee(
             .await
             .map_err(ServiceError::NetworkErrors)?;
 
+        if gas.max_priority_fee > 0 {
+            // force remove it becase alloy.rs convert it as legacy
+            gas.gas_price = Default::default();
+        }
+
         if gas.tx_estimate_gas == U256::ZERO {
             match tx {
                 TransactionRequest::Zilliqa((tx, _)) => {
