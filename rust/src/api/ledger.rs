@@ -1,6 +1,5 @@
 use zilpay::{
-    background::bg_provider::ProvidersManagement,
-    crypto::bip49::{split_path, DerivationPath},
+    background::bg_provider::ProvidersManagement, crypto::bip49::split_path,
     wallet::wallet_storage::StorageOperations,
 };
 pub use zilpay::{
@@ -15,9 +14,7 @@ use crate::{
     models::{ftoken::FTokenInfo, settings::WalletSettingsInfo},
     utils::{
         errors::ServiceError,
-        utils::{
-            get_last_wallet, pubkey_from_provider, with_service, with_service_mut, with_wallet,
-        },
+        utils::{get_last_wallet, pubkey_from_provider, with_service, with_service_mut},
     },
 };
 

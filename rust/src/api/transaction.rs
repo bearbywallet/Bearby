@@ -14,7 +14,7 @@ pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
-use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
+use zilpay::crypto::bip49::{components_to_derivation_path, split_path};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
 pub use zilpay::proto::address::Address;
@@ -187,12 +187,18 @@ pub async fn encode_tx_rlp(
             }),
             TransactionRequest::Ethereum((ref mut tx_eth, _)) => {
                 tx_eth.chain_id = Some(account.chain_id);
-                let derivation_path =
-                    DerivationPath::new(account.slip_44, account.account_type.value());
-                let derivation_path = split_path(&derivation_path.get_path()).unwrap_or_default();
+                let ledger_path = format!(
+                    "44'/{}'/{}'/{}/{}",
+                    account.slip_44,
+                    0,
+                    0,
+                    account.account_type.value()
+                );
+                let derivation_path = split_path(&ledger_path).unwrap_or_default();
                 let derivation_bytes = components_to_derivation_path(&derivation_path);
                 let transaction_type = tx_eth.preferred_type();
 
+                dbg!(&tx, &transaction_type);
                 let rlp = tx
                     .to_rlp_encode(&account.pub_key)
                     .map_err(ServiceError::TransactionErrors)?;
@@ -440,11 +446,6 @@ pub async fn cacl_gas_fee(
             .estimate_params_batch(&tx, &sender_account.addr, 4, None)
             .await
             .map_err(ServiceError::NetworkErrors)?;
-
-        if gas.max_priority_fee > 0 {
-            // force remove it becase alloy.rs convert it as legacy
-            gas.gas_price = Default::default();
-        }
 
         if gas.tx_estimate_gas == U256::ZERO {
             match tx {

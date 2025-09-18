@@ -216,7 +216,8 @@ class _ConfirmTransactionContentState
           maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
           maxPriorityFeePerGas: _maxPriorityFee,
           gasLimit: _txParamsInfo.txEstimateGas,
-          gasPrice: _gasPrice,
+          gasPrice:
+              _txParamsInfo.feeHistory.maxFee > BigInt.zero ? null : _gasPrice,
           maxFeePerGas:
               (_txParamsInfo.feeHistory.baseFee * BigInt.two) + _maxPriorityFee,
         ),

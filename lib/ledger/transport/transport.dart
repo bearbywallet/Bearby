@@ -36,7 +36,6 @@ abstract class Transport {
     final apdu = Uint8List.fromList([cla, ins, p1, p2, data.length, ...data]);
     final response = await exchange(apdu);
 
-    debugPrint("response: $response");
     if (response.length < 2) {
       throw TransportException(
         'Response is too short',
@@ -45,14 +44,18 @@ abstract class Transport {
     }
 
     final sw =
-        response.buffer.asByteData().getUint16(response.length - 2, Endian.big);
+        (response[response.length - 2] << 8) | response[response.length - 1];
 
-    if (statusCodeChecker != null) {
-      final exception = statusCodeChecker(sw);
+    debugPrint("Status code: 0x${sw.toRadixString(16)}");
 
-      if (exception != null) {
-        throw exception;
+    if (sw != 0x9000) {
+      if (statusCodeChecker != null) {
+        final exception = statusCodeChecker(sw);
+        if (exception != null) {
+          throw exception;
+        }
       }
+      throw TransportStatusError(sw, 'Status code: 0x${sw.toRadixString(16)}');
     }
 
     return response.sublist(0, response.length - 2);

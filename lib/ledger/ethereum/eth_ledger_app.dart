@@ -243,36 +243,38 @@ class EthLedgerApp {
       throw ArgumentError('Transaction chunks cannot be empty.');
     }
 
-    if (resolution != null) {
-      for (final plugin in resolution.plugin) {
-        await _setPlugin(plugin);
-      }
-      for (final extPlugin in resolution.externalPlugin) {
-        await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
-      }
-      for (final nft in resolution.nfts) {
-        await _provideNFTInformation(nft);
-      }
-      for (final token in resolution.erc20Tokens) {
-        await _provideERC20TokenInformation(token);
-      }
+    debugPrint('Total chunks: ${transactionChunks.length}');
+    for (int i = 0; i < transactionChunks.length; i++) {
+      final chunk = transactionChunks[i];
+      debugPrint('Chunk $i length: ${chunk.length}');
+      debugPrint('Chunk $i hex: ${bytesToHex(chunk)}...');
     }
 
-    late Uint8List response;
-    try {
-      response = await transport.send(
-        0xe0, // CLA
-        0x04, // INS
-        0x00, // P1
-        0x00, // P2
-        transactionChunks.first,
-      );
+    // if (resolution != null) {
+    //   for (final plugin in resolution.plugin) {
+    //     await _setPlugin(plugin);
+    //   }
+    //   for (final extPlugin in resolution.externalPlugin) {
+    //     await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
+    //   }
+    //   for (final nft in resolution.nfts) {
+    //     await _provideNFTInformation(nft);
+    //   }
+    //   for (final token in resolution.erc20Tokens) {
+    //     await _provideERC20TokenInformation(token);
+    //   }
+    // }
 
-      for (int i = 1; i < transactionChunks.length; i++) {
+    late Uint8List response;
+
+    try {
+      for (int i = 0; i < transactionChunks.length; i++) {
+        final isFirstChunk = i == 0;
+
         response = await transport.send(
           0xe0, // CLA
           0x04, // INS
-          0x80, // P1
+          isFirstChunk ? 0x00 : 0x80, // P1: 0x00
           0x00, // P2
           transactionChunks[i],
         );
