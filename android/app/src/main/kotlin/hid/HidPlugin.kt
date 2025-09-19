@@ -192,13 +192,21 @@ class HidPlugin : FlutterPlugin, MethodChannel.MethodCallHandler, EventChannel.S
             }
 
             val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
+                PendingIntent.FLAG_MUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
             } else {
                 PendingIntent.FLAG_UPDATE_CURRENT
             }
-            val permIntent = PendingIntent.getBroadcast(context, 0, Intent(ACTION_USB_PERMISSION), flags)
+            val permissionIntent = Intent(ACTION_USB_PERMISSION).apply {
+                setPackage(context.packageName)
+            }
+            val permIntent = PendingIntent.getBroadcast(context, 0, permissionIntent, flags)
 
-            ContextCompat.registerReceiver(context, usbReceiver, filter, ContextCompat.RECEIVER_NOT_EXPORTED)
+            val receiverFlags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                ContextCompat.RECEIVER_EXPORTED
+            } else {
+                0
+            }
+            ContextCompat.registerReceiver(context, usbReceiver, filter, receiverFlags)
             usbManager.requestPermission(device, permIntent)
         }
     }
