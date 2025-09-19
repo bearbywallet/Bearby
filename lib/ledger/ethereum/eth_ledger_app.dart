@@ -203,8 +203,8 @@ class EthLedgerApp {
         const ResolutionConfig(
           erc20: true,
           externalPlugins: true,
-          nft: true,
-          uniswapV3: true,
+          nft: false,
+          uniswapV3: false,
         );
 
     LedgerEthTransactionResolution? resolution;
@@ -223,6 +223,7 @@ class EthLedgerApp {
       tx: transaction,
       walletIndex: BigInt.from(walletIndex),
       accountIndex: BigInt.from(accountIndex),
+      slip44: slip44,
     );
 
     return await signTransaction(
@@ -269,6 +270,7 @@ class EthLedgerApp {
 
     try {
       for (int i = 0; i < transactionChunks.length; i++) {
+        await Future.delayed(const Duration(milliseconds: 50));
         final isFirstChunk = i == 0;
 
         response = await transport.send(

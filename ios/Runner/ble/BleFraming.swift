@@ -13,31 +13,34 @@ func sendApdu(
     logger.info("APDU size: \(apdu.count) bytes, MTU: \(mtuSize)")
     logger.info("Full APDU: \(apdu.map { String(format: "%02x", $0) }.joined())")
     
-    let chunkSize = mtuSize - 3
-    guard chunkSize > 0 else {
+    let firstChunkPayloadSize = mtuSize - 5
+    let subsequentChunkPayloadSize = mtuSize - 3
+    
+    guard firstChunkPayloadSize > 0, subsequentChunkPayloadSize > 0 else {
         logger.error("MTU size too small: \(mtuSize)")
         throw BleError.illegalArgument("MTU size is too small")
     }
     
-    logger.info("Chunk size: \(chunkSize) bytes")
+    logger.info("Payload size: First chunk: \(firstChunkPayloadSize), Subsequent: \(subsequentChunkPayloadSize)")
 
     var offset = 0
     var sequence: UInt16 = 0
-    let totalChunks = (apdu.count + chunkSize - 1) / chunkSize
-    logger.info("Will send \(totalChunks) chunks")
     
     while offset < apdu.count {
+        let isFirstChunk = sequence == 0
+        let chunkSize = isFirstChunk ? firstChunkPayloadSize : subsequentChunkPayloadSize
+        
         let remaining = apdu.count - offset
         let size = min(remaining, chunkSize)
         
-        logger.info("Preparing chunk \(sequence + 1)/\(totalChunks):")
+        logger.info("Preparing chunk \(sequence + 1):")
         logger.info("  Offset: \(offset), Size: \(size)")
         
         var buffer = Data()
         buffer.append(TAG_ID)
         buffer.append(contentsOf: withUnsafeBytes(of: sequence.bigEndian) { Array($0) })
         
-        if sequence == 0 {
+        if isFirstChunk {
             logger.info("  First chunk - adding length header: \(apdu.count)")
             buffer.append(contentsOf: withUnsafeBytes(of: UInt16(apdu.count).bigEndian) { Array($0) })
         }

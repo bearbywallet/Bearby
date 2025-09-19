@@ -1226,6 +1226,7 @@ fn wire__crate__api__transaction__encode_tx_rlp_impl(
             let api_tx = <crate::models::transactions::request::TransactionRequestInfo>::sse_decode(
                 &mut deserializer,
             );
+            let api_slip44 = <u32>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -1234,6 +1235,7 @@ fn wire__crate__api__transaction__encode_tx_rlp_impl(
                             api_wallet_index,
                             api_account_index,
                             api_tx,
+                            api_slip44,
                         )
                         .await?;
                         Ok(output_ok)

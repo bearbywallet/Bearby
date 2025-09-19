@@ -145,6 +145,7 @@ class ZilliqaLedgerApp {
       tx: transaction,
       walletIndex: BigInt.from(walletIndex),
       accountIndex: BigInt.from(accountIndex),
+      slip44: 313,
     );
     final txnBytes = txProto.bytes;
 

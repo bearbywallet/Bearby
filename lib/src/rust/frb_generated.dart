@@ -233,7 +233,8 @@ abstract class RustLibApi extends BaseApi {
   Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp(
       {required BigInt walletIndex,
       required BigInt accountIndex,
-      required TransactionRequestInfo tx});
+      required TransactionRequestInfo tx,
+      required int slip44});
 
   Future<List<FinalOutputInfo>> crateApiStakeFetchEvmStake(
       {required BigInt walletIndex, required BigInt accountIndex});
@@ -1316,13 +1317,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<EncodedRLPTx> crateApiTransactionEncodeTxRlp(
       {required BigInt walletIndex,
       required BigInt accountIndex,
-      required TransactionRequestInfo tx}) {
+      required TransactionRequestInfo tx,
+      required int slip44}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
         sse_encode_usize(accountIndex, serializer);
         sse_encode_box_autoadd_transaction_request_info(tx, serializer);
+        sse_encode_u_32(slip44, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 29, port: port_);
       },
@@ -1331,7 +1334,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiTransactionEncodeTxRlpConstMeta,
-      argValues: [walletIndex, accountIndex, tx],
+      argValues: [walletIndex, accountIndex, tx, slip44],
       apiImpl: this,
     ));
   }
@@ -1339,7 +1342,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiTransactionEncodeTxRlpConstMeta =>
       const TaskConstMeta(
         debugName: "encode_tx_rlp",
-        argNames: ["walletIndex", "accountIndex", "tx"],
+        argNames: ["walletIndex", "accountIndex", "tx", "slip44"],
       );
 
   @override

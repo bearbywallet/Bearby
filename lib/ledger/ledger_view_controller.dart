@@ -178,7 +178,7 @@ class LedgerViewController extends ChangeNotifier {
         transaction: transaction,
         walletIndex: walletIndex,
         accountIndex: account.index.toInt(),
-        slip44: account.slip44,
+        slip44: 60,
       );
 
       return sig.toBytes();

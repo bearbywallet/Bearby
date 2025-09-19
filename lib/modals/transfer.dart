@@ -580,6 +580,7 @@ class _ConfirmTransactionContentState
                               widget.onConfirm(sendedTx);
                             }
                           } catch (e) {
+                            debugPrint("send tx err: $e");
                             setState(() => _error = e.toString());
                           } finally {
                             setState(() => _loading = false);

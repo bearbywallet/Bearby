@@ -45,9 +45,13 @@ Future<HistoricalTransactionInfo> signSendTransactions(
 Future<EncodedRLPTx> encodeTxRlp(
         {required BigInt walletIndex,
         required BigInt accountIndex,
-        required TransactionRequestInfo tx}) =>
+        required TransactionRequestInfo tx,
+        required int slip44}) =>
     RustLib.instance.api.crateApiTransactionEncodeTxRlp(
-        walletIndex: walletIndex, accountIndex: accountIndex, tx: tx);
+        walletIndex: walletIndex,
+        accountIndex: accountIndex,
+        tx: tx,
+        slip44: slip44);
 
 Future<Uint8List> prepareMessage(
         {required BigInt walletIndex,

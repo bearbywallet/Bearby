@@ -291,7 +291,7 @@ class BleTransport: NSObject, CBPeripheralDelegate {
         Self.logger.info("APDU to send (\(apdu.count) bytes): \(apdu.map { String(format: "%02x", $0) }.joined())")
         Self.logger.info("Using MTU size: \(self.mtuSize)")
 
-        return try await withTimeout(30.0) {
+        return try await withTimeout(120.0) {
             Self.logger.info("Setting up response stream...")
             let responseStream = receiveApdu(notificationStream: self.notificationStream)
 

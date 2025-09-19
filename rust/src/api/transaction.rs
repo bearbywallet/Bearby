@@ -164,6 +164,7 @@ pub async fn encode_tx_rlp(
     wallet_index: usize,
     account_index: usize,
     tx: TransactionRequestInfo,
+    slip44: u32,
 ) -> Result<EncodedRLPTx, String> {
     with_wallet(wallet_index, |wallet| {
         let walelt_data = wallet
@@ -189,7 +190,7 @@ pub async fn encode_tx_rlp(
                 tx_eth.chain_id = Some(account.chain_id);
                 let ledger_path = format!(
                     "44'/{}'/{}'/{}/{}",
-                    account.slip_44,
+                    slip44,
                     0,
                     0,
                     account.account_type.value()
