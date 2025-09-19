@@ -18,6 +18,7 @@ class HidDevice(manager: UsbManager, device: UsbDevice) {
     companion object {
         private const val HID_BUFFER_SIZE = 64
         private const val LEDGER_DEFAULT_CHANNEL = 1
+        private const val TIMEOUT_MS = 5000L
     }
 
     init {
@@ -39,71 +40,80 @@ class HidDevice(manager: UsbManager, device: UsbDevice) {
 
     fun exchange(command: ByteArray): ByteArray {
         val future = executor.submit<ByteArray> {
-            val response = ByteArrayOutputStream()
-            var responseData: ByteArray? = null
-            var offset = 0
+            // Wrap command into HID packets
             val wrappedCommand = LedgerHelper.wrapCommandAPDU(LEDGER_DEFAULT_CHANNEL, command, HID_BUFFER_SIZE)
 
-            val outRequest = UsbRequest()
-            try {
-                if (!outRequest.initialize(connection, endpointOut)) {
-                    throw DisconnectedDeviceException("Failed to initialize OUT request")
-                }
-                while (offset != wrappedCommand.size) {
-                    val blockSize = min(wrappedCommand.size - offset, HID_BUFFER_SIZE)
-                    val buffer = ByteBuffer.wrap(wrappedCommand, offset, blockSize)
-
-                    if (!outRequest.queue(buffer, blockSize)) {
-                        throw DisconnectedDeviceException("Failed to queue OUT request")
-                    }
-
-                    if (connection.requestWait() == null) {
-                        throw DisconnectedDeviceException("I/O error on write (requestWait failed)")
-                    }
-                    offset += blockSize
-                }
-            } finally {
-                outRequest.close()
+            // Send packets one by one
+            val packets = mutableListOf<ByteArray>()
+            var offset = 0
+            while (offset < wrappedCommand.size) {
+                val packet = ByteArray(HID_BUFFER_SIZE)
+                val copySize = min(HID_BUFFER_SIZE, wrappedCommand.size - offset)
+                System.arraycopy(wrappedCommand, offset, packet, 0, copySize)
+                packets.add(packet)
+                offset += HID_BUFFER_SIZE
             }
 
-            val inRequest = UsbRequest()
-            try {
-                if (!inRequest.initialize(connection, endpointIn)) {
-                    throw DisconnectedDeviceException("Failed to initialize IN request")
+            // Send each packet
+            for ((index, packet) in packets.withIndex()) {
+                val bytesSent = connection.bulkTransfer(
+                    endpointOut,
+                    packet,
+                    packet.size,
+                    TIMEOUT_MS.toInt()
+                )
+
+                if (bytesSent != packet.size) {
+                    throw DisconnectedDeviceException("Failed to send packet $index: expected ${packet.size}, sent $bytesSent")
                 }
-                val responseBuffer = ByteBuffer.allocate(HID_BUFFER_SIZE)
 
-                while (true) {
-                    responseBuffer.clear()
-                    if (!inRequest.queue(responseBuffer, HID_BUFFER_SIZE)) {
-                        throw DisconnectedDeviceException("Failed to queue IN request")
-                    }
-
-                    if (connection.requestWait() == null) {
-                        throw DisconnectedDeviceException("I/O error on read (requestWait failed)")
-                    }
-
-                    val bytesRead = responseBuffer.position()
-                    if (bytesRead > 0) {
-                        val chunk = ByteArray(bytesRead)
-                        responseBuffer.rewind()
-                        responseBuffer.get(chunk, 0, bytesRead)
-                        response.write(chunk)
-                    }
-
-                    responseData = LedgerHelper.unwrapResponseAPDU(LEDGER_DEFAULT_CHANNEL, response.toByteArray(), HID_BUFFER_SIZE)
-                    if (responseData != null) {
-                        break
-                    }
+                // Small delay between packets for device processing
+                if (index < packets.size - 1) {
+                    Thread.sleep(10)
                 }
-            } finally {
-                inRequest.close()
+            }
+
+            // Read response
+            val response = ByteArrayOutputStream()
+            var responseData: ByteArray? = null
+            val buffer = ByteArray(HID_BUFFER_SIZE)
+            var attempts = 0
+            val maxAttempts = 100 // Max 5 seconds with 50ms delays
+
+            while (responseData == null && attempts < maxAttempts) {
+                val bytesRead = connection.bulkTransfer(
+                    endpointIn,
+                    buffer,
+                    buffer.size,
+                    50 // Short timeout for each read
+                )
+
+                if (bytesRead > 0) {
+                    response.write(buffer, 0, bytesRead)
+                    responseData = LedgerHelper.unwrapResponseAPDU(
+                        LEDGER_DEFAULT_CHANNEL,
+                        response.toByteArray(),
+                        HID_BUFFER_SIZE
+                    )
+                } else if (bytesRead < 0 && response.size() == 0) {
+                    // Only throw if we haven't received any data yet
+                    Thread.sleep(50)
+                    attempts++
+                } else {
+                    // No more data but we already have some response
+                    Thread.sleep(50)
+                    attempts++
+                }
+            }
+
+            if (responseData == null) {
+                throw DisconnectedDeviceException("Failed to receive complete response after $attempts attempts")
             }
 
             responseData
         }
-        // Вот изменение:
-        return future.get(15, TimeUnit.SECONDS)
+
+        return future.get(30, TimeUnit.SECONDS)
     }
 
     fun close() {

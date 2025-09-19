@@ -13,78 +13,125 @@ object LedgerHelper {
         var sequenceIdx = 0
         var offset = 0
 
-        output.write(channel shr 8)
-        output.write(channel)
-        output.write(TAG_APDU)
-        output.write(sequenceIdx shr 8)
-        output.write(sequenceIdx)
+        // Debug: Log command info
+        android.util.Log.d("LedgerHelper", "Wrapping command: size=${command.size}, packetSize=$packetSize")
+
+        // First packet
+        val firstPacket = ByteArrayOutputStream()
+        firstPacket.write(channel shr 8)
+        firstPacket.write(channel and 0xff)
+        firstPacket.write(TAG_APDU)
+        firstPacket.write(sequenceIdx shr 8)
+        firstPacket.write(sequenceIdx and 0xff)
         sequenceIdx++
-        output.write(command.size shr 8)
-        output.write(command.size)
+        firstPacket.write(command.size shr 8)
+        firstPacket.write(command.size and 0xff)
+
         var blockSize = (command.size - offset).coerceAtMost(packetSize - 7)
-        output.write(command, offset, blockSize)
+        firstPacket.write(command, offset, blockSize)
         offset += blockSize
-        while (offset != command.size) {
-            output.write(channel shr 8)
-            output.write(channel)
-            output.write(TAG_APDU)
-            output.write(sequenceIdx shr 8)
-            output.write(sequenceIdx)
+
+        // Pad first packet to packetSize
+        while (firstPacket.size() < packetSize) {
+            firstPacket.write(0x00)
+        }
+        val firstBytes = firstPacket.toByteArray()
+        android.util.Log.d("LedgerHelper", "First packet: size=${firstBytes.size}, header=${firstBytes.take(7).joinToString(" ") { "%02x".format(it) }}")
+        output.write(firstBytes)
+
+        // Subsequent packets
+        var packetCount = 1
+        while (offset < command.size) {
+            val packet = ByteArrayOutputStream()
+            packet.write(channel shr 8)
+            packet.write(channel and 0xff)
+            packet.write(TAG_APDU)
+            packet.write(sequenceIdx shr 8)
+            packet.write(sequenceIdx and 0xff)
             sequenceIdx++
+
             blockSize = (command.size - offset).coerceAtMost(packetSize - 5)
-            output.write(command, offset, blockSize)
+            packet.write(command, offset, blockSize)
             offset += blockSize
+
+            // Pad each packet to packetSize
+            while (packet.size() < packetSize) {
+                packet.write(0x00)
+            }
+            val packetBytes = packet.toByteArray()
+            android.util.Log.d("LedgerHelper", "Packet $packetCount: size=${packetBytes.size}, seq=${sequenceIdx-1}")
+            output.write(packetBytes)
+            packetCount++
         }
-        val currentSize = output.size()
-        if ((currentSize % packetSize) != 0) {
-            val paddingSize = packetSize - (currentSize % packetSize)
-            val padding = ByteArray(paddingSize)
-            output.write(padding, 0, padding.size)
-        }
+
+        android.util.Log.d("LedgerHelper", "Total packets created: $packetCount")
         return output.toByteArray()
     }
 
     fun unwrapResponseAPDU(channel: Int, data: ByteArray, packetSize: Int): ByteArray? {
-        val response = ByteArrayOutputStream()
-        var offset = 0
-        val responseLength: Int
-        var sequenceIdx = 0
-        if (data.size < 7 + 5) {
+        if (data.size < 7) {
             return null
         }
-        if (data[offset++].toInt() != (channel shr 8)) throw Exception("Invalid channel")
-        if (data[offset++].toInt() != (channel and 0xff)) throw Exception("Invalid channel")
-        if (data[offset++].toInt() != TAG_APDU) throw Exception("Invalid tag")
-        if (data[offset++].toInt() != 0x00) throw Exception("Invalid sequence")
-        if (data[offset++].toInt() != 0x00) throw Exception("Invalid sequence")
 
-        responseLength = ((data[offset++].toInt() and 0xff) shl 8) or (data[offset++].toInt() and 0xff)
-        if (data.size < 7 + responseLength) {
-            return null
+        val response = ByteArrayOutputStream()
+        var offset = 0
+        var sequenceIdx = 0
+
+        // Parse first packet
+        if (data[offset++].toInt() and 0xff != (channel shr 8)) return null
+        if (data[offset++].toInt() and 0xff != (channel and 0xff)) return null
+        if (data[offset++].toInt() and 0xff != TAG_APDU) return null
+        if (data[offset++].toInt() and 0xff != 0x00) return null
+        if (data[offset++].toInt() and 0xff != 0x00) return null
+
+        val responseLength = ((data[offset++].toInt() and 0xff) shl 8) or (data[offset++].toInt() and 0xff)
+
+        if (responseLength == 0) {
+            return ByteArray(0)
         }
 
         var blockSize = responseLength.coerceAtMost(packetSize - 7)
+        if (offset + blockSize > data.size) {
+            blockSize = data.size - offset
+        }
         response.write(data, offset, blockSize)
         offset += blockSize
 
-        while (response.size() != responseLength) {
-            sequenceIdx++
-            if (offset == data.size) {
-                return null
+        // Skip padding in first packet
+        val firstPacketEnd = ((offset - 1) / packetSize + 1) * packetSize
+        offset = firstPacketEnd
+
+        // Parse subsequent packets
+        while (response.size() < responseLength) {
+            if (offset >= data.size) {
+                return null // Need more data
             }
-            if (data[offset++].toInt() != (channel shr 8)) throw Exception("Invalid channel")
-            if (data[offset++].toInt() != (channel and 0xff)) throw Exception("Invalid channel")
-            if (data[offset++].toInt() != TAG_APDU) throw Exception("Invalid tag")
-            if (data[offset++].toInt() != (sequenceIdx shr 8)) throw Exception("Invalid sequence")
-            if (data[offset++].toInt() != (sequenceIdx and 0xff)) throw Exception("Invalid sequence")
+
+            sequenceIdx++
+
+            // Check packet header
+            if (data[offset++].toInt() and 0xff != (channel shr 8)) return null
+            if (data[offset++].toInt() and 0xff != (channel and 0xff)) return null
+            if (data[offset++].toInt() and 0xff != TAG_APDU) return null
+            if (data[offset++].toInt() and 0xff != (sequenceIdx shr 8)) return null
+            if (data[offset++].toInt() and 0xff != (sequenceIdx and 0xff)) return null
 
             blockSize = (responseLength - response.size()).coerceAtMost(packetSize - 5)
-            if (blockSize > data.size - offset) {
-                return null
+            if (offset + blockSize > data.size) {
+                blockSize = data.size - offset
             }
             response.write(data, offset, blockSize)
             offset += blockSize
+
+            // Skip padding
+            val packetEnd = ((offset - 1) / packetSize + 1) * packetSize
+            offset = packetEnd
         }
-        return response.toByteArray()
+
+        return if (response.size() == responseLength) {
+            response.toByteArray()
+        } else {
+            null
+        }
     }
 }
