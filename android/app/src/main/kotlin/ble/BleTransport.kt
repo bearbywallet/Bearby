@@ -207,7 +207,7 @@ class BleTransport(private val context: Context, private val device: BluetoothDe
         }
     }
 
-    suspend fun exchange(apdu: ByteArray): ByteArray = withTimeout(30000) {
+    suspend fun exchange(apdu: ByteArray): ByteArray = withTimeout(120000) {
         coroutineScope {
             val responseFlow = receiveApdu(notificationFlow)
             val responseJob = async { responseFlow.first() }

@@ -1,5 +1,6 @@
 package ble
 
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.transform
@@ -12,21 +13,41 @@ suspend fun sendApdu(
     apdu: ByteArray,
     mtuSize: Int
 ) {
-    val chunks = apdu.asIterable().chunked(mtuSize - 3) { it.toByteArray() }
-        .mapIndexed { i, chunk ->
-            val headerSize = if (i == 0) 5 else 3
-            val buffer = ByteBuffer.allocate(headerSize + chunk.size)
-            buffer.put(TAG_ID)
-            buffer.putShort(i.toShort())
-            if (i == 0) {
-                buffer.putShort(apdu.size.toShort())
-            }
-            buffer.put(chunk)
-            buffer.array()
+    val firstChunkPayloadSize = mtuSize - 5
+    val subsequentChunkPayloadSize = mtuSize - 3
+
+    if (firstChunkPayloadSize <= 0) {
+        throw IllegalArgumentException("MTU size is too small")
+    }
+
+    val chunks = mutableListOf<ByteArray>()
+    var offset = 0
+    var sequence = 0
+
+    while (offset < apdu.size) {
+        val isFirstChunk = sequence == 0
+        val payloadSize = if (isFirstChunk) firstChunkPayloadSize else subsequentChunkPayloadSize
+        val chunkSize = minOf(apdu.size - offset, payloadSize)
+
+        val chunkData = apdu.sliceArray(offset until offset + chunkSize)
+
+        val headerSize = if (isFirstChunk) 5 else 3
+        val buffer = ByteBuffer.allocate(headerSize + chunkData.size)
+        buffer.put(TAG_ID)
+        buffer.putShort(sequence.toShort())
+        if (isFirstChunk) {
+            buffer.putShort(apdu.size.toShort())
         }
+        buffer.put(chunkData)
+        chunks.add(buffer.array())
+
+        offset += chunkSize
+        sequence++
+    }
 
     for (chunk in chunks) {
         write(chunk)
+        delay(20)
     }
 }
 
@@ -40,7 +61,7 @@ fun receiveApdu(rawFlow: Flow<ByteArray>): Flow<ByteArray> = flow {
             if (value.isEmpty() || value[0] != TAG_ID) return@transform
 
             val buffer = ByteBuffer.wrap(value)
-            buffer.get() // Skip tag
+            buffer.get()
             val chunkIndex = buffer.short.toInt()
 
             if (notifiedIndex != chunkIndex) {
@@ -48,7 +69,7 @@ fun receiveApdu(rawFlow: Flow<ByteArray>): Flow<ByteArray> = flow {
             }
 
             val chunkData = if (chunkIndex == 0) {
-                notifiedDataLength = buffer.short.toInt()
+                notifiedDataLength = buffer.short.toInt() and 0xFFFF
                 ByteArray(value.size - 5).also { buffer.get(it) }
             } else {
                 ByteArray(value.size - 3).also { buffer.get(it) }
