@@ -15,7 +15,7 @@ use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     crypto::slip44::ZILLIQA,
     proto::{address::Address, pubkey::PubKey},
-    wallet::wallet_storage::StorageOperations,
+    wallet::{wallet_storage::StorageOperations, wallet_types::WalletTypes},
 };
 
 pub async fn add_new_book_address(
@@ -77,7 +77,9 @@ pub async fn get_combine_sort_addresses(
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let providers = core.get_providers();
 
-        let my_accounts: Vec<Entry> = if selected_account.slip_44 == ZILLIQA {
+        let my_accounts: Vec<Entry> = if selected_account.slip_44 == ZILLIQA
+            && !matches!(wallet_data.wallet_type, WalletTypes::Ledger(_))
+        {
             let capacity = wallet_data.accounts.len() * 2;
             let mut accounts = Vec::with_capacity(capacity);
 
