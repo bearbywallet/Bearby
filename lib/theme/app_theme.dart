@@ -62,10 +62,6 @@ abstract class AppTheme {
   Color get success;
   Color get warning;
 
-  Color get gradientStart;
-  Color get gradientMiddle;
-  Color get gradientEnd;
-
   Color get modalBorder;
 
   Brightness get brightness;
@@ -106,13 +102,6 @@ class DarkTheme implements AppTheme {
   Color get success => const Color(0xFF4CAF50);
   @override
   Color get warning => const Color(0xFFFF9800);
-
-  @override
-  Color get gradientStart => const Color(0xFF4A0E4E);
-  @override
-  Color get gradientMiddle => const Color(0xFF220A23);
-  @override
-  Color get gradientEnd => Colors.black;
 
   @override
   Color get modalBorder => Colors.grey.withValues(alpha: 0.2);
@@ -164,13 +153,6 @@ class LightTheme implements AppTheme {
   Color get success => const Color(0xFF00D395);
   @override
   Color get warning => const Color(0xFFFFA500);
-
-  @override
-  Color get gradientStart => const Color(0xFFFF007A);
-  @override
-  Color get gradientMiddle => const Color(0xFFD500F9);
-  @override
-  Color get gradientEnd => const Color(0xFFFF007A);
 
   @override
   Color get modalBorder => const Color(0xFFE0E0E0);

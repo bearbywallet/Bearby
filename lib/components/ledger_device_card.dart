@@ -24,23 +24,8 @@ class LedgerCard extends StatefulWidget {
   State<LedgerCard> createState() => _LedgerCardState();
 }
 
-class _LedgerCardState extends State<LedgerCard>
-    with SingleTickerProviderStateMixin {
+class _LedgerCardState extends State<LedgerCard> {
   bool _isPressed = false;
-  late final AnimationController _shimmerController;
-
-  @override
-  void initState() {
-    super.initState();
-    _shimmerController = AnimationController.unbounded(vsync: this)
-      ..repeat(min: -1.0, max: 2.0, period: const Duration(milliseconds: 1200));
-  }
-
-  @override
-  void dispose() {
-    _shimmerController.dispose();
-    super.dispose();
-  }
 
   void _setPressed(bool pressed) {
     if (widget.isConnecting || widget.isConnected) return;
@@ -57,7 +42,7 @@ class _LedgerCardState extends State<LedgerCard>
 
     final cardColor = widget.isConnected
         ? theme.success.withValues(alpha: 0.15)
-        : theme.cardBackground;
+        : theme.buttonBackground.withValues(alpha: 0.1);
     final borderColor = widget.isConnected
         ? theme.success.withValues(alpha: 0.7)
         : theme.cardBackground.withValues(alpha: 0.5);
@@ -77,42 +62,23 @@ class _LedgerCardState extends State<LedgerCard>
         scale: scale,
         duration: const Duration(milliseconds: 200),
         curve: Curves.fastOutSlowIn,
-        child: Container(
-          clipBehavior: Clip.antiAlias,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
           decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(16.0),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
+            color: cardColor,
+            border: Border.all(color: borderColor, width: 1.0),
+            borderRadius: BorderRadius.circular(12.0),
           ),
-          child: Stack(
-            children: [
-              // Base Card Content
-              AnimatedContainer(
-                duration: const Duration(milliseconds: 300),
-                decoration: BoxDecoration(
-                  color: cardColor,
-                  border: Border.all(color: borderColor, width: 1.5),
-                  borderRadius: BorderRadius.circular(16.0),
-                ),
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
-                  child: Row(
-                    children: [
-                      _buildDeviceIcon(theme),
-                      const SizedBox(width: 16),
-                      Expanded(child: _buildDeviceInfo(theme)),
-                      _buildStatusIndicator(theme),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          child: Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            child: Row(
+              children: [
+                _buildDeviceIcon(theme),
+                const SizedBox(width: 12),
+                Expanded(child: _buildDeviceInfo(theme)),
+                _buildStatusIndicator(theme),
+              ],
+            ),
           ),
         ),
       ),
@@ -121,8 +87,8 @@ class _LedgerCardState extends State<LedgerCard>
 
   Widget _buildDeviceIcon(dynamic theme) {
     return Container(
-      width: 48,
-      height: 48,
+      width: 40,
+      height: 40,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         color: widget.isConnected
@@ -130,16 +96,16 @@ class _LedgerCardState extends State<LedgerCard>
             : theme.background,
         border: Border.all(
             color: widget.isConnected
-                ? theme.success.withOpacity(0.3)
-                : theme.primaryPurple.withOpacity(0.2)),
+                ? theme.success.withOpacity(0.4)
+                : theme.primaryPurple.withOpacity(0.3)),
       ),
       child: Center(
         child: SvgPicture.asset(
           widget.device.connectionType == ConnectionType.ble
               ? 'assets/icons/ble.svg'
               : 'assets/icons/usb.svg',
-          width: 22,
-          height: 22,
+          width: 20,
+          height: 20,
           colorFilter: ColorFilter.mode(
               widget.isConnected ? theme.success : theme.primaryPurple,
               BlendMode.srcIn),
@@ -155,26 +121,30 @@ class _LedgerCardState extends State<LedgerCard>
         Text(
           widget.device.deviceModelProducName ??
               widget.device.name ??
-              '(Unknown Device)',
+              widget.device.deviceModelId ??
+              "",
           style: TextStyle(
             color: theme.textPrimary,
             fontWeight: FontWeight.w600,
-            fontSize: 17,
+            fontSize: 16,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        const SizedBox(height: 6),
+        const SizedBox(height: 4),
         Chip(
-          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 4),
-          backgroundColor: theme.background.withOpacity(0.5),
+          padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+          backgroundColor: theme.background.withOpacity(0.6),
           label: Text(
             widget.device.connectionType.name.toUpperCase(),
             style: TextStyle(
-              color: theme.textSecondary.withOpacity(0.8),
-              fontSize: 11,
+              color: theme.textSecondary.withOpacity(0.9),
+              fontSize: 10,
               fontWeight: FontWeight.bold,
             ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
           ),
         ),
       ],
@@ -187,10 +157,10 @@ class _LedgerCardState extends State<LedgerCard>
     if (widget.isConnecting) {
       icon = SizedBox(
         key: const ValueKey('connecting'),
-        width: 22,
-        height: 22,
+        width: 20,
+        height: 20,
         child: CircularProgressIndicator(
-          strokeWidth: 2.5,
+          strokeWidth: 2.0,
           valueColor: AlwaysStoppedAnimation<Color>(theme.primaryPurple),
         ),
       );
@@ -198,23 +168,23 @@ class _LedgerCardState extends State<LedgerCard>
       icon = SvgPicture.asset(
         'assets/icons/check.svg',
         key: const ValueKey('connected'),
-        width: 28,
-        height: 28,
+        width: 24,
+        height: 24,
         colorFilter: ColorFilter.mode(theme.success, BlendMode.srcIn),
       );
     } else {
       icon = SvgPicture.asset(
         'assets/icons/chevron_right.svg',
         key: const ValueKey('idle'),
-        width: 28,
-        height: 28,
+        width: 24,
+        height: 24,
         colorFilter: ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
       );
     }
 
     return SizedBox(
-      width: 28,
-      height: 28,
+      width: 24,
+      height: 24,
       child: AnimatedSwitcher(
         duration: const Duration(milliseconds: 300),
         switchInCurve: Curves.easeIn,
