@@ -100,7 +100,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
                 BigInt.zero;
       } else {
         _availableBalance =
-            BigInt.tryParse(widget.stake.delegAmt) ?? BigInt.zero;
+            (BigInt.tryParse(widget.stake.delegAmt) ?? BigInt.zero).abs();
       }
     } catch (e) {
       debugPrint('Error loading balance: $e');
@@ -117,9 +117,13 @@ class _StakeModalContentState extends State<StakeModalContent> {
         (_availableBalance * BigInt.from((percentage * 100).round())) ~/
             BigInt.from(100);
 
-    if (percentage >= 1.0) {
+    if (percentage >= 1.0 && _isStaking) {
       final (value, _) = toWei(value: '100', decimals: _balanceDecimals);
       amount -= BigInt.parse(value);
+    }
+
+    if (amount < BigInt.zero) {
+      amount = BigInt.zero;
     }
 
     final formattedAmount = fromWei(
@@ -333,8 +337,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
 
     if (widget.stake.unbondingPeriod != null &&
         widget.stake.unbondingPeriod! > BigInt.zero) {
-      final periodInBlocks = widget.stake.unbondingPeriod!;
-      final seconds = (periodInBlocks.toDouble() * 1.5).round();
+      final periodInBlocks = widget.stake.unbondingPeriod!.abs();
+      final seconds = (periodInBlocks.toDouble() * 2.0).round();
       final duration = Duration(seconds: seconds);
       final formattedDuration = _formatDuration(duration, l10n);
       unbondingPeriodText = '${periodInBlocks.toString()} ($formattedDuration)';
@@ -628,6 +632,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
   }
 
   String _formatDuration(Duration duration, AppLocalizations l10n) {
+    duration = Duration(seconds: duration.inSeconds.abs());
     final days = duration.inDays;
     final hours = duration.inHours.remainder(24);
     final minutes = duration.inMinutes.remainder(60);

@@ -201,8 +201,8 @@ class EthLedgerApp {
   }) async {
     final config = resolutionConfig ??
         const ResolutionConfig(
-          erc20: true,
-          externalPlugins: true,
+          erc20: false,
+          externalPlugins: false,
           nft: false,
           uniswapV3: false,
         );
