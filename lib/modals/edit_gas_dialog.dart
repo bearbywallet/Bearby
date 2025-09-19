@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/button.dart';
+import 'package:zilpay/components/detail_group_card.dart';
+import 'package:zilpay/components/detail_item_group_card.dart';
+import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
@@ -45,6 +49,10 @@ class _EditGasDialogState extends State<EditGasDialog> {
   late TextEditingController _nonceController;
   late bool _isLegacy;
 
+  final String _solidityCodeExample =
+      'function proofEncap(uint32 time, uint64 mileage, bytes32 blockHash) internal pure returns (uint256)';
+  final String _dataExample = '0x03...EBC5';
+
   @override
   void initState() {
     super.initState();
@@ -76,28 +84,25 @@ class _EditGasDialogState extends State<EditGasDialog> {
 
   void _handleSave() {
     try {
-      final (gasPriceWeiStr, _) =
-          toWei(value: _gasPriceController.text, decimals: 9);
-      final gasPriceWei = BigInt.parse(gasPriceWeiStr);
-
+      final gasPriceWei =
+          BigInt.parse(toWei(value: _gasPriceController.text, decimals: 9).$1);
       final gasLimit = BigInt.parse(_gasLimitController.text);
       final nonce = BigInt.parse(_nonceController.text);
 
       BigInt maxPriorityFeeWei;
       if (!_isLegacy) {
-        final (maxPriorityFeeWeiStr, _) =
-            toWei(value: _maxPriorityFeeController.text, decimals: 9);
-        maxPriorityFeeWei = BigInt.parse(maxPriorityFeeWeiStr);
+        maxPriorityFeeWei = BigInt.parse(
+            toWei(value: _maxPriorityFeeController.text, decimals: 9).$1);
       } else {
         maxPriorityFeeWei = BigInt.zero;
       }
 
+      final l10n = AppLocalizations.of(context)!;
       if (gasPriceWei < BigInt.zero ||
           maxPriorityFeeWei < BigInt.zero ||
           gasLimit <= BigInt.zero ||
           nonce < BigInt.zero) {
-        throw ArgumentError(
-            "Gas values cannot be negative or zero (for limit)");
+        throw ArgumentError(l10n.editGasDialogInvalidGasValues);
       }
       if (!_isLegacy && maxPriorityFeeWei > gasPriceWei) {
         throw ArgumentError(
@@ -115,7 +120,7 @@ class _EditGasDialogState extends State<EditGasDialog> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            AppLocalizations.of(context)!.editGasDialogInvalidGasValues,
+            e.toString(),
             style: const TextStyle(color: Colors.white),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
@@ -129,133 +134,40 @@ class _EditGasDialogState extends State<EditGasDialog> {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final l10n = AppLocalizations.of(context)!;
-
-    final effectivePrimaryColor = widget.primaryColor ?? theme.primaryPurple;
-    final effectiveTextColor = widget.textColor ?? theme.textPrimary;
-    final effectiveSecondaryColor =
-        widget.secondaryColor ?? theme.textSecondary;
+    final screenWidth = MediaQuery.of(context).size.width;
 
     return Dialog(
       backgroundColor: Colors.transparent,
-      insetPadding: const EdgeInsets.symmetric(horizontal: 16),
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: theme.modalBorder, width: 1),
-        ),
-        child: SingleChildScrollView(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
+      child: ConstrainedBox(
+        constraints: BoxConstraints(maxWidth: screenWidth > 600 ? 500 : 600),
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: theme.background,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: theme.modalBorder, width: 1.5),
+          ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    l10n.editGasDialogTitle,
-                    style: TextStyle(
-                      color: effectiveTextColor,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
+              _buildHeader(l10n, theme),
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      _buildGasSettings(l10n, theme),
+                      const SizedBox(height: 16),
+                      _buildSolidityView(theme),
+                      const SizedBox(height: 16),
+                      _buildTransactionDetails(l10n, theme),
+                    ],
                   ),
-                  InkWell(
-                    splashFactory: NoSplash.splashFactory,
-                    highlightColor: Colors.transparent,
-                    onTap: () => Navigator.of(context).pop(),
-                    child: Container(
-                      padding: const EdgeInsets.all(4),
-                      child: SvgPicture.asset(
-                        'assets/icons/close.svg',
-                        width: 18,
-                        height: 18,
-                        colorFilter: ColorFilter.mode(
-                          effectiveTextColor,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-              _buildInputField(
-                label: l10n.editGasDialogGasPrice,
-                controller: _gasPriceController,
-                hint: '0.0',
-                suffix: 'Gwei',
-                effectiveTextColor: effectiveTextColor,
-                effectiveSecondaryColor: effectiveSecondaryColor,
-                theme: theme,
-              ),
-              const SizedBox(height: 12),
-              if (!_isLegacy)
-                Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    _buildInputField(
-                      label: l10n.editGasDialogMaxPriorityFee,
-                      controller: _maxPriorityFeeController,
-                      hint: '0.0',
-                      suffix: 'Gwei',
-                      effectiveTextColor: effectiveTextColor,
-                      effectiveSecondaryColor: effectiveSecondaryColor,
-                      theme: theme,
-                    ),
-                    const SizedBox(height: 12),
-                  ],
                 ),
-              _buildInputField(
-                label: l10n.editGasDialogGasLimit,
-                controller: _gasLimitController,
-                hint: '21000',
-                effectiveTextColor: effectiveTextColor,
-                effectiveSecondaryColor: effectiveSecondaryColor,
-                theme: theme,
-                readOnly: false,
-                isIntegerInput: true,
-              ),
-              const SizedBox(height: 12),
-              _buildInputField(
-                label: l10n.transactionDetailsModal_nonce,
-                controller: _nonceController,
-                hint: '0',
-                effectiveTextColor: effectiveTextColor,
-                effectiveSecondaryColor: effectiveSecondaryColor,
-                theme: theme,
-                readOnly: false,
-                isIntegerInput: true,
               ),
               const SizedBox(height: 24),
-              Row(
-                children: [
-                  Expanded(
-                    child: CustomButton(
-                      text: l10n.editGasDialogCancel,
-                      onPressed: () => Navigator.of(context).pop(),
-                      backgroundColor: theme.background,
-                      textColor: effectiveTextColor,
-                      height: 48,
-                      borderRadius: 8,
-                    ),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: CustomButton(
-                      text: l10n.editGasDialogSave,
-                      onPressed: _handleSave,
-                      backgroundColor: effectivePrimaryColor,
-                      textColor: theme.buttonText,
-                      height: 48,
-                      borderRadius: 8,
-                    ),
-                  ),
-                ],
-              ),
+              _buildActionButton(theme),
             ],
           ),
         ),
@@ -263,73 +175,230 @@ class _EditGasDialogState extends State<EditGasDialog> {
     );
   }
 
+  Widget _buildHeader(AppLocalizations l10n, AppTheme theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            l10n.editGasDialogTitle,
+            style: theme.headline2.copyWith(color: theme.textPrimary),
+          ),
+          HoverSvgIcon(
+            assetName: 'assets/icons/close.svg',
+            onTap: () => Navigator.of(context).pop(),
+            width: 20,
+            height: 20,
+            color: theme.textSecondary,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildGasSettings(AppLocalizations l10n, AppTheme theme) {
+    return DetailGroupCard(
+      title: 'Advanced Gas settings',
+      theme: theme,
+      contentPadding: const EdgeInsets.only(top: 16, left: 12, right: 12),
+      children: [
+        _buildInputField(
+          label: l10n.editGasDialogGasPrice,
+          controller: _gasPriceController,
+          suffix: 'Gwei',
+          theme: theme,
+        ),
+        if (!_isLegacy)
+          Padding(
+            padding: const EdgeInsets.only(top: 12),
+            child: _buildInputField(
+              label: l10n.editGasDialogMaxPriorityFee,
+              controller: _maxPriorityFeeController,
+              suffix: 'Gwei',
+              theme: theme,
+            ),
+          ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12),
+          child: _buildInputField(
+            label: l10n.editGasDialogGasLimit,
+            controller: _gasLimitController,
+            isIntegerInput: true,
+            theme: theme,
+          ),
+        ),
+        Padding(
+          padding: const EdgeInsets.only(top: 12, bottom: 4),
+          child: _buildInputField(
+            label: l10n.transactionDetailsModal_nonce,
+            controller: _nonceController,
+            isIntegerInput: true,
+            theme: theme,
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSolidityView(AppTheme theme) {
+    return DetailGroupCard(
+      title: 'Solidity',
+      theme: theme,
+      headerTrailing: _buildCopyButton(_solidityCodeExample),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+      children: [
+        Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: theme.background,
+            borderRadius: BorderRadius.circular(8),
+            border: Border.all(
+              color: theme.textSecondary.withValues(alpha: 0.2),
+            ),
+          ),
+          child: RichText(
+            text: TextSpan(
+              style: theme.bodyText2.copyWith(
+                fontFamily: 'Courier',
+                color: theme.textPrimary,
+              ),
+              children: _buildHighlightedCode(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  List<TextSpan> _buildHighlightedCode() {
+    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
+    final keywordStyle =
+        TextStyle(color: theme.secondaryPurple, fontWeight: FontWeight.bold);
+    final typeStyle = TextStyle(color: theme.warning);
+    final nameStyle = TextStyle(color: theme.textPrimary);
+    final punctuationStyle = TextStyle(color: theme.textSecondary);
+
+    return [
+      TextSpan(text: 'function ', style: keywordStyle),
+      TextSpan(text: 'proofEncap', style: nameStyle),
+      TextSpan(text: '(', style: punctuationStyle),
+      TextSpan(text: 'uint32', style: typeStyle),
+      TextSpan(text: ' time, ', style: nameStyle),
+      TextSpan(text: 'uint64', style: typeStyle),
+      TextSpan(text: ' mileage, ', style: nameStyle),
+      TextSpan(text: 'bytes32', style: typeStyle),
+      TextSpan(text: ' blockHash', style: nameStyle),
+      TextSpan(text: ') ', style: punctuationStyle),
+      TextSpan(text: 'internal pure returns ', style: keywordStyle),
+      TextSpan(text: '(', style: punctuationStyle),
+      TextSpan(text: 'uint256', style: typeStyle),
+      TextSpan(text: ')', style: punctuationStyle),
+    ];
+  }
+
+  Widget _buildTransactionDetails(AppLocalizations l10n, AppTheme theme) {
+    return DetailGroupCard(
+      title: l10n.transactionDetailsModal_transaction,
+      theme: theme,
+      children: [
+        DetailItem(label: 'Function', value: 'Transfer', theme: theme),
+        const SizedBox(height: 8),
+        DetailItem(
+          label: 'To',
+          theme: theme,
+          valueWidget: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+            decoration: BoxDecoration(
+              color: theme.danger.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: Text(
+              'Account 1',
+              style: theme.caption.copyWith(
+                color: theme.danger,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+        ),
+        const SizedBox(height: 8),
+        DetailItem(label: 'Value', value: '100000', theme: theme),
+        const SizedBox(height: 8),
+        DetailItem(
+          label: 'Data',
+          theme: theme,
+          valueWidget: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              Flexible(
+                child: Text(
+                  _dataExample,
+                  style: theme.bodyText2.copyWith(color: theme.textPrimary),
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ),
+              const SizedBox(width: 8),
+              _buildCopyButton(_dataExample),
+            ],
+          ),
+        ),
+        const SizedBox(height: 4),
+      ],
+    );
+  }
+
+  Widget _buildActionButton(AppTheme theme) {
+    return CustomButton(
+      text: 'Update settings',
+      onPressed: _handleSave,
+      backgroundColor: widget.primaryColor ?? theme.primaryPurple,
+      textColor: theme.buttonText,
+      height: 52,
+      borderRadius: 12,
+    );
+  }
+
+  Widget _buildCopyButton(String textToCopy) {
+    final theme = Provider.of<AppState>(context).currentTheme;
+    return HoverSvgIcon(
+      assetName: 'assets/icons/copy.svg',
+      onTap: () {
+        Clipboard.setData(ClipboardData(text: textToCopy));
+      },
+      width: 18,
+      height: 18,
+      color: theme.primaryPurple,
+    );
+  }
+
   Widget _buildInputField({
     required String label,
     required TextEditingController controller,
-    required String hint,
-    String? suffix,
-    required Color effectiveTextColor,
-    required Color effectiveSecondaryColor,
     required AppTheme theme,
-    bool readOnly = false,
+    String? suffix,
     bool isIntegerInput = false,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: TextStyle(
-            color: effectiveSecondaryColor,
-            fontSize: 14,
+        Padding(
+          padding: const EdgeInsets.only(left: 4, bottom: 8),
+          child: Text(
+            label,
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
           ),
         ),
-        const SizedBox(height: 8),
-        Container(
-          height: 48,
-          decoration: BoxDecoration(
-            color: readOnly
-                ? theme.background.withValues(alpha: 0.5)
-                : theme.background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(color: theme.modalBorder),
-          ),
-          child: Row(
-            children: [
-              Expanded(
-                child: TextField(
-                  controller: controller,
-                  readOnly: readOnly,
-                  keyboardType: isIntegerInput
-                      ? TextInputType.number
-                      : const TextInputType.numberWithOptions(decimal: true),
-                  style: TextStyle(
-                    color: effectiveTextColor,
-                    fontSize: 16,
-                  ),
-                  decoration: InputDecoration(
-                    hintText: hint,
-                    hintStyle: TextStyle(
-                      color: effectiveSecondaryColor.withValues(alpha: 0.5),
-                    ),
-                    contentPadding: const EdgeInsets.symmetric(horizontal: 16),
-                    border: InputBorder.none,
-                  ),
-                ),
-              ),
-              if (suffix != null)
-                Padding(
-                  padding: const EdgeInsets.only(right: 16),
-                  child: Text(
-                    suffix,
-                    style: TextStyle(
-                      color: effectiveSecondaryColor,
-                      fontSize: 14,
-                    ),
-                  ),
-                ),
-            ],
-          ),
+        SmartInput(
+          height: 52,
+          controller: controller,
+          keyboardType: isIntegerInput
+              ? TextInputType.number
+              : const TextInputType.numberWithOptions(decimal: true),
+          backgroundColor: theme.cardBackground,
+          borderColor: theme.modalBorder.withValues(alpha: 0.5),
+          textColor: theme.textPrimary,
+          secondaryColor: theme.textSecondary,
         ),
       ],
     );
