@@ -118,7 +118,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
             BigInt.from(100);
 
     if (percentage >= 1.0 && _isStaking) {
-      final (value, _) = toWei(value: '100', decimals: _balanceDecimals);
+      final (value, _) = toWei(value: '50', decimals: _balanceDecimals);
       amount -= BigInt.parse(value);
     }
 
