@@ -14,8 +14,6 @@ import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
-enum SortType { apr, commission, tvl, votePower }
-
 class ZilStakePage extends StatefulWidget {
   const ZilStakePage({super.key});
 
@@ -27,7 +25,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
   List<FinalOutputInfo> _stakes = [];
   bool _isLoading = true;
   String? _errorMessage;
-  SortType _sortType = SortType.apr;
 
   @override
   void initState() {
@@ -101,7 +98,12 @@ class _ZilStakePageState extends State<ZilStakePage> {
               ),
             ),
             Expanded(
-              child: isIOS ? _buildIosBody() : _buildAndroidBody(),
+              child: Center(
+                child: ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 600),
+                  child: isIOS ? _buildIosBody() : _buildAndroidBody(),
+                ),
+              ),
             ),
           ],
         ),
@@ -167,15 +169,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
               );
             },
           ),
-        SliverPadding(
-          padding: EdgeInsets.symmetric(
-            horizontal: adaptivePadding,
-            vertical: 8,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: _buildSortButtons(theme, l10n),
-          ),
-        ),
         SliverPadding(
           padding: EdgeInsets.fromLTRB(
             adaptivePadding,
@@ -314,15 +307,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
             onRefresh: () => _fetchStakes(isRefresh: true),
           ),
         SliverPadding(
-          padding: EdgeInsets.symmetric(
-            horizontal: adaptivePadding,
-            vertical: 8,
-          ),
-          sliver: SliverToBoxAdapter(
-            child: _buildSkeletonSortButtons(theme),
-          ),
-        ),
-        SliverPadding(
           padding: EdgeInsets.fromLTRB(
             adaptivePadding,
             8,
@@ -342,28 +326,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
           ),
         ),
       ],
-    );
-  }
-
-  Widget _buildSkeletonSortButtons(AppTheme theme) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: List.generate(4, (index) {
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: Container(
-              width: 80,
-              height: 32,
-              decoration: BoxDecoration(
-                color: theme.textSecondary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
-              ),
-            ),
-          );
-        }),
-      ),
     );
   }
 
@@ -485,66 +447,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildSortButtons(AppTheme theme, AppLocalizations l10n) {
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      physics: const BouncingScrollPhysics(),
-      child: Row(
-        children: SortType.values.map((type) {
-          final isSelected = _sortType == type;
-          String label;
-          switch (type) {
-            case SortType.apr:
-              label = l10n.aprSort;
-              break;
-            case SortType.commission:
-              label = l10n.commissionSort;
-              break;
-            case SortType.tvl:
-              label = l10n.tvlSort;
-              break;
-            case SortType.votePower:
-              label = "VP";
-              break;
-          }
-          return Padding(
-            padding: const EdgeInsets.only(right: 8.0),
-            child: GestureDetector(
-              onTap: () {
-                if (_sortType != type) {
-                  setState(() => _sortType = type);
-                }
-              },
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 200),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                decoration: BoxDecoration(
-                  color:
-                      isSelected ? theme.primaryPurple : theme.cardBackground,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(
-                    color: isSelected
-                        ? Colors.transparent
-                        : theme.textSecondary.withValues(alpha: 0.2),
-                  ),
-                ),
-                child: Text(
-                  label.toUpperCase(),
-                  style: TextStyle(
-                    color: isSelected ? theme.buttonText : theme.textPrimary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ),
-          );
-        }).toList(),
       ),
     );
   }
