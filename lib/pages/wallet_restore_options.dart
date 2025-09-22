@@ -153,16 +153,6 @@ class RestoreWalletOptionsPage extends StatelessWidget {
       ),
     );
 
-    final puzzleIcon = SvgPicture.asset(
-      'assets/icons/puzzle.svg',
-      width: 35,
-      height: 35,
-      colorFilter: ColorFilter.mode(
-        theme.primaryPurple,
-        BlendMode.srcIn,
-      ),
-    );
-
     final bincodeIcon = SvgPicture.asset(
       'assets/icons/bincode.svg',
       width: 35,

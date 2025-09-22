@@ -10,6 +10,7 @@ class HoverSvgIcon extends StatefulWidget {
   final VoidCallback onTap;
   final Color? color;
   final EdgeInsets? padding;
+  final BlendMode? blendMode;
 
   const HoverSvgIcon({
     super.key,
@@ -19,6 +20,7 @@ class HoverSvgIcon extends StatefulWidget {
     required this.onTap,
     this.color,
     this.padding = const EdgeInsets.all(8.0),
+    this.blendMode,
   });
 
   @override
@@ -32,6 +34,7 @@ class HoverSvgIconState extends State<HoverSvgIcon> {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final iconColor = widget.color ?? theme.textPrimary;
+    final effectiveBlendMode = widget.blendMode ?? BlendMode.srcIn;
 
     return Container(
       constraints: BoxConstraints(
@@ -54,7 +57,7 @@ class HoverSvgIconState extends State<HoverSvgIcon> {
               height: widget.height,
               colorFilter: ColorFilter.mode(
                 iconColor,
-                BlendMode.srcIn,
+                effectiveBlendMode,
               ),
             ),
           ),

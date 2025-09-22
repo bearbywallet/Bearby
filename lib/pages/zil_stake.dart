@@ -142,8 +142,6 @@ class _ZilStakePageState extends State<ZilStakePage> {
   }
 
   Widget _buildStakeList() {
-    final theme = Provider.of<AppState>(context).currentTheme;
-    final l10n = AppLocalizations.of(context)!;
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 

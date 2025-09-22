@@ -309,70 +309,127 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     },
                     chain: appState.chain!,
                   ),
-                  SizedBox(width: adaptivePadding),
+                  const SizedBox(width: 12),
                   HoverSvgIcon(
                     assetName: appState.hideBalance
                         ? 'assets/icons/close_eye.svg'
                         : 'assets/icons/open_eye.svg',
-                    width: ICON_SIZE_MEDIUM,
-                    height: ICON_SIZE_MEDIUM,
-                    padding: EdgeInsets.fromLTRB(
-                        0, adaptivePadding, 0, adaptivePadding),
-                    color: theme.textSecondary,
+                    width: ICON_SIZE_SMALL,
+                    height: ICON_SIZE_SMALL,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
-                      setState(() {
-                        appState.setHideBalance(!appState.hideBalance);
-                      });
+                      appState.setHideBalance(!appState.hideBalance);
                     },
                   ),
                 ],
               ),
-              HoverSvgIcon(
-                assetName: 'assets/icons/manage.svg',
-                width: ICON_SIZE_MEDIUM,
-                height: ICON_SIZE_MEDIUM,
-                padding: EdgeInsets.fromLTRB(
-                    30, adaptivePadding, 0, adaptivePadding),
-                color: theme.textSecondary,
-                onTap: () {
-                  Navigator.pushNamed(context, '/manage_tokens');
-                },
+              Row(
+                children: [
+                  HoverSvgIcon(
+                    assetName: appState.isTileView
+                        ? 'assets/icons/tiles.svg'
+                        : 'assets/icons/lines.svg',
+                    width: ICON_SIZE_SMALL,
+                    height: ICON_SIZE_SMALL,
+                    blendMode: BlendMode.modulate,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.cardBackground,
+                    onTap: () {
+                      appState.isTileView = !appState.isTileView;
+                    },
+                  ),
+                  const SizedBox(width: 12),
+                  HoverSvgIcon(
+                    assetName: 'assets/icons/manage.svg',
+                    width: ICON_SIZE_SMALL,
+                    height: ICON_SIZE_SMALL,
+                    blendMode: BlendMode.modulate,
+                    padding: const EdgeInsets.all(0),
+                    color: theme.cardBackground,
+                    onTap: () {
+                      Navigator.pushNamed(context, '/manage_tokens');
+                    },
+                  ),
+                ],
               ),
             ],
           ),
         ),
       ),
-      SliverList(
-        delegate: SliverChildBuilderDelegate(
-          (context, index) {
-            final token = filteredTokens[index];
-            final isLast = index == filteredTokens.length - 1;
-            final tokenAmountValue = token.balances.isNotEmpty &&
-                    token.balances.keys
-                        .contains(appState.wallet!.selectedAccount)
-                ? BigInt.tryParse(token
-                        .balances[appState.wallet!.selectedAccount]
-                        .toString()) ??
-                    BigInt.zero
-                : BigInt.zero;
+      if (appState.isTileView)
+        SliverPadding(
+          padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+          sliver: SliverGrid(
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              childAspectRatio: 1.618,
+              crossAxisSpacing: 12,
+              mainAxisSpacing: 12,
+            ),
+            delegate: SliverChildBuilderDelegate(
+              (context, index) {
+                final token = filteredTokens[index];
+                final tokenAmountValue = token.balances.isNotEmpty &&
+                        token.balances.keys
+                            .contains(appState.wallet!.selectedAccount)
+                    ? BigInt.tryParse(token
+                            .balances[appState.wallet!.selectedAccount]
+                            .toString()) ??
+                        BigInt.zero
+                    : BigInt.zero;
 
-            return TokenCard(
-              ftoken: token,
-              hideBalance: appState.hideBalance,
-              tokenAmount: tokenAmountValue,
-              showDivider: !isLast,
-              onTap: () {
-                final originalIndex = appState.wallet!.tokens.indexOf(token);
-                Navigator.of(context).pushNamed(
-                  '/send',
-                  arguments: {'token_index': originalIndex},
+                return TokenCard(
+                  ftoken: token,
+                  hideBalance: appState.hideBalance,
+                  tokenAmount: tokenAmountValue,
+                  showDivider: false,
+                  onTap: () {
+                    final originalIndex =
+                        appState.wallet!.tokens.indexOf(token);
+                    Navigator.of(context).pushNamed(
+                      '/send',
+                      arguments: {'token_index': originalIndex},
+                    );
+                  },
                 );
               },
-            );
-          },
-          childCount: filteredTokens.length,
+              childCount: filteredTokens.length,
+            ),
+          ),
+        )
+      else
+        SliverList(
+          delegate: SliverChildBuilderDelegate(
+            (context, index) {
+              final token = filteredTokens[index];
+              final isLast = index == filteredTokens.length - 1;
+              final tokenAmountValue = token.balances.isNotEmpty &&
+                      token.balances.keys
+                          .contains(appState.wallet!.selectedAccount)
+                  ? BigInt.tryParse(token
+                          .balances[appState.wallet!.selectedAccount]
+                          .toString()) ??
+                      BigInt.zero
+                  : BigInt.zero;
+
+              return TokenCard(
+                ftoken: token,
+                hideBalance: appState.hideBalance,
+                tokenAmount: tokenAmountValue,
+                showDivider: !isLast,
+                onTap: () {
+                  final originalIndex = appState.wallet!.tokens.indexOf(token);
+                  Navigator.of(context).pushNamed(
+                    '/send',
+                    arguments: {'token_index': originalIndex},
+                  );
+                },
+              );
+            },
+            childCount: filteredTokens.length,
+          ),
         ),
-      ),
     ];
 
     Widget scrollView = CustomScrollView(

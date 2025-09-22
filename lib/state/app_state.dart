@@ -39,6 +39,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   late String _cahceDir;
   int _selectedWallet = 0;
   bool _hideBalance = false;
+  bool _isTileView = true;
 
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
@@ -56,6 +57,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _selectedWallet = index;
     notifyListeners();
   }
+
+  bool get isTileView => _isTileView;
 
   bool get showAddressesThroughTransactionHistory {
     return _showAddressesThroughTransactionHistory;
@@ -245,6 +248,13 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       }
     }
     notifyListeners();
+  }
+
+  set isTileView(bool value) {
+    if (_isTileView != value) {
+      _isTileView = value;
+      notifyListeners();
+    }
   }
 
   Future<void> setShowAddressesThroughTransactionHistory(bool value) async {
