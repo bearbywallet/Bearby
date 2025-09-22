@@ -221,24 +221,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
             children: [
               TileButton(
                 icon: SvgPicture.asset(
-                  "assets/icons/send.svg",
-                  width: ICON_SIZE_TILE_BUTTON,
-                  height: ICON_SIZE_TILE_BUTTON,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                title: l10n.homePageSendButton,
-                onPressed: () {
-                  Navigator.pushNamed(context, '/send');
-                },
-                backgroundColor: theme.cardBackground,
-                textColor: theme.primaryPurple,
-              ),
-              SizedBox(width: adaptivePaddingCard),
-              TileButton(
-                icon: SvgPicture.asset(
                   "assets/icons/receive.svg",
                   width: ICON_SIZE_TILE_BUTTON,
                   height: ICON_SIZE_TILE_BUTTON,

@@ -220,15 +220,6 @@ class RestoreWalletOptionsPage extends StatelessWidget {
               onTap: () => _handleBip39Restore(context),
             ),
             WalletListItem(
-              disabled: true,
-              title: AppLocalizations.of(context)!
-                  .restoreWalletOptionsSLIP0039Title,
-              subtitle: AppLocalizations.of(context)!
-                  .restoreWalletOptionsSLIP0039Subtitle,
-              icon: puzzleIcon,
-              onTap: null,
-            ),
-            WalletListItem(
               title: AppLocalizations.of(context)!
                   .restoreWalletOptionsPrivateKeyTitle,
               subtitle: AppLocalizations.of(context)!

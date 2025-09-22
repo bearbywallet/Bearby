@@ -56,23 +56,6 @@ class GenWalletOptionsPage extends StatelessWidget {
                 },
               ),
               WalletListItem(
-                disabled: true,
-                title:
-                    AppLocalizations.of(context)!.genWalletOptionsSLIP0039Title,
-                subtitle: AppLocalizations.of(context)!
-                    .genWalletOptionsSLIP0039Subtitle,
-                icon: SvgPicture.asset(
-                  'assets/icons/puzzle.svg',
-                  width: 35,
-                  height: 35,
-                  colorFilter: ColorFilter.mode(
-                    theme.primaryPurple,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onTap: () {},
-              ),
-              WalletListItem(
                 title: AppLocalizations.of(context)!
                     .genWalletOptionsPrivateKeyTitle,
                 subtitle: AppLocalizations.of(context)!

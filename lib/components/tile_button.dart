@@ -8,6 +8,7 @@ class TileButton extends StatefulWidget {
   final VoidCallback onPressed;
   final Color backgroundColor;
   final Color textColor;
+  final BorderSide? defaultBorderSide;
   final bool disabled;
 
   const TileButton({
@@ -17,6 +18,7 @@ class TileButton extends StatefulWidget {
     this.title,
     this.backgroundColor = const Color(0xFF2C2C2E),
     this.textColor = const Color(0xFF9D4BFF),
+    this.defaultBorderSide,
     this.disabled = false,
   });
 
@@ -60,6 +62,18 @@ class _TileButtonState extends State<TileButton>
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  BorderSide _getBorderSide() {
+    final base =
+        widget.defaultBorderSide ?? const BorderSide(color: Colors.transparent);
+    if (_isHovered && !widget.disabled) {
+      return base.copyWith(
+        color: widget.textColor,
+        width: 2.0,
+      );
+    }
+    return base;
   }
 
   void _handleTapDown(TapDownDetails details) {
@@ -174,17 +188,7 @@ class _TileButtonState extends State<TileButton>
                   decoration: BoxDecoration(
                     color: widget.backgroundColor,
                     borderRadius: BorderRadius.circular(borderRadius),
-                    // border: Border.all(
-                    //     color: theme.primaryPurple.withValues(alpha: 0.2)),
-                    boxShadow: [
-                      if (_isHovered && !widget.disabled)
-                        BoxShadow(
-                          color:
-                              widget.textColor.withAlpha((0.1 * 255).round()),
-                          blurRadius: 8,
-                          spreadRadius: 1,
-                        ),
-                    ],
+                    border: Border.fromBorderSide(_getBorderSide()),
                   ),
                   child: buttonContent,
                 ),

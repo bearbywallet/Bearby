@@ -67,6 +67,7 @@ class ZilPayApp extends StatelessWidget {
                   brightness: currentTheme.brightness,
                   primaryColor: currentTheme.primaryPurple,
                   cardColor: currentTheme.cardBackground,
+                  splashFactory: NoSplash.splashFactory,
                   scaffoldBackgroundColor: currentTheme.background,
                   canvasColor: Colors.transparent,
                   textTheme: TextTheme(
