@@ -124,14 +124,8 @@ class _TokenCardState extends State<TokenCard>
     return Column(
       children: [
         MouseRegion(
-          onEnter: (_) {
-            setState(() => isHovered = true);
-            _controller.forward(from: 0.5);
-          },
-          onExit: (_) {
-            setState(() => isHovered = false);
-            _controller.reverse();
-          },
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
           child: GestureDetector(
             behavior: HitTestBehavior.opaque,
             onTapDown: (_) {
@@ -153,6 +147,9 @@ class _TokenCardState extends State<TokenCard>
                   Transform.scale(scale: _animation.value, child: child),
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 150),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
+                ),
                 child: Padding(
                   padding: EdgeInsets.symmetric(
                       horizontal: adaptivePadding, vertical: adaptivePadding),
@@ -221,9 +218,9 @@ class _TokenCardState extends State<TokenCard>
                       ),
                       const SizedBox(width: 12),
                       Container(
-                        padding: const EdgeInsets.all(12),
+                        padding: const EdgeInsets.all(4),
                         decoration: BoxDecoration(
-                          color: Colors.white.withValues(alpha: 0.05),
+                          color: theme.textPrimary.withValues(alpha: 0.05),
                           shape: BoxShape.circle,
                         ),
                         child: _buildIcon(Provider.of<AppState>(context)),

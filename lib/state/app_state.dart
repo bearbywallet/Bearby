@@ -32,6 +32,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   static const Duration _rateUpdateCooldown = Duration(minutes: 1);
   static const String _hideBalanceStorageKey = "hide_balance_key";
   static const String _gasOptionStorageKey = "gas_option_key";
+  static const String _tokensCardStyleKey = "tokens_card_styles_key";
   static const String _showAddressesThroughTransactionHistoryKey =
       "show_addresses_transaction_history_key";
 
@@ -155,6 +156,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await loadSelectedGasOption();
     await loadHideBalance();
     await loadShowAddressesThroughTransactionHistory();
+    await loadIsTileView();
     notifyListeners();
   }
 
@@ -255,6 +257,23 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
       _isTileView = value;
       notifyListeners();
     }
+  }
+
+  Future<void> updateIsTileView(bool value) async {
+    if (_isTileView != value) {
+      _isTileView = value;
+      final prefs = await SharedPreferences.getInstance();
+      final key = "$_tokensCardStyleKey:$selectedWallet";
+      await prefs.setBool(key, value);
+      notifyListeners();
+    }
+  }
+
+  Future<void> loadIsTileView() async {
+    final prefs = await SharedPreferences.getInstance();
+    final key = "$_tokensCardStyleKey:$selectedWallet";
+    _isTileView = prefs.getBool(key) ?? true;
+    notifyListeners();
   }
 
   Future<void> setShowAddressesThroughTransactionHistory(bool value) async {

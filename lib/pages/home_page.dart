@@ -326,19 +326,21 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               ),
               Row(
                 children: [
-                  HoverSvgIcon(
-                    assetName: appState.isTileView
-                        ? 'assets/icons/tiles.svg'
-                        : 'assets/icons/lines.svg',
-                    width: ICON_SIZE_SMALL,
-                    height: ICON_SIZE_SMALL,
-                    blendMode: BlendMode.modulate,
-                    padding: const EdgeInsets.all(0),
-                    color: theme.cardBackground,
-                    onTap: () {
-                      appState.isTileView = !appState.isTileView;
-                    },
-                  ),
+                  if (appState.wallet != null &&
+                      appState.wallet!.tokens.length > 1)
+                    HoverSvgIcon(
+                      assetName: appState.isTileView
+                          ? 'assets/icons/tiles.svg'
+                          : 'assets/icons/lines.svg',
+                      width: ICON_SIZE_SMALL,
+                      height: ICON_SIZE_SMALL,
+                      blendMode: BlendMode.modulate,
+                      padding: const EdgeInsets.all(0),
+                      color: theme.cardBackground,
+                      onTap: () async {
+                        await appState.updateIsTileView(!appState.isTileView);
+                      },
+                    ),
                   const SizedBox(width: 12),
                   HoverSvgIcon(
                     assetName: 'assets/icons/manage.svg',
@@ -357,7 +359,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           ),
         ),
       ),
-      if (appState.isTileView)
+      if (appState.wallet != null &&
+          appState.wallet!.tokens.length > 1 &&
+          appState.isTileView)
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
           sliver: SliverGrid(
