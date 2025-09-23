@@ -414,19 +414,15 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
       );
     }
 
-    // Изменения ниже:
     return SingleChildScrollView(
       padding: padding.copyWith(top: 32, bottom: 16),
       child: Center(
-        // 1. Оборачиваем в Center
         child: ConstrainedBox(
-          // 2. Задаем максимальную ширину
           constraints: const BoxConstraints(maxWidth: 450),
           child: Wrap(
             spacing: 16,
             runSpacing: 16,
-            alignment:
-                WrapAlignment.center, // 3. Центрируем иконки внутри блока
+            alignment: WrapAlignment.center,
             children: connections.map((connection) {
               final url = 'https://${connection.domain}';
               return _buildConnectedTile(
