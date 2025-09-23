@@ -333,6 +333,7 @@ class _LoginPageState extends State<LoginPage> {
             padding: const EdgeInsets.symmetric(horizontal: 20),
             focusedBorderColor: theme.currentTheme.primaryPurple,
             obscureText: _obscurePassword,
+            onSubmitted: (_) => _handleAuthentication(),
             onFocusChanged: (isFocused) =>
                 setState(() => _obscureButton = !isFocused),
             rightIconPath: _obscurePassword

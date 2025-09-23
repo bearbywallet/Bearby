@@ -172,6 +172,15 @@ class ZilPayLegacyHandler {
   ) async {
     try {
       final appState = Provider.of<AppState>(context, listen: false);
+
+      if (appState.account?.addrType == 1 && appState.chain?.slip44 == 313) {
+        await zilliqaSwapChain(
+          walletIndex: BigInt.from(appState.selectedWallet),
+          accountIndex: appState.wallet!.selectedAccount,
+        );
+        await appState.syncData();
+      }
+
       FTokenInfo? ftoken = appState.wallet?.tokens
           .firstWhere((t) => t.addrType == 0 && t.native);
 
