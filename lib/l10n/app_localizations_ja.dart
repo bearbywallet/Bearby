@@ -159,9 +159,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get networkPageAvailableNetworks => '利用可能なネットワーク';
 
   @override
-  String get networkPageLoadError => 'ネットワークチェーンの読み込みに失敗: ';
-
-  @override
   String get networkPageAddError => 'ネットワークの追加に失敗: ';
 
   @override
@@ -261,9 +258,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get secretPhraseGeneratorPageNextButton => '次へ';
-
-  @override
-  String get homePageTestnetLabel => 'テストネット';
 
   @override
   String get homePageErrorTitle => '信号なし';
@@ -581,9 +575,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get secretPhraseVerifyPageTitle => '秘密を確認';
 
   @override
-  String get secretPhraseVerifyPageSkipButton => 'スキップ';
-
-  @override
   String get secretPhraseVerifyPageSubtitle => 'Bip39秘密を確認';
 
   @override
@@ -776,12 +767,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get genWalletOptionsBIP39Subtitle => 'ニーモニックフレーズを生成';
 
   @override
-  String get genWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get genWalletOptionsSLIP0039Subtitle => '共有付きニーモニックフレーズを生成';
-
-  @override
   String get genWalletOptionsPrivateKeyTitle => 'プライベートキー';
 
   @override
@@ -854,12 +839,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get restoreWalletOptionsBIP39Subtitle => 'ニーモニックフレーズで復元';
 
   @override
-  String get restoreWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get restoreWalletOptionsSLIP0039Subtitle => '共有ニーモニックフレーズで復元';
-
-  @override
   String get restoreWalletOptionsPrivateKeyTitle => 'プライベートキー';
 
   @override
@@ -918,9 +897,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get confirmTransactionContentConfirm => '確認';
-
-  @override
-  String get confirmTransactionContentInsufficientBalance => '残高不足';
 
   @override
   String get confirmTransactionContentNoActiveAccount => 'アクティブなアカウントがありません';
@@ -1056,9 +1032,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get deleteWalletModalSubmit => '送信';
-
-  @override
-  String get manageTokensModalContentSearchHint => '検索';
 
   @override
   String get addressSelectModalContentTitle => 'アドレスを選択';
@@ -1435,12 +1408,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get keystoreBackupCreateButton => 'バックアップを作成';
 
   @override
-  String get keystoreBackupPasswordsDoNotMatch => 'パスワードが一致しません';
-
-  @override
-  String get keystoreBackupPasswordTooShort => 'パスワードは8文字以上である必要があります';
-
-  @override
   String get keystoreBackupError => 'バックアップ作成エラー：';
 
   @override
@@ -1466,6 +1433,9 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get keystoreBackupSaveFailed => 'キーストアファイルの保存に失敗しました';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'パスワードは8文字以上である必要があります';
 
   @override
   String get keystoreBackupTempLocation => '一時ファイルの場所';

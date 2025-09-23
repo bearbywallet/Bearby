@@ -159,9 +159,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get networkPageAvailableNetworks => 'Доступные сети';
 
   @override
-  String get networkPageLoadError => 'Не удалось загрузить сети: ';
-
-  @override
   String get networkPageAddError => 'Не удалось добавить сеть: ';
 
   @override
@@ -261,9 +258,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get secretPhraseGeneratorPageNextButton => 'Далее';
-
-  @override
-  String get homePageTestnetLabel => 'Тестовая сеть';
 
   @override
   String get homePageErrorTitle => 'Нет сигнала';
@@ -581,9 +575,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get secretPhraseVerifyPageTitle => 'Проверка секрета';
 
   @override
-  String get secretPhraseVerifyPageSkipButton => 'Пропустить';
-
-  @override
   String get secretPhraseVerifyPageSubtitle => 'Проверка Bip39 секрета';
 
   @override
@@ -776,12 +767,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get genWalletOptionsBIP39Subtitle => 'Создать мнемоническую фразу';
 
   @override
-  String get genWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get genWalletOptionsSLIP0039Subtitle => 'Создать мнемоническую фразу с долями';
-
-  @override
   String get genWalletOptionsPrivateKeyTitle => 'Приватный ключ';
 
   @override
@@ -854,12 +839,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get restoreWalletOptionsBIP39Subtitle => 'Восстановить с помощью мнемонической фразы';
 
   @override
-  String get restoreWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get restoreWalletOptionsSLIP0039Subtitle => 'Восстановить с помощью разделенной мнемонической фразы';
-
-  @override
   String get restoreWalletOptionsPrivateKeyTitle => 'Приватный ключ';
 
   @override
@@ -918,9 +897,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get confirmTransactionContentConfirm => 'Подтвердить';
-
-  @override
-  String get confirmTransactionContentInsufficientBalance => 'Недостаточный баланс';
 
   @override
   String get confirmTransactionContentNoActiveAccount => 'Нет активного аккаунта';
@@ -1056,9 +1032,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get deleteWalletModalSubmit => 'Удалить';
-
-  @override
-  String get manageTokensModalContentSearchHint => 'Поиск';
 
   @override
   String get addressSelectModalContentTitle => 'Выберите адрес';
@@ -1435,12 +1408,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get keystoreBackupCreateButton => 'Создать Резервную Копию';
 
   @override
-  String get keystoreBackupPasswordsDoNotMatch => 'Пароли не совпадают';
-
-  @override
-  String get keystoreBackupPasswordTooShort => 'Пароль должен содержать не менее 8 символов';
-
-  @override
   String get keystoreBackupError => 'Ошибка создания резервной копии:';
 
   @override
@@ -1466,6 +1433,9 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get keystoreBackupSaveFailed => 'Не удалось сохранить файл keystore';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'Пароль должен содержать не менее 8 символов';
 
   @override
   String get keystoreBackupTempLocation => 'Расположение временного файла';

@@ -399,12 +399,6 @@ abstract class AppLocalizations {
   /// **'Available Networks'**
   String get networkPageAvailableNetworks;
 
-  /// Error message prefix when loading networks fails on NetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load network chains: '**
-  String get networkPageLoadError;
-
   /// Error message prefix when adding a network fails on NetworkPage
   ///
   /// In en, this message translates to:
@@ -602,12 +596,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next'**
   String get secretPhraseGeneratorPageNextButton;
-
-  /// Label displayed when using a testnet on HomePage
-  ///
-  /// In en, this message translates to:
-  /// **'Testnet'**
-  String get homePageTestnetLabel;
 
   /// Label displayed when shows error on home page
   ///
@@ -1203,12 +1191,6 @@ abstract class AppLocalizations {
   /// **'Verify Secret'**
   String get secretPhraseVerifyPageTitle;
 
-  /// Text on the skip button in the SecretPhraseVerifyPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Skip'**
-  String get secretPhraseVerifyPageSkipButton;
-
   /// Subtitle text displayed below the app bar in the SecretPhraseVerifyPage component
   ///
   /// In en, this message translates to:
@@ -1593,18 +1575,6 @@ abstract class AppLocalizations {
   /// **'Generate Mnemonic phrase'**
   String get genWalletOptionsBIP39Subtitle;
 
-  /// Title for SLIP-0039 wallet generation option
-  ///
-  /// In en, this message translates to:
-  /// **'SLIP-0039'**
-  String get genWalletOptionsSLIP0039Title;
-
-  /// Subtitle for SLIP-0039 wallet generation option
-  ///
-  /// In en, this message translates to:
-  /// **'Generate Mnemonic phrase with share'**
-  String get genWalletOptionsSLIP0039Subtitle;
-
   /// Title for Private Key wallet generation option
   ///
   /// In en, this message translates to:
@@ -1749,18 +1719,6 @@ abstract class AppLocalizations {
   /// **'Restore with Mnemonic phrase'**
   String get restoreWalletOptionsBIP39Subtitle;
 
-  /// Title for SLIP-0039 restore option
-  ///
-  /// In en, this message translates to:
-  /// **'SLIP-0039'**
-  String get restoreWalletOptionsSLIP0039Title;
-
-  /// Subtitle for SLIP-0039 restore option
-  ///
-  /// In en, this message translates to:
-  /// **'Restore with Shared Mnemonic phrase'**
-  String get restoreWalletOptionsSLIP0039Subtitle;
-
   /// Title for Private Key restore option
   ///
   /// In en, this message translates to:
@@ -1880,12 +1838,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Confirm'**
   String get confirmTransactionContentConfirm;
-
-  /// Error message shown when the user has insufficient balance to complete the transaction in the ConfirmTransactionContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Insufficient balance'**
-  String get confirmTransactionContentInsufficientBalance;
 
   /// Error message thrown when no active account is found in the ConfirmTransactionContent modal.
   ///
@@ -2144,12 +2096,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Destroy'**
   String get deleteWalletModalSubmit;
-
-  /// Hint text for the search input field in the ManageTokensModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Search'**
-  String get manageTokensModalContentSearchHint;
 
   /// Title text for the AddressSelectModalContent modal.
   ///
@@ -2895,18 +2841,6 @@ abstract class AppLocalizations {
   /// **'Create Backup'**
   String get keystoreBackupCreateButton;
 
-  /// Error message shown when the entered passwords don't match
-  ///
-  /// In en, this message translates to:
-  /// **'Passwords do not match'**
-  String get keystoreBackupPasswordsDoNotMatch;
-
-  /// Error message shown when the password is too short
-  ///
-  /// In en, this message translates to:
-  /// **'Password must be at least 8 characters'**
-  String get keystoreBackupPasswordTooShort;
-
   /// Prefix for error messages when backup creation fails
   ///
   /// In en, this message translates to:
@@ -2960,6 +2894,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Failed to save keystore file'**
   String get keystoreBackupSaveFailed;
+
+  /// Error message shown when the password is too short
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 8 characters'**
+  String get keystoreBackupPasswordTooShort;
 
   /// Label for displaying the temporary file location
   ///

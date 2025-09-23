@@ -58,7 +58,6 @@
   "networkPageSearchHint": "Поиск",
   "networkPageAddedNetworks": "Добавленные сети",
   "networkPageAvailableNetworks": "Доступные сети",
-  "networkPageLoadError": "Не удалось загрузить сети: ",
   "networkPageAddError": "Не удалось добавить сеть: ",
 
   "receivePageTitle": "Получить",
@@ -97,7 +96,6 @@
   "secretPhraseGeneratorPageBackupCheckbox": "Я сохранил секретные слова",
   "secretPhraseGeneratorPageNextButton": "Далее",
 
-  "homePageTestnetLabel": "Тестовая сеть",
   "homePageErrorTitle": "Нет сигнала",
   "homePageSendButton": "Отправить",
   "homePageReceiveButton": "Получить",
@@ -210,7 +208,6 @@
   "cipherSettingsPageConfirmButton": "Подтвердить",
 
   "secretPhraseVerifyPageTitle": "Проверка секрета",
-  "secretPhraseVerifyPageSkipButton": "Пропустить",
   "secretPhraseVerifyPageSubtitle": "Проверка Bip39 секрета",
   "secretPhraseVerifyPageNextButton": "Далее",
 
@@ -281,8 +278,6 @@
   "genWalletOptionsTitle": "Создать кошелек",
   "genWalletOptionsBIP39Title": "BIP39",
   "genWalletOptionsBIP39Subtitle": "Создать мнемоническую фразу",
-  "genWalletOptionsSLIP0039Title": "SLIP-0039",
-  "genWalletOptionsSLIP0039Subtitle": "Создать мнемоническую фразу с долями",
   "genWalletOptionsPrivateKeyTitle": "Приватный ключ",
   "genWalletOptionsPrivateKeySubtitle": "Создать только один приватный ключ",
 
@@ -310,8 +305,6 @@
   "restoreWalletOptionsTitle": "Восстановить кошелек",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "Восстановить с помощью мнемонической фразы",
-  "restoreWalletOptionsSLIP0039Title": "SLIP-0039",
-  "restoreWalletOptionsSLIP0039Subtitle": "Восстановить с помощью разделенной мнемонической фразы",
   "restoreWalletOptionsPrivateKeyTitle": "Приватный ключ",
   "restoreWalletOptionsPrivateKeySubtitle": "Восстановить с помощью приватного ключа",
   "restoreWalletOptionsQRCodeTitle": "QR-код",
@@ -334,7 +327,6 @@
   "confirmTransactionContentPasswordHint": "Пароль",
   "confirmTransactionContentUnableToConfirm": "Невозможно подтвердить",
   "confirmTransactionContentConfirm": "Подтвердить",
-  "confirmTransactionContentInsufficientBalance": "Недостаточный баланс",
   "confirmTransactionContentNoActiveAccount": "Нет активного аккаунта",
   "confirmTransactionContentFailedLoadTransfer": "Не удалось загрузить детали перевода",
   "confirmTransactionEditGasButtonText": "Изменить Газ",
@@ -384,8 +376,6 @@
   "deleteWalletModalSecretPhraseWarning": "Пожалуйста, убедитесь, что у вас есть доступ к вашей секретной фразе, прежде чем продолжить.",
   "deleteWalletModalPasswordHint": "Введите пароль",
   "deleteWalletModalSubmit": "Удалить",
-
-  "manageTokensModalContentSearchHint": "Поиск",
 
   "addressSelectModalContentTitle": "Выберите адрес",
   "addressSelectModalContentSearchHint": "Поиск / Адрес / ENS",
@@ -545,7 +535,6 @@
   "keystoreBackupWarningMessage": "Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.",
   "keystoreBackupConfirmPasswordHint": "Подтвердить Пароль",
   "keystoreBackupCreateButton": "Создать Резервную Копию",
-  "keystoreBackupPasswordsDoNotMatch": "Пароли не совпадают",
   "keystoreBackupPasswordTooShort": "Пароль должен содержать не менее 8 символов",
   "keystoreBackupError": "Ошибка создания резервной копии:",
   "keystoreBackupShareButton": "Поделиться Файлом Keystore",

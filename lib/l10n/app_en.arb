@@ -246,11 +246,6 @@
     "description": "Section title for available networks on NetworkPage"
   },
   
-  "networkPageLoadError": "Failed to load network chains: ",
-  "@networkPageLoadError": {
-    "description": "Error message prefix when loading networks fails on NetworkPage"
-  },
-  
   "networkPageAddError": "Failed to add network: ",
   "@networkPageAddError": {
     "description": "Error message prefix when adding a network fails on NetworkPage"
@@ -419,10 +414,6 @@
     "description": "Text for next button on SecretPhraseGeneratorPage"
   },
 
-  "homePageTestnetLabel": "Testnet",
-  "@homePageTestnetLabel": {
-    "description": "Label displayed when using a testnet on HomePage"
-  },
   "homePageErrorTitle": "No signal",
   "@homePageErrorTitle": {
     "description": "Label displayed when shows error on home page"
@@ -873,10 +864,6 @@
   "@secretPhraseVerifyPageTitle": {
     "description": "Title displayed in the app bar of the SecretPhraseVerifyPage component"
   },
-  "secretPhraseVerifyPageSkipButton": "Skip",
-  "@secretPhraseVerifyPageSkipButton": {
-    "description": "Text on the skip button in the SecretPhraseVerifyPage component"
-  },
   "secretPhraseVerifyPageSubtitle": "Verify Bip39 Secret",
   "@secretPhraseVerifyPageSubtitle": {
     "description": "Subtitle text displayed below the app bar in the SecretPhraseVerifyPage component"
@@ -1135,14 +1122,6 @@
   "@genWalletOptionsBIP39Subtitle": {
     "description": "Subtitle for BIP39 wallet generation option"
   },
-  "genWalletOptionsSLIP0039Title": "SLIP-0039",
-  "@genWalletOptionsSLIP0039Title": {
-    "description": "Title for SLIP-0039 wallet generation option"
-  },
-  "genWalletOptionsSLIP0039Subtitle": "Generate Mnemonic phrase with share",
-  "@genWalletOptionsSLIP0039Subtitle": {
-    "description": "Subtitle for SLIP-0039 wallet generation option"
-  },
   "genWalletOptionsPrivateKeyTitle": "Private Key",
   "@genWalletOptionsPrivateKeyTitle": {
     "description": "Title for Private Key wallet generation option"
@@ -1239,14 +1218,6 @@
   "@restoreWalletOptionsBIP39Subtitle": {
     "description": "Subtitle for BIP39 restore option"
   },
-  "restoreWalletOptionsSLIP0039Title": "SLIP-0039",
-  "@restoreWalletOptionsSLIP0039Title": {
-    "description": "Title for SLIP-0039 restore option"
-  },
-  "restoreWalletOptionsSLIP0039Subtitle": "Restore with Shared Mnemonic phrase",
-  "@restoreWalletOptionsSLIP0039Subtitle": {
-    "description": "Subtitle for SLIP-0039 restore option"
-  },
   "restoreWalletOptionsPrivateKeyTitle": "Private Key",
   "@restoreWalletOptionsPrivateKeyTitle": {
     "description": "Title for Private Key restore option"
@@ -1331,10 +1302,6 @@
   "confirmTransactionContentConfirm": "Confirm",
   "@confirmTransactionContentConfirm": {
     "description": "Text displayed on the swipe button to confirm the transaction in the ConfirmTransactionContent modal."
-  },
-  "confirmTransactionContentInsufficientBalance": "Insufficient balance",
-  "@confirmTransactionContentInsufficientBalance": {
-    "description": "Error message shown when the user has insufficient balance to complete the transaction in the ConfirmTransactionContent modal."
   },
   "confirmTransactionContentNoActiveAccount": "No active account",
   "@confirmTransactionContentNoActiveAccount": {
@@ -1510,10 +1477,6 @@
   "deleteWalletModalSubmit": "Destroy",
   "@deleteWalletModalSubmit": {
     "description": "Text on the button to confirm wallet deletion in the DeleteWalletModal modal."
-  },
-  "manageTokensModalContentSearchHint": "Search",
-  "@manageTokensModalContentSearchHint": {
-    "description": "Hint text for the search input field in the ManageTokensModalContent modal."
   },
 
   "addressSelectModalContentTitle": "Select Address",
@@ -2024,14 +1987,6 @@
   "@keystoreBackupCreateButton": {
     "description": "Text for the button to create a keystore backup"
   },
-  "keystoreBackupPasswordsDoNotMatch": "Passwords do not match",
-  "@keystoreBackupPasswordsDoNotMatch": {
-    "description": "Error message shown when the entered passwords don't match"
-  },
-  "keystoreBackupPasswordTooShort": "Password must be at least 8 characters",
-  "@keystoreBackupPasswordTooShort": {
-    "description": "Error message shown when the password is too short"
-  },
   "keystoreBackupError": "Error creating backup:",
   "@keystoreBackupError": {
     "description": "Prefix for error messages when backup creation fails"
@@ -2067,6 +2022,10 @@
   "keystoreBackupSaveFailed": "Failed to save keystore file",
   "@keystoreBackupSaveFailed": {
     "description": "Error message when keystore file save failed"
+  },
+  "keystoreBackupPasswordTooShort": "Password must be at least 8 characters",
+  "@keystoreBackupPasswordTooShort": {
+    "description": "Error message shown when the password is too short"
   },
   "keystoreBackupTempLocation": "Temporary file location",
   "@keystoreBackupTempLocation": {

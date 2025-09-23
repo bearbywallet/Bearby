@@ -159,9 +159,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get networkPageAvailableNetworks => '可用网络';
 
   @override
-  String get networkPageLoadError => '加载网络链失败：';
-
-  @override
   String get networkPageAddError => '添加网络失败：';
 
   @override
@@ -261,9 +258,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get secretPhraseGeneratorPageNextButton => '下一步';
-
-  @override
-  String get homePageTestnetLabel => '测试网';
 
   @override
   String get homePageErrorTitle => '无信号';
@@ -581,9 +575,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get secretPhraseVerifyPageTitle => '验证密钥';
 
   @override
-  String get secretPhraseVerifyPageSkipButton => '跳过';
-
-  @override
   String get secretPhraseVerifyPageSubtitle => '验证 Bip39 密钥';
 
   @override
@@ -776,12 +767,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get genWalletOptionsBIP39Subtitle => '生成助记词';
 
   @override
-  String get genWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get genWalletOptionsSLIP0039Subtitle => '生成带分享的助记词';
-
-  @override
   String get genWalletOptionsPrivateKeyTitle => '私钥';
 
   @override
@@ -854,12 +839,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get restoreWalletOptionsBIP39Subtitle => '使用助记词恢复';
 
   @override
-  String get restoreWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get restoreWalletOptionsSLIP0039Subtitle => '使用共享助记词恢复';
-
-  @override
   String get restoreWalletOptionsPrivateKeyTitle => '私钥';
 
   @override
@@ -918,9 +897,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get confirmTransactionContentConfirm => '确认';
-
-  @override
-  String get confirmTransactionContentInsufficientBalance => '余额不足';
 
   @override
   String get confirmTransactionContentNoActiveAccount => '无活动账户';
@@ -1056,9 +1032,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get deleteWalletModalSubmit => '提交';
-
-  @override
-  String get manageTokensModalContentSearchHint => '搜索';
 
   @override
   String get addressSelectModalContentTitle => '选择地址';
@@ -1435,12 +1408,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get keystoreBackupCreateButton => '创建备份';
 
   @override
-  String get keystoreBackupPasswordsDoNotMatch => '密码不匹配';
-
-  @override
-  String get keystoreBackupPasswordTooShort => '密码必须至少8个字符';
-
-  @override
   String get keystoreBackupError => '创建备份错误：';
 
   @override
@@ -1466,6 +1433,9 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get keystoreBackupSaveFailed => '密钥库文件保存失败';
+
+  @override
+  String get keystoreBackupPasswordTooShort => '密码必须至少8个字符';
 
   @override
   String get keystoreBackupTempLocation => '临时文件位置';

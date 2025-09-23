@@ -58,7 +58,6 @@
   "networkPageSearchHint": "搜索",
   "networkPageAddedNetworks": "已添加的网络",
   "networkPageAvailableNetworks": "可用网络",
-  "networkPageLoadError": "加载网络链失败：",
   "networkPageAddError": "添加网络失败：",
 
   "receivePageTitle": "接收",
@@ -97,7 +96,6 @@
   "secretPhraseGeneratorPageBackupCheckbox": "我已备份助记词",
   "secretPhraseGeneratorPageNextButton": "下一步",
 
-  "homePageTestnetLabel": "测试网",
   "homePageErrorTitle": "无信号",
   "homePageSendButton": "发送",
   "homePageReceiveButton": "接收",
@@ -210,7 +208,6 @@
   "cipherSettingsPageConfirmButton": "确认",
 
   "secretPhraseVerifyPageTitle": "验证密钥",
-  "secretPhraseVerifyPageSkipButton": "跳过",
   "secretPhraseVerifyPageSubtitle": "验证 Bip39 密钥",
   "secretPhraseVerifyPageNextButton": "下一步",
 
@@ -280,8 +277,6 @@
   "genWalletOptionsTitle": "生成钱包",
   "genWalletOptionsBIP39Title": "BIP39",
   "genWalletOptionsBIP39Subtitle": "生成助记词",
-  "genWalletOptionsSLIP0039Title": "SLIP-0039",
-  "genWalletOptionsSLIP0039Subtitle": "生成带分享的助记词",
   "genWalletOptionsPrivateKeyTitle": "私钥",
   "genWalletOptionsPrivateKeySubtitle": "仅生成一个私钥",
 
@@ -309,8 +304,6 @@
   "restoreWalletOptionsTitle": "恢复钱包",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "使用助记词恢复",
-  "restoreWalletOptionsSLIP0039Title": "SLIP-0039",
-  "restoreWalletOptionsSLIP0039Subtitle": "使用共享助记词恢复",
   "restoreWalletOptionsPrivateKeyTitle": "私钥",
   "restoreWalletOptionsPrivateKeySubtitle": "使用私钥恢复",
   "restoreWalletOptionsKeyStoreTitle": "密钥库文件",
@@ -333,7 +326,6 @@
   "confirmTransactionContentPasswordHint": "密码",
   "confirmTransactionContentUnableToConfirm": "无法确认",
   "confirmTransactionContentConfirm": "确认",
-  "confirmTransactionContentInsufficientBalance": "余额不足",
   "confirmTransactionContentNoActiveAccount": "无活动账户",
   "confirmTransactionContentFailedLoadTransfer": "加载转账详情失败",
   "confirmTransactionEditGasButtonText": "编辑",
@@ -383,8 +375,6 @@
   "deleteWalletModalSecretPhraseWarning": "请确保您能够访问您的助记词，然后再继续。",
   "deleteWalletModalPasswordHint": "输入密码",
   "deleteWalletModalSubmit": "提交",
-
-  "manageTokensModalContentSearchHint": "搜索",
 
   "addressSelectModalContentTitle": "选择地址",
   "addressSelectModalContentSearchHint": "搜索 / 地址 / ENS",
@@ -529,7 +519,6 @@
   "keystoreBackupWarningMessage": "密钥库文件包含您的加密私钥。将此文件保存在安全位置，绝不与任何人分享。您需要创建的密码来解密此文件。",
   "keystoreBackupConfirmPasswordHint": "确认密码",
   "keystoreBackupCreateButton": "创建备份",
-  "keystoreBackupPasswordsDoNotMatch": "密码不匹配",
   "keystoreBackupPasswordTooShort": "密码必须至少8个字符",
   "keystoreBackupError": "创建备份错误：",
   "keystoreBackupShareButton": "分享密钥库文件",

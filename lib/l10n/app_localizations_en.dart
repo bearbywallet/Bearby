@@ -159,9 +159,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get networkPageAvailableNetworks => 'Available Networks';
 
   @override
-  String get networkPageLoadError => 'Failed to load network chains: ';
-
-  @override
   String get networkPageAddError => 'Failed to add network: ';
 
   @override
@@ -261,9 +258,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get secretPhraseGeneratorPageNextButton => 'Next';
-
-  @override
-  String get homePageTestnetLabel => 'Testnet';
 
   @override
   String get homePageErrorTitle => 'No signal';
@@ -581,9 +575,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get secretPhraseVerifyPageTitle => 'Verify Secret';
 
   @override
-  String get secretPhraseVerifyPageSkipButton => 'Skip';
-
-  @override
   String get secretPhraseVerifyPageSubtitle => 'Verify Bip39 Secret';
 
   @override
@@ -776,12 +767,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get genWalletOptionsBIP39Subtitle => 'Generate Mnemonic phrase';
 
   @override
-  String get genWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get genWalletOptionsSLIP0039Subtitle => 'Generate Mnemonic phrase with share';
-
-  @override
   String get genWalletOptionsPrivateKeyTitle => 'Private Key';
 
   @override
@@ -854,12 +839,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get restoreWalletOptionsBIP39Subtitle => 'Restore with Mnemonic phrase';
 
   @override
-  String get restoreWalletOptionsSLIP0039Title => 'SLIP-0039';
-
-  @override
-  String get restoreWalletOptionsSLIP0039Subtitle => 'Restore with Shared Mnemonic phrase';
-
-  @override
   String get restoreWalletOptionsPrivateKeyTitle => 'Private Key';
 
   @override
@@ -918,9 +897,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get confirmTransactionContentConfirm => 'Confirm';
-
-  @override
-  String get confirmTransactionContentInsufficientBalance => 'Insufficient balance';
 
   @override
   String get confirmTransactionContentNoActiveAccount => 'No active account';
@@ -1056,9 +1032,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteWalletModalSubmit => 'Destroy';
-
-  @override
-  String get manageTokensModalContentSearchHint => 'Search';
 
   @override
   String get addressSelectModalContentTitle => 'Select Address';
@@ -1435,12 +1408,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get keystoreBackupCreateButton => 'Create Backup';
 
   @override
-  String get keystoreBackupPasswordsDoNotMatch => 'Passwords do not match';
-
-  @override
-  String get keystoreBackupPasswordTooShort => 'Password must be at least 8 characters';
-
-  @override
   String get keystoreBackupError => 'Error creating backup:';
 
   @override
@@ -1466,6 +1433,9 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get keystoreBackupSaveFailed => 'Failed to save keystore file';
+
+  @override
+  String get keystoreBackupPasswordTooShort => 'Password must be at least 8 characters';
 
   @override
   String get keystoreBackupTempLocation => 'Temporary file location';
