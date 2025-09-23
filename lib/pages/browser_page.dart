@@ -350,11 +350,12 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
           HoverSvgIcon(
             assetName: 'assets/icons/close.svg',
             onTap: () async {
-              await _webViewController?.loadUrl(
-                urlRequest: URLRequest(url: WebUri("about:blank")),
-              );
+              _legacyHandler?.dispose();
+              _eip1193Handler?.dispose();
+
               setState(() {
                 _isWebViewVisible = false;
+                _searchController.text = "";
                 _searchController.clear();
               });
             },

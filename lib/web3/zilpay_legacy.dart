@@ -74,11 +74,13 @@ class ZilPayLegacyHandler {
 
     final jsonString = jsonEncode(response);
     try {
-      await webViewController.evaluateJavascript(source: '''
-    window.dispatchEvent(new MessageEvent('message', { 
-      data: $jsonString
-    }));
-    ''');
+      await webViewController.evaluateJavascript(
+        source: '''
+        window.dispatchEvent(new MessageEvent('message', { 
+          data: $jsonString
+        }));
+        ''',
+      );
     } catch (e) {
       debugPrint("legacy: evaluateJavascript error: $e");
       rethrow;
