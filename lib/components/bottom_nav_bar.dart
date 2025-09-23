@@ -20,40 +20,50 @@ class CustomBottomNavigationBar extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
 
-    return ClipRect(
-      child: BackdropFilter(
-        filter: ImageFilter.blur(
-          sigmaX: 10.0,
-          sigmaY: 10.0,
-        ),
+    return Container(
+      width: double.infinity,
+      height: 80,
+      color: Colors.transparent,
+      child: Center(
         child: SizedBox(
-          height: 80,
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceAround,
-            children: items.asMap().entries.map((entry) {
-              int index = entry.key;
-              CustomBottomNavigationBarItem item = entry.value;
-              return Expanded(
-                child: GestureDetector(
-                  behavior: HitTestBehavior.opaque,
-                  onTap: () => onTap(index),
-                  child: Container(
-                    color: Colors.transparent,
-                    child: SvgPicture.asset(
-                      item.iconPath,
-                      colorFilter: ColorFilter.mode(
-                        index == currentIndex
-                            ? theme.primaryPurple
-                            : theme.textSecondary,
-                        BlendMode.srcIn,
+          width: 450,
+          child: ClipRect(
+            child: BackdropFilter(
+              filter: ImageFilter.blur(
+                sigmaX: 10.0,
+                sigmaY: 10.0,
+              ),
+              child: SizedBox(
+                height: 80,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  children: items.asMap().entries.map((entry) {
+                    int index = entry.key;
+                    CustomBottomNavigationBarItem item = entry.value;
+                    return Expanded(
+                      child: GestureDetector(
+                        behavior: HitTestBehavior.opaque,
+                        onTap: () => onTap(index),
+                        child: Container(
+                          color: Colors.transparent,
+                          child: SvgPicture.asset(
+                            item.iconPath,
+                            colorFilter: ColorFilter.mode(
+                              index == currentIndex
+                                  ? theme.primaryPurple
+                                  : theme.textSecondary,
+                              BlendMode.srcIn,
+                            ),
+                            width: 40,
+                            height: 40,
+                          ),
+                        ),
                       ),
-                      width: 40,
-                      height: 40,
-                    ),
-                  ),
+                    );
+                  }).toList(),
                 ),
-              );
-            }).toList(),
+              ),
+            ),
           ),
         ),
       ),
