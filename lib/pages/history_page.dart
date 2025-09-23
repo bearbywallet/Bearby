@@ -290,7 +290,6 @@ class _HistoryPageState extends State<HistoryPage> {
                     keyboardType: TextInputType.text,
                   ),
                 ),
-                const SizedBox(height: 4),
               ],
             ),
           ),

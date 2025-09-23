@@ -336,7 +336,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       height: ICON_SIZE_SMALL,
                       blendMode: BlendMode.modulate,
                       padding: const EdgeInsets.all(0),
-                      color: theme.cardBackground,
+                      color: theme.textSecondary,
                       onTap: () async {
                         await appState.updateIsTileView(!appState.isTileView);
                       },
@@ -348,7 +348,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     height: ICON_SIZE_SMALL,
                     blendMode: BlendMode.modulate,
                     padding: const EdgeInsets.all(0),
-                    color: theme.cardBackground,
+                    color: theme.textSecondary,
                     onTap: () {
                       Navigator.pushNamed(context, '/manage_tokens');
                     },

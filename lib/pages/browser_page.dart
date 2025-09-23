@@ -64,9 +64,9 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
   }
 
   @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
+  void didChangeAppLifecycleState(AppLifecycleState state) async {
     if (state == AppLifecycleState.resumed && _webViewController != null) {
-      _webViewController?.reload();
+      await _webViewController?.reload();
     }
   }
 
@@ -207,7 +207,7 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
             ),
             Padding(
               padding:
-                  EdgeInsets.fromLTRB(adaptivePadding, 8, adaptivePadding, 12),
+                  EdgeInsets.fromLTRB(adaptivePadding, 8, adaptivePadding, 0),
               child: _isWebViewVisible
                   ? _buildBrowserControls(theme)
                   : _buildSearchBar(theme),
@@ -352,13 +352,14 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
           ),
           HoverSvgIcon(
             assetName: 'assets/icons/close.svg',
-            onTap: () {
+            onTap: () async {
               setState(() {
                 _isWebViewVisible = false;
                 _searchController.clear();
-                _webViewController?.loadUrl(
-                    urlRequest: URLRequest(url: WebUri("about:blank")));
               });
+              await _webViewController?.loadUrl(
+                urlRequest: URLRequest(url: WebUri("")),
+              );
             },
             color: theme.textPrimary,
             width: 24,
@@ -437,7 +438,7 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
         height: 24,
         fit: BoxFit.contain,
         errorWidget: HoverSvgIcon(
-          assetName: 'assets/icons/default.svg',
+          assetName: 'assets/icons/warning.svg',
           width: 24,
           height: 24,
           onTap: () {},

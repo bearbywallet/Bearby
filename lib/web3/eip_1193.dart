@@ -134,7 +134,11 @@ class Web3EIP1193Handler {
     })();
     ''';
 
-    await webViewController.evaluateJavascript(source: jsCode);
+    try {
+      await webViewController.evaluateJavascript(source: jsCode);
+    } catch (e) {
+      debugPrint("evaluateJavascript error: $e");
+    }
   }
 
   void _returnError(
