@@ -192,8 +192,11 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
               child: Stack(
                 fit: StackFit.expand,
                 children: [
-                  _buildConnectedTab(appState.connections, theme,
-                      EdgeInsets.symmetric(horizontal: adaptivePadding)),
+                  _buildConnectedTab(
+                    appState.connections,
+                    theme,
+                    EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  ),
                   if (_isWebViewVisible) _buildWebView(),
                 ],
               ),
@@ -389,7 +392,10 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
   }
 
   Widget _buildConnectedTab(
-      List<ConnectionInfo> connections, AppTheme theme, EdgeInsets padding) {
+    List<ConnectionInfo> connections,
+    AppTheme theme,
+    EdgeInsets padding,
+  ) {
     final l10n = AppLocalizations.of(context)!;
 
     if (connections.isEmpty) {
@@ -404,41 +410,42 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
       );
     }
 
-    return GridView.builder(
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 3,
-        mainAxisSpacing: 16,
-        crossAxisSpacing: 16,
-        childAspectRatio: 0.9,
-      ),
+    return SingleChildScrollView(
       padding: padding.copyWith(top: 32, bottom: 16),
-      itemCount: connections.length,
-      itemBuilder: (context, index) {
-        final connection = connections[index];
-        final url = 'https://${connection.domain}';
-        return _buildConnectedTile(
-          connection.title,
-          connection.favicon ?? 'https://${connection.domain}/favicon.ico',
-          url,
-          theme,
-        );
-      },
+      child: Wrap(
+        spacing: 16,
+        runSpacing: 16,
+        alignment: WrapAlignment.start,
+        children: connections.map((connection) {
+          final url = 'https://${connection.domain}';
+          return _buildConnectedTile(
+            connection.title,
+            connection.favicon,
+            url,
+            theme,
+          );
+        }).toList(),
+      ),
     );
   }
 
   Widget _buildConnectedTile(
-      String label, String iconUrl, String url, AppTheme theme) {
+    String label,
+    String? iconUrl,
+    String url,
+    AppTheme theme,
+  ) {
     return TileButton(
       title: label,
       icon: AsyncImage(
         url: iconUrl,
-        width: 24,
-        height: 24,
+        width: 30,
+        height: 30,
         fit: BoxFit.contain,
         errorWidget: HoverSvgIcon(
           assetName: 'assets/icons/warning.svg',
-          width: 24,
-          height: 24,
+          width: 30,
+          height: 30,
           onTap: () {},
           color: theme.textPrimary,
         ),
