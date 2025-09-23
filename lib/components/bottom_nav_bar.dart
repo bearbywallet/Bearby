@@ -26,7 +26,7 @@ class CustomBottomNavigationBar extends StatelessWidget {
       color: Colors.transparent,
       child: Center(
         child: SizedBox(
-          width: 450,
+          width: 600,
           child: ClipRect(
             child: BackdropFilter(
               filter: ImageFilter.blur(

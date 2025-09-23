@@ -123,109 +123,113 @@ class _TokenCardState extends State<TokenCard>
 
     return Column(
       children: [
-        MouseRegion(
-          onEnter: (_) => setState(() => isHovered = true),
-          onExit: (_) => setState(() => isHovered = false),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (_) {
-              setState(() => isPressed = true);
-              _controller.forward();
-            },
-            onTapUp: (_) {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTapCancel: () {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTap: widget.onTap,
-            child: AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) =>
-                  Transform.scale(scale: _animation.value, child: child),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Padding(
-                  padding: EdgeInsets.symmetric(
-                      horizontal: adaptivePadding, vertical: adaptivePadding),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            LayoutBuilder(
-                              builder: (context, constraints) {
-                                return Row(
-                                  children: [
-                                    Flexible(
-                                      child: Text(
-                                        widget.ftoken.name,
-                                        style: theme.bodyText1.copyWith(
-                                          color: theme.textPrimary
-                                              .withValues(alpha: 0.7),
-                                          fontWeight: FontWeight.w500,
+        Expanded(
+          child: MouseRegion(
+            onEnter: (_) => setState(() => isHovered = true),
+            onExit: (_) => setState(() => isHovered = false),
+            child: GestureDetector(
+              behavior: HitTestBehavior.opaque,
+              onTapDown: (_) {
+                setState(() => isPressed = true);
+                _controller.forward();
+              },
+              onTapUp: (_) {
+                setState(() => isPressed = false);
+                _controller.reverse();
+              },
+              onTapCancel: () {
+                setState(() => isPressed = false);
+                _controller.reverse();
+              },
+              onTap: widget.onTap,
+              child: AnimatedBuilder(
+                animation: _animation,
+                builder: (context, child) =>
+                    Transform.scale(scale: _animation.value, child: child),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 150),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(
+                        horizontal: adaptivePadding, vertical: adaptivePadding),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              LayoutBuilder(
+                                builder: (context, constraints) {
+                                  return Row(
+                                    children: [
+                                      Flexible(
+                                        child: Text(
+                                          widget.ftoken.name,
+                                          style: theme.bodyText1.copyWith(
+                                            color: theme.textPrimary
+                                                .withValues(alpha: 0.7),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                          maxLines: 1,
                                         ),
-                                        overflow: TextOverflow.ellipsis,
-                                        maxLines: 1,
                                       ),
-                                    ),
-                                    const SizedBox(width: 8),
-                                    Text(
-                                      '(${widget.ftoken.symbol})',
-                                      style: theme.caption.copyWith(
-                                        color: theme.textSecondary
-                                            .withValues(alpha: 0.5),
-                                        fontSize: 13,
+                                      const SizedBox(width: 8),
+                                      Text(
+                                        '(${widget.ftoken.symbol})',
+                                        style: theme.caption.copyWith(
+                                          color: theme.textSecondary
+                                              .withValues(alpha: 0.5),
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                    ),
-                                  ],
-                                );
-                              },
-                            ),
-                            const SizedBox(height: 8),
-                            Row(
-                              children: [
-                                Flexible(
-                                  child: Text(
-                                    displayAmount,
-                                    style: theme.subtitle1.copyWith(
-                                      color: theme.textPrimary,
-                                      fontWeight: FontWeight.w600,
-                                      letterSpacing: 0.5,
-                                    ),
-                                    overflow: TextOverflow.ellipsis,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 4),
-                            if (appState.wallet?.settings.currencyConvert !=
-                                null)
-                              Text(
-                                displayConverted,
-                                style: theme.bodyText2
-                                    .copyWith(color: theme.textSecondary),
+                                    ],
+                                  );
+                                },
                               ),
-                          ],
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      displayAmount,
+                                      style: theme.subtitle1.copyWith(
+                                        color: theme.textPrimary,
+                                        fontWeight: FontWeight.w600,
+                                        letterSpacing: 0.5,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              if (appState.wallet?.settings.currencyConvert !=
+                                  null)
+                                Text(
+                                  displayConverted,
+                                  style: theme.bodyText2
+                                      .copyWith(color: theme.textSecondary),
+                                ),
+                            ],
+                          ),
                         ),
-                      ),
-                      const SizedBox(width: 12),
-                      Container(
-                        padding: const EdgeInsets.all(4),
-                        decoration: BoxDecoration(
-                          color: theme.textPrimary.withValues(alpha: 0.05),
-                          shape: BoxShape.circle,
+                        const SizedBox(width: 12),
+                        Container(
+                          padding: const EdgeInsets.all(4),
+                          decoration: BoxDecoration(
+                            color: theme.textPrimary.withValues(alpha: 0.05),
+                            shape: BoxShape.circle,
+                          ),
+                          child: _buildIcon(Provider.of<AppState>(context)),
                         ),
-                        child: _buildIcon(Provider.of<AppState>(context)),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),
