@@ -4,9 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-import 'package:share_plus/share_plus.dart';
-import 'package:zilpay/components/browser_action_menu.dart';
-import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/web3/eip_1193.dart';
@@ -54,9 +51,9 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
       _legacyHandler!.dispose();
     }
 
-    // if (_eip1193Handler != null) {
-    //   _eip1193Handler!.dispose();
-    // }
+    if (_eip1193Handler != null) {
+      _eip1193Handler!.dispose();
+    }
 
     if (_webViewController != null) {
       _webViewController!.dispose();
@@ -523,31 +520,7 @@ class _WebViewPageState extends State<WebViewPage> with WidgetsBindingObserver {
               ),
             ],
           ),
-          actions: [
-            BrowserActionMenu(
-              parentContext: context,
-              onShare: () {
-                SharePlus.instance.share(
-                  ShareParams(
-                    text: _currentUrl,
-                  ),
-                );
-              },
-              onCopyLink: () {
-                Clipboard.setData(ClipboardData(text: _currentUrl));
-              },
-              onClose: () {
-                stopBlockWorker();
-                Navigator.pop(context);
-              },
-              onBack: () {
-                _webViewController?.goBack();
-              },
-              onForward: () {
-                _webViewController?.goForward();
-              },
-            ),
-          ],
+          actions: [],
         ),
       ),
       body: _hasError

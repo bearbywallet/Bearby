@@ -717,10 +717,6 @@
     "description": "Label for the delete button, typically in dialogs or for destructive actions"
   },
 
-  "browserPageConnectedTab": "Connected",
-  "@browserPageConnectedTab": {
-    "description": "Label for the Connected tab on the Browser page"
-  },
   "browserPageExploreTab": "Explore",
   "@browserPageExploreTab": {
     "description": "Label for the Explore tab on the Browser page"

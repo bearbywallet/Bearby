@@ -975,12 +975,6 @@ abstract class AppLocalizations {
   /// **'Delete'**
   String get delete;
 
-  /// Label for the Connected tab on the Browser page
-  ///
-  /// In en, this message translates to:
-  /// **'Connected'**
-  String get browserPageConnectedTab;
-
   /// Label for the Explore tab on the Browser page
   ///
   /// In en, this message translates to:

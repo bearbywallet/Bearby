@@ -465,9 +465,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get delete => 'Удалить';
 
   @override
-  String get browserPageConnectedTab => 'Подключенные';
-
-  @override
   String get browserPageExploreTab => 'Обзор';
 
   @override

@@ -167,7 +167,6 @@
   "cancel": "取消",
   "delete": "删除",
 
-  "browserPageConnectedTab": "已连接",
   "browserPageExploreTab": "探索",
   "browserPageNoExploreApps": "暂无可探索的应用",
   "browserPageSearchHint": "使用 {engine} 搜索或输入地址",

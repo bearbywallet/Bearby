@@ -93,6 +93,10 @@ class Web3EIP1193Handler {
     _activeRequests.remove(method);
   }
 
+  void dispose() {
+    // TODO: here we dispose account tracker.
+  }
+
   Future<void> _sendResponse({
     required String type,
     required String uuid,

@@ -1,16 +1,23 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/config/search_engines.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
-import 'package:zilpay/components/image_cache.dart';
-import 'package:zilpay/pages/web_view.dart';
-import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/web3/eip_1193.dart';
+import 'package:zilpay/web3/message.dart';
+import 'package:zilpay/web3/zilpay_legacy.dart';
 
 class BrowserPage extends StatefulWidget {
   const BrowserPage({super.key});
@@ -19,24 +26,48 @@ class BrowserPage extends StatefulWidget {
   State<BrowserPage> createState() => _BrowserPageState();
 }
 
-class _BrowserPageState extends State<BrowserPage>
-    with SingleTickerProviderStateMixin {
-  late TabController _tabController;
+class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
   final TextEditingController _searchController = TextEditingController();
+
+  InAppWebViewController? _webViewController;
+  ZilPayLegacyHandler? _legacyHandler;
+  Web3EIP1193Handler? _eip1193Handler;
+  CookieManager? _cookieManager;
+
+  bool _isWebViewVisible = false;
+  String _currentUrl = '';
+  double _progress = 0;
+  bool _isLoading = true;
+  bool _canGoBack = false;
+  bool _canGoForward = false;
+
+  String get _baseUserAgent => Platform.isIOS
+      ? 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_7_1 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.1.2 Mobile/15E148 Safari/604.1'
+      : 'Mozilla/5.0 (Linux; Android 11; SM-G998U) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/96.0.4664.110 Mobile Safari/537.36';
 
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 2, vsync: this);
+    WidgetsBinding.instance.addObserver(this);
+    _cookieManager = CookieManager.instance();
     final appState = Provider.of<AppState>(context, listen: false);
     appState.syncConnections();
   }
 
   @override
   void dispose() {
-    _tabController.dispose();
+    WidgetsBinding.instance.removeObserver(this);
     _searchController.dispose();
+    _legacyHandler?.dispose();
+    _webViewController?.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed && _webViewController != null) {
+      _webViewController?.reload();
+    }
   }
 
   void _handleSearch(String value) {
@@ -46,11 +77,10 @@ class _BrowserPageState extends State<BrowserPage>
     final browserSettings = appState.state.browserSettings;
     final searchEngineIndex = browserSettings.searchEngineIndex;
     final searchEngine = baseSearchEngines[searchEngineIndex];
-
     String query = value.trim();
     String url;
-
     final uri = Uri.tryParse(query);
+
     if (uri != null) {
       if (uri.hasScheme && uri.hasAuthority) {
         url = query;
@@ -68,19 +98,15 @@ class _BrowserPageState extends State<BrowserPage>
         url = '${searchEngine.url}${Uri.encodeQueryComponent(query)}';
       }
     }
-
     _openWebView(url);
   }
 
   void _openWebView(String url) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => WebViewPage(
-          initialUrl: url,
-        ),
-      ),
-    );
+    setState(() {
+      _currentUrl = url;
+      _searchController.text = url;
+      _isWebViewVisible = true;
+    });
   }
 
   bool isDomainName(String input) {
@@ -90,74 +116,255 @@ class _BrowserPageState extends State<BrowserPage>
     return domainRegex.hasMatch(domainPart);
   }
 
+  void _setupJavaScriptHandlers() {
+    if (_webViewController == null) return;
+
+    _legacyHandler =
+        ZilPayLegacyHandler(webViewController: _webViewController!);
+    _eip1193Handler = Web3EIP1193Handler(
+      webViewController: _webViewController!,
+      initialUrl: _currentUrl,
+    );
+
+    _webViewController?.addJavaScriptHandler(
+      handlerName: 'ZilPayLegacy',
+      callback: (args) {
+        if (!mounted) return;
+        try {
+          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
+          final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
+          _legacyHandler?.handleLegacyZilPayMessage(zilPayMessage, context);
+        } catch (e) {
+          debugPrint("Error handling ZilPayLegacy message: $e");
+        }
+      },
+    );
+
+    _webViewController?.addJavaScriptHandler(
+      handlerName: 'EIP1193Channel',
+      callback: (args) {
+        if (!mounted) return;
+        try {
+          final jsonData = jsonDecode(args[0]) as Map<String, dynamic>;
+          final zilPayMessage = ZilPayWeb3Message.fromJson(jsonData);
+          _eip1193Handler?.handleWeb3EIP1193Message(zilPayMessage, context);
+        } catch (e) {
+          debugPrint("Error handling EIP1193Channel message: $e");
+        }
+      },
+    );
+  }
+
+  Future<void> _initializeZilPayInjection(AppState appState) async {
+    try {
+      if (appState.chain?.slip44 == 60 || appState.chain?.slip44 == 313) {
+        await _webViewController?.injectJavascriptFileFromAsset(
+            assetFilePath: 'assets/evm_inject.js');
+      }
+      if (appState.chain?.slip44 == 313) {
+        String scilla =
+            await rootBundle.loadString('assets/zilpay_legacy_inject.js');
+        await _webViewController?.evaluateJavascript(source: scilla);
+        await _legacyHandler?.sendData(appState);
+      }
+    } catch (e) {
+      debugPrint("Injection Error: $e");
+    }
+  }
+
+  void _applyPrivacySettings(
+      AppState appState, InAppWebViewController controller) {
+    if (!appState.state.browserSettings.cookiesEnabled) {
+      _cookieManager?.deleteAllCookies();
+    }
+    if (appState.state.browserSettings.incognitoMode) {
+      InAppWebViewController.clearAllCache();
+      controller.clearHistory();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
-    final padding = EdgeInsets.symmetric(
-        horizontal: AdaptiveSize.getAdaptivePadding(context, 16));
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final connections = appState.connections;
-    final l10n = AppLocalizations.of(context)!;
 
-    return SafeArea(
-      child: Center(
-        child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
-          child: Scaffold(
-            backgroundColor: theme.background,
-            body: Column(
-              children: [
-                TabBar(
-                  controller: _tabController,
-                  tabs: [
-                    Tab(text: l10n.browserPageConnectedTab),
-                    Tab(text: l10n.browserPageExploreTab),
-                  ],
-                  labelStyle: TextStyle(
-                      color: theme.textPrimary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600),
-                  unselectedLabelStyle: TextStyle(
-                      color: theme.textSecondary,
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600),
-                  indicatorColor: theme.primaryPurple,
-                  labelColor: theme.textPrimary,
-                  unselectedLabelColor: theme.textSecondary,
-                  indicatorSize: TabBarIndicatorSize.label,
-                  splashFactory: NoSplash.splashFactory,
-                  dividerColor: Colors.transparent,
-                ),
-                Expanded(
-                  child: TabBarView(
-                    controller: _tabController,
-                    children: [
-                      _buildConnectedTab(connections, theme, padding),
-                      Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            Text(l10n.browserPageNoExploreApps,
-                                style: TextStyle(
-                                    color: theme.textSecondary,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500)),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
-                  child: _buildSearchBar(theme),
-                ),
-                const SizedBox(height: 4),
-              ],
+    return Scaffold(
+      resizeToAvoidBottomInset: false,
+      backgroundColor: theme.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            Expanded(
+              child: Stack(
+                fit: StackFit.expand,
+                children: [
+                  _buildConnectedTab(appState.connections, theme,
+                      EdgeInsets.symmetric(horizontal: adaptivePadding)),
+                  if (_isWebViewVisible) _buildWebView(),
+                ],
+              ),
             ),
+            Padding(
+              padding:
+                  EdgeInsets.fromLTRB(adaptivePadding, 8, adaptivePadding, 12),
+              child: _isWebViewVisible
+                  ? _buildBrowserControls(theme)
+                  : _buildSearchBar(theme),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildWebView() {
+    final appState = Provider.of<AppState>(context);
+    final theme = appState.currentTheme;
+    return Column(
+      children: [
+        if (_isLoading && _progress < 1.0)
+          LinearProgressIndicator(
+            value: _progress,
+            backgroundColor: Colors.transparent,
+            color: theme.primaryPurple,
+            minHeight: 2,
+          ),
+        Expanded(
+          child: InAppWebView(
+            initialUrlRequest: URLRequest(url: WebUri(_currentUrl)),
+            initialSettings: InAppWebViewSettings(
+              javaScriptEnabled: true,
+              safeBrowsingEnabled: false,
+              userAgent: _baseUserAgent +
+                  (appState.state.browserSettings.doNotTrack
+                      ? ' DNT:1'
+                      : ' ZilPay/1.0'),
+              useHybridComposition: true,
+              supportZoom: true,
+              useOnLoadResource: true,
+              verticalScrollBarEnabled: false,
+              horizontalScrollBarEnabled: false,
+              transparentBackground: false,
+              javaScriptCanOpenWindowsAutomatically: false,
+              supportMultipleWindows: false,
+              cacheEnabled: appState.state.browserSettings.cacheEnabled,
+              clearCache: !appState.state.browserSettings.cacheEnabled,
+              mediaPlaybackRequiresUserGesture:
+                  !appState.state.browserSettings.allowAutoPlay,
+              allowsInlineMediaPlayback:
+                  appState.state.browserSettings.allowAutoPlay,
+              forceDark: appState.currentTheme.value == "Dark"
+                  ? ForceDark.ON
+                  : ForceDark.OFF,
+            ),
+            onWebViewCreated: (controller) {
+              _webViewController = controller;
+              _setupJavaScriptHandlers();
+            },
+            onLoadStart: (controller, url) {
+              setState(() {
+                _isLoading = true;
+                _currentUrl = url.toString();
+                _searchController.text = url.toString();
+              });
+              _applyPrivacySettings(appState, controller);
+            },
+            onLoadStop: (controller, url) async {
+              await _initializeZilPayInjection(appState);
+
+              final canGoBack = await controller.canGoBack();
+              final canGoForward = await controller.canGoForward();
+              setState(() {
+                _isLoading = false;
+                _currentUrl = url.toString();
+                _searchController.text = url.toString();
+                _canGoBack = canGoBack;
+                _canGoForward = canGoForward;
+              });
+
+              _legacyHandler?.handleStartBlockWorker(appState);
+            },
+            onProgressChanged: (controller, progress) {
+              setState(() => _progress = progress / 100);
+            },
+            onUpdateVisitedHistory: (controller, url, androidIsReload) async {
+              final canGoBack = await controller.canGoBack();
+              final canGoForward = await controller.canGoForward();
+              setState(() {
+                _currentUrl = url.toString();
+                _searchController.text = url.toString();
+                _canGoBack = canGoBack;
+                _canGoForward = canGoForward;
+              });
+            },
           ),
         ),
+      ],
+    );
+  }
+
+  Widget _buildBrowserControls(AppTheme theme) {
+    return Container(
+      height: 48,
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: Row(
+        children: [
+          HoverSvgIcon(
+            assetName: 'assets/icons/back.svg',
+            onTap: _canGoBack ? () => _webViewController?.goBack() : () {},
+            color: _canGoBack
+                ? theme.textPrimary
+                : theme.textSecondary.withValues(alpha: 0.5),
+            width: 24,
+            height: 24,
+          ),
+          HoverSvgIcon(
+            assetName: 'assets/icons/forward.svg',
+            onTap:
+                _canGoForward ? () => _webViewController?.goForward() : () {},
+            color: _canGoForward
+                ? theme.textPrimary
+                : theme.textSecondary.withValues(alpha: 0.5),
+            width: 24,
+            height: 24,
+          ),
+          Expanded(
+            child: SmartInput(
+              controller: _searchController,
+              onSubmitted: _handleSearch,
+              borderColor: Colors.transparent,
+              focusedBorderColor: Colors.transparent,
+              backgroundColor: Colors.transparent,
+              height: 48,
+              fontSize: 14,
+            ),
+          ),
+          HoverSvgIcon(
+            assetName: 'assets/icons/dots.svg',
+            onTap: () {},
+            color: theme.textPrimary,
+            width: 24,
+            height: 24,
+          ),
+          HoverSvgIcon(
+            assetName: 'assets/icons/close.svg',
+            onTap: () {
+              setState(() {
+                _isWebViewVisible = false;
+                _searchController.clear();
+                _webViewController?.loadUrl(
+                    urlRequest: URLRequest(url: WebUri("about:blank")));
+              });
+            },
+            color: theme.textPrimary,
+            width: 24,
+            height: 24,
+          ),
+        ],
       ),
     );
   }
@@ -168,28 +375,17 @@ class _BrowserPageState extends State<BrowserPage>
     final searchEngine = baseSearchEngines[searchEngineIndex];
     final l10n = AppLocalizations.of(context)!;
 
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        SmartInput(
-          controller: _searchController,
-          hint: l10n.browserPageSearchHint(searchEngine.name),
-          leftIconPath: 'assets/icons/search.svg',
-          rightIconPath: "assets/icons/close.svg",
-          onChanged: (value) {},
-          onSubmitted: _handleSearch,
-          onRightIconTap: () {
-            _searchController.text = "";
-          },
-          borderColor: theme.textPrimary,
-          focusedBorderColor: theme.primaryPurple,
-          height: 48,
-          fontSize: 16,
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          autofocus: false,
-          keyboardType: TextInputType.url,
-        ),
-      ],
+    return SmartInput(
+      controller: _searchController,
+      hint: l10n.browserPageSearchHint(searchEngine.name),
+      leftIconPath: 'assets/icons/search.svg',
+      onSubmitted: _handleSearch,
+      borderColor: theme.textPrimary,
+      focusedBorderColor: theme.primaryPurple,
+      height: 48,
+      fontSize: 16,
+      autofocus: false,
+      keyboardType: TextInputType.url,
     );
   }
 

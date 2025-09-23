@@ -167,7 +167,6 @@
   "cancel": "Отмена",
   "delete": "Удалить",
 
-  "browserPageConnectedTab": "Подключенные",
   "browserPageExploreTab": "Обзор",
   "browserPageNoExploreApps": "Пока нет приложений для обзора",
   "browserPageSearchHint": "Искать с помощью {engine} или введите адрес",

@@ -465,9 +465,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get delete => '削除';
 
   @override
-  String get browserPageConnectedTab => '接続済み';
-
-  @override
   String get browserPageExploreTab => '探索';
 
   @override

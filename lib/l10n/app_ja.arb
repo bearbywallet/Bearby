@@ -167,7 +167,6 @@
   "cancel": "キャンセル",
   "delete": "削除",
 
-  "browserPageConnectedTab": "接続済み",
   "browserPageExploreTab": "探索",
   "browserPageNoExploreApps": "探索するアプリがまだありません",
   "browserPageSearchHint": "{engine}で検索するかアドレスを入力",
