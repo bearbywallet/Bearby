@@ -63,13 +63,6 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     super.dispose();
   }
 
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) async {
-    if (state == AppLifecycleState.resumed && _webViewController != null) {
-      await _webViewController?.reload();
-    }
-  }
-
   void _handleSearch(String value) {
     if (value.isEmpty) return;
 
@@ -285,7 +278,11 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
 
               _legacyHandler?.handleStartBlockWorker(appState);
             },
-            onProgressChanged: (controller, progress) {
+            onProgressChanged: (controller, progress) async {
+              if (progress > 20) {
+                await _initializeZilPayInjection(appState);
+              }
+
               setState(() => _progress = progress / 100);
             },
             onUpdateVisitedHistory: (controller, url, androidIsReload) async {
@@ -353,13 +350,13 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
           HoverSvgIcon(
             assetName: 'assets/icons/close.svg',
             onTap: () async {
+              await _webViewController?.loadUrl(
+                urlRequest: URLRequest(url: WebUri("about:blank")),
+              );
               setState(() {
                 _isWebViewVisible = false;
                 _searchController.clear();
               });
-              await _webViewController?.loadUrl(
-                urlRequest: URLRequest(url: WebUri("")),
-              );
             },
             color: theme.textPrimary,
             width: 24,

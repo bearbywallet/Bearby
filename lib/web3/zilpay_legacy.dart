@@ -73,11 +73,16 @@ class ZilPayLegacyHandler {
     ).toJson();
 
     final jsonString = jsonEncode(response);
-    await webViewController.evaluateJavascript(source: '''
+    try {
+      await webViewController.evaluateJavascript(source: '''
     window.dispatchEvent(new MessageEvent('message', { 
       data: $jsonString
     }));
     ''');
+    } catch (e) {
+      debugPrint("legacy: evaluateJavascript error: $e");
+      rethrow;
+    }
   }
 
   Future<Map<String, String>?> _getAccountIfConnected(AppState appState) async {
