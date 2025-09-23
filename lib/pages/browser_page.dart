@@ -377,17 +377,22 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     final searchEngine = baseSearchEngines[searchEngineIndex];
     final l10n = AppLocalizations.of(context)!;
 
-    return SmartInput(
-      controller: _searchController,
-      hint: l10n.browserPageSearchHint(searchEngine.name),
-      leftIconPath: 'assets/icons/search.svg',
-      onSubmitted: _handleSearch,
-      borderColor: theme.textPrimary,
-      focusedBorderColor: theme.primaryPurple,
-      height: 48,
-      fontSize: 16,
-      autofocus: false,
-      keyboardType: TextInputType.url,
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 450),
+        child: SmartInput(
+          controller: _searchController,
+          hint: l10n.browserPageSearchHint(searchEngine.name),
+          leftIconPath: 'assets/icons/search.svg',
+          onSubmitted: _handleSearch,
+          borderColor: theme.textPrimary,
+          focusedBorderColor: theme.primaryPurple,
+          height: 48,
+          fontSize: 16,
+          autofocus: false,
+          keyboardType: TextInputType.url,
+        ),
+      ),
     );
   }
 
@@ -397,7 +402,6 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     EdgeInsets padding,
   ) {
     final l10n = AppLocalizations.of(context)!;
-
     if (connections.isEmpty) {
       return Center(
         child: Text(
@@ -410,21 +414,30 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
       );
     }
 
+    // Изменения ниже:
     return SingleChildScrollView(
       padding: padding.copyWith(top: 32, bottom: 16),
-      child: Wrap(
-        spacing: 16,
-        runSpacing: 16,
-        alignment: WrapAlignment.start,
-        children: connections.map((connection) {
-          final url = 'https://${connection.domain}';
-          return _buildConnectedTile(
-            connection.title,
-            connection.favicon,
-            url,
-            theme,
-          );
-        }).toList(),
+      child: Center(
+        // 1. Оборачиваем в Center
+        child: ConstrainedBox(
+          // 2. Задаем максимальную ширину
+          constraints: const BoxConstraints(maxWidth: 450),
+          child: Wrap(
+            spacing: 16,
+            runSpacing: 16,
+            alignment:
+                WrapAlignment.center, // 3. Центрируем иконки внутри блока
+            children: connections.map((connection) {
+              final url = 'https://${connection.domain}';
+              return _buildConnectedTile(
+                connection.title,
+                connection.favicon,
+                url,
+                theme,
+              );
+            }).toList(),
+          ),
+        ),
       ),
     );
   }
