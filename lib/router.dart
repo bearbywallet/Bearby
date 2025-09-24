@@ -50,7 +50,7 @@ class AppRouter {
 
   AppRouter({required this.authGuard, required this.appState});
 
-  Route<dynamic> onGenerateRoute(RouteSettings settings) {
+  Route<void> onGenerateRoute(RouteSettings settings) {
     return MaterialPageRoute(
       settings: settings,
       builder: (context) => _buildRoute(context, settings),

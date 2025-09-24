@@ -15,41 +15,30 @@ class MainPage extends StatefulWidget {
 class MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
 
-  static final List<Widget> _pages = <Widget>[
-    const HomePage(),
-    const HistoryPage(),
-    // const ChatPage(),
-    const BrowserPage()
+  final List<Widget> _pages = const <Widget>[
+    HomePage(),
+    HistoryPage(),
+    BrowserPage(),
   ];
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-
     final args =
         ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     final selectedIndex = args?['selectedIndex'] as int?;
 
-    if (selectedIndex != null) {
-      _selectedIndex = selectedIndex;
+    if (selectedIndex != null && selectedIndex != _selectedIndex) {
+      setState(() {
+        _selectedIndex = selectedIndex;
+      });
     }
   }
 
   void _onItemTapped(int index) {
-    if (index == _selectedIndex) {
-      return;
-    }
-
-    Navigator.push(
-      context,
-      PageRouteBuilder<MainPage>(
-        settings: RouteSettings(
-          name: '/',
-          arguments: {'selectedIndex': index},
-        ),
-        pageBuilder: (_, __, ___) => const MainPage(),
-      ),
-    );
+    setState(() {
+      _selectedIndex = index;
+    });
   }
 
   @override
@@ -72,7 +61,13 @@ class MainPageState extends State<MainPage> {
     return Scaffold(
       extendBody: true,
       body: SafeArea(
-          top: true, bottom: false, child: _pages.elementAt(_selectedIndex)),
+        top: true,
+        bottom: false,
+        child: IndexedStack(
+          index: _selectedIndex,
+          children: _pages,
+        ),
+      ),
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
