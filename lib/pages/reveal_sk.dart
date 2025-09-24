@@ -236,10 +236,14 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
         children: [
           Row(
             children: [
-              Icon(
-                Icons.warning_amber_rounded,
-                color: theme.danger,
-                size: 24,
+              SvgPicture.asset(
+                "assets/icons/warning.svg",
+                width: 30,
+                height: 30,
+                colorFilter: ColorFilter.mode(
+                  theme.danger,
+                  BlendMode.srcIn,
+                ),
               ),
               const SizedBox(width: 8),
               Text(

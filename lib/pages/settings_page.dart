@@ -5,6 +5,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
+import 'package:zilpay/components/wallet_section.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -81,7 +82,8 @@ class _SettingsPageState extends State<SettingsPage> {
                             EdgeInsets.symmetric(horizontal: adaptivePadding),
                         child: Column(
                           children: [
-                            _buildWalletSection(theme, appState),
+                            HoverableWalletSection(
+                                theme: theme, appState: appState),
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
                               if (appState.chain?.slip44 == 313 &&
@@ -254,69 +256,6 @@ class _SettingsPageState extends State<SettingsPage> {
               ],
             ),
           ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWalletSection(AppTheme theme, AppState appState) {
-    final chain = appState.chain!;
-
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => Navigator.pushNamed(context, '/wallet'),
-      child: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: theme.cardBackground,
-          borderRadius: BorderRadius.circular(16),
-        ),
-        child: Row(
-          children: [
-            Container(
-              width: 40,
-              height: 40,
-              decoration: BoxDecoration(
-                color: theme.background,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: AsyncImage(
-                url: viewChain(network: chain, theme: theme.value),
-                width: 32,
-                height: 32,
-                fit: BoxFit.contain,
-                errorWidget: Blockies(
-                  seed: appState.wallet!.walletAddress,
-                  color: theme.secondaryPurple,
-                  bgColor: theme.primaryPurple,
-                  spotColor: theme.background,
-                  size: 8,
-                ),
-                loadingWidget: const Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                  ),
-                ),
-              ),
-            ),
-            const SizedBox(width: 16),
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(appState.wallet!.walletName,
-                    style: theme.caption.copyWith(
-                      color: theme.textSecondary,
-                    )),
-                Text(
-                  appState.chain?.name ?? "",
-                  style: theme.headline2.copyWith(
-                    color: theme.textPrimary,
-                    fontSize: 21,
-                  ),
-                ),
-              ],
-            ),
-          ],
         ),
       ),
     );
