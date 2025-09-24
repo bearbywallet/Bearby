@@ -81,6 +81,7 @@ class ZilPayLegacyHandler {
 
   void dispose() {
     appState.removeListener(_handleAppStateChange);
+    webViewController.dispose();
     _blockStreamSubscription?.cancel();
     stopBlockWorker();
   }

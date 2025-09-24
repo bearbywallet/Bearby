@@ -120,6 +120,7 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     _eip1193Handler = Web3EIP1193Handler(
       webViewController: _webViewController!,
       initialUrl: _currentUrl,
+      appState: appState,
     );
 
     _webViewController?.addJavaScriptHandler(
@@ -356,14 +357,14 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
           HoverSvgIcon(
             assetName: 'assets/icons/close.svg',
             onTap: () async {
-              _legacyHandler?.dispose();
-              _eip1193Handler?.dispose();
-
               setState(() {
                 _isWebViewVisible = false;
                 _searchController.text = "";
                 _searchController.clear();
               });
+
+              _legacyHandler?.dispose();
+              _eip1193Handler?.dispose();
             },
             color: theme.textPrimary,
             width: 24,

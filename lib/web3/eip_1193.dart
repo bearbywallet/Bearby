@@ -75,11 +75,19 @@ class Web3EIP1193Handler {
   final InAppWebViewController webViewController;
   final String _currentDomain;
   final Set<String> _activeRequests = {};
+  final AppState appState;
+  String? _lastKnownAddress;
+  BigInt? _lastKnownChainId;
 
   Web3EIP1193Handler({
     required this.webViewController,
     required String initialUrl,
-  }) : _currentDomain = Uri.parse(initialUrl).host;
+    required this.appState,
+  }) : _currentDomain = Uri.parse(initialUrl).host {
+    _lastKnownAddress = appState.account?.addr;
+    _lastKnownChainId = appState.chain?.chainId;
+    appState.addListener(_handleAppStateChange);
+  }
 
   bool _isRequestActive(String method) {
     return _activeRequests.contains(method);
@@ -94,7 +102,65 @@ class Web3EIP1193Handler {
   }
 
   void dispose() {
-    // TODO: here we dispose account tracker.
+    appState.removeListener(_handleAppStateChange);
+    webViewController.dispose();
+  }
+
+  void _handleAppStateChange() async {
+    try {
+      await webViewController.getUrl();
+    } catch (e) {
+      debugPrint("WebView недоступен, пропуск уведомления.");
+      return;
+    }
+
+    final newAccount = appState.account;
+    final newChain = appState.chain;
+
+    if (newAccount != null && newAccount.addr != _lastKnownAddress) {
+      _lastKnownAddress = newAccount.addr;
+      final addresses = await _getWalletAddresses(appState);
+      await _sendNotification(
+        eventName: 'accountsChanged',
+        data: addresses,
+      );
+    }
+
+    if (newChain != null && newChain.chainId != _lastKnownChainId) {
+      _lastKnownChainId = newChain.chainId;
+      final chainIdHex = '0x${newChain.chainId.toRadixString(16)}';
+      await _sendNotification(
+        eventName: 'chainChanged',
+        data: chainIdHex,
+      );
+    }
+  }
+
+  Future<void> _sendNotification({
+    required String eventName,
+    required dynamic data,
+  }) async {
+    final eventData = {
+      'event': eventName,
+      'data': data,
+    };
+    final jsonEventData = jsonEncode(eventData);
+
+    final jsCode = '''
+    (function() {
+      if (typeof window.handleZilPayEvent === 'function') {
+        console.log('ZilPay EIP-1193: Calling handleZilPayEvent with:', $jsonEventData);
+        window.handleZilPayEvent($jsonEventData);
+      } else {
+        console.log('ZilPay EIP-1193: window.handleZilPayEvent not found. Event "$eventName" not sent.');
+      }
+    })();
+    ''';
+    try {
+      await webViewController.evaluateJavascript(source: jsCode);
+    } catch (e) {
+      debugPrint("EIP-1193 notification error: $e");
+    }
   }
 
   Future<void> _sendResponse({
