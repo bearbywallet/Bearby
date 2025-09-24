@@ -332,8 +332,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                       assetName: appState.isTileView
                           ? 'assets/icons/tiles.svg'
                           : 'assets/icons/lines.svg',
-                      width: ICON_SIZE_SMALL,
-                      height: ICON_SIZE_SMALL,
+                      width: 18,
+                      height: 18,
                       blendMode: BlendMode.modulate,
                       padding: const EdgeInsets.all(0),
                       color: theme.surface,
@@ -344,8 +344,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                   const SizedBox(width: 12),
                   HoverSvgIcon(
                     assetName: 'assets/icons/manage.svg',
-                    width: ICON_SIZE_SMALL,
-                    height: ICON_SIZE_SMALL,
+                    width: 18,
+                    height: 18,
                     blendMode: BlendMode.modulate,
                     padding: const EdgeInsets.all(0),
                     color: theme.surface,
