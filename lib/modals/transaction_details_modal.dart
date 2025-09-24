@@ -130,6 +130,12 @@ class TransactionDetailsModal extends StatelessWidget {
               value: _formatTimestamp(),
               theme: theme,
             ),
+            if (transaction.statusCode != null)
+              DetailItem(
+                label: 'Status Code',
+                value: transaction.statusCode.toString(),
+                theme: theme,
+              ),
             if (transaction.blockNumber != null)
               DetailItem(
                 label: l10n.transactionDetailsModal_blockNumber,
