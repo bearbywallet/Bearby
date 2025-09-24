@@ -1,63 +1,5 @@
 [
   {
-    "name": "Zilliqa",
-    "chain": "ZIL",
-    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
-    "rpc": [
-      "https://api.zilliqa.com",
-      "https://ssn.zilpay.io/api"
-    ],
-    "features": [],
-    "ftokens": [
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Zilliqa",
-        "symbol": "ZIL",
-        "decimals": 18
-      },
-      {
-        "native": true,
-        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
-        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa",
-        "symbol": "ZIL",
-        "decimals": 12
-      }
-    ],
-    "chainIds": [32769, 1],
-    "infoURL": "https://www.zilliqa.com/",
-    "shortName": "zilliqa",
-    "slip44": 313,
-    "explorers": [
-      {
-        "name": "Viewblock",
-        "url": "https://viewblock.io/zilliqa",
-        "icon": "https://viewblock.io/apple-touch-icon.png",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Evmx",
-        "url": "https://evmx.zilliqa.com/",
-        "icon": "https://cdn.prod.website-files.com/68525c9b37d60bd3223ceb0b/685bd7f0ca540e4a6a4dd672_Favicon-mainnet.jpg",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "blockscout",
-        "url": "https://zq2-mainnet.blockscout.com/",
-        "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
-        "standard": "EIP3091"
-      },
-      {
-        "name": "Otterscan",
-        "icon": "https://otterscan.zilliqa.com/assets/otter-DYFeLtFi.png",
-        "url": "https://otterscan.zilliqa.com/",
-        "standard": "EIP3091"
-      }
-    ]
-  },
-  {
     "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
@@ -85,7 +27,10 @@
         "decimals": 18
       }
     ],
-    "chainIds": [56, 0],
+    "chainIds": [
+      56,
+      0
+    ],
     "infoURL": "https://bnbchain.org",
     "shortName": "bnbchain",
     "slip44": 60,
@@ -127,7 +72,10 @@
     ],
     "infoURL": "https://ethereum.org",
     "shortName": "ethereum",
-    "chainIds": [1, 0],
+    "chainIds": [
+      1,
+      0
+    ],
     "networkId": 1,
     "slip44": 60,
     "ens": "0x00000000000C2E074eC69A0dFb2997BA6C7d2e1e",
@@ -142,6 +90,67 @@
         "name": "blockscout",
         "url": "https://eth.blockscout.com",
         "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Zilliqa",
+    "chain": "ZIL",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.zilliqa.com",
+      "https://ssn.zilpay.io/api"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Zilliqa",
+        "symbol": "ZIL",
+        "decimals": 18
+      },
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
+        "name": "Zilliqa",
+        "symbol": "ZIL",
+        "decimals": 12
+      }
+    ],
+    "chainIds": [
+      32769,
+      1
+    ],
+    "infoURL": "https://www.zilliqa.com/",
+    "shortName": "zilliqa",
+    "slip44": 313,
+    "explorers": [
+      {
+        "name": "Viewblock",
+        "url": "https://viewblock.io/zilliqa",
+        "icon": "https://viewblock.io/apple-touch-icon.png",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Evmx",
+        "url": "https://evmx.zilliqa.com/",
+        "icon": "https://cdn.prod.website-files.com/68525c9b37d60bd3223ceb0b/685bd7f0ca540e4a6a4dd672_Favicon-mainnet.jpg",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "blockscout",
+        "url": "https://zq2-mainnet.blockscout.com/",
+        "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Otterscan",
+        "icon": "https://otterscan.zilliqa.com/assets/otter-DYFeLtFi.png",
+        "url": "https://otterscan.zilliqa.com/",
         "standard": "EIP3091"
       }
     ]
