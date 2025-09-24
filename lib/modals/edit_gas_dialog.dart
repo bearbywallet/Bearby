@@ -18,9 +18,11 @@ class EditGasDialog extends StatefulWidget {
   final BigInt initialMaxPriorityFee;
   final BigInt initialGasLimit;
   final BigInt initialNonce;
+  final String? data;
   final Function(
           BigInt gasPrice, BigInt maxPriorityFee, BigInt gasLimit, BigInt nonce)
       onSave;
+
   final Color? primaryColor;
   final Color? textColor;
   final Color? secondaryColor;
@@ -36,6 +38,7 @@ class EditGasDialog extends StatefulWidget {
     this.primaryColor,
     this.textColor,
     this.secondaryColor,
+    this.data,
   });
 
   @override
@@ -48,10 +51,6 @@ class _EditGasDialogState extends State<EditGasDialog> {
   late TextEditingController _gasLimitController;
   late TextEditingController _nonceController;
   late bool _isLegacy;
-
-  final String _solidityCodeExample =
-      'function proofEncap(uint32 time, uint64 mileage, bytes32 blockHash) internal pure returns (uint256)';
-  final String _dataExample = '0x03...EBC5';
 
   @override
   void initState() {
@@ -159,8 +158,6 @@ class _EditGasDialogState extends State<EditGasDialog> {
                     children: [
                       _buildGasSettings(l10n, theme),
                       const SizedBox(height: 16),
-                      _buildSolidityView(theme),
-                      const SizedBox(height: 16),
                       _buildTransactionDetails(l10n, theme),
                     ],
                   ),
@@ -241,108 +238,30 @@ class _EditGasDialogState extends State<EditGasDialog> {
     );
   }
 
-  Widget _buildSolidityView(AppTheme theme) {
-    return DetailGroupCard(
-      title: 'Solidity',
-      theme: theme,
-      headerTrailing: _buildCopyButton(_solidityCodeExample),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
-      children: [
-        Container(
-          padding: const EdgeInsets.all(12),
-          decoration: BoxDecoration(
-            color: theme.background,
-            borderRadius: BorderRadius.circular(8),
-            border: Border.all(
-              color: theme.textSecondary.withValues(alpha: 0.2),
-            ),
-          ),
-          child: RichText(
-            text: TextSpan(
-              style: theme.bodyText2.copyWith(
-                fontFamily: 'Courier',
-                color: theme.textPrimary,
-              ),
-              children: _buildHighlightedCode(),
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
-  List<TextSpan> _buildHighlightedCode() {
-    final theme = Provider.of<AppState>(context, listen: false).currentTheme;
-    final keywordStyle =
-        TextStyle(color: theme.secondaryPurple, fontWeight: FontWeight.bold);
-    final typeStyle = TextStyle(color: theme.warning);
-    final nameStyle = TextStyle(color: theme.textPrimary);
-    final punctuationStyle = TextStyle(color: theme.textSecondary);
-
-    return [
-      TextSpan(text: 'function ', style: keywordStyle),
-      TextSpan(text: 'proofEncap', style: nameStyle),
-      TextSpan(text: '(', style: punctuationStyle),
-      TextSpan(text: 'uint32', style: typeStyle),
-      TextSpan(text: ' time, ', style: nameStyle),
-      TextSpan(text: 'uint64', style: typeStyle),
-      TextSpan(text: ' mileage, ', style: nameStyle),
-      TextSpan(text: 'bytes32', style: typeStyle),
-      TextSpan(text: ' blockHash', style: nameStyle),
-      TextSpan(text: ') ', style: punctuationStyle),
-      TextSpan(text: 'internal pure returns ', style: keywordStyle),
-      TextSpan(text: '(', style: punctuationStyle),
-      TextSpan(text: 'uint256', style: typeStyle),
-      TextSpan(text: ')', style: punctuationStyle),
-    ];
-  }
-
   Widget _buildTransactionDetails(AppLocalizations l10n, AppTheme theme) {
     return DetailGroupCard(
       title: l10n.transactionDetailsModal_transaction,
       theme: theme,
       children: [
-        DetailItem(label: 'Function', value: 'Transfer', theme: theme),
-        const SizedBox(height: 8),
-        DetailItem(
-          label: 'To',
-          theme: theme,
-          valueWidget: Container(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-            decoration: BoxDecoration(
-              color: theme.danger.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: Text(
-              'Account 1',
-              style: theme.caption.copyWith(
-                color: theme.danger,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        const SizedBox(height: 8),
-        DetailItem(label: 'Value', value: '100000', theme: theme),
-        const SizedBox(height: 8),
-        DetailItem(
-          label: 'Data',
-          theme: theme,
-          valueWidget: Row(
-            mainAxisAlignment: MainAxisAlignment.end,
-            children: [
-              Flexible(
-                child: Text(
-                  _dataExample,
-                  style: theme.bodyText2.copyWith(color: theme.textPrimary),
-                  overflow: TextOverflow.ellipsis,
+        if (widget.data != null)
+          DetailItem(
+            label: 'Data',
+            theme: theme,
+            valueWidget: Row(
+              mainAxisAlignment: MainAxisAlignment.end,
+              children: [
+                Flexible(
+                  child: Text(
+                    widget.data!,
+                    style: theme.bodyText2.copyWith(color: theme.textPrimary),
+                    overflow: TextOverflow.ellipsis,
+                  ),
                 ),
-              ),
-              const SizedBox(width: 8),
-              _buildCopyButton(_dataExample),
-            ],
+                const SizedBox(width: 8),
+                _buildCopyButton(widget.data!),
+              ],
+            ),
           ),
-        ),
         const SizedBox(height: 4),
       ],
     );

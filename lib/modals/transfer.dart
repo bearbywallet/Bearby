@@ -29,6 +29,7 @@ import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/src/rust/models/transactions/scilla.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/utils/utils.dart';
 
 void showConfirmTransactionModal({
   required BuildContext context,
@@ -426,6 +427,9 @@ class _ConfirmTransactionContentState
                                     initialGasPrice: _gasPrice,
                                     initialNonce: _txParamsInfo.nonce,
                                     initialMaxPriorityFee: _maxPriorityFee,
+                                    data: widget.tx.evm?.data != null
+                                        ? bytesToHex(widget.tx.evm!.data!)
+                                        : null,
                                     initialGasLimit:
                                         _txParamsInfo.txEstimateGas,
                                     onSave: (

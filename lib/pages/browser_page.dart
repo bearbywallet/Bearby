@@ -363,8 +363,17 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
                 _searchController.clear();
               });
 
-              _legacyHandler?.dispose();
-              _eip1193Handler?.dispose();
+              try {
+                _legacyHandler?.dispose();
+              } catch (e) {
+                //
+              }
+
+              try {
+                _eip1193Handler?.dispose();
+              } catch (e) {
+                //
+              }
             },
             color: theme.textPrimary,
             width: 24,
