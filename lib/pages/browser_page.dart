@@ -111,9 +111,12 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
 
   void _setupJavaScriptHandlers() {
     if (_webViewController == null) return;
+    final appState = Provider.of<AppState>(context, listen: false);
 
-    _legacyHandler =
-        ZilPayLegacyHandler(webViewController: _webViewController!);
+    _legacyHandler = ZilPayLegacyHandler(
+      webViewController: _webViewController!,
+      appState: appState,
+    );
     _eip1193Handler = Web3EIP1193Handler(
       webViewController: _webViewController!,
       initialUrl: _currentUrl,

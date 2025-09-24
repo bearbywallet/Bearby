@@ -28,7 +28,6 @@ import 'package:zilpay/pages/setup_net.dart';
 import 'package:zilpay/pages/sk_gen.dart';
 import 'package:zilpay/pages/verify_bip39.dart';
 import 'package:zilpay/pages/wallet.dart';
-import 'package:zilpay/pages/web_view.dart';
 import 'package:zilpay/pages/zil_stake.dart';
 
 import 'services/auth_guard.dart';
@@ -200,8 +199,6 @@ class AppRouter {
             return wrapWithProviders(const AddWalletOptionsPage());
           case '/initial':
             return wrapWithProviders(const InitialPage());
-          case '/web_view':
-            return wrapWithProviders(const WebViewPage(initialUrl: ''));
           case '/add_ledger_account':
             return wrapWithProviders(const AddLedgerAccountPage());
           default:
@@ -286,12 +283,6 @@ class AppRouter {
         return wrapWithProviders(const AddLedgerAccountPage());
       case '/zil_stake':
         return wrapWithProviders(const ZilStakePage());
-      case '/web_view':
-        final uri =
-            Uri.tryParse(settings.name?.replaceFirst('/web_view?', '') ?? '') ??
-                Uri();
-        return wrapWithProviders(
-            WebViewPage(initialUrl: uri.queryParameters['url'] ?? ''));
       default:
         return wrapWithProviders(const MainPage());
     }

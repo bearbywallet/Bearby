@@ -50,13 +50,37 @@ class ZilPayLegacyTransactionParam {
 
 class ZilPayLegacyHandler {
   final InAppWebViewController webViewController;
+  final AppState appState;
   StreamSubscription<BlockEvent>? _blockStreamSubscription;
+  String? _lastKnownAddress;
 
   ZilPayLegacyHandler({
     required this.webViewController,
-  });
+    required this.appState,
+  }) {
+    _lastKnownAddress = appState.account?.addr;
+    appState.addListener(_handleAppStateChange);
+  }
+
+  void _handleAppStateChange() async {
+    final newAccount = appState.account;
+    if (newAccount != null && newAccount.addr != _lastKnownAddress) {
+      _lastKnownAddress = newAccount.addr;
+      final accountDetails = await _getAccountIfConnected(appState);
+      _sendResponse(
+        type: ZilliqaLegacyMessages.addressChanged,
+        payload: {
+          'account': accountDetails,
+          'isConnect': accountDetails != null,
+          'isEnable': true,
+        },
+        uuid: "",
+      );
+    }
+  }
 
   void dispose() {
+    appState.removeListener(_handleAppStateChange);
     _blockStreamSubscription?.cancel();
     stopBlockWorker();
   }
@@ -129,7 +153,6 @@ class ZilPayLegacyHandler {
         startBlockWorker(walletIndex: BigInt.from(appState.selectedWallet));
 
     _blockStreamSubscription = blockStream.listen((block) {
-      // TODO: maybe need send bloc header.
       if (block.blockNumber != null) {
         _sendResponse(
           type: ZilliqaLegacyMessages.newBlock,
@@ -261,7 +284,6 @@ class ZilPayLegacyHandler {
       );
 
       if (account.addrType == 1) {
-        // evm enabled.
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -331,7 +353,6 @@ class ZilPayLegacyHandler {
     final account = appState.account!;
 
     if (account.addrType == 1) {
-      // evm disable.
       await zilliqaSwapChain(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
