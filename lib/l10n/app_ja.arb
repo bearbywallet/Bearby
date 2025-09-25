@@ -532,6 +532,7 @@
   "browserActionMenuShare": "共有",
   "browserActionMenuCopyLink": "リンクをコピー",
   "browserActionMenuClose": "閉じる",
+  "browserActionMenuRefresh": "更新",
 
   "keystoreBackupTitle": "キーストアバックアップ",
   "keystoreBackupWarningTitle": "キーストアファイルを安全に保管",

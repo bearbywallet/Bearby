@@ -1390,6 +1390,9 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browserActionMenuClose => '关闭';
 
   @override
+  String get browserActionMenuRefresh => '刷新';
+
+  @override
   String get keystoreBackupTitle => '密钥库备份';
 
   @override

@@ -5,6 +5,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
+import 'package:share_plus/share_plus.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
@@ -12,6 +13,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/modals/browser_action_modal.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
@@ -61,6 +63,33 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     _legacyHandler?.dispose();
     _webViewController?.dispose();
     super.dispose();
+  }
+
+  void _showBrowserMenu() {
+    final isConnected =
+        _legacyHandler?.isConnected ?? _eip1193Handler?.isConnected ?? false;
+
+    showBrowserActionModal(
+      context: context,
+      isConnected: isConnected,
+      onRefresh: () => _webViewController?.reload(),
+      onCopyLink: () async {
+        final url = await _webViewController?.getUrl();
+        if (url != null) {
+          await Clipboard.setData(ClipboardData(text: url.toString()));
+        }
+      },
+      onShare: () async {
+        final url = await _webViewController?.getUrl();
+        if (url != null) {
+          SharePlus.instance.share(
+            ShareParams(
+              text: _currentUrl,
+            ),
+          );
+        }
+      },
+    );
   }
 
   void _handleSearch(String value) {
@@ -349,7 +378,7 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
           ),
           HoverSvgIcon(
             assetName: 'assets/icons/dots.svg',
-            onTap: () {},
+            onTap: _showBrowserMenu,
             color: theme.textPrimary,
             width: 24,
             height: 24,

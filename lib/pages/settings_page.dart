@@ -1,14 +1,11 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/components/wallet_section.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
-import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/social_media.dart';
 import 'package:zilpay/src/rust/api/token.dart';

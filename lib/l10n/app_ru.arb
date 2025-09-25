@@ -528,6 +528,7 @@
   "browserActionMenuShare": "Поделиться",
   "browserActionMenuCopyLink": "Копировать ссылку",
   "browserActionMenuClose": "Закрыть",
+  "browserActionMenuRefresh": "Обновить",
 
   "keystoreBackupTitle": "Резервное копирование Keystore",
   "keystoreBackupWarningTitle": "Защитите Ваш Keystore Файл",

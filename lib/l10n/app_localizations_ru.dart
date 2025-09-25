@@ -1390,6 +1390,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get browserActionMenuClose => 'Закрыть';
 
   @override
+  String get browserActionMenuRefresh => 'Обновить';
+
+  @override
   String get keystoreBackupTitle => 'Резервное копирование Keystore';
 
   @override

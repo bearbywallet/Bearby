@@ -2805,6 +2805,12 @@ abstract class AppLocalizations {
   /// **'Close'**
   String get browserActionMenuClose;
 
+  /// Menu item text for refreshing the current page
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get browserActionMenuRefresh;
+
   /// Title for the Keystore Backup screen
   ///
   /// In en, this message translates to:

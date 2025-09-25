@@ -512,6 +512,7 @@
   "browserActionMenuShare": "分享",
   "browserActionMenuCopyLink": "复制链接",
   "browserActionMenuClose": "关闭",
+  "browserActionMenuRefresh": "刷新",
   
   "keystoreBackupTitle": "密钥库备份",
   "keystoreBackupWarningTitle": "保护您的密钥库文件",

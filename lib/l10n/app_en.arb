@@ -1962,6 +1962,10 @@
   "@browserActionMenuClose": {
     "description": "Menu item text for closing the current page or tab"
   },
+  "browserActionMenuRefresh": "Refresh",
+  "@browserActionMenuRefresh": {
+    "description": "Menu item text for refreshing the current page"
+  },
 
   "keystoreBackupTitle": "Keystore Backup",
   "@keystoreBackupTitle": {

@@ -78,6 +78,7 @@ class Web3EIP1193Handler {
   final AppState appState;
   String? _lastKnownAddress;
   BigInt? _lastKnownChainId;
+  bool isConnected = false;
 
   Web3EIP1193Handler({
     required this.webViewController,
@@ -110,7 +111,7 @@ class Web3EIP1193Handler {
     try {
       await webViewController.getUrl();
     } catch (e) {
-      debugPrint("WebView недоступен, пропуск уведомления.");
+      debugPrint("WebView $e");
       return;
     }
 
@@ -234,8 +235,11 @@ class Web3EIP1193Handler {
     if (selectedAccountIndex != null &&
         selectedAccountIndex >= 0 &&
         selectedAccountIndex < addresses.length) {
+      isConnected = false;
       return [addresses[selectedAccountIndex]];
     }
+
+    isConnected = true;
 
     return addresses;
   }

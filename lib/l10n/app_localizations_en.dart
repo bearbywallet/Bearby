@@ -1390,6 +1390,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserActionMenuClose => 'Close';
 
   @override
+  String get browserActionMenuRefresh => 'Refresh';
+
+  @override
   String get keystoreBackupTitle => 'Keystore Backup';
 
   @override

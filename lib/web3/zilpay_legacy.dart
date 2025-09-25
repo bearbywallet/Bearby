@@ -53,6 +53,7 @@ class ZilPayLegacyHandler {
   final AppState appState;
   StreamSubscription<BlockEvent>? _blockStreamSubscription;
   String? _lastKnownAddress;
+  bool isConnected = false;
 
   ZilPayLegacyHandler({
     required this.webViewController,
@@ -118,12 +119,17 @@ class ZilPayLegacyHandler {
     final connected =
         Web3Utils.findConnected(currentDomain, appState.connections);
 
-    if (connected == null) return null;
+    if (connected == null) {
+      isConnected = false;
+      return null;
+    }
 
     final (bech32, base16) = await zilliqaGetBech32Base16Address(
       walletIndex: BigInt.from(appState.selectedWallet),
       accountIndex: appState.wallet!.selectedAccount,
     );
+
+    isConnected = true;
 
     return {"base16": base16, "bech32": bech32};
   }
