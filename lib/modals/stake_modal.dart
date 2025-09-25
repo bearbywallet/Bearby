@@ -598,7 +598,7 @@ class _StakeModalContentState extends State<StakeModalContent> {
           if (!mounted) return;
 
           Navigator.of(context).pop();
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },

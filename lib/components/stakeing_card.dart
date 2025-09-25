@@ -1134,7 +1134,7 @@ class StakingPoolCard extends StatelessWidget {
         token: nativeToken!,
         amount: "0",
         onConfirm: (_) {
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },
@@ -1203,7 +1203,7 @@ class StakingPoolCard extends StatelessWidget {
         token: nativeToken!,
         amount: "0",
         onConfirm: (_) {
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },
@@ -1260,7 +1260,7 @@ class StakingPoolCard extends StatelessWidget {
         token: stake.token ?? nativeToken!,
         amount: "0",
         onConfirm: (_) {
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },
@@ -1309,7 +1309,7 @@ class StakingPoolCard extends StatelessWidget {
         token: stake.token ?? nativeToken!,
         amount: "0",
         onConfirm: (_) {
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },

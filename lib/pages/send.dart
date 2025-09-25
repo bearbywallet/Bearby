@@ -250,7 +250,7 @@ class _SendTokenPageState extends State<SendTokenPage> {
         token: token,
         amount: _amount,
         onConfirm: (_) {
-          Navigator.of(context).pushNamed('/', arguments: {
+          Navigator.of(context).pushReplacementNamed('/', arguments: {
             'selectedIndex': 1,
           });
         },

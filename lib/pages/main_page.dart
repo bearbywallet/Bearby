@@ -14,6 +14,7 @@ class MainPage extends StatefulWidget {
 
 class MainPageState extends State<MainPage> {
   int _selectedIndex = 0;
+  bool _isInitialRoute = true;
 
   final List<Widget> _pages = const <Widget>[
     HomePage(),
@@ -24,14 +25,17 @@ class MainPageState extends State<MainPage> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
-    final selectedIndex = args?['selectedIndex'] as int?;
 
-    if (selectedIndex != null && selectedIndex != _selectedIndex) {
-      setState(() {
+    if (_isInitialRoute) {
+      final args =
+          ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+      final selectedIndex = args?['selectedIndex'] as int?;
+
+      if (selectedIndex != null) {
         _selectedIndex = selectedIndex;
-      });
+      }
+
+      _isInitialRoute = false;
     }
   }
 
