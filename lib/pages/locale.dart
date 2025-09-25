@@ -50,6 +50,7 @@ class _LanguagePageState extends State<LanguagePage> {
     languages.addAll([
       Language('system', 'System', ""),
       Language('ru', 'Russian', "Русский"),
+      Language('ko', 'Korean', "한국어"),
       Language('en', 'English', "English"),
       Language('ja', 'Japanese', "日本語"),
       Language('zh', 'Chinese', "中文"),
