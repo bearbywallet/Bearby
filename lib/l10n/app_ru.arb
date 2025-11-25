@@ -654,5 +654,14 @@
   "durationLessThanAMinute": "< 1м",
   "durationNotAvailable": "Н/Д",
   "rewardsProgressTitle": "Прогресс награждения",
-  "nodes": "узлы"
+  "nodes": "узлы",
+
+  "manageTokensPageTitle": "Токены",
+  "manageTokensSearchHint": "Поиск токенов или вставьте адрес",
+  "manageTokensFoundToken": "Найденный токен",
+  "manageTokensDeletedTokens": "Удаленные токены",
+  "manageTokensSuggestedTokens": "Предложенные токены",
+  "manageTokensFetchError": "Не удалось получить токен",
+  "manageTokensWrongChain": "Токен принадлежит другой сети",
+  "manageTokensClear": "Очистить"
 }

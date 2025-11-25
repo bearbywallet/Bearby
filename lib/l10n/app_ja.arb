@@ -658,5 +658,14 @@
   "durationLessThanAMinute": "< 1分",
   "durationNotAvailable": "適用外",
   "rewardsProgressTitle": "報酬の進捗",
-  "nodes": "ノード"
+  "nodes": "ノード",
+
+  "manageTokensPageTitle": "トークン",
+  "manageTokensSearchHint": "トークンを検索またはアドレスを貼り付け",
+  "manageTokensFoundToken": "見つかったトークン",
+  "manageTokensDeletedTokens": "削除されたトークン",
+  "manageTokensSuggestedTokens": "おすすめトークン",
+  "manageTokensFetchError": "トークンの取得に失敗しました",
+  "manageTokensWrongChain": "トークンは別のチェーンに属しています",
+  "manageTokensClear": "クリア"
 }

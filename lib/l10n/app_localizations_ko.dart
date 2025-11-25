@@ -1785,4 +1785,28 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get nodes => '노드';
+
+  @override
+  String get manageTokensPageTitle => '토큰';
+
+  @override
+  String get manageTokensSearchHint => '토큰 검색 또는 주소 붙여넣기';
+
+  @override
+  String get manageTokensFoundToken => '찾은 토큰';
+
+  @override
+  String get manageTokensDeletedTokens => '삭제된 토큰';
+
+  @override
+  String get manageTokensSuggestedTokens => '추천 토큰';
+
+  @override
+  String get manageTokensFetchError => '토큰 가져오기 실패';
+
+  @override
+  String get manageTokensWrongChain => '토큰이 다른 체인에 속함';
+
+  @override
+  String get manageTokensClear => '지우기';
 }

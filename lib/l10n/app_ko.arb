@@ -695,5 +695,14 @@
   "durationMinute": "분",
   "durationLessThanAMinute": "< 1분",
   "durationNotAvailable": "N/A",
-  "nodes": "노드"
+  "nodes": "노드",
+
+  "manageTokensPageTitle": "토큰",
+  "manageTokensSearchHint": "토큰 검색 또는 주소 붙여넣기",
+  "manageTokensFoundToken": "찾은 토큰",
+  "manageTokensDeletedTokens": "삭제된 토큰",
+  "manageTokensSuggestedTokens": "추천 토큰",
+  "manageTokensFetchError": "토큰 가져오기 실패",
+  "manageTokensWrongChain": "토큰이 다른 체인에 속함",
+  "manageTokensClear": "지우기"
 }

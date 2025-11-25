@@ -1785,4 +1785,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get nodes => 'nodes';
+
+  @override
+  String get manageTokensPageTitle => 'Tokens';
+
+  @override
+  String get manageTokensSearchHint => 'Search tokens or paste address';
+
+  @override
+  String get manageTokensFoundToken => 'Found Token';
+
+  @override
+  String get manageTokensDeletedTokens => 'Deleted Tokens';
+
+  @override
+  String get manageTokensSuggestedTokens => 'Suggested Tokens';
+
+  @override
+  String get manageTokensFetchError => 'Failed to fetch token';
+
+  @override
+  String get manageTokensWrongChain => 'Token belongs to a different chain';
+
+  @override
+  String get manageTokensClear => 'Clear';
 }

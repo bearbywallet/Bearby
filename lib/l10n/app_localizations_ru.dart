@@ -1785,4 +1785,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get nodes => 'узлы';
+
+  @override
+  String get manageTokensPageTitle => 'Токены';
+
+  @override
+  String get manageTokensSearchHint => 'Поиск токенов или вставьте адрес';
+
+  @override
+  String get manageTokensFoundToken => 'Найденный токен';
+
+  @override
+  String get manageTokensDeletedTokens => 'Удаленные токены';
+
+  @override
+  String get manageTokensSuggestedTokens => 'Предложенные токены';
+
+  @override
+  String get manageTokensFetchError => 'Не удалось получить токен';
+
+  @override
+  String get manageTokensWrongChain => 'Токен принадлежит другой сети';
+
+  @override
+  String get manageTokensClear => 'Очистить';
 }

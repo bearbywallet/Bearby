@@ -3520,6 +3520,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'nodes'**
   String get nodes;
+
+  /// Title for the Manage Tokens page
+  ///
+  /// In en, this message translates to:
+  /// **'Tokens'**
+  String get manageTokensPageTitle;
+
+  /// Hint text for the search input on the Manage Tokens page
+  ///
+  /// In en, this message translates to:
+  /// **'Search tokens or paste address'**
+  String get manageTokensSearchHint;
+
+  /// Section title when a token is found by address
+  ///
+  /// In en, this message translates to:
+  /// **'Found Token'**
+  String get manageTokensFoundToken;
+
+  /// Section title for deleted tokens list
+  ///
+  /// In en, this message translates to:
+  /// **'Deleted Tokens'**
+  String get manageTokensDeletedTokens;
+
+  /// Section title for suggested tokens list
+  ///
+  /// In en, this message translates to:
+  /// **'Suggested Tokens'**
+  String get manageTokensSuggestedTokens;
+
+  /// Error message when token fetch fails
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to fetch token'**
+  String get manageTokensFetchError;
+
+  /// Error message when token is from a different chain
+  ///
+  /// In en, this message translates to:
+  /// **'Token belongs to a different chain'**
+  String get manageTokensWrongChain;
+
+  /// Button text to clear deleted tokens
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get manageTokensClear;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

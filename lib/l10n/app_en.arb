@@ -2532,5 +2532,38 @@
   "durationMinute": "m",
   "durationLessThanAMinute": "< 1m",
   "durationNotAvailable": "N/A",
-  "nodes": "nodes"
+  "nodes": "nodes",
+
+  "manageTokensPageTitle": "Tokens",
+  "@manageTokensPageTitle": {
+    "description": "Title for the Manage Tokens page"
+  },
+  "manageTokensSearchHint": "Search tokens or paste address",
+  "@manageTokensSearchHint": {
+    "description": "Hint text for the search input on the Manage Tokens page"
+  },
+  "manageTokensFoundToken": "Found Token",
+  "@manageTokensFoundToken": {
+    "description": "Section title when a token is found by address"
+  },
+  "manageTokensDeletedTokens": "Deleted Tokens",
+  "@manageTokensDeletedTokens": {
+    "description": "Section title for deleted tokens list"
+  },
+  "manageTokensSuggestedTokens": "Suggested Tokens",
+  "@manageTokensSuggestedTokens": {
+    "description": "Section title for suggested tokens list"
+  },
+  "manageTokensFetchError": "Failed to fetch token",
+  "@manageTokensFetchError": {
+    "description": "Error message when token fetch fails"
+  },
+  "manageTokensWrongChain": "Token belongs to a different chain",
+  "@manageTokensWrongChain": {
+    "description": "Error message when token is from a different chain"
+  },
+  "manageTokensClear": "Clear",
+  "@manageTokensClear": {
+    "description": "Button text to clear deleted tokens"
+  }
 }

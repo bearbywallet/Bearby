@@ -1785,4 +1785,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get nodes => '节点';
+
+  @override
+  String get manageTokensPageTitle => '代币';
+
+  @override
+  String get manageTokensSearchHint => '搜索代币或粘贴地址';
+
+  @override
+  String get manageTokensFoundToken => '找到的代币';
+
+  @override
+  String get manageTokensDeletedTokens => '已删除的代币';
+
+  @override
+  String get manageTokensSuggestedTokens => '推荐代币';
+
+  @override
+  String get manageTokensFetchError => '获取代币失败';
+
+  @override
+  String get manageTokensWrongChain => '代币属于其他链';
+
+  @override
+  String get manageTokensClear => '清除';
 }

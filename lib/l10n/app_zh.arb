@@ -638,5 +638,14 @@
   "durationLessThanAMinute": "< 1分钟",
   "durationNotAvailable": "不适用",
   "rewardsProgressTitle": "收益进度",
-  "nodes": "节点"
+  "nodes": "节点",
+
+  "manageTokensPageTitle": "代币",
+  "manageTokensSearchHint": "搜索代币或粘贴地址",
+  "manageTokensFoundToken": "找到的代币",
+  "manageTokensDeletedTokens": "已删除的代币",
+  "manageTokensSuggestedTokens": "推荐代币",
+  "manageTokensFetchError": "获取代币失败",
+  "manageTokensWrongChain": "代币属于其他链",
+  "manageTokensClear": "清除"
 }

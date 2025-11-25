@@ -1785,4 +1785,28 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get nodes => 'ノード';
+
+  @override
+  String get manageTokensPageTitle => 'トークン';
+
+  @override
+  String get manageTokensSearchHint => 'トークンを検索またはアドレスを貼り付け';
+
+  @override
+  String get manageTokensFoundToken => '見つかったトークン';
+
+  @override
+  String get manageTokensDeletedTokens => '削除されたトークン';
+
+  @override
+  String get manageTokensSuggestedTokens => 'おすすめトークン';
+
+  @override
+  String get manageTokensFetchError => 'トークンの取得に失敗しました';
+
+  @override
+  String get manageTokensWrongChain => 'トークンは別のチェーンに属しています';
+
+  @override
+  String get manageTokensClear => 'クリア';
 }
