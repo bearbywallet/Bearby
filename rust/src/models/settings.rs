@@ -7,9 +7,8 @@ use zilpay::{
     errors::cipher::CipherErrors,
     settings::{
         browser::{BrowserSettings, ContentBlockingLevel},
-        wallet_settings::{NetworkSettings, WalletFeatures},
+        wallet_settings::{NetworkSettings, TokenQuotesAPIOptions, WalletFeatures},
     },
-    token_quotes::TokenQuotesAPIOptions,
 };
 
 #[derive(Debug, Clone, PartialEq)]

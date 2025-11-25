@@ -7,10 +7,13 @@ import '../frb_generated.dart';
 import '../models/ftoken.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+// These types are ignored because they are neither used by any `pub` functions nor (for structs and enums) marked `#[frb(unignore)]`: `PortfolioBalance`, `PortfolioResponse`, `PortfolioToken`, `Portfolio`, `ProtectionInfo`, `TokenAmount`, `TokenMetadata`
+// These function are ignored because they are on traits that is not defined in current crate (put an empty `#[frb]` on it to unignore): `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`, `fmt`
+
 Future<void> syncBalances({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenSyncBalances(walletIndex: walletIndex);
 
-Future<void> updateRates({required BigInt walletIndex}) =>
+Future<List<FTokenInfo>> updateRates({required BigInt walletIndex}) =>
     RustLib.instance.api.crateApiTokenUpdateRates(walletIndex: walletIndex);
 
 Future<FTokenInfo> fetchTokenMeta(
@@ -18,15 +21,8 @@ Future<FTokenInfo> fetchTokenMeta(
     RustLib.instance.api
         .crateApiTokenFetchTokenMeta(addr: addr, walletIndex: walletIndex);
 
-Future<List<FTokenInfo>> fetchTokensListZilliqaLegacy(
-        {required int limit, required int offset}) =>
-    RustLib.instance.api.crateApiTokenFetchTokensListZilliqaLegacy(
-        limit: limit, offset: offset);
-
-Future<List<FTokenInfo>> fetchTokensEvmList(
-        {required String chainName, required int chainId}) =>
-    RustLib.instance.api.crateApiTokenFetchTokensEvmList(
-        chainName: chainName, chainId: chainId);
+Future<List<FTokenInfo>> autoHintTokens({required BigInt walletIndex}) =>
+    RustLib.instance.api.crateApiTokenAutoHintTokens(walletIndex: walletIndex);
 
 Future<List<FTokenInfo>> addFtoken(
         {required FTokenInfo meta, required BigInt walletIndex}) =>

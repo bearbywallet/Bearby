@@ -2,9 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
 import 'package:zilpay/ledger/common.dart';
-import 'package:zilpay/ledger/ethereum/ledger_resolver.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
-import 'package:zilpay/ledger/ethereum/resolution_types.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
 import 'package:zilpay/ledger/transport/exceptions.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
@@ -197,28 +195,7 @@ class EthLedgerApp {
     required int walletIndex,
     required int accountIndex,
     required int slip44,
-    ResolutionConfig? resolutionConfig,
   }) async {
-    final config = resolutionConfig ??
-        const ResolutionConfig(
-          erc20: false,
-          externalPlugins: false,
-          nft: false,
-          uniswapV3: false,
-        );
-
-    LedgerEthTransactionResolution? resolution;
-    try {
-      resolution = await LedgerTransactionResolver.resolveTransaction(
-        transaction,
-        const LoadConfig(),
-        config,
-      );
-    } catch (e) {
-      debugPrint(
-          '[LEDGER_ERROR] Resolution failed, falling back to blind signing: $e');
-    }
-
     final EncodedRLPTx txRLP = await encodeTxRlp(
       tx: transaction,
       walletIndex: BigInt.from(walletIndex),
@@ -230,7 +207,6 @@ class EthLedgerApp {
       index: accountIndex,
       slip44: slip44,
       transactionChunks: txRLP.chunksBytes,
-      resolution: resolution,
     );
   }
 
@@ -238,7 +214,6 @@ class EthLedgerApp {
     required int index,
     required int slip44,
     required List<Uint8List> transactionChunks,
-    LedgerEthTransactionResolution? resolution,
   }) async {
     if (transactionChunks.isEmpty) {
       throw ArgumentError('Transaction chunks cannot be empty.');
@@ -249,21 +224,6 @@ class EthLedgerApp {
       final chunk = transactionChunks[i];
       debugPrint('Chunk $i length: ${chunk.length}');
       debugPrint('Chunk $i hex: ${bytesToHex(chunk)}...');
-    }
-
-    if (resolution != null) {
-      for (final plugin in resolution.plugin) {
-        await _setPlugin(plugin);
-      }
-      for (final extPlugin in resolution.externalPlugin) {
-        await _setExternalPlugin(extPlugin.payload, extPlugin.signature);
-      }
-      for (final nft in resolution.nfts) {
-        await _provideNFTInformation(nft);
-      }
-      for (final token in resolution.erc20Tokens) {
-        await _provideERC20TokenInformation(token);
-      }
     }
 
     late Uint8List response;

@@ -6,18 +6,68 @@ use crate::{
         utils::{parse_address, with_service},
     },
 };
-use std::sync::Arc;
-pub use zilpay::background::{bg_rates::RatesManagement, bg_token::TokensManagement};
+use serde::Deserialize;
+use std::{collections::HashMap, sync::Arc};
+pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::{
-    background::bg_wallet::WalletManagement,
+    background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     token::ft::FToken,
-    token_quotes::{
-        bnb_tokens::pancakeswap_get_tokens, coingecko_tokens::coingecko_get_tokens,
-        zilliqa_tokens::zilpay_get_tokens,
-    },
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
+
+const UNISWAP_API_URL: &str =
+    "https://interface.gateway.uniswap.org/v2/data.v1.DataApiService/GetPortfolio";
+const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
+const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
+
+// CoinGecko response: { "symbol": { "currency": price } }
+type CoinGeckoResponse = HashMap<String, HashMap<String, f64>>;
+
+#[derive(Debug, Deserialize)]
+struct ProtectionInfo {
+    result: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TokenMetadata {
+    #[serde(rename = "logoUrl")]
+    logo_url: Option<String>,
+    #[serde(rename = "protectionInfo")]
+    protection_info: Option<ProtectionInfo>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PortfolioToken {
+    address: Option<String>,
+    symbol: Option<String>,
+    decimals: Option<u8>,
+    name: Option<String>,
+    #[serde(rename = "type")]
+    token_type: Option<String>,
+    metadata: Option<TokenMetadata>,
+}
+
+#[derive(Debug, Deserialize)]
+struct TokenAmount {
+    raw: Option<String>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PortfolioBalance {
+    token: Option<PortfolioToken>,
+    amount: Option<TokenAmount>,
+}
+
+#[derive(Debug, Deserialize)]
+struct Portfolio {
+    balances: Option<Vec<PortfolioBalance>>,
+}
+
+#[derive(Debug, Deserialize)]
+struct PortfolioResponse {
+    portfolio: Option<Portfolio>,
+}
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
@@ -33,18 +83,72 @@ pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
     }
 }
 
-pub async fn update_rates(wallet_index: usize) -> Result<(), String> {
-    if let Some(service) = BACKGROUND_SERVICE.read().await.as_ref() {
-        let core = Arc::clone(&service.core);
+pub async fn update_rates(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
 
-        core.update_rates(wallet_index)
-            .await
-            .map_err(ServiceError::BackgroundError)?;
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
 
-        Ok(())
-    } else {
-        Err(ServiceError::NotRunning.to_string())
+    let data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    let currency = data.settings.features.currency_convert.to_lowercase();
+
+    let mut ftokens = wallet
+        .get_ftokens()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    if ftokens.is_empty() {
+        return Ok(Vec::new());
     }
+
+    let symbols: String = ftokens
+        .iter()
+        .map(|t| t.symbol.to_lowercase())
+        .collect::<Vec<_>>()
+        .join(",");
+
+    let url = format!(
+        "{}?symbols={}&vs_currencies={}",
+        COINGECKO_API_URL, symbols, currency
+    );
+
+    let client = reqwest::Client::new();
+    let response = client
+        .get(&url)
+        .send()
+        .await
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+    if !response.status().is_success() {
+        return Err(format!("CoinGecko API error: {}", response.status()));
+    }
+
+    let rates: CoinGeckoResponse = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse CoinGecko response: {}", e))?;
+
+    for token in &mut ftokens {
+        let symbol_lower = token.symbol.to_lowercase();
+        if let Some(price_data) = rates.get(&symbol_lower) {
+            if let Some(&rate) = price_data.get(&currency) {
+                token.rate = rate;
+            }
+        }
+    }
+
+    wallet
+        .save_ftokens(&ftokens)
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    let updated_tokens = ftokens.into_iter().map(|t| t.into()).collect();
+
+    Ok(updated_tokens)
 }
 
 pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FTokenInfo, String> {
@@ -63,35 +167,135 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
     }
 }
 
-pub async fn fetch_tokens_list_zilliqa_legacy(
-    limit: u32,
-    offset: u32,
-) -> Result<Vec<FTokenInfo>, String> {
-    let tokens = zilpay_get_tokens(limit, offset)
+pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
+    let guard = BACKGROUND_SERVICE.read().await;
+    let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
+
+    let wallet = service
+        .core
+        .get_wallet_by_index(wallet_index)
+        .map_err(ServiceError::BackgroundError)?;
+
+    let data = wallet
+        .get_wallet_data()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    let account = data
+        .get_selected_account()
+        .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+    let provider = service
+        .core
+        .get_provider(account.chain_hash)
+        .map_err(ServiceError::BackgroundError)?;
+    if provider.config.testnet.unwrap_or(false) {
+        return Ok(Vec::new());
+    }
+
+    let addr = account
+        .addr
+        .to_eth_checksummed()
+        .unwrap_or_else(|_| account.addr.auto_format());
+    let chain_id = account.chain_id;
+    let chain_hash = account.chain_hash;
+    let addr_type = account.addr.prefix_type();
+    let default_logo = provider.config.ftokens.first().and_then(|t| t.logo.clone());
+    let request_body = serde_json::json!({
+        "walletAccount": {
+            "platformAddresses": [
+                { "address": addr }
+            ]
+        },
+        "chainIds": [chain_id],
+        "modifier": {
+            "address": addr,
+            "includeOverrides": []
+        }
+    });
+
+    let client = reqwest::Client::new();
+    let response = client
+        .post(UNISWAP_API_URL)
+        .header("Content-Type", "application/json")
+        .header("Origin", "https://app.uniswap.org")
+        .json(&request_body)
+        .send()
         .await
-        .map_err(|e| e.to_string())?;
+        .map_err(|e| format!("HTTP request failed: {}", e))?;
 
-    Ok(tokens
+    if !response.status().is_success() {
+        return Err(format!("API error: {}", response.status()));
+    }
+
+    let result: PortfolioResponse = response
+        .json()
+        .await
+        .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+    let balances = result
+        .portfolio
+        .and_then(|p| p.balances)
+        .unwrap_or_default();
+
+    let tokens: Vec<FTokenInfo> = balances
         .into_iter()
-        .map(From::from)
-        .collect::<Vec<FTokenInfo>>())
-}
+        .filter_map(|balance| {
+            let token = balance.token?;
 
-pub async fn fetch_tokens_evm_list(
-    chain_name: String,
-    chain_id: u16,
-) -> Result<Vec<FTokenInfo>, String> {
-    let tokens = match chain_id {
-        56 => pancakeswap_get_tokens().await.map_err(|e| e.to_string())?,
-        _ => coingecko_get_tokens(&chain_name)
-            .await
-            .map_err(|e| e.to_string())?,
-    };
+            if let Some(ref metadata) = token.metadata {
+                if let Some(ref protection) = metadata.protection_info {
+                    if let Some(ref result) = protection.result {
+                        if result == "PROTECTION_RESULT_MALICIOUS"
+                            || result == "PROTECTION_RESULT_WARNING"
+                        {
+                            return None;
+                        }
+                    }
+                }
+            }
 
-    Ok(tokens
-        .into_iter()
-        .map(From::from)
-        .collect::<Vec<FTokenInfo>>())
+            let token_type = token.token_type.as_deref()?;
+            if token_type != "TOKEN_TYPE_ERC20" {
+                return None;
+            }
+
+            let address = token.address.as_deref()?;
+            if address == ZERO_EVM {
+                return None;
+            }
+
+            let logo = token
+                .metadata
+                .as_ref()
+                .and_then(|m| m.logo_url.clone())
+                .or_else(|| default_logo.clone());
+
+            let mut balances_map = HashMap::new();
+            balances_map.insert(
+                data.selected_account,
+                balance
+                    .amount
+                    .and_then(|a| a.raw)
+                    .unwrap_or_else(|| "0".to_string()),
+            );
+
+            Some(FTokenInfo {
+                name: token.name.unwrap_or_default(),
+                symbol: token.symbol.unwrap_or_default(),
+                decimals: token.decimals.unwrap_or(18),
+                addr: address.to_string(),
+                addr_type,
+                logo,
+                balances: balances_map,
+                rate: 0.0,
+                default: false,
+                native: false,
+                chain_hash,
+            })
+        })
+        .collect();
+
+    Ok(tokens)
 }
 
 pub async fn add_ftoken(meta: FTokenInfo, wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {

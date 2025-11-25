@@ -10,7 +10,7 @@ pub use zilpay::settings::{
     theme::{Appearances, Theme},
 };
 use zilpay::{
-    background::bg_settings::SettingsManagement, token_quotes::TokenQuotesAPIOptions,
+    background::bg_settings::SettingsManagement, settings::wallet_settings::TokenQuotesAPIOptions,
     wallet::wallet_storage::StorageOperations,
 };
 
