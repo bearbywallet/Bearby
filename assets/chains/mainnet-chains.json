@@ -108,7 +108,7 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Zilliqa",
+        "name": "EVM",
         "symbol": "ZIL",
         "decimals": 18
       },
@@ -116,7 +116,7 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa",
+        "name": "Scilla",
         "symbol": "ZIL",
         "decimals": 12
       }
@@ -137,22 +137,71 @@
       },
       {
         "name": "Evmx",
-        "url": "https://evmx.zilliqa.com/",
+        "url": "https://evmx.zilliqa.com",
         "icon": "https://cdn.prod.website-files.com/68525c9b37d60bd3223ceb0b/685bd7f0ca540e4a6a4dd672_Favicon-mainnet.jpg",
         "standard": "EIP3091"
       },
       {
         "name": "blockscout",
-        "url": "https://zq2-mainnet.blockscout.com/",
+        "url": "https://zq2-mainnet.blockscout.com",
         "icon": "https://eth.blockscout.com/assets/favicon/android-chrome-192x192.png",
         "standard": "EIP3091"
       },
       {
         "name": "Otterscan",
         "icon": "https://otterscan.zilliqa.com/assets/otter-DYFeLtFi.png",
-        "url": "https://otterscan.zilliqa.com/",
+        "url": "https://otterscan.zilliqa.com",
+        "standard": "EIP3091"
+      }
+    ]
+  },
+  {
+    "name": "Avalanche (C-Chain)",
+    "chain": "AVAX",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.avax.network/ext/bc/C/rpc",
+      "https://avalanche-c-chain-rpc.publicnode.com",
+      "https://avax.meowrpc.com",
+      "https://avalanche.drpc.org",
+      "https://1rpc.io/avax/c",
+      "https://0xrpc.io/avax"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/avalanche/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Avalanche",
+        "symbol": "AVAX",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [
+      43114,
+      0
+    ],
+    "infoURL": "https://www.avax.network/",
+    "shortName": "avalanche",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Snowtrace",
+        "url": "https://snowtrace.io",
+        "icon": "https://snowtrace.io/favicon.ico",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Avascan",
+        "url": "https://avascan.info/blockchain/c",
+        "icon": "https://avascan.info/cdn/safari-pinned-tab.svg",
         "standard": "EIP3091"
       }
     ]
   }
 ]
+

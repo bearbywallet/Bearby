@@ -15,16 +15,16 @@
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
-        "name": "Zilliqa",
-        "symbol": "ZIL",
+        "name": "EVM",
+        "symbol": "ZILt",
         "decimals": 18
       },
       {
         "native": true,
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/zilliqa/%{contract_address}%/%{dark,light}%.webp",
         "addr": "zil1qqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq9yf6pz",
-        "name": "Zilliqa Scilla",
-        "symbol": "ZIL",
+        "name": "Scilla",
+        "symbol": "ZILt",
         "decimals": 12
       }
     ],
@@ -34,6 +34,12 @@
     "shortName": "zilliqa",
     "slip44": 313,
     "explorers": [
+      {
+        "name": "Otterscan",
+        "icon": "https://testnet.zilliqa.blockscout.com/assets/favicon/apple-touch-icon-180x180.png",
+        "url": "https://testnet.zilliqa.blockscout.com/",
+        "standard": "EIP3091"
+      },
       {
         "name": "Otterscan",
         "icon": "https://otterscan.testnet.zilliqa.com/assets/otter-DYFeLtFi.png",
@@ -47,9 +53,10 @@
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
+      "https://bsc-testnet.public.blastapi.io",
       "https://bsc-testnet-dataseed.bnbchain.org",
-      "https://bsc-testnet.bnbchain.org",
-      "https://bsc-prebsc-dataseed.bnbchain.org"
+      "https://bsc-prebsc-dataseed.bnbchain.org",
+      "https://bsc-testnet.bnbchain.org"
     ],
     "features": [
       "EIP1559",
@@ -62,7 +69,7 @@
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "BinanceCoin",
-        "symbol": "BNB",
+        "symbol": "tBNB",
         "decimals": 18
       }
     ],
@@ -85,9 +92,9 @@
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/ethereum/chain/%{dark,light}%.svg",
     "chain": "ETH",
     "rpc": [
-      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8",
       "https://rpc-sepolia.rockx.com",
-      "https://rpc.sepolia.dev"
+      "https://rpc.sepolia.dev",
+      "https://sepolia.infura.io/v3/b6bf7d3508c941499b10025c0776eaf8"
     ],
     "features": [
       "EIP155",
@@ -100,7 +107,7 @@
         "addr": "0x0000000000000000000000000000000000000000",
         "name": "Ethereum",
         "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bnbchain/%{contract_address}%/%{dark,light}%.webp",
-        "symbol": "ETH",
+        "symbol": "tETH",
         "decimals": 18
       }
     ],
@@ -117,6 +124,50 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Avalanche Fuji (C-Chain)",
+    "chain": "AVAX",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://api.avax-test.network/ext/bc/C/rpc",
+      "https://avalanche-fuji.drpc.org"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/avalanche/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Avalanche",
+        "symbol": "AVAXt",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [
+      43113,
+      0
+    ],
+    "testnet": true,
+    "infoURL": "https://www.avax.network/",
+    "shortName": "avalanche",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Snowtrace",
+        "url": "https://testnet.snowtrace.io",
+        "icon": "https://snowtrace.io/favicon.ico",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Avalanche Explorer",
+        "url": "https://subnets-test.avax.network/c-chain",
+        "icon": "https://subnets-test.avax.network/favicon.ico",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
-
