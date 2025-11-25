@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_protector/screen_protector.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -35,6 +35,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
   bool _obscurePassword = true;
   KeyPairInfo? keys;
 
+  final _noScreenshot = NoScreenshot.instance;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -47,16 +48,12 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
 
   @override
   void dispose() {
-    ScreenProtector.preventScreenshotOff();
-    ScreenProtector.protectDataLeakageOff();
-    ScreenProtector.protectDataLeakageWithBlurOff();
+    _noScreenshot.screenshotOn();
     super.dispose();
   }
 
   Future<void> _secureScreen() async {
-    await ScreenProtector.preventScreenshotOn();
-    await ScreenProtector.protectDataLeakageOn();
-    await ScreenProtector.protectDataLeakageWithBlur();
+    await _noScreenshot.screenshotOff();
   }
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:screen_protector/screen_protector.dart';
+import 'package:no_screenshot/no_screenshot.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -34,6 +34,7 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
   String? backupFilePath;
   Uint8List? keystoreBytes;
 
+  final _noScreenshot = NoScreenshot.instance;
   final _confirmPasswordController = TextEditingController();
   final _confirmPasswordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -47,16 +48,12 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
   @override
   void dispose() {
     _confirmPasswordController.dispose();
-    ScreenProtector.preventScreenshotOff();
-    ScreenProtector.protectDataLeakageOff();
-    ScreenProtector.protectDataLeakageWithBlurOff();
+    _noScreenshot.screenshotOn();
     super.dispose();
   }
 
   Future<void> _secureScreen() async {
-    await ScreenProtector.preventScreenshotOn();
-    await ScreenProtector.protectDataLeakageOn();
-    await ScreenProtector.protectDataLeakageWithBlur();
+    await _noScreenshot.screenshotOff();
   }
 
   void _onCreateBackup(BigInt walletIndex, String name) async {
