@@ -1,7 +1,6 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/mixins/jazzicon.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/state/app_state.dart';
 
@@ -35,15 +34,12 @@ class AvatarAddress extends StatelessWidget {
             ? Jazzicon(
                 diameter: avatarSize,
                 seed: account.addr,
-                theme: theme,
                 shapeCount: 4,
               )
-            : Blockies(
-                color: theme.secondaryPurple,
-                bgColor: theme.primaryPurple,
-                size: 8,
-                spotColor: theme.background,
+            : Jazzicon(
+                diameter: avatarSize,
                 seed: account.addr,
+                shapeCount: 4,
               ),
       ),
     );

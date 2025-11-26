@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -137,8 +136,9 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     if (cachedData != null && mounted) {
       final List<dynamic> decoded = jsonDecode(cachedData);
       setState(() {
-        _deletedTokens =
-            decoded.map((item) => FTokenInfoJsonExtension.fromJson(item)).toList();
+        _deletedTokens = decoded
+            .map((item) => FTokenInfoJsonExtension.fromJson(item))
+            .toList();
       });
     }
   }
@@ -331,7 +331,8 @@ class _ManageTokensPageState extends State<ManageTokensPage>
 
     return appState.wallet?.tokens
             .where((t) =>
-                t.chainHash == chain.chainHash && t.addrType == account.addrType)
+                t.chainHash == chain.chainHash &&
+                t.addrType == account.addrType)
             .toList() ??
         [];
   }
@@ -431,8 +432,7 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                     autofocus: false,
                   ),
                 ),
-                if (_isLoading)
-                  const LinearProgressIndicator(),
+                if (_isLoading) const LinearProgressIndicator(),
                 Expanded(
                   child: ListView(
                     controller: _scrollController,
@@ -548,15 +548,6 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                 width: 32.0,
                 height: 32.0,
                 fit: BoxFit.contain,
-                errorWidget: SvgPicture.asset(
-                  "assets/icons/warning.svg",
-                  width: 32.0,
-                  height: 32.0,
-                  colorFilter: ColorFilter.mode(
-                    theme.warning,
-                    BlendMode.srcIn,
-                  ),
-                ),
                 loadingWidget: const Center(
                   child: CircularProgressIndicator(strokeWidth: 2),
                 ),

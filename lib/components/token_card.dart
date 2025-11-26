@@ -1,4 +1,4 @@
-import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -88,12 +88,9 @@ class _TokenCardState extends State<TokenCard>
           width: 32,
           height: 32,
           fit: BoxFit.contain,
-          errorWidget: Blockies(
+          errorWidget: Jazzicon(
             seed: widget.ftoken.addr,
-            color: theme.secondaryPurple,
-            bgColor: state.currentTheme.primaryPurple,
-            spotColor: state.currentTheme.background,
-            size: 8,
+            diameter: 32,
           ),
           loadingWidget:
               const Center(child: CircularProgressIndicator(strokeWidth: 2)),

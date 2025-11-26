@@ -1,6 +1,5 @@
 import 'dart:io';
 
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -13,6 +12,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/qrcode.dart';
 import 'package:zilpay/mixins/status_bar.dart';
@@ -332,12 +332,9 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                   width: 32,
                   height: 32,
                   fit: BoxFit.contain,
-                  errorWidget: Blockies(
+                  errorWidget: Jazzicon(
                     seed: token.addr,
-                    color: theme.secondaryPurple,
-                    bgColor: theme.primaryPurple,
-                    spotColor: theme.background,
-                    size: 8,
+                    diameter: 32,
                   ),
                   loadingWidget: const Center(
                     child: CircularProgressIndicator(strokeWidth: 2),

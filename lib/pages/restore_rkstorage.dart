@@ -1,8 +1,8 @@
 import 'dart:convert';
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -259,12 +259,10 @@ class AccountItem extends StatelessWidget {
             height: 40,
             child: ClipRRect(
               borderRadius: BorderRadius.circular(20),
-              child: Blockies(
+              child: Jazzicon(
+                diameter: 40,
                 seed: account.address.toLowerCase(),
-                size: 8,
-                color: theme.secondaryPurple,
-                bgColor: theme.primaryPurple,
-                spotColor: theme.background,
+                shapeCount: 4,
               ),
             ),
           ),

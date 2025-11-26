@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/notification.dart';
@@ -190,12 +190,10 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage>
             height: 40,
             child: Padding(
               padding: const EdgeInsets.all(4),
-              child: Blockies(
+              child: Jazzicon(
+                diameter: 32,
                 seed: wallet.walletAddress,
-                color: theme.secondaryPurple,
-                bgColor: theme.primaryPurple,
-                spotColor: theme.background,
-                size: 8,
+                shapeCount: 4,
               ),
             ),
           ),

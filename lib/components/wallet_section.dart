@@ -1,4 +1,4 @@
-import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -56,12 +56,9 @@ class _HoverableWalletSectionState extends State<HoverableWalletSection> {
                   width: 32,
                   height: 32,
                   fit: BoxFit.contain,
-                  errorWidget: Blockies(
+                  errorWidget: Jazzicon(
                     seed: widget.appState.wallet!.walletAddress,
-                    color: widget.theme.secondaryPurple,
-                    bgColor: widget.theme.primaryPurple,
-                    spotColor: widget.theme.background,
-                    size: 8,
+                    diameter: 40,
                   ),
                   loadingWidget: const Center(
                     child: CircularProgressIndicator(

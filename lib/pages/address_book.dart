@@ -1,4 +1,4 @@
-import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -213,12 +213,9 @@ class _AddressBookPageState extends State<AddressBookPage>
                   child: SizedBox(
                     width: 40,
                     height: 40,
-                    child: Blockies(
+                    child: Jazzicon(
                       seed: address.addr.toLowerCase(),
-                      size: 8,
-                      color: theme.primaryPurple,
-                      bgColor: theme.background,
-                      spotColor: theme.textSecondary,
+                      diameter: 40,
                     ),
                   ),
                 ),

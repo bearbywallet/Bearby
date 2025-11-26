@@ -1,9 +1,8 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
-import 'package:zilpay/mixins/jazzicon.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -371,24 +370,11 @@ class _AddressSelectModalContentState
   }
 
   Widget _getAvatarWidget(Entry entry, AppTheme theme) {
-    final isEvm = entry.tag == "evm" || _isEvmAddress(entry.address);
-
-    if (isEvm) {
-      return Jazzicon(
-        diameter: 30,
-        seed: entry.address,
-        theme: theme,
-        shapeCount: 4,
-      );
-    } else {
-      return Blockies(
-        color: theme.secondaryPurple,
-        bgColor: theme.primaryPurple,
-        size: 8,
-        spotColor: theme.background,
-        seed: entry.address,
-      );
-    }
+    return Jazzicon(
+      diameter: 30,
+      seed: entry.address,
+      shapeCount: 4,
+    );
   }
 
   Widget _buildTag(String text, Color color, AppTheme theme) {

@@ -1,4 +1,4 @@
-import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -57,12 +57,9 @@ class TokenSelectItem extends StatelessWidget {
                   width: iconSize,
                   height: iconSize,
                   fit: BoxFit.contain,
-                  errorWidget: Blockies(
+                  errorWidget: Jazzicon(
                     seed: ftoken.addr,
-                    color: theme.secondaryPurple,
-                    bgColor: theme.primaryPurple,
-                    spotColor: theme.background,
-                    size: 8,
+                    diameter: iconSize,
                   ),
                   loadingWidget: const Center(
                     child: CircularProgressIndicator(

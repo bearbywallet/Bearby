@@ -1,5 +1,5 @@
 import 'dart:ui';
-import 'package:blockies/blockies.dart';
+import 'package:zilpay/components/jazzicon.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
@@ -66,12 +66,9 @@ class WalletOption extends StatelessWidget {
                       width: 32,
                       height: 32,
                       fit: BoxFit.contain,
-                      errorWidget: Blockies(
+                      errorWidget: Jazzicon(
                         seed: appState.wallet!.walletAddress,
-                        color: theme.secondaryPurple,
-                        bgColor: theme.primaryPurple,
-                        spotColor: theme.background,
-                        size: 8,
+                        diameter: 40,
                       ),
                       loadingWidget: const Center(
                         child: CircularProgressIndicator(
