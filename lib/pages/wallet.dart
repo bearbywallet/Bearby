@@ -1,4 +1,3 @@
-import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -350,12 +349,22 @@ class _WalletPageState extends State<WalletPage> {
               width: 32,
               height: 32,
               fit: BoxFit.contain,
-              errorWidget: Blockies(
-                seed: appState.wallet!.walletAddress,
-                color: theme.secondaryPurple,
-                bgColor: theme.primaryPurple,
-                spotColor: theme.background,
-                size: 8,
+              errorWidget: Container(
+                width: 32,
+                height: 32,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: theme.background,
+                ),
+                child: SvgPicture.asset(
+                  'assets/icons/warning.svg',
+                  width: 16,
+                  height: 16,
+                  colorFilter: ColorFilter.mode(
+                    theme.textSecondary,
+                    BlendMode.srcIn,
+                  ),
+                ),
               ),
               loadingWidget: const Center(
                 child: CircularProgressIndicator(

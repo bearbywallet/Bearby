@@ -11,10 +11,40 @@ import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
 import 'package:zilpay/utils/utils.dart';
 
+class EthAppConfiguration {
+  final String version;
+
+  EthAppConfiguration({required this.version});
+}
+
 class EthLedgerApp {
+  static const int _cla = 0xe0;
+  static const int _insGetAppConfiguration = 0x06;
+
   final Transport transport;
 
   EthLedgerApp(this.transport);
+
+  Future<EthAppConfiguration?> getAppConfiguration() async {
+    try {
+      final response = await transport.send(
+        _cla,
+        _insGetAppConfiguration,
+        0x00,
+        0x00,
+        Uint8List(0),
+      );
+
+      if (response.isEmpty || response.length < 4) {
+        return null;
+      }
+
+      final version = 'v${response[1]}.${response[2]}.${response[3]}';
+      return EthAppConfiguration(version: version);
+    } catch (e) {
+      return null;
+    }
+  }
 
   Future<List<int>> _getPaths({required int slip44, required int index}) async {
     final String path = "44'/$slip44'/0'/0/$index";

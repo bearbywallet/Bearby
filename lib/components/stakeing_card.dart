@@ -1,6 +1,5 @@
 import 'dart:math';
 
-import 'package:blockies/blockies.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -707,12 +706,10 @@ class StakingPoolCard extends StatelessWidget {
                   width: 24,
                   height: 24,
                   fit: BoxFit.contain,
-                  errorWidget: Blockies(
-                    seed: stake.token!.addr,
-                    color: theme.secondaryPurple,
-                    bgColor: theme.primaryPurple,
-                    spotColor: theme.background,
-                    size: 8,
+                  errorWidget: SvgPicture.asset(
+                    'assets/icons/warning.svg',
+                    width: 24,
+                    height: 24,
                   ),
                   loadingWidget: const Center(
                       child: CircularProgressIndicator(strokeWidth: 2)),

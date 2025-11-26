@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:blockies/blockies.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zilpay/components/detail_group_card.dart';
 import 'package:zilpay/components/detail_item_group_card.dart';
@@ -889,12 +889,22 @@ class _AmountSection extends StatelessWidget {
           width: 45,
           height: 45,
           fit: BoxFit.contain,
-          errorWidget: Blockies(
-            seed: transaction.transactionHash,
-            color: theme.secondaryPurple,
-            bgColor: theme.primaryPurple,
-            spotColor: theme.background,
-            size: 8,
+          errorWidget: Container(
+            width: 45,
+            height: 45,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.background,
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/warning.svg',
+              width: 20,
+              height: 20,
+              colorFilter: ColorFilter.mode(
+                theme.textSecondary,
+                BlendMode.srcIn,
+              ),
+            ),
           ),
           loadingWidget: const Center(
             child: CircularProgressIndicator(

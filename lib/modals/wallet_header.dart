@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:blockies/blockies.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/image_cache.dart';
@@ -101,12 +101,22 @@ class _WalletModalContentState extends State<_WalletModalContent> {
                     width: 32,
                     height: 32,
                     fit: BoxFit.contain,
-                    errorWidget: Blockies(
-                      seed: wallet.walletAddress,
-                      color: theme.secondaryPurple,
-                      bgColor: theme.primaryPurple,
-                      spotColor: theme.background,
-                      size: 8,
+                    errorWidget: Container(
+                      width: 40,
+                      height: 40,
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: theme.background,
+                      ),
+                      child: SvgPicture.asset(
+                        'assets/icons/warning.svg',
+                        width: 16,
+                        height: 16,
+                        colorFilter: ColorFilter.mode(
+                          theme.textSecondary,
+                          BlendMode.srcIn,
+                        ),
+                      ),
                     ),
                     loadingWidget:
                         const CircularProgressIndicator(strokeWidth: 2),

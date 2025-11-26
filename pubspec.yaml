@@ -13,7 +13,6 @@ dependencies:
   rust_lib_zilpay:
     path: rust_builder
   flutter_rust_bridge: ^2.11.1
-  blockies: ^0.1.2
   path_provider: ^2.0.11
   provider: ^6.1.2
   flutter_svg: ^2.0.10+1
@@ -29,7 +28,6 @@ dependencies:
   no_screenshot: ^0.3.1
   file_picker: ^10.1.2
   shared_preferences: ^2.5.3
-  http: ^1.5.0
 
 dev_dependencies:
   flutter_test:

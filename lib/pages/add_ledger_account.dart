@@ -44,7 +44,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
   bool _loading = false;
   String _errorMessage = '';
   bool _createWallet = true;
-  bool _zilliqaLegacy = false;
   NetworkConfigInfo? _network;
   List<LedgerAccount> _accounts = [];
   Map<LedgerAccount, bool> _selectedAccounts = {};
@@ -79,15 +78,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
       return;
     }
 
-    final appState = context.read<AppState>();
     final network = args['chain'] as NetworkConfigInfo?;
     final createWallet = args['createWallet'] as bool?;
-
-    if (appState.wallets.isNotEmpty &&
-        _createWallet &&
-        appState.account?.addrType == 0) {
-      _zilliqaLegacy = true;
-    }
 
     if (network == null) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -199,6 +191,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
         DeviceInfoService device = DeviceInfoService();
         List<String> identifiers = await device.getDeviceIdentifiers();
 
+        final isZilliqaApp = appState.ledgerViewController.isZilliqaApp;
+
         final (session, walletAddress) = await addLedgerWallet(
           params: LedgerParamsInput(
             pubKeys: pubKeys,
@@ -209,7 +203,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             biometricType: AuthMethod.none.name,
             identifiers: identifiers,
             chainHash: chainHash,
-            zilliqaLegacy: _zilliqaLegacy,
+            zilliqaLegacy: isZilliqaApp,
           ),
           walletSettings: settings,
           ftokens: ftokens,
@@ -248,10 +242,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 ))
             .toList();
 
+        final isZilliqaAppUpdate = appState.ledgerViewController.isZilliqaApp;
+
         await updateLedgerAccounts(
           walletIndex: BigInt.from(walletIndex),
           accounts: accountsToUpdate,
-          zilliqaLegacy: _zilliqaLegacy,
+          zilliqaLegacy: isZilliqaAppUpdate,
         );
 
         await appState.syncData();
@@ -349,7 +345,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                       slip44: _network!.slip44,
                       count: _accountCount,
                       chainId: _network!.chainId.toInt(),
-                      zilliqaLegacy: _zilliqaLegacy,
                     );
 
                     final newSelectedAccounts = {
@@ -460,58 +455,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     );
   }
 
-  Widget _buildLegacySwitch(AppTheme theme, AppLocalizations l10n) {
-    return Container(
-      decoration: BoxDecoration(
-        color: theme.cardBackground,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: theme.textSecondary.withValues(alpha: 0.3),
-          width: 1.5,
-        ),
-      ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              SvgPicture.asset(
-                "assets/icons/scilla.svg",
-                width: 24,
-                height: 24,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
-                ),
-              ),
-              const SizedBox(width: 12),
-              Text(
-                l10n.settingsPageZilliqaLegacy,
-                style: theme.bodyLarge.copyWith(
-                  color: theme.textPrimary,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ],
-          ),
-          Switch(
-            value: _zilliqaLegacy,
-            onChanged: _loading
-                ? null
-                : (value) {
-                    setState(() {
-                      _zilliqaLegacy = value;
-                    });
-                  },
-            activeThumbColor: theme.primaryPurple,
-            activeTrackColor: theme.primaryPurple.withValues(alpha: 0.4),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(context) {
     final appState = Provider.of<AppState>(context);
@@ -561,10 +504,6 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                                 ],
                                 const SizedBox(height: 16),
                                 _buildWalletInfoCard(appState, l10n),
-                                if (_network?.slip44 == 313) ...[
-                                  const SizedBox(height: 16),
-                                  _buildLegacySwitch(theme, l10n),
-                                ],
                                 if (_accounts.isNotEmpty) ...[
                                   const SizedBox(height: 16),
                                   _buildAccountsCard(theme),

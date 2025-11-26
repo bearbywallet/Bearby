@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
-import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -73,12 +73,23 @@ class _HistoryItemState extends State<HistoryItem>
           width: 32,
           height: 32,
           fit: BoxFit.contain,
-          errorWidget: Blockies(
-              seed: widget.transaction.transactionHash,
-              color: theme.secondaryPurple,
-              bgColor: theme.primaryPurple,
-              spotColor: theme.background,
-              size: 8),
+          errorWidget: Container(
+            width: 32,
+            height: 32,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              color: theme.background,
+            ),
+            child: SvgPicture.asset(
+              'assets/icons/warning.svg',
+              width: 16,
+              height: 16,
+              colorFilter: ColorFilter.mode(
+                theme.textSecondary,
+                BlendMode.srcIn,
+              ),
+            ),
+          ),
           loadingWidget:
               const Center(child: CircularProgressIndicator(strokeWidth: 2)),
         ),

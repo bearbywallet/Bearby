@@ -29,6 +29,20 @@ enum LedgerStatus {
   disconnected,
 }
 
+enum LedgerAppType {
+  unknown,
+  zilliqa,
+  ethereum,
+}
+
+class LedgerAppDetectionError implements Exception {
+  final String message;
+  LedgerAppDetectionError(this.message);
+
+  @override
+  String toString() => message;
+}
+
 class LedgerViewController extends ChangeNotifier {
   final Set<DiscoveredDevice> _discoveredDevices = {};
   final List<StreamSubscription> _scanSubscriptions = [];
@@ -40,6 +54,7 @@ class LedgerViewController extends ChangeNotifier {
   Transport? _connectedTransport;
   DiscoveredDevice? _connectingDevice;
   LedgerStatus _status = LedgerStatus.initializing;
+  LedgerAppType _detectedAppType = LedgerAppType.unknown;
 
   Set<DiscoveredDevice> get discoveredDevices => _discoveredDevices;
   bool get isScanning => _isScanning;
@@ -48,6 +63,9 @@ class LedgerViewController extends ChangeNotifier {
   Transport? get connectedTransport => _connectedTransport;
   LedgerStatus get status => _status;
   String? get errorDetails => _errorDetails;
+  LedgerAppType get detectedAppType => _detectedAppType;
+  bool get isZilliqaApp => _detectedAppType == LedgerAppType.zilliqa;
+  bool get isEthApp => _detectedAppType == LedgerAppType.ethereum;
 
   Future<void> scan() async {
     if (_isScanning || _isConnecting) return;
@@ -220,20 +238,51 @@ class LedgerViewController extends ChangeNotifier {
     return sig;
   }
 
+  Future<LedgerAppType> detectLedgerApp() async {
+    if (_connectedTransport == null) {
+      throw LedgerAppDetectionError('Not connected to Ledger device');
+    }
+
+    try {
+      final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
+      final version = await zilliqaApp.getVersion();
+      if (version != null) {
+        _detectedAppType = LedgerAppType.zilliqa;
+        notifyListeners();
+        return LedgerAppType.zilliqa;
+      }
+    } catch (_) {}
+
+    try {
+      final ethApp = EthLedgerApp(_connectedTransport!);
+      final config = await ethApp.getAppConfiguration();
+      if (config != null) {
+        _detectedAppType = LedgerAppType.ethereum;
+        notifyListeners();
+        return LedgerAppType.ethereum;
+      }
+    } catch (_) {}
+
+    _detectedAppType = LedgerAppType.unknown;
+    notifyListeners();
+    throw LedgerAppDetectionError('Failed to detect Ledger app. Please open Zilliqa or Ethereum app on your Ledger device.');
+  }
+
   Future<List<LedgerAccount>> getAccounts({
     required DiscoveredDevice device,
     required int slip44,
     required int count,
     required int chainId,
-    bool zilliqaLegacy = false,
   }) async {
     if (_connectedTransport == null) {
       await open(device);
     }
 
+    await detectLedgerApp();
+
     List<LedgerAccount> accounts = [];
 
-    if (zilliqaLegacy && slip44 == 313) {
+    if (_detectedAppType == LedgerAppType.zilliqa && slip44 == 313) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
@@ -298,6 +347,7 @@ class LedgerViewController extends ChangeNotifier {
       debugPrint("Error disconnecting: $e");
     } finally {
       _connectedTransport = null;
+      _detectedAppType = LedgerAppType.unknown;
       _updateStatus(LedgerStatus.disconnected);
     }
   }

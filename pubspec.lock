@@ -17,14 +17,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "2.13.0"
-  blockies:
-    dependency: "direct main"
-    description:
-      name: blockies
-      sha256: d4537970b968e17b1a2604ba10a5bf3e5ce12fbdf7fe9612feb31091cbd8217e
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -320,7 +312,7 @@ packages:
     source: sdk
     version: "0.0.0"
   http:
-    dependency: "direct main"
+    dependency: transitive
     description:
       name: http
       sha256: "87721a4a50b19c7f1d49001e51409bddc46303966ce89a65af4f4e6004896412"
