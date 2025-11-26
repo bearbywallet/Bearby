@@ -570,6 +570,7 @@
   "browserActionMenuCopyLink": "링크 복사",
   "browserActionMenuClose": "닫기",
   "browserActionMenuRefresh": "새로고침",
+  "browserActionMenuUrlBarTop": "URL바 상단 배치",
 
   "keystoreBackupTitle": "키스토어 백업",
   "keystoreBackupWarningTitle": "키스토어 파일 보호",

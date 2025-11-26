@@ -14,6 +14,8 @@ void showBrowserActionModal({
   required VoidCallback onCopyLink,
   required VoidCallback onShare,
   required bool isConnected,
+  required bool urlBarTop,
+  required ValueChanged<bool> onUrlBarPositionChanged,
 }) {
   showModalBottomSheet<void>(
     context: context,
@@ -24,6 +26,8 @@ void showBrowserActionModal({
       onCopyLink: onCopyLink,
       onShare: onShare,
       isConnected: isConnected,
+      urlBarTop: urlBarTop,
+      onUrlBarPositionChanged: onUrlBarPositionChanged,
     ),
   );
 }
@@ -33,6 +37,8 @@ class BrowserActionModal extends StatelessWidget {
   final VoidCallback onCopyLink;
   final VoidCallback onShare;
   final bool isConnected;
+  final bool urlBarTop;
+  final ValueChanged<bool> onUrlBarPositionChanged;
 
   const BrowserActionModal({
     super.key,
@@ -40,6 +46,8 @@ class BrowserActionModal extends StatelessWidget {
     required this.onCopyLink,
     required this.onShare,
     required this.isConnected,
+    required this.urlBarTop,
+    required this.onUrlBarPositionChanged,
   });
 
   @override
@@ -65,6 +73,8 @@ class BrowserActionModal extends StatelessWidget {
               _buildAccountInfo(appState, theme),
               const SizedBox(height: 24),
               _buildActionGrid(context, theme, l10n),
+              const SizedBox(height: 16),
+              _buildUrlBarPositionToggle(context, theme, l10n),
               const SizedBox(height: 16),
             ],
           ),
@@ -187,6 +197,35 @@ class BrowserActionModal extends StatelessWidget {
           style: theme.caption.copyWith(color: theme.textSecondary),
         ),
       ],
+    );
+  }
+
+  Widget _buildUrlBarPositionToggle(
+      BuildContext context, AppTheme theme, AppLocalizations l10n) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: BoxDecoration(
+        color: theme.textSecondary.withValues(alpha: 0.1),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            l10n.browserActionMenuUrlBarTop,
+            style: theme.bodyText1.copyWith(color: theme.textPrimary),
+          ),
+          Switch(
+            value: urlBarTop,
+            onChanged: (value) {
+              onUrlBarPositionChanged(value);
+              Navigator.pop(context);
+            },
+            activeTrackColor: theme.primaryPurple.withValues(alpha: 0.5),
+            activeThumbColor: theme.primaryPurple,
+          ),
+        ],
+      ),
     );
   }
 }

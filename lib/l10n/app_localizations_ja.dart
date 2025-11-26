@@ -1393,6 +1393,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get browserActionMenuRefresh => '更新';
 
   @override
+  String get browserActionMenuUrlBarTop => 'URLバーを上部に';
+
+  @override
   String get keystoreBackupTitle => 'キーストアバックアップ';
 
   @override

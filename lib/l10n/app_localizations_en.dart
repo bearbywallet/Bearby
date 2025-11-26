@@ -1393,6 +1393,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserActionMenuRefresh => 'Refresh';
 
   @override
+  String get browserActionMenuUrlBarTop => 'URL Bar at Top';
+
+  @override
   String get keystoreBackupTitle => 'Keystore Backup';
 
   @override

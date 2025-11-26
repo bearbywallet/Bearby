@@ -1393,6 +1393,9 @@ class AppLocalizationsRu extends AppLocalizations {
   String get browserActionMenuRefresh => 'Обновить';
 
   @override
+  String get browserActionMenuUrlBarTop => 'URL панель сверху';
+
+  @override
   String get keystoreBackupTitle => 'Резервное копирование Keystore';
 
   @override

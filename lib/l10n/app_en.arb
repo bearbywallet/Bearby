@@ -1966,6 +1966,10 @@
   "@browserActionMenuRefresh": {
     "description": "Menu item text for refreshing the current page"
   },
+  "browserActionMenuUrlBarTop": "URL Bar at Top",
+  "@browserActionMenuUrlBarTop": {
+    "description": "Toggle option to move URL bar to top of browser"
+  },
 
   "keystoreBackupTitle": "Keystore Backup",
   "@keystoreBackupTitle": {

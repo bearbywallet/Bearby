@@ -1393,6 +1393,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get browserActionMenuRefresh => '새로고침';
 
   @override
+  String get browserActionMenuUrlBarTop => 'URL바 상단 배치';
+
+  @override
   String get keystoreBackupTitle => '키스토어 백업';
 
   @override

@@ -70,10 +70,13 @@ class _BrowserPageState extends State<BrowserPage>
   void _showBrowserMenu() {
     final isConnected =
         _legacyHandler?.isConnected ?? _eip1193Handler?.isConnected ?? false;
+    final appState = Provider.of<AppState>(context, listen: false);
 
     showBrowserActionModal(
       context: context,
       isConnected: isConnected,
+      urlBarTop: appState.browserUrlBarTop,
+      onUrlBarPositionChanged: (value) => appState.setBrowserUrlBarTop(value),
       onRefresh: () => _webViewController?.reload(),
       onCopyLink: () async {
         final url = await _webViewController?.getUrl();
@@ -216,6 +219,7 @@ class _BrowserPageState extends State<BrowserPage>
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final urlBarTop = appState.browserUrlBarTop && _isWebViewVisible;
 
     return Scaffold(
       resizeToAvoidBottomInset: false,
@@ -230,6 +234,17 @@ class _BrowserPageState extends State<BrowserPage>
       body: SafeArea(
         child: Column(
           children: [
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: urlBarTop
+                  ? Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          adaptivePadding, 0, adaptivePadding, 8),
+                      child: _buildBrowserControls(theme),
+                    )
+                  : const SizedBox.shrink(),
+            ),
             Expanded(
               child: Stack(
                 fit: StackFit.expand,
@@ -243,12 +258,18 @@ class _BrowserPageState extends State<BrowserPage>
                 ],
               ),
             ),
-            Padding(
-              padding:
-                  EdgeInsets.fromLTRB(adaptivePadding, 8, adaptivePadding, 0),
-              child: _isWebViewVisible
-                  ? _buildBrowserControls(theme)
-                  : _buildSearchBar(theme),
+            AnimatedSize(
+              duration: const Duration(milliseconds: 250),
+              curve: Curves.easeInOut,
+              child: !urlBarTop
+                  ? Padding(
+                      padding: EdgeInsets.fromLTRB(
+                          adaptivePadding, 8, adaptivePadding, 0),
+                      child: _isWebViewVisible
+                          ? _buildBrowserControls(theme)
+                          : _buildSearchBar(theme),
+                    )
+                  : const SizedBox.shrink(),
             ),
           ],
         ),

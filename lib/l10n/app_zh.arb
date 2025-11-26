@@ -513,7 +513,8 @@
   "browserActionMenuCopyLink": "复制链接",
   "browserActionMenuClose": "关闭",
   "browserActionMenuRefresh": "刷新",
-  
+  "browserActionMenuUrlBarTop": "地址栏置顶",
+
   "keystoreBackupTitle": "密钥库备份",
   "keystoreBackupWarningTitle": "保护您的密钥库文件",
   "keystoreBackupWarningMessage": "密钥库文件包含您的加密私钥。将此文件保存在安全位置，绝不与任何人分享。您需要创建的密码来解密此文件。",

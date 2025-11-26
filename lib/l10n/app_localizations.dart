@@ -2813,6 +2813,12 @@ abstract class AppLocalizations {
   /// **'Refresh'**
   String get browserActionMenuRefresh;
 
+  /// Toggle option to move URL bar to top of browser
+  ///
+  /// In en, this message translates to:
+  /// **'URL Bar at Top'**
+  String get browserActionMenuUrlBarTop;
+
   /// Title for the Keystore Backup screen
   ///
   /// In en, this message translates to:

@@ -35,12 +35,14 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   static const String _tokensCardStyleKey = "tokens_card_styles_key";
   static const String _showAddressesThroughTransactionHistoryKey =
       "show_addresses_transaction_history_key";
+  static const String _browserUrlBarTopKey = "browser_url_bar_top_key";
 
   late BackgroundState _state;
   late String _cahceDir;
   int _selectedWallet = 0;
   bool _hideBalance = false;
   bool _isTileView = true;
+  bool _browserUrlBarTop = false;
 
   final Brightness _systemBrightness =
       PlatformDispatcher.instance.platformBrightness;
@@ -60,6 +62,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   bool get isTileView => _isTileView;
+
+  bool get browserUrlBarTop => _browserUrlBarTop;
 
   bool get showAddressesThroughTransactionHistory {
     return _showAddressesThroughTransactionHistory;
@@ -157,6 +161,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     await loadHideBalance();
     await loadShowAddressesThroughTransactionHistory();
     await loadIsTileView();
+    await loadBrowserUrlBarTop();
     notifyListeners();
   }
 
@@ -288,6 +293,19 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     final prefs = await SharedPreferences.getInstance();
     final key = "$_showAddressesThroughTransactionHistoryKey:$selectedWallet";
     _showAddressesThroughTransactionHistory = prefs.getBool(key) ?? false;
+    notifyListeners();
+  }
+
+  Future<void> setBrowserUrlBarTop(bool value) async {
+    _browserUrlBarTop = value;
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(_browserUrlBarTopKey, value);
+    notifyListeners();
+  }
+
+  Future<void> loadBrowserUrlBarTop() async {
+    final prefs = await SharedPreferences.getInstance();
+    _browserUrlBarTop = prefs.getBool(_browserUrlBarTopKey) ?? false;
     notifyListeners();
   }
 

@@ -529,6 +529,7 @@
   "browserActionMenuCopyLink": "Копировать ссылку",
   "browserActionMenuClose": "Закрыть",
   "browserActionMenuRefresh": "Обновить",
+  "browserActionMenuUrlBarTop": "URL панель сверху",
 
   "keystoreBackupTitle": "Резервное копирование Keystore",
   "keystoreBackupWarningTitle": "Защитите Ваш Keystore Файл",
