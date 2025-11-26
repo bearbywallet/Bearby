@@ -359,10 +359,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                           Text(
                             AppLocalizations.of(context)!
                                 .passwordSetupPageSubtitle,
-                            style: TextStyle(
+                            style: theme.titleLarge.copyWith(
                               color: theme.textPrimary,
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                           SizedBox(height: adaptivePadding),
@@ -442,10 +440,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                           const SizedBox(height: 8),
                           Text(
                             _errorMessage,
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.danger,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                           if (_chain?.slip44 == 313)
@@ -471,9 +467,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                                       Text(
                                         AppLocalizations.of(context)!
                                             .passwordSetupPageLegacyLabel,
-                                        style: TextStyle(
+                                        style: theme.bodyLarge.copyWith(
                                           color: theme.textPrimary,
-                                          fontSize: 16,
                                         ),
                                       ),
                                     ],
@@ -518,10 +513,8 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                       child: Text(
                         AppLocalizations.of(context)!
                             .passwordSetupPageCreateButton,
-                        style: TextStyle(
+                        style: theme.titleSmall.copyWith(
                           color: theme.buttonText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

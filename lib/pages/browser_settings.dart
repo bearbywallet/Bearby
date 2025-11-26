@@ -269,9 +269,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             AppLocalizations.of(context)!.browserSettingsBrowserOptions,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -325,9 +324,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             AppLocalizations.of(context)!.browserSettingsPrivacySecurity,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -384,9 +382,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             AppLocalizations.of(context)!.browserSettingsPerformance,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -420,9 +417,8 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             AppLocalizations.of(context)!.browserSettingsClearData,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -500,18 +496,15 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage>
               children: [
                 Text(
                   title,
-                  style: TextStyle(
+                  style: theme.bodyLarge.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   description,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: theme.textSecondary,
-                    fontSize: 14,
                   ),
                 ),
               ],

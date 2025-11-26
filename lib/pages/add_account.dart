@@ -290,10 +290,8 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                       children: [
                         Text(
                           l10n.addAccountPageSubtitle,
-                          style: TextStyle(
+                          style: theme.titleLarge.copyWith(
                             color: theme.textPrimary,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
                           ),
                         ),
                         SizedBox(height: adaptivePadding),
@@ -320,10 +318,8 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                             children: [
                               Text(
                                 l10n.addAccountPageBip39Index,
-                                style: TextStyle(
+                                style: theme.bodyLarge.copyWith(
                                   color: theme.textPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
                               SizedBox(height: 8),
@@ -333,10 +329,8 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                 maxValue: 2147483647,
                                 disabled: _isCreating,
                                 iconColor: theme.primaryPurple,
-                                numberStyle: TextStyle(
+                                numberStyle: theme.bodyLarge.copyWith(
                                   color: theme.textPrimary,
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
                                 ),
                                 onChanged: (value) {
                                   setState(() {
@@ -373,9 +367,9 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                 Expanded(
                                   child: Text(
                                     l10n.addAccountPageUseBiometrics,
-                                    style: TextStyle(
+                                    style: theme.bodyLarge.copyWith(
                                       color: theme.textPrimary,
-                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -426,9 +420,9 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                                 Expanded(
                                   child: Text(
                                     l10n.addAccountPageZilliqaLegacy,
-                                    style: TextStyle(
+                                    style: theme.bodyLarge.copyWith(
                                       color: theme.textPrimary,
-                                      fontSize: 16,
+                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                 ),
@@ -452,9 +446,8 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
                           SizedBox(height: adaptivePadding),
                           Text(
                             _errorMessage!,
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.danger,
-                              fontSize: 14,
                             ),
                           ),
                         ],

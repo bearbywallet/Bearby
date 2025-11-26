@@ -223,11 +223,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
             padding: EdgeInsets.symmetric(horizontal: padding),
             child: Text(
               title,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
-              ),
+              style: theme.titleMedium.copyWith(color: theme.textPrimary),
             ),
           ),
         SizedBox(height: padding),
@@ -282,26 +278,16 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   children: [
                     Text(
                       token.name,
-                      style: TextStyle(
-                        color: theme.textPrimary,
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      style: theme.labelLarge.copyWith(color: theme.textPrimary),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       token.symbol,
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 14,
-                      ),
+                      style: theme.bodyText2.copyWith(color: theme.textSecondary),
                     ),
                     Text(
                       '${l10n.chainInfoModalContentDecimalsLabel} ${token.decimals}',
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 12,
-                      ),
+                      style: theme.labelSmall.copyWith(color: theme.textSecondary),
                     ),
                   ],
                 ),
@@ -418,17 +404,15 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                   children: [
                     Text(
                       explorer.name,
-                      style: TextStyle(
+                      style: theme.labelSmall.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 12,
                         fontWeight: FontWeight.normal,
                       ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     Text(
                       explorer.url,
-                      style:
-                          TextStyle(color: theme.textSecondary, fontSize: 10),
+                      style: theme.overline.copyWith(color: theme.textSecondary),
                       overflow: TextOverflow.ellipsis,
                     ),
                   ],
@@ -536,11 +520,7 @@ class _ChainInfoModalContentState extends State<_ChainInfoModalContent> {
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: Text(
                   _errorText!,
-                  style: TextStyle(
-                    color: theme.danger,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
+                  style: theme.labelSmall.copyWith(color: theme.danger),
                   textAlign: TextAlign.center,
                 ),
               ),

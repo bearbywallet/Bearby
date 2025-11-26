@@ -115,10 +115,7 @@ class _ConnectedDappsModalContentState
                 ? Center(
                     child: Text(
                       AppLocalizations.of(context)!.connectedDappsModalNoDapps,
-                      style: TextStyle(
-                        color: theme.textSecondary,
-                        fontSize: 16,
-                      ),
+                      style: theme.bodyLarge.copyWith(color: theme.textSecondary),
                     ),
                   )
                 : ListView.builder(
@@ -230,31 +227,18 @@ class _DappListItem extends StatelessWidget {
               children: [
                 Text(
                   name,
-                  style: TextStyle(
-                    color: appTheme.textPrimary,
-                    fontSize: 16,
-                    fontWeight: FontWeight.w500,
-                    height: 1.2,
-                  ),
+                  style: appTheme.bodyLarge.copyWith(color: appTheme.textPrimary),
                 ),
                 SizedBox(height: 4),
                 Text(
                   url,
-                  style: TextStyle(
-                    color: appTheme.textSecondary,
-                    fontSize: 14,
-                    height: 1.2,
-                  ),
+                  style: appTheme.bodyText2.copyWith(color: appTheme.textSecondary),
                 ),
                 SizedBox(height: 2),
                 Text(
                   AppLocalizations.of(context)!.dappListItemConnected(
                       _formatLastConnected(context, lastConnected)),
-                  style: TextStyle(
-                    color: appTheme.textSecondary,
-                    fontSize: 12,
-                    height: 1.2,
-                  ),
+                  style: appTheme.labelSmall.copyWith(color: appTheme.textSecondary),
                 ),
               ],
             ),

@@ -154,28 +154,17 @@ class _ArgonSettingsModalContentState
                       children: [
                         Text(
                           argonDescriptions[index]['title']!,
-                          style: TextStyle(
-                            color: theme.textPrimary,
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: theme.labelLarge.copyWith(color: theme.textPrimary),
                         ),
                         const SizedBox(height: 4),
                         Text(
                           argonDescriptions[index]['subtitle']!,
-                          style: TextStyle(
-                            color: theme.primaryPurple,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
-                          ),
+                          style: theme.labelMedium.copyWith(color: theme.primaryPurple),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           argonDescriptions[index]['description']!,
-                          style: TextStyle(
-                            color: theme.textSecondary,
-                            fontSize: 14,
-                          ),
+                          style: theme.bodyText2.copyWith(color: theme.textSecondary),
                         ),
                       ],
                     ),

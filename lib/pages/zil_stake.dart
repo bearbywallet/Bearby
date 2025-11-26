@@ -231,7 +231,7 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
               padding: EdgeInsets.all(adaptivePadding),
               child: Text(
                 'Error: $_errorMessage',
-                style: TextStyle(color: theme.danger),
+                style: theme.bodyText2.copyWith(color: theme.danger),
                 textAlign: TextAlign.center,
               ),
             ),
@@ -286,10 +286,8 @@ class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
                 Text(
                   l10n.noStakingPoolsFound,
                   textAlign: TextAlign.center,
-                  style: TextStyle(
+                  style: theme.titleLarge.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ],

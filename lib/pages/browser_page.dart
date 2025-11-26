@@ -457,10 +457,8 @@ class _BrowserPageState extends State<BrowserPage>
       return Center(
         child: Text(
           l10n.browserPageNoConnectedApps,
-          style: TextStyle(
-              color: theme.textSecondary,
-              fontSize: 16,
-              fontWeight: FontWeight.w500),
+          style: theme.bodyLarge.copyWith(
+              color: theme.textSecondary),
         ),
       );
     }

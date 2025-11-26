@@ -158,8 +158,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                       children: [
                         if (accounts.isNotEmpty) ...[
                           Text(l10n.restoreRKStorageAccountsPrompt,
-                              style: TextStyle(
-                                  color: theme.textSecondary, fontSize: 14)),
+                              style: theme.bodyText2.copyWith(
+                                  color: theme.textSecondary)),
                           const SizedBox(height: 16),
                           Container(
                             padding: const EdgeInsets.all(16.0),
@@ -198,8 +198,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                           Padding(
                             padding: const EdgeInsets.only(top: 8.0),
                             child: Text(_errorMessage!,
-                                style: TextStyle(
-                                    color: theme.danger, fontSize: 14)),
+                                style: theme.bodyText2.copyWith(
+                                    color: theme.danger)),
                           ),
                         const SizedBox(height: 16),
                         SizedBox(
@@ -222,9 +222,8 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
                               onPressed: () => Navigator.of(context)
                                   .pushNamed('/new_wallet_options'),
                               child: Text(l10n.restoreRKStorageSkipButton,
-                                  style: TextStyle(
-                                      color: theme.textSecondary,
-                                      fontSize: 14)),
+                                  style: theme.bodyText2.copyWith(
+                                      color: theme.textSecondary)),
                             ),
                           ),
                         ),
@@ -275,16 +274,15 @@ class AccountItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(account.name,
-                    style: TextStyle(
+                    style: theme.bodyLarge.copyWith(
                         color: theme.textPrimary,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16)),
+                        fontWeight: FontWeight.bold)),
                 Text(account.address,
-                    style: TextStyle(color: theme.textSecondary, fontSize: 14),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
                     overflow: TextOverflow.ellipsis),
                 Text(
                     '${l10n.accountItemBalanceLabel} ${account.balance ?? '0'} ZIL',
-                    style: TextStyle(color: theme.textSecondary, fontSize: 14)),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary)),
               ],
             ),
           ),

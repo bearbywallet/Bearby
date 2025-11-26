@@ -213,9 +213,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                         child: Text(
                                           l10n.receivePageWarning(
                                               chain.name, token.symbol),
-                                          style: TextStyle(
+                                          style: theme.bodyText2.copyWith(
                                             color: theme.warning,
-                                            fontSize: 14,
                                           ),
                                         ),
                                       ),
@@ -253,9 +252,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                                       const SizedBox(height: 16),
                                       Text(
                                         currentAddress,
-                                        style: TextStyle(
+                                        style: theme.labelSmall.copyWith(
                                           color: theme.textSecondary,
-                                          fontSize: 12,
                                         ),
                                         textAlign: TextAlign.center,
                                       ),
@@ -352,18 +350,16 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               overflow: TextOverflow.ellipsis,
               maxLines: 1,
               token.name,
-              style: TextStyle(
+              style: theme.labelSmall.copyWith(
                 color: theme.textPrimary,
-                fontSize: 12,
                 fontWeight: FontWeight.bold,
               ),
             ),
             const SizedBox(width: 2),
             Text(
               "(${token.symbol})",
-              style: TextStyle(
+              style: theme.titleSmall.copyWith(
                 color: theme.textSecondary,
-                fontSize: 18,
               ),
             ),
           ],
@@ -464,9 +460,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           backgroundColor: theme.cardBackground,
           title: Text(
             l10n.receivePageAmountDialogTitle,
-            style: TextStyle(
+            style: theme.titleMedium.copyWith(
               color: theme.textPrimary,
-              fontWeight: FontWeight.bold,
             ),
           ),
           content: TextField(
@@ -496,9 +491,8 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
                 borderSide: BorderSide(color: theme.primaryPurple, width: 2),
               ),
             ),
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textPrimary,
-              fontSize: 16,
             ),
             autofocus: true,
           ),
@@ -507,7 +501,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 l10n.receivePageAmountDialogCancel,
-                style: TextStyle(color: theme.textSecondary),
+                style: theme.labelMedium.copyWith(color: theme.textSecondary),
               ),
             ),
             TextButton(
@@ -519,7 +513,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
               },
               child: Text(
                 l10n.receivePageAmountDialogConfirm,
-                style: TextStyle(
+                style: theme.labelMedium.copyWith(
                   color: theme.primaryPurple,
                   fontWeight: FontWeight.bold,
                 ),

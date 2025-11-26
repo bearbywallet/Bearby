@@ -443,7 +443,9 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                           padding: const EdgeInsets.symmetric(vertical: 16),
                           child: Text(
                             getErrorText()!,
-                            style: TextStyle(color: theme.danger),
+                            style: theme.bodyText2.copyWith(
+                              color: theme.danger,
+                            ),
                             textAlign: TextAlign.center,
                           ),
                         ),
@@ -516,10 +518,8 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                 if (title != null)
                   Text(
                     title,
-                    style: TextStyle(
+                    style: theme.labelMedium.copyWith(
                       color: theme.textSecondary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
                     ),
                   ),
                 if (showClearButton && onClear != null)
@@ -527,9 +527,8 @@ class _ManageTokensPageState extends State<ManageTokensPage>
                     onTap: onClear,
                     child: Text(
                       clearText ?? "Clear",
-                      style: TextStyle(
+                      style: theme.labelMedium.copyWith(
                         color: theme.primaryPurple,
-                        fontSize: 14,
                         fontWeight: FontWeight.w600,
                       ),
                     ),

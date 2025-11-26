@@ -271,9 +271,8 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
                           margin: const EdgeInsets.only(top: 8),
                           child: Text(
                             errorMessage!,
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.danger,
-                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -290,10 +289,8 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
                           ),
                           child: Text(
                             l10n.keystoreBackupCreateButton,
-                            style: TextStyle(
+                            style: theme.titleSmall.copyWith(
                               color: theme.buttonText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -379,10 +376,9 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
               const SizedBox(width: 8),
               Text(
                 l10n.keystoreBackupWarningTitle,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.warning,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
             ],
@@ -390,9 +386,8 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
           const SizedBox(height: 8),
           Text(
             l10n.keystoreBackupWarningMessage,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: theme.warning,
-              fontSize: 14,
             ),
           ),
         ],
@@ -417,10 +412,9 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
             children: [
               Text(
                 l10n.keystoreBackupSuccessTitle,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.success,
                   fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
             ],
@@ -428,18 +422,16 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
           const SizedBox(height: 8),
           Text(
             l10n.keystoreBackupSuccessMessage,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: theme.success,
-              fontSize: 14,
             ),
           ),
           if (backupFilePath != null) ...[
             const SizedBox(height: 8),
             Text(
               '${l10n.keystoreBackupTempLocation}:\n$backupFilePath',
-              style: TextStyle(
+              style: theme.labelSmall.copyWith(
                 color: theme.success,
-                fontSize: 12,
                 fontStyle: FontStyle.italic,
               ),
             ),

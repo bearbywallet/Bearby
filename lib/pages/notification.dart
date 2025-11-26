@@ -120,19 +120,16 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage>
               Text(
                 AppLocalizations.of(context)!
                     .notificationsSettingsPageWalletsTitle,
-                style: TextStyle(
+                style: theme.titleMedium.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
               SizedBox(height: 8),
               Text(
                 AppLocalizations.of(context)!
                     .notificationsSettingsPageWalletsDescription,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textSecondary,
-                  fontSize: 16,
                 ),
               ),
               SizedBox(height: adaptivePadding),
@@ -208,10 +205,8 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage>
               wallet.walletName.isEmpty
                   ? "${AppLocalizations.of(context)!.notificationsSettingsPageWalletPrefix} ${index + 1}"
                   : wallet.walletName,
-              style: TextStyle(
+              style: theme.bodyLarge.copyWith(
                 color: theme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ),

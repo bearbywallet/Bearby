@@ -36,7 +36,7 @@ class TokenTransferInfo extends StatelessWidget {
     String address,
     String? name,
     AppTheme theme,
-    TextStyle style,
+    Color effectiveTextColor,
   ) {
     return Expanded(
       flex: 3,
@@ -53,17 +53,20 @@ class TokenTransferInfo extends StatelessWidget {
           children: [
             Text(
               name ?? AppLocalizations.of(context)!.tokenTransferAmountUnknown,
-              style: style.copyWith(
-                // style is already themed addressStyle
+              style: theme.overline.copyWith(
+                color: effectiveTextColor.withValues(alpha: 0.7),
                 fontSize: 8,
-                fontWeight: FontWeight.normal, // w400 is FontWeight.normal
               ),
               overflow: TextOverflow.ellipsis,
             ),
             const SizedBox(height: 2),
             Text(
               shortenAddress(address),
-              style: style, // style is already themed addressStyle
+              style: theme.overline.copyWith(
+                color: effectiveTextColor.withValues(alpha: 0.7),
+                letterSpacing: 0.5,
+                fontWeight: FontWeight.w500,
+              ),
               overflow: TextOverflow.ellipsis,
             ),
           ],
@@ -80,12 +83,6 @@ class TokenTransferInfo extends StatelessWidget {
     final effectiveTextColor = textColor ?? theme.textPrimary;
     final effectiveSecondaryColor = secondaryColor ?? theme.textSecondary;
 
-    final addressStyle = theme.overline.copyWith(
-      color: effectiveTextColor.withValues(alpha: 0.7),
-      letterSpacing: 0.5,
-      fontWeight: FontWeight.w500,
-    );
-
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
       decoration: BoxDecoration(
@@ -100,7 +97,7 @@ class TokenTransferInfo extends StatelessWidget {
             fromAddress,
             fromName,
             theme,
-            addressStyle,
+            effectiveTextColor,
           ),
           Expanded(
             flex: 4,
@@ -126,7 +123,7 @@ class TokenTransferInfo extends StatelessWidget {
             toAddress,
             toName,
             theme,
-            addressStyle,
+            effectiveTextColor,
           ),
         ],
       ),

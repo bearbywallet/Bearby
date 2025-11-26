@@ -116,7 +116,7 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
                                         child: CheckboxListTile(
                                           title: Text(
                                             l10n.secretKeyGeneratorPageBackupCheckbox,
-                                            style: TextStyle(
+                                            style: theme.bodyText2.copyWith(
                                               color: theme.textSecondary,
                                             ),
                                           ),

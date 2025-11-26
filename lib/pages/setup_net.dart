@@ -184,10 +184,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                         Expanded(
                           child: Text(
                             chain.name,
-                            style: TextStyle(
+                            style: theme.labelLarge.copyWith(
                               color: theme.textPrimary,
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
                             ),
                           ),
                         ),
@@ -204,10 +202,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                             _isTestnet
                                 ? l10n.setupNetworkSettingsPageTestnetLabel
                                 : l10n.setupNetworkSettingsPageMainnetLabel,
-                            style: TextStyle(
+                            style: theme.labelSmall.copyWith(
                               color: _isTestnet ? theme.warning : theme.success,
-                              fontSize: 12,
-                              fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
@@ -216,27 +212,23 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     const SizedBox(height: 4),
                     Text(
                       '${l10n.setupNetworkSettingsPageChainIdLabel} ${chain.chainIds.where((id) => id != BigInt.zero).toList().join(",")}',
-                      style: TextStyle(
+                      style: theme.bodyText2.copyWith(
                         color: theme.primaryPurple,
-                        fontSize: 14,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       '${l10n.setupNetworkSettingsPageTokenLabel} ${chain.chain}',
-                      style: TextStyle(
+                      style: theme.bodyText2.copyWith(
                         color: theme.textSecondary,
-                        fontSize: 14,
                       ),
                     ),
                     if (chain.explorers.isNotEmpty) ...[
                       const SizedBox(height: 4),
                       Text(
                         '${l10n.setupNetworkSettingsPageExplorerLabel} ${chain.explorers.first.name}',
-                        style: TextStyle(
+                        style: theme.labelSmall.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 12,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -279,9 +271,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     children: [
                       Text(
                         l10n.setupNetworkSettingsPageTestnetSwitch,
-                        style: TextStyle(
+                        style: theme.bodyText2.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(width: 8),
@@ -318,9 +309,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     padding: EdgeInsets.all(adaptivePadding),
                     child: Text(
                       _errorMessage!,
-                      style: TextStyle(
+                      style: theme.bodyText2.copyWith(
                         color: theme.danger,
-                        fontSize: 14,
                       ),
                       textAlign: TextAlign.center,
                     ),
@@ -333,9 +323,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                             ? l10n.setupNetworkSettingsPageNoNetworks
                             : l10n.setupNetworkSettingsPageNoResults(
                                 _searchQuery),
-                        style: TextStyle(
+                        style: theme.bodyLarge.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 16,
                         ),
                       ),
                     ),

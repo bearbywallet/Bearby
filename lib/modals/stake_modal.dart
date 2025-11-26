@@ -252,9 +252,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
             children: [
               Text(
                 widget.stake.name,
-                style: TextStyle(
+                style: theme.titleMedium.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
@@ -269,11 +268,10 @@ class _StakeModalContentState extends State<StakeModalContent> {
                 ),
                 child: Text(
                   widget.stake.tag.toUpperCase(),
-                  style: TextStyle(
+                  style: theme.overline.copyWith(
                     color: widget.stake.tag == 'scilla'
                         ? theme.success
                         : theme.primaryPurple,
-                    fontSize: 10,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -384,17 +382,14 @@ class _StakeModalContentState extends State<StakeModalContent> {
       children: [
         Text(
           label,
-          style: TextStyle(
+          style: theme.labelMedium.copyWith(
             color: theme.textSecondary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
           ),
         ),
         Text(
           value,
-          style: TextStyle(
+          style: theme.bodyText2.copyWith(
             color: theme.textPrimary,
-            fontSize: 14,
             fontWeight: FontWeight.w600,
           ),
         ),
@@ -409,19 +404,16 @@ class _StakeModalContentState extends State<StakeModalContent> {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: theme.labelSmall.copyWith(
               color: theme.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
             value,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: valueColor,
-              fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.center,
@@ -437,10 +429,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
       children: [
         Text(
           _isStaking ? l10n.stakeButton : l10n.unstakeButton,
-          style: TextStyle(
+          style: theme.titleSmall.copyWith(
             color: theme.textPrimary,
-            fontSize: 18,
-            fontWeight: FontWeight.w600,
           ),
         ),
         const SizedBox(height: 8),
@@ -487,9 +477,8 @@ class _StakeModalContentState extends State<StakeModalContent> {
                 child: Center(
                   child: Text(
                     label,
-                    style: TextStyle(
+                    style: theme.bodyText2.copyWith(
                       color: theme.primaryPurple,
-                      fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
                   ),
@@ -611,18 +600,18 @@ class _StakeModalContentState extends State<StakeModalContent> {
           backgroundColor: appState.currentTheme.cardBackground,
           title: Text(
             "Error",
-            style: TextStyle(color: appState.currentTheme.textPrimary),
+            style: appState.currentTheme.bodyText1.copyWith(color: appState.currentTheme.textPrimary),
           ),
           content: Text(
             err.toString(),
-            style: TextStyle(color: appState.currentTheme.danger),
+            style: appState.currentTheme.bodyText2.copyWith(color: appState.currentTheme.danger),
           ),
           actions: [
             TextButton(
               onPressed: () => Navigator.of(context).pop(),
               child: Text(
                 "OK",
-                style: TextStyle(color: appState.currentTheme.primaryPurple),
+                style: appState.currentTheme.button.copyWith(color: appState.currentTheme.primaryPurple),
               ),
             )
           ],

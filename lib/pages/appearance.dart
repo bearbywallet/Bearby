@@ -115,27 +115,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                   children: [
                                     Text(
                                       l10n.appearanceSettingsPageDeviceSettingsTitle,
-                                      style: TextStyle(
+                                      style: theme.labelLarge.copyWith(
                                         color: theme.textPrimary,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       l10n.appearanceSettingsPageDeviceSettingsSubtitle,
-                                      style: TextStyle(
+                                      style: theme.labelMedium.copyWith(
                                         color: theme.primaryPurple,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       l10n.appearanceSettingsPageDeviceSettingsDescription,
-                                      style: TextStyle(
+                                      style: theme.bodyText2.copyWith(
                                         color: theme.textSecondary,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -149,27 +144,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                   children: [
                                     Text(
                                       l10n.appearanceSettingsPageDarkModeTitle,
-                                      style: TextStyle(
+                                      style: theme.labelLarge.copyWith(
                                         color: theme.textPrimary,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       l10n.appearanceSettingsPageDarkModeSubtitle,
-                                      style: TextStyle(
+                                      style: theme.labelMedium.copyWith(
                                         color: theme.primaryPurple,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       l10n.appearanceSettingsPageDarkModeDescription,
-                                      style: TextStyle(
+                                      style: theme.bodyText2.copyWith(
                                         color: theme.textSecondary,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ],
@@ -183,27 +173,22 @@ class _AppearanceSettingsPageState extends State<AppearanceSettingsPage> {
                                   children: [
                                     Text(
                                       l10n.appearanceSettingsPageLightModeTitle,
-                                      style: TextStyle(
+                                      style: theme.labelLarge.copyWith(
                                         color: theme.textPrimary,
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
                                       ),
                                     ),
                                     const SizedBox(height: 4),
                                     Text(
                                       l10n.appearanceSettingsPageLightModeSubtitle,
-                                      style: TextStyle(
+                                      style: theme.labelMedium.copyWith(
                                         color: theme.primaryPurple,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
                                       l10n.appearanceSettingsPageLightModeDescription,
-                                      style: TextStyle(
+                                      style: theme.bodyText2.copyWith(
                                         color: theme.textSecondary,
-                                        fontSize: 14,
                                       ),
                                     ),
                                   ],

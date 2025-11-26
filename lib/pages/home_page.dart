@@ -166,9 +166,8 @@ class _HomePageState extends State<HomePage>
                           const SizedBox(height: 4),
                           Text(
                             _errorMessage!,
-                            style: TextStyle(
+                            style: theme.bodyLarge.copyWith(
                               color: theme.buttonText,
-                              fontSize: 16,
                             ),
                           ),
                         ],

@@ -1,46 +1,96 @@
 import 'package:flutter/material.dart';
 
 class _TextStyles {
-  static const String _fontFamily = 'SFRounded';
+  static const String fontFamily = 'SFRounded';
 
+  static const TextStyle displayLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 32,
+    fontWeight: FontWeight.bold,
+  );
   static const TextStyle headline1 = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 28,
     fontWeight: FontWeight.bold,
   );
   static const TextStyle headline2 = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 22,
     fontWeight: FontWeight.w600,
   );
+  static const TextStyle titleLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 24,
+    fontWeight: FontWeight.bold,
+  );
+  static const TextStyle titleMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 20,
+    fontWeight: FontWeight.w600,
+  );
+  static const TextStyle titleSmall = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 18,
+    fontWeight: FontWeight.w600,
+  );
   static const TextStyle subtitle1 = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 20,
     fontWeight: FontWeight.w500,
   );
+  static const TextStyle subtitle2 = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
+  static const TextStyle bodyLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w500,
+  );
   static const TextStyle bodyText1 = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 15,
     fontWeight: FontWeight.w500,
   );
   static const TextStyle bodyText2 = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 14,
     fontWeight: FontWeight.w500,
   );
+  static const TextStyle bodySmall = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 13,
+    fontWeight: FontWeight.w400,
+  );
+  static const TextStyle labelLarge = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 16,
+    fontWeight: FontWeight.w600,
+  );
+  static const TextStyle labelMedium = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 14,
+    fontWeight: FontWeight.w500,
+  );
+  static const TextStyle labelSmall = TextStyle(
+    fontFamily: fontFamily,
+    fontSize: 12,
+    fontWeight: FontWeight.w500,
+  );
   static const TextStyle button = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 16,
     fontWeight: FontWeight.w600,
     letterSpacing: 1.25,
   );
   static const TextStyle caption = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 11,
     fontWeight: FontWeight.w400,
   );
   static const TextStyle overline = TextStyle(
-    fontFamily: _fontFamily,
+    fontFamily: fontFamily,
     fontSize: 10,
     fontWeight: FontWeight.w300,
     letterSpacing: 1.5,
@@ -49,6 +99,8 @@ class _TextStyles {
 
 abstract class AppTheme {
   String value = "Dark";
+
+  static const String fontFamily = 'SFRounded';
 
   Color get primaryPurple;
   Color get secondaryPurple;
@@ -67,11 +119,21 @@ abstract class AppTheme {
 
   Brightness get brightness;
 
+  TextStyle get displayLarge;
   TextStyle get headline1;
   TextStyle get headline2;
+  TextStyle get titleLarge;
+  TextStyle get titleMedium;
+  TextStyle get titleSmall;
   TextStyle get subtitle1;
+  TextStyle get subtitle2;
+  TextStyle get bodyLarge;
   TextStyle get bodyText1;
   TextStyle get bodyText2;
+  TextStyle get bodySmall;
+  TextStyle get labelLarge;
+  TextStyle get labelMedium;
+  TextStyle get labelSmall;
   TextStyle get button;
   TextStyle get caption;
   TextStyle get overline;
@@ -113,15 +175,35 @@ class DarkTheme implements AppTheme {
   Brightness get brightness => Brightness.light;
 
   @override
+  TextStyle get displayLarge => _TextStyles.displayLarge;
+  @override
   TextStyle get headline1 => _TextStyles.headline1;
   @override
   TextStyle get headline2 => _TextStyles.headline2;
   @override
+  TextStyle get titleLarge => _TextStyles.titleLarge;
+  @override
+  TextStyle get titleMedium => _TextStyles.titleMedium;
+  @override
+  TextStyle get titleSmall => _TextStyles.titleSmall;
+  @override
   TextStyle get subtitle1 => _TextStyles.subtitle1;
+  @override
+  TextStyle get subtitle2 => _TextStyles.subtitle2;
+  @override
+  TextStyle get bodyLarge => _TextStyles.bodyLarge;
   @override
   TextStyle get bodyText1 => _TextStyles.bodyText1;
   @override
   TextStyle get bodyText2 => _TextStyles.bodyText2;
+  @override
+  TextStyle get bodySmall => _TextStyles.bodySmall;
+  @override
+  TextStyle get labelLarge => _TextStyles.labelLarge;
+  @override
+  TextStyle get labelMedium => _TextStyles.labelMedium;
+  @override
+  TextStyle get labelSmall => _TextStyles.labelSmall;
   @override
   TextStyle get button => _TextStyles.button;
   @override
@@ -166,15 +248,35 @@ class LightTheme implements AppTheme {
   Brightness get brightness => Brightness.light;
 
   @override
+  TextStyle get displayLarge => _TextStyles.displayLarge;
+  @override
   TextStyle get headline1 => _TextStyles.headline1;
   @override
   TextStyle get headline2 => _TextStyles.headline2;
   @override
+  TextStyle get titleLarge => _TextStyles.titleLarge;
+  @override
+  TextStyle get titleMedium => _TextStyles.titleMedium;
+  @override
+  TextStyle get titleSmall => _TextStyles.titleSmall;
+  @override
   TextStyle get subtitle1 => _TextStyles.subtitle1;
+  @override
+  TextStyle get subtitle2 => _TextStyles.subtitle2;
+  @override
+  TextStyle get bodyLarge => _TextStyles.bodyLarge;
   @override
   TextStyle get bodyText1 => _TextStyles.bodyText1;
   @override
   TextStyle get bodyText2 => _TextStyles.bodyText2;
+  @override
+  TextStyle get bodySmall => _TextStyles.bodySmall;
+  @override
+  TextStyle get labelLarge => _TextStyles.labelLarge;
+  @override
+  TextStyle get labelMedium => _TextStyles.labelMedium;
+  @override
+  TextStyle get labelSmall => _TextStyles.labelSmall;
   @override
   TextStyle get button => _TextStyles.button;
   @override

@@ -150,27 +150,22 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                     children: [
                       Text(
                         l10n.deleteWalletModalTitle,
-                        style: TextStyle(
+                        style: theme.titleSmall.copyWith(
                           color: theme.danger,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.deleteWalletModalWarning,
-                        style: TextStyle(
+                        style: theme.bodyText2.copyWith(
                           color: theme.warning,
-                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 16),
                       Text(
                         l10n.deleteWalletModalSecretPhraseWarning,
-                        style: TextStyle(
+                        style: theme.labelMedium.copyWith(
                           color: theme.danger,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -199,10 +194,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                         const SizedBox(height: 8),
                         Text(
                           _errorMessage,
-                          style: TextStyle(
+                          style: theme.labelMedium.copyWith(
                             color: theme.danger,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],
@@ -216,9 +209,8 @@ class _DeleteWalletModalState extends State<DeleteWalletModal> {
                           controller: _btnController,
                           child: Text(
                             l10n.deleteWalletModalSubmit,
-                            style: TextStyle(
+                            style: theme.titleSmall.copyWith(
                               color: theme.buttonText,
-                              fontSize: 18,
                               fontWeight: FontWeight.bold,
                             ),
                           ),

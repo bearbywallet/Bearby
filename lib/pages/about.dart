@@ -117,19 +117,16 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
         const SizedBox(height: 16),
         Text(
           l10n.aboutPageAppName,
-          style: TextStyle(
+          style: theme.headline1.copyWith(
             color: theme.textPrimary,
-            fontSize: 28,
-            fontWeight: FontWeight.bold,
             overflow: TextOverflow.ellipsis,
           ),
         ),
         const SizedBox(height: 8),
         Text(
           l10n.aboutPageAppDescription,
-          style: TextStyle(
+          style: theme.bodyLarge.copyWith(
             color: theme.textSecondary,
-            fontSize: 16,
           ),
           textAlign: TextAlign.center,
         ),
@@ -254,10 +251,8 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   Widget _buildSectionTitle(AppTheme theme, String title) {
     return Text(
       title,
-      style: TextStyle(
+      style: theme.titleSmall.copyWith(
         color: theme.textPrimary,
-        fontSize: 18,
-        fontWeight: FontWeight.bold,
         overflow: TextOverflow.ellipsis,
       ),
     );
@@ -273,9 +268,8 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
             flex: 3,
             child: Text(
               label,
-              style: TextStyle(
+              style: theme.bodyLarge.copyWith(
                 color: theme.textSecondary,
-                fontSize: 16,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -284,10 +278,8 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
             flex: 4,
             child: Text(
               value,
-              style: TextStyle(
+              style: theme.bodyLarge.copyWith(
                 color: theme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
                 overflow: TextOverflow.ellipsis,
               ),
               textAlign: TextAlign.end,
@@ -335,9 +327,8 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
             Expanded(
               child: Text(
                 title,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
                   overflow: TextOverflow.ellipsis,
                 ),
               ),

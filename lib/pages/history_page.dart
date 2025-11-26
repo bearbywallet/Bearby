@@ -130,10 +130,8 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
         children: [
           Text(
             AppLocalizations.of(context)!.historyPageTitle,
-            style: TextStyle(
+            style: appState.currentTheme.titleMedium.copyWith(
               color: appState.currentTheme.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
             ),
           ),
           Row(
@@ -183,10 +181,8 @@ class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
           children: [
             Text(
               AppLocalizations.of(context)!.historyPageNoTransactions,
-              style: TextStyle(
+              style: appState.currentTheme.bodyLarge.copyWith(
                 color: appState.currentTheme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
               ),
             ),
           ],

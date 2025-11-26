@@ -53,9 +53,8 @@ class EnableCard extends StatelessWidget {
                     Expanded(
                       child: Text(
                         title,
-                        style: theme.bodyText1.copyWith(
+                        style: theme.bodyLarge.copyWith(
                           color: theme.textPrimary,
-                          fontWeight: FontWeight.w500,
                           height: 1.2,
                         ),
                         overflow: TextOverflow.ellipsis,

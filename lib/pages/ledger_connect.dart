@@ -74,13 +74,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
       builder: (context) => AlertDialog(
         backgroundColor: theme.cardBackground,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-        title: Text(title, style: TextStyle(color: theme.textPrimary)),
-        content: Text(content, style: TextStyle(color: theme.textSecondary)),
+        title: Text(title, style: theme.titleMedium.copyWith(color: theme.textPrimary)),
+        content: Text(content, style: theme.bodyText2.copyWith(color: theme.textSecondary)),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(localizations.cancel,
-                style: TextStyle(color: theme.primaryPurple)),
+                style: theme.button.copyWith(color: theme.primaryPurple)),
           ),
           if (showSettingsButton)
             TextButton(
@@ -90,7 +90,7 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
               },
               child: Text(
                 localizations.ledgerConnectPageGoToSettings,
-                style: TextStyle(color: theme.primaryPurple),
+                style: theme.button.copyWith(color: theme.primaryPurple),
               ),
             ),
         ],

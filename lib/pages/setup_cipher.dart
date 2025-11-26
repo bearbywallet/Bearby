@@ -138,8 +138,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
                           child: Text(
                             AppLocalizations.of(context)!
                                 .cipherSettingsPageAdvancedButton,
-                            style: const TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                            style: theme.bodyLarge,
                           ),
                         ),
                         OptionsList(
@@ -151,25 +150,20 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
                                 children: [
                                   Text(
                                     cipherDescriptions[index]['title']!,
-                                    style: TextStyle(
+                                    style: theme.labelLarge.copyWith(
                                       color: theme.textPrimary,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
                                     ),
                                   ),
                                   Text(
                                     cipherDescriptions[index]['subtitle']!,
-                                    style: TextStyle(
+                                    style: theme.bodyText2.copyWith(
                                       color: theme.primaryPurple,
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.w500,
                                     ),
                                   ),
                                   Text(
                                     cipherDescriptions[index]['description']!,
-                                    style: TextStyle(
+                                    style: theme.bodyText2.copyWith(
                                       color: theme.textSecondary,
-                                      fontSize: 14,
                                     ),
                                   ),
                                 ],
@@ -193,9 +187,8 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
                         Text(
                           AppLocalizations.of(context)!
                               .cipherSettingsPageQuantumWarning,
-                          style: TextStyle(
+                          style: theme.bodyText2.copyWith(
                             color: theme.textSecondary,
-                            fontSize: 14,
                             fontStyle: FontStyle.italic,
                           ),
                           textAlign: TextAlign.center,

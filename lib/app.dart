@@ -67,26 +67,36 @@ class ZilPayApp extends StatelessWidget {
                   splashFactory: NoSplash.splashFactory,
                   scaffoldBackgroundColor: currentTheme.background,
                   canvasColor: Colors.transparent,
+                  fontFamily: 'SFRounded',
                   textTheme: TextTheme(
-                    bodyLarge: TextStyle(color: currentTheme.textPrimary),
-                    bodyMedium: TextStyle(color: currentTheme.textSecondary),
+                    bodyLarge: TextStyle(
+                        fontFamily: 'SFRounded',
+                        color: currentTheme.textPrimary),
+                    bodyMedium: TextStyle(
+                        fontFamily: 'SFRounded',
+                        color: currentTheme.textSecondary),
                     displayLarge: TextStyle(
+                        fontFamily: 'SFRounded',
                         color: currentTheme.textPrimary,
                         fontSize: 34.0,
                         fontWeight: FontWeight.bold),
                     displayMedium: TextStyle(
+                        fontFamily: 'SFRounded',
                         color: currentTheme.textPrimary,
                         fontSize: 28.0,
                         fontWeight: FontWeight.bold),
                     headlineMedium: TextStyle(
+                        fontFamily: 'SFRounded',
                         color: currentTheme.textPrimary,
                         fontSize: 24.0,
                         fontWeight: FontWeight.w600),
                     titleMedium: TextStyle(
+                        fontFamily: 'SFRounded',
                         color: currentTheme.textPrimary,
                         fontSize: 18.0,
                         fontWeight: FontWeight.w500),
                     labelLarge: TextStyle(
+                        fontFamily: 'SFRounded',
                         color: currentTheme.buttonText,
                         fontSize: 16.0,
                         fontWeight: FontWeight.w500),

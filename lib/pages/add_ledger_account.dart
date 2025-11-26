@@ -314,9 +314,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                   iconSize: 24,
                   iconColor: theme.textPrimary,
                   animationDuration: const Duration(milliseconds: 300),
-                  numberStyle: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
+                  numberStyle: theme.titleLarge.copyWith(
                     color: theme.textPrimary,
                   ),
                   minValue: 1,
@@ -377,10 +375,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 },
                 child: Text(
                   l10n.addLedgerAccountPageGetAccountsButton,
-                  style: TextStyle(
+                  style: theme.titleSmall.copyWith(
                     color: theme.buttonText,
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
                   ),
                 ),
               ),
@@ -453,10 +449,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
           Expanded(
             child: Text(
               _errorMessage,
-              style: TextStyle(
+              style: theme.labelMedium.copyWith(
                 color: theme.danger,
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
               ),
               textAlign: TextAlign.center,
             ),
@@ -494,9 +488,9 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
               const SizedBox(width: 12),
               Text(
                 l10n.settingsPageZilliqaLegacy,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -601,10 +595,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                         _createWallet
                             ? l10n.addLedgerAccountPageCreateButton
                             : l10n.addLedgerAccountPageAddButton,
-                        style: TextStyle(
+                        style: theme.titleSmall.copyWith(
                           color: theme.buttonText,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

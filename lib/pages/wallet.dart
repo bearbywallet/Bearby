@@ -400,9 +400,8 @@ class _WalletPageState extends State<WalletPage> {
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             AppLocalizations.of(context)!.walletPagePreferencesTitle,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: _fontSize,
             ),
           ),
         ),
@@ -480,9 +479,8 @@ class _WalletPageState extends State<WalletPage> {
             Expanded(
               child: Text(
                 item.title,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textPrimary,
-                  fontSize: _fontSize,
                 ),
               ),
             ),
@@ -496,9 +494,8 @@ class _WalletPageState extends State<WalletPage> {
                 AppLocalizations.of(context)!.walletPageManageConnections)
               Text(
                 '${appState.connections.length}',
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textSecondary,
-                  fontSize: _fontSize,
                 ),
               ),
           ],
@@ -525,9 +522,11 @@ class _WalletPageState extends State<WalletPage> {
             Expanded(
               child: Text(
                 AppLocalizations.of(context)!.walletPageDeleteWallet,
-                style: const TextStyle(
+                style: TextStyle(
+                  fontFamily: AppTheme.fontFamily,
                   color: Colors.red,
                   fontSize: _fontSize,
+                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

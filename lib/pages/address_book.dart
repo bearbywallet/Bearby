@@ -35,14 +35,14 @@ class _AddressBookPageState extends State<AddressBookPage>
           backgroundColor: theme.background,
           title: Text(
             l10n.addressBookPageDeleteConfirmationTitle,
-            style: TextStyle(color: theme.textPrimary),
+            style: theme.bodyLarge.copyWith(color: theme.textPrimary),
           ),
           content: SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
                 Text(
                   l10n.addressBookPageDeleteConfirmationMessage(address.name),
-                  style: TextStyle(color: theme.textSecondary),
+                  style: theme.bodyText2.copyWith(color: theme.textSecondary),
                 ),
               ],
             ),
@@ -51,7 +51,7 @@ class _AddressBookPageState extends State<AddressBookPage>
             TextButton(
               child: Text(
                 l10n.cancel,
-                style: TextStyle(color: theme.textSecondary),
+                style: theme.button.copyWith(color: theme.textSecondary),
               ),
               onPressed: () {
                 Navigator.of(dialogContext).pop();
@@ -60,7 +60,7 @@ class _AddressBookPageState extends State<AddressBookPage>
             TextButton(
               child: Text(
                 l10n.delete,
-                style: TextStyle(color: theme.danger),
+                style: theme.button.copyWith(color: theme.danger),
               ),
               onPressed: () async {
                 try {
@@ -169,9 +169,8 @@ class _AddressBookPageState extends State<AddressBookPage>
             Text(
               l10n.addressBookPageEmptyMessage,
               textAlign: TextAlign.center,
-              style: TextStyle(
+              style: theme.bodyLarge.copyWith(
                 color: theme.textSecondary,
-                fontSize: 16,
               ),
             ),
           ],
@@ -231,10 +230,8 @@ class _AddressBookPageState extends State<AddressBookPage>
                     children: [
                       Text(
                         address.name,
-                        style: TextStyle(
+                        style: theme.labelLarge.copyWith(
                           color: theme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
@@ -243,9 +240,8 @@ class _AddressBookPageState extends State<AddressBookPage>
                       Text(
                         shortenAddress(address.addr,
                             leftSize: 12, rightSize: 12),
-                        style: TextStyle(
+                        style: theme.bodyText2.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 14,
                         ),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,

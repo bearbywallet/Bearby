@@ -89,10 +89,9 @@ class _SettingsItemState extends State<SettingsItem> {
             Expanded(
               child: Text(
                 widget.title,
-                style: theme.headline1.copyWith(
+                style: theme.subtitle2.copyWith(
                   color: theme.textPrimary,
                   fontSize: sizes.fontSize,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ),

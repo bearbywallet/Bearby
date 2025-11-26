@@ -116,11 +116,12 @@ class _EditGasDialogState extends State<EditGasDialog> {
       );
       Navigator.of(context).pop();
     } catch (e) {
+      final theme = Provider.of<AppState>(context, listen: false).currentTheme;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
             e.toString(),
-            style: const TextStyle(color: Colors.white),
+            style: theme.bodyText2.copyWith(color: Colors.white),
           ),
           backgroundColor: Theme.of(context).colorScheme.error,
         ),

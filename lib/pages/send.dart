@@ -274,11 +274,15 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
           backgroundColor: appState.currentTheme.cardBackground,
           title: Text(
             "Error",
-            style: TextStyle(color: appState.currentTheme.textPrimary),
+            style: appState.currentTheme.titleMedium.copyWith(
+              color: appState.currentTheme.textPrimary,
+            ),
           ),
           content: Text(
             errorMessage,
-            style: TextStyle(color: appState.currentTheme.danger),
+            style: appState.currentTheme.bodyLarge.copyWith(
+              color: appState.currentTheme.danger,
+            ),
           ),
           actions: [],
         ),

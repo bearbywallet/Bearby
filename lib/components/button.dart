@@ -68,11 +68,10 @@ class _CustomButtonState extends State<CustomButton> {
               fit: BoxFit.scaleDown,
               child: Text(
                 widget.text,
-                style: theme.subtitle1.copyWith(
+                style: theme.titleMedium.copyWith(
                   color: widget.disabled
                       ? widget.textColor.withAlpha(128)
                       : widget.textColor,
-                  fontWeight: FontWeight.bold,
                 ),
               ),
             ),

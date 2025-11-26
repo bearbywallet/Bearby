@@ -111,9 +111,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             l10n.securityPageNetworkPrivacy,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -235,9 +234,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 Expanded(
                   child: Text(
                     title,
-                    style: TextStyle(
+                    style: theme.bodyLarge.copyWith(
                       color: theme.textPrimary,
-                      fontSize: 16,
                     ),
                   ),
                 ),
@@ -255,9 +253,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 padding: const EdgeInsets.only(left: 40),
                 child: Text(
                   description,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: theme.textSecondary,
-                    fontSize: 14,
                   ),
                 ),
               ),
@@ -269,11 +266,10 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
                 child: TextField(
                   controller: controller,
                   readOnly: !value,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: value
                         ? theme.textPrimary
                         : theme.textSecondary.withValues(alpha: 0.5),
-                    fontSize: 14,
                   ),
                   decoration: InputDecoration(
                     contentPadding: const EdgeInsets.symmetric(
@@ -314,9 +310,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
           padding: const EdgeInsets.only(left: 16, bottom: 16),
           child: Text(
             l10n.securityPageEncryptionLevel,
-            style: TextStyle(
+            style: theme.bodyLarge.copyWith(
               color: theme.textSecondary,
-              fontSize: 16,
             ),
           ),
         ),
@@ -398,10 +393,8 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
               const SizedBox(width: 12),
               Text(
                 algorithm.name,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
               const Spacer(),
@@ -442,16 +435,14 @@ class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
           children: [
             Text(
               label,
-              style: TextStyle(
+              style: theme.labelSmall.copyWith(
                 color: theme.textSecondary,
-                fontSize: 12,
               ),
             ),
             Text(
               '${(value * 100).toInt()}%',
-              style: TextStyle(
+              style: theme.labelSmall.copyWith(
                 color: theme.textSecondary,
-                fontSize: 12,
               ),
             ),
           ],

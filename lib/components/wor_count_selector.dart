@@ -59,14 +59,13 @@ class WordCountSelector extends StatelessWidget {
                     child: Center(
                       child: AnimatedDefaultTextStyle(
                         duration: const Duration(milliseconds: 300),
-                        style: theme.subtitle1.copyWith(
-                          fontSize: 18, // subtitle1 is 20, adjusting
+                        style: theme.titleSmall.copyWith(
                           color: selectedCount == wordCounts[index]
                               ? Colors.white
                               : theme.textSecondary,
                           fontWeight: selectedCount == wordCounts[index]
                               ? FontWeight.bold
-                              : FontWeight.normal, // subtitle1 is w500 by default
+                              : FontWeight.w600,
                         ),
                         child: Text(wordCounts[index].toString()),
                       ),

@@ -120,11 +120,7 @@ class _SwitchChainNetworkContentState
           padding: EdgeInsets.symmetric(horizontal: padding),
           child: Text(
             l10n.switchChainNetworkContentTitle,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 20,
-              fontWeight: FontWeight.w600,
-            ),
+            style: theme.titleMedium.copyWith(color: theme.textPrimary),
           ),
         ),
       ],
@@ -335,11 +331,7 @@ class _SwitchChainNetworkContentState
         Expanded(
           child: Text(
             network.name,
-            style: TextStyle(
-              color: theme.textPrimary,
-              fontSize: 16,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
-            ),
+            style: (isSelected ? theme.labelLarge : theme.bodyLarge).copyWith(color: theme.textPrimary),
             overflow: TextOverflow.ellipsis,
           ),
         ),
@@ -353,11 +345,7 @@ class _SwitchChainNetworkContentState
             ),
             child: Text(
               l10n.switchChainNetworkContentTestnetLabel,
-              style: TextStyle(
-                color: theme.warning,
-                fontSize: 12,
-                fontWeight: FontWeight.w500,
-              ),
+              style: theme.labelSmall.copyWith(color: theme.warning),
             ),
           ),
       ],
@@ -376,20 +364,13 @@ class _SwitchChainNetworkContentState
           ),
           child: Text(
             network.shortName,
-            style: TextStyle(
-              color: theme.primaryPurple,
-              fontSize: 12,
-              fontWeight: FontWeight.w500,
-            ),
+            style: theme.labelSmall.copyWith(color: theme.primaryPurple),
           ),
         ),
         const SizedBox(width: 8),
         Text(
           '${l10n.switchChainNetworkContentIdLabel} ${network.chainIds.join(", ")}',
-          style: TextStyle(
-            color: theme.textSecondary,
-            fontSize: 12,
-          ),
+          style: theme.labelSmall.copyWith(color: theme.textSecondary),
         ),
       ],
     );

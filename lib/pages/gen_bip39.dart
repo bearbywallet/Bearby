@@ -119,7 +119,7 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
                                   title: Text(
                                     l10n.secretPhraseGeneratorPageBackupCheckbox,
                                     style:
-                                        TextStyle(color: theme.textSecondary),
+                                        theme.bodyText2.copyWith(color: theme.textSecondary),
                                   ),
                                   value: _hasBackupWords,
                                   onChanged: (_) {

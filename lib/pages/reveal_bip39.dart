@@ -180,9 +180,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                           margin: const EdgeInsets.only(top: 8),
                           child: Text(
                             errorMessage!,
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.danger,
-                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -199,10 +198,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                           child: Text(
                             AppLocalizations.of(context)!
                                 .revealSecretPhraseSubmitButton,
-                            style: TextStyle(
+                            style: theme.titleSmall.copyWith(
                               color: theme.buttonText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -281,28 +278,24 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
           const SizedBox(height: 16),
           Text(
             "Security Timer",
-            style: TextStyle(
+            style: theme.subtitle1.copyWith(
               color: theme.textPrimary,
-              fontSize: 20,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
           Text(
             AppLocalizations.of(context)!.revealSecretPhraseRevealAfter,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: theme.textSecondary,
-              fontSize: 14,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           Text(
             _formatTime(_remainingTime),
-            style: TextStyle(
+            style: theme.displayLarge.copyWith(
               color: theme.primaryPurple,
-              fontSize: 32,
-              fontWeight: FontWeight.bold,
               fontFamily: 'monospace',
             ),
           ),
@@ -343,10 +336,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
               const SizedBox(width: 8),
               Text(
                 AppLocalizations.of(context)!.revealSecretPhraseScamAlertTitle,
-                style: TextStyle(
+                style: theme.labelLarge.copyWith(
                   color: theme.danger,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
             ],
@@ -355,9 +346,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
           Text(
             AppLocalizations.of(context)!
                 .revealSecretPhraseScamAlertDescription,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: theme.danger,
-              fontSize: 14,
             ),
           ),
         ],
@@ -403,9 +393,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
                     ),
                     child: Text(
                       '${startIndex + index + 1}. ${words[startIndex + index]}',
-                      style: TextStyle(
+                      style: theme.overline.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 10,
                       ),
                     ),
                   ),

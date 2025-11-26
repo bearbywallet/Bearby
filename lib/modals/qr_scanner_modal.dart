@@ -151,11 +151,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
             children: [
               Text(
                 l10n.qrScannerModalContentTitle,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: theme.titleMedium.copyWith(color: theme.textPrimary),
               ),
               IconButton(
                 onPressed: () => Navigator.pop(context),
@@ -241,7 +237,7 @@ class _QRScannerModalContentState extends State<_QRScannerModalContent>
               Text(
                 l10n.qrScannerModalContentCameraInitError,
                 textAlign: TextAlign.center,
-                style: const TextStyle(color: Colors.white, fontSize: 16),
+                style: theme.bodyLarge.copyWith(color: Colors.white),
               ),
             ],
           ),

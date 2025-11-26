@@ -363,9 +363,8 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
         onPressed: _handleAuthentication,
         child: Text(
           l10n.loginPageUnlockButton,
-          style: TextStyle(
+          style: theme.titleSmall.copyWith(
             color: theme.buttonText,
-            fontSize: 18,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -411,10 +410,8 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
                     _buildHeader(appState),
                     Text(
                       l10n.loginPageWelcomeBack,
-                      style: TextStyle(
+                      style: appState.currentTheme.displayLarge.copyWith(
                         color: appState.currentTheme.textPrimary,
-                        fontSize: 32,
-                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 16),

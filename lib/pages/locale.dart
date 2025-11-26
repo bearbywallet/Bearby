@@ -140,10 +140,8 @@ class _LanguagePageState extends State<LanguagePage> with StatusBarMixin {
           children: [
             Text(
               language.name,
-              style: TextStyle(
+              style: theme.bodyLarge.copyWith(
                 color: theme.textPrimary,
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
               ),
             ),
             const SizedBox(height: 4),
@@ -153,9 +151,8 @@ class _LanguagePageState extends State<LanguagePage> with StatusBarMixin {
                 Expanded(
                   child: Text(
                     language.localName,
-                    style: TextStyle(
+                    style: theme.bodyText2.copyWith(
                       color: theme.textSecondary,
-                      fontSize: 14,
                     ),
                   ),
                 ),

@@ -107,9 +107,8 @@ class _SettingsPageState extends State<SettingsPage> {
                                         child: Text(
                                           AppLocalizations.of(context)!
                                               .settingsPageZilliqaLegacy,
-                                          style: TextStyle(
+                                          style: theme.bodyLarge.copyWith(
                                             color: theme.textPrimary,
-                                            fontSize: 16,
                                           ),
                                         ),
                                       ),

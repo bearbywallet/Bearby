@@ -144,18 +144,15 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                     children: [
                       Text(
                         l10n.changePasswordModalTitle,
-                        style: TextStyle(
+                        style: widget.theme.titleSmall.copyWith(
                           color: widget.theme.textPrimary,
-                          fontSize: 18,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                       const SizedBox(height: 8),
                       Text(
                         l10n.changePasswordModalDescription,
-                        style: TextStyle(
+                        style: widget.theme.bodyText2.copyWith(
                           color: widget.theme.textSecondary,
-                          fontSize: 14,
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -219,10 +216,8 @@ class _ChangePasswordModalState extends State<ChangePasswordModal> {
                         const SizedBox(height: 8),
                         Text(
                           _errorMessage,
-                          style: TextStyle(
+                          style: widget.theme.labelMedium.copyWith(
                             color: widget.theme.danger,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ],

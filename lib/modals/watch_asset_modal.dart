@@ -190,16 +190,12 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                 children: [
                   Text(
                     l10n.watchAssetModalContentTitle,
-                    style: TextStyle(
-                      color: textColor,
-                      fontSize: 20,
-                      fontWeight: FontWeight.w600,
-                    ),
+                    style: theme.titleMedium.copyWith(color: textColor),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     l10n.watchAssetModalContentDescription,
-                    style: TextStyle(color: secondaryColor, fontSize: 14),
+                    style: theme.bodyText2.copyWith(color: secondaryColor),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 16),
@@ -254,9 +250,8 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                           ),
                         Text(
                           widget.appTitle,
-                          style: TextStyle(
+                          style: theme.titleSmall.copyWith(
                             color: textColor,
-                            fontSize: 18,
                             fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
@@ -274,7 +269,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                       ),
                       child: Text(
                         _errorMessage!,
-                        style: const TextStyle(color: Colors.red, fontSize: 14),
+                        style: theme.bodyText2.copyWith(color: Colors.red),
                         textAlign: TextAlign.center,
                       ),
                     ),
@@ -285,11 +280,11 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                     children: [
                       Text(
                         l10n.watchAssetModalContentTokenLabel,
-                        style: TextStyle(color: secondaryColor, fontSize: 14),
+                        style: theme.bodyText2.copyWith(color: secondaryColor),
                       ),
                       Text(
                         l10n.watchAssetModalContentBalanceLabel,
-                        style: TextStyle(color: secondaryColor, fontSize: 14),
+                        style: theme.bodyText2.copyWith(color: secondaryColor),
                       ),
                     ],
                   ),
@@ -353,11 +348,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                   const SizedBox(width: 12),
                                   Text(
                                     _ftoken?.name ?? widget.tokenName,
-                                    style: TextStyle(
-                                      color: textColor,
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w500,
-                                    ),
+                                    style: theme.bodyLarge.copyWith(color: textColor),
                                   ),
                                 ],
                               ),
@@ -366,13 +357,11 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 children: [
                                   Text(
                                     balance,
-                                    style: TextStyle(
-                                        color: textColor, fontSize: 16),
+                                    style: theme.bodyLarge.copyWith(color: textColor),
                                   ),
                                   Text(
                                     convertedBalance,
-                                    style: TextStyle(
-                                        color: secondaryColor, fontSize: 14),
+                                    style: theme.bodyText2.copyWith(color: secondaryColor),
                                   ),
                                 ],
                               ),
@@ -398,11 +387,7 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                                 const SizedBox(width: 12),
                                 Text(
                                   widget.tokenName,
-                                  style: TextStyle(
-                                    color: textColor,
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
-                                  ),
+                                  style: theme.bodyLarge.copyWith(color: textColor),
                                 ),
                               ],
                             ),
@@ -411,13 +396,11 @@ class _WatchAssetModalContentState extends State<_WatchAssetModalContent>
                               children: [
                                 Text(
                                   balance,
-                                  style:
-                                      TextStyle(color: textColor, fontSize: 16),
+                                  style: theme.bodyLarge.copyWith(color: textColor),
                                 ),
                                 Text(
                                   convertedBalance,
-                                  style: TextStyle(
-                                      color: secondaryColor, fontSize: 14),
+                                  style: theme.bodyText2.copyWith(color: secondaryColor),
                                 ),
                               ],
                             ),

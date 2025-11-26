@@ -129,9 +129,8 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                                 padding: const EdgeInsets.only(top: 8),
                                 child: Text(
                                   _errorMessage!,
-                                  style: TextStyle(
+                                  style: theme.bodyText2.copyWith(
                                     color: theme.danger,
-                                    fontSize: 14,
                                   ),
                                 ),
                               ),
@@ -162,7 +161,9 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
                               child: CheckboxListTile(
                                 title: Text(
                                   l10n.secretKeyRestorePageBackupLabel,
-                                  style: TextStyle(color: theme.textSecondary),
+                                  style: theme.bodyText2.copyWith(
+                                    color: theme.textSecondary,
+                                  ),
                                 ),
                                 value: _hasBackup,
                                 onChanged: (value) {

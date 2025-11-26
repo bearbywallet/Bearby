@@ -115,11 +115,7 @@ class _AddressSelectModalContentState
               padding: const EdgeInsets.symmetric(horizontal: 16),
               child: Text(
                 l10n.addressSelectModalContentTitle,
-                style: TextStyle(
-                  color: theme.textPrimary,
-                  fontSize: 20,
-                  fontWeight: FontWeight.w600,
-                ),
+                style: theme.titleMedium.copyWith(color: theme.textPrimary),
               ),
             ),
             Padding(
@@ -214,9 +210,8 @@ class _AddressSelectModalContentState
               ],
               Text(
                 categoryInfo.displayName,
-                style: TextStyle(
+                style: theme.bodyText2.copyWith(
                   color: theme.textSecondary,
-                  fontSize: 14,
                   fontWeight: FontWeight.w600,
                 ),
               ),
@@ -328,10 +323,7 @@ class _AddressSelectModalContentState
                   ),
                   Text(
                     shortenAddress(entry.address),
-                    style: TextStyle(
-                      color: theme.textSecondary,
-                      fontSize: 14,
-                    ),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
                   ),
                 ],
               ),
@@ -409,9 +401,8 @@ class _AddressSelectModalContentState
       ),
       child: Text(
         text,
-        style: TextStyle(
+        style: theme.labelSmall.copyWith(
           color: color,
-          fontSize: 12,
           fontWeight: FontWeight.w600,
         ),
       ),

@@ -208,9 +208,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(title,
-            style: TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w500,
+            style: theme.bodyLarge.copyWith(
                 color: theme.textSecondary.withValues(alpha: 0.7))),
         const SizedBox(height: 16),
         ...networks.map((network) => NetworkCard(
@@ -272,8 +270,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                     actionWidget: Row(
                       children: [
                         Text(l10n.networkPageShowTestnet,
-                            style: TextStyle(
-                                color: theme.textSecondary, fontSize: 14)),
+                            style: theme.bodyText2.copyWith(
+                                color: theme.textSecondary)),
                         const SizedBox(width: 8),
                         Switch(
                             value: isTestnet,
@@ -304,7 +302,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(errorMessage!,
-                          style: TextStyle(color: theme.danger, fontSize: 14))),
+                          style: theme.bodyText2.copyWith(color: theme.danger))),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),

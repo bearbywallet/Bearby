@@ -150,9 +150,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
                           margin: const EdgeInsets.only(top: 8),
                           child: Text(
                             errorMessage!,
-                            style: TextStyle(
+                            style: theme.bodyText2.copyWith(
                               color: theme.danger,
-                              fontSize: 14,
                             ),
                           ),
                         ),
@@ -169,10 +168,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
                           ),
                           child: Text(
                             l10n.revealSecretKeySubmitButton,
-                            style: TextStyle(
+                            style: theme.titleSmall.copyWith(
                               color: theme.buttonText,
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
@@ -254,10 +251,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
               const SizedBox(width: 8),
               Text(
                 l10n.revealSecretKeyScamAlertTitle,
-                style: TextStyle(
+                style: theme.labelLarge.copyWith(
                   color: theme.danger,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 16,
                 ),
               ),
             ],
@@ -265,9 +260,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
           const SizedBox(height: 8),
           Text(
             l10n.revealSecretKeyScamAlertMessage,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: theme.danger,
-              fontSize: 14,
             ),
           ),
         ],

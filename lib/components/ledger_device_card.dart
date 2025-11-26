@@ -123,10 +123,8 @@ class _LedgerCardState extends State<LedgerCard> {
               widget.device.name ??
               widget.device.deviceModelId ??
               "",
-          style: TextStyle(
+          style: theme.labelLarge.copyWith(
             color: theme.textPrimary,
-            fontWeight: FontWeight.w600,
-            fontSize: 16,
           ),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -137,9 +135,8 @@ class _LedgerCardState extends State<LedgerCard> {
           backgroundColor: theme.background.withOpacity(0.6),
           label: Text(
             widget.device.connectionType.name.toUpperCase(),
-            style: TextStyle(
+            style: theme.overline.copyWith(
               color: theme.textSecondary.withOpacity(0.9),
-              fontSize: 10,
               fontWeight: FontWeight.bold,
             ),
           ),

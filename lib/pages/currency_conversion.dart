@@ -328,19 +328,16 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
               width: 60,
               child: Text(
                 currency.code.toUpperCase(),
-                style: TextStyle(
+                style: theme.labelLarge.copyWith(
                   color: theme.textPrimary,
-                  fontSize: 16,
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ),
             Expanded(
               child: Text(
                 currency.name,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textSecondary,
-                  fontSize: 16,
                 ),
               ),
             ),

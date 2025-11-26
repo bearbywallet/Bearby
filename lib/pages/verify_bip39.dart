@@ -113,9 +113,7 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
                               Text(
                                 AppLocalizations.of(context)!
                                     .secretPhraseVerifyPageSubtitle,
-                                style: TextStyle(
-                                  fontSize: 24,
-                                  fontWeight: FontWeight.bold,
+                                style: theme.titleLarge.copyWith(
                                   color: theme.textPrimary,
                                 ),
                               ),

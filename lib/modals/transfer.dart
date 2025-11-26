@@ -383,8 +383,8 @@ class _ConfirmTransactionContentState
                             const SizedBox(width: 8),
                             Expanded(
                                 child: Text(_error!,
-                                    style: TextStyle(
-                                        color: theme.danger, fontSize: 14))),
+                                    style: theme.bodyText2.copyWith(
+                                        color: theme.danger))),
                           ],
                         ),
                       ),
@@ -491,10 +491,8 @@ class _ConfirmTransactionContentState
                                     const SizedBox(width: 4),
                                     Text(
                                       l10n.confirmTransactionEditGasButtonText,
-                                      style: TextStyle(
+                                      style: theme.labelMedium.copyWith(
                                         color: theme.warning,
-                                        fontSize: 14,
-                                        fontWeight: FontWeight.w500,
                                       ),
                                     ),
                                   ],

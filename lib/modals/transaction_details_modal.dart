@@ -520,9 +520,8 @@ class TransactionDetailsModal extends StatelessWidget {
       child: Center(
         child: Text(
           firstLetter,
-          style: TextStyle(
+          style: theme.labelSmall.copyWith(
             color: theme.background,
-            fontSize: 12,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -563,19 +562,16 @@ class TransactionDetailsModal extends StatelessWidget {
       children: [
         Text(
           amount,
-          style: TextStyle(
+          style: theme.labelMedium.copyWith(
             color: theme.textPrimary,
-            fontSize: 14,
-            fontWeight: FontWeight.w500,
           ),
           textAlign: TextAlign.right,
         ),
         if (converted.isNotEmpty && converted != '0')
           Text(
             converted,
-            style: TextStyle(
+            style: theme.labelSmall.copyWith(
               color: theme.textSecondary,
-              fontSize: 12,
               fontWeight: FontWeight.w400,
             ),
             textAlign: TextAlign.right,
@@ -793,10 +789,8 @@ class _AmountSection extends StatelessWidget {
               const SizedBox(width: 6),
               Text(
                 l10n.amountSection_pending,
-                style: TextStyle(
+                style: theme.labelMedium.copyWith(
                   color: Colors.orange,
-                  fontSize: 14,
-                  fontWeight: FontWeight.w500,
                 ),
               ),
             ],
@@ -811,10 +805,8 @@ class _AmountSection extends StatelessWidget {
           ),
           child: Text(
             l10n.amountSection_confirmed,
-            style: TextStyle(
+            style: theme.labelMedium.copyWith(
               color: theme.success,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
             ),
           ),
         );
@@ -827,10 +819,8 @@ class _AmountSection extends StatelessWidget {
           ),
           child: Text(
             l10n.amountSection_rejected,
-            style: TextStyle(
+            style: theme.labelMedium.copyWith(
               color: theme.danger,
-              fontSize: 14,
-              fontWeight: FontWeight.w500,
             ),
           ),
         );
@@ -852,18 +842,15 @@ class _AmountSection extends StatelessWidget {
               children: [
                 Text(
                   amount,
-                  style: TextStyle(
+                  style: theme.titleMedium.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
                   ),
                 ),
                 if (converted.isNotEmpty && converted != '0')
                   Text(
                     converted,
-                    style: TextStyle(
+                    style: theme.bodyText2.copyWith(
                       color: theme.textSecondary,
-                      fontSize: 14,
                       fontWeight: FontWeight.w400,
                     ),
                   ),
@@ -982,10 +969,8 @@ class _ModalHeader extends StatelessWidget {
             padding: EdgeInsets.symmetric(horizontal: padding),
             child: Text(
               title,
-              style: TextStyle(
+              style: theme.titleMedium.copyWith(
                 color: theme.textPrimary,
-                fontSize: 20,
-                fontWeight: FontWeight.w600,
               ),
             ),
           ),

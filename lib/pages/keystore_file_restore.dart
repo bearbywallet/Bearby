@@ -404,10 +404,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                             : () {},
                         child: Text(
                           l10n.keystoreRestoreButton,
-                          style: const TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: theme.titleSmall,
                         ),
                       ),
                     ),
@@ -416,10 +413,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
                         padding: const EdgeInsets.only(bottom: 16),
                         child: Text(
                           _errorMessage,
-                          style: TextStyle(
+                          style: theme.bodyText2.copyWith(
                             color: theme.danger,
-                            fontSize: 14,
-                            fontWeight: FontWeight.w500,
                           ),
                           textAlign: TextAlign.center,
                         ),
@@ -446,8 +441,7 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
         children: [
           Text(
             l10n.keystoreRestoreFilesTitle,
-            style: TextStyle(
-              fontSize: 16,
+            style: theme.bodyLarge.copyWith(
               fontWeight: FontWeight.bold,
               color: theme.textPrimary,
             ),
@@ -485,9 +479,8 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
           ? Center(
               child: Text(
                 l10n.keystoreRestoreNoFile,
-                style: TextStyle(
+                style: theme.bodyLarge.copyWith(
                   color: theme.textSecondary,
-                  fontSize: 16,
                 ),
               ),
             )
@@ -593,12 +586,10 @@ class KeystoreFileCard extends StatelessWidget {
                     children: [
                       Text(
                         file.fileName,
-                        style: TextStyle(
+                        style: theme.bodyLarge.copyWith(
                           color: disabled
                               ? theme.textSecondary
                               : theme.textPrimary,
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
                         ),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
@@ -608,17 +599,15 @@ class KeystoreFileCard extends StatelessWidget {
                         children: [
                           Text(
                             formattedDate,
-                            style: TextStyle(
+                            style: theme.labelSmall.copyWith(
                               color: theme.textSecondary,
-                              fontSize: 12,
                             ),
                           ),
                           const SizedBox(width: 8),
                           Text(
                             _formatFileSize(),
-                            style: TextStyle(
+                            style: theme.labelSmall.copyWith(
                               color: theme.textSecondary,
-                              fontSize: 12,
                             ),
                           ),
                         ],
@@ -637,11 +626,10 @@ class KeystoreFileCard extends StatelessWidget {
                     ),
                     child: Text(
                       'v${file.version ?? "?"}',
-                      style: TextStyle(
+                      style: theme.labelSmall.copyWith(
                         color: disabled
                             ? theme.textSecondary
                             : theme.primaryPurple,
-                        fontSize: 12,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -651,9 +639,8 @@ class KeystoreFileCard extends StatelessWidget {
             const SizedBox(height: 8),
             Text(
               file.filePath,
-              style: TextStyle(
+              style: theme.labelSmall.copyWith(
                 color: theme.textSecondary,
-                fontSize: 12,
               ),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,

@@ -200,7 +200,10 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
         children: [
           Text(
             AppLocalizations.of(context)!.checksumValidationFailed,
-            style: TextStyle(color: theme.danger, fontWeight: FontWeight.bold),
+            style: theme.bodyText2.copyWith(
+              color: theme.danger,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           Row(
             children: [
@@ -216,7 +219,9 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
               Expanded(
                 child: Text(
                   AppLocalizations.of(context)!.proceedDespiteInvalidChecksum,
-                  style: TextStyle(color: theme.textPrimary),
+                  style: theme.bodyText2.copyWith(
+                    color: theme.textPrimary,
+                  ),
                 ),
               ),
             ],

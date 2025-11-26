@@ -16,6 +16,7 @@ import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
+import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 void showSignMessageModal({
@@ -566,7 +567,7 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
   Widget _buildTypedDataRow(
     String label,
     String value,
-    theme,
+    AppTheme theme,
     Color valueColor, {
     bool isTitle = false,
   }) {

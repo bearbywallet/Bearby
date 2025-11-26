@@ -193,9 +193,8 @@ class StakingPoolCard extends StatelessWidget {
                   Expanded(
                     child: Text(
                       stake.name,
-                      style: TextStyle(
+                      style: theme.subtitle1.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 20,
                         fontWeight: FontWeight.bold,
                         letterSpacing: -0.5,
                       ),
@@ -214,9 +213,8 @@ class StakingPoolCard extends StatelessWidget {
                     ),
                     child: Text(
                       stake.tag.toUpperCase(),
-                      style: TextStyle(
+                      style: theme.overline.copyWith(
                         color: theme.primaryPurple,
-                        fontSize: 10,
                         fontWeight: FontWeight.bold,
                         letterSpacing: 0.5,
                       ),
@@ -240,9 +238,8 @@ class StakingPoolCard extends StatelessWidget {
                     children: [
                       Text(
                         'LP',
-                        style: TextStyle(
+                        style: theme.labelSmall.copyWith(
                           color: theme.primaryPurple,
-                          fontSize: 12,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
@@ -295,9 +292,8 @@ class StakingPoolCard extends StatelessWidget {
               Expanded(
                 child: Text(
                   l10n.pendingWithdrawals,
-                  style: TextStyle(
+                  style: theme.labelMedium.copyWith(
                     color: theme.textPrimary,
-                    fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -310,9 +306,8 @@ class StakingPoolCard extends StatelessWidget {
                 ),
                 child: Text(
                   '${stake.pendingWithdrawals.length}',
-                  style: TextStyle(
+                  style: theme.labelSmall.copyWith(
                     color: theme.warning,
-                    fontSize: 12,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -377,18 +372,15 @@ class StakingPoolCard extends StatelessWidget {
                   children: [
                     Text(
                       l10n.amount,
-                      style: TextStyle(
+                      style: theme.labelSmall.copyWith(
                         color: theme.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       _formatTokenAmount(item.amount, appState).$1,
-                      style: TextStyle(
+                      style: theme.bodyLarge.copyWith(
                         color: theme.textPrimary,
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -414,9 +406,8 @@ class StakingPoolCard extends StatelessWidget {
               children: [
                 Text(
                   '${l10n.claimableIn} ${_formatTime(blocksRemaining)}',
-                  style: TextStyle(
+                  style: theme.labelSmall.copyWith(
                     color: theme.warning,
-                    fontSize: 12,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
@@ -499,10 +490,8 @@ class StakingPoolCard extends StatelessWidget {
                         isLiquidStaking
                             ? stake.token?.symbol ?? ""
                             : l10n.stakedAmount,
-                        style: TextStyle(
+                        style: theme.labelSmall.copyWith(
                           color: theme.textSecondary,
-                          fontSize: 12,
-                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
@@ -561,9 +550,8 @@ class StakingPoolCard extends StatelessWidget {
                             const SizedBox(width: 8),
                             Text(
                               l10n.rewardsProgressTitle,
-                              style: TextStyle(
+                              style: theme.caption.copyWith(
                                 color: theme.textSecondary,
-                                fontSize: 11,
                                 fontWeight: FontWeight.w600,
                                 letterSpacing: 0.2,
                               ),
@@ -575,27 +563,23 @@ class StakingPoolCard extends StatelessWidget {
                           children: [
                             Text(
                               '+',
-                              style: TextStyle(
+                              style: theme.bodyText2.copyWith(
                                 color: theme.success,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             Text(
                               liquidRewards,
-                              style: TextStyle(
+                              style: theme.bodyText2.copyWith(
                                 color: theme.success,
-                                fontSize: 14,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                             const SizedBox(width: 4),
                             Text(
                               'backed ZIL',
-                              style: TextStyle(
+                              style: theme.caption.copyWith(
                                 color: theme.textSecondary,
-                                fontSize: 11,
-                                fontWeight: FontWeight.w500,
                               ),
                             ),
                           ],
@@ -647,9 +631,8 @@ class StakingPoolCard extends StatelessWidget {
                             children: [
                               Text(
                                 'Claimable Amount',
-                                style: TextStyle(
+                                style: theme.caption.copyWith(
                                   color: theme.textSecondary,
-                                  fontSize: 11,
                                   fontWeight: FontWeight.w600,
                                   letterSpacing: 0.2,
                                 ),
@@ -660,9 +643,8 @@ class StakingPoolCard extends StatelessWidget {
                                         stake.claimableAmount, appState,
                                         isLSTToken: true)
                                     .$1,
-                                style: TextStyle(
+                                style: theme.bodyText2.copyWith(
                                   color: theme.warning,
-                                  fontSize: 14,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -743,18 +725,15 @@ class StakingPoolCard extends StatelessWidget {
                   children: [
                     Text(
                       "${stake.token?.symbol ?? ""} (${stake.token?.name ?? ""})",
-                      style: TextStyle(
+                      style: theme.labelSmall.copyWith(
                         color: theme.textSecondary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       _formatLSTPrice(appState),
-                      style: TextStyle(
+                      style: theme.bodyLarge.copyWith(
                         color: theme.primaryPurple,
-                        fontSize: 16,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -780,9 +759,8 @@ class StakingPoolCard extends StatelessWidget {
       children: [
         Text(
           primaryValue,
-          style: TextStyle(
+          style: theme.bodyLarge.copyWith(
             color: valueColor,
-            fontSize: 16,
             fontWeight: FontWeight.bold,
           ),
         ),
@@ -852,19 +830,16 @@ class StakingPoolCard extends StatelessWidget {
         children: [
           Text(
             label,
-            style: TextStyle(
+            style: theme.caption.copyWith(
               color: theme.textSecondary,
-              fontSize: 11,
-              fontWeight: FontWeight.w500,
             ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 6),
           Text(
             value,
-            style: TextStyle(
+            style: theme.bodyText2.copyWith(
               color: valueColor,
-              fontSize: 14,
               fontWeight: FontWeight.w700,
             ),
             textAlign: TextAlign.center,
@@ -912,18 +887,15 @@ class StakingPoolCard extends StatelessWidget {
               children: [
                 Text(
                   l10n.rewardsAvailable,
-                  style: TextStyle(
+                  style: theme.labelSmall.copyWith(
                     color: theme.textSecondary,
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
                   ),
                 ),
                 const SizedBox(height: 4),
                 Text(
                   _formatTokenAmount(stake.rewards, appState).$1,
-                  style: TextStyle(
+                  style: theme.bodyText2.copyWith(
                     color: theme.success,
-                    fontSize: 14,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
@@ -1064,18 +1036,18 @@ class StakingPoolCard extends StatelessWidget {
         backgroundColor: appState.currentTheme.cardBackground,
         title: Text(
           "Error",
-          style: TextStyle(color: appState.currentTheme.textPrimary),
+          style: appState.currentTheme.bodyLarge.copyWith(color: appState.currentTheme.textPrimary),
         ),
         content: Text(
           e.toString(),
-          style: TextStyle(color: appState.currentTheme.danger),
+          style: appState.currentTheme.bodyLarge.copyWith(color: appState.currentTheme.danger),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.of(context).pop(),
             child: Text(
               "OK",
-              style: TextStyle(color: appState.currentTheme.primaryPurple),
+              style: appState.currentTheme.bodyLarge.copyWith(color: appState.currentTheme.primaryPurple),
             ),
           )
         ],

@@ -155,8 +155,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
             padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: Text(
               widget.title,
-              style: TextStyle(
-                  color: textColor, fontSize: 20, fontWeight: FontWeight.w600),
+              style: theme.titleMedium.copyWith(color: textColor),
               textAlign: TextAlign.center,
             ),
           ),
@@ -194,7 +193,7 @@ class _AppConnectModalContentState extends State<_AppConnectModalContent> {
         padding: EdgeInsets.all(16),
         child: Text(
           l10n.appConnectModalContent_noAccounts,
-          style: TextStyle(color: secondaryColor, fontSize: 14),
+          style: theme.bodyText2.copyWith(color: secondaryColor),
         ),
       );
     }
