@@ -667,5 +667,20 @@
   "manageTokensSuggestedTokens": "おすすめトークン",
   "manageTokensFetchError": "トークンの取得に失敗しました",
   "manageTokensWrongChain": "トークンは別のチェーンに属しています",
-  "manageTokensClear": "クリア"
+  "manageTokensClear": "クリア",
+
+  "signedMessageTypePersonalSign": "個人署名",
+  "signedMessageTypeEip712": "EIP-712",
+  "signedMessageTypeUnknown": "不明",
+  "signedMessageSigner": "署名者",
+  "signedMessagePublicKey": "公開鍵",
+  "signedMessageType": "タイプ",
+  "signedMessageEip712Domain": "EIP-712 ドメイン",
+  "signedMessageDomainName": "名前",
+  "signedMessageDomainChainId": "チェーンID",
+  "signedMessageDomainContract": "コントラクト",
+  "signedMessagePrimaryType": "プライマリタイプ",
+  "signedMessageData": "メッセージデータ",
+  "signedMessageContent": "内容",
+  "signedMessageMessage": "メッセージ"
 }

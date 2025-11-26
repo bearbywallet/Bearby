@@ -2565,5 +2565,62 @@
   "manageTokensClear": "Clear",
   "@manageTokensClear": {
     "description": "Button text to clear deleted tokens"
+  },
+
+  "signedMessageTypePersonalSign": "Personal Sign",
+  "@signedMessageTypePersonalSign": {
+    "description": "Label for personal sign message type"
+  },
+  "signedMessageTypeEip712": "EIP-712",
+  "@signedMessageTypeEip712": {
+    "description": "Label for EIP-712 typed data message type"
+  },
+  "signedMessageTypeUnknown": "Unknown",
+  "@signedMessageTypeUnknown": {
+    "description": "Label for unknown message type"
+  },
+  "signedMessageSigner": "Signer",
+  "@signedMessageSigner": {
+    "description": "Label for signer address"
+  },
+  "signedMessagePublicKey": "Public Key",
+  "@signedMessagePublicKey": {
+    "description": "Label for public key"
+  },
+  "signedMessageType": "Type",
+  "@signedMessageType": {
+    "description": "Label for message type"
+  },
+  "signedMessageEip712Domain": "EIP-712 Domain",
+  "@signedMessageEip712Domain": {
+    "description": "Title for EIP-712 domain section"
+  },
+  "signedMessageDomainName": "Name",
+  "@signedMessageDomainName": {
+    "description": "Label for domain name"
+  },
+  "signedMessageDomainChainId": "Chain ID",
+  "@signedMessageDomainChainId": {
+    "description": "Label for domain chain ID"
+  },
+  "signedMessageDomainContract": "Contract",
+  "@signedMessageDomainContract": {
+    "description": "Label for verifying contract address"
+  },
+  "signedMessagePrimaryType": "Primary Type",
+  "@signedMessagePrimaryType": {
+    "description": "Label for primary type"
+  },
+  "signedMessageData": "Message Data",
+  "@signedMessageData": {
+    "description": "Title for message data section"
+  },
+  "signedMessageContent": "Content",
+  "@signedMessageContent": {
+    "description": "Label for message content"
+  },
+  "signedMessageMessage": "Message",
+  "@signedMessageMessage": {
+    "description": "Title for message section"
   }
 }

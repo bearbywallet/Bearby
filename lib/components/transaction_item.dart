@@ -132,15 +132,27 @@ class _HistoryItemState extends State<HistoryItem>
 
     if (widget.transaction.isSignedMessage) {
       final signedMsg = widget.transaction.parsedSignedMessage;
-      final message = signedMsg?.message ?? '';
-      final displayMessage =
-          message.length > 50 ? '${message.substring(0, 50)}...' : message;
+      if (signedMsg == null) {
+        return const SizedBox.shrink();
+      }
+
+      String displayContent;
+      if (signedMsg.isTypedData) {
+        final domainName = signedMsg.domainName ?? '';
+        final primaryType = signedMsg.primaryType ?? '';
+        displayContent =
+            domainName.isNotEmpty ? '$domainName - $primaryType' : primaryType;
+      } else {
+        final decoded = signedMsg.decodedMessage;
+        displayContent =
+            decoded.length > 50 ? '${decoded.substring(0, 50)}...' : decoded;
+      }
 
       return Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            displayMessage.isNotEmpty ? displayMessage : 'Signed Message',
+            displayContent.isNotEmpty ? displayContent : 'Signed Message',
             style: theme.bodyText1.copyWith(
               color: theme.textPrimary,
               fontWeight: FontWeight.w600,
@@ -198,11 +210,38 @@ class _HistoryItemState extends State<HistoryItem>
     );
   }
 
-  Widget _buildFeeWithPrice(AppState appState) {
+  Widget _buildFeeWithPrice(AppState appState, AppLocalizations l10n) {
     final theme = appState.currentTheme;
 
     if (widget.transaction.isSignedMessage) {
-      return const SizedBox.shrink();
+      final signedMsg = widget.transaction.parsedSignedMessage;
+      if (signedMsg == null) {
+        return const SizedBox.shrink();
+      }
+
+      String badgeText;
+      if (signedMsg.isPersonalSign) {
+        badgeText = l10n.signedMessageTypePersonalSign;
+      } else if (signedMsg.isTypedData) {
+        badgeText = l10n.signedMessageTypeEip712;
+      } else {
+        badgeText = l10n.signedMessageTypeUnknown;
+      }
+
+      return Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+        decoration: BoxDecoration(
+          color: theme.primaryPurple.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Text(
+          badgeText,
+          style: theme.caption.copyWith(
+            color: theme.primaryPurple,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      );
     }
 
     final token = appState.wallet?.tokens.first;
@@ -335,7 +374,7 @@ class _HistoryItemState extends State<HistoryItem>
                             color: theme.textSecondary.withValues(alpha: 0.7),
                           ),
                         ),
-                        _buildFeeWithPrice(state),
+                        _buildFeeWithPrice(state, l10n),
                       ],
                     ),
                   ],

@@ -147,6 +147,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
               : null,
           sessionCipher: session,
           passphrase: "",
+          title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
+          icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,
         );
         widget.onMessageSigned(pubkey, sig);
       } else if (widget.message != null) {
@@ -160,6 +162,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
               : null,
           sessionCipher: session,
           passphrase: "",
+          title: widget.appTitle.isNotEmpty ? widget.appTitle : null,
+          icon: widget.appIcon.isNotEmpty ? widget.appIcon : null,
         );
         widget.onMessageSigned(pubkey, sig);
       }
@@ -282,16 +286,12 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                         ],
                         Text(
                           l10n.signMessageModalContentTitle,
-                          style: TextStyle(
-                            color: textColor,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w600,
-                          ),
+                          style: theme.subtitle1.copyWith(color: textColor),
                         ),
                         const SizedBox(height: 8),
                         Text(
                           l10n.signMessageModalContentDescription,
-                          style: TextStyle(color: secondaryColor, fontSize: 14),
+                          style: theme.bodyText2.copyWith(color: secondaryColor),
                           textAlign: TextAlign.center,
                         ),
                         const SizedBox(height: 16),
@@ -351,10 +351,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                 ),
                               Text(
                                 widget.appTitle,
-                                style: TextStyle(
+                                style: theme.bodyText1.copyWith(
                                   color: textColor,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.w500,
+                                  fontWeight: FontWeight.w600,
                                 ),
                                 textAlign: TextAlign.center,
                               ),
@@ -370,28 +369,27 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
                                     children: [
-                                      Text(
-                                        '${l10n.signMessageModalContentDomain} ${widget.typedData!.domain.name}',
-                                        style: TextStyle(
-                                          color: textColor,
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      _buildTypedDataRow(
+                                        l10n.signMessageModalContentDomain,
+                                        widget.typedData!.domain.name,
+                                        theme,
+                                        textColor,
+                                        isTitle: true,
                                       ),
                                       const SizedBox(height: 4),
-                                      Text(
-                                        '${l10n.signMessageModalContentChainId} ${widget.typedData!.domain.chainId}',
-                                        style: TextStyle(
-                                          color: secondaryColor,
-                                          fontSize: 14,
-                                        ),
+                                      _buildTypedDataRow(
+                                        l10n.signMessageModalContentChainId,
+                                        widget.typedData!.domain.chainId
+                                            .toString(),
+                                        theme,
+                                        secondaryColor,
                                       ),
-                                      Text(
-                                        '${l10n.signMessageModalContentContract} ${widget.typedData!.domain.verifyingContract}',
-                                        style: TextStyle(
-                                          color: secondaryColor,
-                                          fontSize: 14,
-                                        ),
+                                      _buildTypedDataRow(
+                                        l10n.signMessageModalContentContract,
+                                        widget.typedData!.domain
+                                            .verifyingContract,
+                                        theme,
+                                        secondaryColor,
                                       ),
                                     ],
                                   ),
@@ -410,13 +408,12 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          '${l10n.signMessageModalContentType} ${widget.typedData!.primaryType}',
-                                          style: TextStyle(
-                                            color: textColor,
-                                            fontSize: 16,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                        _buildTypedDataRow(
+                                          l10n.signMessageModalContentType,
+                                          widget.typedData!.primaryType,
+                                          theme,
+                                          textColor,
+                                          isTitle: true,
                                         ),
                                         const SizedBox(height: 8),
                                         ...widget.typedData!.message.entries
@@ -430,9 +427,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                               children: [
                                                 Text(
                                                   '${e.key}: ',
-                                                  style: TextStyle(
+                                                  style:
+                                                      theme.bodyText2.copyWith(
                                                     color: primaryColor,
-                                                    fontSize: 14,
                                                     fontWeight: FontWeight.w500,
                                                   ),
                                                 ),
@@ -441,9 +438,9 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                                     e.value is Map
                                                         ? jsonEncode(e.value)
                                                         : e.value.toString(),
-                                                    style: TextStyle(
-                                                        color: textColor,
-                                                        fontSize: 14),
+                                                    style: theme.bodyText2
+                                                        .copyWith(
+                                                            color: textColor),
                                                   ),
                                                 ),
                                               ],
@@ -462,8 +459,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                     child: Text(
                                       widget.message ??
                                           l10n.signMessageModalContentNoData,
-                                      style: TextStyle(
-                                          color: textColor, fontSize: 16),
+                                      style: theme.bodyText1
+                                          .copyWith(color: textColor),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -495,8 +492,8 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
                                   Expanded(
                                     child: Text(
                                       _error!,
-                                      style: TextStyle(
-                                          color: theme.danger, fontSize: 14),
+                                      style: theme.bodyText2
+                                          .copyWith(color: theme.danger),
                                       textAlign: TextAlign.center,
                                     ),
                                   ),
@@ -563,6 +560,24 @@ class _SignMessageModalContentState extends State<_SignMessageModalContent> {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _buildTypedDataRow(
+    String label,
+    String value,
+    theme,
+    Color valueColor, {
+    bool isTitle = false,
+  }) {
+    return Text(
+      '$label $value',
+      style: isTitle
+          ? theme.bodyText1.copyWith(
+              color: valueColor,
+              fontWeight: FontWeight.w600,
+            )
+          : theme.bodyText2.copyWith(color: valueColor),
     );
   }
 }

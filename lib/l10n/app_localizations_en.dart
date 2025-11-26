@@ -1809,4 +1809,46 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get manageTokensClear => 'Clear';
+
+  @override
+  String get signedMessageTypePersonalSign => 'Personal Sign';
+
+  @override
+  String get signedMessageTypeEip712 => 'EIP-712';
+
+  @override
+  String get signedMessageTypeUnknown => 'Unknown';
+
+  @override
+  String get signedMessageSigner => 'Signer';
+
+  @override
+  String get signedMessagePublicKey => 'Public Key';
+
+  @override
+  String get signedMessageType => 'Type';
+
+  @override
+  String get signedMessageEip712Domain => 'EIP-712 Domain';
+
+  @override
+  String get signedMessageDomainName => 'Name';
+
+  @override
+  String get signedMessageDomainChainId => 'Chain ID';
+
+  @override
+  String get signedMessageDomainContract => 'Contract';
+
+  @override
+  String get signedMessagePrimaryType => 'Primary Type';
+
+  @override
+  String get signedMessageData => 'Message Data';
+
+  @override
+  String get signedMessageContent => 'Content';
+
+  @override
+  String get signedMessageMessage => 'Message';
 }

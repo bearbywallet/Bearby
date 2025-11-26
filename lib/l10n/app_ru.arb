@@ -663,5 +663,20 @@
   "manageTokensSuggestedTokens": "Предложенные токены",
   "manageTokensFetchError": "Не удалось получить токен",
   "manageTokensWrongChain": "Токен принадлежит другой сети",
-  "manageTokensClear": "Очистить"
+  "manageTokensClear": "Очистить",
+
+  "signedMessageTypePersonalSign": "Личная подпись",
+  "signedMessageTypeEip712": "EIP-712",
+  "signedMessageTypeUnknown": "Неизвестно",
+  "signedMessageSigner": "Подписант",
+  "signedMessagePublicKey": "Публичный ключ",
+  "signedMessageType": "Тип",
+  "signedMessageEip712Domain": "Домен EIP-712",
+  "signedMessageDomainName": "Название",
+  "signedMessageDomainChainId": "ID сети",
+  "signedMessageDomainContract": "Контракт",
+  "signedMessagePrimaryType": "Основной тип",
+  "signedMessageData": "Данные сообщения",
+  "signedMessageContent": "Содержимое",
+  "signedMessageMessage": "Сообщение"
 }

@@ -647,5 +647,20 @@
   "manageTokensSuggestedTokens": "推荐代币",
   "manageTokensFetchError": "获取代币失败",
   "manageTokensWrongChain": "代币属于其他链",
-  "manageTokensClear": "清除"
+  "manageTokensClear": "清除",
+
+  "signedMessageTypePersonalSign": "个人签名",
+  "signedMessageTypeEip712": "EIP-712",
+  "signedMessageTypeUnknown": "未知",
+  "signedMessageSigner": "签名者",
+  "signedMessagePublicKey": "公钥",
+  "signedMessageType": "类型",
+  "signedMessageEip712Domain": "EIP-712 域",
+  "signedMessageDomainName": "名称",
+  "signedMessageDomainChainId": "链 ID",
+  "signedMessageDomainContract": "合约",
+  "signedMessagePrimaryType": "主类型",
+  "signedMessageData": "消息数据",
+  "signedMessageContent": "内容",
+  "signedMessageMessage": "消息"
 }

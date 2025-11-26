@@ -1809,4 +1809,46 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get manageTokensClear => 'クリア';
+
+  @override
+  String get signedMessageTypePersonalSign => '個人署名';
+
+  @override
+  String get signedMessageTypeEip712 => 'EIP-712';
+
+  @override
+  String get signedMessageTypeUnknown => '不明';
+
+  @override
+  String get signedMessageSigner => '署名者';
+
+  @override
+  String get signedMessagePublicKey => '公開鍵';
+
+  @override
+  String get signedMessageType => 'タイプ';
+
+  @override
+  String get signedMessageEip712Domain => 'EIP-712 ドメイン';
+
+  @override
+  String get signedMessageDomainName => '名前';
+
+  @override
+  String get signedMessageDomainChainId => 'チェーンID';
+
+  @override
+  String get signedMessageDomainContract => 'コントラクト';
+
+  @override
+  String get signedMessagePrimaryType => 'プライマリタイプ';
+
+  @override
+  String get signedMessageData => 'メッセージデータ';
+
+  @override
+  String get signedMessageContent => '内容';
+
+  @override
+  String get signedMessageMessage => 'メッセージ';
 }

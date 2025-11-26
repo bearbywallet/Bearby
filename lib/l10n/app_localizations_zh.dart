@@ -1809,4 +1809,46 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get manageTokensClear => '清除';
+
+  @override
+  String get signedMessageTypePersonalSign => '个人签名';
+
+  @override
+  String get signedMessageTypeEip712 => 'EIP-712';
+
+  @override
+  String get signedMessageTypeUnknown => '未知';
+
+  @override
+  String get signedMessageSigner => '签名者';
+
+  @override
+  String get signedMessagePublicKey => '公钥';
+
+  @override
+  String get signedMessageType => '类型';
+
+  @override
+  String get signedMessageEip712Domain => 'EIP-712 域';
+
+  @override
+  String get signedMessageDomainName => '名称';
+
+  @override
+  String get signedMessageDomainChainId => '链 ID';
+
+  @override
+  String get signedMessageDomainContract => '合约';
+
+  @override
+  String get signedMessagePrimaryType => '主类型';
+
+  @override
+  String get signedMessageData => '消息数据';
+
+  @override
+  String get signedMessageContent => '内容';
+
+  @override
+  String get signedMessageMessage => '消息';
 }

@@ -3568,6 +3568,90 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Clear'**
   String get manageTokensClear;
+
+  /// Label for personal sign message type
+  ///
+  /// In en, this message translates to:
+  /// **'Personal Sign'**
+  String get signedMessageTypePersonalSign;
+
+  /// Label for EIP-712 typed data message type
+  ///
+  /// In en, this message translates to:
+  /// **'EIP-712'**
+  String get signedMessageTypeEip712;
+
+  /// Label for unknown message type
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown'**
+  String get signedMessageTypeUnknown;
+
+  /// Label for signer address
+  ///
+  /// In en, this message translates to:
+  /// **'Signer'**
+  String get signedMessageSigner;
+
+  /// Label for public key
+  ///
+  /// In en, this message translates to:
+  /// **'Public Key'**
+  String get signedMessagePublicKey;
+
+  /// Label for message type
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
+  String get signedMessageType;
+
+  /// Title for EIP-712 domain section
+  ///
+  /// In en, this message translates to:
+  /// **'EIP-712 Domain'**
+  String get signedMessageEip712Domain;
+
+  /// Label for domain name
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get signedMessageDomainName;
+
+  /// Label for domain chain ID
+  ///
+  /// In en, this message translates to:
+  /// **'Chain ID'**
+  String get signedMessageDomainChainId;
+
+  /// Label for verifying contract address
+  ///
+  /// In en, this message translates to:
+  /// **'Contract'**
+  String get signedMessageDomainContract;
+
+  /// Label for primary type
+  ///
+  /// In en, this message translates to:
+  /// **'Primary Type'**
+  String get signedMessagePrimaryType;
+
+  /// Title for message data section
+  ///
+  /// In en, this message translates to:
+  /// **'Message Data'**
+  String get signedMessageData;
+
+  /// Label for message content
+  ///
+  /// In en, this message translates to:
+  /// **'Content'**
+  String get signedMessageContent;
+
+  /// Title for message section
+  ///
+  /// In en, this message translates to:
+  /// **'Message'**
+  String get signedMessageMessage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

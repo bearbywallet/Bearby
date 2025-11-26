@@ -704,5 +704,20 @@
   "manageTokensSuggestedTokens": "추천 토큰",
   "manageTokensFetchError": "토큰 가져오기 실패",
   "manageTokensWrongChain": "토큰이 다른 체인에 속함",
-  "manageTokensClear": "지우기"
+  "manageTokensClear": "지우기",
+
+  "signedMessageTypePersonalSign": "개인 서명",
+  "signedMessageTypeEip712": "EIP-712",
+  "signedMessageTypeUnknown": "알 수 없음",
+  "signedMessageSigner": "서명자",
+  "signedMessagePublicKey": "공개 키",
+  "signedMessageType": "유형",
+  "signedMessageEip712Domain": "EIP-712 도메인",
+  "signedMessageDomainName": "이름",
+  "signedMessageDomainChainId": "체인 ID",
+  "signedMessageDomainContract": "계약",
+  "signedMessagePrimaryType": "기본 유형",
+  "signedMessageData": "메시지 데이터",
+  "signedMessageContent": "내용",
+  "signedMessageMessage": "메시지"
 }

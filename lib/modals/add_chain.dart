@@ -8,7 +8,6 @@ import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/swipe_button.dart';
-import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
 void showAddChainModal({
@@ -88,17 +87,167 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
         border: Border.all(color: theme.modalBorder, width: 2),
       ),
       child: Column(
+        mainAxisSize: MainAxisSize.min,
         children: [
-          Padding(
-            padding: EdgeInsets.all(adaptivePadding),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.center,
-              children: children(theme, l10n),
+          Container(
+            width: 36,
+            height: 4,
+            margin: const EdgeInsets.symmetric(vertical: 16),
+            decoration: BoxDecoration(
+              color: theme.modalBorder,
+              borderRadius: BorderRadius.circular(2),
             ),
           ),
-          Expanded(
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+            child: Text(
+              widget.title,
+              style: theme.subtitle1.copyWith(color: theme.textPrimary),
+              textAlign: TextAlign.center,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: theme.primaryPurple.withValues(alpha: 0.2),
+                    width: 2,
+                  ),
+                ),
+                child: ClipOval(
+                  child: AsyncImage(
+                    url: widget.appIcon,
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    loadingWidget: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.primaryPurple,
+                      ),
+                    ),
+                    errorWidget: Icon(
+                      Icons.broken_image,
+                      color: theme.textSecondary,
+                      size: 24,
+                    ),
+                  ),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 12),
+                child: SvgPicture.asset(
+                  'assets/icons/right_circle_arrow.svg',
+                  width: 32,
+                  height: 32,
+                  colorFilter:
+                      ColorFilter.mode(theme.textSecondary, BlendMode.srcIn),
+                ),
+              ),
+              Container(
+                width: 64,
+                height: 64,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(
+                    color: theme.primaryPurple.withValues(alpha: 0.2),
+                    width: 2,
+                  ),
+                ),
+                child: ClipOval(
+                  child: AsyncImage(
+                    url: viewChain(network: widget.chain, theme: theme.value),
+                    width: 64,
+                    height: 64,
+                    fit: BoxFit.cover,
+                    loadingWidget: Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: theme.primaryPurple,
+                      ),
+                    ),
+                    errorWidget: SvgPicture.asset(
+                      'assets/icons/warning.svg',
+                      width: 24,
+                      height: 24,
+                      colorFilter: ColorFilter.mode(
+                        theme.warning,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Text(
+            widget.chain.name,
+            style: theme.bodyText1.copyWith(
+              color: theme.textPrimary,
+              fontWeight: FontWeight.w600,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Padding(
+            padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+            child: Container(
+              padding: const EdgeInsets.all(12),
+              decoration: BoxDecoration(
+                color: theme.textSecondary.withValues(alpha: 0.05),
+                border: Border.all(
+                  color: theme.textSecondary.withValues(alpha: 0.2),
+                ),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.addChainModalContentDetails,
+                    style: theme.bodyText1.copyWith(
+                      color: theme.textPrimary,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  _buildDetailRow(
+                    l10n.addChainModalContentNetworkName,
+                    widget.chain.name,
+                    theme,
+                  ),
+                  _buildDetailRow(
+                    l10n.addChainModalContentCurrencySymbol,
+                    widget.chain.shortName,
+                    theme,
+                  ),
+                  _buildDetailRow(
+                    l10n.addChainModalContentChainId,
+                    widget.chain.chainId.toString(),
+                    theme,
+                  ),
+                  if (widget.chain.explorers.isNotEmpty)
+                    _buildDetailRow(
+                      l10n.addChainModalContentBlockExplorer,
+                      widget.chain.explorers.first.url,
+                      theme,
+                    ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: 16),
+          Flexible(
             child: ListView.builder(
-              padding: EdgeInsets.symmetric(horizontal: 16),
+              shrinkWrap: true,
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
               itemCount: widget.chain.rpc.length,
               itemBuilder: (context, index) {
                 final rpc = widget.chain.rpc[index];
@@ -118,39 +267,40 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
             ),
           ),
           Container(
-            padding: EdgeInsets.fromLTRB(16, 8, 16, 8 + bottomPadding),
+            padding: EdgeInsets.fromLTRB(
+              adaptivePadding,
+              12,
+              adaptivePadding,
+              12 + bottomPadding,
+            ),
             decoration: BoxDecoration(
               color: theme.cardBackground,
-              boxShadow: const [
-                BoxShadow(
-                    color: Colors.black12,
-                    blurRadius: 4,
-                    offset: Offset(0, -2)),
-              ],
+              border: Border(
+                top: BorderSide(color: theme.modalBorder, width: 1),
+              ),
             ),
             child: Column(
               children: [
                 Text(
                   l10n.addChainModalContentWarning,
-                  style: TextStyle(color: theme.danger, fontSize: 14),
+                  style: theme.caption.copyWith(color: theme.danger),
+                  textAlign: TextAlign.center,
                 ),
-                SizedBox(height: adaptivePadding),
-                Center(
-                  child: SwipeButton(
-                    text: l10n.addChainModalContentApprove,
-                    backgroundColor: theme.primaryPurple,
-                    textColor: theme.buttonText,
-                    onSwipeComplete: () async {
-                      final selected = widget.chain.rpc
-                          .asMap()
-                          .entries
-                          .where((entry) => rpcSelections[entry.key])
-                          .map((entry) => entry.value)
-                          .toList();
-                      widget.onConfirm(selected);
-                      Navigator.pop(context, selected);
-                    },
-                  ),
+                const SizedBox(height: 12),
+                SwipeButton(
+                  text: l10n.addChainModalContentApprove,
+                  backgroundColor: theme.primaryPurple,
+                  textColor: theme.buttonText,
+                  onSwipeComplete: () async {
+                    final selected = widget.chain.rpc
+                        .asMap()
+                        .entries
+                        .where((entry) => rpcSelections[entry.key])
+                        .map((entry) => entry.value)
+                        .toList();
+                    widget.onConfirm(selected);
+                    Navigator.pop(context, selected);
+                  },
                 ),
               ],
             ),
@@ -160,138 +310,25 @@ class _AddChainModalContentState extends State<_AddChainModalContent> {
     );
   }
 
-  List<Widget> children(AppTheme theme, AppLocalizations l10n) {
-    return [
-      Container(
-        width: 36,
-        height: 4,
-        margin: const EdgeInsets.symmetric(vertical: 8),
-        decoration: BoxDecoration(
-          color: theme.modalBorder,
-          borderRadius: BorderRadius.circular(2),
-        ),
-      ),
-      Text(
-        widget.title,
-        style: TextStyle(
-          color: theme.textPrimary,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
-        ),
-      ),
-      Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+  Widget _buildDetailRow(String label, String value, theme) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 4),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: theme.primaryPurple, width: 2),
-            ),
-            child: ClipOval(
-              child: AsyncImage(
-                url: widget.appIcon,
-                width: 64,
-                height: 64,
-                fit: BoxFit.cover,
-                loadingWidget: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: theme.primaryPurple,
-                  ),
-                ),
-                errorWidget: Icon(
-                  Icons.broken_image,
-                  color: theme.textSecondary,
-                  size: 24,
-                ),
-              ),
-            ),
+          Text(
+            '$label ',
+            style: theme.bodyText2.copyWith(color: theme.textSecondary),
           ),
-          const SizedBox(width: 12),
-          SvgPicture.asset(
-            'assets/icons/right_circle_arrow.svg',
-            width: 32,
-            height: 32,
-            colorFilter: ColorFilter.mode(theme.textPrimary, BlendMode.srcIn),
-          ),
-          const SizedBox(width: 12),
-          Container(
-            width: 64,
-            height: 64,
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: theme.primaryPurple, width: 2),
-            ),
-            child: ClipOval(
-              child: AsyncImage(
-                url: viewChain(network: widget.chain, theme: theme.value),
-                width: 64,
-                height: 64,
-                fit: BoxFit.cover,
-                loadingWidget: Center(
-                  child: CircularProgressIndicator(
-                    strokeWidth: 2,
-                    color: theme.primaryPurple,
-                  ),
-                ),
-                errorWidget: SvgPicture.asset(
-                  'assets/icons/warning.svg',
-                  width: 24,
-                  height: 24,
-                  colorFilter: ColorFilter.mode(
-                    theme.warning,
-                    BlendMode.srcIn,
-                  ),
-                ),
-              ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.bodyText2.copyWith(color: theme.textPrimary),
+              overflow: TextOverflow.ellipsis,
             ),
           ),
         ],
       ),
-      const SizedBox(height: 8),
-      Text(
-        widget.chain.name,
-        style: TextStyle(
-          color: theme.textPrimary,
-          fontSize: 18,
-          fontWeight: FontWeight.w500,
-        ),
-        textAlign: TextAlign.center,
-      ),
-      const SizedBox(height: 16),
-      Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          border: Border.all(color: theme.textSecondary.withValues(alpha: 0.2)),
-          borderRadius: BorderRadius.circular(8),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              l10n.addChainModalContentDetails,
-              style: TextStyle(
-                color: theme.textPrimary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-            const SizedBox(height: 8),
-            Text('${l10n.addChainModalContentNetworkName} ${widget.chain.name}',
-                style: TextStyle(color: theme.textSecondary)),
-            Text(
-                '${l10n.addChainModalContentCurrencySymbol} ${widget.chain.shortName}',
-                style: TextStyle(color: theme.textSecondary)),
-            Text('${l10n.addChainModalContentChainId} ${widget.chain.chainId}',
-                style: TextStyle(color: theme.textSecondary)),
-            if (widget.chain.explorers.isNotEmpty)
-              Text(
-                  '${l10n.addChainModalContentBlockExplorer} ${widget.chain.explorers.first.url}',
-                  style: TextStyle(color: theme.textSecondary)),
-          ],
-        ),
-      ),
-    ];
+    );
   }
 }

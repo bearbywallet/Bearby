@@ -1809,4 +1809,46 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get manageTokensClear => '지우기';
+
+  @override
+  String get signedMessageTypePersonalSign => '개인 서명';
+
+  @override
+  String get signedMessageTypeEip712 => 'EIP-712';
+
+  @override
+  String get signedMessageTypeUnknown => '알 수 없음';
+
+  @override
+  String get signedMessageSigner => '서명자';
+
+  @override
+  String get signedMessagePublicKey => '공개 키';
+
+  @override
+  String get signedMessageType => '유형';
+
+  @override
+  String get signedMessageEip712Domain => 'EIP-712 도메인';
+
+  @override
+  String get signedMessageDomainName => '이름';
+
+  @override
+  String get signedMessageDomainChainId => '체인 ID';
+
+  @override
+  String get signedMessageDomainContract => '계약';
+
+  @override
+  String get signedMessagePrimaryType => '기본 유형';
+
+  @override
+  String get signedMessageData => '메시지 데이터';
+
+  @override
+  String get signedMessageContent => '내용';
+
+  @override
+  String get signedMessageMessage => '메시지';
 }

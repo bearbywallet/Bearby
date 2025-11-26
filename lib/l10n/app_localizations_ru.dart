@@ -1809,4 +1809,46 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get manageTokensClear => 'Очистить';
+
+  @override
+  String get signedMessageTypePersonalSign => 'Личная подпись';
+
+  @override
+  String get signedMessageTypeEip712 => 'EIP-712';
+
+  @override
+  String get signedMessageTypeUnknown => 'Неизвестно';
+
+  @override
+  String get signedMessageSigner => 'Подписант';
+
+  @override
+  String get signedMessagePublicKey => 'Публичный ключ';
+
+  @override
+  String get signedMessageType => 'Тип';
+
+  @override
+  String get signedMessageEip712Domain => 'Домен EIP-712';
+
+  @override
+  String get signedMessageDomainName => 'Название';
+
+  @override
+  String get signedMessageDomainChainId => 'ID сети';
+
+  @override
+  String get signedMessageDomainContract => 'Контракт';
+
+  @override
+  String get signedMessagePrimaryType => 'Основной тип';
+
+  @override
+  String get signedMessageData => 'Данные сообщения';
+
+  @override
+  String get signedMessageContent => 'Содержимое';
+
+  @override
+  String get signedMessageMessage => 'Сообщение';
 }

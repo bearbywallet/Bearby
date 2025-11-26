@@ -282,6 +282,18 @@ class TransactionDetailsModal extends StatelessWidget {
           title: l10n.signMessageModalContentTitle,
           theme: theme,
           children: [
+            DetailItem(
+              label: l10n.signedMessageType,
+              value: _getLocalizedSignType(signedMsg, l10n),
+              theme: theme,
+            ),
+            if (signedMsg?.signer != null)
+              DetailItem(
+                label: l10n.signedMessageSigner,
+                value: signedMsg!.signer!,
+                theme: theme,
+                isCopyable: true,
+              ),
             if (signedMsg?.signature != null)
               DetailItem(
                 label: l10n.transactionDetailsModal_sig,
@@ -291,7 +303,7 @@ class TransactionDetailsModal extends StatelessWidget {
               ),
             if (signedMsg?.pubKey != null)
               DetailItem(
-                label: 'Public Key',
+                label: l10n.signedMessagePublicKey,
                 value: signedMsg!.pubKey!,
                 theme: theme,
                 isCopyable: true,
@@ -315,15 +327,69 @@ class TransactionDetailsModal extends StatelessWidget {
             ),
           ],
         ),
-        if (signedMsg?.message != null) ...[
+        if (signedMsg?.isTypedData == true) ...[
           const SizedBox(height: 12),
           DetailGroupCard(
-            title: 'Message',
+            title: l10n.signedMessageEip712Domain,
+            theme: theme,
+            children: [
+              if (signedMsg?.domainName != null)
+                DetailItem(
+                  label: l10n.signedMessageDomainName,
+                  value: signedMsg!.domainName!,
+                  theme: theme,
+                ),
+              if (signedMsg?.domainChainId != null)
+                DetailItem(
+                  label: l10n.signedMessageDomainChainId,
+                  value: signedMsg!.domainChainId.toString(),
+                  theme: theme,
+                ),
+              if (signedMsg?.domainContract != null)
+                DetailItem(
+                  label: l10n.signedMessageDomainContract,
+                  value: signedMsg!.domainContract!,
+                  theme: theme,
+                  isCopyable: true,
+                ),
+              if (signedMsg?.primaryType != null)
+                DetailItem(
+                  label: l10n.signedMessagePrimaryType,
+                  value: signedMsg!.primaryType!,
+                  theme: theme,
+                ),
+            ],
+          ),
+          if (signedMsg?.typedMessage != null) ...[
+            const SizedBox(height: 12),
+            DetailGroupCard(
+              title: l10n.signedMessageData,
+              theme: theme,
+              children: [
+                ...signedMsg!.typedMessage!.entries.map(
+                  (e) => DetailItem(
+                    label: e.key,
+                    value: e.value is Map || e.value is List
+                        ? _formatJsonValue(e.value)
+                        : e.value.toString(),
+                    theme: theme,
+                    isCopyable: true,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ],
+        if (signedMsg?.isPersonalSign == true &&
+            signedMsg?.message != null) ...[
+          const SizedBox(height: 12),
+          DetailGroupCard(
+            title: l10n.signedMessageMessage,
             theme: theme,
             children: [
               DetailItem(
-                label: 'Content',
-                value: signedMsg!.message!,
+                label: l10n.signedMessageContent,
+                value: signedMsg!.decodedMessage,
                 theme: theme,
                 isCopyable: true,
               ),
@@ -332,6 +398,25 @@ class TransactionDetailsModal extends StatelessWidget {
         ],
       ],
     );
+  }
+
+  String _getLocalizedSignType(ParsedSignedMessage? signedMsg, AppLocalizations l10n) {
+    if (signedMsg == null) return l10n.signedMessageTypeUnknown;
+    if (signedMsg.isPersonalSign) return l10n.signedMessageTypePersonalSign;
+    if (signedMsg.isTypedData) return l10n.signedMessageTypeEip712;
+    return l10n.signedMessageTypeUnknown;
+  }
+
+  String _formatJsonValue(dynamic value) {
+    if (value is Map) {
+      return value.entries
+          .map((e) => '${e.key}: ${e.value}')
+          .join(', ');
+    }
+    if (value is List) {
+      return value.map((e) => e.toString()).join(', ');
+    }
+    return value.toString();
   }
 
   Widget _buildExplorerLinks(
@@ -604,9 +689,25 @@ class _AmountSection extends StatelessWidget {
 
   Widget _buildSignedMessageInfo(AppLocalizations l10n) {
     final signedMsg = transaction.parsedSignedMessage;
-    final message = signedMsg?.message ?? '';
-    final displayMessage =
-        message.length > 100 ? '${message.substring(0, 100)}...' : message;
+    if (signedMsg == null) {
+      return const SizedBox.shrink();
+    }
+
+    String displayContent;
+    String subtitle;
+    String badgeText;
+
+    if (signedMsg.isTypedData) {
+      final domainName = signedMsg.domainName ?? l10n.signedMessageTypeUnknown;
+      final primaryType = signedMsg.primaryType ?? '';
+      displayContent = domainName;
+      subtitle = primaryType.isNotEmpty ? primaryType : l10n.signedMessageTypeEip712;
+      badgeText = l10n.signedMessageTypeEip712;
+    } else {
+      displayContent = signedMsg.decodedMessage;
+      subtitle = l10n.signedMessageTypePersonalSign;
+      badgeText = l10n.signedMessageTypePersonalSign;
+    }
 
     return Padding(
       padding: const EdgeInsets.all(12),
@@ -618,25 +719,47 @@ class _AmountSection extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  transaction.title ?? l10n.signMessageModalContentTitle,
-                  style: TextStyle(
-                    color: theme.textPrimary,
-                    fontSize: 20,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-                if (displayMessage.isNotEmpty)
-                  Text(
-                    displayMessage,
-                    style: TextStyle(
-                      color: theme.textSecondary,
-                      fontSize: 14,
-                      fontWeight: FontWeight.w400,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        transaction.title ?? l10n.signMessageModalContentTitle,
+                        style: theme.subtitle1.copyWith(color: theme.textPrimary),
+                      ),
                     ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 8,
+                        vertical: 4,
+                      ),
+                      decoration: BoxDecoration(
+                        color: theme.primaryPurple.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Text(
+                        badgeText,
+                        style: theme.caption.copyWith(
+                          color: theme.primaryPurple,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  subtitle,
+                  style: theme.bodyText2.copyWith(color: theme.textSecondary),
+                ),
+                if (displayContent.isNotEmpty) ...[
+                  const SizedBox(height: 8),
+                  Text(
+                    displayContent,
+                    style: theme.bodyText1.copyWith(color: theme.textPrimary),
                     maxLines: 3,
                     overflow: TextOverflow.ellipsis,
                   ),
+                ],
               ],
             ),
           ),

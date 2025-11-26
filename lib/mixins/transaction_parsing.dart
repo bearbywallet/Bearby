@@ -142,7 +142,7 @@ class ParsedSignedMessage {
   final String? signature;
   final String? pubKey;
   final String? signer;
-  final dynamic typedData;
+  final Map<String, dynamic>? typedData;
 
   ParsedSignedMessage({
     this.type,
@@ -160,12 +160,41 @@ class ParsedSignedMessage {
       signature: json['signature'] as String?,
       pubKey: json['pubKey'] as String?,
       signer: json['signer'] as String?,
-      typedData: json['typedData'],
+      typedData: json['typedData'] as Map<String, dynamic>?,
     );
   }
 
   bool get isPersonalSign => type == 'personal_sign';
   bool get isTypedData => type == 'eth_signTypedData_v4';
+
+  String get decodedMessage {
+    if (message == null) return '';
+    if (message!.startsWith('0x')) {
+      try {
+        final hex = message!.substring(2);
+        final bytes = <int>[];
+        for (var i = 0; i < hex.length; i += 2) {
+          bytes.add(int.parse(hex.substring(i, i + 2), radix: 16));
+        }
+        return utf8.decode(bytes);
+      } catch (_) {
+        return message!;
+      }
+    }
+    return message!;
+  }
+
+  String? get domainName => typedData?['domain']?['name'] as String?;
+  int? get domainChainId => typedData?['domain']?['chainId'] as int?;
+  String? get domainContract => typedData?['domain']?['verifyingContract'] as String?;
+  String? get primaryType => typedData?['primaryType'] as String?;
+  Map<String, dynamic>? get typedMessage => typedData?['message'] as Map<String, dynamic>?;
+
+  String get displayType {
+    if (isPersonalSign) return 'Personal Sign';
+    if (isTypedData) return 'EIP-712';
+    return 'Unknown';
+  }
 }
 
 extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
