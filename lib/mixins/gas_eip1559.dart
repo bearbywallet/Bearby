@@ -5,7 +5,7 @@ enum GasFeeOption { low, market, aggressive }
 BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
   switch (option) {
     case GasFeeOption.low:
-      return BigInt.zero;
+      return priorityFee;
     case GasFeeOption.market:
       final multiplied = priorityFee * BigInt.from(150);
 
