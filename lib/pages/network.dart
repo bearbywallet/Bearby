@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilpay/components/network_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -14,6 +15,8 @@ import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+
+const String kTestnetEnabledKey = 'testnet_enabled';
 
 class NetworkPage extends StatefulWidget {
   const NetworkPage({super.key});
@@ -35,7 +38,18 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   @override
   void initState() {
     super.initState();
+    _loadTestnetPreference();
     _loadNetworks();
+  }
+
+  Future<void> _loadTestnetPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool(kTestnetEnabledKey) ?? false;
+    if (mounted) {
+      setState(() {
+        isTestnet = enabled;
+      });
+    }
   }
 
   @override
@@ -267,21 +281,6 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   child: CustomAppBar(
                     title: l10n.networkPageTitle,
                     onBackPressed: () => Navigator.pop(context),
-                    actionWidget: Row(
-                      children: [
-                        Text(l10n.networkPageShowTestnet,
-                            style: theme.bodyText2.copyWith(
-                                color: theme.textSecondary)),
-                        const SizedBox(width: 8),
-                        Switch(
-                            value: isTestnet,
-                            onChanged: (value) => setState(() {
-                                  isTestnet = value;
-                                  _loadNetworks();
-                                }),
-                            activeThumbColor: theme.primaryPurple),
-                      ],
-                    ),
                   ),
                 ),
                 Padding(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
@@ -9,6 +10,9 @@ import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import '../state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+
+const String kTestnetEnabledKey = 'testnet_enabled';
+const int kTapsToEnableTestnet = 7;
 
 class AboutPage extends StatefulWidget {
   const AboutPage({super.key});
@@ -24,11 +28,14 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
     version: '',
     buildNumber: '',
   );
+  int _logoTapCount = 0;
+  bool _testnetEnabled = false;
 
   @override
   void initState() {
     super.initState();
     _initPackageInfo();
+    _loadTestnetPreference();
   }
 
   Future<void> _initPackageInfo() async {
@@ -37,6 +44,41 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
       setState(() {
         _packageInfo = info;
       });
+    }
+  }
+
+  Future<void> _loadTestnetPreference() async {
+    final prefs = await SharedPreferences.getInstance();
+    final enabled = prefs.getBool(kTestnetEnabledKey) ?? false;
+    if (mounted) {
+      setState(() {
+        _testnetEnabled = enabled;
+      });
+    }
+  }
+
+  Future<void> _onLogoTap() async {
+    _logoTapCount++;
+    if (_logoTapCount >= kTapsToEnableTestnet) {
+      _logoTapCount = 0;
+      final prefs = await SharedPreferences.getInstance();
+      final newValue = !_testnetEnabled;
+      await prefs.setBool(kTestnetEnabledKey, newValue);
+      if (mounted) {
+        setState(() {
+          _testnetEnabled = newValue;
+        });
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text(
+              newValue
+                  ? 'Testnet options enabled'
+                  : 'Testnet options disabled',
+            ),
+            duration: const Duration(seconds: 2),
+          ),
+        );
+      }
     }
   }
 
@@ -99,18 +141,21 @@ class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   Widget _buildLogoSection(AppTheme theme, AppLocalizations l10n) {
     return Column(
       children: [
-        Container(
-          width: 120,
-          height: 120,
-          decoration: BoxDecoration(
-            color: theme.cardBackground,
-            borderRadius: BorderRadius.circular(24),
-          ),
-          child: Center(
-            child: SvgPicture.asset(
-              'assets/imgs/zilpay.svg',
-              width: 80,
-              height: 80,
+        GestureDetector(
+          onTap: _onLogoTap,
+          child: Container(
+            width: 120,
+            height: 120,
+            decoration: BoxDecoration(
+              color: theme.cardBackground,
+              borderRadius: BorderRadius.circular(24),
+            ),
+            child: Center(
+              child: SvgPicture.asset(
+                'assets/imgs/zilpay.svg',
+                width: 80,
+                height: 80,
+              ),
             ),
           ),
         ),
