@@ -392,6 +392,7 @@ class _HomePageState extends State<HomePage>
                   hideBalance: appState.hideBalance,
                   tokenAmount: tokenAmountValue,
                   showDivider: false,
+                  isTileView: true,
                   onTap: () {
                     final originalIndex =
                         appState.wallet!.tokens.indexOf(token);

@@ -14,6 +14,7 @@ class TokenCard extends StatefulWidget {
   final bool showDivider;
   final VoidCallback? onTap;
   final bool hideBalance;
+  final bool isTileView;
 
   const TokenCard({
     super.key,
@@ -22,6 +23,7 @@ class TokenCard extends StatefulWidget {
     this.showDivider = true,
     this.onTap,
     this.hideBalance = false,
+    this.isTileView = false,
   });
 
   @override
@@ -103,12 +105,140 @@ class _TokenCardState extends State<TokenCard>
     return "*******";
   }
 
+  Widget _buildTileLayout(AppState appState, String displayAmount, String displayConverted) {
+    final theme = appState.currentTheme;
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 28);
+
+    return Container(
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  widget.ftoken.name,
+                  style: theme.bodyText2.copyWith(
+                    color: theme.textPrimary.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(width: 8),
+              _buildIcon(appState, iconSize),
+            ],
+          ),
+          const Spacer(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              FittedBox(
+                fit: BoxFit.scaleDown,
+                alignment: Alignment.centerLeft,
+                child: Text(
+                  displayAmount,
+                  style: theme.subtitle1.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                  maxLines: 1,
+                ),
+              ),
+              const SizedBox(height: 2),
+              if (appState.wallet?.settings.currencyConvert != null)
+                Text(
+                  displayConverted,
+                  style: theme.caption.copyWith(color: theme.textSecondary),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildListLayout(AppState appState, String displayAmount, String displayConverted, double adaptivePadding) {
+    final theme = appState.currentTheme;
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
+
+    return Padding(
+      padding: EdgeInsets.symmetric(
+          horizontal: adaptivePadding, vertical: adaptivePadding),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  '${widget.ftoken.name} (${widget.ftoken.symbol})',
+                  style: theme.bodyText1.copyWith(
+                    color: theme.textPrimary.withValues(alpha: 0.7),
+                    fontWeight: FontWeight.w500,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  displayAmount,
+                  style: theme.subtitle1.copyWith(
+                    color: theme.textPrimary,
+                    fontWeight: FontWeight.w600,
+                    letterSpacing: 0.5,
+                  ),
+                  overflow: TextOverflow.ellipsis,
+                  maxLines: 1,
+                ),
+                const SizedBox(height: 4),
+                if (appState.wallet?.settings.currencyConvert !=
+                    null)
+                  Text(
+                    displayConverted,
+                    style: theme.bodyText2
+                        .copyWith(color: theme.textSecondary),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
+                  ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 12),
+          Container(
+            padding: const EdgeInsets.all(4),
+            decoration: BoxDecoration(
+              color: theme.textPrimary.withValues(alpha: 0.05),
+              shape: BoxShape.circle,
+            ),
+            child: _buildIcon(appState, iconSize),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
     final (amount, converted) = formatingAmount(
       amount: widget.tokenAmount,
       symbol: widget.ftoken.symbol,
@@ -119,127 +249,52 @@ class _TokenCardState extends State<TokenCard>
     final displayAmount = widget.hideBalance ? maskBalance() : amount;
     final displayConverted = widget.hideBalance ? maskBalance() : converted;
 
-    return SingleChildScrollView(
-      physics: const BouncingScrollPhysics(),
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          MouseRegion(
-            onEnter: (_) => setState(() => isHovered = true),
-            onExit: (_) => setState(() => isHovered = false),
-            child: GestureDetector(
-              behavior: HitTestBehavior.opaque,
-              onTapDown: (_) {
-                setState(() => isPressed = true);
-                _controller.forward();
-              },
-              onTapUp: (_) {
-                setState(() => isPressed = false);
-                _controller.reverse();
-              },
-              onTapCancel: () {
-                setState(() => isPressed = false);
-                _controller.reverse();
-              },
-              onTap: widget.onTap,
-              child: AnimatedBuilder(
-                animation: _animation,
-                builder: (context, child) =>
-                    Transform.scale(scale: _animation.value, child: child),
-                child: AnimatedContainer(
-                  duration: const Duration(milliseconds: 150),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(
-                        horizontal: adaptivePadding, vertical: adaptivePadding),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              LayoutBuilder(
-                                builder: (context, constraints) {
-                                  return Row(
-                                    children: [
-                                      Flexible(
-                                        child: Text(
-                                          widget.ftoken.name,
-                                          style: theme.bodyText1.copyWith(
-                                            color: theme.textPrimary
-                                                .withValues(alpha: 0.7),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          overflow: TextOverflow.ellipsis,
-                                          maxLines: 1,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Text(
-                                        '(${widget.ftoken.symbol})',
-                                        style: theme.caption.copyWith(
-                                          color: theme.textSecondary
-                                              .withValues(alpha: 0.5),
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                    ],
-                                  );
-                                },
-                              ),
-                              const SizedBox(height: 8),
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: Text(
-                                      displayAmount,
-                                      style: theme.subtitle1.copyWith(
-                                        color: theme.textPrimary,
-                                        fontWeight: FontWeight.w600,
-                                        letterSpacing: 0.5,
-                                      ),
-                                      overflow: TextOverflow.ellipsis,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 4),
-                              if (appState.wallet?.settings.currencyConvert !=
-                                  null)
-                                Text(
-                                  displayConverted,
-                                  style: theme.bodyText2
-                                      .copyWith(color: theme.textSecondary),
-                                ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(width: 12),
-                        Container(
-                          padding: const EdgeInsets.all(4),
-                          decoration: BoxDecoration(
-                            color: theme.textPrimary.withValues(alpha: 0.05),
-                            shape: BoxShape.circle,
-                          ),
-                          child: _buildIcon(Provider.of<AppState>(context), iconSize),
-                        ),
-                      ],
-                    ),
-                  ),
+    Widget content;
+    if (widget.isTileView) {
+      content = _buildTileLayout(appState, displayAmount, displayConverted);
+    } else {
+      content = _buildListLayout(appState, displayAmount, displayConverted, adaptivePadding);
+    }
+
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        MouseRegion(
+          onEnter: (_) => setState(() => isHovered = true),
+          onExit: (_) => setState(() => isHovered = false),
+          child: GestureDetector(
+            behavior: HitTestBehavior.opaque,
+            onTapDown: (_) {
+              setState(() => isPressed = true);
+              _controller.forward();
+            },
+            onTapUp: (_) {
+              setState(() => isPressed = false);
+              _controller.reverse();
+            },
+            onTapCancel: () {
+              setState(() => isPressed = false);
+              _controller.reverse();
+            },
+            onTap: widget.onTap,
+            child: AnimatedBuilder(
+              animation: _animation,
+              builder: (context, child) =>
+                  Transform.scale(scale: _animation.value, child: child),
+              child: AnimatedContainer(
+                duration: const Duration(milliseconds: 150),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(12),
                 ),
+                child: content,
               ),
             ),
           ),
-          if (widget.showDivider)
-            Container(
-                height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
-        ],
-      ),
+        ),
+        if (widget.showDivider && !widget.isTileView)
+          Container(
+              height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
+      ],
     );
   }
 }
