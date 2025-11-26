@@ -8,6 +8,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
@@ -107,6 +108,11 @@ class TransactionDetailsModal extends StatelessWidget {
     AppTheme theme,
   ) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (transaction.isSignedMessage) {
+      return _buildSignedMessageDetails(context, appState, theme, l10n);
+    }
+
     return Column(
       children: [
         DetailGroupCard(
@@ -119,12 +125,13 @@ class TransactionDetailsModal extends StatelessWidget {
               theme: theme,
               isCopyable: true,
             ),
-            DetailItem(
-              label: l10n.transactionDetailsModal_sig,
-              value: transaction.sig,
-              theme: theme,
-              isCopyable: true,
-            ),
+            if (transaction.sig != null)
+              DetailItem(
+                label: l10n.transactionDetailsModal_sig,
+                value: transaction.sig!,
+                theme: theme,
+                isCopyable: true,
+              ),
             DetailItem(
               label: l10n.transactionDetailsModal_timestamp,
               value: _formatTimestamp(),
@@ -142,11 +149,12 @@ class TransactionDetailsModal extends StatelessWidget {
                 value: transaction.blockNumber.toString(),
                 theme: theme,
               ),
-            DetailItem(
-              label: l10n.transactionDetailsModal_nonce,
-              value: transaction.nonce.toString(),
-              theme: theme,
-            ),
+            if (transaction.nonce != null)
+              DetailItem(
+                label: l10n.transactionDetailsModal_nonce,
+                value: transaction.nonce.toString(),
+                theme: theme,
+              ),
           ],
         ),
         const SizedBox(height: 12),
@@ -154,18 +162,20 @@ class TransactionDetailsModal extends StatelessWidget {
           title: l10n.transactionDetailsModal_addresses,
           theme: theme,
           children: [
-            DetailItem(
-              label: l10n.transactionDetailsModal_sender,
-              value: transaction.sender,
-              theme: theme,
-              isCopyable: true,
-            ),
-            DetailItem(
-              label: l10n.transactionDetailsModal_recipient,
-              value: transaction.recipient,
-              theme: theme,
-              isCopyable: true,
-            ),
+            if (transaction.sender.isNotEmpty)
+              DetailItem(
+                label: l10n.transactionDetailsModal_sender,
+                value: transaction.sender,
+                theme: theme,
+                isCopyable: true,
+              ),
+            if (transaction.recipient.isNotEmpty)
+              DetailItem(
+                label: l10n.transactionDetailsModal_recipient,
+                value: transaction.recipient,
+                theme: theme,
+                isCopyable: true,
+              ),
             if (transaction.contractAddress != null)
               DetailItem(
                 label: l10n.transactionDetailsModal_contractAddress,
@@ -250,6 +260,72 @@ class TransactionDetailsModal extends StatelessWidget {
                 label: l10n.transactionDetailsModal_errorMessage,
                 value: transaction.error!,
                 theme: theme,
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
+  Widget _buildSignedMessageDetails(
+    BuildContext context,
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    final signedMsg = transaction.parsedSignedMessage;
+
+    return Column(
+      children: [
+        DetailGroupCard(
+          title: l10n.signMessageModalContentTitle,
+          theme: theme,
+          children: [
+            if (signedMsg?.signature != null)
+              DetailItem(
+                label: l10n.transactionDetailsModal_sig,
+                value: signedMsg!.signature!,
+                theme: theme,
+                isCopyable: true,
+              ),
+            if (signedMsg?.pubKey != null)
+              DetailItem(
+                label: 'Public Key',
+                value: signedMsg!.pubKey!,
+                theme: theme,
+                isCopyable: true,
+              ),
+            DetailItem(
+              label: l10n.transactionDetailsModal_timestamp,
+              value: _formatTimestamp(),
+              theme: theme,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DetailGroupCard(
+          title: l10n.transactionDetailsModal_network,
+          theme: theme,
+          children: [
+            DetailItem(
+              label: l10n.transactionDetailsModal_networkName,
+              value: _getNetworkName(appState, transaction.chainHash),
+              theme: theme,
+            ),
+          ],
+        ),
+        if (signedMsg?.message != null) ...[
+          const SizedBox(height: 12),
+          DetailGroupCard(
+            title: 'Message',
+            theme: theme,
+            children: [
+              DetailItem(
+                label: 'Content',
+                value: signedMsg!.message!,
+                theme: theme,
+                isCopyable: true,
               ),
             ],
           ),
@@ -504,6 +580,18 @@ class _AmountSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+
+    if (transaction.isSignedMessage) {
+      return DetailGroupCard(
+        title: l10n.signMessageModalContentTitle,
+        theme: theme,
+        headerTrailing: _buildStatusWidget(context, theme),
+        children: [
+          _buildSignedMessageInfo(l10n),
+        ],
+      );
+    }
+
     return DetailGroupCard(
       title: l10n.amountSection_transfer,
       theme: theme,
@@ -511,6 +599,49 @@ class _AmountSection extends StatelessWidget {
       children: [
         _buildTokenTransferInfo(),
       ],
+    );
+  }
+
+  Widget _buildSignedMessageInfo(AppLocalizations l10n) {
+    final signedMsg = transaction.parsedSignedMessage;
+    final message = signedMsg?.message ?? '';
+    final displayMessage =
+        message.length > 100 ? '${message.substring(0, 100)}...' : message;
+
+    return Padding(
+      padding: const EdgeInsets.all(12),
+      child: Row(
+        children: [
+          _buildTokenIcon(),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  transaction.title ?? l10n.signMessageModalContentTitle,
+                  style: TextStyle(
+                    color: theme.textPrimary,
+                    fontSize: 20,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                if (displayMessage.isNotEmpty)
+                  Text(
+                    displayMessage,
+                    style: TextStyle(
+                      color: theme.textSecondary,
+                      fontSize: 14,
+                      fontWeight: FontWeight.w400,
+                    ),
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 
@@ -548,7 +679,7 @@ class _AmountSection extends StatelessWidget {
             ],
           ),
         );
-      case TransactionStatusInfo.confirmed:
+      case TransactionStatusInfo.success:
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           decoration: BoxDecoration(
@@ -564,7 +695,7 @@ class _AmountSection extends StatelessWidget {
             ),
           ),
         );
-      case TransactionStatusInfo.rejected:
+      case TransactionStatusInfo.failed:
         return Container(
           padding: const EdgeInsets.symmetric(vertical: 6, horizontal: 12),
           decoration: BoxDecoration(

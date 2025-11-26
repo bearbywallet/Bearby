@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/backend.dart';

@@ -6,6 +6,7 @@ import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -103,11 +104,11 @@ class _HistoryItemState extends State<HistoryItem>
 
   Color _getStatusColor(AppTheme theme) {
     switch (widget.transaction.status) {
-      case TransactionStatusInfo.confirmed:
+      case TransactionStatusInfo.success:
         return theme.success;
       case TransactionStatusInfo.pending:
         return theme.warning;
-      case TransactionStatusInfo.rejected:
+      case TransactionStatusInfo.failed:
         return theme.danger;
     }
   }
@@ -128,6 +129,30 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildAmountWithPrice(AppState appState) {
     final theme = appState.currentTheme;
+
+    if (widget.transaction.isSignedMessage) {
+      final signedMsg = widget.transaction.parsedSignedMessage;
+      final message = signedMsg?.message ?? '';
+      final displayMessage =
+          message.length > 50 ? '${message.substring(0, 50)}...' : message;
+
+      return Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(
+            displayMessage.isNotEmpty ? displayMessage : 'Signed Message',
+            style: theme.bodyText1.copyWith(
+              color: theme.textPrimary,
+              fontWeight: FontWeight.w600,
+              letterSpacing: 0.5,
+            ),
+            overflow: TextOverflow.ellipsis,
+            maxLines: 2,
+          ),
+        ],
+      );
+    }
+
     final token = _findMatchingToken(appState);
     final baseToken = appState.wallet?.tokens.first;
 
@@ -175,6 +200,11 @@ class _HistoryItemState extends State<HistoryItem>
 
   Widget _buildFeeWithPrice(AppState appState) {
     final theme = appState.currentTheme;
+
+    if (widget.transaction.isSignedMessage) {
+      return const SizedBox.shrink();
+    }
+
     final token = appState.wallet?.tokens.first;
 
     if (token == null) {

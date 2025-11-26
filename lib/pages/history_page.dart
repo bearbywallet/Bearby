@@ -7,6 +7,7 @@ import 'package:zilpay/components/transaction_item.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/transaction_details_modal.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';

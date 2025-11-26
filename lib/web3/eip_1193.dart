@@ -7,6 +7,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/config/ftokens.dart';
 import 'package:zilpay/mixins/eip712.dart';
+import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/add_chain.dart';
 import 'package:zilpay/modals/app_connect.dart';
 import 'package:zilpay/modals/sign_message.dart';
