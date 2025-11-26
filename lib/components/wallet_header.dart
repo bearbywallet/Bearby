@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/modals/wallet_header.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -63,6 +64,9 @@ class _WalletHeaderState extends State<WalletHeader>
   Widget build(BuildContext context) {
     final state = Provider.of<AppState>(context);
     final theme = state.currentTheme;
+    final avatarSize = AdaptiveSize.getAdaptiveIconSize(context, 50);
+    final gearSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
+    final spacing = AdaptiveSize.getAdaptiveSize(context, 8);
 
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 0.0),
@@ -86,22 +90,22 @@ class _WalletHeaderState extends State<WalletHeader>
                   opacity: _opacity,
                   duration: Duration(milliseconds: _isAnimated ? 150 : 0),
                   child: AvatarAddress(
-                    avatarSize: 50,
+                    avatarSize: avatarSize,
                     account: widget.account,
                   ),
                 ),
               ),
               HoverSvgIcon(
                 assetName: 'assets/icons/gear.svg',
-                width: 32,
-                height: 32,
-                padding: const EdgeInsets.fromLTRB(16, 0, 0, 0),
+                width: gearSize,
+                height: gearSize,
+                padding: EdgeInsets.fromLTRB(spacing * 2, 0, 0, 0),
                 color: theme.textSecondary,
                 onTap: widget.onSettings,
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          SizedBox(height: spacing),
           Row(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -113,7 +117,7 @@ class _WalletHeaderState extends State<WalletHeader>
                   fontSize: theme.headline2.fontSize,
                 ),
               ),
-              const SizedBox(width: 8),
+              SizedBox(width: spacing),
               CopyContent(
                 address: widget.account.addr,
               ),

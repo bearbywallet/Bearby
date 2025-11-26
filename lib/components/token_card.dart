@@ -54,7 +54,7 @@ class _TokenCardState extends State<TokenCard>
     super.dispose();
   }
 
-  Widget _buildIcon(AppState state) {
+  Widget _buildIcon(AppState state, double iconSize) {
     final theme = state.currentTheme;
     FTokenInfo token = FTokenInfo(
       name: widget.ftoken.name,
@@ -71,8 +71,8 @@ class _TokenCardState extends State<TokenCard>
     );
 
     return Container(
-      width: 32,
-      height: 32,
+      width: iconSize,
+      height: iconSize,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
         border: Border.all(
@@ -85,12 +85,12 @@ class _TokenCardState extends State<TokenCard>
             shortName: state.chain?.shortName ?? '',
             theme: theme.value,
           ),
-          width: 32,
-          height: 32,
+          width: iconSize,
+          height: iconSize,
           fit: BoxFit.contain,
           errorWidget: Jazzicon(
             seed: widget.ftoken.addr,
-            diameter: 32,
+            diameter: iconSize,
           ),
           loadingWidget:
               const Center(child: CircularProgressIndicator(strokeWidth: 2)),
@@ -108,6 +108,7 @@ class _TokenCardState extends State<TokenCard>
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 32);
     final (amount, converted) = formatingAmount(
       amount: widget.tokenAmount,
       symbol: widget.ftoken.symbol,
@@ -225,7 +226,7 @@ class _TokenCardState extends State<TokenCard>
                             color: theme.textPrimary.withValues(alpha: 0.05),
                             shape: BoxShape.circle,
                           ),
-                          child: _buildIcon(Provider.of<AppState>(context)),
+                          child: _buildIcon(Provider.of<AppState>(context), iconSize),
                         ),
                       ],
                     ),

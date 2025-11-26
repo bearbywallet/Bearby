@@ -51,7 +51,7 @@ class ZilPayApp extends StatelessWidget {
 
                   double scaleFactor = screenWidth / baseWidth;
 
-                  final textScale = scaleFactor.clamp(0.85, 1.15);
+                  final textScale = scaleFactor.clamp(0.85, 1.35);
 
                   return MediaQuery(
                     data: mediaQuery.copyWith(

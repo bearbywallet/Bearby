@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TileButton extends StatefulWidget {
@@ -107,31 +108,35 @@ class _TileButtonState extends State<TileButton>
   Widget build(BuildContext context) {
     final appState = Provider.of<AppState>(context);
     final theme = appState.currentTheme;
+    final scaleFactor = AdaptiveSize.getScaleFactor(context);
 
     final bool hasTitle = widget.title != null && widget.title!.isNotEmpty;
 
-    final double iconSize = hasTitle ? 34.0 : 20.0;
-    final double borderRadius = 16.0;
+    final double baseIconSize = hasTitle ? 34.0 : 20.0;
+    final double iconSize = baseIconSize * scaleFactor;
+    final double borderRadius = 16.0 * scaleFactor;
 
     double containerSize;
 
     if (hasTitle) {
-      final double estimatedFontSize = theme.caption.fontSize ?? 14.0;
+      final double estimatedFontSize = (theme.caption.fontSize ?? 14.0) * scaleFactor;
       final double estimatedLineHeightFactor = theme.caption.height ?? 1.3;
       final double actualTextHeightForTwoLines =
           estimatedFontSize * 2 * estimatedLineHeightFactor;
+      final double padding = 12.0 * scaleFactor;
 
       containerSize =
-          12.0 + iconSize + 4.0 + actualTextHeightForTwoLines + 12.0;
+          padding + iconSize + 4.0 * scaleFactor + actualTextHeightForTwoLines + padding;
     } else {
-      containerSize = 48.0;
+      containerSize = 48.0 * scaleFactor;
     }
 
     Widget buttonContent;
+    final double padding = 12.0 * scaleFactor;
 
     if (hasTitle) {
       buttonContent = Padding(
-        padding: const EdgeInsets.all(12.0),
+        padding: EdgeInsets.all(padding),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -142,7 +147,7 @@ class _TileButtonState extends State<TileButton>
               height: iconSize,
               child: Center(child: widget.icon),
             ),
-            const SizedBox(height: 4),
+            SizedBox(height: 4 * scaleFactor),
             Text(
               widget.title!,
               style: theme.caption.copyWith(

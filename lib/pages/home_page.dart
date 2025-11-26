@@ -19,9 +19,8 @@ import 'package:zilpay/state/app_state.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
-const double ICON_SIZE_SMALL = 24.0;
-const double ICON_SIZE_MEDIUM = 32.0;
-const double ICON_SIZE_TILE_BUTTON = 25.0;
+const double _ICON_SIZE_SMALL_BASE = 24.0;
+const double _ICON_SIZE_TILE_BUTTON_BASE = 25.0;
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -113,6 +112,10 @@ class _HomePageState extends State<HomePage>
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
+    final iconSizeSmall = AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_SMALL_BASE);
+    final iconSizeTileButton = AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_TILE_BUTTON_BASE);
+    final iconSizeManage = AdaptiveSize.getAdaptiveIconSize(context, 18);
+    final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
     final l10n = AppLocalizations.of(context)!;
 
@@ -176,8 +179,8 @@ class _HomePageState extends State<HomePage>
                     IconButton(
                       icon: SvgPicture.asset(
                         'assets/icons/close.svg',
-                        width: ICON_SIZE_SMALL,
-                        height: ICON_SIZE_SMALL,
+                        width: iconSizeSmall,
+                        height: iconSizeSmall,
                         colorFilter: ColorFilter.mode(
                           theme.buttonText,
                           BlendMode.srcIn,
@@ -223,8 +226,8 @@ class _HomePageState extends State<HomePage>
               TileButton(
                 icon: SvgPicture.asset(
                   "assets/icons/receive.svg",
-                  width: ICON_SIZE_TILE_BUTTON,
-                  height: ICON_SIZE_TILE_BUTTON,
+                  width: iconSizeTileButton,
+                  height: iconSizeTileButton,
                   colorFilter: ColorFilter.mode(
                     theme.primaryPurple,
                     BlendMode.srcIn,
@@ -243,8 +246,8 @@ class _HomePageState extends State<HomePage>
                 TileButton(
                   icon: SvgPicture.asset(
                     "assets/icons/anchor.svg",
-                    width: ICON_SIZE_TILE_BUTTON,
-                    height: ICON_SIZE_TILE_BUTTON,
+                    width: iconSizeTileButton,
+                    height: iconSizeTileButton,
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
@@ -266,8 +269,8 @@ class _HomePageState extends State<HomePage>
                     appState.account?.addrType == 0
                         ? "assets/icons/scilla.svg"
                         : "assets/icons/solidity.svg",
-                    width: ICON_SIZE_TILE_BUTTON,
-                    height: ICON_SIZE_TILE_BUTTON,
+                    width: iconSizeTileButton,
+                    height: iconSizeTileButton,
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
@@ -310,13 +313,13 @@ class _HomePageState extends State<HomePage>
                     },
                     chain: appState.chain!,
                   ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: spacing),
                   HoverSvgIcon(
                     assetName: appState.hideBalance
                         ? 'assets/icons/close_eye.svg'
                         : 'assets/icons/open_eye.svg',
-                    width: ICON_SIZE_SMALL,
-                    height: ICON_SIZE_SMALL,
+                    width: iconSizeSmall,
+                    height: iconSizeSmall,
                     padding: const EdgeInsets.all(0),
                     color: theme.textSecondary.withValues(alpha: 0.5),
                     onTap: () {
@@ -333,8 +336,8 @@ class _HomePageState extends State<HomePage>
                       assetName: appState.isTileView
                           ? 'assets/icons/tiles.svg'
                           : 'assets/icons/lines.svg',
-                      width: 18,
-                      height: 18,
+                      width: iconSizeManage,
+                      height: iconSizeManage,
                       blendMode: BlendMode.modulate,
                       padding: const EdgeInsets.all(0),
                       color: theme.surface,
@@ -342,11 +345,11 @@ class _HomePageState extends State<HomePage>
                         await appState.updateIsTileView(!appState.isTileView);
                       },
                     ),
-                  const SizedBox(width: 12),
+                  SizedBox(width: spacing),
                   HoverSvgIcon(
                     assetName: 'assets/icons/manage.svg',
-                    width: 18,
-                    height: 18,
+                    width: iconSizeManage,
+                    height: iconSizeManage,
                     blendMode: BlendMode.modulate,
                     padding: const EdgeInsets.all(0),
                     color: theme.surface,
@@ -366,11 +369,11 @@ class _HomePageState extends State<HomePage>
         SliverPadding(
           padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
           sliver: SliverGrid(
-            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               childAspectRatio: 1.618,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
+              crossAxisSpacing: spacing,
+              mainAxisSpacing: spacing,
             ),
             delegate: SliverChildBuilderDelegate(
               (context, index) {
@@ -449,10 +452,13 @@ class _HomePageState extends State<HomePage>
       );
     }
 
+    final screenWidth = MediaQuery.of(context).size.width;
+    final maxWidth = screenWidth < 600 ? double.infinity : 600.0;
+
     return SafeArea(
       child: Center(
         child: ConstrainedBox(
-          constraints: const BoxConstraints(maxWidth: 480),
+          constraints: BoxConstraints(maxWidth: maxWidth),
           child: scrollView,
         ),
       ),
