@@ -8,6 +8,7 @@ import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -22,7 +23,8 @@ class SecretPhraseGeneratorPage extends StatefulWidget {
   State<SecretPhraseGeneratorPage> createState() => _CreateAccountPageState();
 }
 
-class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
+class _CreateAccountPageState extends State<SecretPhraseGeneratorPage>
+    with StatusBarMixin {
   List<String> _mnemonicWords = [];
   var _count = 12;
   bool _hasBackupWords = false;
@@ -42,6 +44,13 @@ class _CreateAccountPageState extends State<SecretPhraseGeneratorPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

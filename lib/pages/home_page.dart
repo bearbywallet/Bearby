@@ -11,6 +11,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -29,7 +30,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with TickerProviderStateMixin, StatusBarMixin {
   bool _isFirstLoad = true;
   String? _errorMessage;
   late AnimationController _animationController;

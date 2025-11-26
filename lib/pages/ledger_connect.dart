@@ -7,6 +7,7 @@ import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:permission_handler/permission_handler.dart';
 
@@ -17,7 +18,8 @@ class LedgerConnectPage extends StatefulWidget {
   State<LedgerConnectPage> createState() => _LedgerConnectPageState();
 }
 
-class _LedgerConnectPageState extends State<LedgerConnectPage> {
+class _LedgerConnectPageState extends State<LedgerConnectPage>
+    with StatusBarMixin {
   @override
   void initState() {
     super.initState();
@@ -125,6 +127,13 @@ class _LedgerConnectPageState extends State<LedgerConnectPage> {
 
         return Scaffold(
           backgroundColor: theme.background,
+          appBar: AppBar(
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            automaticallyImplyLeading: false,
+            toolbarHeight: 0,
+            systemOverlayStyle: getSystemUiOverlayStyle(context),
+          ),
           body: SafeArea(
             child: Center(
               child: ConstrainedBox(

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -15,7 +16,7 @@ class SecurityPage extends StatefulWidget {
   State<SecurityPage> createState() => _SecurityPageState();
 }
 
-class _SecurityPageState extends State<SecurityPage> {
+class _SecurityPageState extends State<SecurityPage> with StatusBarMixin {
   final TextEditingController _ipfsController = TextEditingController(text: '');
 
   @override
@@ -48,6 +49,13 @@ class _SecurityPageState extends State<SecurityPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

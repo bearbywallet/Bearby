@@ -6,6 +6,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
 import 'package:zilpay/components/wor_count_selector.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -19,7 +20,8 @@ class RestoreSecretPhrasePage extends StatefulWidget {
       _RestoreSecretPhrasePageState();
 }
 
-class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
+class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
+    with StatusBarMixin {
   late List<String> _words;
   List<int> _wordsErrorIndexes = [];
   int _count = 12;
@@ -236,6 +238,13 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage> {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

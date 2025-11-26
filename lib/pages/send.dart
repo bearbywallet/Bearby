@@ -9,6 +9,7 @@ import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/transfer.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
@@ -25,7 +26,7 @@ class SendTokenPage extends StatefulWidget {
   State<SendTokenPage> createState() => _SendTokenPageState();
 }
 
-class _SendTokenPageState extends State<SendTokenPage> {
+class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   bool _initialized = false;
   int _tokenIndex = 0;
   String _amount = "0";
@@ -80,6 +81,13 @@ class _SendTokenPageState extends State<SendTokenPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

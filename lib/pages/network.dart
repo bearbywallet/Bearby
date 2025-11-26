@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/network_card.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/chain_config_edit.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -21,7 +22,7 @@ class NetworkPage extends StatefulWidget {
   State<NetworkPage> createState() => _NetworkPageState();
 }
 
-class _NetworkPageState extends State<NetworkPage> {
+class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
   List<NetworkItem> addedNetworks = [];
@@ -247,6 +248,13 @@ class _NetworkPageState extends State<NetworkPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

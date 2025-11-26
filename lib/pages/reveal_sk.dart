@@ -12,6 +12,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -27,7 +28,8 @@ class RevealSecretKey extends StatefulWidget {
   State<RevealSecretKey> createState() => _RevealSecretKeyState();
 }
 
-class _RevealSecretKeyState extends State<RevealSecretKey> {
+class _RevealSecretKeyState extends State<RevealSecretKey>
+    with StatusBarMixin {
   bool isCopied = false;
   bool isAuthenticated = false;
   bool hasError = false;
@@ -103,6 +105,13 @@ class _RevealSecretKeyState extends State<RevealSecretKey> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

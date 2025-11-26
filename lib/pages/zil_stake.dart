@@ -9,6 +9,7 @@ import 'package:zilpay/components/linear_refresh_indicator.dart';
 import 'package:zilpay/components/stakeing_card.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/stake.dart';
 import 'package:zilpay/src/rust/models/stake.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -21,7 +22,7 @@ class ZilStakePage extends StatefulWidget {
   State<ZilStakePage> createState() => _ZilStakePageState();
 }
 
-class _ZilStakePageState extends State<ZilStakePage> {
+class _ZilStakePageState extends State<ZilStakePage> with StatusBarMixin {
   List<FinalOutputInfo> _stakes = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -87,6 +88,13 @@ class _ZilStakePageState extends State<ZilStakePage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

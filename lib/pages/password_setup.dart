@@ -1,6 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/components/biometric_switch.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -8,6 +8,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
@@ -27,7 +28,8 @@ class PasswordSetupPage extends StatefulWidget {
   State<PasswordSetupPage> createState() => _PasswordSetupPageState();
 }
 
-class _PasswordSetupPageState extends State<PasswordSetupPage> {
+class _PasswordSetupPageState extends State<PasswordSetupPage>
+    with StatusBarMixin {
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   WalletArgonParamsInfo? _argon2;
@@ -328,6 +330,13 @@ class _PasswordSetupPageState extends State<PasswordSetupPage> {
 
     return Scaffold(
       resizeToAvoidBottomInset: true,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

@@ -1,7 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/counter.dart';
@@ -13,6 +13,7 @@ import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
@@ -33,7 +34,8 @@ class AddLedgerAccountPage extends StatefulWidget {
   State<AddLedgerAccountPage> createState() => _AddLedgerAccountPageState();
 }
 
-class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
+class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
+    with StatusBarMixin {
   final _walletNameController = TextEditingController();
   final _btnController = RoundedLoadingButtonController();
   final _createBtnController = RoundedLoadingButtonController();
@@ -524,6 +526,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

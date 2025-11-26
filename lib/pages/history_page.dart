@@ -7,6 +7,7 @@ import 'package:zilpay/components/transaction_item.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/transaction_details_modal.dart';
 import 'package:zilpay/src/rust/api/transaction.dart';
@@ -23,7 +24,7 @@ class HistoryPage extends StatefulWidget {
   State<HistoryPage> createState() => _HistoryPageState();
 }
 
-class _HistoryPageState extends State<HistoryPage> {
+class _HistoryPageState extends State<HistoryPage> with StatusBarMixin {
   List<HistoricalTransactionInfo> _history = [];
   bool _isLoading = true;
   SortType _sortType = SortType.date;
@@ -261,6 +262,13 @@ class _HistoryPageState extends State<HistoryPage> {
 
     return Scaffold(
       backgroundColor: appState.currentTheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

@@ -3,6 +3,7 @@ import 'package:blockies/blockies.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -33,7 +34,8 @@ class RestoreRKStorage extends StatefulWidget {
   State<RestoreRKStorage> createState() => _RestoreRKStorageState();
 }
 
-class _RestoreRKStorageState extends State<RestoreRKStorage> {
+class _RestoreRKStorageState extends State<RestoreRKStorage>
+    with StatusBarMixin {
   List<Account> accounts = [];
   final TextEditingController _passwordController = TextEditingController();
   bool _isLoading = false;
@@ -129,6 +131,13 @@ class _RestoreRKStorageState extends State<RestoreRKStorage> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

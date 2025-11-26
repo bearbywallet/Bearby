@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import '../theme/app_theme.dart';
 import '../components/custom_app_bar.dart';
 import '../state/app_state.dart';
@@ -16,7 +17,7 @@ class AboutPage extends StatefulWidget {
   State<AboutPage> createState() => _AboutPageState();
 }
 
-class _AboutPageState extends State<AboutPage> {
+class _AboutPageState extends State<AboutPage> with StatusBarMixin {
   PackageInfo _packageInfo = PackageInfo(
     appName: 'ZilPay',
     packageName: '',
@@ -48,6 +49,13 @@ class _AboutPageState extends State<AboutPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

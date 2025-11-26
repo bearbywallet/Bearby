@@ -1,11 +1,12 @@
+import 'dart:typed_data';
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/config/argon.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/argon2.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
@@ -20,7 +21,8 @@ class CipherSettingsPage extends StatefulWidget {
   State<CipherSettingsPage> createState() => _CipherSettingsPageState();
 }
 
-class _CipherSettingsPageState extends State<CipherSettingsPage> {
+class _CipherSettingsPageState extends State<CipherSettingsPage>
+    with StatusBarMixin {
   List<String>? _bip39List;
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
@@ -98,6 +100,13 @@ class _CipherSettingsPageState extends State<CipherSettingsPage> {
     final padding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

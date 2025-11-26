@@ -8,6 +8,7 @@ import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/list_selector.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/settings.dart';
@@ -21,7 +22,8 @@ class BrowserSettingsPage extends StatefulWidget {
   State<BrowserSettingsPage> createState() => _BrowserSettingsPageState();
 }
 
-class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
+class _BrowserSettingsPageState extends State<BrowserSettingsPage>
+    with StatusBarMixin {
   final List<ListItem> searchEngines = baseSearchEngines
       .map((s) => ListItem(title: s.name, subtitle: s.description))
       .toList();
@@ -209,6 +211,13 @@ class _BrowserSettingsPageState extends State<BrowserSettingsPage> {
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

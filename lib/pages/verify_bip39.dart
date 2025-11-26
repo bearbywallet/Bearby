@@ -4,6 +4,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/mnemonic_word_input.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -30,7 +31,8 @@ class SecretPhraseVerifyPage extends StatefulWidget {
   State<SecretPhraseVerifyPage> createState() => _VerifyBip39PageState();
 }
 
-class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
+class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
+    with StatusBarMixin {
   List<String>? _bip39List;
   List<int> _indexes = [];
   final List<String> _verifyWords =
@@ -67,6 +69,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage> {
     final theme = Provider.of<AppState>(context).currentTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

@@ -6,6 +6,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -18,7 +19,8 @@ class SecretKeyRestorePage extends StatefulWidget {
   State<SecretKeyRestorePage> createState() => _SecretKeyRestorePageState();
 }
 
-class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
+class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
+    with StatusBarMixin {
   final TextEditingController _privateKeyController = TextEditingController();
   String? _errorMessage;
   bool _hasBackup = false;
@@ -69,6 +71,13 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

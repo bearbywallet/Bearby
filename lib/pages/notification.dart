@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:blockies/blockies.dart';
 import 'package:zilpay/components/switch_setting_item.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/models/notification.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
@@ -19,7 +20,8 @@ class NotificationsSettingsPage extends StatefulWidget {
       _NotificationsSettingsPageState();
 }
 
-class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
+class _NotificationsSettingsPageState extends State<NotificationsSettingsPage>
+    with StatusBarMixin {
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -44,6 +46,13 @@ class _NotificationsSettingsPageState extends State<NotificationsSettingsPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

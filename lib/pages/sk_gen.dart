@@ -7,6 +7,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/hex_key.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/backup_confirmation_modal.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -20,7 +21,8 @@ class SecretKeyGeneratorPage extends StatefulWidget {
   State<SecretKeyGeneratorPage> createState() => _CreateAccountPageState();
 }
 
-class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
+class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
+    with StatusBarMixin {
   KeyPairInfo _keyPair = KeyPairInfo(sk: "", pk: "");
   bool _hasBackupWords = false;
   bool isCopied = false;
@@ -46,6 +48,13 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

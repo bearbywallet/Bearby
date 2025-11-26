@@ -8,6 +8,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/token.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -60,7 +61,8 @@ class ManageTokensPage extends StatefulWidget {
   State<ManageTokensPage> createState() => _ManageTokensPageState();
 }
 
-class _ManageTokensPageState extends State<ManageTokensPage> {
+class _ManageTokensPageState extends State<ManageTokensPage>
+    with StatusBarMixin {
   final TextEditingController _searchController = TextEditingController();
   final ScrollController _scrollController = ScrollController();
 
@@ -388,6 +390,13 @@ class _ManageTokensPageState extends State<ManageTokensPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

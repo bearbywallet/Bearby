@@ -1,8 +1,8 @@
 // ignore_for_file: constant_identifier_names
 
 import 'dart:io';
-import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:file_picker/file_picker.dart';
@@ -11,6 +11,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -28,7 +29,8 @@ class RestoreKeystoreFilePage extends StatefulWidget {
       _RestoreKeystoreFilePageState();
 }
 
-class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
+class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage>
+    with StatusBarMixin {
   static const List<int> SIGNATURE = [
     90,
     73,
@@ -320,6 +322,13 @@ class _RestoreKeystoreFilePageState extends State<RestoreKeystoreFilePage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

@@ -13,6 +13,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/config/search_engines.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/browser_action_modal.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -28,7 +29,8 @@ class BrowserPage extends StatefulWidget {
   State<BrowserPage> createState() => _BrowserPageState();
 }
 
-class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
+class _BrowserPageState extends State<BrowserPage>
+    with WidgetsBindingObserver, StatusBarMixin {
   final TextEditingController _searchController = TextEditingController();
 
   InAppWebViewController? _webViewController;
@@ -218,6 +220,13 @@ class _BrowserPageState extends State<BrowserPage> with WidgetsBindingObserver {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

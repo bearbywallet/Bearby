@@ -8,6 +8,7 @@ import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/src/rust/api/provider.dart';
 import 'package:zilpay/src/rust/models/keypair.dart';
@@ -24,7 +25,8 @@ class SetupNetworkSettingsPage extends StatefulWidget {
       _SetupNetworkSettingsPageState();
 }
 
-class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
+class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
+    with StatusBarMixin {
   List<String>? _bip39List;
   KeyPairInfo? _keys;
   DiscoveredDevice? _ledger;
@@ -259,6 +261,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

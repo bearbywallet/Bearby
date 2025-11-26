@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../components/view_item.dart';
 
@@ -17,6 +18,7 @@ class GenWalletOptionsPage extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
+        systemOverlayStyle: StatusBarUtils.getOverlayStyle(context),
         leading: IconButton(
           icon: SvgPicture.asset(
             'assets/icons/back.svg',

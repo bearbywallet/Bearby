@@ -16,6 +16,7 @@ import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/qrcode.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 
@@ -26,7 +27,8 @@ class RevealSecretPhrase extends StatefulWidget {
   State<RevealSecretPhrase> createState() => _RevealSecretPhraseState();
 }
 
-class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
+class _RevealSecretPhraseState extends State<RevealSecretPhrase>
+    with StatusBarMixin {
   bool isCopied = false;
   bool isAuthenticated = false;
   bool hasError = false;
@@ -133,6 +135,13 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase> {
     final theme = state.currentTheme;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

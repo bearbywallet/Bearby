@@ -5,6 +5,7 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'dart:async';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
@@ -22,7 +23,7 @@ class AddAccount extends StatefulWidget {
   State<AddAccount> createState() => _AddAccountState();
 }
 
-class _AddAccountState extends State<AddAccount> {
+class _AddAccountState extends State<AddAccount> with StatusBarMixin {
   final TextEditingController _accountNameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
@@ -234,6 +235,13 @@ class _AddAccountState extends State<AddAccount> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

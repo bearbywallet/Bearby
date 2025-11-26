@@ -5,6 +5,7 @@ import 'package:zilpay/components/button_item.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -19,7 +20,8 @@ class CurrencyConversionPage extends StatefulWidget {
   State<CurrencyConversionPage> createState() => _CurrencyConversionPageState();
 }
 
-class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
+class _CurrencyConversionPageState extends State<CurrencyConversionPage>
+    with StatusBarMixin {
   late List<Currency> _currencies = [];
   late List<Currency> _filteredCurrencies = [];
   final TextEditingController _searchController = TextEditingController();
@@ -123,6 +125,13 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_common.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:no_screenshot/no_screenshot.dart';
@@ -9,6 +9,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -25,7 +26,7 @@ class KeystoreBackup extends StatefulWidget {
   State<KeystoreBackup> createState() => _KeystoreBackupState();
 }
 
-class _KeystoreBackupState extends State<KeystoreBackup> {
+class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
   bool isProcessing = false;
   bool hasError = false;
   String? errorMessage;
@@ -223,6 +224,13 @@ class _KeystoreBackupState extends State<KeystoreBackup> {
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Column(
           children: [

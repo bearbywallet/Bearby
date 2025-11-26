@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/src/rust/api/settings.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -22,7 +23,7 @@ class LanguagePage extends StatefulWidget {
   State<LanguagePage> createState() => _LanguagePageState();
 }
 
-class _LanguagePageState extends State<LanguagePage> {
+class _LanguagePageState extends State<LanguagePage> with StatusBarMixin {
   final List<Language> languages = [];
 
   String selectedLanguage = 'system';
@@ -58,6 +59,13 @@ class _LanguagePageState extends State<LanguagePage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

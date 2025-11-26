@@ -15,6 +15,7 @@ import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/qrcode.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/select_token.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
@@ -32,7 +33,7 @@ class ReceivePage extends StatefulWidget {
   State<ReceivePage> createState() => _ReceivePageState();
 }
 
-class _ReceivePageState extends State<ReceivePage> {
+class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
   bool isCopied = false;
   bool isPressedToken = false;
   int selectedToken = 0;
@@ -153,6 +154,13 @@ class _ReceivePageState extends State<ReceivePage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(

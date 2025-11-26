@@ -6,6 +6,7 @@ import 'package:flutter_svg/svg.dart';
 import 'package:zilpay/src/rust/api/auth.dart';
 import 'package:zilpay/src/rust/models/wallet.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 
 import '../components/load_button.dart';
 import '../components/smart_input.dart';
@@ -24,7 +25,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with StatusBarMixin {
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -391,6 +392,13 @@ class _LoginPageState extends State<LoginPage> {
 
     return Scaffold(
       backgroundColor: appState.currentTheme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: Stack(
         children: [
           _buildBackground(screenSize),

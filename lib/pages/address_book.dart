@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/addr.dart';
+import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/modals/add_contect.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/models/book.dart';
@@ -19,7 +20,8 @@ class AddressBookPage extends StatefulWidget {
   State<AddressBookPage> createState() => _AddressBookPageState();
 }
 
-class _AddressBookPageState extends State<AddressBookPage> {
+class _AddressBookPageState extends State<AddressBookPage>
+    with StatusBarMixin {
   Future<void> _showDeleteConfirmationDialog(BuildContext context,
       AppState state, AddressBookEntryInfo address) async {
     final l10n = AppLocalizations.of(context)!;
@@ -89,6 +91,13 @@ class _AddressBookPageState extends State<AddressBookPage> {
 
     return Scaffold(
       backgroundColor: theme.background,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        automaticallyImplyLeading: false,
+        toolbarHeight: 0,
+        systemOverlayStyle: getSystemUiOverlayStyle(context),
+      ),
       body: SafeArea(
         child: Center(
           child: ConstrainedBox(
