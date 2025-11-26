@@ -138,9 +138,12 @@ class _CurrencyConversionPageState extends State<CurrencyConversionPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title: AppLocalizations.of(context)!.currencyConversionTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: AppLocalizations.of(context)!.currencyConversionTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: Padding(

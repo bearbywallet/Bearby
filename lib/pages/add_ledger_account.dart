@@ -478,9 +478,12 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
               children: [
                 Column(
                   children: [
-                    CustomAppBar(
-                      title: l10n.addLedgerAccountPageAppBarTitle,
-                      onBackPressed: () => Navigator.pop(context),
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: CustomAppBar(
+                        title: l10n.addLedgerAccountPageAppBarTitle,
+                        onBackPressed: () => Navigator.pop(context),
+                      ),
                     ),
                     Expanded(
                       child: RefreshIndicator(

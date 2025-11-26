@@ -81,16 +81,19 @@ class _SecretKeyRestorePageState extends State<SecretKeyRestorePage>
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: l10n.secretKeyRestorePageTitle,
-              onBackPressed: () => Navigator.pop(context),
-              actionIcon: SvgPicture.asset(
-                'assets/icons/paste.svg',
-                width: 30,
-                height: 30,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: CustomAppBar(
+                title: l10n.secretKeyRestorePageTitle,
+                onBackPressed: () => Navigator.pop(context),
+                actionIcon: SvgPicture.asset(
+                  'assets/icons/paste.svg',
+                  width: 30,
+                  height: 30,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary,
+                    BlendMode.srcIn,
+                  ),
                 ),
               ),
             ),

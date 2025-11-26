@@ -118,6 +118,7 @@ class _TokenCardState extends State<TokenCard>
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisSize: MainAxisSize.max,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -138,7 +139,6 @@ class _TokenCardState extends State<TokenCard>
               _buildIcon(appState, iconSize),
             ],
           ),
-          const Spacer(),
           Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -256,42 +256,48 @@ class _TokenCardState extends State<TokenCard>
       content = _buildListLayout(appState, displayAmount, displayConverted, adaptivePadding);
     }
 
+    Widget gestureWidget = MouseRegion(
+      onEnter: (_) => setState(() => isHovered = true),
+      onExit: (_) => setState(() => isHovered = false),
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTapDown: (_) {
+          setState(() => isPressed = true);
+          _controller.forward();
+        },
+        onTapUp: (_) {
+          setState(() => isPressed = false);
+          _controller.reverse();
+        },
+        onTapCancel: () {
+          setState(() => isPressed = false);
+          _controller.reverse();
+        },
+        onTap: widget.onTap,
+        child: AnimatedBuilder(
+          animation: _animation,
+          builder: (context, child) =>
+              Transform.scale(scale: _animation.value, child: child),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 150),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: content,
+          ),
+        ),
+      ),
+    );
+
+    if (widget.isTileView) {
+      return gestureWidget;
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        MouseRegion(
-          onEnter: (_) => setState(() => isHovered = true),
-          onExit: (_) => setState(() => isHovered = false),
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (_) {
-              setState(() => isPressed = true);
-              _controller.forward();
-            },
-            onTapUp: (_) {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTapCancel: () {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTap: widget.onTap,
-            child: AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) =>
-                  Transform.scale(scale: _animation.value, child: child),
-              child: AnimatedContainer(
-                duration: const Duration(milliseconds: 150),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: content,
-              ),
-            ),
-          ),
-        ),
-        if (widget.showDivider && !widget.isTileView)
+        gestureWidget,
+        if (widget.showDivider)
           Container(
               height: 1, color: theme.textPrimary.withValues(alpha: 0.1)),
       ],

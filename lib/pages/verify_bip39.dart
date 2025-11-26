@@ -82,25 +82,13 @@ class _VerifyBip39PageState extends State<SecretPhraseVerifyPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title:
-                      AppLocalizations.of(context)!.secretPhraseVerifyPageTitle,
-                  onBackPressed: () => Navigator.pop(context),
-                  // actionWidget: TextButton(
-                  //   onPressed: () {
-                  //     Navigator.of(context).pushNamed('/net_setup',
-                  //         arguments: {'bip39': _bip39List});
-                  //   },
-                  //   child: Text(
-                  //     AppLocalizations.of(context)!
-                  //         .secretPhraseVerifyPageSkipButton,
-                  //     style: TextStyle(
-                  //       color: theme.textPrimary,
-                  //       fontSize: 16,
-                  //       fontWeight: FontWeight.w500,
-                  //     ),
-                  //   ),
-                  // ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: CustomAppBar(
+                    title:
+                        AppLocalizations.of(context)!.secretPhraseVerifyPageTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: _bip39List == null

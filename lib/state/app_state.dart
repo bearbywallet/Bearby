@@ -277,7 +277,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> loadIsTileView() async {
     final prefs = await SharedPreferences.getInstance();
     final key = "$_tokensCardStyleKey:$selectedWallet";
-    _isTileView = prefs.getBool(key) ?? true;
+    _isTileView = prefs.getBool(key) ?? false;
     notifyListeners();
   }
 

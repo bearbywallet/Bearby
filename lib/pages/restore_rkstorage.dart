@@ -145,9 +145,12 @@ class _RestoreRKStorageState extends State<RestoreRKStorage>
             child: CustomScrollView(
               slivers: [
                 SliverToBoxAdapter(
-                  child: CustomAppBar(
-                    title: l10n.restoreRKStorageTitle,
-                    onBackPressed: () => Navigator.pop(context),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16),
+                    child: CustomAppBar(
+                      title: l10n.restoreRKStorageTitle,
+                      onBackPressed: () => Navigator.pop(context),
+                    ),
                   ),
                 ),
                 SliverToBoxAdapter(

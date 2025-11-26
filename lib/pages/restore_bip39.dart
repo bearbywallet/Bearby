@@ -256,10 +256,13 @@ class _RestoreSecretPhrasePageState extends State<RestoreSecretPhrasePage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  title: AppLocalizations.of(context)!
-                      .restoreSecretPhrasePageTitle,
-                  onBackPressed: () => Navigator.pop(context),
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: AppLocalizations.of(context)!
+                        .restoreSecretPhrasePageTitle,
+                    onBackPressed: () => Navigator.pop(context),
+                  ),
                 ),
                 Expanded(
                   child: Padding(

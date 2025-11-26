@@ -58,19 +58,22 @@ class _CreateAccountPageState extends State<SecretKeyGeneratorPage>
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: l10n.secretKeyGeneratorPageTitle,
-              onBackPressed: () => Navigator.pop(context),
-              actionIcon: SvgPicture.asset(
-                'assets/icons/reload.svg',
-                width: 30,
-                height: 30,
-                colorFilter: ColorFilter.mode(
-                  theme.textPrimary,
-                  BlendMode.srcIn,
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: CustomAppBar(
+                title: l10n.secretKeyGeneratorPageTitle,
+                onBackPressed: () => Navigator.pop(context),
+                actionIcon: SvgPicture.asset(
+                  'assets/icons/reload.svg',
+                  width: 30,
+                  height: 30,
+                  colorFilter: ColorFilter.mode(
+                    theme.textPrimary,
+                    BlendMode.srcIn,
+                  ),
                 ),
+                onActionPressed: _regenerateKeys,
               ),
-              onActionPressed: _regenerateKeys,
             ),
             Expanded(
               child: Padding(

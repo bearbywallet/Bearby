@@ -145,9 +145,12 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
       body: SafeArea(
         child: Column(
           children: [
-            CustomAppBar(
-              title: AppLocalizations.of(context)!.revealSecretPhraseTitle,
-              onBackPressed: () => Navigator.pop(context),
+            Padding(
+              padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+              child: CustomAppBar(
+                title: AppLocalizations.of(context)!.revealSecretPhraseTitle,
+                onBackPressed: () => Navigator.pop(context),
+              ),
             ),
             Expanded(
               child: SingleChildScrollView(

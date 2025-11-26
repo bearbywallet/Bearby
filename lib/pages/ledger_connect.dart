@@ -140,22 +140,25 @@ class _LedgerConnectPageState extends State<LedgerConnectPage>
                 constraints: const BoxConstraints(maxWidth: 500),
                 child: Column(
                   children: [
-                    CustomAppBar(
-                      title: localizations.ledgerConnectPageTitle,
-                      onBackPressed: () => Navigator.pop(context),
-                      actionIcon: SvgPicture.asset(
-                        'assets/icons/reload.svg',
-                        width: 28,
-                        height: 28,
-                        colorFilter: ColorFilter.mode(
-                          isBusy
-                              ? theme.textSecondary.withAlpha(128)
-                              : theme.textPrimary,
-                          BlendMode.srcIn,
+                    Padding(
+                      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      child: CustomAppBar(
+                        title: localizations.ledgerConnectPageTitle,
+                        onBackPressed: () => Navigator.pop(context),
+                        actionIcon: SvgPicture.asset(
+                          'assets/icons/reload.svg',
+                          width: 28,
+                          height: 28,
+                          colorFilter: ColorFilter.mode(
+                            isBusy
+                                ? theme.textSecondary.withAlpha(128)
+                                : theme.textPrimary,
+                            BlendMode.srcIn,
+                          ),
                         ),
+                        onActionPressed:
+                            isBusy ? null : appState.ledgerViewController.scan,
                       ),
-                      onActionPressed:
-                          isBusy ? null : appState.ledgerViewController.scan,
                     ),
                     Expanded(
                       child: RefreshIndicator(
