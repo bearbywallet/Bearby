@@ -71,7 +71,9 @@ Future<(String, String)> signMessage(
         String? passphrase,
         String? sessionCipher,
         required List<String> identifiers,
-        required String message}) =>
+        required String message,
+        String? title,
+        String? icon}) =>
     RustLib.instance.api.crateApiTransactionSignMessage(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -79,7 +81,9 @@ Future<(String, String)> signMessage(
         passphrase: passphrase,
         sessionCipher: sessionCipher,
         identifiers: identifiers,
-        message: message);
+        message: message,
+        title: title,
+        icon: icon);
 
 Future<(String, String)> signTypedDataEip712(
         {required BigInt walletIndex,
@@ -88,7 +92,9 @@ Future<(String, String)> signTypedDataEip712(
         String? passphrase,
         String? sessionCipher,
         required List<String> identifiers,
-        required String typedDataJson}) =>
+        required String typedDataJson,
+        String? title,
+        String? icon}) =>
     RustLib.instance.api.crateApiTransactionSignTypedDataEip712(
         walletIndex: walletIndex,
         accountIndex: accountIndex,
@@ -96,7 +102,9 @@ Future<(String, String)> signTypedDataEip712(
         passphrase: passphrase,
         sessionCipher: sessionCipher,
         identifiers: identifiers,
-        typedDataJson: typedDataJson);
+        typedDataJson: typedDataJson,
+        title: title,
+        icon: icon);
 
 Future<List<HistoricalTransactionInfo>> getHistory(
         {required BigInt walletIndex}) =>

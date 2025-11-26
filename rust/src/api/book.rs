@@ -192,10 +192,19 @@ pub async fn get_combine_sort_addresses(
                 .map_err(|e| ServiceError::WalletError(wallet_index, e))?
                 .into_iter()
                 .filter_map(|tx| {
-                    if tx.chain_hash == selected_account.chain_hash {
-                        Some(Entry {
-                            name: tx.title.unwrap_or_default(),
-                            address: tx.recipient,
+                    if tx.metadata.chain_hash == selected_account.chain_hash {
+                        // Extract recipient from EVM or Scilla data
+                        let recipient = tx
+                            .get_evm()
+                            .and_then(|v| v.get("to").and_then(|t| t.as_str()).map(|s| s.to_string()))
+                            .or_else(|| {
+                                tx.get_scilla()
+                                    .and_then(|v| v.get("toAddr").and_then(|t| t.as_str()).map(|s| s.to_string()))
+                            });
+
+                        recipient.map(|address| Entry {
+                            name: tx.metadata.title.unwrap_or_default(),
+                            address,
                             tag: None,
                         })
                     } else {

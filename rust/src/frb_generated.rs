@@ -3525,6 +3525,8 @@ fn wire__crate__api__transaction__sign_message_impl(
             let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_message = <String>::sse_decode(&mut deserializer);
+            let api_title = <Option<String>>::sse_decode(&mut deserializer);
+            let api_icon = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -3537,6 +3539,8 @@ fn wire__crate__api__transaction__sign_message_impl(
                             api_session_cipher,
                             api_identifiers,
                             api_message,
+                            api_title,
+                            api_icon,
                         )
                         .await?;
                         Ok(output_ok)
@@ -3629,6 +3633,8 @@ fn wire__crate__api__transaction__sign_typed_data_eip712_impl(
             let api_session_cipher = <Option<String>>::sse_decode(&mut deserializer);
             let api_identifiers = <Vec<String>>::sse_decode(&mut deserializer);
             let api_typed_data_json = <String>::sse_decode(&mut deserializer);
+            let api_title = <Option<String>>::sse_decode(&mut deserializer);
+            let api_icon = <Option<String>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
@@ -3641,6 +3647,8 @@ fn wire__crate__api__transaction__sign_typed_data_eip712_impl(
                             api_session_cipher,
                             api_identifiers,
                             api_typed_data_json,
+                            api_title,
+                            api_icon,
                         )
                         .await?;
                         Ok(output_ok)
@@ -4786,59 +4794,20 @@ impl SseDecode for crate::models::gas::GasFeeHistoryInfo {
 impl SseDecode for crate::models::transactions::history::HistoricalTransactionInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        let mut var_transactionHash = <String>::sse_decode(deserializer);
-        let mut var_amount = <String>::sse_decode(deserializer);
-        let mut var_sender = <String>::sse_decode(deserializer);
-        let mut var_recipient = <String>::sse_decode(deserializer);
-        let mut var_contractAddress = <Option<String>>::sse_decode(deserializer);
         let mut var_status =
             <crate::models::transactions::history::TransactionStatusInfo>::sse_decode(deserializer);
-        let mut var_statusCode = <Option<u8>>::sse_decode(deserializer);
+        let mut var_metadata = <crate::models::transactions::transaction_metadata::TransactionMetadataInfo>::sse_decode(deserializer);
+        let mut var_evm = <Option<String>>::sse_decode(deserializer);
+        let mut var_scilla = <Option<String>>::sse_decode(deserializer);
+        let mut var_signedMessage = <Option<String>>::sse_decode(deserializer);
         let mut var_timestamp = <u64>::sse_decode(deserializer);
-        let mut var_blockNumber = <Option<u128>>::sse_decode(deserializer);
-        let mut var_gasUsed = <Option<u128>>::sse_decode(deserializer);
-        let mut var_gasLimit = <Option<u128>>::sse_decode(deserializer);
-        let mut var_gasPrice = <Option<u128>>::sse_decode(deserializer);
-        let mut var_blobGasUsed = <Option<u128>>::sse_decode(deserializer);
-        let mut var_blobGasPrice = <Option<u128>>::sse_decode(deserializer);
-        let mut var_effectiveGasPrice = <Option<u128>>::sse_decode(deserializer);
-        let mut var_fee = <u128>::sse_decode(deserializer);
-        let mut var_icon = <Option<String>>::sse_decode(deserializer);
-        let mut var_title = <Option<String>>::sse_decode(deserializer);
-        let mut var_error = <Option<String>>::sse_decode(deserializer);
-        let mut var_sig = <String>::sse_decode(deserializer);
-        let mut var_nonce = <u128>::sse_decode(deserializer);
-        let mut var_tokenInfo =
-            <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
-                deserializer,
-            );
-        let mut var_chainType = <String>::sse_decode(deserializer);
-        let mut var_chainHash = <u64>::sse_decode(deserializer);
         return crate::models::transactions::history::HistoricalTransactionInfo {
-            transaction_hash: var_transactionHash,
-            amount: var_amount,
-            sender: var_sender,
-            recipient: var_recipient,
-            contract_address: var_contractAddress,
             status: var_status,
-            status_code: var_statusCode,
+            metadata: var_metadata,
+            evm: var_evm,
+            scilla: var_scilla,
+            signed_message: var_signedMessage,
             timestamp: var_timestamp,
-            block_number: var_blockNumber,
-            gas_used: var_gasUsed,
-            gas_limit: var_gasLimit,
-            gas_price: var_gasPrice,
-            blob_gas_used: var_blobGasUsed,
-            blob_gas_price: var_blobGasPrice,
-            effective_gas_price: var_effectiveGasPrice,
-            fee: var_fee,
-            icon: var_icon,
-            title: var_title,
-            error: var_error,
-            sig: var_sig,
-            nonce: var_nonce,
-            token_info: var_tokenInfo,
-            chain_type: var_chainType,
-            chain_hash: var_chainHash,
         };
     }
 }
@@ -5399,17 +5368,6 @@ impl SseDecode for Option<u64> {
     }
 }
 
-impl SseDecode for Option<u8> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
-        if (<bool>::sse_decode(deserializer)) {
-            return Some(<u8>::sse_decode(deserializer));
-        } else {
-            return None;
-        }
-    }
-}
-
 impl SseDecode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5714,8 +5672,8 @@ impl SseDecode for crate::models::transactions::history::TransactionStatusInfo {
         let mut inner = <i32>::sse_decode(deserializer);
         return match inner {
             0 => crate::models::transactions::history::TransactionStatusInfo::Pending,
-            1 => crate::models::transactions::history::TransactionStatusInfo::Confirmed,
-            2 => crate::models::transactions::history::TransactionStatusInfo::Rejected,
+            1 => crate::models::transactions::history::TransactionStatusInfo::Success,
+            2 => crate::models::transactions::history::TransactionStatusInfo::Failed,
             _ => unreachable!("Invalid variant for TransactionStatusInfo: {}", inner),
         };
     }
@@ -6704,30 +6662,12 @@ impl flutter_rust_bridge::IntoDart
 {
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         [
-            self.transaction_hash.into_into_dart().into_dart(),
-            self.amount.into_into_dart().into_dart(),
-            self.sender.into_into_dart().into_dart(),
-            self.recipient.into_into_dart().into_dart(),
-            self.contract_address.into_into_dart().into_dart(),
             self.status.into_into_dart().into_dart(),
-            self.status_code.into_into_dart().into_dart(),
+            self.metadata.into_into_dart().into_dart(),
+            self.evm.into_into_dart().into_dart(),
+            self.scilla.into_into_dart().into_dart(),
+            self.signed_message.into_into_dart().into_dart(),
             self.timestamp.into_into_dart().into_dart(),
-            self.block_number.into_into_dart().into_dart(),
-            self.gas_used.into_into_dart().into_dart(),
-            self.gas_limit.into_into_dart().into_dart(),
-            self.gas_price.into_into_dart().into_dart(),
-            self.blob_gas_used.into_into_dart().into_dart(),
-            self.blob_gas_price.into_into_dart().into_dart(),
-            self.effective_gas_price.into_into_dart().into_dart(),
-            self.fee.into_into_dart().into_dart(),
-            self.icon.into_into_dart().into_dart(),
-            self.title.into_into_dart().into_dart(),
-            self.error.into_into_dart().into_dart(),
-            self.sig.into_into_dart().into_dart(),
-            self.nonce.into_into_dart().into_dart(),
-            self.token_info.into_into_dart().into_dart(),
-            self.chain_type.into_into_dart().into_dart(),
-            self.chain_hash.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7071,8 +7011,8 @@ impl flutter_rust_bridge::IntoDart for crate::models::transactions::history::Tra
     fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
         match self {
             Self::Pending => 0.into_dart(),
-            Self::Confirmed => 1.into_dart(),
-            Self::Rejected => 2.into_dart(),
+            Self::Success => 1.into_dart(),
+            Self::Failed => 2.into_dart(),
             _ => unreachable!(),
         }
     }
@@ -7531,36 +7471,18 @@ impl SseEncode for crate::models::gas::GasFeeHistoryInfo {
 impl SseEncode for crate::models::transactions::history::HistoricalTransactionInfo {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <String>::sse_encode(self.transaction_hash, serializer);
-        <String>::sse_encode(self.amount, serializer);
-        <String>::sse_encode(self.sender, serializer);
-        <String>::sse_encode(self.recipient, serializer);
-        <Option<String>>::sse_encode(self.contract_address, serializer);
         <crate::models::transactions::history::TransactionStatusInfo>::sse_encode(
             self.status,
             serializer,
         );
-        <Option<u8>>::sse_encode(self.status_code, serializer);
-        <u64>::sse_encode(self.timestamp, serializer);
-        <Option<u128>>::sse_encode(self.block_number, serializer);
-        <Option<u128>>::sse_encode(self.gas_used, serializer);
-        <Option<u128>>::sse_encode(self.gas_limit, serializer);
-        <Option<u128>>::sse_encode(self.gas_price, serializer);
-        <Option<u128>>::sse_encode(self.blob_gas_used, serializer);
-        <Option<u128>>::sse_encode(self.blob_gas_price, serializer);
-        <Option<u128>>::sse_encode(self.effective_gas_price, serializer);
-        <u128>::sse_encode(self.fee, serializer);
-        <Option<String>>::sse_encode(self.icon, serializer);
-        <Option<String>>::sse_encode(self.title, serializer);
-        <Option<String>>::sse_encode(self.error, serializer);
-        <String>::sse_encode(self.sig, serializer);
-        <u128>::sse_encode(self.nonce, serializer);
-        <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_encode(
-            self.token_info,
+        <crate::models::transactions::transaction_metadata::TransactionMetadataInfo>::sse_encode(
+            self.metadata,
             serializer,
         );
-        <String>::sse_encode(self.chain_type, serializer);
-        <u64>::sse_encode(self.chain_hash, serializer);
+        <Option<String>>::sse_encode(self.evm, serializer);
+        <Option<String>>::sse_encode(self.scilla, serializer);
+        <Option<String>>::sse_encode(self.signed_message, serializer);
+        <u64>::sse_encode(self.timestamp, serializer);
     }
 }
 
@@ -7992,16 +7914,6 @@ impl SseEncode for Option<u64> {
     }
 }
 
-impl SseEncode for Option<u8> {
-    // Codec=Sse (Serialization based), see doc to use other codecs
-    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
-        <bool>::sse_encode(self.is_some(), serializer);
-        if let Some(value) = self {
-            <u8>::sse_encode(value, serializer);
-        }
-    }
-}
-
 impl SseEncode for Option<Vec<String>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -8225,8 +8137,8 @@ impl SseEncode for crate::models::transactions::history::TransactionStatusInfo {
         <i32>::sse_encode(
             match self {
                 crate::models::transactions::history::TransactionStatusInfo::Pending => 0,
-                crate::models::transactions::history::TransactionStatusInfo::Confirmed => 1,
-                crate::models::transactions::history::TransactionStatusInfo::Rejected => 2,
+                crate::models::transactions::history::TransactionStatusInfo::Success => 1,
+                crate::models::transactions::history::TransactionStatusInfo::Failed => 2,
                 _ => {
                     unimplemented!("");
                 }

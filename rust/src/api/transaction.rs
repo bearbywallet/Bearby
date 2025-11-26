@@ -261,6 +261,8 @@ pub async fn sign_message(
     session_cipher: Option<String>,
     identifiers: Vec<String>,
     message: String,
+    title: Option<String>,
+    icon: Option<String>,
 ) -> Result<(String, String), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -281,6 +283,8 @@ pub async fn sign_message(
                 &seed_bytes,
                 passphrase.as_ref().map(|s| s.as_ref()),
                 &message,
+                title,
+                icon,
             )
             .map_err(ServiceError::BackgroundError)?;
 
@@ -301,6 +305,8 @@ pub async fn sign_typed_data_eip712(
     session_cipher: Option<String>,
     identifiers: Vec<String>,
     typed_data_json: String,
+    title: Option<String>,
+    icon: Option<String>,
 ) -> Result<(String, String), String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -321,6 +327,8 @@ pub async fn sign_typed_data_eip712(
                 &seed_bytes,
                 passphrase.as_ref().map(|s| s.as_ref()),
                 &typed_data_json,
+                title,
+                icon,
             )
             .await
             .map_err(ServiceError::BackgroundError)?;
