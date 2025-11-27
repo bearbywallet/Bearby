@@ -107,6 +107,8 @@
   "revealSecretKeyDoneButton": "完了",
   "revealSecretKeyScamAlertTitle": "詐欺警告",
   "revealSecretKeyScamAlertMessage": "秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。",
+  "revealSecretKeySecurityTimer": "セキュリティタイマー",
+  "revealSecretKeyRevealAfter": "秘密鍵は次の時間後に表示されます:",
 
   "setupNetworkSettingsPageTestnetSwitch": "テストネット",
   "setupNetworkSettingsPageSearchHint": "検索",

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -33,9 +34,13 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
   bool isCopied = false;
   bool isAuthenticated = false;
   bool hasError = false;
+  bool isTimerActive = false;
+  bool canShowKey = false;
   String? errorMessage;
   bool _obscurePassword = true;
   KeyPairInfo? keys;
+  Timer? _countdownTimer;
+  int _remainingTime = 1800;
 
   final _noScreenshot = NoScreenshot.instance;
   final _passwordController = TextEditingController();
@@ -50,8 +55,34 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
 
   @override
   void dispose() {
+    _countdownTimer?.cancel();
     _noScreenshot.screenshotOn();
     super.dispose();
+  }
+
+  void _startCountdown() {
+    setState(() {
+      isTimerActive = true;
+      _remainingTime = 1800;
+    });
+
+    _countdownTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      setState(() {
+        if (_remainingTime > 0) {
+          _remainingTime--;
+        } else {
+          canShowKey = true;
+          isTimerActive = false;
+          timer.cancel();
+        }
+      });
+    });
+  }
+
+  String _formatTime(int seconds) {
+    final minutes = seconds ~/ 60;
+    final secs = seconds % 60;
+    return '${minutes.toString().padLeft(2, '0')}:${secs.toString().padLeft(2, '0')}';
   }
 
   Future<void> _secureScreen() async {
@@ -85,6 +116,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
         errorMessage = null;
       });
       _btnController.success();
+      _startCountdown();
     } catch (e) {
       setState(() {
         isAuthenticated = false;
@@ -178,14 +210,15 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
                         ),
                       ),
                     ],
-                    if (isAuthenticated) ...[
-                      if (keys != null) ...[
-                        _buildQrCode(theme),
-                        HexKeyDisplay(
-                          hexKey: keys!.sk,
-                          title: "",
-                        )
-                      ],
+                    if (isAuthenticated && isTimerActive && !canShowKey) ...[
+                      _buildTimerDisplay(theme),
+                    ],
+                    if (isAuthenticated && canShowKey && keys != null) ...[
+                      _buildQrCode(theme),
+                      HexKeyDisplay(
+                        hexKey: keys!.sk,
+                        title: "",
+                      ),
                       SizedBox(height: adaptivePadding),
                       TileButton(
                         icon: SvgPicture.asset(
@@ -223,6 +256,65 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildTimerDisplay(AppTheme theme) {
+    final l10n = AppLocalizations.of(context)!;
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 48);
+
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 32),
+      padding: const EdgeInsets.all(24),
+      decoration: BoxDecoration(
+        color: theme.cardBackground,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: theme.secondaryPurple),
+      ),
+      child: Column(
+        children: [
+          SvgPicture.asset(
+            "assets/icons/clock.svg",
+            width: iconSize,
+            height: iconSize,
+            colorFilter: ColorFilter.mode(
+              theme.primaryPurple,
+              BlendMode.srcIn,
+            ),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            l10n.revealSecretKeySecurityTimer,
+            style: theme.subtitle1.copyWith(
+              color: theme.textPrimary,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          Text(
+            l10n.revealSecretKeyRevealAfter,
+            style: theme.bodyText2.copyWith(
+              color: theme.textSecondary,
+            ),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 16),
+          Text(
+            _formatTime(_remainingTime),
+            style: theme.displayLarge.copyWith(
+              color: theme.primaryPurple,
+              fontFamily: 'monospace',
+            ),
+          ),
+          const SizedBox(height: 16),
+          LinearProgressIndicator(
+            value: 1 - (_remainingTime / 1800),
+            backgroundColor: theme.background,
+            valueColor: AlwaysStoppedAnimation(theme.primaryPurple),
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ],
       ),
     );
   }

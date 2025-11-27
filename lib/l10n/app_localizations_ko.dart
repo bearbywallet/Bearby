@@ -290,6 +290,12 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretKeyScamAlertMessage => '비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.';
 
   @override
+  String get revealSecretKeySecurityTimer => '보안 타이머';
+
+  @override
+  String get revealSecretKeyRevealAfter => '비밀 키 공개 시간:';
+
+  @override
   String get setupNetworkSettingsPageTestnetSwitch => '테스트넷';
 
   @override

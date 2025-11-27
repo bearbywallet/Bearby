@@ -107,6 +107,8 @@
   "revealSecretKeyDoneButton": "Готово",
   "revealSecretKeyScamAlertTitle": "ВНИМАНИЕ МОШЕННИЧЕСТВО",
   "revealSecretKeyScamAlertMessage": "Никогда не делитесь своим секретным ключом с кем-либо. Никогда не вводите его на каких-либо сайтах.",
+  "revealSecretKeySecurityTimer": "Таймер безопасности",
+  "revealSecretKeyRevealAfter": "Ваш секретный ключ будет раскрыт через:",
 
   "setupNetworkSettingsPageTestnetSwitch": "Тестовая сеть",
   "setupNetworkSettingsPageSearchHint": "Поиск",

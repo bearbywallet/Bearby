@@ -179,6 +179,10 @@
   "revealSecretKeyScamAlertTitle": "사기 경고",
   
   "revealSecretKeyScamAlertMessage": "비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.",
+
+  "revealSecretKeySecurityTimer": "보안 타이머",
+
+  "revealSecretKeyRevealAfter": "비밀 키 공개 시간:",
   "setupNetworkSettingsPageTestnetSwitch": "테스트넷",
   
   "setupNetworkSettingsPageSearchHint": "검색",

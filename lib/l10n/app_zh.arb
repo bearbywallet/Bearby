@@ -107,6 +107,8 @@
   "revealSecretKeyDoneButton": "完成",
   "revealSecretKeyScamAlertTitle": "诈骗警告",
   "revealSecretKeyScamAlertMessage": "绝不与任何人分享您的私钥。绝不在任何网站上输入。",
+  "revealSecretKeySecurityTimer": "安全计时器",
+  "revealSecretKeyRevealAfter": "您的私钥将在以下时间后显示:",
 
   "setupNetworkSettingsPageTestnetSwitch": "测试网",
   "setupNetworkSettingsPageSearchHint": "搜索",

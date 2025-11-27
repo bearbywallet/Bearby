@@ -290,6 +290,12 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretKeyScamAlertMessage => '秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。';
 
   @override
+  String get revealSecretKeySecurityTimer => 'セキュリティタイマー';
+
+  @override
+  String get revealSecretKeyRevealAfter => '秘密鍵は次の時間後に表示されます:';
+
+  @override
   String get setupNetworkSettingsPageTestnetSwitch => 'テストネット';
 
   @override

@@ -290,6 +290,12 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretKeyScamAlertMessage => '绝不与任何人分享您的私钥。绝不在任何网站上输入。';
 
   @override
+  String get revealSecretKeySecurityTimer => '安全计时器';
+
+  @override
+  String get revealSecretKeyRevealAfter => '您的私钥将在以下时间后显示:';
+
+  @override
   String get setupNetworkSettingsPageTestnetSwitch => '测试网';
 
   @override

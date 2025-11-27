@@ -290,6 +290,12 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revealSecretKeyScamAlertMessage => 'Никогда не делитесь своим секретным ключом с кем-либо. Никогда не вводите его на каких-либо сайтах.';
 
   @override
+  String get revealSecretKeySecurityTimer => 'Таймер безопасности';
+
+  @override
+  String get revealSecretKeyRevealAfter => 'Ваш секретный ключ будет раскрыт через:';
+
+  @override
   String get setupNetworkSettingsPageTestnetSwitch => 'Тестовая сеть';
 
   @override

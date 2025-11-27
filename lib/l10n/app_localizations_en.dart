@@ -290,6 +290,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretKeyScamAlertMessage => 'Never share your secret key with anyone. Never input it on any website.';
 
   @override
+  String get revealSecretKeySecurityTimer => 'Security Timer';
+
+  @override
+  String get revealSecretKeyRevealAfter => 'Your secret key will be revealed after:';
+
+  @override
   String get setupNetworkSettingsPageTestnetSwitch => 'Testnet';
 
   @override

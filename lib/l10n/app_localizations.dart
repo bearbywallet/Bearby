@@ -659,6 +659,18 @@ abstract class AppLocalizations {
   /// **'Never share your secret key with anyone. Never input it on any website.'**
   String get revealSecretKeyScamAlertMessage;
 
+  /// Title for security timer display on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Security Timer'**
+  String get revealSecretKeySecurityTimer;
+
+  /// Message explaining the reveal delay on RevealSecretKey page
+  ///
+  /// In en, this message translates to:
+  /// **'Your secret key will be revealed after:'**
+  String get revealSecretKeyRevealAfter;
+
   /// Label for Testnet switch on SetupNetworkSettingsPage
   ///
   /// In en, this message translates to:

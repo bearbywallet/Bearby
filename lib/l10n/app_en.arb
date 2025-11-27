@@ -462,6 +462,16 @@
   "@revealSecretKeyScamAlertMessage": {
     "description": "Message content for scam alert section on RevealSecretKey page"
   },
+
+  "revealSecretKeySecurityTimer": "Security Timer",
+  "@revealSecretKeySecurityTimer": {
+    "description": "Title for security timer display on RevealSecretKey page"
+  },
+
+  "revealSecretKeyRevealAfter": "Your secret key will be revealed after:",
+  "@revealSecretKeyRevealAfter": {
+    "description": "Message explaining the reveal delay on RevealSecretKey page"
+  },
   "setupNetworkSettingsPageTestnetSwitch": "Testnet",
   "@setupNetworkSettingsPageTestnetSwitch": {
     "description": "Label for Testnet switch on SetupNetworkSettingsPage"
