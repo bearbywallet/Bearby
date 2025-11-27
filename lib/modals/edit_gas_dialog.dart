@@ -81,17 +81,33 @@ class _EditGasDialogState extends State<EditGasDialog> {
     super.dispose();
   }
 
+  String _normalizeDecimalInput(String value) {
+    String normalized = value.replaceAll(',', '.');
+    final parts = normalized.split('.');
+    if (parts.length > 2) {
+      final integerPart = parts.sublist(0, parts.length - 1).join('');
+      final decimalPart = parts.last;
+      normalized = '$integerPart.$decimalPart';
+    }
+    return normalized.trim();
+  }
+
   void _handleSave() {
     try {
+      final normalizedGasPrice = _normalizeDecimalInput(_gasPriceController.text);
+      final normalizedGasLimit = _normalizeDecimalInput(_gasLimitController.text);
+      final normalizedNonce = _normalizeDecimalInput(_nonceController.text);
+
       final gasPriceWei =
-          BigInt.parse(toWei(value: _gasPriceController.text, decimals: 9).$1);
-      final gasLimit = BigInt.parse(_gasLimitController.text);
-      final nonce = BigInt.parse(_nonceController.text);
+          BigInt.parse(toWei(value: normalizedGasPrice, decimals: 9).$1);
+      final gasLimit = BigInt.parse(normalizedGasLimit.split('.').first);
+      final nonce = BigInt.parse(normalizedNonce.split('.').first);
 
       BigInt maxPriorityFeeWei;
       if (!_isLegacy) {
+        final normalizedMaxPriorityFee = _normalizeDecimalInput(_maxPriorityFeeController.text);
         maxPriorityFeeWei = BigInt.parse(
-            toWei(value: _maxPriorityFeeController.text, decimals: 9).$1);
+            toWei(value: normalizedMaxPriorityFee, decimals: 9).$1);
       } else {
         maxPriorityFeeWei = BigInt.zero;
       }
