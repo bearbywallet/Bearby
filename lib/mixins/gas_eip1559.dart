@@ -5,14 +5,13 @@ enum GasFeeOption { low, market, aggressive }
 BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
   switch (option) {
     case GasFeeOption.low:
-      return priorityFee;
+      final multiplied = priorityFee * BigInt.from(120);
+      return multiplied ~/ BigInt.from(100);
     case GasFeeOption.market:
-      final multiplied = priorityFee * BigInt.from(150);
-
+      final multiplied = priorityFee * BigInt.from(200);
       return multiplied ~/ BigInt.from(100);
     case GasFeeOption.aggressive:
-      final multiplied = priorityFee * BigInt.from(300);
-
+      final multiplied = priorityFee * BigInt.from(400);
       return multiplied ~/ BigInt.from(100);
   }
 }
@@ -20,19 +19,16 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
 BigInt calculateGasPrice(GasFeeOption option, BigInt gasPrice) {
   switch (option) {
     case GasFeeOption.low:
-      return gasPrice;
+      final multiplied = gasPrice * BigInt.from(120);
+      return multiplied ~/ BigInt.from(100);
 
     case GasFeeOption.market:
-      final increase = gasPrice * BigInt.from(20);
-
-      final increasedAmount = increase ~/ BigInt.from(100);
-      return gasPrice + increasedAmount;
+      final multiplied = gasPrice * BigInt.from(150);
+      return multiplied ~/ BigInt.from(100);
 
     case GasFeeOption.aggressive:
-      final increase = gasPrice * BigInt.from(50);
-
-      final increasedAmount = increase ~/ BigInt.from(100);
-      return gasPrice + increasedAmount;
+      final multiplied = gasPrice * BigInt.from(200);
+      return multiplied ~/ BigInt.from(100);
   }
 }
 
@@ -44,15 +40,14 @@ BigInt calculateMaxFeePerGas(
   final maxPriorityFee = calculateMaxPriorityFee(option, priorityFee);
   switch (option) {
     case GasFeeOption.low:
-      return baseFee + maxPriorityFee;
+      final baseBuffer = baseFee * BigInt.from(125) ~/ BigInt.from(100);
+      return baseBuffer + maxPriorityFee;
     case GasFeeOption.market:
-      return baseFee +
-          maxPriorityFee +
-          (baseFee * BigInt.from(20) ~/ BigInt.from(100));
+      final baseBuffer = baseFee * BigInt.from(150) ~/ BigInt.from(100);
+      return baseBuffer + maxPriorityFee;
     case GasFeeOption.aggressive:
-      return baseFee +
-          maxPriorityFee +
-          (baseFee * BigInt.from(50) ~/ BigInt.from(100));
+      final baseBuffer = baseFee * BigInt.from(200) ~/ BigInt.from(100);
+      return baseBuffer + maxPriorityFee;
   }
 }
 
