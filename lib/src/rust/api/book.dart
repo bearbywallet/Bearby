@@ -21,10 +21,9 @@ Future<void> removeFromAddressBook({required String addr}) =>
 Future<List<AddressBookEntryInfo>> getAddressBookList() =>
     RustLib.instance.api.crateApiBookGetAddressBookList();
 
-Future<List<Category>> getCombineSortAddresses(
-        {required BigInt walletIndex, required bool history}) =>
-    RustLib.instance.api.crateApiBookGetCombineSortAddresses(
-        walletIndex: walletIndex, history: history);
+Future<List<Category>> getCombineSortAddresses({required BigInt walletIndex}) =>
+    RustLib.instance.api
+        .crateApiBookGetCombineSortAddresses(walletIndex: walletIndex);
 
 class Category {
   final String name;

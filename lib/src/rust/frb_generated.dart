@@ -266,7 +266,7 @@ abstract class RustLibApi extends BaseApi {
       {required String jsonStr});
 
   Future<List<Category>> crateApiBookGetCombineSortAddresses(
-      {required BigInt walletIndex, required bool history});
+      {required BigInt walletIndex});
 
   Future<List<ConnectionInfo>> crateApiConnectionsGetConnectionsList(
       {required BigInt walletIndex});
@@ -1629,12 +1629,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
   @override
   Future<List<Category>> crateApiBookGetCombineSortAddresses(
-      {required BigInt walletIndex, required bool history}) {
+      {required BigInt walletIndex}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_usize(walletIndex, serializer);
-        sse_encode_bool(history, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 41, port: port_);
       },
@@ -1643,7 +1642,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiBookGetCombineSortAddressesConstMeta,
-      argValues: [walletIndex, history],
+      argValues: [walletIndex],
       apiImpl: this,
     ));
   }
@@ -1651,7 +1650,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiBookGetCombineSortAddressesConstMeta =>
       const TaskConstMeta(
         debugName: "get_combine_sort_addresses",
-        argNames: ["walletIndex", "history"],
+        argNames: ["walletIndex"],
       );
 
   @override

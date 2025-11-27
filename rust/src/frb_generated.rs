@@ -1657,16 +1657,12 @@ fn wire__crate__api__book__get_combine_sort_addresses_impl(
             let mut deserializer =
                 flutter_rust_bridge::for_generated::SseDeserializer::new(message);
             let api_wallet_index = <usize>::sse_decode(&mut deserializer);
-            let api_history = <bool>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
                 transform_result_sse::<_, String>(
                     (move || async move {
-                        let output_ok = crate::api::book::get_combine_sort_addresses(
-                            api_wallet_index,
-                            api_history,
-                        )
-                        .await?;
+                        let output_ok =
+                            crate::api::book::get_combine_sort_addresses(api_wallet_index).await?;
                         Ok(output_ok)
                     })()
                     .await,

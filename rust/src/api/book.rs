@@ -63,10 +63,7 @@ pub struct Entry {
     pub tag: Option<String>,
 }
 
-pub async fn get_combine_sort_addresses(
-    wallet_index: usize,
-    history: bool,
-) -> Result<Vec<Category>, String> {
+pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Category>, String> {
     with_service(|core| {
         let wallet = core.get_wallet_by_index(wallet_index)?;
         let wallet_data = wallet
@@ -185,39 +182,6 @@ pub async fn get_combine_sort_addresses(
         ];
 
         categories.extend(wallets_category);
-
-        if history {
-            let history_accounts: Vec<Entry> = wallet
-                .get_history()
-                .map_err(|e| ServiceError::WalletError(wallet_index, e))?
-                .into_iter()
-                .filter_map(|tx| {
-                    if tx.metadata.chain_hash == selected_account.chain_hash {
-                        // Extract recipient from EVM or Scilla data
-                        let recipient = tx
-                            .get_evm()
-                            .and_then(|v| v.get("to").and_then(|t| t.as_str()).map(|s| s.to_string()))
-                            .or_else(|| {
-                                tx.get_scilla()
-                                    .and_then(|v| v.get("toAddr").and_then(|t| t.as_str()).map(|s| s.to_string()))
-                            });
-
-                        recipient.map(|address| Entry {
-                            name: tx.metadata.title.unwrap_or_default(),
-                            address,
-                            tag: None,
-                        })
-                    } else {
-                        None
-                    }
-                })
-                .collect();
-
-            categories.push(Category {
-                name: String::from("history"),
-                entries: history_accounts,
-            });
-        }
 
         Ok(categories)
     })
