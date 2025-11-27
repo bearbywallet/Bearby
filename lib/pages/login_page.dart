@@ -88,6 +88,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       );
 
       if (unlocked) {
+        _appState.setSelectedWallet(walletIndex);
         await _appState.syncData();
         _authGuard.setEnabled(true);
         return true;
@@ -111,6 +112,7 @@ class _LoginPageState extends State<LoginPage> with StatusBarMixin {
       );
 
       if (unlocked) {
+        _appState.setSelectedWallet(walletIndex);
         await _appState.syncData();
         _authGuard.setEnabled(true);
         return true;

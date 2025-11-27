@@ -41,7 +41,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   late String _cahceDir;
   int _selectedWallet = 0;
   bool _hideBalance = false;
-  bool _isTileView = true;
+  bool _isTileView = false;
   bool _browserUrlBarTop = false;
 
   final Brightness _systemBrightness =
@@ -167,7 +167,6 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> syncBook() async {
     _book = await getAddressBookList();
-
     notifyListeners();
   }
 

@@ -112,8 +112,10 @@ class _HomePageState extends State<HomePage>
     final theme = appState.currentTheme;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
     final adaptivePaddingCard = AdaptiveSize.getAdaptivePadding(context, 12);
-    final iconSizeSmall = AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_SMALL_BASE);
-    final iconSizeTileButton = AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_TILE_BUTTON_BASE);
+    final iconSizeSmall =
+        AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_SMALL_BASE);
+    final iconSizeTileButton =
+        AdaptiveSize.getAdaptiveIconSize(context, _ICON_SIZE_TILE_BUTTON_BASE);
     final iconSizeManage = AdaptiveSize.getAdaptiveIconSize(context, 18);
     final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
     final isIOS = defaultTargetPlatform == TargetPlatform.iOS;
