@@ -309,7 +309,11 @@ class _HomePageState extends State<HomePage>
                 children: [
                   NetworkDownButton(
                     onPressed: () {
-                      Navigator.pushNamed(context, '/networks');
+                      Navigator.pushNamed(
+                        context,
+                        '/networks',
+                        arguments: {'popOnSelect': true},
+                      );
                     },
                     chain: appState.chain!,
                   ),

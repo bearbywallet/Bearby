@@ -33,15 +33,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
   String? _errorMessage;
   String? _shortName;
   bool _bypassChecksumValidation = false;
-  bool _isTestnet = false;
 
   final TextEditingController _searchController = TextEditingController();
   String _searchQuery = '';
 
   int selectedNetworkIndex = 0;
   bool optionsDisabled = false;
-  List<NetworkConfigInfo> mainnetNetworks = [];
-  List<NetworkConfigInfo> testnetNetworks = [];
+  List<NetworkConfigInfo> networks = [];
 
   @override
   void initState() {
@@ -82,7 +80,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
   }
 
   List<NetworkConfigInfo> get filteredNetworks {
-    final networks = _isTestnet ? testnetNetworks : mainnetNetworks;
     if (_searchQuery.isEmpty) {
       return networks;
     }
@@ -101,21 +98,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
 
       final String mainnetJsonData =
           await rootBundle.loadString('assets/chains/mainnet-chains.json');
-      final String testnetJsonData =
-          await rootBundle.loadString('assets/chains/testnet-chains.json');
       final List<NetworkConfigInfo> mainnetChains =
           await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
-      final List<NetworkConfigInfo> testnetChains =
-          await getChainsProvidersFromJson(jsonStr: testnetJsonData);
 
       setState(() {
-        mainnetNetworks = mainnetChains;
-        mainnetNetworks =
-            _appendUniqueMainnetNetworks(storedProviders, mainnetNetworks);
-        testnetNetworks = testnetChains;
+        networks = _appendUniqueNetworks(storedProviders, mainnetChains);
 
         if (_shortName != null) {
-          final networks = _isTestnet ? testnetNetworks : mainnetNetworks;
           int foundIndex =
               networks.indexWhere((network) => network.shortName == _shortName);
           if (foundIndex > 0) {
@@ -131,7 +120,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
     }
   }
 
-  List<NetworkConfigInfo> _appendUniqueMainnetNetworks(
+  List<NetworkConfigInfo> _appendUniqueNetworks(
       List<NetworkConfigInfo> storedProviders,
       List<NetworkConfigInfo> jsonChains) {
     final Set<String> jsonNetworkIds =
@@ -157,6 +146,8 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
   OptionItem _buildNetworkItem(
       NetworkConfigInfo chain, AppTheme theme, int index) {
     final l10n = AppLocalizations.of(context)!;
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 40);
+    final spacing = AdaptiveSize.getAdaptiveSize(context, 12);
 
     return OptionItem(
       child: Column(
@@ -165,49 +156,24 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
           Row(
             children: [
               SizedBox(
-                width: 40,
-                height: 40,
+                width: iconSize,
+                height: iconSize,
                 child: AsyncImage(
                   url: viewChain(network: chain, theme: theme.value),
                   fit: BoxFit.contain,
                   errorWidget: const Icon(Icons.error),
                 ),
               ),
-              const SizedBox(width: 12),
+              SizedBox(width: spacing),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            chain.name,
-                            style: theme.labelLarge.copyWith(
-                              color: theme.textPrimary,
-                            ),
-                          ),
-                        ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 8, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: _isTestnet
-                                ? theme.warning.withValues(alpha: 0.2)
-                                : theme.success.withValues(alpha: 0.2),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: Text(
-                            _isTestnet
-                                ? l10n.setupNetworkSettingsPageTestnetLabel
-                                : l10n.setupNetworkSettingsPageMainnetLabel,
-                            style: theme.labelSmall.copyWith(
-                              color: _isTestnet ? theme.warning : theme.success,
-                            ),
-                          ),
-                        ),
-                      ],
+                    Text(
+                      chain.name,
+                      style: theme.labelLarge.copyWith(
+                        color: theme.textPrimary,
+                      ),
                     ),
                     const SizedBox(height: 4),
                     Text(
@@ -266,32 +232,15 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
             constraints: const BoxConstraints(maxWidth: 480),
             child: Column(
               children: [
-                CustomAppBar(
-                  actionWidget: Row(
-                    children: [
-                      Text(
-                        l10n.setupNetworkSettingsPageTestnetSwitch,
-                        style: theme.bodyText2.copyWith(
-                          color: theme.textSecondary,
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      Switch(
-                        value: _isTestnet,
-                        onChanged: (value) {
-                          setState(() {
-                            _isTestnet = value;
-                            selectedNetworkIndex = 0;
-                          });
-                        },
-                        activeThumbColor: theme.primaryPurple,
-                      ),
-                    ],
+                Padding(
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                  child: CustomAppBar(
+                    title: l10n.networkPageTitle,
+                    onBackPressed: () => Navigator.pop(context),
                   ),
-                  onBackPressed: () => Navigator.pop(context),
                 ),
                 Padding(
-                  padding: EdgeInsets.all(adaptivePadding),
+                  padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: SmartInput(
                     controller: _searchController,
                     hint: l10n.setupNetworkSettingsPageSearchHint,
@@ -319,7 +268,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                   Expanded(
                     child: Center(
                       child: Text(
-                        mainnetNetworks.isEmpty && testnetNetworks.isEmpty
+                        networks.isEmpty
                             ? l10n.setupNetworkSettingsPageNoNetworks
                             : l10n.setupNetworkSettingsPageNoResults(
                                 _searchQuery),
@@ -339,6 +288,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
+                            const SizedBox(height: 16),
                             OptionsList(
                               disabled: optionsDisabled,
                               options: List.generate(
@@ -362,16 +312,13 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     onPressed: filteredNetworks.isEmpty
                         ? () {}
                         : () {
-                            final chain = _isTestnet
-                                ? testnetNetworks[selectedNetworkIndex]
-                                : mainnetNetworks[selectedNetworkIndex];
+                            final chain = networks[selectedNetworkIndex];
 
                             if (_ledger != null) {
                               Navigator.of(context).pushNamed(
                                 '/add_ledger_account',
                                 arguments: {
                                   'chain': chain,
-                                  'isTestnet': _isTestnet,
                                   'ledger': _ledger,
                                 },
                               );
@@ -383,7 +330,6 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                                   'bip39': _bip39List,
                                   'keys': _keys,
                                   'chain': chain,
-                                  'isTestnet': _isTestnet,
                                   'ignore_checksum': _bypassChecksumValidation,
                                 },
                               );

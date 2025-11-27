@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
+import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/theme/app_theme.dart';
 
@@ -15,7 +16,6 @@ class NetworkTile extends StatelessWidget {
   final bool? isDefault;
   final VoidCallback? onTap;
   final VoidCallback? onEdit;
-  final VoidCallback? onAdd;
 
   const NetworkTile({
     super.key,
@@ -28,13 +28,13 @@ class NetworkTile extends StatelessWidget {
     this.isDefault = false,
     this.onTap,
     this.onEdit,
-    this.onAdd,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Provider.of<AppState>(context).currentTheme;
     final isActive = !disabled;
+    final iconSize = AdaptiveSize.getAdaptiveIconSize(context, 20);
 
     final textColor =
         disabled ? theme.textPrimary.withValues(alpha: 0.5) : theme.textPrimary;
@@ -80,7 +80,7 @@ class NetworkTile extends StatelessWidget {
                 ),
               ],
             ),
-            trailing: _buildTrailingIcon(isActive, textColor),
+            trailing: _buildTrailingIcon(isActive, textColor, iconSize),
           ),
         ),
       ),
@@ -151,33 +151,18 @@ class NetworkTile extends StatelessWidget {
     );
   }
 
-  Widget? _buildTrailingIcon(bool isActive, Color iconColor) {
-    if (isAdded) {
-      if (onEdit == null) return null;
-
-      return IconButton(
-        icon: SvgPicture.asset(
-          "assets/icons/edit.svg",
-          width: 20,
-          height: 20,
-          colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
-        ),
-        padding: const EdgeInsets.all(8),
-        onPressed: isActive ? onEdit : null,
-      );
-    }
-
-    if (onAdd == null) return null;
+  Widget? _buildTrailingIcon(bool isActive, Color iconColor, double iconSize) {
+    if (onEdit == null) return null;
 
     return IconButton(
       icon: SvgPicture.asset(
-        "assets/icons/plus.svg",
-        width: 20,
-        height: 20,
+        "assets/icons/edit.svg",
+        width: iconSize,
+        height: iconSize,
         colorFilter: ColorFilter.mode(iconColor, BlendMode.srcIn),
       ),
       padding: const EdgeInsets.all(8),
-      onPressed: isActive ? onAdd : null,
+      onPressed: isActive ? onEdit : null,
     );
   }
 }

@@ -12,7 +12,6 @@ class NetworkCard extends StatefulWidget {
   final String iconUrl;
   final Function(NetworkConfigInfo) onNetworkSelect;
   final Function(NetworkConfigInfo) onNetworkEdit;
-  final Function(NetworkConfigInfo) onNetworkAdd;
 
   const NetworkCard({
     super.key,
@@ -25,7 +24,6 @@ class NetworkCard extends StatefulWidget {
     required this.iconUrl,
     required this.onNetworkSelect,
     required this.onNetworkEdit,
-    required this.onNetworkAdd,
   });
 
   @override
@@ -65,13 +63,7 @@ class _NetworkCardState extends State<NetworkCard>
 
   void _handleNetworkTap() {
     if (widget.disabled) return;
-
-    if (!widget.isAdded) {
-      widget.onNetworkAdd(widget.configInfo);
-      widget.onNetworkSelect(widget.configInfo);
-    } else {
-      widget.onNetworkSelect(widget.configInfo);
-    }
+    widget.onNetworkSelect(widget.configInfo);
   }
 
   @override
@@ -108,12 +100,7 @@ class _NetworkCardState extends State<NetworkCard>
             isSelected: widget.isSelected,
             disabled: widget.disabled,
             onTap: null,
-            onAdd: widget.isAdded
-                ? null
-                : () => widget.onNetworkAdd(widget.configInfo),
-            onEdit: widget.isAdded
-                ? () => widget.onNetworkEdit(widget.configInfo)
-                : null,
+            onEdit: () => widget.onNetworkEdit(widget.configInfo),
           ),
         ),
       ),
