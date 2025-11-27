@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:zilpay/components/load_button.dart';
+import 'package:zilpay/components/modal_drag_handle.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/theme/app_theme.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -138,15 +139,7 @@ class _ConfirmPasswordModalState extends State<ConfirmPasswordModal> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Container(
-              width: 36,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 16),
-              decoration: BoxDecoration(
-                color: widget.theme.modalBorder,
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
+            ModalDragHandle(theme: widget.theme),
             Flexible(
               child: SingleChildScrollView(
                 physics: const BouncingScrollPhysics(),

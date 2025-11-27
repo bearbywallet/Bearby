@@ -2,9 +2,9 @@ import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
 import 'package:zilpay/mixins/gas_eip1559.dart';
+import 'package:zilpay/services/preferences_service.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
@@ -30,15 +30,10 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   bool _showAddressesThroughTransactionHistory = false;
 
   static const Duration _rateUpdateCooldown = Duration(minutes: 1);
-  static const String _hideBalanceStorageKey = "hide_balance_key";
-  static const String _gasOptionStorageKey = "gas_option_key";
-  static const String _tokensCardStyleKey = "tokens_card_styles_key";
-  static const String _showAddressesThroughTransactionHistoryKey =
-      "show_addresses_transaction_history_key";
-  static const String _browserUrlBarTopKey = "browser_url_bar_top_key";
 
   late BackgroundState _state;
   late String _cahceDir;
+  late PreferencesService _prefs;
   int _selectedWallet = 0;
   bool _hideBalance = false;
   bool _isTileView = false;
@@ -50,10 +45,12 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   AppState({
     required BackgroundState state,
     required String cahceDir,
+    required PreferencesService prefs,
   }) {
     WidgetsBinding.instance.addObserver(this);
     _state = state;
     _cahceDir = cahceDir;
+    _prefs = prefs;
   }
 
   void setSelectedWallet(int index) {
@@ -62,94 +59,49 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   }
 
   bool get isTileView => _isTileView;
-
   bool get browserUrlBarTop => _browserUrlBarTop;
-
-  bool get showAddressesThroughTransactionHistory {
-    return _showAddressesThroughTransactionHistory;
-  }
-
-  GasFeeOption get selectedGasOption {
-    return _selectedGasOption;
-  }
-
-  String get cahceDir {
-    return _cahceDir;
-  }
-
-  bool get hideBalance {
-    return _hideBalance;
-  }
-
-  List<WalletInfo> get wallets {
-    return _state.wallets;
-  }
-
-  Locale? get locale {
-    return state.locale != null ? Locale(state.locale!) : null;
-  }
-
-  List<ConnectionInfo> get connections {
-    return _connections;
-  }
-
-  List<AddressBookEntryInfo> get book {
-    return _book;
-  }
-
-  BackgroundState get state {
-    return _state;
-  }
+  bool get showAddressesThroughTransactionHistory => _showAddressesThroughTransactionHistory;
+  GasFeeOption get selectedGasOption => _selectedGasOption;
+  String get cahceDir => _cahceDir;
+  bool get hideBalance => _hideBalance;
+  List<WalletInfo> get wallets => _state.wallets;
+  Locale? get locale => state.locale != null ? Locale(state.locale!) : null;
+  List<ConnectionInfo> get connections => _connections;
+  List<AddressBookEntryInfo> get book => _book;
+  BackgroundState get state => _state;
 
   AppTheme get currentTheme {
     switch (_state.appearances) {
       case 0:
-        return _systemBrightness == Brightness.dark
-            ? DarkTheme()
-            : LightTheme();
+        return _systemBrightness == Brightness.dark ? DarkTheme() : LightTheme();
       case 1:
         return DarkTheme();
       case 2:
         return LightTheme();
       default:
-        return _systemBrightness == Brightness.dark
-            ? DarkTheme()
-            : LightTheme();
+        return _systemBrightness == Brightness.dark ? DarkTheme() : LightTheme();
     }
   }
 
-  WalletInfo? get wallet {
-    return _state.wallets[_selectedWallet];
-  }
+  WalletInfo? get wallet => _state.wallets[_selectedWallet];
 
   NetworkConfigInfo? get chain {
     BigInt? hash = account?.chainHash;
-
-    if (hash == null) {
-      return null;
-    }
-
+    if (hash == null) return null;
     return getChain(hash);
   }
 
   AccountInfo? get account {
-    if (wallet == null) {
-      return null;
-    }
-
+    if (wallet == null) return null;
     int index = wallet!.selectedAccount.toInt();
-
     return wallet!.accounts[index];
   }
 
-  int get selectedWallet {
-    return _selectedWallet;
-  }
+  int get selectedWallet => _selectedWallet;
 
   void setHideBalance(bool value) async {
     _hideBalance = value;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_hideBalanceStorageKey, value);
+    await _prefs.setHideBalance(value);
     notifyListeners();
   }
 
@@ -157,12 +109,29 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     _state = await getData();
     await syncBook();
     await syncConnections();
-    await loadSelectedGasOption();
-    await loadHideBalance();
-    await loadShowAddressesThroughTransactionHistory();
-    await loadIsTileView();
-    await loadBrowserUrlBarTop();
+    _loadPreferences();
     notifyListeners();
+  }
+
+  void _loadPreferences() {
+    _hideBalance = _prefs.getHideBalance();
+    _isTileView = _prefs.getIsTileView(_selectedWallet);
+    _browserUrlBarTop = _prefs.getBrowserUrlBarTop();
+    _showAddressesThroughTransactionHistory = _prefs.getShowAddressesHistory(_selectedWallet);
+    _loadGasOption();
+  }
+
+  void _loadGasOption() {
+    final optionName = _prefs.getGasOption(_selectedWallet);
+    if (optionName != null) {
+      try {
+        _selectedGasOption = GasFeeOption.values.firstWhere(
+          (option) => option.name == optionName,
+        );
+      } catch (e) {
+        _selectedGasOption = GasFeeOption.market;
+      }
+    }
   }
 
   Future<void> syncBook() async {
@@ -170,16 +139,8 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> loadHideBalance() async {
-    final prefs = await SharedPreferences.getInstance();
-    _hideBalance = prefs.getBool(_hideBalanceStorageKey) ?? false;
-    notifyListeners();
-  }
-
   Future<void> syncConnections() async {
-    _connections =
-        await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
-
+    _connections = await getConnectionsList(walletIndex: BigInt.from(_selectedWallet));
     notifyListeners();
   }
 
@@ -201,23 +162,15 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
     notifyListeners();
   }
 
-  Future<void> updateSelectedAccount(
-    BigInt walletIndex,
-    BigInt accountIndex,
-  ) async {
+  Future<void> updateSelectedAccount(BigInt walletIndex, BigInt accountIndex) async {
     await selectAccount(walletIndex: walletIndex, accountIndex: accountIndex);
     await syncData();
-
     notifyListeners();
   }
 
   Future<void> setAppearancesCode(int code, bool compactNumbers) async {
-    await setTheme(
-      appearancesCode: code,
-      compactNumbers: compactNumbers,
-    );
+    await setTheme(appearancesCode: code, compactNumbers: compactNumbers);
     _state = await getData();
-
     notifyListeners();
 
     SystemChrome.setSystemUIOverlayStyle(SystemUiOverlayStyle(
@@ -233,26 +186,7 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
 
   Future<void> setSelectedGasOption(GasFeeOption option) async {
     _selectedGasOption = option;
-    final prefs = await SharedPreferences.getInstance();
-    final key = "$_gasOptionStorageKey:$selectedWallet";
-    await prefs.setString(key, option.name);
-    notifyListeners();
-  }
-
-  Future<void> loadSelectedGasOption() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = "$_gasOptionStorageKey:$selectedWallet";
-    final optionName = prefs.getString(key);
-
-    if (optionName != null) {
-      try {
-        _selectedGasOption = GasFeeOption.values.firstWhere(
-          (option) => option.name == optionName,
-        );
-      } catch (e) {
-        _selectedGasOption = GasFeeOption.market;
-      }
-    }
+    await _prefs.setGasOption(_selectedWallet, option.name);
     notifyListeners();
   }
 
@@ -266,53 +200,26 @@ class AppState extends ChangeNotifier with WidgetsBindingObserver {
   Future<void> updateIsTileView(bool value) async {
     if (_isTileView != value) {
       _isTileView = value;
-      final prefs = await SharedPreferences.getInstance();
-      final key = "$_tokensCardStyleKey:$selectedWallet";
-      await prefs.setBool(key, value);
+      await _prefs.setIsTileView(_selectedWallet, value);
       notifyListeners();
     }
   }
 
-  Future<void> loadIsTileView() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = "$_tokensCardStyleKey:$selectedWallet";
-    _isTileView = prefs.getBool(key) ?? false;
-    notifyListeners();
-  }
-
   Future<void> setShowAddressesThroughTransactionHistory(bool value) async {
     _showAddressesThroughTransactionHistory = value;
-    final prefs = await SharedPreferences.getInstance();
-    final key = "$_showAddressesThroughTransactionHistoryKey:$selectedWallet";
-    await prefs.setBool(key, value);
-    notifyListeners();
-  }
-
-  Future<void> loadShowAddressesThroughTransactionHistory() async {
-    final prefs = await SharedPreferences.getInstance();
-    final key = "$_showAddressesThroughTransactionHistoryKey:$selectedWallet";
-    _showAddressesThroughTransactionHistory = prefs.getBool(key) ?? false;
+    await _prefs.setShowAddressesHistory(_selectedWallet, value);
     notifyListeners();
   }
 
   Future<void> setBrowserUrlBarTop(bool value) async {
     _browserUrlBarTop = value;
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool(_browserUrlBarTopKey, value);
-    notifyListeners();
-  }
-
-  Future<void> loadBrowserUrlBarTop() async {
-    final prefs = await SharedPreferences.getInstance();
-    _browserUrlBarTop = prefs.getBool(_browserUrlBarTopKey) ?? false;
+    await _prefs.setBrowserUrlBarTop(value);
     notifyListeners();
   }
 
   Future<void> startTrackHistoryWorker() async {
     try {
-      Stream<String> stream =
-          startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
-
+      Stream<String> stream = startHistoryWorker(walletIndex: BigInt.from(selectedWallet));
       stream.listen((event) async {
         notifyListeners();
       });

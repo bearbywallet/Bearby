@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class TileButton extends StatefulWidget {
@@ -28,80 +29,29 @@ class TileButton extends StatefulWidget {
 }
 
 class _TileButtonState extends State<TileButton>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
-  bool _isHovered = false;
-
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.90,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.fastEaseInToSlowEaseOut,
-    ));
-
-    _opacityAnimation = Tween<double>(
-      begin: 1.0,
-      end: 0.7,
-    ).animate(CurvedAnimation(
-      parent: _controller,
-      curve: Curves.fastEaseInToSlowEaseOut,
-    ));
+    initPressAnimation(scaleEnd: 0.90, opacityEnd: 0.7);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    disposePressAnimation();
     super.dispose();
   }
 
   BorderSide _getBorderSide() {
     final base =
         widget.defaultBorderSide ?? const BorderSide(color: Colors.transparent);
-    if (_isHovered && !widget.disabled) {
+    if (isHovered && !widget.disabled) {
       return base.copyWith(
         color: widget.textColor,
         width: 2.0,
       );
     }
     return base;
-  }
-
-  void _handleTapDown(TapDownDetails details) {
-    if (!widget.disabled) {
-      _controller.forward();
-    }
-  }
-
-  void _handleTapUp(TapUpDetails details) {
-    if (!widget.disabled) {
-      _controller.reverse();
-      widget.onPressed();
-    }
-  }
-
-  void _handleTapCancel() {
-    if (!widget.disabled) {
-      _controller.reverse();
-    }
-  }
-
-  void _handleHoverChanged(bool isHovered) {
-    if (!widget.disabled) {
-      setState(() {
-        _isHovered = isHovered;
-      });
-    }
   }
 
   @override
@@ -169,38 +119,19 @@ class _TileButtonState extends State<TileButton>
       );
     }
 
-    return MouseRegion(
-      onEnter: (_) => _handleHoverChanged(true),
-      onExit: (_) => _handleHoverChanged(false),
-      cursor: widget.disabled
-          ? SystemMouseCursors.forbidden
-          : SystemMouseCursors.click,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: _handleTapDown,
-        onTapUp: _handleTapUp,
-        onTapCancel: _handleTapCancel,
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Opacity(
-                opacity: widget.disabled ? 0.5 : _opacityAnimation.value,
-                child: Container(
-                  width: containerSize,
-                  height: containerSize,
-                  decoration: BoxDecoration(
-                    color: widget.backgroundColor,
-                    borderRadius: BorderRadius.circular(borderRadius),
-                    border: Border.fromBorderSide(_getBorderSide()),
-                  ),
-                  child: buttonContent,
-                ),
-              ),
-            );
-          },
+    return buildPressableWithOpacity(
+      onTap: widget.onPressed,
+      disabled: widget.disabled,
+      enableHover: true,
+      child: Container(
+        width: containerSize,
+        height: containerSize,
+        decoration: BoxDecoration(
+          color: widget.backgroundColor,
+          borderRadius: BorderRadius.circular(borderRadius),
+          border: Border.fromBorderSide(_getBorderSide()),
         ),
+        child: buttonContent,
       ),
     );
   }

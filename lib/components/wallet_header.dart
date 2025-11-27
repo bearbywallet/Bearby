@@ -4,6 +4,7 @@ import 'package:zilpay/components/address_avatar.dart';
 import 'package:zilpay/components/copy_content.dart';
 import 'package:zilpay/components/hoverd_svg.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/modals/wallet_header.dart';
 import 'package:zilpay/src/rust/models/account.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -25,29 +26,17 @@ class WalletHeader extends StatefulWidget {
 }
 
 class _WalletHeaderState extends State<WalletHeader>
-    with SingleTickerProviderStateMixin {
-  double _opacity = 1.0;
-  bool _isAnimated = true;
-
-  void _handleTapDown(TapDownDetails details) {
-    setState(() {
-      _isAnimated = false;
-      _opacity = 0.5;
-    });
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
+  @override
+  void initState() {
+    super.initState();
+    initPressAnimation(opacityEnd: 0.5);
   }
 
-  void _handleTapUp(TapUpDetails details) {
-    setState(() {
-      _isAnimated = true;
-      _opacity = 1.0;
-    });
-  }
-
-  void _handleTapCancel() {
-    setState(() {
-      _isAnimated = true;
-      _opacity = 1.0;
-    });
+  @override
+  void dispose() {
+    disposePressAnimation();
+    super.dispose();
   }
 
   void _showWalletModal() {
@@ -77,22 +66,14 @@ class _WalletHeaderState extends State<WalletHeader>
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              GestureDetector(
-                behavior: HitTestBehavior.opaque,
-                onTapDown: _handleTapDown,
-                onTapUp: _handleTapUp,
-                onTapCancel: _handleTapCancel,
+              buildPressableWithOpacity(
                 onTap: () {
                   _showWalletModal();
                   widget.onTap?.call();
                 },
-                child: AnimatedOpacity(
-                  opacity: _opacity,
-                  duration: Duration(milliseconds: _isAnimated ? 150 : 0),
-                  child: AvatarAddress(
-                    avatarSize: avatarSize,
-                    account: widget.account,
-                  ),
+                child: AvatarAddress(
+                  avatarSize: avatarSize,
+                  account: widget.account,
                 ),
               ),
               HoverSvgIcon(

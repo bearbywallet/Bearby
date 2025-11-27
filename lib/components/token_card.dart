@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/state/app_state.dart';
@@ -31,28 +32,16 @@ class TokenCard extends StatefulWidget {
 }
 
 class _TokenCardState extends State<TokenCard>
-    with SingleTickerProviderStateMixin {
-  bool isHovered = false;
-  bool isPressed = false;
-
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
-
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 150),
-      vsync: this,
-    );
-    _animation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    initPressAnimation();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    disposePressAnimation();
     super.dispose();
   }
 
@@ -208,12 +197,10 @@ class _TokenCardState extends State<TokenCard>
                   maxLines: 1,
                 ),
                 const SizedBox(height: 4),
-                if (appState.wallet?.settings.currencyConvert !=
-                    null)
+                if (appState.wallet?.settings.currencyConvert != null)
                   Text(
                     displayConverted,
-                    style: theme.bodyText2
-                        .copyWith(color: theme.textSecondary),
+                    style: theme.bodyText2.copyWith(color: theme.textSecondary),
                     overflow: TextOverflow.ellipsis,
                     maxLines: 1,
                   ),
@@ -249,43 +236,19 @@ class _TokenCardState extends State<TokenCard>
     final displayAmount = widget.hideBalance ? maskBalance() : amount;
     final displayConverted = widget.hideBalance ? maskBalance() : converted;
 
-    Widget content;
-    if (widget.isTileView) {
-      content = _buildTileLayout(appState, displayAmount, displayConverted);
-    } else {
-      content = _buildListLayout(appState, displayAmount, displayConverted, adaptivePadding);
-    }
+    Widget content = widget.isTileView
+        ? _buildTileLayout(appState, displayAmount, displayConverted)
+        : _buildListLayout(appState, displayAmount, displayConverted, adaptivePadding);
 
-    Widget gestureWidget = MouseRegion(
-      onEnter: (_) => setState(() => isHovered = true),
-      onExit: (_) => setState(() => isHovered = false),
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) {
-          setState(() => isPressed = true);
-          _controller.forward();
-        },
-        onTapUp: (_) {
-          setState(() => isPressed = false);
-          _controller.reverse();
-        },
-        onTapCancel: () {
-          setState(() => isPressed = false);
-          _controller.reverse();
-        },
-        onTap: widget.onTap,
-        child: AnimatedBuilder(
-          animation: _animation,
-          builder: (context, child) =>
-              Transform.scale(scale: _animation.value, child: child),
-          child: AnimatedContainer(
-            duration: const Duration(milliseconds: 150),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(12),
-            ),
-            child: content,
-          ),
+    Widget gestureWidget = buildPressable(
+      onTap: widget.onTap,
+      enableHover: true,
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
         ),
+        child: content,
       ),
     );
 

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 import 'package:flutter/material.dart';
+import 'package:zilpay/services/preferences_service.dart';
 import 'package:zilpay/src/rust/api/backend.dart';
 import 'package:zilpay/src/rust/models/background.dart';
 
@@ -34,10 +35,12 @@ Future<void> main() async {
     }
 
     state = await loadService(path: "$appDocPath/storage");
+    final prefs = await PreferencesService.getInstance();
 
     final appState = AppState(
       state: state,
       cahceDir: tempDir.path,
+      prefs: prefs,
     );
 
     final authGuard = AuthGuard(state: appState);

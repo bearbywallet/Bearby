@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:zilpay/components/network_tile.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/src/rust/models/provider.dart';
 
 class NetworkCard extends StatefulWidget {
@@ -31,77 +32,36 @@ class NetworkCard extends StatefulWidget {
 }
 
 class _NetworkCardState extends State<NetworkCard>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _animationController;
-  late Animation<double> _scaleAnimation;
-
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   @override
   void initState() {
     super.initState();
-    _animationController = AnimationController(
-      vsync: this,
-      duration: const Duration(milliseconds: 100),
-    );
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.97).animate(
-      CurvedAnimation(parent: _animationController, curve: Curves.easeInOut),
-    );
+    initPressAnimation(duration: const Duration(milliseconds: 100), scaleEnd: 0.97);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    disposePressAnimation();
     super.dispose();
-  }
-
-  void _handlePress(bool isDown) {
-    if (isDown) {
-      _animationController.forward();
-    } else {
-      _animationController.reverse();
-    }
-  }
-
-  void _handleNetworkTap() {
-    if (widget.disabled) return;
-    widget.onNetworkSelect(widget.configInfo);
   }
 
   @override
   Widget build(BuildContext context) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: GestureDetector(
-        onTapDown: (_) {
-          if (!widget.disabled) {
-            _handlePress(true);
-          }
-        },
-        onTapUp: (_) {
-          _handlePress(false);
-        },
-        onTapCancel: () {
-          _handlePress(false);
-        },
-        onTap: _handleNetworkTap,
-        child: AnimatedBuilder(
-          animation: _scaleAnimation,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: child,
-            );
-          },
-          child: NetworkTile(
-            iconUrl: widget.iconUrl,
-            title: widget.configInfo.name,
-            isTestnet: widget.isTestnet,
-            isAdded: widget.isAdded,
-            isDefault: widget.isDefault,
-            isSelected: widget.isSelected,
-            disabled: widget.disabled,
-            onTap: null,
-            onEdit: () => widget.onNetworkEdit(widget.configInfo),
-          ),
+      child: buildPressable(
+        onTap: widget.disabled ? null : () => widget.onNetworkSelect(widget.configInfo),
+        disabled: widget.disabled,
+        child: NetworkTile(
+          iconUrl: widget.iconUrl,
+          title: widget.configInfo.name,
+          isTestnet: widget.isTestnet,
+          isAdded: widget.isAdded,
+          isDefault: widget.isDefault,
+          isSelected: widget.isSelected,
+          disabled: widget.disabled,
+          onTap: null,
+          onEdit: () => widget.onNetworkEdit(widget.configInfo),
         ),
       ),
     );

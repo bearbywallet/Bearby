@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/mixins/addr.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/state/app_state.dart';
 
 class CopyContent extends StatefulWidget {
@@ -20,32 +21,18 @@ class CopyContent extends StatefulWidget {
 }
 
 class _CopyContentState extends State<CopyContent>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-  late Animation<double> _scaleAnimation;
-  late Animation<double> _opacityAnimation;
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   bool _isCopied = false;
 
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 200),
-      vsync: this,
-    );
-
-    _scaleAnimation = Tween<double>(begin: 1.0, end: 0.95).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
-
-    _opacityAnimation = Tween<double>(begin: 1.0, end: 0.7).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
-    );
+    initPressAnimation(duration: const Duration(milliseconds: 200), opacityEnd: 0.7);
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    disposePressAnimation();
     super.dispose();
   }
 
@@ -71,61 +58,44 @@ class _CopyContentState extends State<CopyContent>
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
-      child: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTapDown: (_) => _controller.forward(),
-        onTapUp: (_) {
-          _controller.reverse();
-          _copyToClipboard();
-        },
-        onTapCancel: () => _controller.reverse(),
-        child: AnimatedBuilder(
-          animation: _controller,
-          builder: (context, child) {
-            return Transform.scale(
-              scale: _scaleAnimation.value,
-              child: Opacity(
-                opacity: _opacityAnimation.value,
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: theme.textSecondary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 8,
-                    vertical: 4,
-                  ),
-                  child: Wrap(
-                    alignment: WrapAlignment.center,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 4,
-                    runSpacing: 4,
-                    children: [
-                      Text(
-                        widget.isShort
-                            ? shortenAddress(widget.address)
-                            : widget.address,
-                        style: theme.bodyText2.copyWith(
-                          color: theme.textSecondary,
-                        ),
-                      ),
-                      SvgPicture.asset(
-                        _isCopied
-                            ? 'assets/icons/check.svg'
-                            : 'assets/icons/copy.svg',
-                        width: 14,
-                        height: 14,
-                        colorFilter: ColorFilter.mode(
-                          _isCopied ? theme.success : theme.textSecondary,
-                          BlendMode.srcIn,
-                        ),
-                      ),
-                    ],
-                  ),
+      child: buildPressableWithOpacity(
+        onTap: _copyToClipboard,
+        child: Container(
+          decoration: BoxDecoration(
+            color: theme.textSecondary.withValues(alpha: 0.1),
+            borderRadius: BorderRadius.circular(6),
+          ),
+          padding: const EdgeInsets.symmetric(
+            horizontal: 8,
+            vertical: 4,
+          ),
+          child: Wrap(
+            alignment: WrapAlignment.center,
+            crossAxisAlignment: WrapCrossAlignment.center,
+            spacing: 4,
+            runSpacing: 4,
+            children: [
+              Text(
+                widget.isShort
+                    ? shortenAddress(widget.address)
+                    : widget.address,
+                style: theme.bodyText2.copyWith(
+                  color: theme.textSecondary,
                 ),
               ),
-            );
-          },
+              SvgPicture.asset(
+                _isCopied
+                    ? 'assets/icons/check.svg'
+                    : 'assets/icons/copy.svg',
+                width: 14,
+                height: 14,
+                colorFilter: ColorFilter.mode(
+                  _isCopied ? theme.success : theme.textSecondary,
+                  BlendMode.srcIn,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

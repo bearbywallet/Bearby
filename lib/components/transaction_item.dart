@@ -5,6 +5,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/pressable_animation.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
@@ -29,23 +30,16 @@ class HistoryItem extends StatefulWidget {
 }
 
 class _HistoryItemState extends State<HistoryItem>
-    with SingleTickerProviderStateMixin {
-  bool isPressed = false;
-  late final AnimationController _controller;
-  late final Animation<double> _animation;
-
+    with SingleTickerProviderStateMixin, PressableAnimationMixin {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-        duration: const Duration(milliseconds: 150), vsync: this);
-    _animation = Tween<double>(begin: 1.0, end: 0.95)
-        .animate(CurvedAnimation(parent: _controller, curve: Curves.easeInOut));
+    initPressAnimation();
   }
 
   @override
   void dispose() {
-    _controller.dispose();
+    disposePressAnimation();
     super.dispose();
   }
 
@@ -303,94 +297,75 @@ class _HistoryItemState extends State<HistoryItem>
 
     return Column(
       children: [
-        MouseRegion(
-          child: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTapDown: (_) {
-              setState(() => isPressed = true);
-              _controller.forward();
-            },
-            onTapUp: (_) {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTapCancel: () {
-              setState(() => isPressed = false);
-              _controller.reverse();
-            },
-            onTap: widget.onTap,
-            child: AnimatedBuilder(
-              animation: _animation,
-              builder: (context, child) =>
-                  Transform.scale(scale: _animation.value, child: child),
-              child: Padding(
-                padding: EdgeInsets.all(adaptivePadding),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
+        buildPressable(
+          onTap: widget.onTap,
+          enableHover: true,
+          child: Padding(
+            padding: EdgeInsets.all(adaptivePadding),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
                             children: [
-                              Row(
-                                children: [
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                        horizontal: 8, vertical: 4),
-                                    decoration: BoxDecoration(
-                                        color: _getStatusColor(theme)
-                                            .withValues(alpha: 0.1),
-                                        borderRadius:
-                                            BorderRadius.circular(12)),
-                                    child: Text(
-                                        widget.transaction.status.name
-                                            .toUpperCase(),
-                                        style: theme.caption.copyWith(
-                                            color: _getStatusColor(theme),
-                                            fontWeight: FontWeight.w600)),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Flexible(
-                                    child: Text(
-                                        widget.transaction.title ??
-                                            l10n
-                                                .transactionDetailsModal_transaction,
-                                        style: theme.bodyText1.copyWith(
-                                            color: theme.textPrimary
-                                                .withValues(alpha: 0.7),
-                                            fontWeight: FontWeight.w500),
-                                        overflow: TextOverflow.ellipsis),
-                                  ),
-                                ],
+                              Container(
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                    color: _getStatusColor(theme)
+                                        .withValues(alpha: 0.1),
+                                    borderRadius:
+                                        BorderRadius.circular(12)),
+                                child: Text(
+                                    widget.transaction.status.name
+                                        .toUpperCase(),
+                                    style: theme.caption.copyWith(
+                                        color: _getStatusColor(theme),
+                                        fontWeight: FontWeight.w600)),
                               ),
-                              const SizedBox(height: 8),
-                              _buildAmountWithPrice(state),
+                              const SizedBox(width: 8),
+                              Flexible(
+                                child: Text(
+                                    widget.transaction.title ??
+                                        l10n
+                                            .transactionDetailsModal_transaction,
+                                    style: theme.bodyText1.copyWith(
+                                        color: theme.textPrimary
+                                            .withValues(alpha: 0.7),
+                                        fontWeight: FontWeight.w500),
+                                    overflow: TextOverflow.ellipsis),
+                              ),
                             ],
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        _buildIcon(state),
-                      ],
+                          const SizedBox(height: 8),
+                          _buildAmountWithPrice(state),
+                        ],
+                      ),
                     ),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          _formatDateTime(),
-                          style: theme.bodyText2.copyWith(
-                            color: theme.textSecondary.withValues(alpha: 0.7),
-                          ),
-                        ),
-                        _buildFeeWithPrice(state, l10n),
-                      ],
-                    ),
+                    const SizedBox(width: 12),
+                    _buildIcon(state),
                   ],
                 ),
-              ),
+                const SizedBox(height: 8),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      _formatDateTime(),
+                      style: theme.bodyText2.copyWith(
+                        color: theme.textSecondary.withValues(alpha: 0.7),
+                      ),
+                    ),
+                    _buildFeeWithPrice(state, l10n),
+                  ],
+                ),
+              ],
             ),
           ),
         ),
