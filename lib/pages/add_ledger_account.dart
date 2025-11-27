@@ -55,8 +55,13 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
     super.initState();
     final appState = context.read<AppState>();
     _authGuard = Provider.of<AuthGuard>(context, listen: false);
+    final discoveredDevice =
+        appState.ledgerViewController.discoveredDevices.firstOrNull;
     final productName = appState.ledgerViewController.connectedTransport
             ?.deviceModel?.productName ??
+        discoveredDevice?.deviceModelProducName ??
+        discoveredDevice?.name ??
+        discoveredDevice?.deviceModelId ??
         "Ledger";
     _walletNameController.text =
         _createWallet ? productName : appState.wallet?.walletName ?? "";
@@ -479,7 +484,8 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
                 Column(
                   children: [
                     Padding(
-                      padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
+                      padding:
+                          EdgeInsets.symmetric(horizontal: adaptivePadding),
                       child: CustomAppBar(
                         title: l10n.addLedgerAccountPageAppBarTitle,
                         onBackPressed: () => Navigator.pop(context),
