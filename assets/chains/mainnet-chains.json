@@ -202,6 +202,54 @@
         "standard": "EIP3091"
       }
     ]
+  },
+  {
+    "name": "Base",
+    "chain": "BASE",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "https://mainnet.base.org",
+      "https://base.publicnode.com",
+      "https://1rpc.io/base",
+      "https://base.drpc.org",
+      "https://base.meowrpc.com"
+    ],
+    "features": [
+      "EIP155",
+      "EIP1559",
+      "EIP4844"
+    ],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/base/%{contract_address}%/%{dark,light}%.webp",
+        "addr": "0x0000000000000000000000000000000000000000",
+        "name": "Base",
+        "symbol": "BASE",
+        "decimals": 18
+      }
+    ],
+    "chainIds": [
+      8453,
+      0
+    ],
+    "infoURL": "https://base.org",
+    "shortName": "base",
+    "slip44": 60,
+    "explorers": [
+      {
+        "name": "Basescan",
+        "url": "https://basescan.org",
+        "icon": "https://basescan.org/assets/base/images/favicon.ico?v=25.12.1.1",
+        "standard": "EIP3091"
+      },
+      {
+        "name": "Blockscout",
+        "url": "https://base.blockscout.com",
+        "icon": "https://base.blockscout.com/assets/favicon/android-chrome-192x192.png",
+        "standard": "EIP3091"
+      }
+    ]
   }
 ]
 

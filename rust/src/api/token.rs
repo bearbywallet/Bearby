@@ -21,7 +21,6 @@ const UNISWAP_API_URL: &str =
 const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
-// CoinGecko response: { "symbol": { "currency": price } }
 type CoinGeckoResponse = HashMap<String, HashMap<String, f64>>;
 
 #[derive(Debug, Deserialize)]
