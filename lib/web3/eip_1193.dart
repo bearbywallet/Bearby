@@ -215,7 +215,7 @@ class Web3EIP1193Handler {
     String errorMessage,
   ) {
     _sendResponse(
-      type: 'ZILPAY_RESPONSE',
+      type: 'BEARBY_RESPONSE',
       uuid: uuid,
       errorCode: errorCode,
       errorMessage: errorMessage,
@@ -388,7 +388,7 @@ class Web3EIP1193Handler {
         _removeActiveRequest(method);
 
         return _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: message.uuid,
           result: addresses,
         );
@@ -416,7 +416,7 @@ class Web3EIP1193Handler {
         iconUrl: message.icon ?? "",
         onReject: () {
           _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: <void>[],
           );
@@ -426,7 +426,7 @@ class Web3EIP1193Handler {
           try {
             if (selectedIndices.isEmpty) {
               return _sendResponse(
-                type: 'ZILPAY_RESPONSE',
+                type: 'BEARBY_RESPONSE',
                 uuid: message.uuid,
                 result: <void>[],
               );
@@ -454,7 +454,7 @@ class Web3EIP1193Handler {
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
             _sendResponse(
-              type: 'ZILPAY_RESPONSE',
+              type: 'BEARBY_RESPONSE',
               uuid: message.uuid,
               result: connectedAddr,
             );
@@ -485,7 +485,7 @@ class Web3EIP1193Handler {
         filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
 
     _sendResponse(
-      type: 'ZILPAY_RESPONSE',
+      type: 'BEARBY_RESPONSE',
       uuid: message.uuid,
       result: connectedAddr,
     );
@@ -516,7 +516,7 @@ class Web3EIP1193Handler {
         final errorMessage = error['message'] as String? ?? 'Unknown RPC error';
 
         _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: uuid,
           errorCode: Web3EIP1193ErrorCode.values.firstWhere(
             (e) => e.code == errorCode,
@@ -526,7 +526,7 @@ class Web3EIP1193Handler {
         );
       } else {
         _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: uuid,
           result: response['result'],
         );
@@ -626,7 +626,7 @@ class Web3EIP1193Handler {
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: sig,
           );
@@ -843,7 +843,7 @@ class Web3EIP1193Handler {
         ).toString(),
         onConfirm: (tx) {
           _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: tx.transactionHash,
           );
@@ -883,7 +883,7 @@ class Web3EIP1193Handler {
 
       if (connection == null) {
         return _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: message.uuid,
           result: [],
         );
@@ -894,7 +894,7 @@ class Web3EIP1193Handler {
           filterByIndexes(addresses, connection.accountIndexes);
 
       _sendResponse(
-        type: 'ZILPAY_RESPONSE',
+        type: 'BEARBY_RESPONSE',
         uuid: message.uuid,
         result: [
           {
@@ -971,7 +971,7 @@ class Web3EIP1193Handler {
               connection.accountIndexes.length) {
         _removeActiveRequest(method);
         return _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: message.uuid,
           result: {
             'permissions': [
@@ -1049,7 +1049,7 @@ class Web3EIP1193Handler {
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
             _sendResponse(
-              type: 'ZILPAY_RESPONSE',
+              type: 'BEARBY_RESPONSE',
               uuid: message.uuid,
               result: {
                 'permissions': [
@@ -1173,7 +1173,7 @@ class Web3EIP1193Handler {
         typedData: typedDataeip712,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: sig,
           );
@@ -1267,7 +1267,7 @@ class Web3EIP1193Handler {
       if (tokenExists == true) {
         _removeActiveRequest(method);
         return _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: message.uuid,
           result: true,
         );
@@ -1302,7 +1302,7 @@ class Web3EIP1193Handler {
             walletIndex: BigInt.from(appState.selectedWallet),
           );
           _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: true,
           );
@@ -1311,7 +1311,7 @@ class Web3EIP1193Handler {
         },
         onCancel: () {
           _sendResponse(
-            type: 'ZILPAY_RESPONSE',
+            type: 'BEARBY_RESPONSE',
             uuid: message.uuid,
             result: false,
           );
@@ -1479,7 +1479,7 @@ class Web3EIP1193Handler {
             );
             await createOrUpdateChain(providerConfig: foundChain!);
             _sendResponse(
-              type: 'ZILPAY_RESPONSE',
+              type: 'BEARBY_RESPONSE',
               uuid: message.uuid,
               result: null,
             );
@@ -1630,7 +1630,7 @@ class Web3EIP1193Handler {
         await appState.syncData();
 
         _sendResponse(
-          type: 'ZILPAY_RESPONSE',
+          type: 'BEARBY_RESPONSE',
           uuid: message.uuid,
           result: null,
         );
@@ -1642,7 +1642,7 @@ class Web3EIP1193Handler {
           selectedChainId: chainId,
           onNetworkSelected: () {
             _sendResponse(
-              type: 'ZILPAY_RESPONSE',
+              type: 'BEARBY_RESPONSE',
               uuid: message.uuid,
               result: null,
             );

@@ -1,6 +1,6 @@
 class EVMMessages {
-  static const String request = 'ZILPAY_REQUEST';
-  static const String response = 'ZILPAY_RESPONSE';
+  static const String request = 'BEARBY_REQUEST';
+  static const String response = 'BEARBY_RESPONSE';
   static const String connect = 'connect';
   static const String disconnect = 'disconnect';
   static const String chainChanged = 'chainChanged';
