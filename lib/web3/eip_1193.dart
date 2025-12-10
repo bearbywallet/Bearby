@@ -780,8 +780,13 @@ class Web3EIP1193Handler {
         maxFeePerBlobGas: null,
       );
 
-      FTokenInfo? mbToken = appState.wallet?.tokens
-          .firstWhere((t) => t.addrType == 1 && t.native);
+      FTokenInfo? mbToken;
+      try {
+        mbToken = appState.wallet?.tokens
+            .firstWhere((t) => t.addrType == 1 && t.native);
+      } catch (e) {
+        mbToken = null;
+      }
 
       if (mbToken == null) {
         _removeActiveRequest(method);
