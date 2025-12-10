@@ -1860,4 +1860,67 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get signedMessageMessage => 'メッセージ';
+
+  @override
+  String get web3ErrorNoMethod => 'メソッドが指定されていません';
+
+  @override
+  String web3ErrorUnsupportedMethod(String method) {
+    return 'メソッド \"$method\" はサポートされていません';
+  }
+
+  @override
+  String get web3ErrorRequestInProgress => '同様のリクエストがすでに処理中です';
+
+  @override
+  String get web3ErrorUnknownRpc => '不明なRPCエラー';
+
+  @override
+  String get web3ErrorNotConnected => 'このドメインは接続されていません。まず接続してください。';
+
+  @override
+  String web3ErrorInvalidParams(String method, String params) {
+    return '$method のパラメータが無効です。必要: $params';
+  }
+
+  @override
+  String get web3ErrorAddressNotAuthorized => 'リクエストされたアドレスは承認されていません';
+
+  @override
+  String get web3ErrorUserRejected => 'ユーザーが拒否しました';
+
+  @override
+  String get web3ErrorUserRejectedRequest => 'ユーザーがリクエストを拒否しました';
+
+  @override
+  String web3ErrorMissingParam(String param) {
+    return '必須パラメータがありません: $param';
+  }
+
+  @override
+  String get web3ErrorNoNativeToken => 'ネイティブトークンが見つかりません';
+
+  @override
+  String get web3ErrorPermissionNotSupported => 'eth_accounts パーミッションのみサポートされています';
+
+  @override
+  String get web3ErrorNotAuthorizedSuggestTokens => 'このドメインはトークンの提案を許可されていません。';
+
+  @override
+  String get web3ErrorInvalidTokenType => 'wallet_watchAsset のパラメータが無効です。ERC20トークンタイプが必要です。';
+
+  @override
+  String get web3ErrorMissingTokenFields => '必須フィールドがありません: address、symbol、または decimals。';
+
+  @override
+  String get web3ErrorMissingChainFields => 'wallet_addEthereumChain の必須フィールドがありません';
+
+  @override
+  String get web3ErrorNoValidRpcUrls => '有効なHTTP RPC URLが提供されていません';
+
+  @override
+  String get web3ErrorMissingChainId => '必須フィールドがありません: chainId';
+
+  @override
+  String get web3ErrorChainNotAdded => 'リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。';
 }

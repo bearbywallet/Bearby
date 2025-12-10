@@ -3670,6 +3670,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Message'**
   String get signedMessageMessage;
+
+  /// Error when no method is specified in the request
+  ///
+  /// In en, this message translates to:
+  /// **'No method specified'**
+  String get web3ErrorNoMethod;
+
+  /// Error when the requested method is not supported
+  ///
+  /// In en, this message translates to:
+  /// **'Method \"{method}\" is not supported'**
+  String web3ErrorUnsupportedMethod(String method);
+
+  /// Error when a similar request is already in progress
+  ///
+  /// In en, this message translates to:
+  /// **'A similar request is already being processed'**
+  String get web3ErrorRequestInProgress;
+
+  /// Error for unknown RPC errors
+  ///
+  /// In en, this message translates to:
+  /// **'Unknown RPC error'**
+  String get web3ErrorUnknownRpc;
+
+  /// Error when domain is not connected to the wallet
+  ///
+  /// In en, this message translates to:
+  /// **'This domain is not connected. Please connect first.'**
+  String get web3ErrorNotConnected;
+
+  /// Error when parameters are invalid for a method
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid parameters for {method}. Required: {params}'**
+  String web3ErrorInvalidParams(String method, String params);
+
+  /// Error when the requested address is not authorized
+  ///
+  /// In en, this message translates to:
+  /// **'The requested address is not authorized'**
+  String get web3ErrorAddressNotAuthorized;
+
+  /// Error when user rejects the request
+  ///
+  /// In en, this message translates to:
+  /// **'User rejected'**
+  String get web3ErrorUserRejected;
+
+  /// Error when user rejects the request (longer version)
+  ///
+  /// In en, this message translates to:
+  /// **'User rejected the request'**
+  String get web3ErrorUserRejectedRequest;
+
+  /// Error when a required parameter is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing required parameter: {param}'**
+  String web3ErrorMissingParam(String param);
+
+  /// Error when no native token is found
+  ///
+  /// In en, this message translates to:
+  /// **'No native token found'**
+  String get web3ErrorNoNativeToken;
+
+  /// Error when requesting unsupported permission
+  ///
+  /// In en, this message translates to:
+  /// **'Only eth_accounts permission is supported'**
+  String get web3ErrorPermissionNotSupported;
+
+  /// Error when domain is not authorized to suggest tokens
+  ///
+  /// In en, this message translates to:
+  /// **'This domain is not authorized to suggest tokens.'**
+  String get web3ErrorNotAuthorizedSuggestTokens;
+
+  /// Error when token type is not ERC20
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.'**
+  String get web3ErrorInvalidTokenType;
+
+  /// Error when required token fields are missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing required fields: address, symbol, or decimals.'**
+  String get web3ErrorMissingTokenFields;
+
+  /// Error when required chain fields are missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing required fields for wallet_addEthereumChain'**
+  String get web3ErrorMissingChainFields;
+
+  /// Error when no valid RPC URLs are provided
+  ///
+  /// In en, this message translates to:
+  /// **'No valid HTTP RPC URLs provided'**
+  String get web3ErrorNoValidRpcUrls;
+
+  /// Error when chainId is missing
+  ///
+  /// In en, this message translates to:
+  /// **'Missing required field: chainId'**
+  String get web3ErrorMissingChainId;
+
+  /// Error when trying to switch to a chain that hasn't been added
+  ///
+  /// In en, this message translates to:
+  /// **'The requested chain has not been added. Use wallet_addEthereumChain first.'**
+  String get web3ErrorChainNotAdded;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

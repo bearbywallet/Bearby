@@ -1860,4 +1860,67 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get signedMessageMessage => 'Message';
+
+  @override
+  String get web3ErrorNoMethod => 'No method specified';
+
+  @override
+  String web3ErrorUnsupportedMethod(String method) {
+    return 'Method \"$method\" is not supported';
+  }
+
+  @override
+  String get web3ErrorRequestInProgress => 'A similar request is already being processed';
+
+  @override
+  String get web3ErrorUnknownRpc => 'Unknown RPC error';
+
+  @override
+  String get web3ErrorNotConnected => 'This domain is not connected. Please connect first.';
+
+  @override
+  String web3ErrorInvalidParams(String method, String params) {
+    return 'Invalid parameters for $method. Required: $params';
+  }
+
+  @override
+  String get web3ErrorAddressNotAuthorized => 'The requested address is not authorized';
+
+  @override
+  String get web3ErrorUserRejected => 'User rejected';
+
+  @override
+  String get web3ErrorUserRejectedRequest => 'User rejected the request';
+
+  @override
+  String web3ErrorMissingParam(String param) {
+    return 'Missing required parameter: $param';
+  }
+
+  @override
+  String get web3ErrorNoNativeToken => 'No native token found';
+
+  @override
+  String get web3ErrorPermissionNotSupported => 'Only eth_accounts permission is supported';
+
+  @override
+  String get web3ErrorNotAuthorizedSuggestTokens => 'This domain is not authorized to suggest tokens.';
+
+  @override
+  String get web3ErrorInvalidTokenType => 'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.';
+
+  @override
+  String get web3ErrorMissingTokenFields => 'Missing required fields: address, symbol, or decimals.';
+
+  @override
+  String get web3ErrorMissingChainFields => 'Missing required fields for wallet_addEthereumChain';
+
+  @override
+  String get web3ErrorNoValidRpcUrls => 'No valid HTTP RPC URLs provided';
+
+  @override
+  String get web3ErrorMissingChainId => 'Missing required field: chainId';
+
+  @override
+  String get web3ErrorChainNotAdded => 'The requested chain has not been added. Use wallet_addEthereumChain first.';
 }

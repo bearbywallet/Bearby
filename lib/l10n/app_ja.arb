@@ -685,5 +685,25 @@
   "signedMessagePrimaryType": "プライマリタイプ",
   "signedMessageData": "メッセージデータ",
   "signedMessageContent": "内容",
-  "signedMessageMessage": "メッセージ"
+  "signedMessageMessage": "メッセージ",
+
+  "web3ErrorNoMethod": "メソッドが指定されていません",
+  "web3ErrorUnsupportedMethod": "メソッド \"{method}\" はサポートされていません",
+  "web3ErrorRequestInProgress": "同様のリクエストがすでに処理中です",
+  "web3ErrorUnknownRpc": "不明なRPCエラー",
+  "web3ErrorNotConnected": "このドメインは接続されていません。まず接続してください。",
+  "web3ErrorInvalidParams": "{method} のパラメータが無効です。必要: {params}",
+  "web3ErrorAddressNotAuthorized": "リクエストされたアドレスは承認されていません",
+  "web3ErrorUserRejected": "ユーザーが拒否しました",
+  "web3ErrorUserRejectedRequest": "ユーザーがリクエストを拒否しました",
+  "web3ErrorMissingParam": "必須パラメータがありません: {param}",
+  "web3ErrorNoNativeToken": "ネイティブトークンが見つかりません",
+  "web3ErrorPermissionNotSupported": "eth_accounts パーミッションのみサポートされています",
+  "web3ErrorNotAuthorizedSuggestTokens": "このドメインはトークンの提案を許可されていません。",
+  "web3ErrorInvalidTokenType": "wallet_watchAsset のパラメータが無効です。ERC20トークンタイプが必要です。",
+  "web3ErrorMissingTokenFields": "必須フィールドがありません: address、symbol、または decimals。",
+  "web3ErrorMissingChainFields": "wallet_addEthereumChain の必須フィールドがありません",
+  "web3ErrorNoValidRpcUrls": "有効なHTTP RPC URLが提供されていません",
+  "web3ErrorMissingChainId": "必須フィールドがありません: chainId",
+  "web3ErrorChainNotAdded": "リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。"
 }

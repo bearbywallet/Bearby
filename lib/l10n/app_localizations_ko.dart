@@ -1860,4 +1860,67 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get signedMessageMessage => '메시지';
+
+  @override
+  String get web3ErrorNoMethod => '메서드가 지정되지 않았습니다';
+
+  @override
+  String web3ErrorUnsupportedMethod(String method) {
+    return '메서드 \"$method\"는 지원되지 않습니다';
+  }
+
+  @override
+  String get web3ErrorRequestInProgress => '유사한 요청이 이미 처리 중입니다';
+
+  @override
+  String get web3ErrorUnknownRpc => '알 수 없는 RPC 오류';
+
+  @override
+  String get web3ErrorNotConnected => '이 도메인이 연결되지 않았습니다. 먼저 연결하세요.';
+
+  @override
+  String web3ErrorInvalidParams(String method, String params) {
+    return '$method에 대한 매개변수가 유효하지 않습니다. 필요: $params';
+  }
+
+  @override
+  String get web3ErrorAddressNotAuthorized => '요청한 주소가 승인되지 않았습니다';
+
+  @override
+  String get web3ErrorUserRejected => '사용자가 거부했습니다';
+
+  @override
+  String get web3ErrorUserRejectedRequest => '사용자가 요청을 거부했습니다';
+
+  @override
+  String web3ErrorMissingParam(String param) {
+    return '필수 매개변수가 없습니다: $param';
+  }
+
+  @override
+  String get web3ErrorNoNativeToken => '네이티브 토큰을 찾을 수 없습니다';
+
+  @override
+  String get web3ErrorPermissionNotSupported => 'eth_accounts 권한만 지원됩니다';
+
+  @override
+  String get web3ErrorNotAuthorizedSuggestTokens => '이 도메인은 토큰 제안 권한이 없습니다.';
+
+  @override
+  String get web3ErrorInvalidTokenType => 'wallet_watchAsset에 대한 매개변수가 유효하지 않습니다. ERC20 토큰 유형이 필요합니다.';
+
+  @override
+  String get web3ErrorMissingTokenFields => '필수 필드가 없습니다: address, symbol 또는 decimals.';
+
+  @override
+  String get web3ErrorMissingChainFields => 'wallet_addEthereumChain에 대한 필수 필드가 없습니다';
+
+  @override
+  String get web3ErrorNoValidRpcUrls => '유효한 HTTP RPC URL이 제공되지 않았습니다';
+
+  @override
+  String get web3ErrorMissingChainId => '필수 필드가 없습니다: chainId';
+
+  @override
+  String get web3ErrorChainNotAdded => '요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.';
 }

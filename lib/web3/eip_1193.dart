@@ -6,6 +6,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/config/eip1193.dart';
 import 'package:zilpay/config/ftokens.dart';
+import 'package:zilpay/config/web3_constants.dart';
+import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/eip712.dart';
 import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/add_chain.dart';
@@ -123,16 +125,17 @@ class Web3EIP1193Handler {
       _lastKnownAddress = newAccount.addr;
       final addresses = await _getWalletAddresses(appState);
       await _sendNotification(
-        eventName: 'accountsChanged',
+        eventName: kAccountsChangedEvent,
         data: addresses,
       );
     }
 
     if (newChain != null && newChain.chainId != _lastKnownChainId) {
       _lastKnownChainId = newChain.chainId;
-      final chainIdHex = '0x${newChain.chainId.toRadixString(16)}';
+      final chainIdHex =
+          '$kHexPrefix${newChain.chainId.toRadixString(kHexRadix)}';
       await _sendNotification(
-        eventName: 'chainChanged',
+        eventName: kChainChangedEvent,
         data: chainIdHex,
       );
     }
@@ -215,7 +218,7 @@ class Web3EIP1193Handler {
     String errorMessage,
   ) {
     _sendResponse(
-      type: 'BEARBY_RESPONSE',
+      type: kBearbyResponseType,
       uuid: uuid,
       errorCode: errorCode,
       errorMessage: errorMessage,
@@ -226,7 +229,7 @@ class Web3EIP1193Handler {
     List<String> addresses = [];
     final selectedAccountIndex = appState.wallet?.selectedAccount.toInt();
 
-    if (appState.chain?.slip44 == 313) {
+    if (appState.chain?.slip44 == kZilliqaSlip44) {
       addresses = await getZilEthChecksumAddresses(
           walletIndex: BigInt.from(appState.selectedWallet));
     } else {
@@ -256,10 +259,11 @@ class Web3EIP1193Handler {
       final method = message.payload['method'] as String?;
 
       if (method == null) {
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unsupportedMethod,
-          'No method specified',
+          l10n?.web3ErrorNoMethod ?? '',
         );
       }
 
@@ -339,10 +343,11 @@ class Web3EIP1193Handler {
           break;
 
         default:
+          final l10n = AppLocalizations.of(context);
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.unsupportedMethod,
-            'Method "${zilPayMethod.value}" is not supported',
+            l10n?.web3ErrorUnsupportedMethod(zilPayMethod.value) ?? '',
           );
           break;
       }
@@ -367,7 +372,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -388,7 +393,7 @@ class Web3EIP1193Handler {
         _removeActiveRequest(method);
 
         return _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: message.uuid,
           result: addresses,
         );
@@ -396,7 +401,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -416,7 +422,7 @@ class Web3EIP1193Handler {
         iconUrl: message.icon ?? "",
         onReject: () {
           _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: <void>[],
           );
@@ -426,7 +432,7 @@ class Web3EIP1193Handler {
           try {
             if (selectedIndices.isEmpty) {
               return _sendResponse(
-                type: 'BEARBY_RESPONSE',
+                type: kBearbyResponseType,
                 uuid: message.uuid,
                 result: <void>[],
               );
@@ -454,7 +460,7 @@ class Web3EIP1193Handler {
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
             _sendResponse(
-              type: 'BEARBY_RESPONSE',
+              type: kBearbyResponseType,
               uuid: message.uuid,
               result: connectedAddr,
             );
@@ -485,7 +491,7 @@ class Web3EIP1193Handler {
         filterByIndexes(addresses, connection?.accountIndexes ?? Uint64List(0));
 
     _sendResponse(
-      type: 'BEARBY_RESPONSE',
+      type: kBearbyResponseType,
       uuid: message.uuid,
       result: connectedAddr,
     );
@@ -501,7 +507,7 @@ class Web3EIP1193Handler {
       final payload = jsonEncode({
         'method': method,
         'params': params ?? [],
-        'jsonrpc': '2.0',
+        'jsonrpc': kJsonRpcVersion,
         'id': uuid,
       });
 
@@ -513,10 +519,10 @@ class Web3EIP1193Handler {
         final error = response['error'];
         final errorCode =
             error['code'] as int? ?? Web3EIP1193ErrorCode.internalError.code;
-        final errorMessage = error['message'] as String? ?? 'Unknown RPC error';
+        final errorMessage = error['message'] as String? ?? '';
 
         _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: uuid,
           errorCode: Web3EIP1193ErrorCode.values.firstWhere(
             (e) => e.code == errorCode,
@@ -526,7 +532,7 @@ class Web3EIP1193Handler {
         );
       } else {
         _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: uuid,
           result: response['result'],
         );
@@ -553,7 +559,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -568,7 +574,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'This domain is not connected. Please connect first.',
+          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -578,10 +584,11 @@ class Web3EIP1193Handler {
         final methodName = isPersonalSign ? 'personal_sign' : 'eth_sign';
         final paramOrder =
             isPersonalSign ? '[message, address]' : '[address, message]';
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Invalid parameters for $methodName. Required: $paramOrder',
+          l10n?.web3ErrorInvalidParams(methodName, paramOrder) ?? '',
         );
       }
 
@@ -601,14 +608,15 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'The requested address is not authorized',
+          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
       final messageContent =
           isPersonalSign ? decodePersonalSignMessage(dataToSign) : dataToSign;
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -626,7 +634,7 @@ class Web3EIP1193Handler {
         message: messageContent,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: sig,
           );
@@ -639,7 +647,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected',
+            AppLocalizations.of(context)?.web3ErrorUserRejected ?? '',
           );
           _removeActiveRequest(method);
         },
@@ -669,7 +677,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -686,7 +694,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'This domain is not connected. Please connect first.',
+          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -703,14 +711,15 @@ class Web3EIP1193Handler {
       }
 
       final txParams = params[0] as Map<String, dynamic>;
-      final from = txParams['from'] as String?;
+      final from = txParams[kParamFrom] as String?;
 
       if (from == null) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Missing required parameter: from',
+          l10n?.web3ErrorMissingParam(kParamFrom) ?? '',
         );
       }
 
@@ -725,43 +734,48 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'The requested address is not authorized',
+          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
       String? title = await webViewController.getTitle();
 
-      final BigInt? chainId = txParams['chainId'] != null
-          ? BigInt.parse(txParams['chainId'].toString().replaceFirst('0x', ''),
-              radix: 16)
-          : null;
-      final BigInt? gasLimit = txParams['gas'] != null
-          ? BigInt.parse(txParams['gas'].toString().replaceFirst('0x', ''),
-              radix: 16)
-          : null;
-      final BigInt? maxFeePerGas = txParams['maxFeePerGas'] != null
+      final BigInt? chainId = txParams[kParamChainId] != null
           ? BigInt.parse(
-              txParams['maxFeePerGas'].toString().replaceFirst('0x', ''),
-              radix: 16)
+              txParams[kParamChainId].toString().replaceFirst(kHexPrefix, ''),
+              radix: kHexRadix)
+          : null;
+      final BigInt? gasLimit = txParams[kParamGas] != null
+          ? BigInt.parse(
+              txParams[kParamGas].toString().replaceFirst(kHexPrefix, ''),
+              radix: kHexRadix)
+          : null;
+      final BigInt? maxFeePerGas = txParams[kParamMaxFeePerGas] != null
+          ? BigInt.parse(
+              txParams[kParamMaxFeePerGas]
+                  .toString()
+                  .replaceFirst(kHexPrefix, ''),
+              radix: kHexRadix)
           : null;
       final BigInt? maxPriorityFeePerGas =
-          txParams['maxPriorityFeePerGas'] != null
+          txParams[kParamMaxPriorityFeePerGas] != null
               ? BigInt.parse(
-                  txParams['maxPriorityFeePerGas']
+                  txParams[kParamMaxPriorityFeePerGas]
                       .toString()
-                      .replaceFirst('0x', ''),
-                  radix: 16)
+                      .replaceFirst(kHexPrefix, ''),
+                  radix: kHexRadix)
               : null;
-      final BigInt? gasPrice = txParams['gasPrice'] != null
-          ? BigInt.parse(txParams['gasPrice'].toString().replaceFirst('0x', ''),
-              radix: 16)
+      final BigInt? gasPrice = txParams[kParamGasPrice] != null
+          ? BigInt.parse(
+              txParams[kParamGasPrice].toString().replaceFirst(kHexPrefix, ''),
+              radix: kHexRadix)
           : null;
-      final String? value = txParams['value'] as String?;
-      final String? to = txParams['to'] as String?;
+      final String? value = txParams[kParamValue] as String?;
+      final String? to = txParams[kParamTo] as String?;
 
-      final Uint8List? data = txParams['data'] != null
-          ? Uint8List.fromList(
-              hexToBytes(txParams['data'].toString().replaceFirst('0x', '')))
+      final Uint8List? data = txParams[kParamData] != null
+          ? Uint8List.fromList(hexToBytes(
+              txParams[kParamData].toString().replaceFirst(kHexPrefix, '')))
           : null;
 
       final evmRequest = TransactionRequestEVM(
@@ -783,7 +797,7 @@ class Web3EIP1193Handler {
       FTokenInfo? mbToken;
       try {
         mbToken = appState.wallet?.tokens
-            .firstWhere((t) => t.addrType == 1 && t.native);
+            .firstWhere((t) => t.addrType == kEvmAddressType && t.native);
       } catch (e) {
         mbToken = null;
       }
@@ -793,12 +807,12 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.internalError,
-          'No native token found',
+          AppLocalizations.of(context)?.web3ErrorNoNativeToken ?? '',
         );
       }
 
-      final BigInt valueAmount = value != null && value != '0x0'
-          ? BigInt.parse(value.replaceFirst('0x', ''), radix: 16)
+      final BigInt valueAmount = value != null && value != kHexZero
+          ? BigInt.parse(value.replaceFirst(kHexPrefix, ''), radix: kHexRadix)
           : BigInt.zero;
 
       final tokenInfo = BaseTokenInfo(
@@ -823,7 +837,8 @@ class Web3EIP1193Handler {
         evm: evmRequest,
       );
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -848,7 +863,7 @@ class Web3EIP1193Handler {
         ).toString(),
         onConfirm: (tx) {
           _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: tx.transactionHash,
           );
@@ -861,7 +876,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected the request',
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
           );
           _removeActiveRequest(method);
         },
@@ -888,7 +903,7 @@ class Web3EIP1193Handler {
 
       if (connection == null) {
         return _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: message.uuid,
           result: [],
         );
@@ -899,15 +914,15 @@ class Web3EIP1193Handler {
           filterByIndexes(addresses, connection.accountIndexes);
 
       _sendResponse(
-        type: 'BEARBY_RESPONSE',
+        type: kBearbyResponseType,
         uuid: message.uuid,
         result: [
           {
-            'parentCapability': 'eth_accounts',
-            'caveats': [
+            kParentCapabilityKey: kEthAccountsPermission,
+            kCaveatsKey: [
               {
-                'type': 'filterResponse',
-                'value': connectedAddr,
+                kTypeKey: kFilterResponseType,
+                kValueKey: connectedAddr,
               }
             ],
           }
@@ -934,7 +949,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -955,12 +970,13 @@ class Web3EIP1193Handler {
 
       final requestParams = params[0] as Map<String, dynamic>;
 
-      if (!requestParams.containsKey('eth_accounts')) {
+      if (!requestParams.containsKey(kEthAccountsPermission)) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Only eth_accounts permission is supported',
+          l10n?.web3ErrorPermissionNotSupported ?? '',
         );
       }
 
@@ -976,16 +992,16 @@ class Web3EIP1193Handler {
               connection.accountIndexes.length) {
         _removeActiveRequest(method);
         return _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: message.uuid,
           result: {
-            'permissions': [
+            kPermissionsKey: [
               {
-                'parentCapability': 'eth_accounts',
-                'caveats': [
+                kParentCapabilityKey: kEthAccountsPermission,
+                kCaveatsKey: [
                   {
-                    'type': 'filterResponse',
-                    'value': addresses,
+                    kTypeKey: kFilterResponseType,
+                    kValueKey: addresses,
                   }
                 ],
               }
@@ -996,7 +1012,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -1018,7 +1035,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected the request',
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
           );
           _removeActiveRequest(method);
         },
@@ -1028,7 +1045,8 @@ class Web3EIP1193Handler {
               return _returnError(
                 message.uuid,
                 Web3EIP1193ErrorCode.userRejectedRequest,
-                'User rejected the request',
+                AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ??
+                    '',
               );
             }
 
@@ -1054,16 +1072,16 @@ class Web3EIP1193Handler {
 
             final connectedAddr = filterByIndexes(addresses, accountIndexes);
             _sendResponse(
-              type: 'BEARBY_RESPONSE',
+              type: kBearbyResponseType,
               uuid: message.uuid,
               result: {
-                'permissions': [
+                kPermissionsKey: [
                   {
-                    'parentCapability': 'eth_accounts',
-                    'caveats': [
+                    kParentCapabilityKey: kEthAccountsPermission,
+                    kCaveatsKey: [
                       {
-                        'type': 'filterResponse',
-                        'value': connectedAddr,
+                        kTypeKey: kFilterResponseType,
+                        kValueKey: connectedAddr,
                       }
                     ],
                   }
@@ -1097,7 +1115,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -1111,7 +1129,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'This domain is not connected. Please connect first.',
+          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -1154,11 +1172,12 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'The requested address is not authorized',
+          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -1178,7 +1197,7 @@ class Web3EIP1193Handler {
         typedData: typedDataeip712,
         onMessageSigned: (pubkey, sig) async {
           await _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: sig,
           );
@@ -1191,7 +1210,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected',
+            AppLocalizations.of(context)?.web3ErrorUserRejected ?? '',
           );
           _removeActiveRequest(method);
         },
@@ -1220,7 +1239,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -1231,48 +1250,51 @@ class Web3EIP1193Handler {
           Web3Utils.findConnected(_currentDomain, appState.connections);
       if (connection == null) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          'This domain is not authorized to suggest tokens.',
+          l10n?.web3ErrorNotAuthorizedSuggestTokens ?? '',
         );
       }
 
       final params = message.payload['params'] as Map<String, dynamic>?;
-      if (params == null || params['type'] != 'ERC20') {
+      if (params == null || params[kTypeKey] != kErc20TokenType) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Invalid parameters for wallet_watchAsset. Expected ERC20 token type.',
+          l10n?.web3ErrorInvalidTokenType ?? '',
         );
       }
 
-      final options = params['options'] as Map<String, dynamic>?;
+      final options = params[kParamOptions] as Map<String, dynamic>?;
       if (options == null ||
-          !options.containsKey('address') ||
-          !options.containsKey('symbol') ||
-          !options.containsKey('decimals')) {
+          !options.containsKey(kParamAddress) ||
+          !options.containsKey(kParamSymbol) ||
+          !options.containsKey(kParamDecimals)) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Missing required fields: address, symbol, or decimals.',
+          l10n?.web3ErrorMissingTokenFields ?? '',
         );
       }
 
-      final tokenAddress = options['address'] as String;
-      final tokenSymbol = options['symbol'] as String;
-      final tokenImage = options['image'] as String?;
+      final tokenAddress = options[kParamAddress] as String;
+      final tokenSymbol = options[kParamSymbol] as String;
+      final tokenImage = options[kParamImage] as String?;
 
       final tokenExists = appState.wallet?.tokens.any((t) =>
           t.addr.toLowerCase() == tokenAddress.toLowerCase() &&
-          t.addrType == 1);
+          t.addrType == kEvmAddressType);
 
       if (tokenExists == true) {
         _removeActiveRequest(method);
         return _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: message.uuid,
           result: true,
         );
@@ -1280,7 +1302,8 @@ class Web3EIP1193Handler {
 
       String? title = await webViewController.getTitle();
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -1307,7 +1330,7 @@ class Web3EIP1193Handler {
             walletIndex: BigInt.from(appState.selectedWallet),
           );
           _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: true,
           );
@@ -1316,7 +1339,7 @@ class Web3EIP1193Handler {
         },
         onCancel: () {
           _sendResponse(
-            type: 'BEARBY_RESPONSE',
+            type: kBearbyResponseType,
             uuid: message.uuid,
             result: false,
           );
@@ -1345,7 +1368,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -1366,43 +1389,48 @@ class Web3EIP1193Handler {
 
       final chainParams = params[0] as Map<String, dynamic>;
 
-      if (!chainParams.containsKey('chainId') ||
-          !chainParams.containsKey('chainName') ||
-          !chainParams.containsKey('nativeCurrency') ||
-          !chainParams.containsKey('rpcUrls') ||
-          !chainParams.containsKey('blockExplorerUrls')) {
+      if (!chainParams.containsKey(kParamChainId) ||
+          !chainParams.containsKey(kParamChainName) ||
+          !chainParams.containsKey(kParamNativeCurrency) ||
+          !chainParams.containsKey(kParamRpcUrls) ||
+          !chainParams.containsKey(kParamBlockExplorerUrls)) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Missing required fields for wallet_addEthereumChain',
+          l10n?.web3ErrorMissingChainFields ?? '',
         );
       }
 
-      final rpcUrls = (chainParams['rpcUrls'] as List<dynamic>)
-          .where((url) => url is String && url.startsWith('https'))
+      final rpcUrls = (chainParams[kParamRpcUrls] as List<dynamic>)
+          .where((url) => url is String && url.startsWith(kHttpsProtocol))
           .cast<String>()
           .toList();
 
       if (rpcUrls.isEmpty) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'No valid HTTP RPC URLs provided',
+          l10n?.web3ErrorNoValidRpcUrls ?? '',
         );
       }
 
       final nativeCurrency =
-          chainParams['nativeCurrency'] as Map<String, dynamic>;
+          chainParams[kParamNativeCurrency] as Map<String, dynamic>;
       final chainId = BigInt.parse(
-          chainParams['chainId'].toString().replaceFirst('0x', ''),
-          radix: 16);
-      final explorers = (chainParams['blockExplorerUrls'] as List<dynamic>)
-          .map((url) => ExplorerInfo(name: 'Explorer', url: url, standard: 0))
+          chainParams[kParamChainId].toString().replaceFirst(kHexPrefix, ''),
+          radix: kHexRadix);
+      final explorers = (chainParams[kParamBlockExplorerUrls] as List<dynamic>)
+          .map((url) => ExplorerInfo(
+              name: kDefaultExplorerName,
+              url: url,
+              standard: kDefaultExplorerStandard))
           .toList();
-      final symbol = nativeCurrency['symbol'].toString();
-      final name = nativeCurrency['name'].toString();
+      final symbol = nativeCurrency[kParamSymbol].toString();
+      final name = nativeCurrency[kParamName].toString();
 
       NetworkConfigInfo? foundChain;
 
@@ -1415,7 +1443,7 @@ class Web3EIP1193Handler {
         foundChain = chain;
       } else {
         final String mainnetJsonData =
-            await rootBundle.loadString('assets/chains/mainnet-chains.json');
+            await rootBundle.loadString(kMainnetChainsPath);
         final List<NetworkConfigInfo> mainnetChains =
             await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
 
@@ -1436,9 +1464,9 @@ class Web3EIP1193Handler {
             logo: logo,
             name: name,
             symbol: symbol,
-            decimals: 18,
+            decimals: kDefaultEvmDecimals,
             addr: zeroEVM,
-            addrType: 1,
+            addrType: kEvmAddressType,
             balances: {},
             rate: 0,
             default_: false,
@@ -1446,20 +1474,20 @@ class Web3EIP1193Handler {
             chainHash: BigInt.zero,
           )
         ],
-        name: chainParams['chainName'] as String,
+        name: chainParams[kParamChainName] as String,
         logo: logo,
-        chain: chainParams['chainName'] as String,
+        chain: chainParams[kParamChainName] as String,
         shortName: symbol,
         rpc: rpcUrls,
-        features: Uint16List.fromList([155, 1559, 4844]),
+        features: Uint16List.fromList(kDefaultEvmFeatures),
         chainId: chainId,
         chainIds: Uint64List.fromList([chainId, 0]),
-        slip44: 60,
+        slip44: kEthereumSlip44,
         diffBlockTime: BigInt.zero,
         chainHash: BigInt.zero,
         explorers: explorers,
         fallbackEnabled: true,
-        testnet: name.toLowerCase().contains("test"),
+        testnet: name.toLowerCase().contains(kTestnetIdentifier),
       );
 
       foundChain = foundChain.copyWith(
@@ -1484,7 +1512,7 @@ class Web3EIP1193Handler {
             );
             await createOrUpdateChain(providerConfig: foundChain!);
             _sendResponse(
-              type: 'BEARBY_RESPONSE',
+              type: kBearbyResponseType,
               uuid: message.uuid,
               result: null,
             );
@@ -1503,7 +1531,7 @@ class Web3EIP1193Handler {
           _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.userRejectedRequest,
-            'User rejected the request',
+            AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
           );
           _removeActiveRequest(method);
         },
@@ -1530,7 +1558,7 @@ class Web3EIP1193Handler {
       return _returnError(
         message.uuid,
         Web3EIP1193ErrorCode.resourceUnavailable,
-        'A similar request is already being processed',
+        AppLocalizations.of(context)?.web3ErrorRequestInProgress ?? '',
       );
     }
 
@@ -1550,21 +1578,23 @@ class Web3EIP1193Handler {
       }
 
       final chainParams = params[0] as Map<String, dynamic>;
-      if (!chainParams.containsKey('chainId')) {
+      if (!chainParams.containsKey(kParamChainId)) {
         _removeActiveRequest(method);
+        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
-          'Missing required field: chainId',
+          l10n?.web3ErrorMissingChainId ?? '',
         );
       }
 
       final chainId = BigInt.parse(
-        chainParams['chainId'].toString().replaceFirst('0x', ''),
-        radix: 16,
+        chainParams[kParamChainId].toString().replaceFirst(kHexPrefix, ''),
+        radix: kHexRadix,
       );
 
-      if (appState.account?.addrType == 0 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kScillaAddressType &&
+          appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -1577,7 +1607,8 @@ class Web3EIP1193Handler {
 
       for (final provider in providers) {
         if (provider.chainId == chainId &&
-            !(provider.slip44 == 313 && provider.chainId == BigInt.one)) {
+            !(provider.slip44 == kZilliqaSlip44 &&
+                provider.chainId == kZilliqaChainId)) {
           targetNetwork = provider;
           break;
         }
@@ -1585,9 +1616,9 @@ class Web3EIP1193Handler {
 
       if (targetNetwork == null) {
         final String mainnetJsonData =
-            await rootBundle.loadString('assets/chains/mainnet-chains.json');
+            await rootBundle.loadString(kMainnetChainsPath);
         final String testnetJsonData =
-            await rootBundle.loadString('assets/chains/testnet-chains.json');
+            await rootBundle.loadString(kTestnetChainsPath);
         final List<NetworkConfigInfo> mainnetChains =
             await getChainsProvidersFromJson(jsonStr: mainnetJsonData);
         final List<NetworkConfigInfo> testnetChains =
@@ -1595,7 +1626,8 @@ class Web3EIP1193Handler {
 
         for (final chain in mainnetChains) {
           if (chain.chainId == chainId &&
-              !(chain.slip44 == 313 && chain.chainId == BigInt.one)) {
+              !(chain.slip44 == kZilliqaSlip44 &&
+                  chain.chainId == kZilliqaChainId)) {
             targetNetwork = chain;
             break;
           }
@@ -1604,7 +1636,8 @@ class Web3EIP1193Handler {
         if (targetNetwork == null) {
           for (final chain in testnetChains) {
             if (chain.chainId == chainId &&
-                !(chain.slip44 == 313 && chain.chainId == BigInt.one)) {
+                !(chain.slip44 == kZilliqaSlip44 &&
+                    chain.chainId == kZilliqaChainId)) {
               targetNetwork = chain;
               break;
             }
@@ -1616,10 +1649,11 @@ class Web3EIP1193Handler {
           await appState.syncData();
         } else {
           _removeActiveRequest(method);
+          final l10n = AppLocalizations.of(context);
           return _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.chainNotAdded,
-            'The requested chain has not been added. Use wallet_addEthereumChain first.',
+            l10n?.web3ErrorChainNotAdded ?? '',
           );
         }
       }
@@ -1635,7 +1669,7 @@ class Web3EIP1193Handler {
         await appState.syncData();
 
         _sendResponse(
-          type: 'BEARBY_RESPONSE',
+          type: kBearbyResponseType,
           uuid: message.uuid,
           result: null,
         );
@@ -1647,7 +1681,7 @@ class Web3EIP1193Handler {
           selectedChainId: chainId,
           onNetworkSelected: () {
             _sendResponse(
-              type: 'BEARBY_RESPONSE',
+              type: kBearbyResponseType,
               uuid: message.uuid,
               result: null,
             );
@@ -1657,7 +1691,7 @@ class Web3EIP1193Handler {
             _returnError(
               message.uuid,
               Web3EIP1193ErrorCode.userRejectedRequest,
-              'User rejected the request',
+              AppLocalizations.of(context)?.web3ErrorUserRejectedRequest ?? '',
             );
             _removeActiveRequest(method);
           },

@@ -681,5 +681,25 @@
   "signedMessagePrimaryType": "Основной тип",
   "signedMessageData": "Данные сообщения",
   "signedMessageContent": "Содержимое",
-  "signedMessageMessage": "Сообщение"
+  "signedMessageMessage": "Сообщение",
+
+  "web3ErrorNoMethod": "Метод не указан",
+  "web3ErrorUnsupportedMethod": "Метод \"{method}\" не поддерживается",
+  "web3ErrorRequestInProgress": "Аналогичный запрос уже обрабатывается",
+  "web3ErrorUnknownRpc": "Неизвестная ошибка RPC",
+  "web3ErrorNotConnected": "Этот домен не подключен. Пожалуйста, подключитесь сначала.",
+  "web3ErrorInvalidParams": "Недопустимые параметры для {method}. Требуется: {params}",
+  "web3ErrorAddressNotAuthorized": "Запрашиваемый адрес не авторизован",
+  "web3ErrorUserRejected": "Пользователь отклонил",
+  "web3ErrorUserRejectedRequest": "Пользователь отклонил запрос",
+  "web3ErrorMissingParam": "Отсутствует обязательный параметр: {param}",
+  "web3ErrorNoNativeToken": "Нативный токен не найден",
+  "web3ErrorPermissionNotSupported": "Поддерживается только разрешение eth_accounts",
+  "web3ErrorNotAuthorizedSuggestTokens": "Этот домен не авторизован для предложения токенов.",
+  "web3ErrorInvalidTokenType": "Недопустимые параметры для wallet_watchAsset. Ожидается тип токена ERC20.",
+  "web3ErrorMissingTokenFields": "Отсутствуют обязательные поля: address, symbol или decimals.",
+  "web3ErrorMissingChainFields": "Отсутствуют обязательные поля для wallet_addEthereumChain",
+  "web3ErrorNoValidRpcUrls": "Не предоставлены действительные HTTP RPC URL",
+  "web3ErrorMissingChainId": "Отсутствует обязательное поле: chainId",
+  "web3ErrorChainNotAdded": "Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain."
 }

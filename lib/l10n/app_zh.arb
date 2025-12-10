@@ -665,5 +665,25 @@
   "signedMessagePrimaryType": "主类型",
   "signedMessageData": "消息数据",
   "signedMessageContent": "内容",
-  "signedMessageMessage": "消息"
+  "signedMessageMessage": "消息",
+
+  "web3ErrorNoMethod": "未指定方法",
+  "web3ErrorUnsupportedMethod": "不支持方法 \"{method}\"",
+  "web3ErrorRequestInProgress": "类似的请求已在处理中",
+  "web3ErrorUnknownRpc": "未知的 RPC 错误",
+  "web3ErrorNotConnected": "此域名未连接。请先连接。",
+  "web3ErrorInvalidParams": "{method} 的参数无效。需要：{params}",
+  "web3ErrorAddressNotAuthorized": "请求的地址未授权",
+  "web3ErrorUserRejected": "用户拒绝",
+  "web3ErrorUserRejectedRequest": "用户拒绝了请求",
+  "web3ErrorMissingParam": "缺少必需参数：{param}",
+  "web3ErrorNoNativeToken": "未找到原生代币",
+  "web3ErrorPermissionNotSupported": "仅支持 eth_accounts 权限",
+  "web3ErrorNotAuthorizedSuggestTokens": "此域名未授权建议代币。",
+  "web3ErrorInvalidTokenType": "wallet_watchAsset 的参数无效。需要 ERC20 代币类型。",
+  "web3ErrorMissingTokenFields": "缺少必需字段：address、symbol 或 decimals。",
+  "web3ErrorMissingChainFields": "wallet_addEthereumChain 缺少必需字段",
+  "web3ErrorNoValidRpcUrls": "未提供有效的 HTTP RPC URL",
+  "web3ErrorMissingChainId": "缺少必需字段：chainId",
+  "web3ErrorChainNotAdded": "请求的链尚未添加。请先使用 wallet_addEthereumChain。"
 }

@@ -1860,4 +1860,67 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get signedMessageMessage => '消息';
+
+  @override
+  String get web3ErrorNoMethod => '未指定方法';
+
+  @override
+  String web3ErrorUnsupportedMethod(String method) {
+    return '不支持方法 \"$method\"';
+  }
+
+  @override
+  String get web3ErrorRequestInProgress => '类似的请求已在处理中';
+
+  @override
+  String get web3ErrorUnknownRpc => '未知的 RPC 错误';
+
+  @override
+  String get web3ErrorNotConnected => '此域名未连接。请先连接。';
+
+  @override
+  String web3ErrorInvalidParams(String method, String params) {
+    return '$method 的参数无效。需要：$params';
+  }
+
+  @override
+  String get web3ErrorAddressNotAuthorized => '请求的地址未授权';
+
+  @override
+  String get web3ErrorUserRejected => '用户拒绝';
+
+  @override
+  String get web3ErrorUserRejectedRequest => '用户拒绝了请求';
+
+  @override
+  String web3ErrorMissingParam(String param) {
+    return '缺少必需参数：$param';
+  }
+
+  @override
+  String get web3ErrorNoNativeToken => '未找到原生代币';
+
+  @override
+  String get web3ErrorPermissionNotSupported => '仅支持 eth_accounts 权限';
+
+  @override
+  String get web3ErrorNotAuthorizedSuggestTokens => '此域名未授权建议代币。';
+
+  @override
+  String get web3ErrorInvalidTokenType => 'wallet_watchAsset 的参数无效。需要 ERC20 代币类型。';
+
+  @override
+  String get web3ErrorMissingTokenFields => '缺少必需字段：address、symbol 或 decimals。';
+
+  @override
+  String get web3ErrorMissingChainFields => 'wallet_addEthereumChain 缺少必需字段';
+
+  @override
+  String get web3ErrorNoValidRpcUrls => '未提供有效的 HTTP RPC URL';
+
+  @override
+  String get web3ErrorMissingChainId => '缺少必需字段：chainId';
+
+  @override
+  String get web3ErrorChainNotAdded => '请求的链尚未添加。请先使用 wallet_addEthereumChain。';
 }

@@ -2636,5 +2636,100 @@
   "signedMessageMessage": "Message",
   "@signedMessageMessage": {
     "description": "Title for message section"
+  },
+
+  "web3ErrorNoMethod": "No method specified",
+  "@web3ErrorNoMethod": {
+    "description": "Error when no method is specified in the request"
+  },
+  "web3ErrorUnsupportedMethod": "Method \"{method}\" is not supported",
+  "@web3ErrorUnsupportedMethod": {
+    "description": "Error when the requested method is not supported",
+    "placeholders": {
+      "method": {
+        "type": "String"
+      }
+    }
+  },
+  "web3ErrorRequestInProgress": "A similar request is already being processed",
+  "@web3ErrorRequestInProgress": {
+    "description": "Error when a similar request is already in progress"
+  },
+  "web3ErrorUnknownRpc": "Unknown RPC error",
+  "@web3ErrorUnknownRpc": {
+    "description": "Error for unknown RPC errors"
+  },
+  "web3ErrorNotConnected": "This domain is not connected. Please connect first.",
+  "@web3ErrorNotConnected": {
+    "description": "Error when domain is not connected to the wallet"
+  },
+  "web3ErrorInvalidParams": "Invalid parameters for {method}. Required: {params}",
+  "@web3ErrorInvalidParams": {
+    "description": "Error when parameters are invalid for a method",
+    "placeholders": {
+      "method": {
+        "type": "String"
+      },
+      "params": {
+        "type": "String"
+      }
+    }
+  },
+  "web3ErrorAddressNotAuthorized": "The requested address is not authorized",
+  "@web3ErrorAddressNotAuthorized": {
+    "description": "Error when the requested address is not authorized"
+  },
+  "web3ErrorUserRejected": "User rejected",
+  "@web3ErrorUserRejected": {
+    "description": "Error when user rejects the request"
+  },
+  "web3ErrorUserRejectedRequest": "User rejected the request",
+  "@web3ErrorUserRejectedRequest": {
+    "description": "Error when user rejects the request (longer version)"
+  },
+  "web3ErrorMissingParam": "Missing required parameter: {param}",
+  "@web3ErrorMissingParam": {
+    "description": "Error when a required parameter is missing",
+    "placeholders": {
+      "param": {
+        "type": "String"
+      }
+    }
+  },
+  "web3ErrorNoNativeToken": "No native token found",
+  "@web3ErrorNoNativeToken": {
+    "description": "Error when no native token is found"
+  },
+  "web3ErrorPermissionNotSupported": "Only eth_accounts permission is supported",
+  "@web3ErrorPermissionNotSupported": {
+    "description": "Error when requesting unsupported permission"
+  },
+  "web3ErrorNotAuthorizedSuggestTokens": "This domain is not authorized to suggest tokens.",
+  "@web3ErrorNotAuthorizedSuggestTokens": {
+    "description": "Error when domain is not authorized to suggest tokens"
+  },
+  "web3ErrorInvalidTokenType": "Invalid parameters for wallet_watchAsset. Expected ERC20 token type.",
+  "@web3ErrorInvalidTokenType": {
+    "description": "Error when token type is not ERC20"
+  },
+  "web3ErrorMissingTokenFields": "Missing required fields: address, symbol, or decimals.",
+  "@web3ErrorMissingTokenFields": {
+    "description": "Error when required token fields are missing"
+  },
+  "web3ErrorMissingChainFields": "Missing required fields for wallet_addEthereumChain",
+  "@web3ErrorMissingChainFields": {
+    "description": "Error when required chain fields are missing"
+  },
+  "web3ErrorNoValidRpcUrls": "No valid HTTP RPC URLs provided",
+  "@web3ErrorNoValidRpcUrls": {
+    "description": "Error when no valid RPC URLs are provided"
+  },
+  "web3ErrorMissingChainId": "Missing required field: chainId",
+  "@web3ErrorMissingChainId": {
+    "description": "Error when chainId is missing"
+  },
+  "web3ErrorChainNotAdded": "The requested chain has not been added. Use wallet_addEthereumChain first.",
+  "@web3ErrorChainNotAdded": {
+    "description": "Error when trying to switch to a chain that hasn't been added"
   }
 }

@@ -1860,4 +1860,67 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get signedMessageMessage => 'Сообщение';
+
+  @override
+  String get web3ErrorNoMethod => 'Метод не указан';
+
+  @override
+  String web3ErrorUnsupportedMethod(String method) {
+    return 'Метод \"$method\" не поддерживается';
+  }
+
+  @override
+  String get web3ErrorRequestInProgress => 'Аналогичный запрос уже обрабатывается';
+
+  @override
+  String get web3ErrorUnknownRpc => 'Неизвестная ошибка RPC';
+
+  @override
+  String get web3ErrorNotConnected => 'Этот домен не подключен. Пожалуйста, подключитесь сначала.';
+
+  @override
+  String web3ErrorInvalidParams(String method, String params) {
+    return 'Недопустимые параметры для $method. Требуется: $params';
+  }
+
+  @override
+  String get web3ErrorAddressNotAuthorized => 'Запрашиваемый адрес не авторизован';
+
+  @override
+  String get web3ErrorUserRejected => 'Пользователь отклонил';
+
+  @override
+  String get web3ErrorUserRejectedRequest => 'Пользователь отклонил запрос';
+
+  @override
+  String web3ErrorMissingParam(String param) {
+    return 'Отсутствует обязательный параметр: $param';
+  }
+
+  @override
+  String get web3ErrorNoNativeToken => 'Нативный токен не найден';
+
+  @override
+  String get web3ErrorPermissionNotSupported => 'Поддерживается только разрешение eth_accounts';
+
+  @override
+  String get web3ErrorNotAuthorizedSuggestTokens => 'Этот домен не авторизован для предложения токенов.';
+
+  @override
+  String get web3ErrorInvalidTokenType => 'Недопустимые параметры для wallet_watchAsset. Ожидается тип токена ERC20.';
+
+  @override
+  String get web3ErrorMissingTokenFields => 'Отсутствуют обязательные поля: address, symbol или decimals.';
+
+  @override
+  String get web3ErrorMissingChainFields => 'Отсутствуют обязательные поля для wallet_addEthereumChain';
+
+  @override
+  String get web3ErrorNoValidRpcUrls => 'Не предоставлены действительные HTTP RPC URL';
+
+  @override
+  String get web3ErrorMissingChainId => 'Отсутствует обязательное поле: chainId';
+
+  @override
+  String get web3ErrorChainNotAdded => 'Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain.';
 }
