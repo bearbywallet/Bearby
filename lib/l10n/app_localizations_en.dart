@@ -105,9 +105,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get languagePageTitle => 'Language';
 
   @override
-  String get languagePageSystem => 'System';
-
-  @override
   String get secretKeyGeneratorPageTitle => 'Secret Key';
 
   @override
@@ -121,9 +118,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get secretKeyGeneratorPageNextButton => 'Next';
-
-  @override
-  String get walletPageTitle => '';
 
   @override
   String get walletPageWalletNameHint => 'Wallet name';
@@ -147,16 +141,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get networkPageTitle => '';
 
   @override
-  String get networkPageShowTestnet => 'Show Testnet';
-
-  @override
   String get networkPageSearchHint => 'Search';
-
-  @override
-  String get networkPageAddedNetworks => 'Added Networks';
-
-  @override
-  String get networkPageAvailableNetworks => 'Available Networks';
 
   @override
   String get networkPageAddError => 'Failed to add network: ';
@@ -239,18 +224,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get securityPageUnknown => 'Unknown';
 
   @override
-  String get webViewPageDntLabel => 'DNT';
-
-  @override
-  String get webViewPageIncognitoLabel => 'Incognito';
-
-  @override
-  String get webViewPageLoadError => 'Failed to load';
-
-  @override
-  String get webViewPageTryAgain => 'Try Again';
-
-  @override
   String get secretPhraseGeneratorPageTitle => 'New Wallet';
 
   @override
@@ -261,9 +234,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get homePageErrorTitle => 'No signal';
-
-  @override
-  String get homePageSendButton => 'Send';
 
   @override
   String get homePageReceiveButton => 'Receive';
@@ -296,9 +266,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get revealSecretKeyRevealAfter => 'Your secret key will be revealed after:';
 
   @override
-  String get setupNetworkSettingsPageTestnetSwitch => 'Testnet';
-
-  @override
   String get setupNetworkSettingsPageSearchHint => 'Search';
 
   @override
@@ -311,12 +278,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => 'Next';
-
-  @override
-  String get setupNetworkSettingsPageTestnetLabel => 'Testnet';
-
-  @override
-  String get setupNetworkSettingsPageMainnetLabel => 'Mainnet';
 
   @override
   String get setupNetworkSettingsPageChainIdLabel => 'Chain ID:';
@@ -469,12 +430,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get delete => 'Delete';
-
-  @override
-  String get browserPageExploreTab => 'Explore';
-
-  @override
-  String get browserPageNoExploreApps => 'No apps to explore yet';
 
   @override
   String browserPageSearchHint(Object engine) {
@@ -997,31 +952,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get signMessageModalContentSign => 'Sign Message';
 
   @override
-  String get signMessageModalContentScanning => 'Scanning Ledger devices...';
-
-  @override
-  String get signMessageModalContentNoLedgerDevices => 'No Ledger devices found';
-
-  @override
-  String get signMessageModalContentWalletNotSelected => 'Wallet not selected';
-
-  @override
-  String get signMessageModalContentLedgerNotSelected => 'Ledger device not selected';
-
-  @override
-  String signMessageModalContentFailedToScanLedger(Object error) {
-    return 'Failed to scan Ledger devices: $error';
-  }
-
-  @override
-  String signMessageModalContentFailedToSignMessage(Object error) {
-    return 'Failed to sign message: $error';
-  }
-
-  @override
-  String get signMessageModalContentBluetoothOff => 'Bluetooth is turned off. Please enable it to scan for Ledger devices.';
-
-  @override
   String get deleteWalletModalTitle => 'Delete Wallet';
 
   @override
@@ -1107,12 +1037,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get qrScannerModalContentCameraInitError => 'Camera initialization error:';
-
-  @override
-  String get qrScannerModalContentTorchError => 'Failed to toggle torch:';
-
-  @override
-  String get qrScannerModalContentOpenSettings => 'Open Settings';
 
   @override
   String get chainInfoModalContentTokenTitle => 'Network Token';
@@ -1393,9 +1317,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get browserActionMenuCopyLink => 'Copy Link';
 
   @override
-  String get browserActionMenuClose => 'Close';
-
-  @override
   String get browserActionMenuRefresh => 'Refresh';
 
   @override
@@ -1477,12 +1398,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get editGasDialogGasLimit => 'Gas Limit';
 
   @override
-  String get editGasDialogCancel => 'Cancel';
-
-  @override
-  String get editGasDialogSave => 'Save';
-
-  @override
   String get editGasDialogInvalidGasValues => 'Invalid gas values. Please check your inputs.';
 
   @override
@@ -1496,29 +1411,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageAddButton => 'Update';
-
-  @override
-  String get addLedgerAccountPageScanningMessage => 'Scanning for Ledger devices...';
-
-  @override
-  String get addLedgerAccountPageNoDevicesMessage => 'No Ledger devices found';
-
-  @override
-  String get addLedgerAccountPageBluetoothOffError => 'Bluetooth is turned off. Please enable it to scan for Ledger devices.';
-
-  @override
-  String get addLedgerAccountPageEmptyWalletNameError => 'Wallet name cannot be empty';
-
-  @override
-  String get addLedgerAccountPageWalletNameTooLongError => 'Wallet name is too long (max 24 characters)';
-
-  @override
-  String addLedgerAccountPageFailedToScanError(Object error) {
-    return 'Failed to scan for Ledger devices: $error';
-  }
-
-  @override
-  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'Network or Ledger data is missing';
 
   @override
   String get addLedgerAccountPageNoAccountsSelectedError => 'No accounts selected';
@@ -1539,15 +1431,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noStakingPoolsFound => 'No Staking Pools Found';
 
   @override
-  String get aprSort => 'APR';
-
-  @override
-  String get commissionSort => 'Commission';
-
-  @override
-  String get tvlSort => 'TVL';
-
-  @override
   String get claimButton => 'Claim';
 
   @override
@@ -1557,19 +1440,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get unstakeButton => 'Unstake';
 
   @override
-  String get reinvest => 'Reinvest';
-
-  @override
   String get aprLabel => 'APR';
 
   @override
   String get commissionLabel => 'Commission';
-
-  @override
-  String get tvlLabel => 'TVL';
-
-  @override
-  String get lpStakingBadge => 'LP Staking';
 
   @override
   String get stakedAmount => 'Staked';
@@ -1608,55 +1482,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get ledgerConnectPageInitializing => 'Initializing...';
 
   @override
-  String get ledgerConnectPageReadyToScan => 'Ready to scan. Press refresh button.';
-
-  @override
-  String ledgerConnectPageInitializationError(String error) {
-    return 'Error initializing Ledger: $error';
-  }
-
-  @override
-  String get ledgerConnectPageInitErrorTitle => 'Initialization Error';
-
-  @override
-  String ledgerConnectPageInitErrorContent(String error) {
-    return 'Failed to initialize Ledger interfaces: $error';
-  }
-
-  @override
-  String get ledgerConnectPageBluetoothOffStatus => 'Bluetooth is turned off. Please enable Bluetooth on your device.';
-
-  @override
-  String get ledgerConnectPageBluetoothOffTitle => 'Bluetooth Off';
-
-  @override
-  String get ledgerConnectPageBluetoothOffContent => 'Please turn on Bluetooth in your device settings and try again.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedStatus => 'Bluetooth permission denied. Please enable in settings.';
-
-  @override
-  String get ledgerConnectPagePermissionRequiredTitle => 'Permission Required';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedTitle => 'Permission Denied';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContent => 'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContentIOS => 'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.';
-
-  @override
-  String get ledgerConnectPageUnsupportedStatus => 'Bluetooth LE is not supported on this device.';
-
-  @override
-  String get ledgerConnectPageUnsupportedTitle => 'Unsupported Device';
-
-  @override
-  String get ledgerConnectPageUnsupportedContent => 'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.';
-
-  @override
   String get ledgerConnectPageScanningStatus => 'Scanning for Ledger devices...';
 
   @override
@@ -1670,9 +1495,6 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanErrorTitle => 'Scan Error';
-
-  @override
   String get ledgerConnectPageScanFinishedNoDevices => 'Scan finished. No devices found.';
 
   @override
@@ -1681,30 +1503,9 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageFailedToStartScan(String error) {
-    return 'Failed to start scan: $error';
-  }
-
-  @override
-  String get ledgerConnectPageScanStopped => 'Scan stopped.';
-
-  @override
-  String ledgerConnectPageScanStoppedWithDevices(int count) {
-    return 'Scan stopped. Found $count device(s).';
-  }
-
-  @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return 'Connecting to $deviceName ($connectionType)...';
   }
-
-  @override
-  String ledgerConnectPageConnectionTimeoutError(int seconds) {
-    return 'Connection timed out after $seconds seconds';
-  }
-
-  @override
-  String get ledgerConnectPageInterfaceUnavailableError => 'Appropriate Ledger interface not available.';
 
   @override
   String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
@@ -1712,26 +1513,11 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
-    return 'Connection Failed: Timed out after $count attempts';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => 'Connection Failed';
-
-  @override
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
-    return 'Connection timed out after $count attempts. Please ensure the device is unlocked and try again.';
-  }
 
   @override
   String ledgerConnectPageConnectionFailedErrorStatus(String error) {
     return 'Connection Failed: $error';
-  }
-
-  @override
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
-    return 'Ledger Error: $error';
   }
 
   @override
@@ -1740,27 +1526,8 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageDeviceDisconnected => 'Device disconnected.';
-
-  @override
-  String get ledgerConnectPageListenerStopped => 'Listener stopped.';
-
-  @override
-  String get ledgerConnectPageFailedToMonitorDisconnects => 'Failed to monitor disconnects.';
-
-  @override
-  String ledgerConnectPageDisconnectingStatus(String deviceName) {
-    return 'Disconnecting from $deviceName...';
-  }
-
-  @override
   String ledgerConnectPageDisconnectedStatus(String deviceName) {
     return 'Disconnected from $deviceName.';
-  }
-
-  @override
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
-    return 'Error disconnecting from $deviceName.';
   }
 
   @override
@@ -1768,14 +1535,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get ledgerConnectPageNoDevicesFound => 'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.';
-
-  @override
-  String ledgerConnectPageDisconnectButton(String deviceName) {
-    return 'Disconnect from $deviceName';
-  }
-
-  @override
-  String get unknownDevice => 'Unknown';
 
   @override
   String get durationDay => 'd';
@@ -1871,9 +1630,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get web3ErrorRequestInProgress => 'A similar request is already being processed';
-
-  @override
-  String get web3ErrorUnknownRpc => 'Unknown RPC error';
 
   @override
   String get web3ErrorNotConnected => 'This domain is not connected. Please connect first.';

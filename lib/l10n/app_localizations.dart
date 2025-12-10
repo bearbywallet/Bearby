@@ -293,12 +293,6 @@ abstract class AppLocalizations {
   /// **'Language'**
   String get languagePageTitle;
 
-  /// System language option name on LanguagePage
-  ///
-  /// In en, this message translates to:
-  /// **'System'**
-  String get languagePageSystem;
-
   /// Title for the SecretKeyGeneratorPage
   ///
   /// In en, this message translates to:
@@ -328,12 +322,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next'**
   String get secretKeyGeneratorPageNextButton;
-
-  /// Title for the WalletPage (empty as per original implementation)
-  ///
-  /// In en, this message translates to:
-  /// **''**
-  String get walletPageTitle;
 
   /// Hint text for wallet name input on WalletPage
   ///
@@ -377,29 +365,11 @@ abstract class AppLocalizations {
   /// **''**
   String get networkPageTitle;
 
-  /// Label for testnet toggle switch on NetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Show Testnet'**
-  String get networkPageShowTestnet;
-
   /// Hint text for search input on NetworkPage
   ///
   /// In en, this message translates to:
   /// **'Search'**
   String get networkPageSearchHint;
-
-  /// Section title for added networks on NetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Added Networks'**
-  String get networkPageAddedNetworks;
-
-  /// Section title for available networks on NetworkPage
-  ///
-  /// In en, this message translates to:
-  /// **'Available Networks'**
-  String get networkPageAvailableNetworks;
 
   /// Error message prefix when adding a network fails on NetworkPage
   ///
@@ -557,30 +527,6 @@ abstract class AppLocalizations {
   /// **'Unknown'**
   String get securityPageUnknown;
 
-  /// Label indicating Do Not Track is enabled in the WebViewPage app bar
-  ///
-  /// In en, this message translates to:
-  /// **'DNT'**
-  String get webViewPageDntLabel;
-
-  /// Label indicating Incognito mode is enabled in the WebViewPage app bar
-  ///
-  /// In en, this message translates to:
-  /// **'Incognito'**
-  String get webViewPageIncognitoLabel;
-
-  /// Error message title when web page fails to load on WebViewPage
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to load'**
-  String get webViewPageLoadError;
-
-  /// Button text to retry loading the web page on WebViewPage
-  ///
-  /// In en, this message translates to:
-  /// **'Try Again'**
-  String get webViewPageTryAgain;
-
   /// Title for the SecretPhraseGeneratorPage
   ///
   /// In en, this message translates to:
@@ -604,12 +550,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No signal'**
   String get homePageErrorTitle;
-
-  /// A Receive Tile Button title
-  ///
-  /// In en, this message translates to:
-  /// **'Send'**
-  String get homePageSendButton;
 
   /// No description provided for @homePageReceiveButton.
   ///
@@ -671,12 +611,6 @@ abstract class AppLocalizations {
   /// **'Your secret key will be revealed after:'**
   String get revealSecretKeyRevealAfter;
 
-  /// Label for Testnet switch on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Testnet'**
-  String get setupNetworkSettingsPageTestnetSwitch;
-
   /// Hint text for search input on SetupNetworkSettingsPage
   ///
   /// In en, this message translates to:
@@ -700,18 +634,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Next'**
   String get setupNetworkSettingsPageNextButton;
-
-  /// Label indicating Testnet in network item on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Testnet'**
-  String get setupNetworkSettingsPageTestnetLabel;
-
-  /// Label indicating Mainnet in network item on SetupNetworkSettingsPage
-  ///
-  /// In en, this message translates to:
-  /// **'Mainnet'**
-  String get setupNetworkSettingsPageMainnetLabel;
 
   /// Label prefix for Chain ID in network item on SetupNetworkSettingsPage
   ///
@@ -988,18 +910,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Delete'**
   String get delete;
-
-  /// Label for the Explore tab on the Browser page
-  ///
-  /// In en, this message translates to:
-  /// **'Explore'**
-  String get browserPageExploreTab;
-
-  /// Message displayed when there are no apps to explore on the Browser page
-  ///
-  /// In en, this message translates to:
-  /// **'No apps to explore yet'**
-  String get browserPageNoExploreApps;
 
   /// Hint text for the search bar on the Browser page
   ///
@@ -2033,48 +1943,6 @@ abstract class AppLocalizations {
   /// **'Sign Message'**
   String get signMessageModalContentSign;
 
-  /// Text displayed below the progress indicator when scanning for Ledger devices in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Scanning Ledger devices...'**
-  String get signMessageModalContentScanning;
-
-  /// Error message displayed when no Ledger devices are found after scanning in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'No Ledger devices found'**
-  String get signMessageModalContentNoLedgerDevices;
-
-  /// Error message displayed when no wallet is selected in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet not selected'**
-  String get signMessageModalContentWalletNotSelected;
-
-  /// Error message displayed when no Ledger device is selected in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Ledger device not selected'**
-  String get signMessageModalContentLedgerNotSelected;
-
-  /// Error message format when scanning for Ledger devices fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to scan Ledger devices: {error}'**
-  String signMessageModalContentFailedToScanLedger(Object error);
-
-  /// Error message format when signing a message with a Ledger device fails in the SignMessageModalContent modal, with {error} placeholder for the error details.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to sign message: {error}'**
-  String signMessageModalContentFailedToSignMessage(Object error);
-
-  /// Error message displayed when Bluetooth is not enabled during Ledger device scanning in the SignMessageModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth is turned off. Please enable it to scan for Ledger devices.'**
-  String get signMessageModalContentBluetoothOff;
-
   /// Title text for the DeleteWalletModal modal.
   ///
   /// In en, this message translates to:
@@ -2248,18 +2116,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Camera initialization error:'**
   String get qrScannerModalContentCameraInitError;
-
-  /// Prefix for error message when toggling the torch fails in the QRScannerModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to toggle torch:'**
-  String get qrScannerModalContentTorchError;
-
-  /// Text on the button to open app settings when camera permission is denied on iOS in the QRScannerModalContent modal.
-  ///
-  /// In en, this message translates to:
-  /// **'Open Settings'**
-  String get qrScannerModalContentOpenSettings;
 
   /// Title text for the network token section in the ChainInfoModalContent modal.
   ///
@@ -2813,12 +2669,6 @@ abstract class AppLocalizations {
   /// **'Copy Link'**
   String get browserActionMenuCopyLink;
 
-  /// Menu item text for closing the current page or tab
-  ///
-  /// In en, this message translates to:
-  /// **'Close'**
-  String get browserActionMenuClose;
-
   /// Menu item text for refreshing the current page
   ///
   /// In en, this message translates to:
@@ -2981,18 +2831,6 @@ abstract class AppLocalizations {
   /// **'Gas Limit'**
   String get editGasDialogGasLimit;
 
-  /// Button text to cancel gas parameter changes
-  ///
-  /// In en, this message translates to:
-  /// **'Cancel'**
-  String get editGasDialogCancel;
-
-  /// Button text to save gas parameter changes
-  ///
-  /// In en, this message translates to:
-  /// **'Save'**
-  String get editGasDialogSave;
-
   /// Error message shown when invalid gas values are entered
   ///
   /// In en, this message translates to:
@@ -3022,48 +2860,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Update'**
   String get addLedgerAccountPageAddButton;
-
-  /// Message displayed while scanning for Ledger devices in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Scanning for Ledger devices...'**
-  String get addLedgerAccountPageScanningMessage;
-
-  /// Message displayed when no Ledger devices are found in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'No Ledger devices found'**
-  String get addLedgerAccountPageNoDevicesMessage;
-
-  /// Error message displayed when Bluetooth is disabled in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth is turned off. Please enable it to scan for Ledger devices.'**
-  String get addLedgerAccountPageBluetoothOffError;
-
-  /// Error message displayed when the wallet name is empty in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet name cannot be empty'**
-  String get addLedgerAccountPageEmptyWalletNameError;
-
-  /// Error message displayed when the wallet name exceeds the maximum length in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Wallet name is too long (max 24 characters)'**
-  String get addLedgerAccountPageWalletNameTooLongError;
-
-  /// Error message displayed when scanning for Ledger devices fails in the AddLedgerAccountPage component, with a placeholder for the error details
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to scan for Ledger devices: {error}'**
-  String addLedgerAccountPageFailedToScanError(Object error);
-
-  /// Error message displayed when network or Ledger data is missing in the AddLedgerAccountPage component
-  ///
-  /// In en, this message translates to:
-  /// **'Network or Ledger data is missing'**
-  String get addLedgerAccountPageNetworkOrLedgerMissingError;
 
   /// Error message displayed when no accounts are selected for creating a wallet in the AddLedgerAccountPage component
   ///
@@ -3101,24 +2897,6 @@ abstract class AppLocalizations {
   /// **'No Staking Pools Found'**
   String get noStakingPoolsFound;
 
-  /// Label for sorting by Annual Percentage Rate
-  ///
-  /// In en, this message translates to:
-  /// **'APR'**
-  String get aprSort;
-
-  /// Label for sorting by Commission
-  ///
-  /// In en, this message translates to:
-  /// **'Commission'**
-  String get commissionSort;
-
-  /// Label for sorting by Total Value Locked
-  ///
-  /// In en, this message translates to:
-  /// **'TVL'**
-  String get tvlSort;
-
   /// Text for the claim rewards button
   ///
   /// In en, this message translates to:
@@ -3137,12 +2915,6 @@ abstract class AppLocalizations {
   /// **'Unstake'**
   String get unstakeButton;
 
-  /// Text for the reinvest button
-  ///
-  /// In en, this message translates to:
-  /// **'Reinvest'**
-  String get reinvest;
-
   /// Label for APR in the staking pool card
   ///
   /// In en, this message translates to:
@@ -3154,18 +2926,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Commission'**
   String get commissionLabel;
-
-  /// Label for TVL in the staking pool card
-  ///
-  /// In en, this message translates to:
-  /// **'TVL'**
-  String get tvlLabel;
-
-  /// Badge text for liquidity pool staking
-  ///
-  /// In en, this message translates to:
-  /// **'LP Staking'**
-  String get lpStakingBadge;
 
   /// Label for the amount of tokens staked by user
   ///
@@ -3239,96 +2999,6 @@ abstract class AppLocalizations {
   /// **'Initializing...'**
   String get ledgerConnectPageInitializing;
 
-  /// Status text indicating that the Ledger interface is initialized and ready for scanning.
-  ///
-  /// In en, this message translates to:
-  /// **'Ready to scan. Press refresh button.'**
-  String get ledgerConnectPageReadyToScan;
-
-  /// Status text shown when Ledger initialization fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Error initializing Ledger: {error}'**
-  String ledgerConnectPageInitializationError(String error);
-
-  /// Title for the dialog when Ledger initialization fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Initialization Error'**
-  String get ledgerConnectPageInitErrorTitle;
-
-  /// Content for the dialog when Ledger initialization fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to initialize Ledger interfaces: {error}'**
-  String ledgerConnectPageInitErrorContent(String error);
-
-  /// Status text shown when Bluetooth is detected as powered off.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth is turned off. Please enable Bluetooth on your device.'**
-  String get ledgerConnectPageBluetoothOffStatus;
-
-  /// Title for the dialog shown when Bluetooth is off.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth Off'**
-  String get ledgerConnectPageBluetoothOffTitle;
-
-  /// Content for the dialog shown when Bluetooth is off.
-  ///
-  /// In en, this message translates to:
-  /// **'Please turn on Bluetooth in your device settings and try again.'**
-  String get ledgerConnectPageBluetoothOffContent;
-
-  /// Status text shown when necessary Bluetooth permissions have been denied by the user.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth permission denied. Please enable in settings.'**
-  String get ledgerConnectPagePermissionDeniedStatus;
-
-  /// Title for the dialog requesting the user to grant permissions.
-  ///
-  /// In en, this message translates to:
-  /// **'Permission Required'**
-  String get ledgerConnectPagePermissionRequiredTitle;
-
-  /// Title for the dialog informing the user that permissions were denied.
-  ///
-  /// In en, this message translates to:
-  /// **'Permission Denied'**
-  String get ledgerConnectPagePermissionDeniedTitle;
-
-  /// Content for the dialog when Bluetooth permissions are denied, prompting the user to go to settings. Common for Android.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.'**
-  String get ledgerConnectPagePermissionDeniedContent;
-
-  /// Content for the permissions dialog specific to iOS.
-  ///
-  /// In en, this message translates to:
-  /// **'This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.'**
-  String get ledgerConnectPagePermissionDeniedContentIOS;
-
-  /// Status text when the device does not support Bluetooth Low Energy.
-  ///
-  /// In en, this message translates to:
-  /// **'Bluetooth LE is not supported on this device.'**
-  String get ledgerConnectPageUnsupportedStatus;
-
-  /// Title for the dialog shown when the device is unsupported.
-  ///
-  /// In en, this message translates to:
-  /// **'Unsupported Device'**
-  String get ledgerConnectPageUnsupportedTitle;
-
-  /// Content for the dialog explaining why the device is unsupported.
-  ///
-  /// In en, this message translates to:
-  /// **'This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.'**
-  String get ledgerConnectPageUnsupportedContent;
-
   /// Status text shown when a scan for Ledger devices is in progress.
   ///
   /// In en, this message translates to:
@@ -3347,12 +3017,6 @@ abstract class AppLocalizations {
   /// **'Scan Error: {error}'**
   String ledgerConnectPageScanErrorStatus(String error);
 
-  /// Title for the dialog shown when a scan error occurs.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan Error'**
-  String get ledgerConnectPageScanErrorTitle;
-
   /// Status text shown when the scan completes and no devices were found.
   ///
   /// In en, this message translates to:
@@ -3365,41 +3029,11 @@ abstract class AppLocalizations {
   /// **'Scan finished. Found {count} device(s). Select one to connect.'**
   String ledgerConnectPageScanFinishedWithDevices(int count);
 
-  /// Status text shown when initiating a scan fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to start scan: {error}'**
-  String ledgerConnectPageFailedToStartScan(String error);
-
-  /// Status text shown when the scan is manually stopped and no devices were found.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan stopped.'**
-  String get ledgerConnectPageScanStopped;
-
-  /// Status text shown when the scan is manually stopped and devices have been found.
-  ///
-  /// In en, this message translates to:
-  /// **'Scan stopped. Found {count} device(s).'**
-  String ledgerConnectPageScanStoppedWithDevices(int count);
-
   /// Status text shown while attempting to connect to a specific Ledger device.
   ///
   /// In en, this message translates to:
   /// **'Connecting to {deviceName} ({connectionType})...'**
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType);
-
-  /// Error message for when a connection attempt times out.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection timed out after {seconds} seconds'**
-  String ledgerConnectPageConnectionTimeoutError(int seconds);
-
-  /// Error message for when the required connection interface (BLE/USB) is not available.
-  ///
-  /// In en, this message translates to:
-  /// **'Appropriate Ledger interface not available.'**
-  String get ledgerConnectPageInterfaceUnavailableError;
 
   /// Status text shown upon a successful connection to a Ledger device.
   ///
@@ -3407,23 +3041,11 @@ abstract class AppLocalizations {
   /// **'Successfully connected to {deviceName}!'**
   String ledgerConnectPageConnectionSuccessStatus(String deviceName);
 
-  /// Status text for a connection failure due to a timeout.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection Failed: Timed out after {count} attempts'**
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count);
-
   /// Title for the dialog shown when a connection attempt fails.
   ///
   /// In en, this message translates to:
   /// **'Connection Failed'**
   String get ledgerConnectPageConnectionFailedTitle;
-
-  /// Content for the dialog when a connection fails due to a timeout.
-  ///
-  /// In en, this message translates to:
-  /// **'Connection timed out after {count} attempts. Please ensure the device is unlocked and try again.'**
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count);
 
   /// Generic status text for a connection failure.
   ///
@@ -3431,53 +3053,17 @@ abstract class AppLocalizations {
   /// **'Connection Failed: {error}'**
   String ledgerConnectPageConnectionFailedErrorStatus(String error);
 
-  /// Content for the dialog when a connection fails due to a specific LedgerException.
-  ///
-  /// In en, this message translates to:
-  /// **'Ledger Error: {error}'**
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error);
-
   /// Content for the dialog for a generic connection failure.
   ///
   /// In en, this message translates to:
   /// **'Could not connect to {deviceName}.\nError: {error}'**
   String ledgerConnectPageConnectionFailedGenericContent(String deviceName, String error);
 
-  /// Status message when the connected device disconnects.
-  ///
-  /// In en, this message translates to:
-  /// **'Device disconnected.'**
-  String get ledgerConnectPageDeviceDisconnected;
-
-  /// Status message when the disconnection listener stream is closed.
-  ///
-  /// In en, this message translates to:
-  /// **'Listener stopped.'**
-  String get ledgerConnectPageListenerStopped;
-
-  /// Status message when setting up the disconnection listener fails.
-  ///
-  /// In en, this message translates to:
-  /// **'Failed to monitor disconnects.'**
-  String get ledgerConnectPageFailedToMonitorDisconnects;
-
-  /// Status text shown while the app is actively disconnecting from a device.
-  ///
-  /// In en, this message translates to:
-  /// **'Disconnecting from {deviceName}...'**
-  String ledgerConnectPageDisconnectingStatus(String deviceName);
-
   /// Status text shown after a successful disconnection.
   ///
   /// In en, this message translates to:
   /// **'Disconnected from {deviceName}.'**
   String ledgerConnectPageDisconnectedStatus(String deviceName);
-
-  /// Status text shown when an error occurs during disconnection.
-  ///
-  /// In en, this message translates to:
-  /// **'Error disconnecting from {deviceName}.'**
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName);
 
   /// Button text in a dialog that opens the device's application settings.
   ///
@@ -3490,18 +3076,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'No devices found. Ensure Ledger is powered on, unlocked, and Bluetooth/USB is enabled.\nPull down or use refresh icon to scan again.'**
   String get ledgerConnectPageNoDevicesFound;
-
-  /// Text for the button to disconnect from the currently connected Ledger device.
-  ///
-  /// In en, this message translates to:
-  /// **'Disconnect from {deviceName}'**
-  String ledgerConnectPageDisconnectButton(String deviceName);
-
-  /// Fallback text for a device name when it cannot be determined.
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown'**
-  String get unknownDevice;
 
   /// No description provided for @durationDay.
   ///
@@ -3688,12 +3262,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'A similar request is already being processed'**
   String get web3ErrorRequestInProgress;
-
-  /// Error for unknown RPC errors
-  ///
-  /// In en, this message translates to:
-  /// **'Unknown RPC error'**
-  String get web3ErrorUnknownRpc;
 
   /// Error when domain is not connected to the wallet
   ///

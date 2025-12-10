@@ -3,7 +3,6 @@
   "@appTitle": {
     "description": "The title of the application"
   },
-
   "initialPagerestoreZilPay": "Restore ZilPay 1.0!",
   "@initialPagerestoreZilPay": {
     "description": "Button text to restore from ZilPay 1.0"
@@ -12,142 +11,114 @@
   "@initialPagegetStarted": {
     "description": "Button text to begin using the app"
   },
-
   "restoreRKStorageTitle": "Migrate ZilPay 1.0 to 2.0",
   "@restoreRKStorageTitle": {
     "description": "Title for the RestoreRKStorage page showing wallet migration"
   },
-  
   "restoreRKStorageAccountsPrompt": "Accounts to migrate to ZilPay 2.0. Enter password.",
   "@restoreRKStorageAccountsPrompt": {
     "description": "Prompt text instructing user to enter password for account migration on RestoreRKStorage page"
   },
-  
   "restoreRKStoragePasswordHint": "Password",
   "@restoreRKStoragePasswordHint": {
     "description": "Hint text for password input field on RestoreRKStorage page"
   },
-  
   "restoreRKStorageEnterPassword": "Enter password",
   "@restoreRKStorageEnterPassword": {
     "description": "Error message when password field is empty on RestoreRKStorage page"
   },
-  
   "restoreRKStorageErrorPrefix": "Error:",
   "@restoreRKStorageErrorPrefix": {
     "description": "Prefix for error messages on RestoreRKStorage page"
   },
-  
   "restoreRKStorageRestoreButton": "Restore",
   "@restoreRKStorageRestoreButton": {
     "description": "Text for restore button on RestoreRKStorage page"
   },
-  
   "restoreRKStorageSkipButton": "Skip",
   "@restoreRKStorageSkipButton": {
     "description": "Text for skip button on RestoreRKStorage page"
   },
-  
   "accountItemBalanceLabel": "Balance:",
   "@accountItemBalanceLabel": {
     "description": "Label for balance display in AccountItem widget"
   },
-
   "sendTokenPageTitle": "",
   "@sendTokenPageTitle": {
     "description": "Title for the SendTokenPage (currently empty as per original code)"
   },
-  
   "sendTokenPageSubmitButton": "Submit",
   "@sendTokenPageSubmitButton": {
     "description": "Text for the submit button on SendTokenPage"
   },
-
   "aboutPageTitle": "About",
   "@aboutPageTitle": {
     "description": "Title for the AboutPage"
   },
-  
   "aboutPageAppName": "ZilPay",
   "@aboutPageAppName": {
     "description": "Application name displayed in logo section on AboutPage"
   },
-  
   "aboutPageAppDescription": "Your Secure Blockchain Wallet",
   "@aboutPageAppDescription": {
     "description": "Description text below app name on AboutPage"
   },
-  
   "aboutPageAppInfoTitle": "Application Info",
   "@aboutPageAppInfoTitle": {
     "description": "Title for application info section on AboutPage"
   },
-  
   "aboutPageVersionLabel": "Version",
   "@aboutPageVersionLabel": {
     "description": "Label for version info on AboutPage"
   },
-  
   "aboutPageBuildDateLabel": "Build Date",
   "@aboutPageBuildDateLabel": {
     "description": "Label for build date on AboutPage"
   },
-  
   "aboutPageBuildDateValue": "March 10, 2025",
   "@aboutPageBuildDateValue": {
     "description": "Value for build date on AboutPage"
   },
-  
   "aboutPagePlatformLabel": "Platform",
   "@aboutPagePlatformLabel": {
     "description": "Label for platform info on AboutPage"
   },
-  
   "aboutPageDeveloperTitle": "Developer",
   "@aboutPageDeveloperTitle": {
     "description": "Title for developer section on AboutPage"
   },
-  
   "aboutPageAuthorLabel": "Author",
   "@aboutPageAuthorLabel": {
     "description": "Label for author info on AboutPage"
   },
-  
   "aboutPageAuthorValue": "Rinat (hicaru)",
   "@aboutPageAuthorValue": {
     "description": "Value for author info on AboutPage"
   },
-  
   "aboutPageWebsiteLabel": "Website",
   "@aboutPageWebsiteLabel": {
     "description": "Label for website info on AboutPage"
   },
-  
   "aboutPageWebsiteValue": "https://zilpay.io",
   "@aboutPageWebsiteValue": {
     "description": "Value for website info on AboutPage"
   },
-  
   "aboutPageLegalTitle": "Legal",
   "@aboutPageLegalTitle": {
     "description": "Title for legal section on AboutPage"
   },
-  
   "aboutPagePrivacyPolicy": "Privacy Policy",
   "@aboutPagePrivacyPolicy": {
     "description": "Text for privacy policy link on AboutPage"
   },
-  
   "aboutPageTermsOfService": "Terms of Service",
   "@aboutPageTermsOfService": {
     "description": "Text for terms of service link on AboutPage"
   },
-  
   "aboutPageLicenses": "Licenses",
   "@aboutPageLicenses": {
     "description": "Text for licenses link on AboutPage"
   },
-  
   "aboutPageLegalese": "© 2025 ZilPay. All rights reserved.",
   "@aboutPageLegalese": {
     "description": "Legal text for license page from AboutPage"
@@ -156,106 +127,66 @@
   "@languagePageTitle": {
     "description": "Title for the LanguagePage"
   },
-  
-  "languagePageSystem": "System",
-  "@languagePageSystem": {
-    "description": "System language option name on LanguagePage"
-  },
-
   "secretKeyGeneratorPageTitle": "Secret Key",
   "@secretKeyGeneratorPageTitle": {
     "description": "Title for the SecretKeyGeneratorPage"
   },
-  
   "secretKeyGeneratorPagePrivateKey": "Private Key",
   "@secretKeyGeneratorPagePrivateKey": {
     "description": "Label for private key display on SecretKeyGeneratorPage"
   },
-  
   "secretKeyGeneratorPagePublicKey": "Public Key",
   "@secretKeyGeneratorPagePublicKey": {
     "description": "Label for public key display on SecretKeyGeneratorPage"
   },
-  
   "secretKeyGeneratorPageBackupCheckbox": "I have backup secret key",
   "@secretKeyGeneratorPageBackupCheckbox": {
     "description": "Text for backup confirmation checkbox on SecretKeyGeneratorPage"
   },
-  
   "secretKeyGeneratorPageNextButton": "Next",
   "@secretKeyGeneratorPageNextButton": {
     "description": "Text for next button on SecretKeyGeneratorPage"
   },
-  "walletPageTitle": "",
-  "@walletPageTitle": {
-    "description": "Title for the WalletPage (empty as per original implementation)"
-  },
-  
   "walletPageWalletNameHint": "Wallet name",
   "@walletPageWalletNameHint": {
     "description": "Hint text for wallet name input on WalletPage"
   },
-  
   "walletPagePreferencesTitle": "Wallet preferences",
   "@walletPagePreferencesTitle": {
     "description": "Title for preferences section on WalletPage"
   },
-  
   "walletPageManageConnections": "Manage connections",
   "@walletPageManageConnections": {
     "description": "Label for manage connections preference item on WalletPage"
   },
-  
   "walletPageBackup": "Backup",
   "@walletPageBackup": {
     "description": "Label for backup preference item on WalletPage"
   },
-  
   "walletPageDeleteWallet": "Delete Wallet",
   "@walletPageDeleteWallet": {
     "description": "Text for delete wallet button on WalletPage"
   },
-  
   "walletPageBiometricReason": "Enable biometric authentication",
   "@walletPageBiometricReason": {
     "description": "Reason text for biometric authentication prompt on WalletPage"
   },
-
   "networkPageTitle": "",
   "@networkPageTitle": {
     "description": "Title for the NetworkPage (empty as per original implementation)"
   },
-  
-  "networkPageShowTestnet": "Show Testnet",
-  "@networkPageShowTestnet": {
-    "description": "Label for testnet toggle switch on NetworkPage"
-  },
-  
   "networkPageSearchHint": "Search",
   "@networkPageSearchHint": {
     "description": "Hint text for search input on NetworkPage"
   },
-  
-  "networkPageAddedNetworks": "Added Networks",
-  "@networkPageAddedNetworks": {
-    "description": "Section title for added networks on NetworkPage"
-  },
-  
-  "networkPageAvailableNetworks": "Available Networks",
-  "@networkPageAvailableNetworks": {
-    "description": "Section title for available networks on NetworkPage"
-  },
-  
   "networkPageAddError": "Failed to add network: ",
   "@networkPageAddError": {
     "description": "Error message prefix when adding a network fails on NetworkPage"
   },
-
   "receivePageTitle": "Receive",
   "@receivePageTitle": {
     "description": "Title for the ReceivePage"
   },
-  
   "receivePageWarning": "Only send {chainName}({tokenSymbol}) assets to this address. Other assets will be lost forever.",
   "@receivePageWarning": {
     "description": "Warning message displayed on ReceivePage with chain name and token symbol placeholders",
@@ -264,229 +195,159 @@
       "tokenSymbol": {}
     }
   },
-  
   "receivePageAccountNameHint": "Account name",
   "@receivePageAccountNameHint": {
     "description": "Hint text for account name input on ReceivePage"
   },
-  
   "receivePageAmountDialogTitle": "Enter Amount",
   "@receivePageAmountDialogTitle": {
     "description": "Title for the amount input dialog on ReceivePage"
   },
-  
   "receivePageAmountDialogHint": "0.0",
   "@receivePageAmountDialogHint": {
     "description": "Hint text for the amount input field in dialog on ReceivePage"
   },
-  
   "receivePageAmountDialogCancel": "Cancel",
   "@receivePageAmountDialogCancel": {
     "description": "Cancel button text in amount dialog on ReceivePage"
   },
-  
   "receivePageAmountDialogConfirm": "Confirm",
   "@receivePageAmountDialogConfirm": {
     "description": "Confirm button text in amount dialog on ReceivePage"
   },
-
   "securityPageTitle": "Security",
   "@securityPageTitle": {
     "description": "Title for the SecurityPage"
   },
-  
   "securityPageNetworkPrivacy": "Network Privacy",
   "@securityPageNetworkPrivacy": {
     "description": "Section title for network privacy settings on SecurityPage"
   },
-  
   "securityPageEnsDomains": "Show ENS domains in address bar",
   "@securityPageEnsDomains": {
     "description": "Label for ENS domains toggle on SecurityPage"
   },
-  
   "securityPageEnsDescription": "Keep in mind that using this feature exposes your IP address to IPFS third-party services.",
   "@securityPageEnsDescription": {
     "description": "Description for ENS domains setting on SecurityPage"
   },
-  
   "securityPageIpfsGateway": "IPFS gateway",
   "@securityPageIpfsGateway": {
     "description": "Label for IPFS gateway setting on SecurityPage"
   },
-  
   "securityPageIpfsDescription": "ZIlPay uses third-party services to show images of your NFTs stored on IPFS, display information related to ENS(ZNS) addresses entered in your browser's address bar, and fetch icons for different tokens. Your IP address may be exposed to these services when you're using them.",
   "@securityPageIpfsDescription": {
     "description": "Description for IPFS gateway setting on SecurityPage"
   },
-  
   "securityPageTokensFetcherTitle": "Tokens fetcher",
   "@securityPageTokensFetcherTitle": {
     "description": "Label for tokens fetcher setting on SecurityPage"
   },
-  
   "securityPageTokensFetcherDescription": "tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added.",
   "@securityPageTokensFetcherDescription": {
     "description": "Label for tokens fetcher setting on SecurityPage. If enabled, tokens will be automatically fetched from the server and can be added."
   },
-  
   "securityPageNodeRanking": "Node ranking",
   "@securityPageNodeRanking": {
     "description": "Label for node ranking setting on SecurityPage"
   },
-  
   "securityPageNodeDescription": "Make requests to ZilPay server for fetch best node",
   "@securityPageNodeDescription": {
     "description": "Description for node ranking setting on SecurityPage"
   },
-  
   "securityPageEncryptionLevel": "Encryption Level",
   "@securityPageEncryptionLevel": {
     "description": "Section title for encryption level settings on SecurityPage"
   },
-  
   "securityPageProtection": "Protection",
   "@securityPageProtection": {
     "description": "Label for protection progress bar in encryption card on SecurityPage"
   },
-  
   "securityPageCpuLoad": "CPU Load",
   "@securityPageCpuLoad": {
     "description": "Label for CPU load progress bar in encryption card on SecurityPage"
   },
-  
   "securityPageAes256": "AES256",
   "@securityPageAes256": {
     "description": "Name of AES256 encryption algorithm on SecurityPage"
   },
-  
   "securityPageKuznechikGost": "KUZNECHIK-GOST",
   "@securityPageKuznechikGost": {
     "description": "Name of KUZNECHIK-GOST encryption algorithm on SecurityPage"
   },
-  
   "securityPageNtruPrime": "NTRUPrime",
   "@securityPageNtruPrime": {
     "description": "Name of NTRUPrime encryption algorithm on SecurityPage"
   },
-  
   "securityPageCyber": "Cyber",
   "@securityPageCyber": {
     "description": "Name of Cyber encryption algorithm on SecurityPage"
   },
-  
   "securityPageUnknown": "Unknown",
   "@securityPageUnknown": {
     "description": "Fallback name for unknown encryption algorithm on SecurityPage"
   },
-  "webViewPageDntLabel": "DNT",
-  "@webViewPageDntLabel": {
-    "description": "Label indicating Do Not Track is enabled in the WebViewPage app bar"
-  },
-  
-  "webViewPageIncognitoLabel": "Incognito",
-  "@webViewPageIncognitoLabel": {
-    "description": "Label indicating Incognito mode is enabled in the WebViewPage app bar"
-  },
-  
-  "webViewPageLoadError": "Failed to load",
-  "@webViewPageLoadError": {
-    "description": "Error message title when web page fails to load on WebViewPage"
-  },
-  
-  "webViewPageTryAgain": "Try Again",
-  "@webViewPageTryAgain": {
-    "description": "Button text to retry loading the web page on WebViewPage"
-  },
-  
   "secretPhraseGeneratorPageTitle": "New Wallet",
   "@secretPhraseGeneratorPageTitle": {
     "description": "Title for the SecretPhraseGeneratorPage"
   },
-  
   "secretPhraseGeneratorPageBackupCheckbox": "I have backup words",
   "@secretPhraseGeneratorPageBackupCheckbox": {
     "description": "Text for backup confirmation checkbox on SecretPhraseGeneratorPage"
   },
-  
   "secretPhraseGeneratorPageNextButton": "Next",
   "@secretPhraseGeneratorPageNextButton": {
     "description": "Text for next button on SecretPhraseGeneratorPage"
   },
-
   "homePageErrorTitle": "No signal",
   "@homePageErrorTitle": {
     "description": "Label displayed when shows error on home page"
   },
-  "homePageSendButton": "Send",
-  "@homePageSendButton": {
-    "description": "A Send Tile Button title"
-  },
   "homePageReceiveButton": "Receive",
-  "@homePageSendButton": {
-    "description": "A Receive Tile Button title"
-  },
-
-
   "revealSecretKeyTitle": "Reveal Secret Key",
   "@revealSecretKeyTitle": {
     "description": "Title for the RevealSecretKey page"
   },
-  
   "revealSecretKeyPasswordHint": "Password",
   "@revealSecretKeyPasswordHint": {
     "description": "Hint text for password input on RevealSecretKey page"
   },
-  
   "revealSecretKeyInvalidPassword": "invalid password, error:",
   "@revealSecretKeyInvalidPassword": {
     "description": "Error message prefix for invalid password on RevealSecretKey page"
   },
-  
   "revealSecretKeySubmitButton": "Submit",
   "@revealSecretKeySubmitButton": {
     "description": "Text for submit button on RevealSecretKey page"
   },
-  
   "revealSecretKeyDoneButton": "Done",
   "@revealSecretKeyDoneButton": {
     "description": "Text for done button after revealing secret key on RevealSecretKey page"
   },
-  
   "revealSecretKeyScamAlertTitle": "SCAM ALERT",
   "@revealSecretKeyScamAlertTitle": {
     "description": "Title for scam alert section on RevealSecretKey page"
   },
-  
   "revealSecretKeyScamAlertMessage": "Never share your secret key with anyone. Never input it on any website.",
   "@revealSecretKeyScamAlertMessage": {
     "description": "Message content for scam alert section on RevealSecretKey page"
   },
-
   "revealSecretKeySecurityTimer": "Security Timer",
   "@revealSecretKeySecurityTimer": {
     "description": "Title for security timer display on RevealSecretKey page"
   },
-
   "revealSecretKeyRevealAfter": "Your secret key will be revealed after:",
   "@revealSecretKeyRevealAfter": {
     "description": "Message explaining the reveal delay on RevealSecretKey page"
   },
-  "setupNetworkSettingsPageTestnetSwitch": "Testnet",
-  "@setupNetworkSettingsPageTestnetSwitch": {
-    "description": "Label for Testnet switch on SetupNetworkSettingsPage"
-  },
-  
   "setupNetworkSettingsPageSearchHint": "Search",
   "@setupNetworkSettingsPageSearchHint": {
     "description": "Hint text for search input on SetupNetworkSettingsPage"
   },
-  
   "setupNetworkSettingsPageNoNetworks": "No networks available",
   "@setupNetworkSettingsPageNoNetworks": {
     "description": "Message when no networks are available on SetupNetworkSettingsPage"
   },
-  
   "setupNetworkSettingsPageNoResults": "No networks found for \"{searchQuery}\"",
   "@setupNetworkSettingsPageNoResults": {
     "description": "Message when no networks match search query on SetupNetworkSettingsPage",
@@ -494,32 +355,18 @@
       "searchQuery": {}
     }
   },
-  
   "setupNetworkSettingsPageNextButton": "Next",
   "@setupNetworkSettingsPageNextButton": {
     "description": "Text for Next button on SetupNetworkSettingsPage"
   },
-  
-  "setupNetworkSettingsPageTestnetLabel": "Testnet",
-  "@setupNetworkSettingsPageTestnetLabel": {
-    "description": "Label indicating Testnet in network item on SetupNetworkSettingsPage"
-  },
-  
-  "setupNetworkSettingsPageMainnetLabel": "Mainnet",
-  "@setupNetworkSettingsPageMainnetLabel": {
-    "description": "Label indicating Mainnet in network item on SetupNetworkSettingsPage"
-  },
-  
   "setupNetworkSettingsPageChainIdLabel": "Chain ID:",
   "@setupNetworkSettingsPageChainIdLabel": {
     "description": "Label prefix for Chain ID in network item on SetupNetworkSettingsPage"
   },
-  
   "setupNetworkSettingsPageTokenLabel": "Token:",
   "@setupNetworkSettingsPageTokenLabel": {
     "description": "Label prefix for Token in network item on SetupNetworkSettingsPage"
   },
-  
   "setupNetworkSettingsPageExplorerLabel": "Explorer:",
   "@setupNetworkSettingsPageExplorerLabel": {
     "description": "Label prefix for Explorer in network item on SetupNetworkSettingsPage"
@@ -572,7 +419,6 @@
   "@appearanceSettingsPageLightModeDescription": {
     "description": "Description for the Light Mode theme option"
   },
-
   "loginPageBiometricReason": "Please authenticate",
   "@loginPageBiometricReason": {
     "description": "Reason text for biometric authentication prompt on the Login page"
@@ -596,7 +442,6 @@
   "@loginPageWelcomeBack": {
     "description": "Welcome message displayed on the Login page"
   },
-
   "secretKeyRestorePageTitle": "Restore Secret Key",
   "@secretKeyRestorePageTitle": {
     "description": "Title for the Secret Key Restore page"
@@ -685,7 +530,6 @@
       "error": {}
     }
   },
-
   "addressBookPageTitle": "Address Book",
   "@addressBookPageTitle": {
     "description": "Title for the Address Book page"
@@ -725,15 +569,6 @@
   "delete": "Delete",
   "@delete": {
     "description": "Label for the delete button, typically in dialogs or for destructive actions"
-  },
-
-  "browserPageExploreTab": "Explore",
-  "@browserPageExploreTab": {
-    "description": "Label for the Explore tab on the Browser page"
-  },
-  "browserPageNoExploreApps": "No apps to explore yet",
-  "@browserPageNoExploreApps": {
-    "description": "Message displayed when there are no apps to explore on the Browser page"
   },
   "browserPageSearchHint": "Search with {engine} or enter address",
   "@browserPageSearchHint": {
@@ -886,7 +721,7 @@
   "@restoreSecretPhrasePageRestoreButton": {
     "description": "Text on the restore button in the RestoreSecretPhrasePage component"
   },
-   "checksumValidationFailed": "Checksum validation failed",
+  "checksumValidationFailed": "Checksum validation failed",
   "@checksumValidationFailed": {
     "description": "Text displayed when BIP39 checksum validation fails"
   },
@@ -950,7 +785,6 @@
   "@settingsPageAbout": {
     "description": "Label for the About settings item in the SettingsPage component"
   },
-
   "passwordSetupPageTitle": "Password Setup",
   "@passwordSetupPageTitle": {
     "description": "Title displayed in the app bar of the PasswordSetupPage component"
@@ -1079,7 +913,6 @@
   "@browserSettingsCache": {
     "description": "Title for cache setting"
   },
-
   "browserSettingsClearData": "Clear Data",
   "@browserSettingsClearData": {
     "description": "Section title for clear data options in browser settings"
@@ -1260,7 +1093,6 @@
   "@argonSettingsModalContentLowMemoryDescription": {
     "description": "Description for low memory Argon2 parameter option in ArgonSettingsModalContent"
   },
-  
   "argonSettingsModalContentOwaspTitle": "OWASP Default",
   "@argonSettingsModalContentOwaspTitle": {
     "description": "Title for OWASP default Argon2 parameter option in ArgonSettingsModalContent"
@@ -1273,7 +1105,6 @@
   "@argonSettingsModalContentOwaspDescription": {
     "description": "Description for OWASP default Argon2 parameter option in ArgonSettingsModalContent"
   },
-  
   "argonSettingsModalContentSecureTitle": "Secure",
   "@argonSettingsModalContentSecureTitle": {
     "description": "Title for secure Argon2 parameter option in ArgonSettingsModalContent"
@@ -1286,17 +1117,14 @@
   "@argonSettingsModalContentSecureDescription": {
     "description": "Description for secure Argon2 parameter option in ArgonSettingsModalContent"
   },
-  
   "argonSettingsModalContentSecretHint": "Enter secret (optional)",
   "@argonSettingsModalContentSecretHint": {
     "description": "Hint text for secret input field in ArgonSettingsModalContent"
   },
-  
   "argonSettingsModalContentConfirmButton": "Confirm",
   "@argonSettingsModalContentConfirmButton": {
     "description": "Text for confirm button in ArgonSettingsModalContent"
   },
-
   "confirmTransactionContentPasswordHint": "Password",
   "@confirmTransactionContentPasswordHint": {
     "description": "Hint text for the password input field in the ConfirmTransactionContent modal."
@@ -1321,7 +1149,6 @@
   "@confirmTransactionEditGasButtonText": {
     "description": "Text displayed on the edit gas button in the ConfirmTransactionContent modal."
   },
-
   "authReason": "Please authenticate",
   "@authReason": {
     "description": "Reason text displayed during authentication prompt in the ConfirmTransactionContent modal."
@@ -1386,7 +1213,6 @@
   "@tokenSelectModalContentSearchHint": {
     "description": "Hint text for the search input field in the TokenSelectModalContent modal."
   },
-
   "signMessageModalContentAuthReason": "Please authenticate to sign the message",
   "@signMessageModalContentAuthReason": {
     "description": "Reason text for authentication prompt in the SignMessageModalContent modal."
@@ -1435,35 +1261,6 @@
   "@signMessageModalContentSign": {
     "description": "Text displayed on the swipe button to confirm signing in the SignMessageModalContent modal."
   },
-  "signMessageModalContentScanning": "Scanning Ledger devices...",
-  "@signMessageModalContentScanning": {
-    "description": "Text displayed below the progress indicator when scanning for Ledger devices in the SignMessageModalContent modal."
-  },
-  "signMessageModalContentNoLedgerDevices": "No Ledger devices found",
-  "@signMessageModalContentNoLedgerDevices": {
-    "description": "Error message displayed when no Ledger devices are found after scanning in the SignMessageModalContent modal."
-  },
-  "signMessageModalContentWalletNotSelected": "Wallet not selected",
-  "@signMessageModalContentWalletNotSelected": {
-    "description": "Error message displayed when no wallet is selected in the SignMessageModalContent modal."
-  },
-  "signMessageModalContentLedgerNotSelected": "Ledger device not selected",
-  "@signMessageModalContentLedgerNotSelected": {
-    "description": "Error message displayed when no Ledger device is selected in the SignMessageModalContent modal."
-  },
-  "signMessageModalContentFailedToScanLedger": "Failed to scan Ledger devices: {error}",
-  "@signMessageModalContentFailedToScanLedger": {
-    "description": "Error message format when scanning for Ledger devices fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
-  },
-  "signMessageModalContentFailedToSignMessage": "Failed to sign message: {error}",
-  "@signMessageModalContentFailedToSignMessage": {
-    "description": "Error message format when signing a message with a Ledger device fails in the SignMessageModalContent modal, with {error} placeholder for the error details."
-  },
-  "signMessageModalContentBluetoothOff": "Bluetooth is turned off. Please enable it to scan for Ledger devices.",
-  "@signMessageModalContentBluetoothOff": {
-    "description": "Error message displayed when Bluetooth is not enabled during Ledger device scanning in the SignMessageModalContent modal."
-  },
-
   "deleteWalletModalTitle": "Delete Wallet",
   "@deleteWalletModalTitle": {
     "description": "Title text for the DeleteWalletModal modal."
@@ -1484,7 +1281,6 @@
   "@deleteWalletModalSubmit": {
     "description": "Text on the button to confirm wallet deletion in the DeleteWalletModal modal."
   },
-
   "addressSelectModalContentTitle": "Select Address",
   "@addressSelectModalContentTitle": {
     "description": "Title text for the AddressSelectModalContent modal."
@@ -1513,7 +1309,6 @@
   "@addressSelectModalContentSender": {
     "description": "Label shown on addresses that belong to the sender account in the AddressSelectModalContent modal."
   },
-
   "changePasswordModalTitle": "Change Password",
   "@changePasswordModalTitle": {
     "description": "Title text for the ChangePasswordModal modal."
@@ -1582,34 +1377,22 @@
   "@qrScannerModalContentCameraInitError": {
     "description": "Prefix for error message when camera initialization fails in the QRScannerModalContent modal."
   },
-  "qrScannerModalContentTorchError": "Failed to toggle torch:",
-  "@qrScannerModalContentTorchError": {
-    "description": "Prefix for error message when toggling the torch fails in the QRScannerModalContent modal."
-  },
-  "qrScannerModalContentOpenSettings": "Open Settings",
-  "@qrScannerModalContentOpenSettings": {
-    "description": "Text on the button to open app settings when camera permission is denied on iOS in the QRScannerModalContent modal."
-  },
   "chainInfoModalContentTokenTitle": "Network Token",
   "@chainInfoModalContentTokenTitle": {
     "description": "Title text for the network token section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentNetworkInfoTitle": "Network Information",
   "@chainInfoModalContentNetworkInfoTitle": {
     "description": "Title text for the network information section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainLabel": "Chain",
   "@chainInfoModalContentChainLabel": {
     "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentShortNameLabel": "Short Name",
   "@chainInfoModalContentShortNameLabel": {
     "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainIdLabel": "Chain ID",
   "@chainInfoModalContentChainIdLabel": {
     "description": "Label for the chain ID field in the network information section of the ChainInfoModalContent modal."
@@ -1662,7 +1445,6 @@
   "@chainInfoModalContentSwipeToDelete": {
     "description": "Text displayed on the swipe button for deleting a network in the ChainInfoModalContent modal."
   },
-
   "switchChainNetworkContentTitle": "Select Network",
   "@switchChainNetworkContentTitle": {
     "description": "Title text for the SwitchChainNetworkContent modal."
@@ -1722,7 +1504,6 @@
   "@dappListItemJustNow": {
     "description": "Text indicating a DApp was connected very recently in the DappListItem component"
   },
-
   "secretRecoveryModalRevealPhraseTitle": "Reveal Secret Recovery Phrase",
   "@secretRecoveryModalRevealPhraseTitle": {
     "description": "Title for the secret recovery phrase option in the SecretRecoveryModal component"
@@ -1959,7 +1740,6 @@
   "@appConnectModalContent_noAccounts": {
     "description": "Text shown when no accounts are available in _AppConnectModalContent"
   },
-
   "browserActionMenuShare": "Share",
   "@browserActionMenuShare": {
     "description": "Menu item text for sharing the current page"
@@ -1967,10 +1747,6 @@
   "browserActionMenuCopyLink": "Copy Link",
   "@browserActionMenuCopyLink": {
     "description": "Menu item text for copying the current page link"
-  },
-  "browserActionMenuClose": "Close",
-  "@browserActionMenuClose": {
-    "description": "Menu item text for closing the current page or tab"
   },
   "browserActionMenuRefresh": "Refresh",
   "@browserActionMenuRefresh": {
@@ -1980,7 +1756,6 @@
   "@browserActionMenuUrlBarTop": {
     "description": "Toggle option to move URL bar to top of browser"
   },
-
   "keystoreBackupTitle": "Keystore Backup",
   "@keystoreBackupTitle": {
     "description": "Title for the Keystore Backup screen"
@@ -2045,7 +1820,6 @@
   "@keystoreBackupTempLocation": {
     "description": "Label for displaying the temporary file location"
   },
-
   "keystorePasswordHint": "Enter your keystore password",
   "@keystorePasswordHint": {
     "description": "Hint text for the keystore password input field"
@@ -2056,17 +1830,10 @@
   },
   "keystoreRestoreExtError": "Please select a valid .zp file",
   "@keystoreRestoreExtError": {
-    "description": "an error about the wrong extension backup file"
-  },
-  "keystoreRestoreNoFile": "No keystore files found",
-  "@keystoreRestoreExtError": {
-    "description": "just a description we have no backup files found!"
-  },
-  "keystoreRestoreFilesTitle": "Keystore Files",
-  "@keystoreRestoreExtError": {
     "description": "title when we have keystore files"
   },
-
+  "keystoreRestoreNoFile": "No keystore files found",
+  "keystoreRestoreFilesTitle": "Keystore Files",
   "editGasDialogTitle": "Edit Gas Parameters",
   "@editGasDialogTitle": {
     "description": "Title of the dialog for editing gas parameters"
@@ -2083,19 +1850,10 @@
   "@editGasDialogGasLimit": {
     "description": "Label for gas limit input field in the gas edit dialog"
   },
-  "editGasDialogCancel": "Cancel",
-  "@editGasDialogCancel": {
-    "description": "Button text to cancel gas parameter changes"
-  },
-  "editGasDialogSave": "Save",
-  "@editGasDialogSave": {
-    "description": "Button text to save gas parameter changes"
-  },
   "editGasDialogInvalidGasValues": "Invalid gas values. Please check your inputs.",
   "@editGasDialogInvalidGasValues": {
     "description": "Error message shown when invalid gas values are entered"
   },
-
   "addLedgerAccountPageAppBarTitle": "Add Ledger Account",
   "@addLedgerAccountPageAppBarTitle": {
     "description": "Title for the app bar in the AddLedgerAccountPage component"
@@ -2112,37 +1870,6 @@
   "@addLedgerAccountPageAddButton": {
     "description": "Button text for adding accounts to an existing wallet in the AddLedgerAccountPage component"
   },
-  "addLedgerAccountPageScanningMessage": "Scanning for Ledger devices...",
-  "@addLedgerAccountPageScanningMessage": {
-    "description": "Message displayed while scanning for Ledger devices in the AddLedgerAccountPage component"
-  },
-  "addLedgerAccountPageNoDevicesMessage": "No Ledger devices found",
-  "@addLedgerAccountPageNoDevicesMessage": {
-    "description": "Message displayed when no Ledger devices are found in the AddLedgerAccountPage component"
-  },
-  "addLedgerAccountPageBluetoothOffError": "Bluetooth is turned off. Please enable it to scan for Ledger devices.",
-  "@addLedgerAccountPageBluetoothOffError": {
-    "description": "Error message displayed when Bluetooth is disabled in the AddLedgerAccountPage component"
-  },
-  "addLedgerAccountPageEmptyWalletNameError": "Wallet name cannot be empty",
-  "@addLedgerAccountPageEmptyWalletNameError": {
-    "description": "Error message displayed when the wallet name is empty in the AddLedgerAccountPage component"
-  },
-  "addLedgerAccountPageWalletNameTooLongError": "Wallet name is too long (max 24 characters)",
-  "@addLedgerAccountPageWalletNameTooLongError": {
-    "description": "Error message displayed when the wallet name exceeds the maximum length in the AddLedgerAccountPage component"
-  },
-  "addLedgerAccountPageFailedToScanError": "Failed to scan for Ledger devices: {error}",
-  "@addLedgerAccountPageFailedToScanError": {
-    "description": "Error message displayed when scanning for Ledger devices fails in the AddLedgerAccountPage component, with a placeholder for the error details",
-    "placeholders": {
-      "error": {}
-    }
-  },
-  "addLedgerAccountPageNetworkOrLedgerMissingError": "Network or Ledger data is missing",
-  "@addLedgerAccountPageNetworkOrLedgerMissingError": {
-    "description": "Error message displayed when network or Ledger data is missing in the AddLedgerAccountPage component"
-  },
   "addLedgerAccountPageNoAccountsSelectedError": "No accounts selected",
   "@addLedgerAccountPageNoAccountsSelectedError": {
     "description": "Error message displayed when no accounts are selected for creating a wallet in the AddLedgerAccountPage component"
@@ -2151,7 +1878,6 @@
   "@addLedgerAccountPageNoWalletSelectedError": {
     "description": "Error message displayed when no wallet is selected for adding accounts in the AddLedgerAccountPage component"
   },
-
   "transactionHistoryTitle": "Transaction History",
   "@transactionHistoryTitle": {
     "description": "Title for the transaction history toggle in the address book settings."
@@ -2160,7 +1886,6 @@
   "@transactionHistoryDescription": {
     "description": "Description for the toggle that enables displaying transaction history addresses in the address book."
   },
-
   "zilStakePageTitle": "Zilliqa Staking",
   "@zilStakePageTitle": {
     "description": "Title for the Zilliqa Staking page"
@@ -2168,18 +1893,6 @@
   "noStakingPoolsFound": "No Staking Pools Found",
   "@noStakingPoolsFound": {
     "description": "Message displayed when no staking pools are available"
-  },
-  "aprSort": "APR",
-  "@aprSort": {
-    "description": "Label for sorting by Annual Percentage Rate"
-  },
-  "commissionSort": "Commission",
-  "@commissionSort": {
-    "description": "Label for sorting by Commission"
-  },
-  "tvlSort": "TVL",
-  "@tvlSort": {
-    "description": "Label for sorting by Total Value Locked"
   },
   "claimButton": "Claim",
   "@claimButton": {
@@ -2193,10 +1906,6 @@
   "@unstakeButton": {
     "description": "Text for the unstake button"
   },
-  "reinvest": "Reinvest",
-  "@reinvest": {
-    "description": "Text for the reinvest button"
-  },
   "aprLabel": "APR",
   "@aprLabel": {
     "description": "Label for APR in the staking pool card"
@@ -2204,14 +1913,6 @@
   "commissionLabel": "Commission",
   "@commissionLabel": {
     "description": "Label for Commission in the staking pool card"
-  },
-  "tvlLabel": "TVL",
-  "@tvlLabel": {
-    "description": "Label for TVL in the staking pool card"
-  },
-  "lpStakingBadge": "LP Staking",
-  "@lpStakingBadge": {
-    "description": "Badge text for liquidity pool staking"
   },
   "stakedAmount": "Staked",
   "@stakedAmount": {
@@ -2253,84 +1954,13 @@
   "@rewardsProgressTitle": {
     "description": "This shows the staking rewards you've earned, reflected as an increase in your Liquid Staking Token's value in ZIL. You'll receive these earnings when you unstake."
   },
-
-   "ledgerConnectPageTitle": "Connect Ledger",
+  "ledgerConnectPageTitle": "Connect Ledger",
   "@ledgerConnectPageTitle": {
     "description": "The title of the Ledger Connect page."
   },
   "ledgerConnectPageInitializing": "Initializing...",
   "@ledgerConnectPageInitializing": {
     "description": "Initial status text shown when the page is loading."
-  },
-  "ledgerConnectPageReadyToScan": "Ready to scan. Press refresh button.",
-  "@ledgerConnectPageReadyToScan": {
-    "description": "Status text indicating that the Ledger interface is initialized and ready for scanning."
-  },
-  "ledgerConnectPageInitializationError": "Error initializing Ledger: {error}",
-  "@ledgerConnectPageInitializationError": {
-    "description": "Status text shown when Ledger initialization fails.",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "ledgerConnectPageInitErrorTitle": "Initialization Error",
-  "@ledgerConnectPageInitErrorTitle": {
-    "description": "Title for the dialog when Ledger initialization fails."
-  },
-  "ledgerConnectPageInitErrorContent": "Failed to initialize Ledger interfaces: {error}",
-  "@ledgerConnectPageInitErrorContent": {
-    "description": "Content for the dialog when Ledger initialization fails.",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "ledgerConnectPageBluetoothOffStatus": "Bluetooth is turned off. Please enable Bluetooth on your device.",
-  "@ledgerConnectPageBluetoothOffStatus": {
-    "description": "Status text shown when Bluetooth is detected as powered off."
-  },
-  "ledgerConnectPageBluetoothOffTitle": "Bluetooth Off",
-  "@ledgerConnectPageBluetoothOffTitle": {
-    "description": "Title for the dialog shown when Bluetooth is off."
-  },
-  "ledgerConnectPageBluetoothOffContent": "Please turn on Bluetooth in your device settings and try again.",
-  "@ledgerConnectPageBluetoothOffContent": {
-    "description": "Content for the dialog shown when Bluetooth is off."
-  },
-  "ledgerConnectPagePermissionDeniedStatus": "Bluetooth permission denied. Please enable in settings.",
-  "@ledgerConnectPagePermissionDeniedStatus": {
-    "description": "Status text shown when necessary Bluetooth permissions have been denied by the user."
-  },
-  "ledgerConnectPagePermissionRequiredTitle": "Permission Required",
-  "@ledgerConnectPagePermissionRequiredTitle": {
-    "description": "Title for the dialog requesting the user to grant permissions."
-  },
-  "ledgerConnectPagePermissionDeniedTitle": "Permission Denied",
-  "@ledgerConnectPagePermissionDeniedTitle": {
-    "description": "Title for the dialog informing the user that permissions were denied."
-  },
-  "ledgerConnectPagePermissionDeniedContent": "Bluetooth permissions are required to scan for Ledger devices. Please grant permissions in settings.",
-  "@ledgerConnectPagePermissionDeniedContent": {
-    "description": "Content for the dialog when Bluetooth permissions are denied, prompting the user to go to settings. Common for Android."
-  },
-  "ledgerConnectPagePermissionDeniedContentIOS": "This app requires Bluetooth permission to scan for Ledger devices. Please enable Bluetooth permission in your device settings.",
-  "@ledgerConnectPagePermissionDeniedContentIOS": {
-    "description": "Content for the permissions dialog specific to iOS."
-  },
-  "ledgerConnectPageUnsupportedStatus": "Bluetooth LE is not supported on this device.",
-  "@ledgerConnectPageUnsupportedStatus": {
-    "description": "Status text when the device does not support Bluetooth Low Energy."
-  },
-  "ledgerConnectPageUnsupportedTitle": "Unsupported Device",
-  "@ledgerConnectPageUnsupportedTitle": {
-    "description": "Title for the dialog shown when the device is unsupported."
-  },
-  "ledgerConnectPageUnsupportedContent": "This device does not support Bluetooth Low Energy, which is required to connect to Ledger devices wirelessly.",
-  "@ledgerConnectPageUnsupportedContent": {
-    "description": "Content for the dialog explaining why the device is unsupported."
   },
   "ledgerConnectPageScanningStatus": "Scanning for Ledger devices...",
   "@ledgerConnectPageScanningStatus": {
@@ -2354,10 +1984,6 @@
       }
     }
   },
-  "ledgerConnectPageScanErrorTitle": "Scan Error",
-  "@ledgerConnectPageScanErrorTitle": {
-    "description": "Title for the dialog shown when a scan error occurs."
-  },
   "ledgerConnectPageScanFinishedNoDevices": "Scan finished. No devices found.",
   "@ledgerConnectPageScanFinishedNoDevices": {
     "description": "Status text shown when the scan completes and no devices were found."
@@ -2365,28 +1991,6 @@
   "ledgerConnectPageScanFinishedWithDevices": "Scan finished. Found {count} device(s). Select one to connect.",
   "@ledgerConnectPageScanFinishedWithDevices": {
     "description": "Status text shown when the scan completes and devices were found.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
-  "ledgerConnectPageFailedToStartScan": "Failed to start scan: {error}",
-  "@ledgerConnectPageFailedToStartScan": {
-    "description": "Status text shown when initiating a scan fails.",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "ledgerConnectPageScanStopped": "Scan stopped.",
-  "@ledgerConnectPageScanStopped": {
-    "description": "Status text shown when the scan is manually stopped and no devices were found."
-  },
-  "ledgerConnectPageScanStoppedWithDevices": "Scan stopped. Found {count} device(s).",
-  "@ledgerConnectPageScanStoppedWithDevices": {
-    "description": "Status text shown when the scan is manually stopped and devices have been found.",
     "placeholders": {
       "count": {
         "type": "int"
@@ -2405,19 +2009,6 @@
       }
     }
   },
-  "ledgerConnectPageConnectionTimeoutError": "Connection timed out after {seconds} seconds",
-  "@ledgerConnectPageConnectionTimeoutError": {
-    "description": "Error message for when a connection attempt times out.",
-    "placeholders": {
-      "seconds": {
-        "type": "int"
-      }
-    }
-  },
-  "ledgerConnectPageInterfaceUnavailableError": "Appropriate Ledger interface not available.",
-  "@ledgerConnectPageInterfaceUnavailableError": {
-    "description": "Error message for when the required connection interface (BLE/USB) is not available."
-  },
   "ledgerConnectPageConnectionSuccessStatus": "Successfully connected to {deviceName}!",
   "@ledgerConnectPageConnectionSuccessStatus": {
     "description": "Status text shown upon a successful connection to a Ledger device.",
@@ -2427,40 +2018,13 @@
       }
     }
   },
-  "ledgerConnectPageConnectionFailedTimeoutStatus": "Connection Failed: Timed out after {count} attempts",
-  "@ledgerConnectPageConnectionFailedTimeoutStatus": {
-    "description": "Status text for a connection failure due to a timeout.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "ledgerConnectPageConnectionFailedTitle": "Connection Failed",
   "@ledgerConnectPageConnectionFailedTitle": {
     "description": "Title for the dialog shown when a connection attempt fails."
   },
-  "ledgerConnectPageConnectionFailedTimeoutContent": "Connection timed out after {count} attempts. Please ensure the device is unlocked and try again.",
-  "@ledgerConnectPageConnectionFailedTimeoutContent": {
-    "description": "Content for the dialog when a connection fails due to a timeout.",
-    "placeholders": {
-      "count": {
-        "type": "int"
-      }
-    }
-  },
   "ledgerConnectPageConnectionFailedErrorStatus": "Connection Failed: {error}",
   "@ledgerConnectPageConnectionFailedErrorStatus": {
     "description": "Generic status text for a connection failure.",
-    "placeholders": {
-      "error": {
-        "type": "String"
-      }
-    }
-  },
-  "ledgerConnectPageConnectionFailedLedgerErrorContent": "Ledger Error: {error}",
-  "@ledgerConnectPageConnectionFailedLedgerErrorContent": {
-    "description": "Content for the dialog when a connection fails due to a specific LedgerException.",
     "placeholders": {
       "error": {
         "type": "String"
@@ -2479,39 +2043,9 @@
       }
     }
   },
-  "ledgerConnectPageDeviceDisconnected": "Device disconnected.",
-  "@ledgerConnectPageDeviceDisconnected": {
-    "description": "Status message when the connected device disconnects."
-  },
-  "ledgerConnectPageListenerStopped": "Listener stopped.",
-  "@ledgerConnectPageListenerStopped": {
-    "description": "Status message when the disconnection listener stream is closed."
-  },
-  "ledgerConnectPageFailedToMonitorDisconnects": "Failed to monitor disconnects.",
-  "@ledgerConnectPageFailedToMonitorDisconnects": {
-    "description": "Status message when setting up the disconnection listener fails."
-  },
-  "ledgerConnectPageDisconnectingStatus": "Disconnecting from {deviceName}...",
-  "@ledgerConnectPageDisconnectingStatus": {
-    "description": "Status text shown while the app is actively disconnecting from a device.",
-    "placeholders": {
-      "deviceName": {
-        "type": "String"
-      }
-    }
-  },
   "ledgerConnectPageDisconnectedStatus": "Disconnected from {deviceName}.",
   "@ledgerConnectPageDisconnectedStatus": {
     "description": "Status text shown after a successful disconnection.",
-    "placeholders": {
-      "deviceName": {
-        "type": "String"
-      }
-    }
-  },
-  "ledgerConnectPageDisconnectErrorStatus": "Error disconnecting from {deviceName}.",
-  "@ledgerConnectPageDisconnectErrorStatus": {
-    "description": "Status text shown when an error occurs during disconnection.",
     "placeholders": {
       "deviceName": {
         "type": "String"
@@ -2526,28 +2060,12 @@
   "@ledgerConnectPageNoDevicesFound": {
     "description": "Message displayed in the center of the screen when no Ledger devices are found after a scan."
   },
-  "ledgerConnectPageDisconnectButton": "Disconnect from {deviceName}",
-  "@ledgerConnectPageDisconnectButton": {
-    "description": "Text for the button to disconnect from the currently connected Ledger device.",
-    "placeholders": {
-      "deviceName": {
-        "type": "String",
-        "example": "Ledger Nano X"
-      }
-    }
-  },
-  "unknownDevice": "Unknown",
-  "@unknownDevice": {
-    "description": "Fallback text for a device name when it cannot be determined."
-  },
-
   "durationDay": "d",
   "durationHour": "h",
   "durationMinute": "m",
   "durationLessThanAMinute": "< 1m",
   "durationNotAvailable": "N/A",
   "nodes": "nodes",
-
   "manageTokensPageTitle": "Tokens",
   "@manageTokensPageTitle": {
     "description": "Title for the Manage Tokens page"
@@ -2580,7 +2098,6 @@
   "@manageTokensClear": {
     "description": "Button text to clear deleted tokens"
   },
-
   "signedMessageTypePersonalSign": "Personal Sign",
   "@signedMessageTypePersonalSign": {
     "description": "Label for personal sign message type"
@@ -2637,7 +2154,6 @@
   "@signedMessageMessage": {
     "description": "Title for message section"
   },
-
   "web3ErrorNoMethod": "No method specified",
   "@web3ErrorNoMethod": {
     "description": "Error when no method is specified in the request"
@@ -2654,10 +2170,6 @@
   "web3ErrorRequestInProgress": "A similar request is already being processed",
   "@web3ErrorRequestInProgress": {
     "description": "Error when a similar request is already in progress"
-  },
-  "web3ErrorUnknownRpc": "Unknown RPC error",
-  "@web3ErrorUnknownRpc": {
-    "description": "Error for unknown RPC errors"
   },
   "web3ErrorNotConnected": "This domain is not connected. Please connect first.",
   "@web3ErrorNotConnected": {

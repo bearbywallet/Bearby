@@ -105,9 +105,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get languagePageTitle => '语言';
 
   @override
-  String get languagePageSystem => '系统';
-
-  @override
   String get secretKeyGeneratorPageTitle => '密钥';
 
   @override
@@ -121,9 +118,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get secretKeyGeneratorPageNextButton => '下一步';
-
-  @override
-  String get walletPageTitle => '';
 
   @override
   String get walletPageWalletNameHint => '钱包名称';
@@ -147,16 +141,7 @@ class AppLocalizationsZh extends AppLocalizations {
   String get networkPageTitle => '';
 
   @override
-  String get networkPageShowTestnet => '显示测试网';
-
-  @override
   String get networkPageSearchHint => '搜索';
-
-  @override
-  String get networkPageAddedNetworks => '已添加的网络';
-
-  @override
-  String get networkPageAvailableNetworks => '可用网络';
 
   @override
   String get networkPageAddError => '添加网络失败：';
@@ -239,18 +224,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get securityPageUnknown => '未知';
 
   @override
-  String get webViewPageDntLabel => 'DNT';
-
-  @override
-  String get webViewPageIncognitoLabel => '隐身模式';
-
-  @override
-  String get webViewPageLoadError => '加载失败';
-
-  @override
-  String get webViewPageTryAgain => '重试';
-
-  @override
   String get secretPhraseGeneratorPageTitle => '新钱包';
 
   @override
@@ -261,9 +234,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get homePageErrorTitle => '无信号';
-
-  @override
-  String get homePageSendButton => '发送';
 
   @override
   String get homePageReceiveButton => '接收';
@@ -296,9 +266,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get revealSecretKeyRevealAfter => '您的私钥将在以下时间后显示:';
 
   @override
-  String get setupNetworkSettingsPageTestnetSwitch => '测试网';
-
-  @override
   String get setupNetworkSettingsPageSearchHint => '搜索';
 
   @override
@@ -311,12 +278,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '下一步';
-
-  @override
-  String get setupNetworkSettingsPageTestnetLabel => '测试网';
-
-  @override
-  String get setupNetworkSettingsPageMainnetLabel => '主网';
 
   @override
   String get setupNetworkSettingsPageChainIdLabel => '链 ID：';
@@ -469,12 +430,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get delete => '删除';
-
-  @override
-  String get browserPageExploreTab => '探索';
-
-  @override
-  String get browserPageNoExploreApps => '暂无可探索的应用';
 
   @override
   String browserPageSearchHint(Object engine) {
@@ -997,31 +952,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get signMessageModalContentSign => '签署消息';
 
   @override
-  String get signMessageModalContentScanning => '正在扫描Ledger设备...';
-
-  @override
-  String get signMessageModalContentNoLedgerDevices => '未找到Ledger设备';
-
-  @override
-  String get signMessageModalContentWalletNotSelected => '未选择钱包';
-
-  @override
-  String get signMessageModalContentLedgerNotSelected => '未选择Ledger设备';
-
-  @override
-  String signMessageModalContentFailedToScanLedger(Object error) {
-    return '扫描Ledger设备失败：$error';
-  }
-
-  @override
-  String signMessageModalContentFailedToSignMessage(Object error) {
-    return '消息签名失败：$error';
-  }
-
-  @override
-  String get signMessageModalContentBluetoothOff => '蓝牙已关闭。请启用蓝牙以扫描Ledger设备。';
-
-  @override
   String get deleteWalletModalTitle => '删除钱包';
 
   @override
@@ -1107,12 +1037,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get qrScannerModalContentCameraInitError => '相机初始化错误：';
-
-  @override
-  String get qrScannerModalContentTorchError => '切换手电筒失败：';
-
-  @override
-  String get qrScannerModalContentOpenSettings => '打开设置';
 
   @override
   String get chainInfoModalContentTokenTitle => '网络代币';
@@ -1393,9 +1317,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get browserActionMenuCopyLink => '复制链接';
 
   @override
-  String get browserActionMenuClose => '关闭';
-
-  @override
   String get browserActionMenuRefresh => '刷新';
 
   @override
@@ -1477,12 +1398,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get editGasDialogGasLimit => '燃料限制';
 
   @override
-  String get editGasDialogCancel => '取消';
-
-  @override
-  String get editGasDialogSave => '保存';
-
-  @override
   String get editGasDialogInvalidGasValues => '燃料值无效。请检查您的输入。';
 
   @override
@@ -1496,29 +1411,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageAddButton => '添加';
-
-  @override
-  String get addLedgerAccountPageScanningMessage => '正在扫描Ledger设备...';
-
-  @override
-  String get addLedgerAccountPageNoDevicesMessage => '未找到Ledger设备';
-
-  @override
-  String get addLedgerAccountPageBluetoothOffError => '蓝牙已关闭。请启用蓝牙以扫描Ledger设备。';
-
-  @override
-  String get addLedgerAccountPageEmptyWalletNameError => '钱包名称不能为空';
-
-  @override
-  String get addLedgerAccountPageWalletNameTooLongError => '钱包名称过长（最多24个字符）';
-
-  @override
-  String addLedgerAccountPageFailedToScanError(Object error) {
-    return '无法扫描Ledger设备：$error';
-  }
-
-  @override
-  String get addLedgerAccountPageNetworkOrLedgerMissingError => '缺少网络或Ledger数据';
 
   @override
   String get addLedgerAccountPageNoAccountsSelectedError => '未选择任何账户';
@@ -1539,15 +1431,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get noStakingPoolsFound => '未找到质押池';
 
   @override
-  String get aprSort => '年化率';
-
-  @override
-  String get commissionSort => '佣金';
-
-  @override
-  String get tvlSort => '总锁定价值';
-
-  @override
   String get claimButton => '领取';
 
   @override
@@ -1557,19 +1440,10 @@ class AppLocalizationsZh extends AppLocalizations {
   String get unstakeButton => '取消质押';
 
   @override
-  String get reinvest => '再投资';
-
-  @override
   String get aprLabel => '年化率';
 
   @override
   String get commissionLabel => '佣金';
-
-  @override
-  String get tvlLabel => '总锁定价值';
-
-  @override
-  String get lpStakingBadge => 'LP 质押';
 
   @override
   String get stakedAmount => '已质押';
@@ -1608,55 +1482,6 @@ class AppLocalizationsZh extends AppLocalizations {
   String get ledgerConnectPageInitializing => '正在初始化...';
 
   @override
-  String get ledgerConnectPageReadyToScan => '准备扫描。请按刷新按钮。';
-
-  @override
-  String ledgerConnectPageInitializationError(String error) {
-    return '初始化 Ledger 时出错: $error';
-  }
-
-  @override
-  String get ledgerConnectPageInitErrorTitle => '初始化错误';
-
-  @override
-  String ledgerConnectPageInitErrorContent(String error) {
-    return '初始化 Ledger 接口失败: $error';
-  }
-
-  @override
-  String get ledgerConnectPageBluetoothOffStatus => '蓝牙已关闭。请在您的设备上启用蓝牙。';
-
-  @override
-  String get ledgerConnectPageBluetoothOffTitle => '蓝牙已关闭';
-
-  @override
-  String get ledgerConnectPageBluetoothOffContent => '请在您的设备设置中打开蓝牙，然后重试。';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedStatus => '蓝牙权限被拒绝。请在设置中启用。';
-
-  @override
-  String get ledgerConnectPagePermissionRequiredTitle => '需要权限';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedTitle => '权限被拒绝';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContent => '扫描 Ledger 设备需要蓝牙权限。请在设置中授予权限。';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContentIOS => '此应用需要蓝牙权限才能扫描 Ledger 设备。请在您的设备设置中启用蓝牙权限。';
-
-  @override
-  String get ledgerConnectPageUnsupportedStatus => '此设备不支持低功耗蓝牙（Bluetooth LE）。';
-
-  @override
-  String get ledgerConnectPageUnsupportedTitle => '不支持的设备';
-
-  @override
-  String get ledgerConnectPageUnsupportedContent => '此设备不支持无线连接 Ledger 设备所需的低功耗蓝牙。';
-
-  @override
   String get ledgerConnectPageScanningStatus => '正在扫描 Ledger 设备...';
 
   @override
@@ -1670,9 +1495,6 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanErrorTitle => '扫描错误';
-
-  @override
   String get ledgerConnectPageScanFinishedNoDevices => '扫描完成。未找到任何设备。';
 
   @override
@@ -1681,30 +1503,9 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageFailedToStartScan(String error) {
-    return '启动扫描失败: $error';
-  }
-
-  @override
-  String get ledgerConnectPageScanStopped => '扫描已停止。';
-
-  @override
-  String ledgerConnectPageScanStoppedWithDevices(int count) {
-    return '扫描已停止。找到 $count 个设备。';
-  }
-
-  @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return '正在连接到 $deviceName ($connectionType)...';
   }
-
-  @override
-  String ledgerConnectPageConnectionTimeoutError(int seconds) {
-    return '连接在 $seconds 秒后超时';
-  }
-
-  @override
-  String get ledgerConnectPageInterfaceUnavailableError => '没有可用的 Ledger 接口。';
 
   @override
   String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
@@ -1712,26 +1513,11 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
-    return '连接失败：尝试 $count 次后超时';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => '连接失败';
-
-  @override
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
-    return '尝试 $count 次后连接超时。请确保设备已解锁，然后重试。';
-  }
 
   @override
   String ledgerConnectPageConnectionFailedErrorStatus(String error) {
     return '连接失败: $error';
-  }
-
-  @override
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
-    return 'Ledger 错误: $error';
   }
 
   @override
@@ -1740,27 +1526,8 @@ class AppLocalizationsZh extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageDeviceDisconnected => '设备已断开连接。';
-
-  @override
-  String get ledgerConnectPageListenerStopped => '监听器已停止。';
-
-  @override
-  String get ledgerConnectPageFailedToMonitorDisconnects => '监控断开连接失败。';
-
-  @override
-  String ledgerConnectPageDisconnectingStatus(String deviceName) {
-    return '正在从 $deviceName 断开连接...';
-  }
-
-  @override
   String ledgerConnectPageDisconnectedStatus(String deviceName) {
     return '已从 $deviceName 断开连接。';
-  }
-
-  @override
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
-    return '从 $deviceName 断开连接时出错。';
   }
 
   @override
@@ -1768,14 +1535,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get ledgerConnectPageNoDevicesFound => '未找到设备。请确保 Ledger 已开机、解锁，并启用了蓝牙/USB。\n下拉或使用刷新图标再次扫描。';
-
-  @override
-  String ledgerConnectPageDisconnectButton(String deviceName) {
-    return '与 $deviceName 断开连接';
-  }
-
-  @override
-  String get unknownDevice => '未知';
 
   @override
   String get durationDay => '天';
@@ -1871,9 +1630,6 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get web3ErrorRequestInProgress => '类似的请求已在处理中';
-
-  @override
-  String get web3ErrorUnknownRpc => '未知的 RPC 错误';
 
   @override
   String get web3ErrorNotConnected => '此域名未连接。请先连接。';

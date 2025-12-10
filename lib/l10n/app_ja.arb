@@ -1,9 +1,7 @@
 {
   "appTitle": "ZilPay ウォレット",
-
   "initialPagerestoreZilPay": "ZilPay 1.0を復元!",
   "initialPagegetStarted": "始める",
-
   "restoreRKStorageTitle": "ZilPay 1.0から2.0への移行",
   "restoreRKStorageAccountsPrompt": "ZilPay 2.0に移行するアカウント。パスワードを入力してください。",
   "restoreRKStoragePasswordHint": "パスワード",
@@ -11,12 +9,9 @@
   "restoreRKStorageErrorPrefix": "エラー:",
   "restoreRKStorageRestoreButton": "復元",
   "restoreRKStorageSkipButton": "スキップ",
-  
   "accountItemBalanceLabel": "残高:",
-
   "sendTokenPageTitle": "",
   "sendTokenPageSubmitButton": "送信",
-
   "aboutPageTitle": "アプリについて",
   "aboutPageAppName": "ZilPay",
   "aboutPageAppDescription": "安全なブロックチェーンウォレット",
@@ -35,31 +30,21 @@
   "aboutPageTermsOfService": "利用規約",
   "aboutPageLicenses": "ライセンス",
   "aboutPageLegalese": "© 2025 ZilPay. 全ての権利を保有。",
-
   "languagePageTitle": "言語",
-  "languagePageSystem": "システム",
-
   "secretKeyGeneratorPageTitle": "秘密鍵",
   "secretKeyGeneratorPagePrivateKey": "プライベートキー",
   "secretKeyGeneratorPagePublicKey": "パブリックキー",
   "secretKeyGeneratorPageBackupCheckbox": "秘密鍵をバックアップしました",
   "secretKeyGeneratorPageNextButton": "次へ",
-
-  "walletPageTitle": "",
   "walletPageWalletNameHint": "ウォレット名",
   "walletPagePreferencesTitle": "ウォレット設定",
   "walletPageManageConnections": "接続の管理",
   "walletPageBackup": "バックアップ",
   "walletPageDeleteWallet": "ウォレットを削除",
   "walletPageBiometricReason": "生体認証を有効にする",
-
   "networkPageTitle": "",
-  "networkPageShowTestnet": "テストネットを表示",
   "networkPageSearchHint": "検索",
-  "networkPageAddedNetworks": "追加したネットワーク",
-  "networkPageAvailableNetworks": "利用可能なネットワーク",
   "networkPageAddError": "ネットワークの追加に失敗: ",
-
   "receivePageTitle": "受信",
   "receivePageWarning": "このアドレスには{chainName}({tokenSymbol})資産のみを送信してください。他の資産は永久に失われます。",
   "receivePageAccountNameHint": "アカウント名",
@@ -67,7 +52,6 @@
   "receivePageAmountDialogHint": "0.0",
   "receivePageAmountDialogCancel": "キャンセル",
   "receivePageAmountDialogConfirm": "確認",
-
   "securityPageTitle": "セキュリティ",
   "securityPageNetworkPrivacy": "ネットワークプライバシー",
   "securityPageEnsDomains": "アドレスバーにENSドメインを表示",
@@ -86,20 +70,11 @@
   "securityPageNtruPrime": "NTRUPrime",
   "securityPageCyber": "サイバー",
   "securityPageUnknown": "不明",
-
-  "webViewPageDntLabel": "DNT",
-  "webViewPageIncognitoLabel": "シークレット",
-  "webViewPageLoadError": "読み込みに失敗",
-  "webViewPageTryAgain": "再試行",
-
   "secretPhraseGeneratorPageTitle": "新しいウォレット",
   "secretPhraseGeneratorPageBackupCheckbox": "単語をバックアップしました",
   "secretPhraseGeneratorPageNextButton": "次へ",
-
   "homePageErrorTitle": "信号なし",
-  "homePageSendButton": "送信",
   "homePageReceiveButton": "受信",
-
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",
@@ -109,18 +84,13 @@
   "revealSecretKeyScamAlertMessage": "秘密鍵を他人と共有したり、いかなるウェブサイトにも入力したりしないでください。",
   "revealSecretKeySecurityTimer": "セキュリティタイマー",
   "revealSecretKeyRevealAfter": "秘密鍵は次の時間後に表示されます:",
-
-  "setupNetworkSettingsPageTestnetSwitch": "テストネット",
   "setupNetworkSettingsPageSearchHint": "検索",
   "setupNetworkSettingsPageNoNetworks": "利用可能なネットワークがありません",
   "setupNetworkSettingsPageNoResults": "\"{searchQuery}\"に一致するネットワークが見つかりません",
   "setupNetworkSettingsPageNextButton": "次へ",
-  "setupNetworkSettingsPageTestnetLabel": "テストネット",
-  "setupNetworkSettingsPageMainnetLabel": "メインネット",
   "setupNetworkSettingsPageChainIdLabel": "チェーンID:",
   "setupNetworkSettingsPageTokenLabel": "トークン:",
   "setupNetworkSettingsPageExplorerLabel": "エクスプローラー:",
-
   "appearanceSettingsPageTitle": "外観設定",
   "appearanceSettingsPageCompactNumbersTitle": "コンパクト数字",
   "appearanceSettingsPageCompactNumbersDescription": "省略形の数字を表示します（例：20,000の代わりに20K）。",
@@ -133,20 +103,17 @@
   "appearanceSettingsPageLightModeTitle": "ライトモード",
   "appearanceSettingsPageLightModeSubtitle": "常にライト",
   "appearanceSettingsPageLightModeDescription": "デバイス設定に関係なく、常にライトテーマを有効にします。",
-
   "loginPageBiometricReason": "認証してください",
   "loginPageWalletTitle": "ウォレット {index}",
   "loginPagePasswordHint": "パスワード",
   "loginPageUnlockButton": "ロック解除",
   "loginPageWelcomeBack": "おかえりなさい",
-
   "secretKeyRestorePageTitle": "秘密鍵を復元",
   "secretKeyRestorePageHint": "プライベートキー",
   "secretKeyRestorePageInvalidFormat": "無効なプライベートキー形式",
   "secretKeyRestorePageKeyTitle": "プライベートキー",
   "secretKeyRestorePageBackupLabel": "秘密鍵をバックアップしました",
   "secretKeyRestorePageNextButton": "次へ",
-
   "addAccountPageTitle": "新しいアカウントを追加",
   "addAccountPageSubtitle": "BIP39アカウントを作成",
   "addAccountPageDefaultName": "アカウント {index}",
@@ -160,7 +127,6 @@
   "addAccountPageIndexExists": "インデックス{index}のアカウントはすでに存在します",
   "addAccountPageBiometricFailed": "生体認証に失敗しました",
   "addAccountPageCreateFailed": "アカウントの作成に失敗: {error}",
-
   "addressBookPageTitle": "アドレス帳",
   "addressBookPageEmptyMessage": "連絡先とそのウォレットアドレスが\nここに表示されます。",
   "addressBookPageDeleteConfirmationTitle": "連絡先を削除",
@@ -168,23 +134,17 @@
   "addressBookPageDeleteTooltip": "{contactName}を削除",
   "cancel": "キャンセル",
   "delete": "削除",
-
-  "browserPageExploreTab": "探索",
-  "browserPageNoExploreApps": "探索するアプリがまだありません",
   "browserPageSearchHint": "{engine}で検索するかアドレスを入力",
   "browserPageNoConnectedApps": "接続されたアプリはありません",
-
   "historyPageTitle": "トランザクション履歴",
   "historyPageNoTransactions": "トランザクションがありません",
   "historyPageSearchHint": "トランザクションを検索...",
-
   "notificationsSettingsPageTitle": "通知",
   "notificationsSettingsPagePushTitle": "プッシュ通知",
   "notificationsSettingsPagePushDescription": "トランザクションの送信と確認、接続されたアプリからの通知を受け取ります。",
   "notificationsSettingsPageWalletsTitle": "ウォレット",
   "notificationsSettingsPageWalletsDescription": "ウォレットからの通知",
   "notificationsSettingsPageWalletPrefix": "ウォレット",
-
   "revealSecretPhraseTitle": "秘密フレーズを表示",
   "revealSecretPhrasePasswordHint": "パスワード",
   "revealSecretPhraseInvalidPassword": "無効なパスワード、エラー:",
@@ -193,7 +153,6 @@
   "revealSecretPhraseDoneButton": "完了",
   "revealSecretPhraseScamAlertTitle": "詐欺警告",
   "revealSecretPhraseScamAlertDescription": "秘密フレーズを他人と共有したり、いかなるウェブサイトにも入力したりしないでください。",
-
   "cipherSettingsPageTitle": "暗号化設定",
   "cipherSettingsPageAdvancedButton": "詳細",
   "cipherSettingsPageStandardTitle": "標準暗号化",
@@ -207,16 +166,13 @@
   "cipherSettingsPageQuantumDescription": "NTRUP1277による高度な量子耐性暗号化。",
   "cipherSettingsPageQuantumWarning": "量子耐性暗号化はパフォーマンスに影響を与える可能性があります",
   "cipherSettingsPageConfirmButton": "確認",
-
   "secretPhraseVerifyPageTitle": "秘密を確認",
   "secretPhraseVerifyPageSubtitle": "Bip39秘密を確認",
   "secretPhraseVerifyPageNextButton": "次へ",
-
   "restoreSecretPhrasePageTitle": "ウォレットを復元",
   "restoreSecretPhrasePageRestoreButton": "復元",
   "checksumValidationFailed": "チェックサム検証に失敗しました",
   "proceedDespiteInvalidChecksum": "チェックサムエラーがありますが続行しますか？",
-
   "settingsPageTitle": "設定",
   "settingsPageZilliqaLegacy": "Zilliqaレガシー",
   "settingsPageCurrency": "通貨",
@@ -231,7 +187,6 @@
   "settingsPageTwitter": "Twitter",
   "settingsPageGitHub": "GitHub",
   "settingsPageAbout": "アプリについて",
-
   "passwordSetupPageTitle": "パスワード設定",
   "passwordSetupPageSubtitle": "パスワードを作成",
   "passwordSetupPageWalletNameHint": "ウォレット名",
@@ -247,7 +202,6 @@
   "passwordSetupPageSeedType": "シード",
   "passwordSetupPageKeyType": "キー",
   "passwordSetupPageUniversalNetwork": "ユニバーサル",
-
   "browserSettingsTitle": "ブラウザ設定",
   "browserSettingsBrowserOptions": "ブラウザオプション",
   "browserSettingsSearchEngine": "検索エンジン",
@@ -265,7 +219,7 @@
   "browserSettingsIncognitoModeDescription": "履歴やクッキーを保存せずにブラウズ",
   "browserSettingsPerformance": "パフォーマンス",
   "browserSettingsCache": "キャッシュ",
-  "browserSettingsCacheDescription": "高速読み込みのためのウェブサイトデータの保存",
+  "browserSettingsCacheDescription": "より速い読み込みのためにウェブサイトのデータを保存",
   "browserSettingsClearData": "データを消去",
   "browserSettingsClear": "消去",
   "browserSettingsClearCookies": "Cookieを消去",
@@ -274,14 +228,11 @@
   "browserSettingsClearCacheDescription": "ブラウジング中に保存された一時ファイルや画像を削除",
   "browserSettingsClearLocalStorage": "ローカルストレージを消去",
   "browserSettingsClearLocalStorageDescription": "デバイスに保存されているウェブサイトのデータを削除",
-  "browserSettingsCacheDescription": "より速い読み込みのためにウェブサイトのデータを保存",
-
   "genWalletOptionsTitle": "ウォレットを生成",
   "genWalletOptionsBIP39Title": "BIP39",
   "genWalletOptionsBIP39Subtitle": "ニーモニックフレーズを生成",
   "genWalletOptionsPrivateKeyTitle": "プライベートキー",
   "genWalletOptionsPrivateKeySubtitle": "1つのプライベートキーのみを生成",
-
   "addWalletOptionsTitle": "ウォレットを追加",
   "addWalletOptionsNewWalletTitle": "新しいウォレット",
   "addWalletOptionsNewWalletSubtitle": "新しいウォレットを作成",
@@ -292,7 +243,6 @@
   "addWalletOptionsOtherOptions": "その他のオプション",
   "addWalletOptionsWatchAccountTitle": "アカウントを監視",
   "addWalletOptionsWatchAccountSubtitle": "回復フレーズなしでウォレットの活動をモニター",
-
   "currencyConversionTitle": "主要通貨",
   "currencyConversionSearchHint": "通貨を検索...",
   "currencyConversionEngineTitle": "通貨エンジン",
@@ -302,7 +252,6 @@
   "currencyConversionEngineNoneSubtitle": "エンジンが選択されていません",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Coingeckoからレートを取得",
-
   "restoreWalletOptionsTitle": "ウォレットを復元",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "ニーモニックフレーズで復元",
@@ -312,7 +261,6 @@
   "restoreWalletOptionsQRCodeSubtitle": "QRコードスキャンでウォレットを復元",
   "restoreWalletOptionsKeyStoreTitle": "キーストアファイル",
   "restoreWalletOptionsKeyStoreSubtitle": "パスワードで暗号化されたバックアップファイルを使用してウォレットを復元",
-
   "argonSettingsModalContentLowMemoryTitle": "低メモリ",
   "argonSettingsModalContentLowMemorySubtitle": "64KB RAM、3反復",
   "argonSettingsModalContentLowMemoryDescription": "最小メモリ使用量、低スペックデバイスに適しています。",
@@ -324,16 +272,13 @@
   "argonSettingsModalContentSecureDescription": "メモリと反復回数を増やした高セキュリティ。",
   "argonSettingsModalContentSecretHint": "秘密を入力（任意）",
   "argonSettingsModalContentConfirmButton": "確認",
-
   "confirmTransactionContentPasswordHint": "パスワード",
   "confirmTransactionContentUnableToConfirm": "確認できません",
   "confirmTransactionContentConfirm": "確認",
   "confirmTransactionContentNoActiveAccount": "アクティブなアカウントがありません",
   "confirmTransactionContentFailedLoadTransfer": "送金詳細の読み込みに失敗",
   "confirmTransactionEditGasButtonText": "編集",
-
   "authReason": "認証してください",
-
   "addChainModalContentWarning": "ネットワーク詐欺とセキュリティリスクに注意してください。",
   "addChainModalContentApprove": "承認",
   "addChainModalContentDetails": "詳細",
@@ -341,7 +286,6 @@
   "addChainModalContentCurrencySymbol": "通貨記号:",
   "addChainModalContentChainId": "チェーンID:",
   "addChainModalContentBlockExplorer": "ブロックエクスプローラー:",
-
   "addAddressModalTitle": "連絡先を追加",
   "addAddressModalDescription": "アドレス帳に追加する連絡先名とウォレットアドレスを入力してください。",
   "addAddressModalNameHint": "名前",
@@ -349,9 +293,7 @@
   "addAddressModalNameEmptyError": "名前は空にできません",
   "addAddressModalAddressEmptyError": "アドレスは空にできません",
   "addAddressModalButton": "連絡先を追加",
-
   "tokenSelectModalContentSearchHint": "検索",
-
   "signMessageModalContentAuthReason": "メッセージに署名するために認証してください",
   "signMessageModalContentFailedToSign": "署名に失敗しました: {error}",
   "signMessageModalContentTitle": "メッセージに署名",
@@ -364,20 +306,11 @@
   "signMessageModalContentPasswordHint": "パスワード",
   "signMessageModalContentProcessing": "処理中...",
   "signMessageModalContentSign": "メッセージに署名",
-  "signMessageModalContentScanning": "Ledgerデバイスをスキャン中...",
-  "signMessageModalContentNoLedgerDevices": "Ledgerデバイスが見つかりませんでした",
-  "signMessageModalContentWalletNotSelected": "ウォレットが選択されていません",
-  "signMessageModalContentLedgerNotSelected": "Ledgerデバイスが選択されていません",
-  "signMessageModalContentFailedToScanLedger": "Ledgerデバイスのスキャンに失敗しました: {error}",
-  "signMessageModalContentFailedToSignMessage": "メッセージの署名に失敗しました: {error}",
-  "signMessageModalContentBluetoothOff": "Bluetoothがオフになっています。Ledgerデバイスのスキャンには有効にしてください。",
-
   "deleteWalletModalTitle": "ウォレットを削除",
   "deleteWalletModalWarning": "警告：この操作は元に戻せません。ウォレットは秘密フレーズを使用してのみ復元できます。アクセスできない場合、このアカウントに関連するすべての資金が永久に失われます。",
   "deleteWalletModalSecretPhraseWarning": "続行する前に、秘密フレーズにアクセスできることを確認してください。",
   "deleteWalletModalPasswordHint": "パスワードを入力",
   "deleteWalletModalSubmit": "送信",
-
   "addressSelectModalContentTitle": "アドレスを選択",
   "addressSelectModalContentSearchHint": "検索 / アドレス / ENS",
   "addressSelectModalContentUnknown": "不明",
@@ -385,7 +318,6 @@
   "addressSelectModalContentAddressBook": "アドレス帳",
   "addressSelectModalContentHistory": "履歴",
   "addressSelectModalContentSender": "送信者",
-
   "changePasswordModalTitle": "パスワード変更",
   "changePasswordModalDescription": "現在のパスワードを入力し、ウォレットのセキュリティを更新するための新しいパスワードを選択してください。",
   "changePasswordModalCurrentPasswordHint": "現在のパスワード",
@@ -395,44 +327,34 @@
   "changePasswordModalPasswordLengthError": "パスワードは6文字以上である必要があります",
   "changePasswordModalPasswordsMismatchError": "パスワードが一致しません",
   "changePasswordModalButton": "パスワード変更",
-
   "confirmPasswordModalTitle": "パスワードを確認",
   "confirmPasswordModalDescription": "続行するにはパスワードを入力してください。",
   "confirmPasswordModalHint": "パスワード",
   "confirmPasswordModalEmptyError": "パスワードは空にできません",
   "confirmPasswordModalGenericError": "エラー:",
   "confirmPasswordModalButton": "確認",
-
   "qrScannerModalContentTitle": "スキャン",
   "qrScannerModalContentCameraInitError": "カメラ初期化エラー:",
-  "qrScannerModalContentTorchError": "トーチの切り替えに失敗:",
-  "qrScannerModalContentOpenSettings": "設定を開く",
-
   "chainInfoModalContentTokenTitle": "ネットワークトークン",
   "@chainInfoModalContentTokenTitle": {
     "description": "Title text for the network token section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentNetworkInfoTitle": "ネットワーク情報",
   "@chainInfoModalContentNetworkInfoTitle": {
     "description": "Title text for the network information section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainLabel": "チェーン",
   "@chainInfoModalContentChainLabel": {
     "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentShortNameLabel": "略称",
   "@chainInfoModalContentShortNameLabel": {
     "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainIdLabel": "チェーンID",
   "@chainInfoModalContentChainIdLabel": {
     "description": "Label for the chain ID field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentSlip44Label": "Slip44",
   "chainInfoModalContentChainIdsLabel": "チェーンID群",
   "chainInfoModalContentTestnetLabel": "テストネット",
@@ -445,25 +367,20 @@
   "chainInfoModalContentExplorersTitle": "エクスプローラー",
   "chainInfoModalContentDeleteProviderTitle": "ネットワークを削除",
   "chainInfoModalContentSwipeToDelete": "削除",
-
   "switchChainNetworkContentTitle": "ネットワークを選択",
   "switchChainNetworkContentButton": "ネットワークを切り替え",
   "switchChainNetworkContentTestnetLabel": "テストネット",
   "switchChainNetworkContentIdLabel": "ID:",
-
   "watchAssetModalContentTitle": "提案されたトークンを追加",
   "watchAssetModalContentDescription": "アプリによって提案された以下のトークンを確認して追加します。",
   "watchAssetModalContentTokenLabel": "トークン",
   "watchAssetModalContentBalanceLabel": "残高",
   "watchAssetModalContentLoadingButton": "残高...",
   "watchAssetModalContentAddButton": "追加",
-
   "connectedDappsModalSearchHint": "DAppsを検索",
   "connectedDappsModalNoDapps": "接続されたDAppsはありません",
-
   "dappListItemConnected": "{time}に接続",
   "dappListItemJustNow": "たった今",
-
   "secretRecoveryModalRevealPhraseTitle": "秘密回復フレーズを表示",
   "secretRecoveryModalRevealPhraseDescription": "ブラウザを変更したりコンピュータを移動する場合、アカウントにアクセスするにはこの秘密回復フレーズが必要です。安全で秘密の場所に保存してください。",
   "secretRecoveryModalRevealPhraseButton": "表示",
@@ -473,34 +390,27 @@
   "secretRecoveryModalKeystoreBackupTitle": "キーストアバックアップ",
   "secretRecoveryModalKeystoreBackupDescription": "パスワードで保護された暗号化されたキーストアファイルに秘密鍵を保存します。これにより、ウォレットにさらなるセキュリティ層が提供されます。",
   "secretRecoveryModalKeystoreBackupButton": "キーストアバックアップを作成",
-
   "backupConfirmationContentTitle": "バックアップ確認",
   "backupConfirmationWarning": "警告：シードフレーズを正確な順序で紛失または忘れた場合、資金は永久に失われます。シードフレーズを他人と共有しないでください。共有すると資金が盗まれる可能性があります。BIP39リカバリーは厳格であり、復元時の単語の間違いは資金の損失につながります。",
   "backupConfirmationContentWrittenDown": "すべてを書き留めました",
   "backupConfirmationContentSafelyStored": "バックアップを安全に保管しました",
   "backupConfirmationContentWontLose": "バックアップを失わないよう注意します",
   "backupConfirmationContentNotShare": "これらの単語を誰とも共有しないことを理解しています",
-
   "counterMaxValueError": "最大値に達しました",
   "counterMinValueError": "最小値に達しました",
-
   "biometricSwitchFaceId": "Face IDを有効にする",
   "biometricSwitchFingerprint": "指紋認証を有効にする",
   "biometricSwitchBiometric": "生体認証ログインを有効にする",
   "biometricSwitchPinCode": "デバイスPINを有効にする",
-
   "gasFeeOptionLow": "低",
   "gasFeeOptionMarket": "市場",
   "gasFeeOptionAggressive": "積極的",
-
   "gasDetailsEstimatedGas": "推定ガス:",
   "gasDetailsGasPrice": "ガス価格:",
   "gasDetailsBaseFee": "基本料金:",
   "gasDetailsPriorityFee": "優先料金:",
   "gasDetailsMaxFee": "最大料金:",
-
   "tokenTransferAmountUnknown": "不明",
-
   "transactionDetailsModal_transaction": "取引",
   "transactionDetailsModal_hash": "ハッシュ",
   "transactionDetailsModal_sig": "署名",
@@ -530,13 +440,10 @@
   "amountSection_rejected": "拒否済み",
   "appConnectModalContent_swipeToConnect": "スワイプして接続",
   "appConnectModalContent_noAccounts": "アカウントがありません",
-
   "browserActionMenuShare": "共有",
   "browserActionMenuCopyLink": "リンクをコピー",
-  "browserActionMenuClose": "閉じる",
   "browserActionMenuRefresh": "更新",
   "browserActionMenuUrlBarTop": "URLバーを上部に",
-
   "keystoreBackupTitle": "キーストアバックアップ",
   "keystoreBackupWarningTitle": "キーストアファイルを安全に保管",
   "keystoreBackupWarningMessage": "キーストアファイルには暗号化された秘密鍵が含まれています。このファイルを安全な場所に保管し、誰とも共有しないでください。このファイルを復号化するには、作成したパスワードが必要です。",
@@ -553,51 +460,31 @@
   "keystoreBackupSavedSuccess": "キーストアファイルが正常に保存されました",
   "keystoreBackupSaveFailed": "キーストアファイルの保存に失敗しました",
   "keystoreBackupTempLocation": "一時ファイルの場所",
-
   "keystorePasswordHint": "キーストアのパスワードを入力してください",
   "keystoreRestoreButton": "ウォレットを復元",
   "keystoreRestoreExtError": "有効な.zpファイルを選択してください",
   "keystoreRestoreNoFile": "キーストアファイルが見つかりません",
   "keystoreRestoreFilesTitle": "キーストアファイル",
-
   "editGasDialogTitle": "ガスパラメータの編集",
   "editGasDialogGasPrice": "ガス価格",
   "editGasDialogMaxPriorityFee": "最大優先手数料",
   "editGasDialogGasLimit": "ガスリミット",
-  "editGasDialogCancel": "キャンセル",
-  "editGasDialogSave": "保存",
   "editGasDialogInvalidGasValues": "無効なガス値です。入力を確認してください。",
-
   "addLedgerAccountPageAppBarTitle": "Ledgerアカウントを追加",
   "addLedgerAccountPageGetAccountsButton": "アカウントを取得",
   "addLedgerAccountPageCreateButton": "作成",
   "addLedgerAccountPageAddButton": "追加",
-  "addLedgerAccountPageScanningMessage": "Ledgerデバイスをスキャン中...",
-  "addLedgerAccountPageNoDevicesMessage": "Ledgerデバイスが見つかりません",
-  "addLedgerAccountPageBluetoothOffError": "Bluetoothがオフになっています。Ledgerデバイスをスキャンするためにオンにしてください。",
-  "addLedgerAccountPageEmptyWalletNameError": "ウォレット名は空にできません",
-  "addLedgerAccountPageWalletNameTooLongError": "ウォレット名が長すぎます（最大24文字）",
-  "addLedgerAccountPageFailedToScanError": "Ledgerデバイスのスキャンに失敗しました：{error}",
-  "addLedgerAccountPageNetworkOrLedgerMissingError": "ネットワークまたはLedgerデータが不足しています",
   "addLedgerAccountPageNoAccountsSelectedError": "アカウントが選択されていません",
   "addLedgerAccountPageNoWalletSelectedError": "ウォレットが選択されていません",
-
   "transactionHistoryTitle": "取引履歴",
   "transactionHistoryDescription": "アドレス帳に取引履歴からのアドレスを表示します。",
-
   "zilStakePageTitle": "Zilliqa ステーキング",
   "noStakingPoolsFound": "ステーキングプールが見つかりません",
-  "aprSort": "APR",
-  "commissionSort": "手数料",
-  "tvlSort": "TVL",
   "claimButton": "請求",
   "stakeButton": "ステーク",
   "unstakeButton": "アンステーク",
-  "reinvest": "再投資",
   "aprLabel": "APR",
   "commissionLabel": "手数料",
-  "tvlLabel": "TVL",
-  "lpStakingBadge": "LP ステーキング",
   "stakedAmount": "ステーク済み",
   "rewardsAvailable": "報酬",
   "pendingWithdrawals": "保留中の出金",
@@ -607,54 +494,21 @@
   "unbondingPeriod": "アンボンディング期間",
   "currentBlock": "現在のブロック",
   "version": "バージョン",
-  
   "ledgerConnectPageTitle": "Ledgerに接続",
   "ledgerConnectPageInitializing": "初期化中...",
-  "ledgerConnectPageReadyToScan": "スキャンの準備ができました。更新ボタンを押してください。",
-  "ledgerConnectPageInitializationError": "Ledgerの初期化エラー: {error}",
-  "ledgerConnectPageInitErrorTitle": "初期化エラー",
-  "ledgerConnectPageInitErrorContent": "Ledgerインターフェースの初期化に失敗しました: {error}",
-  "ledgerConnectPageBluetoothOffStatus": "Bluetoothがオフです。デバイスのBluetoothを有効にしてください。",
-  "ledgerConnectPageBluetoothOffTitle": "Bluetoothがオフです",
-  "ledgerConnectPageBluetoothOffContent": "デバイスの設定でBluetoothをオンにして、もう一度お試しください。",
-  "ledgerConnectPagePermissionDeniedStatus": "Bluetoothの許可が拒否されました。設定で有効にしてください。",
-  "ledgerConnectPagePermissionRequiredTitle": "許可が必要です",
-  "ledgerConnectPagePermissionDeniedTitle": "許可が拒否されました",
-  "ledgerConnectPagePermissionDeniedContent": "LedgerデバイスをスキャンするにはBluetoothの許可が必要です。設定で許可してください。",
-  "ledgerConnectPagePermissionDeniedContentIOS": "このアプリはLedgerデバイスをスキャンするためにBluetoothの許可が必要です。デバイスの設定でBluetoothの許可を有効にしてください。",
-  "ledgerConnectPageUnsupportedStatus": "このデバイスはBluetooth LEをサポートしていません。",
-  "ledgerConnectPageUnsupportedTitle": "サポートされていないデバイス",
-  "ledgerConnectPageUnsupportedContent": "このデバイスは、Ledgerデバイスへのワイヤレス接続に必要なBluetooth Low Energyをサポートしていません。",
   "ledgerConnectPageScanningStatus": "Ledgerデバイスをスキャン中...",
   "ledgerConnectPageFoundDevicesStatus": "{count}台のデバイスが見つかりました...",
   "ledgerConnectPageScanErrorStatus": "スキャンエラー: {error}",
-  "ledgerConnectPageScanErrorTitle": "スキャンエラー",
   "ledgerConnectPageScanFinishedNoDevices": "スキャンが完了しました。デバイスは見つかりませんでした。",
   "ledgerConnectPageScanFinishedWithDevices": "スキャンが完了しました。{count}台のデバイスが見つかりました。接続するものを選択してください。",
-  "ledgerConnectPageFailedToStartScan": "スキャンの開始に失敗しました: {error}",
-  "ledgerConnectPageScanStopped": "スキャンを停止しました。",
-  "ledgerConnectPageScanStoppedWithDevices": "スキャンを停止しました。{count}台のデバイスが見つかりました。",
   "ledgerConnectPageConnectingStatus": "{deviceName}（{connectionType}）に接続中...",
-  "ledgerConnectPageConnectionTimeoutError": "{seconds}秒後に接続がタイムアウトしました",
-  "ledgerConnectPageInterfaceUnavailableError": "適切なLedgerインターフェースが利用できません。",
   "ledgerConnectPageConnectionSuccessStatus": "{deviceName}への接続に成功しました！",
-  "ledgerConnectPageConnectionFailedTimeoutStatus": "接続に失敗しました: {count}回の試行後にタイムアウトしました",
   "ledgerConnectPageConnectionFailedTitle": "接続に失敗しました",
-  "ledgerConnectPageConnectionFailedTimeoutContent": "{count}回の試行後に接続がタイムアウトしました。デバイスがロック解除されていることを確認して、もう一度お試しください。",
   "ledgerConnectPageConnectionFailedErrorStatus": "接続に失敗しました: {error}",
-  "ledgerConnectPageConnectionFailedLedgerErrorContent": "Ledgerエラー: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "{deviceName}に接続できませんでした。\nエラー: {error}",
-  "ledgerConnectPageDeviceDisconnected": "デバイスが切断されました。",
-  "ledgerConnectPageListenerStopped": "リスナーが停止しました。",
-  "ledgerConnectPageFailedToMonitorDisconnects": "切断の監視に失敗しました。",
-  "ledgerConnectPageDisconnectingStatus": "{deviceName}から切断中...",
   "ledgerConnectPageDisconnectedStatus": "{deviceName}から切断しました。",
-  "ledgerConnectPageDisconnectErrorStatus": "{deviceName}からの切断中にエラーが発生しました。",
   "ledgerConnectPageGoToSettings": "設定に移動",
   "ledgerConnectPageNoDevicesFound": "デバイスが見つかりません。Ledgerの電源がオンで、ロックが解除されており、Bluetooth/USBが有効になっていることを確認してください。\n下にスワイプするか、更新アイコンを使用して再度スキャンしてください。",
-  "ledgerConnectPageDisconnectButton": "{deviceName}から切断",
-  "unknownDevice": "不明",
-
   "durationDay": "日",
   "durationHour": "時間",
   "durationMinute": "分",
@@ -662,7 +516,6 @@
   "durationNotAvailable": "適用外",
   "rewardsProgressTitle": "報酬の進捗",
   "nodes": "ノード",
-
   "manageTokensPageTitle": "トークン",
   "manageTokensSearchHint": "トークンを検索またはアドレスを貼り付け",
   "manageTokensFoundToken": "見つかったトークン",
@@ -671,7 +524,6 @@
   "manageTokensFetchError": "トークンの取得に失敗しました",
   "manageTokensWrongChain": "トークンは別のチェーンに属しています",
   "manageTokensClear": "クリア",
-
   "signedMessageTypePersonalSign": "個人署名",
   "signedMessageTypeEip712": "EIP-712",
   "signedMessageTypeUnknown": "不明",
@@ -686,11 +538,9 @@
   "signedMessageData": "メッセージデータ",
   "signedMessageContent": "内容",
   "signedMessageMessage": "メッセージ",
-
   "web3ErrorNoMethod": "メソッドが指定されていません",
   "web3ErrorUnsupportedMethod": "メソッド \"{method}\" はサポートされていません",
   "web3ErrorRequestInProgress": "同様のリクエストがすでに処理中です",
-  "web3ErrorUnknownRpc": "不明なRPCエラー",
   "web3ErrorNotConnected": "このドメインは接続されていません。まず接続してください。",
   "web3ErrorInvalidParams": "{method} のパラメータが無効です。必要: {params}",
   "web3ErrorAddressNotAuthorized": "リクエストされたアドレスは承認されていません",

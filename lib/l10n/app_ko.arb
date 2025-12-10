@@ -1,206 +1,95 @@
 {
   "appTitle": "ZilPay 지갑",
-
   "initialPagerestoreZilPay": "ZilPay 1.0 복원!",
   "initialPagegetStarted": "시작하기",
-
   "restoreRKStorageTitle": "ZilPay 1.0에서 2.0으로 마이그레이션",
-  
   "restoreRKStorageAccountsPrompt": "ZilPay 2.0으로 마이그레이션할 계정. 비밀번호 입력.",
-  
   "restoreRKStoragePasswordHint": "비밀번호",
-  
   "restoreRKStorageEnterPassword": "비밀번호 입력",
-  
   "restoreRKStorageErrorPrefix": "오류:",
-  
   "restoreRKStorageRestoreButton": "복원",
-  
   "restoreRKStorageSkipButton": "건너뛰기",
-  
   "accountItemBalanceLabel": "잔액:",
-
   "sendTokenPageTitle": "",
-  
   "sendTokenPageSubmitButton": "제출",
-
   "aboutPageTitle": "정보",
-  
   "aboutPageAppName": "ZilPay",
-  
   "aboutPageAppDescription": "안전한 블록체인 지갑",
-  
   "aboutPageAppInfoTitle": "앱 정보",
-  
   "aboutPageVersionLabel": "버전",
-  
   "aboutPageBuildDateLabel": "빌드 날짜",
-  
   "aboutPageBuildDateValue": "2025년 3월 10일",
-  
   "aboutPagePlatformLabel": "플랫폼",
-  
   "aboutPageDeveloperTitle": "개발자",
-  
   "aboutPageAuthorLabel": "저자",
-  
   "aboutPageAuthorValue": "Rinat (hicaru)",
-  
   "aboutPageWebsiteLabel": "웹사이트",
-  
   "aboutPageWebsiteValue": "https://zilpay.io",
-  
   "aboutPageLegalTitle": "법적 사항",
-  
   "aboutPagePrivacyPolicy": "개인정보 보호정책",
-  
   "aboutPageTermsOfService": "서비스 약관",
-  
   "aboutPageLicenses": "라이선스",
-  
   "aboutPageLegalese": "© 2025 ZilPay. 모든 권리 보유.",
   "languagePageTitle": "언어",
-  
-  "languagePageSystem": "시스템",
-
   "secretKeyGeneratorPageTitle": "비밀 키",
-  
   "secretKeyGeneratorPagePrivateKey": "개인 키",
-  
   "secretKeyGeneratorPagePublicKey": "공개 키",
-  
   "secretKeyGeneratorPageBackupCheckbox": "비밀 키 백업 완료",
-  
   "secretKeyGeneratorPageNextButton": "다음",
-  "walletPageTitle": "",
-  
   "walletPageWalletNameHint": "지갑 이름",
-  
   "walletPagePreferencesTitle": "지갑 설정",
-  
   "walletPageManageConnections": "연결 관리",
-  
   "walletPageBackup": "백업",
-  
   "walletPageDeleteWallet": "지갑 삭제",
-  
   "walletPageBiometricReason": "생체 인증 활성화",
-
   "networkPageTitle": "",
-  
-  "networkPageShowTestnet": "테스트넷 표시",
-  
   "networkPageSearchHint": "검색",
-  
-  "networkPageAddedNetworks": "추가된 네트워크",
-  
-  "networkPageAvailableNetworks": "사용 가능한 네트워크",
-  
   "networkPageAddError": "네트워크 추가 실패: ",
-
   "receivePageTitle": "수신",
-  
   "receivePageWarning": "이 주소로 {chainName}({tokenSymbol}) 자산만 보내세요. 다른 자산은 영구적으로 손실됩니다.",
-  
   "receivePageAccountNameHint": "계정 이름",
-  
   "receivePageAmountDialogTitle": "금액 입력",
-  
   "receivePageAmountDialogHint": "0.0",
-  
   "receivePageAmountDialogCancel": "취소",
-  
   "receivePageAmountDialogConfirm": "확인",
-
   "securityPageTitle": "보안",
-  
   "securityPageNetworkPrivacy": "네트워크 프라이버시",
-  
   "securityPageEnsDomains": "주소 표시줄에 ENS 도메인 표시",
-  
   "securityPageEnsDescription": "이 기능을 사용하면 IP 주소가 IPFS 타사 서비스에 노출될 수 있습니다.",
-  
   "securityPageIpfsGateway": "IPFS 게이트웨이",
-  
   "securityPageIpfsDescription": "ZIlPay는 타사 서비스를 사용하여 IPFS에 저장된 NFT 이미지를 표시하고, 브라우저 주소 표시줄에 입력된 ENS(ZNS) 주소 관련 정보를 표시하며, 다양한 토큰 아이콘을 가져옵니다. 이를 사용할 때 IP 주소가 노출될 수 있습니다.",
-  
   "securityPageTokensFetcherTitle": "토큰 가져오기",
-  
   "securityPageTokensFetcherDescription": "활성화되면 토큰이 서버에서 자동으로 가져와 추가될 수 있습니다.",
-  
   "securityPageNodeRanking": "노드 랭킹",
-  
   "securityPageNodeDescription": "최적 노드를 가져오기 위해 ZilPay 서버에 요청",
-  
   "securityPageEncryptionLevel": "암호화 수준",
-  
   "securityPageProtection": "보호",
-  
   "securityPageCpuLoad": "CPU 부하",
-  
   "securityPageAes256": "AES256",
-  
   "securityPageKuznechikGost": "KUZNECHIK-GOST",
-  
   "securityPageNtruPrime": "NTRUPrime",
-  
   "securityPageCyber": "Cyber",
-  
   "securityPageUnknown": "알 수 없음",
-  "webViewPageDntLabel": "DNT",
-  
-  "webViewPageIncognitoLabel": "시크릿 모드",
-  
-  "webViewPageLoadError": "로드 실패",
-  
-  "webViewPageTryAgain": "다시 시도",
-  
   "secretPhraseGeneratorPageTitle": "새 지갑",
-  
   "secretPhraseGeneratorPageBackupCheckbox": "단어 백업 완료",
-  
   "secretPhraseGeneratorPageNextButton": "다음",
-
   "homePageErrorTitle": "신호 없음",
-  "homePageSendButton": "보내기",
   "homePageReceiveButton": "수신",
-
-
   "revealSecretKeyTitle": "비밀 키 공개",
-  
   "revealSecretKeyPasswordHint": "비밀번호",
-  
   "revealSecretKeyInvalidPassword": "잘못된 비밀번호, 오류:",
-  
   "revealSecretKeySubmitButton": "제출",
-  
   "revealSecretKeyDoneButton": "완료",
-  
   "revealSecretKeyScamAlertTitle": "사기 경고",
-  
   "revealSecretKeyScamAlertMessage": "비밀 키를 누구와도 공유하지 마세요. 웹사이트에 입력하지 마세요.",
-
   "revealSecretKeySecurityTimer": "보안 타이머",
-
   "revealSecretKeyRevealAfter": "비밀 키 공개 시간:",
-  "setupNetworkSettingsPageTestnetSwitch": "테스트넷",
-  
   "setupNetworkSettingsPageSearchHint": "검색",
-  
   "setupNetworkSettingsPageNoNetworks": "사용 가능한 네트워크 없음",
-  
   "setupNetworkSettingsPageNoResults": "\"{searchQuery}\"에 대한 네트워크 없음",
-  
   "setupNetworkSettingsPageNextButton": "다음",
-  
-  "setupNetworkSettingsPageTestnetLabel": "테스트넷",
-  
-  "setupNetworkSettingsPageMainnetLabel": "메인넷",
-  
   "setupNetworkSettingsPageChainIdLabel": "체인 ID:",
-  
   "setupNetworkSettingsPageTokenLabel": "토큰:",
-  
   "setupNetworkSettingsPageExplorerLabel": "탐색기:",
   "appearanceSettingsPageTitle": "모양 설정",
   "appearanceSettingsPageCompactNumbersTitle": "압축 숫자",
@@ -214,13 +103,11 @@
   "appearanceSettingsPageLightModeTitle": "라이트 모드",
   "appearanceSettingsPageLightModeSubtitle": "항상 라이트",
   "appearanceSettingsPageLightModeDescription": "기기 설정과 상관없이 라이트 테마 항상 활성화.",
-
   "loginPageBiometricReason": "인증하세요",
   "loginPageWalletTitle": "지갑 {index}",
   "loginPagePasswordHint": "비밀번호",
   "loginPageUnlockButton": "잠금 해제",
   "loginPageWelcomeBack": "환영합니다",
-
   "secretKeyRestorePageTitle": "비밀 키 복원",
   "secretKeyRestorePageHint": "개인 키",
   "secretKeyRestorePageInvalidFormat": "잘못된 개인 키 형식",
@@ -240,7 +127,6 @@
   "addAccountPageIndexExists": "인덱스 {index} 계정 이미 존재",
   "addAccountPageBiometricFailed": "생체 인증 실패",
   "addAccountPageCreateFailed": "계정 생성 실패: {error}",
-
   "addressBookPageTitle": "주소록",
   "addressBookPageEmptyMessage": "연락처와 지갑 주소가\n여기에 표시됩니다.",
   "addressBookPageDeleteConfirmationTitle": "연락처 삭제",
@@ -248,9 +134,6 @@
   "addressBookPageDeleteTooltip": "{contactName} 삭제",
   "cancel": "취소",
   "delete": "삭제",
-
-  "browserPageExploreTab": "탐색",
-  "browserPageNoExploreApps": "탐색할 앱 없음",
   "browserPageSearchHint": "{engine}으로 검색 또는 주소 입력",
   "browserPageNoConnectedApps": "연결된 앱 없음",
   "historyPageTitle": "거래 내역",
@@ -288,7 +171,7 @@
   "secretPhraseVerifyPageNextButton": "다음",
   "restoreSecretPhrasePageTitle": "지갑 복원",
   "restoreSecretPhrasePageRestoreButton": "복원",
-   "checksumValidationFailed": "체크섬 검증 실패",
+  "checksumValidationFailed": "체크섬 검증 실패",
   "proceedDespiteInvalidChecksum": "체크섬 오류에도 불구하고 계속?",
   "settingsPageTitle": "설정",
   "settingsPageZilliqaLegacy": "Zilliqa 레거시",
@@ -304,7 +187,6 @@
   "settingsPageTwitter": "Twitter",
   "settingsPageGitHub": "GitHub",
   "settingsPageAbout": "정보",
-
   "passwordSetupPageTitle": "비밀번호 설정",
   "passwordSetupPageSubtitle": "비밀번호 생성",
   "passwordSetupPageWalletNameHint": "지갑 이름",
@@ -337,7 +219,6 @@
   "browserSettingsIncognitoModeDescription": "기록 또는 쿠키 저장 없이 브라우징",
   "browserSettingsPerformance": "성능",
   "browserSettingsCache": "캐시",
-
   "browserSettingsClearData": "데이터 지우기",
   "browserSettingsClear": "지우기",
   "browserSettingsClearCookies": "쿠키 지우기",
@@ -383,26 +264,20 @@
   "argonSettingsModalContentLowMemoryTitle": "저 메모리",
   "argonSettingsModalContentLowMemorySubtitle": "64KB RAM, 3 반복",
   "argonSettingsModalContentLowMemoryDescription": "저사양 기기에 적합한 최소 메모리 사용.",
-  
   "argonSettingsModalContentOwaspTitle": "OWASP 기본",
   "argonSettingsModalContentOwaspSubtitle": "6.5MB RAM, 2 반복",
   "argonSettingsModalContentOwaspDescription": "OWASP에서 일반 용도로 추천.",
-  
   "argonSettingsModalContentSecureTitle": "보안",
   "argonSettingsModalContentSecureSubtitle": "256MB RAM, 4 반복",
   "argonSettingsModalContentSecureDescription": "메모리 및 반복 증가 고보안.",
-  
   "argonSettingsModalContentSecretHint": "비밀 입력 (선택)",
-  
   "argonSettingsModalContentConfirmButton": "확인",
-
   "confirmTransactionContentPasswordHint": "비밀번호",
   "confirmTransactionContentUnableToConfirm": "확인 불가",
   "confirmTransactionContentConfirm": "확인",
   "confirmTransactionContentNoActiveAccount": "활성 계정 없음",
   "confirmTransactionContentFailedLoadTransfer": "전송 세부 정보 로드 실패",
   "confirmTransactionEditGasButtonText": "가스 수정",
-
   "authReason": "인증하세요",
   "addChainModalContentWarning": "네트워크 사기 및 보안 위험 주의.",
   "addChainModalContentApprove": "승인",
@@ -419,7 +294,6 @@
   "addAddressModalAddressEmptyError": "주소 비울 수 없음",
   "addAddressModalButton": "연락처 추가",
   "tokenSelectModalContentSearchHint": "검색",
-
   "signMessageModalContentAuthReason": "메시지 서명 인증",
   "signMessageModalContentFailedToSign": "서명 실패: {error}",
   "signMessageModalContentTitle": "메시지 서명",
@@ -432,20 +306,11 @@
   "signMessageModalContentPasswordHint": "비밀번호",
   "signMessageModalContentProcessing": "처리 중...",
   "signMessageModalContentSign": "메시지 서명",
-  "signMessageModalContentScanning": "Ledger 기기 스캔 중...",
-  "signMessageModalContentNoLedgerDevices": "Ledger 기기 없음",
-  "signMessageModalContentWalletNotSelected": "지갑 선택 안 함",
-  "signMessageModalContentLedgerNotSelected": "Ledger 기기 선택 안 함",
-  "signMessageModalContentFailedToScanLedger": "Ledger 기기 스캔 실패: {error}",
-  "signMessageModalContentFailedToSignMessage": "메시지 서명 실패: {error}",
-  "signMessageModalContentBluetoothOff": "Bluetooth 꺼짐. Ledger 기기 스캔을 위해 활성화하세요.",
-
   "deleteWalletModalTitle": "지갑 삭제",
   "deleteWalletModalWarning": "경고: 이 작업 취소 불가. 비밀 구문으로만 지갑 복구 가능. 액세스 없으면 계정 관련 모든 자금 영구 손실.",
   "deleteWalletModalSecretPhraseWarning": "진행 전에 비밀 구문 액세스 확인하세요.",
   "deleteWalletModalPasswordHint": "비밀번호 입력",
   "deleteWalletModalSubmit": "파괴",
-
   "addressSelectModalContentTitle": "주소 선택",
   "addressSelectModalContentSearchHint": "검색 / 주소 / ENS",
   "addressSelectModalContentUnknown": "알 수 없음",
@@ -453,7 +318,6 @@
   "addressSelectModalContentAddressBook": "주소록",
   "addressSelectModalContentHistory": "기록",
   "addressSelectModalContentSender": "발신자",
-
   "changePasswordModalTitle": "비밀번호 변경",
   "changePasswordModalDescription": "현재 비밀번호 입력 후 새 비밀번호 선택하여 지갑 보안 업데이트.",
   "changePasswordModalCurrentPasswordHint": "현재 비밀번호",
@@ -471,16 +335,10 @@
   "confirmPasswordModalButton": "확인",
   "qrScannerModalContentTitle": "스캔",
   "qrScannerModalContentCameraInitError": "카메라 초기화 오류:",
-  "qrScannerModalContentTorchError": "토치 토글 실패:",
-  "qrScannerModalContentOpenSettings": "설정 열기",
   "chainInfoModalContentTokenTitle": "네트워크 토큰",
-  
   "chainInfoModalContentNetworkInfoTitle": "네트워크 정보",
-  
   "chainInfoModalContentChainLabel": "체인",
-  
   "chainInfoModalContentShortNameLabel": "짧은 이름",
-  
   "chainInfoModalContentChainIdLabel": "체인 ID",
   "chainInfoModalContentSlip44Label": "Slip44",
   "chainInfoModalContentChainIdsLabel": "체인 ID",
@@ -494,7 +352,6 @@
   "chainInfoModalContentExplorersTitle": "탐색기",
   "chainInfoModalContentDeleteProviderTitle": "네트워크 삭제",
   "chainInfoModalContentSwipeToDelete": "네트워크 삭제",
-
   "switchChainNetworkContentTitle": "네트워크 선택",
   "switchChainNetworkContentButton": "네트워크 전환",
   "switchChainNetworkContentTestnetLabel": "테스트넷",
@@ -509,7 +366,6 @@
   "connectedDappsModalNoDapps": "연결된 DApps 없음",
   "dappListItemConnected": "{time} 연결됨",
   "dappListItemJustNow": "방금",
-
   "secretRecoveryModalRevealPhraseTitle": "비밀 복구 구문 공개",
   "secretRecoveryModalRevealPhraseDescription": "브라우저 변경 또는 컴퓨터 이동 시 계정 액세스에 이 비밀 복구 구문 필요. 안전한 곳에 비밀스럽게 저장하세요.",
   "secretRecoveryModalRevealPhraseButton": "공개",
@@ -569,13 +425,10 @@
   "amountSection_rejected": "거부됨",
   "appConnectModalContent_swipeToConnect": "스와이프 연결",
   "appConnectModalContent_noAccounts": "사용 가능한 계정 없음",
-
   "browserActionMenuShare": "공유",
   "browserActionMenuCopyLink": "링크 복사",
-  "browserActionMenuClose": "닫기",
   "browserActionMenuRefresh": "새로고침",
   "browserActionMenuUrlBarTop": "URL바 상단 배치",
-
   "keystoreBackupTitle": "키스토어 백업",
   "keystoreBackupWarningTitle": "키스토어 파일 보호",
   "keystoreBackupWarningMessage": "키스토어 파일에 암호화된 개인 키 포함. 안전한 위치에 보관하고 공유 금지. 파일 복호화에 생성 비밀번호 필요.",
@@ -592,51 +445,31 @@
   "keystoreBackupSaveFailed": "키스토어 파일 저장 실패",
   "keystoreBackupPasswordTooShort": "비밀번호 최소 8자",
   "keystoreBackupTempLocation": "임시 파일 위치",
-
   "keystorePasswordHint": "키스토어 비밀번호 입력",
   "keystoreRestoreButton": "지갑 복원",
   "keystoreRestoreExtError": "유효한 .zp 파일 선택",
   "keystoreRestoreNoFile": "키스토어 파일 없음",
   "keystoreRestoreFilesTitle": "키스토어 파일",
-
   "editGasDialogTitle": "가스 매개변수 수정",
   "editGasDialogGasPrice": "가스 가격",
   "editGasDialogMaxPriorityFee": "최대 우선 수수료",
   "editGasDialogGasLimit": "가스 제한",
-  "editGasDialogCancel": "취소",
-  "editGasDialogSave": "저장",
   "editGasDialogInvalidGasValues": "잘못된 가스 값. 입력 확인.",
-
   "addLedgerAccountPageAppBarTitle": "Ledger 계정 추가",
   "addLedgerAccountPageGetAccountsButton": "계정 가져오기",
   "addLedgerAccountPageCreateButton": "생성",
   "addLedgerAccountPageAddButton": "업데이트",
-  "addLedgerAccountPageScanningMessage": "Ledger 기기 스캔 중...",
-  "addLedgerAccountPageNoDevicesMessage": "Ledger 기기 없음",
-  "addLedgerAccountPageBluetoothOffError": "Bluetooth 꺼짐. Ledger 기기 스캔을 위해 활성화하세요.",
-  "addLedgerAccountPageEmptyWalletNameError": "지갑 이름 비울 수 없음",
-  "addLedgerAccountPageWalletNameTooLongError": "지갑 이름 너무 길음 (최대 24자)",
-  "addLedgerAccountPageFailedToScanError": "Ledger 기기 스캔 실패: {error}",
-  "addLedgerAccountPageNetworkOrLedgerMissingError": "네트워크 또는 Ledger 데이터 없음",
   "addLedgerAccountPageNoAccountsSelectedError": "선택된 계정 없음",
   "addLedgerAccountPageNoWalletSelectedError": "선택된 지갑 없음",
-
   "transactionHistoryTitle": "거래 내역",
   "transactionHistoryDescription": "주소록에 거래 내역 주소 표시.",
-
   "zilStakePageTitle": "Zilliqa 스테이킹",
   "noStakingPoolsFound": "스테이킹 풀 없음",
-  "aprSort": "APR",
-  "commissionSort": "수수료",
-  "tvlSort": "TVL",
   "claimButton": "청구",
   "stakeButton": "스테이크",
   "unstakeButton": "언스테이크",
-  "reinvest": "재투자",
   "aprLabel": "APR",
   "commissionLabel": "수수료",
-  "tvlLabel": "TVL",
-  "lpStakingBadge": "LP 스테이킹",
   "stakedAmount": "스테이크됨",
   "rewardsAvailable": "보상",
   "pendingWithdrawals": "대기 인출",
@@ -647,61 +480,27 @@
   "currentBlock": "현재 블록",
   "version": "버전",
   "rewardsProgressTitle": "보상 진행",
-
-   "ledgerConnectPageTitle": "Ledger 연결",
+  "ledgerConnectPageTitle": "Ledger 연결",
   "ledgerConnectPageInitializing": "초기화 중...",
-  "ledgerConnectPageReadyToScan": "스캔 준비. 새로고침 버튼 누르세요.",
-  "ledgerConnectPageInitializationError": "Ledger 초기화 오류: {error}",
-  "ledgerConnectPageInitErrorTitle": "초기화 오류",
-  "ledgerConnectPageInitErrorContent": "Ledger 인터페이스 초기화 실패: {error}",
-  "ledgerConnectPageBluetoothOffStatus": "Bluetooth 꺼짐. 기기에서 Bluetooth 활성화하세요.",
-  "ledgerConnectPageBluetoothOffTitle": "Bluetooth 꺼짐",
-  "ledgerConnectPageBluetoothOffContent": "기기 설정에서 Bluetooth 켜고 다시 시도하세요.",
-  "ledgerConnectPagePermissionDeniedStatus": "Bluetooth 권한 거부. 설정에서 활성화하세요.",
-  "ledgerConnectPagePermissionRequiredTitle": "권한 필요",
-  "ledgerConnectPagePermissionDeniedTitle": "권한 거부",
-  "ledgerConnectPagePermissionDeniedContent": "Ledger 기기 스캔에 Bluetooth 권한 필요. 설정에서 권한 부여하세요.",
-  "ledgerConnectPagePermissionDeniedContentIOS": "Ledger 기기 스캔에 Bluetooth 권한 필요. 기기 설정에서 Bluetooth 권한 활성화하세요.",
-  "ledgerConnectPageUnsupportedStatus": "이 기기에서 Bluetooth LE 지원 안 함.",
-  "ledgerConnectPageUnsupportedTitle": "지원되지 않는 기기",
-  "ledgerConnectPageUnsupportedContent": "Ledger 기기 무선 연결에 필요한 Bluetooth Low Energy 지원 안 됨.",
   "ledgerConnectPageScanningStatus": "Ledger 기기 스캔 중...",
   "ledgerConnectPageFoundDevicesStatus": "{count} 기기 발견...",
   "ledgerConnectPageScanErrorStatus": "스캔 오류: {error}",
-  "ledgerConnectPageScanErrorTitle": "스캔 오류",
   "ledgerConnectPageScanFinishedNoDevices": "스캔 완료. 기기 없음.",
   "ledgerConnectPageScanFinishedWithDevices": "스캔 완료. {count} 기기 발견. 연결할 하나 선택.",
-  "ledgerConnectPageFailedToStartScan": "스캔 시작 실패: {error}",
-  "ledgerConnectPageScanStopped": "스캔 중지.",
-  "ledgerConnectPageScanStoppedWithDevices": "스캔 중지. {count} 기기 발견.",
   "ledgerConnectPageConnectingStatus": "{deviceName} ({connectionType}) 연결 중...",
-  "ledgerConnectPageConnectionTimeoutError": "{seconds}초 후 연결 시간 초과",
-  "ledgerConnectPageInterfaceUnavailableError": "적절한 Ledger 인터페이스 사용 불가.",
   "ledgerConnectPageConnectionSuccessStatus": "{deviceName} 연결 성공!",
-  "ledgerConnectPageConnectionFailedTimeoutStatus": "연결 실패: {count} 시도 후 시간 초과",
   "ledgerConnectPageConnectionFailedTitle": "연결 실패",
-  "ledgerConnectPageConnectionFailedTimeoutContent": "{count} 시도 후 연결 시간 초과. 기기 잠금 해제 확인 후 다시 시도하세요.",
   "ledgerConnectPageConnectionFailedErrorStatus": "연결 실패: {error}",
-  "ledgerConnectPageConnectionFailedLedgerErrorContent": "Ledger 오류: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "{deviceName} 연결 불가.\n오류: {error}",
-  "ledgerConnectPageDeviceDisconnected": "기기 연결 해제.",
-  "ledgerConnectPageListenerStopped": "리스너 중지.",
-  "ledgerConnectPageFailedToMonitorDisconnects": "연결 해제 모니터링 실패.",
-  "ledgerConnectPageDisconnectingStatus": "{deviceName} 연결 해제 중...",
   "ledgerConnectPageDisconnectedStatus": "{deviceName} 연결 해제.",
-  "ledgerConnectPageDisconnectErrorStatus": "{deviceName} 연결 해제 오류.",
   "ledgerConnectPageGoToSettings": "설정으로 이동",
   "ledgerConnectPageNoDevicesFound": "기기 없음. Ledger 전원 켜기, 잠금 해제, Bluetooth/USB 활성화 확인.\n아래로 끌기 또는 새로고침 아이콘으로 다시 스캔.",
-  "ledgerConnectPageDisconnectButton": "{deviceName} 연결 해제",
-  "unknownDevice": "알 수 없음",
-
   "durationDay": "일",
   "durationHour": "시간",
   "durationMinute": "분",
   "durationLessThanAMinute": "< 1분",
   "durationNotAvailable": "N/A",
   "nodes": "노드",
-
   "manageTokensPageTitle": "토큰",
   "manageTokensSearchHint": "토큰 검색 또는 주소 붙여넣기",
   "manageTokensFoundToken": "찾은 토큰",
@@ -710,7 +509,6 @@
   "manageTokensFetchError": "토큰 가져오기 실패",
   "manageTokensWrongChain": "토큰이 다른 체인에 속함",
   "manageTokensClear": "지우기",
-
   "signedMessageTypePersonalSign": "개인 서명",
   "signedMessageTypeEip712": "EIP-712",
   "signedMessageTypeUnknown": "알 수 없음",
@@ -725,11 +523,9 @@
   "signedMessageData": "메시지 데이터",
   "signedMessageContent": "내용",
   "signedMessageMessage": "메시지",
-
   "web3ErrorNoMethod": "메서드가 지정되지 않았습니다",
   "web3ErrorUnsupportedMethod": "메서드 \"{method}\"는 지원되지 않습니다",
   "web3ErrorRequestInProgress": "유사한 요청이 이미 처리 중입니다",
-  "web3ErrorUnknownRpc": "알 수 없는 RPC 오류",
   "web3ErrorNotConnected": "이 도메인이 연결되지 않았습니다. 먼저 연결하세요.",
   "web3ErrorInvalidParams": "{method}에 대한 매개변수가 유효하지 않습니다. 필요: {params}",
   "web3ErrorAddressNotAuthorized": "요청한 주소가 승인되지 않았습니다",

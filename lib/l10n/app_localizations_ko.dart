@@ -105,9 +105,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get languagePageTitle => '언어';
 
   @override
-  String get languagePageSystem => '시스템';
-
-  @override
   String get secretKeyGeneratorPageTitle => '비밀 키';
 
   @override
@@ -121,9 +118,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get secretKeyGeneratorPageNextButton => '다음';
-
-  @override
-  String get walletPageTitle => '';
 
   @override
   String get walletPageWalletNameHint => '지갑 이름';
@@ -147,16 +141,7 @@ class AppLocalizationsKo extends AppLocalizations {
   String get networkPageTitle => '';
 
   @override
-  String get networkPageShowTestnet => '테스트넷 표시';
-
-  @override
   String get networkPageSearchHint => '검색';
-
-  @override
-  String get networkPageAddedNetworks => '추가된 네트워크';
-
-  @override
-  String get networkPageAvailableNetworks => '사용 가능한 네트워크';
 
   @override
   String get networkPageAddError => '네트워크 추가 실패: ';
@@ -239,18 +224,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get securityPageUnknown => '알 수 없음';
 
   @override
-  String get webViewPageDntLabel => 'DNT';
-
-  @override
-  String get webViewPageIncognitoLabel => '시크릿 모드';
-
-  @override
-  String get webViewPageLoadError => '로드 실패';
-
-  @override
-  String get webViewPageTryAgain => '다시 시도';
-
-  @override
   String get secretPhraseGeneratorPageTitle => '새 지갑';
 
   @override
@@ -261,9 +234,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get homePageErrorTitle => '신호 없음';
-
-  @override
-  String get homePageSendButton => '보내기';
 
   @override
   String get homePageReceiveButton => '수신';
@@ -296,9 +266,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get revealSecretKeyRevealAfter => '비밀 키 공개 시간:';
 
   @override
-  String get setupNetworkSettingsPageTestnetSwitch => '테스트넷';
-
-  @override
   String get setupNetworkSettingsPageSearchHint => '검색';
 
   @override
@@ -311,12 +278,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '다음';
-
-  @override
-  String get setupNetworkSettingsPageTestnetLabel => '테스트넷';
-
-  @override
-  String get setupNetworkSettingsPageMainnetLabel => '메인넷';
 
   @override
   String get setupNetworkSettingsPageChainIdLabel => '체인 ID:';
@@ -469,12 +430,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get delete => '삭제';
-
-  @override
-  String get browserPageExploreTab => '탐색';
-
-  @override
-  String get browserPageNoExploreApps => '탐색할 앱 없음';
 
   @override
   String browserPageSearchHint(Object engine) {
@@ -997,31 +952,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get signMessageModalContentSign => '메시지 서명';
 
   @override
-  String get signMessageModalContentScanning => 'Ledger 기기 스캔 중...';
-
-  @override
-  String get signMessageModalContentNoLedgerDevices => 'Ledger 기기 없음';
-
-  @override
-  String get signMessageModalContentWalletNotSelected => '지갑 선택 안 함';
-
-  @override
-  String get signMessageModalContentLedgerNotSelected => 'Ledger 기기 선택 안 함';
-
-  @override
-  String signMessageModalContentFailedToScanLedger(Object error) {
-    return 'Ledger 기기 스캔 실패: $error';
-  }
-
-  @override
-  String signMessageModalContentFailedToSignMessage(Object error) {
-    return '메시지 서명 실패: $error';
-  }
-
-  @override
-  String get signMessageModalContentBluetoothOff => 'Bluetooth 꺼짐. Ledger 기기 스캔을 위해 활성화하세요.';
-
-  @override
   String get deleteWalletModalTitle => '지갑 삭제';
 
   @override
@@ -1107,12 +1037,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get qrScannerModalContentCameraInitError => '카메라 초기화 오류:';
-
-  @override
-  String get qrScannerModalContentTorchError => '토치 토글 실패:';
-
-  @override
-  String get qrScannerModalContentOpenSettings => '설정 열기';
 
   @override
   String get chainInfoModalContentTokenTitle => '네트워크 토큰';
@@ -1393,9 +1317,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get browserActionMenuCopyLink => '링크 복사';
 
   @override
-  String get browserActionMenuClose => '닫기';
-
-  @override
   String get browserActionMenuRefresh => '새로고침';
 
   @override
@@ -1477,12 +1398,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get editGasDialogGasLimit => '가스 제한';
 
   @override
-  String get editGasDialogCancel => '취소';
-
-  @override
-  String get editGasDialogSave => '저장';
-
-  @override
   String get editGasDialogInvalidGasValues => '잘못된 가스 값. 입력 확인.';
 
   @override
@@ -1496,29 +1411,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageAddButton => '업데이트';
-
-  @override
-  String get addLedgerAccountPageScanningMessage => 'Ledger 기기 스캔 중...';
-
-  @override
-  String get addLedgerAccountPageNoDevicesMessage => 'Ledger 기기 없음';
-
-  @override
-  String get addLedgerAccountPageBluetoothOffError => 'Bluetooth 꺼짐. Ledger 기기 스캔을 위해 활성화하세요.';
-
-  @override
-  String get addLedgerAccountPageEmptyWalletNameError => '지갑 이름 비울 수 없음';
-
-  @override
-  String get addLedgerAccountPageWalletNameTooLongError => '지갑 이름 너무 길음 (최대 24자)';
-
-  @override
-  String addLedgerAccountPageFailedToScanError(Object error) {
-    return 'Ledger 기기 스캔 실패: $error';
-  }
-
-  @override
-  String get addLedgerAccountPageNetworkOrLedgerMissingError => '네트워크 또는 Ledger 데이터 없음';
 
   @override
   String get addLedgerAccountPageNoAccountsSelectedError => '선택된 계정 없음';
@@ -1539,15 +1431,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get noStakingPoolsFound => '스테이킹 풀 없음';
 
   @override
-  String get aprSort => 'APR';
-
-  @override
-  String get commissionSort => '수수료';
-
-  @override
-  String get tvlSort => 'TVL';
-
-  @override
   String get claimButton => '청구';
 
   @override
@@ -1557,19 +1440,10 @@ class AppLocalizationsKo extends AppLocalizations {
   String get unstakeButton => '언스테이크';
 
   @override
-  String get reinvest => '재투자';
-
-  @override
   String get aprLabel => 'APR';
 
   @override
   String get commissionLabel => '수수료';
-
-  @override
-  String get tvlLabel => 'TVL';
-
-  @override
-  String get lpStakingBadge => 'LP 스테이킹';
 
   @override
   String get stakedAmount => '스테이크됨';
@@ -1608,55 +1482,6 @@ class AppLocalizationsKo extends AppLocalizations {
   String get ledgerConnectPageInitializing => '초기화 중...';
 
   @override
-  String get ledgerConnectPageReadyToScan => '스캔 준비. 새로고침 버튼 누르세요.';
-
-  @override
-  String ledgerConnectPageInitializationError(String error) {
-    return 'Ledger 초기화 오류: $error';
-  }
-
-  @override
-  String get ledgerConnectPageInitErrorTitle => '초기화 오류';
-
-  @override
-  String ledgerConnectPageInitErrorContent(String error) {
-    return 'Ledger 인터페이스 초기화 실패: $error';
-  }
-
-  @override
-  String get ledgerConnectPageBluetoothOffStatus => 'Bluetooth 꺼짐. 기기에서 Bluetooth 활성화하세요.';
-
-  @override
-  String get ledgerConnectPageBluetoothOffTitle => 'Bluetooth 꺼짐';
-
-  @override
-  String get ledgerConnectPageBluetoothOffContent => '기기 설정에서 Bluetooth 켜고 다시 시도하세요.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedStatus => 'Bluetooth 권한 거부. 설정에서 활성화하세요.';
-
-  @override
-  String get ledgerConnectPagePermissionRequiredTitle => '권한 필요';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedTitle => '권한 거부';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContent => 'Ledger 기기 스캔에 Bluetooth 권한 필요. 설정에서 권한 부여하세요.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContentIOS => 'Ledger 기기 스캔에 Bluetooth 권한 필요. 기기 설정에서 Bluetooth 권한 활성화하세요.';
-
-  @override
-  String get ledgerConnectPageUnsupportedStatus => '이 기기에서 Bluetooth LE 지원 안 함.';
-
-  @override
-  String get ledgerConnectPageUnsupportedTitle => '지원되지 않는 기기';
-
-  @override
-  String get ledgerConnectPageUnsupportedContent => 'Ledger 기기 무선 연결에 필요한 Bluetooth Low Energy 지원 안 됨.';
-
-  @override
   String get ledgerConnectPageScanningStatus => 'Ledger 기기 스캔 중...';
 
   @override
@@ -1670,9 +1495,6 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanErrorTitle => '스캔 오류';
-
-  @override
   String get ledgerConnectPageScanFinishedNoDevices => '스캔 완료. 기기 없음.';
 
   @override
@@ -1681,30 +1503,9 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageFailedToStartScan(String error) {
-    return '스캔 시작 실패: $error';
-  }
-
-  @override
-  String get ledgerConnectPageScanStopped => '스캔 중지.';
-
-  @override
-  String ledgerConnectPageScanStoppedWithDevices(int count) {
-    return '스캔 중지. $count 기기 발견.';
-  }
-
-  @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return '$deviceName ($connectionType) 연결 중...';
   }
-
-  @override
-  String ledgerConnectPageConnectionTimeoutError(int seconds) {
-    return '$seconds초 후 연결 시간 초과';
-  }
-
-  @override
-  String get ledgerConnectPageInterfaceUnavailableError => '적절한 Ledger 인터페이스 사용 불가.';
 
   @override
   String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
@@ -1712,26 +1513,11 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
-    return '연결 실패: $count 시도 후 시간 초과';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => '연결 실패';
-
-  @override
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
-    return '$count 시도 후 연결 시간 초과. 기기 잠금 해제 확인 후 다시 시도하세요.';
-  }
 
   @override
   String ledgerConnectPageConnectionFailedErrorStatus(String error) {
     return '연결 실패: $error';
-  }
-
-  @override
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
-    return 'Ledger 오류: $error';
   }
 
   @override
@@ -1740,27 +1526,8 @@ class AppLocalizationsKo extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageDeviceDisconnected => '기기 연결 해제.';
-
-  @override
-  String get ledgerConnectPageListenerStopped => '리스너 중지.';
-
-  @override
-  String get ledgerConnectPageFailedToMonitorDisconnects => '연결 해제 모니터링 실패.';
-
-  @override
-  String ledgerConnectPageDisconnectingStatus(String deviceName) {
-    return '$deviceName 연결 해제 중...';
-  }
-
-  @override
   String ledgerConnectPageDisconnectedStatus(String deviceName) {
     return '$deviceName 연결 해제.';
-  }
-
-  @override
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
-    return '$deviceName 연결 해제 오류.';
   }
 
   @override
@@ -1768,14 +1535,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get ledgerConnectPageNoDevicesFound => '기기 없음. Ledger 전원 켜기, 잠금 해제, Bluetooth/USB 활성화 확인.\n아래로 끌기 또는 새로고침 아이콘으로 다시 스캔.';
-
-  @override
-  String ledgerConnectPageDisconnectButton(String deviceName) {
-    return '$deviceName 연결 해제';
-  }
-
-  @override
-  String get unknownDevice => '알 수 없음';
 
   @override
   String get durationDay => '일';
@@ -1871,9 +1630,6 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get web3ErrorRequestInProgress => '유사한 요청이 이미 처리 중입니다';
-
-  @override
-  String get web3ErrorUnknownRpc => '알 수 없는 RPC 오류';
 
   @override
   String get web3ErrorNotConnected => '이 도메인이 연결되지 않았습니다. 먼저 연결하세요.';

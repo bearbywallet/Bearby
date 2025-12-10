@@ -105,9 +105,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get languagePageTitle => '言語';
 
   @override
-  String get languagePageSystem => 'システム';
-
-  @override
   String get secretKeyGeneratorPageTitle => '秘密鍵';
 
   @override
@@ -121,9 +118,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get secretKeyGeneratorPageNextButton => '次へ';
-
-  @override
-  String get walletPageTitle => '';
 
   @override
   String get walletPageWalletNameHint => 'ウォレット名';
@@ -147,16 +141,7 @@ class AppLocalizationsJa extends AppLocalizations {
   String get networkPageTitle => '';
 
   @override
-  String get networkPageShowTestnet => 'テストネットを表示';
-
-  @override
   String get networkPageSearchHint => '検索';
-
-  @override
-  String get networkPageAddedNetworks => '追加したネットワーク';
-
-  @override
-  String get networkPageAvailableNetworks => '利用可能なネットワーク';
 
   @override
   String get networkPageAddError => 'ネットワークの追加に失敗: ';
@@ -239,18 +224,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get securityPageUnknown => '不明';
 
   @override
-  String get webViewPageDntLabel => 'DNT';
-
-  @override
-  String get webViewPageIncognitoLabel => 'シークレット';
-
-  @override
-  String get webViewPageLoadError => '読み込みに失敗';
-
-  @override
-  String get webViewPageTryAgain => '再試行';
-
-  @override
   String get secretPhraseGeneratorPageTitle => '新しいウォレット';
 
   @override
@@ -261,9 +234,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get homePageErrorTitle => '信号なし';
-
-  @override
-  String get homePageSendButton => '送信';
 
   @override
   String get homePageReceiveButton => '受信';
@@ -296,9 +266,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get revealSecretKeyRevealAfter => '秘密鍵は次の時間後に表示されます:';
 
   @override
-  String get setupNetworkSettingsPageTestnetSwitch => 'テストネット';
-
-  @override
   String get setupNetworkSettingsPageSearchHint => '検索';
 
   @override
@@ -311,12 +278,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => '次へ';
-
-  @override
-  String get setupNetworkSettingsPageTestnetLabel => 'テストネット';
-
-  @override
-  String get setupNetworkSettingsPageMainnetLabel => 'メインネット';
 
   @override
   String get setupNetworkSettingsPageChainIdLabel => 'チェーンID:';
@@ -469,12 +430,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get delete => '削除';
-
-  @override
-  String get browserPageExploreTab => '探索';
-
-  @override
-  String get browserPageNoExploreApps => '探索するアプリがまだありません';
 
   @override
   String browserPageSearchHint(Object engine) {
@@ -997,31 +952,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get signMessageModalContentSign => 'メッセージに署名';
 
   @override
-  String get signMessageModalContentScanning => 'Ledgerデバイスをスキャン中...';
-
-  @override
-  String get signMessageModalContentNoLedgerDevices => 'Ledgerデバイスが見つかりませんでした';
-
-  @override
-  String get signMessageModalContentWalletNotSelected => 'ウォレットが選択されていません';
-
-  @override
-  String get signMessageModalContentLedgerNotSelected => 'Ledgerデバイスが選択されていません';
-
-  @override
-  String signMessageModalContentFailedToScanLedger(Object error) {
-    return 'Ledgerデバイスのスキャンに失敗しました: $error';
-  }
-
-  @override
-  String signMessageModalContentFailedToSignMessage(Object error) {
-    return 'メッセージの署名に失敗しました: $error';
-  }
-
-  @override
-  String get signMessageModalContentBluetoothOff => 'Bluetoothがオフになっています。Ledgerデバイスのスキャンには有効にしてください。';
-
-  @override
   String get deleteWalletModalTitle => 'ウォレットを削除';
 
   @override
@@ -1107,12 +1037,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get qrScannerModalContentCameraInitError => 'カメラ初期化エラー:';
-
-  @override
-  String get qrScannerModalContentTorchError => 'トーチの切り替えに失敗:';
-
-  @override
-  String get qrScannerModalContentOpenSettings => '設定を開く';
 
   @override
   String get chainInfoModalContentTokenTitle => 'ネットワークトークン';
@@ -1393,9 +1317,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get browserActionMenuCopyLink => 'リンクをコピー';
 
   @override
-  String get browserActionMenuClose => '閉じる';
-
-  @override
   String get browserActionMenuRefresh => '更新';
 
   @override
@@ -1477,12 +1398,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get editGasDialogGasLimit => 'ガスリミット';
 
   @override
-  String get editGasDialogCancel => 'キャンセル';
-
-  @override
-  String get editGasDialogSave => '保存';
-
-  @override
   String get editGasDialogInvalidGasValues => '無効なガス値です。入力を確認してください。';
 
   @override
@@ -1496,29 +1411,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageAddButton => '追加';
-
-  @override
-  String get addLedgerAccountPageScanningMessage => 'Ledgerデバイスをスキャン中...';
-
-  @override
-  String get addLedgerAccountPageNoDevicesMessage => 'Ledgerデバイスが見つかりません';
-
-  @override
-  String get addLedgerAccountPageBluetoothOffError => 'Bluetoothがオフになっています。Ledgerデバイスをスキャンするためにオンにしてください。';
-
-  @override
-  String get addLedgerAccountPageEmptyWalletNameError => 'ウォレット名は空にできません';
-
-  @override
-  String get addLedgerAccountPageWalletNameTooLongError => 'ウォレット名が長すぎます（最大24文字）';
-
-  @override
-  String addLedgerAccountPageFailedToScanError(Object error) {
-    return 'Ledgerデバイスのスキャンに失敗しました：$error';
-  }
-
-  @override
-  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'ネットワークまたはLedgerデータが不足しています';
 
   @override
   String get addLedgerAccountPageNoAccountsSelectedError => 'アカウントが選択されていません';
@@ -1539,15 +1431,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get noStakingPoolsFound => 'ステーキングプールが見つかりません';
 
   @override
-  String get aprSort => 'APR';
-
-  @override
-  String get commissionSort => '手数料';
-
-  @override
-  String get tvlSort => 'TVL';
-
-  @override
   String get claimButton => '請求';
 
   @override
@@ -1557,19 +1440,10 @@ class AppLocalizationsJa extends AppLocalizations {
   String get unstakeButton => 'アンステーク';
 
   @override
-  String get reinvest => '再投資';
-
-  @override
   String get aprLabel => 'APR';
 
   @override
   String get commissionLabel => '手数料';
-
-  @override
-  String get tvlLabel => 'TVL';
-
-  @override
-  String get lpStakingBadge => 'LP ステーキング';
 
   @override
   String get stakedAmount => 'ステーク済み';
@@ -1608,55 +1482,6 @@ class AppLocalizationsJa extends AppLocalizations {
   String get ledgerConnectPageInitializing => '初期化中...';
 
   @override
-  String get ledgerConnectPageReadyToScan => 'スキャンの準備ができました。更新ボタンを押してください。';
-
-  @override
-  String ledgerConnectPageInitializationError(String error) {
-    return 'Ledgerの初期化エラー: $error';
-  }
-
-  @override
-  String get ledgerConnectPageInitErrorTitle => '初期化エラー';
-
-  @override
-  String ledgerConnectPageInitErrorContent(String error) {
-    return 'Ledgerインターフェースの初期化に失敗しました: $error';
-  }
-
-  @override
-  String get ledgerConnectPageBluetoothOffStatus => 'Bluetoothがオフです。デバイスのBluetoothを有効にしてください。';
-
-  @override
-  String get ledgerConnectPageBluetoothOffTitle => 'Bluetoothがオフです';
-
-  @override
-  String get ledgerConnectPageBluetoothOffContent => 'デバイスの設定でBluetoothをオンにして、もう一度お試しください。';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedStatus => 'Bluetoothの許可が拒否されました。設定で有効にしてください。';
-
-  @override
-  String get ledgerConnectPagePermissionRequiredTitle => '許可が必要です';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedTitle => '許可が拒否されました';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContent => 'LedgerデバイスをスキャンするにはBluetoothの許可が必要です。設定で許可してください。';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContentIOS => 'このアプリはLedgerデバイスをスキャンするためにBluetoothの許可が必要です。デバイスの設定でBluetoothの許可を有効にしてください。';
-
-  @override
-  String get ledgerConnectPageUnsupportedStatus => 'このデバイスはBluetooth LEをサポートしていません。';
-
-  @override
-  String get ledgerConnectPageUnsupportedTitle => 'サポートされていないデバイス';
-
-  @override
-  String get ledgerConnectPageUnsupportedContent => 'このデバイスは、Ledgerデバイスへのワイヤレス接続に必要なBluetooth Low Energyをサポートしていません。';
-
-  @override
   String get ledgerConnectPageScanningStatus => 'Ledgerデバイスをスキャン中...';
 
   @override
@@ -1670,9 +1495,6 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanErrorTitle => 'スキャンエラー';
-
-  @override
   String get ledgerConnectPageScanFinishedNoDevices => 'スキャンが完了しました。デバイスは見つかりませんでした。';
 
   @override
@@ -1681,30 +1503,9 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageFailedToStartScan(String error) {
-    return 'スキャンの開始に失敗しました: $error';
-  }
-
-  @override
-  String get ledgerConnectPageScanStopped => 'スキャンを停止しました。';
-
-  @override
-  String ledgerConnectPageScanStoppedWithDevices(int count) {
-    return 'スキャンを停止しました。$count台のデバイスが見つかりました。';
-  }
-
-  @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return '$deviceName（$connectionType）に接続中...';
   }
-
-  @override
-  String ledgerConnectPageConnectionTimeoutError(int seconds) {
-    return '$seconds秒後に接続がタイムアウトしました';
-  }
-
-  @override
-  String get ledgerConnectPageInterfaceUnavailableError => '適切なLedgerインターフェースが利用できません。';
 
   @override
   String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
@@ -1712,26 +1513,11 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
-    return '接続に失敗しました: $count回の試行後にタイムアウトしました';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => '接続に失敗しました';
-
-  @override
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
-    return '$count回の試行後に接続がタイムアウトしました。デバイスがロック解除されていることを確認して、もう一度お試しください。';
-  }
 
   @override
   String ledgerConnectPageConnectionFailedErrorStatus(String error) {
     return '接続に失敗しました: $error';
-  }
-
-  @override
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
-    return 'Ledgerエラー: $error';
   }
 
   @override
@@ -1740,27 +1526,8 @@ class AppLocalizationsJa extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageDeviceDisconnected => 'デバイスが切断されました。';
-
-  @override
-  String get ledgerConnectPageListenerStopped => 'リスナーが停止しました。';
-
-  @override
-  String get ledgerConnectPageFailedToMonitorDisconnects => '切断の監視に失敗しました。';
-
-  @override
-  String ledgerConnectPageDisconnectingStatus(String deviceName) {
-    return '$deviceNameから切断中...';
-  }
-
-  @override
   String ledgerConnectPageDisconnectedStatus(String deviceName) {
     return '$deviceNameから切断しました。';
-  }
-
-  @override
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
-    return '$deviceNameからの切断中にエラーが発生しました。';
   }
 
   @override
@@ -1768,14 +1535,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get ledgerConnectPageNoDevicesFound => 'デバイスが見つかりません。Ledgerの電源がオンで、ロックが解除されており、Bluetooth/USBが有効になっていることを確認してください。\n下にスワイプするか、更新アイコンを使用して再度スキャンしてください。';
-
-  @override
-  String ledgerConnectPageDisconnectButton(String deviceName) {
-    return '$deviceNameから切断';
-  }
-
-  @override
-  String get unknownDevice => '不明';
 
   @override
   String get durationDay => '日';
@@ -1871,9 +1630,6 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get web3ErrorRequestInProgress => '同様のリクエストがすでに処理中です';
-
-  @override
-  String get web3ErrorUnknownRpc => '不明なRPCエラー';
 
   @override
   String get web3ErrorNotConnected => 'このドメインは接続されていません。まず接続してください。';

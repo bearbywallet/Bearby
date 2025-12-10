@@ -105,9 +105,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get languagePageTitle => 'Язык';
 
   @override
-  String get languagePageSystem => 'Системный';
-
-  @override
   String get secretKeyGeneratorPageTitle => 'Секретный ключ';
 
   @override
@@ -121,9 +118,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get secretKeyGeneratorPageNextButton => 'Далее';
-
-  @override
-  String get walletPageTitle => '';
 
   @override
   String get walletPageWalletNameHint => 'Название кошелька';
@@ -147,16 +141,7 @@ class AppLocalizationsRu extends AppLocalizations {
   String get networkPageTitle => '';
 
   @override
-  String get networkPageShowTestnet => 'Показать тестовую сеть';
-
-  @override
   String get networkPageSearchHint => 'Поиск';
-
-  @override
-  String get networkPageAddedNetworks => 'Добавленные сети';
-
-  @override
-  String get networkPageAvailableNetworks => 'Доступные сети';
 
   @override
   String get networkPageAddError => 'Не удалось добавить сеть: ';
@@ -239,18 +224,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get securityPageUnknown => 'Неизвестно';
 
   @override
-  String get webViewPageDntLabel => 'DNT';
-
-  @override
-  String get webViewPageIncognitoLabel => 'Инкогнито';
-
-  @override
-  String get webViewPageLoadError => 'Ошибка загрузки';
-
-  @override
-  String get webViewPageTryAgain => 'Попробовать снова';
-
-  @override
   String get secretPhraseGeneratorPageTitle => 'Новый кошелек';
 
   @override
@@ -261,9 +234,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get homePageErrorTitle => 'Нет сигнала';
-
-  @override
-  String get homePageSendButton => 'Отправить';
 
   @override
   String get homePageReceiveButton => 'Получить';
@@ -296,9 +266,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get revealSecretKeyRevealAfter => 'Ваш секретный ключ будет раскрыт через:';
 
   @override
-  String get setupNetworkSettingsPageTestnetSwitch => 'Тестовая сеть';
-
-  @override
   String get setupNetworkSettingsPageSearchHint => 'Поиск';
 
   @override
@@ -311,12 +278,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get setupNetworkSettingsPageNextButton => 'Далее';
-
-  @override
-  String get setupNetworkSettingsPageTestnetLabel => 'Тестовая сеть';
-
-  @override
-  String get setupNetworkSettingsPageMainnetLabel => 'Основная сеть';
 
   @override
   String get setupNetworkSettingsPageChainIdLabel => 'ID цепи:';
@@ -469,12 +430,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get delete => 'Удалить';
-
-  @override
-  String get browserPageExploreTab => 'Обзор';
-
-  @override
-  String get browserPageNoExploreApps => 'Пока нет приложений для обзора';
 
   @override
   String browserPageSearchHint(Object engine) {
@@ -997,31 +952,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get signMessageModalContentSign => 'Подписать сообщение';
 
   @override
-  String get signMessageModalContentScanning => 'Сканирование устройств Ledger...';
-
-  @override
-  String get signMessageModalContentNoLedgerDevices => 'Устройства Ledger не найдены';
-
-  @override
-  String get signMessageModalContentWalletNotSelected => 'Кошелёк не выбран';
-
-  @override
-  String get signMessageModalContentLedgerNotSelected => 'Устройство Ledger не выбрано';
-
-  @override
-  String signMessageModalContentFailedToScanLedger(Object error) {
-    return 'Не удалось сканировать устройства Ledger: $error';
-  }
-
-  @override
-  String signMessageModalContentFailedToSignMessage(Object error) {
-    return 'Не удалось подписать сообщение: $error';
-  }
-
-  @override
-  String get signMessageModalContentBluetoothOff => 'Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.';
-
-  @override
   String get deleteWalletModalTitle => 'Удалить кошелек';
 
   @override
@@ -1107,12 +1037,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get qrScannerModalContentCameraInitError => 'Ошибка инициализации камеры:';
-
-  @override
-  String get qrScannerModalContentTorchError => 'Не удалось переключить вспышку:';
-
-  @override
-  String get qrScannerModalContentOpenSettings => 'Открыть настройки';
 
   @override
   String get chainInfoModalContentTokenTitle => 'Токен сети';
@@ -1393,9 +1317,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get browserActionMenuCopyLink => 'Копировать ссылку';
 
   @override
-  String get browserActionMenuClose => 'Закрыть';
-
-  @override
   String get browserActionMenuRefresh => 'Обновить';
 
   @override
@@ -1477,12 +1398,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get editGasDialogGasLimit => 'Лимит газа';
 
   @override
-  String get editGasDialogCancel => 'Отмена';
-
-  @override
-  String get editGasDialogSave => 'Сохранить';
-
-  @override
   String get editGasDialogInvalidGasValues => 'Недопустимые значения газа. Проверьте ваши данные.';
 
   @override
@@ -1496,29 +1411,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get addLedgerAccountPageAddButton => 'Обновить';
-
-  @override
-  String get addLedgerAccountPageScanningMessage => 'Сканирование устройств Ledger...';
-
-  @override
-  String get addLedgerAccountPageNoDevicesMessage => 'Устройства Ledger не найдены';
-
-  @override
-  String get addLedgerAccountPageBluetoothOffError => 'Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.';
-
-  @override
-  String get addLedgerAccountPageEmptyWalletNameError => 'Имя кошелька не может быть пустым';
-
-  @override
-  String get addLedgerAccountPageWalletNameTooLongError => 'Имя кошелька слишком длинное (максимум 24 символа)';
-
-  @override
-  String addLedgerAccountPageFailedToScanError(Object error) {
-    return 'Не удалось отсканировать устройства Ledger: $error';
-  }
-
-  @override
-  String get addLedgerAccountPageNetworkOrLedgerMissingError => 'Отсутствуют данные сети или Ledger';
 
   @override
   String get addLedgerAccountPageNoAccountsSelectedError => 'Аккаунты не выбраны';
@@ -1539,15 +1431,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get noStakingPoolsFound => 'Пулы для стейкинга не найдены';
 
   @override
-  String get aprSort => 'APR';
-
-  @override
-  String get commissionSort => 'Комиссия';
-
-  @override
-  String get tvlSort => 'TVL';
-
-  @override
   String get claimButton => 'Забрать';
 
   @override
@@ -1557,19 +1440,10 @@ class AppLocalizationsRu extends AppLocalizations {
   String get unstakeButton => 'Отозвать';
 
   @override
-  String get reinvest => 'Реинвест';
-
-  @override
   String get aprLabel => 'APR';
 
   @override
   String get commissionLabel => 'Комиссия';
-
-  @override
-  String get tvlLabel => 'TVL';
-
-  @override
-  String get lpStakingBadge => 'LP';
 
   @override
   String get stakedAmount => 'Заблокировано';
@@ -1608,55 +1482,6 @@ class AppLocalizationsRu extends AppLocalizations {
   String get ledgerConnectPageInitializing => 'Инициализация...';
 
   @override
-  String get ledgerConnectPageReadyToScan => 'Готово к сканированию. Нажмите кнопку обновления.';
-
-  @override
-  String ledgerConnectPageInitializationError(String error) {
-    return 'Ошибка инициализации Ledger: $error';
-  }
-
-  @override
-  String get ledgerConnectPageInitErrorTitle => 'Ошибка инициализации';
-
-  @override
-  String ledgerConnectPageInitErrorContent(String error) {
-    return 'Не удалось инициализировать интерфейсы Ledger: $error';
-  }
-
-  @override
-  String get ledgerConnectPageBluetoothOffStatus => 'Bluetooth выключен. Пожалуйста, включите Bluetooth на вашем устройстве.';
-
-  @override
-  String get ledgerConnectPageBluetoothOffTitle => 'Bluetooth выключен';
-
-  @override
-  String get ledgerConnectPageBluetoothOffContent => 'Пожалуйста, включите Bluetooth в настройках вашего устройства и попробуйте снова.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedStatus => 'В разрешении на использование Bluetooth отказано. Пожалуйста, включите в настройках.';
-
-  @override
-  String get ledgerConnectPagePermissionRequiredTitle => 'Требуется разрешение';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedTitle => 'В разрешении отказано';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContent => 'Для сканирования устройств Ledger требуются разрешения Bluetooth. Пожалуйста, предоставьте разрешения в настройках.';
-
-  @override
-  String get ledgerConnectPagePermissionDeniedContentIOS => 'Этому приложению требуется разрешение на использование Bluetooth для поиска устройств Ledger. Пожалуйста, включите разрешение Bluetooth в настройках вашего устройства.';
-
-  @override
-  String get ledgerConnectPageUnsupportedStatus => 'Bluetooth LE не поддерживается на этом устройстве.';
-
-  @override
-  String get ledgerConnectPageUnsupportedTitle => 'Неподдерживаемое устройство';
-
-  @override
-  String get ledgerConnectPageUnsupportedContent => 'Это устройство не поддерживает Bluetooth Low Energy, который необходим для беспроводного подключения к устройствам Ledger.';
-
-  @override
   String get ledgerConnectPageScanningStatus => 'Поиск устройств Ledger...';
 
   @override
@@ -1670,9 +1495,6 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageScanErrorTitle => 'Ошибка сканирования';
-
-  @override
   String get ledgerConnectPageScanFinishedNoDevices => 'Сканирование завершено. Устройства не найдены.';
 
   @override
@@ -1681,30 +1503,9 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageFailedToStartScan(String error) {
-    return 'Не удалось начать сканирование: $error';
-  }
-
-  @override
-  String get ledgerConnectPageScanStopped => 'Сканирование остановлено.';
-
-  @override
-  String ledgerConnectPageScanStoppedWithDevices(int count) {
-    return 'Сканирование остановлено. Найдено устройств: $count.';
-  }
-
-  @override
   String ledgerConnectPageConnectingStatus(String deviceName, String connectionType) {
     return 'Подключение к $deviceName ($connectionType)...';
   }
-
-  @override
-  String ledgerConnectPageConnectionTimeoutError(int seconds) {
-    return 'Время подключения истекло через $seconds секунд';
-  }
-
-  @override
-  String get ledgerConnectPageInterfaceUnavailableError => 'Соответствующий интерфейс Ledger недоступен.';
 
   @override
   String ledgerConnectPageConnectionSuccessStatus(String deviceName) {
@@ -1712,26 +1513,11 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String ledgerConnectPageConnectionFailedTimeoutStatus(int count) {
-    return 'Сбой подключения: время ожидания истекло после $count попыток';
-  }
-
-  @override
   String get ledgerConnectPageConnectionFailedTitle => 'Сбой подключения';
-
-  @override
-  String ledgerConnectPageConnectionFailedTimeoutContent(int count) {
-    return 'Время подключения истекло после $count попыток. Убедитесь, что устройство разблокировано, и попробуйте снова.';
-  }
 
   @override
   String ledgerConnectPageConnectionFailedErrorStatus(String error) {
     return 'Сбой подключения: $error';
-  }
-
-  @override
-  String ledgerConnectPageConnectionFailedLedgerErrorContent(String error) {
-    return 'Ошибка Ledger: $error';
   }
 
   @override
@@ -1740,27 +1526,8 @@ class AppLocalizationsRu extends AppLocalizations {
   }
 
   @override
-  String get ledgerConnectPageDeviceDisconnected => 'Устройство отключено.';
-
-  @override
-  String get ledgerConnectPageListenerStopped => 'Прослушиватель остановлен.';
-
-  @override
-  String get ledgerConnectPageFailedToMonitorDisconnects => 'Не удалось отследить отключения.';
-
-  @override
-  String ledgerConnectPageDisconnectingStatus(String deviceName) {
-    return 'Отключение от $deviceName...';
-  }
-
-  @override
   String ledgerConnectPageDisconnectedStatus(String deviceName) {
     return 'Отключено от $deviceName.';
-  }
-
-  @override
-  String ledgerConnectPageDisconnectErrorStatus(String deviceName) {
-    return 'Ошибка при отключении от $deviceName.';
   }
 
   @override
@@ -1768,14 +1535,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get ledgerConnectPageNoDevicesFound => 'Устройства не найдены. Убедитесь, что Ledger включен, разблокирован и Bluetooth/USB активен.\nПотяните вниз или используйте значок обновления для повторного сканирования.';
-
-  @override
-  String ledgerConnectPageDisconnectButton(String deviceName) {
-    return 'Отключиться от $deviceName';
-  }
-
-  @override
-  String get unknownDevice => 'Неизвестно';
 
   @override
   String get durationDay => 'д';
@@ -1871,9 +1630,6 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get web3ErrorRequestInProgress => 'Аналогичный запрос уже обрабатывается';
-
-  @override
-  String get web3ErrorUnknownRpc => 'Неизвестная ошибка RPC';
 
   @override
   String get web3ErrorNotConnected => 'Этот домен не подключен. Пожалуйста, подключитесь сначала.';

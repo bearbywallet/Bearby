@@ -1,9 +1,7 @@
 {
   "appTitle": "ZilPay Кошелек",
-
   "initialPagerestoreZilPay": "Восстановить ZilPay 1.0!",
   "initialPagegetStarted": "Начать",
-
   "restoreRKStorageTitle": "Перенос ZilPay 1.0 в 2.0",
   "restoreRKStorageAccountsPrompt": "Аккаунты для переноса в ZilPay 2.0. Введите пароль.",
   "restoreRKStoragePasswordHint": "Пароль",
@@ -11,12 +9,9 @@
   "restoreRKStorageErrorPrefix": "Ошибка:",
   "restoreRKStorageRestoreButton": "Восстановить",
   "restoreRKStorageSkipButton": "Пропустить",
-  
   "accountItemBalanceLabel": "Баланс:",
-
   "sendTokenPageTitle": "",
   "sendTokenPageSubmitButton": "Отправить",
-
   "aboutPageTitle": "О приложении",
   "aboutPageAppName": "ZilPay",
   "aboutPageAppDescription": "Ваш безопасный блокчейн-кошелек",
@@ -35,31 +30,21 @@
   "aboutPageTermsOfService": "Условия использования",
   "aboutPageLicenses": "Лицензии",
   "aboutPageLegalese": "© 2025 ZilPay. Все права защищены.",
-
   "languagePageTitle": "Язык",
-  "languagePageSystem": "Системный",
-
   "secretKeyGeneratorPageTitle": "Секретный ключ",
   "secretKeyGeneratorPagePrivateKey": "Приватный ключ",
   "secretKeyGeneratorPagePublicKey": "Публичный ключ",
   "secretKeyGeneratorPageBackupCheckbox": "Я сделал резервную копию секретного ключа",
   "secretKeyGeneratorPageNextButton": "Далее",
-
-  "walletPageTitle": "",
   "walletPageWalletNameHint": "Название кошелька",
   "walletPagePreferencesTitle": "Настройки кошелька",
   "walletPageManageConnections": "Управление подключениями",
   "walletPageBackup": "Резервная копия",
   "walletPageDeleteWallet": "Удалить кошелек",
   "walletPageBiometricReason": "Включить биометрическую аутентификацию",
-
   "networkPageTitle": "",
-  "networkPageShowTestnet": "Показать тестовую сеть",
   "networkPageSearchHint": "Поиск",
-  "networkPageAddedNetworks": "Добавленные сети",
-  "networkPageAvailableNetworks": "Доступные сети",
   "networkPageAddError": "Не удалось добавить сеть: ",
-
   "receivePageTitle": "Получить",
   "receivePageWarning": "Отправляйте только активы {chainName}({tokenSymbol}) на этот адрес. Другие активы будут потеряны навсегда.",
   "receivePageAccountNameHint": "Имя аккаунта",
@@ -67,7 +52,6 @@
   "receivePageAmountDialogHint": "0.0",
   "receivePageAmountDialogCancel": "Отмена",
   "receivePageAmountDialogConfirm": "Подтвердить",
-
   "securityPageTitle": "Безопасность",
   "securityPageNetworkPrivacy": "Приватность сети",
   "securityPageEnsDomains": "Показывать ENS домены в адресной строке",
@@ -86,20 +70,11 @@
   "securityPageNtruPrime": "NTRUPrime",
   "securityPageCyber": "Cyber",
   "securityPageUnknown": "Неизвестно",
-
-  "webViewPageDntLabel": "DNT",
-  "webViewPageIncognitoLabel": "Инкогнито",
-  "webViewPageLoadError": "Ошибка загрузки",
-  "webViewPageTryAgain": "Попробовать снова",
-  
   "secretPhraseGeneratorPageTitle": "Новый кошелек",
   "secretPhraseGeneratorPageBackupCheckbox": "Я сохранил секретные слова",
   "secretPhraseGeneratorPageNextButton": "Далее",
-
   "homePageErrorTitle": "Нет сигнала",
-  "homePageSendButton": "Отправить",
   "homePageReceiveButton": "Получить",
-
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",
   "revealSecretKeyInvalidPassword": "неверный пароль, ошибка:",
@@ -109,18 +84,13 @@
   "revealSecretKeyScamAlertMessage": "Никогда не делитесь своим секретным ключом с кем-либо. Никогда не вводите его на каких-либо сайтах.",
   "revealSecretKeySecurityTimer": "Таймер безопасности",
   "revealSecretKeyRevealAfter": "Ваш секретный ключ будет раскрыт через:",
-
-  "setupNetworkSettingsPageTestnetSwitch": "Тестовая сеть",
   "setupNetworkSettingsPageSearchHint": "Поиск",
   "setupNetworkSettingsPageNoNetworks": "Нет доступных сетей",
   "setupNetworkSettingsPageNoResults": "Не найдено сетей для \"{searchQuery}\"",
   "setupNetworkSettingsPageNextButton": "Далее",
-  "setupNetworkSettingsPageTestnetLabel": "Тестовая сеть",
-  "setupNetworkSettingsPageMainnetLabel": "Основная сеть",
   "setupNetworkSettingsPageChainIdLabel": "ID цепи:",
   "setupNetworkSettingsPageTokenLabel": "Токен:",
   "setupNetworkSettingsPageExplorerLabel": "Обозреватель:",
-
   "appearanceSettingsPageTitle": "Настройки внешнего вида",
   "appearanceSettingsPageCompactNumbersTitle": "Компактные числа",
   "appearanceSettingsPageCompactNumbersDescription": "Включите для отображения сокращенных чисел (например, 20K вместо 20,000).",
@@ -133,20 +103,17 @@
   "appearanceSettingsPageLightModeTitle": "Светлый режим",
   "appearanceSettingsPageLightModeSubtitle": "Всегда светлая",
   "appearanceSettingsPageLightModeDescription": "Всегда использовать светлую тему, независимо от настроек устройства.",
-
   "loginPageBiometricReason": "Пожалуйста, пройдите аутентификацию",
   "loginPageWalletTitle": "Кошелек {index}",
   "loginPagePasswordHint": "Пароль",
   "loginPageUnlockButton": "Разблокировать",
   "loginPageWelcomeBack": "С возвращением",
-
   "secretKeyRestorePageTitle": "Восстановление секретного ключа",
   "secretKeyRestorePageHint": "Приватный ключ",
   "secretKeyRestorePageInvalidFormat": "Неверный формат приватного ключа",
   "secretKeyRestorePageKeyTitle": "Приватный ключ",
   "secretKeyRestorePageBackupLabel": "Я сделал резервную копию моего секретного ключа",
   "secretKeyRestorePageNextButton": "Далее",
-
   "addAccountPageTitle": "Добавить новый аккаунт",
   "addAccountPageSubtitle": "Создать BIP39 аккаунт",
   "addAccountPageDefaultName": "Аккаунт {index}",
@@ -160,7 +127,6 @@
   "addAccountPageIndexExists": "Аккаунт с индексом {index} уже существует",
   "addAccountPageBiometricFailed": "Биометрическая аутентификация не удалась",
   "addAccountPageCreateFailed": "Не удалось создать аккаунт: {error}",
-
   "addressBookPageTitle": "Адресная книга",
   "addressBookPageEmptyMessage": "Ваши контакты и их адреса кошельков\nпоявятся здесь.",
   "addressBookPageDeleteConfirmationTitle": "Удалить контакт",
@@ -168,23 +134,17 @@
   "addressBookPageDeleteTooltip": "Удалить {contactName}",
   "cancel": "Отмена",
   "delete": "Удалить",
-
-  "browserPageExploreTab": "Обзор",
-  "browserPageNoExploreApps": "Пока нет приложений для обзора",
   "browserPageSearchHint": "Искать с помощью {engine} или введите адрес",
   "browserPageNoConnectedApps": "Нет подключенных приложений",
-
   "historyPageTitle": "История транзакций",
   "historyPageNoTransactions": "Пока нет транзакций",
   "historyPageSearchHint": "Поиск транзакций...",
-
   "notificationsSettingsPageTitle": "Уведомления",
   "notificationsSettingsPagePushTitle": "Push-уведомления",
   "notificationsSettingsPagePushDescription": "Получать уведомления о отправке и подтверждении транзакций, уведомления от подключенных приложений.",
   "notificationsSettingsPageWalletsTitle": "Кошельки",
   "notificationsSettingsPageWalletsDescription": "Уведомления от кошельков",
   "notificationsSettingsPageWalletPrefix": "Кошелек",
-
   "revealSecretPhraseTitle": "Показать секретную фразу",
   "revealSecretPhrasePasswordHint": "Пароль",
   "revealSecretPhraseInvalidPassword": "неверный пароль, ошибка:",
@@ -193,7 +153,6 @@
   "revealSecretPhraseDoneButton": "Готово",
   "revealSecretPhraseScamAlertTitle": "ВНИМАНИЕ МОШЕННИЧЕСТВО",
   "revealSecretPhraseScamAlertDescription": "Никогда не делитесь своей секретной фразой с кем-либо. Никогда не вводите её на каких-либо сайтах.",
-
   "cipherSettingsPageTitle": "Настройка шифрования",
   "cipherSettingsPageAdvancedButton": "Продвинутые",
   "cipherSettingsPageStandardTitle": "Стандартное шифрование",
@@ -207,16 +166,13 @@
   "cipherSettingsPageQuantumDescription": "Продвинутое квантово-устойчивое шифрование с NTRUP1277.",
   "cipherSettingsPageQuantumWarning": "Квантово-устойчивое шифрование может повлиять на производительность",
   "cipherSettingsPageConfirmButton": "Подтвердить",
-
   "secretPhraseVerifyPageTitle": "Проверка секрета",
   "secretPhraseVerifyPageSubtitle": "Проверка Bip39 секрета",
   "secretPhraseVerifyPageNextButton": "Далее",
-
   "restoreSecretPhrasePageTitle": "Восстановить кошелек",
   "restoreSecretPhrasePageRestoreButton": "Восстановить",
   "checksumValidationFailed": "Проверка контрольной суммы не пройдена",
   "proceedDespiteInvalidChecksum": "Продолжить, несмотря на ошибку контрольной суммы?",
-
   "settingsPageTitle": "Настройки",
   "settingsPageZilliqaLegacy": "Zilliqa Legacy",
   "settingsPageCurrency": "Валюта",
@@ -231,7 +187,6 @@
   "settingsPageTwitter": "Twitter",
   "settingsPageGitHub": "GitHub",
   "settingsPageAbout": "О приложении",
-
   "passwordSetupPageTitle": "Настройка пароля",
   "passwordSetupPageSubtitle": "Создать пароль",
   "passwordSetupPageWalletNameHint": "Название кошелька",
@@ -247,7 +202,6 @@
   "passwordSetupPageSeedType": "Seed",
   "passwordSetupPageKeyType": "Ключ",
   "passwordSetupPageUniversalNetwork": "Универсальный",
-
   "browserSettingsTitle": "Настройки браузера",
   "browserSettingsBrowserOptions": "Параметры браузера",
   "browserSettingsSearchEngine": "Поисковая система",
@@ -265,23 +219,20 @@
   "browserSettingsIncognitoModeDescription": "Просмотр без сохранения истории и куков",
   "browserSettingsPerformance": "Производительность",
   "browserSettingsCache": "Кэш",
-  "browserSettingsCacheDescription": "Хранить данные сайтов для быстрой загрузки",
-     "browserSettingsClearData": "Очистить данные",
-    "browserSettingsClear": "Очистить",
-    "browserSettingsClearCookies": "Очистить куки",
-    "browserSettingsClearCookiesDescription": "Удалить все куки, сохраненные веб-сайтами",
-    "browserSettingsClearCache": "Очистить кэш",
-    "browserSettingsClearCacheDescription": "Удалить временные файлы и изображения, сохраненные во время просмотра",
-    "browserSettingsClearLocalStorage": "Очистить локальное хранилище",
-    "browserSettingsClearLocalStorageDescription": "Удалить данные веб-сайтов, хранящиеся локально на вашем устройстве",
-    "browserSettingsCacheDescription": "Хранить данные веб-сайтов для более быстрой загрузки",
-
+  "browserSettingsCacheDescription": "Хранить данные веб-сайтов для более быстрой загрузки",
+  "browserSettingsClearData": "Очистить данные",
+  "browserSettingsClear": "Очистить",
+  "browserSettingsClearCookies": "Очистить куки",
+  "browserSettingsClearCookiesDescription": "Удалить все куки, сохраненные веб-сайтами",
+  "browserSettingsClearCache": "Очистить кэш",
+  "browserSettingsClearCacheDescription": "Удалить временные файлы и изображения, сохраненные во время просмотра",
+  "browserSettingsClearLocalStorage": "Очистить локальное хранилище",
+  "browserSettingsClearLocalStorageDescription": "Удалить данные веб-сайтов, хранящиеся локально на вашем устройстве",
   "genWalletOptionsTitle": "Создать кошелек",
   "genWalletOptionsBIP39Title": "BIP39",
   "genWalletOptionsBIP39Subtitle": "Создать мнемоническую фразу",
   "genWalletOptionsPrivateKeyTitle": "Приватный ключ",
   "genWalletOptionsPrivateKeySubtitle": "Создать только один приватный ключ",
-
   "addWalletOptionsTitle": "Добавить кошелек",
   "addWalletOptionsNewWalletTitle": "Новый кошелек",
   "addWalletOptionsNewWalletSubtitle": "Создать новый кошелек",
@@ -292,7 +243,6 @@
   "addWalletOptionsOtherOptions": "Другие варианты",
   "addWalletOptionsWatchAccountTitle": "Наблюдать за аккаунтом",
   "addWalletOptionsWatchAccountSubtitle": "Для мониторинга активности кошелька без фразы восстановления",
-
   "currencyConversionTitle": "Основная валюта",
   "currencyConversionSearchHint": "Поиск валют...",
   "currencyConversionEngineTitle": "Источник курсов валют",
@@ -302,7 +252,6 @@
   "currencyConversionEngineNoneSubtitle": "Источник не выбран",
   "currencyConversionEngineCoingecko": "Coingecko",
   "currencyConversionEngineCoingeckoSubtitle": "Получать курсы из Coingecko",
-
   "restoreWalletOptionsTitle": "Восстановить кошелек",
   "restoreWalletOptionsBIP39Title": "BIP39",
   "restoreWalletOptionsBIP39Subtitle": "Восстановить с помощью мнемонической фразы",
@@ -312,7 +261,6 @@
   "restoreWalletOptionsQRCodeSubtitle": "Восстановить кошелек сканированием QR-кода",
   "restoreWalletOptionsKeyStoreTitle": "Файл Keystore",
   "restoreWalletOptionsKeyStoreSubtitle": "Восстановление кошелька с помощью зашифрованного паролем файла резервной копии",
-
   "argonSettingsModalContentLowMemoryTitle": "Низкая память",
   "argonSettingsModalContentLowMemorySubtitle": "64KB RAM, 3 итерации",
   "argonSettingsModalContentLowMemoryDescription": "Минимальное использование памяти, подходит для устройств с низкими характеристиками.",
@@ -324,16 +272,13 @@
   "argonSettingsModalContentSecureDescription": "Высокая безопасность с увеличенной памятью и итерациями.",
   "argonSettingsModalContentSecretHint": "Введите секрет (опционально)",
   "argonSettingsModalContentConfirmButton": "Подтвердить",
-
   "confirmTransactionContentPasswordHint": "Пароль",
   "confirmTransactionContentUnableToConfirm": "Невозможно подтвердить",
   "confirmTransactionContentConfirm": "Подтвердить",
   "confirmTransactionContentNoActiveAccount": "Нет активного аккаунта",
   "confirmTransactionContentFailedLoadTransfer": "Не удалось загрузить детали перевода",
   "confirmTransactionEditGasButtonText": "Изменить Газ",
-
   "authReason": "Пожалуйста, пройдите аутентификацию",
-
   "addChainModalContentWarning": "Остерегайтесь сетевых мошенничеств и рисков безопасности.",
   "addChainModalContentApprove": "Подтвердить",
   "addChainModalContentDetails": "Детали",
@@ -341,7 +286,6 @@
   "addChainModalContentCurrencySymbol": "Символ валюты:",
   "addChainModalContentChainId": "ID цепи:",
   "addChainModalContentBlockExplorer": "Обозреватель блоков:",
-
   "addAddressModalTitle": "Добавить контакт",
   "addAddressModalDescription": "Введите имя контакта и адрес кошелька для добавления в адресную книгу.",
   "addAddressModalNameHint": "Имя",
@@ -349,9 +293,7 @@
   "addAddressModalNameEmptyError": "Имя не может быть пустым",
   "addAddressModalAddressEmptyError": "Адрес не может быть пустым",
   "addAddressModalButton": "Добавить контакт",
-
   "tokenSelectModalContentSearchHint": "Поиск",
-
   "signMessageModalContentAuthReason": "Пожалуйста, авторизуйтесь для подписи сообщения",
   "signMessageModalContentFailedToSign": "Не удалось подписать: {error}",
   "signMessageModalContentTitle": "Подписать сообщение",
@@ -364,20 +306,11 @@
   "signMessageModalContentPasswordHint": "Пароль",
   "signMessageModalContentProcessing": "Обработка...",
   "signMessageModalContentSign": "Подписать сообщение",
-  "signMessageModalContentScanning": "Сканирование устройств Ledger...",
-  "signMessageModalContentNoLedgerDevices": "Устройства Ledger не найдены",
-  "signMessageModalContentWalletNotSelected": "Кошелёк не выбран",
-  "signMessageModalContentLedgerNotSelected": "Устройство Ledger не выбрано",
-  "signMessageModalContentFailedToScanLedger": "Не удалось сканировать устройства Ledger: {error}",
-  "signMessageModalContentFailedToSignMessage": "Не удалось подписать сообщение: {error}",
-  "signMessageModalContentBluetoothOff": "Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.",
-
   "deleteWalletModalTitle": "Удалить кошелек",
   "deleteWalletModalWarning": "Внимание: Это действие нельзя отменить. Ваш кошелек можно восстановить только с помощью секретной фразы. Если у вас нет к ней доступа, вы навсегда потеряете все средства, связанные с этим аккаунтом.",
   "deleteWalletModalSecretPhraseWarning": "Пожалуйста, убедитесь, что у вас есть доступ к вашей секретной фразе, прежде чем продолжить.",
   "deleteWalletModalPasswordHint": "Введите пароль",
   "deleteWalletModalSubmit": "Удалить",
-
   "addressSelectModalContentTitle": "Выберите адрес",
   "addressSelectModalContentSearchHint": "Поиск / Адрес / ENS",
   "addressSelectModalContentUnknown": "Неизвестно",
@@ -385,7 +318,6 @@
   "addressSelectModalContentAddressBook": "Адресная книга",
   "addressSelectModalContentHistory": "История",
   "addressSelectModalContentSender": "Отправитель",
-
   "changePasswordModalTitle": "Изменить пароль",
   "changePasswordModalDescription": "Введите ваш текущий пароль и выберите новый пароль для обновления безопасности вашего кошелька.",
   "changePasswordModalCurrentPasswordHint": "Текущий пароль",
@@ -395,39 +327,30 @@
   "changePasswordModalPasswordLengthError": "Пароль должен быть не менее 6 символов",
   "changePasswordModalPasswordsMismatchError": "Пароли не совпадают",
   "changePasswordModalButton": "Изменить пароль",
-
   "confirmPasswordModalTitle": "Подтвердить пароль",
   "confirmPasswordModalDescription": "Введите пароль для продолжения.",
   "confirmPasswordModalHint": "Пароль",
   "confirmPasswordModalEmptyError": "Пароль не может быть пустым",
   "confirmPasswordModalGenericError": "Ошибка:",
   "confirmPasswordModalButton": "Подтвердить",
-
   "qrScannerModalContentTitle": "Сканировать",
   "qrScannerModalContentCameraInitError": "Ошибка инициализации камеры:",
-  "qrScannerModalContentTorchError": "Не удалось переключить вспышку:",
-  "qrScannerModalContentOpenSettings": "Открыть настройки",
-
   "chainInfoModalContentTokenTitle": "Токен сети",
   "@chainInfoModalContentTokenTitle": {
     "description": "Title text for the network token section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentNetworkInfoTitle": "Информация о сети",
   "@chainInfoModalContentNetworkInfoTitle": {
     "description": "Title text for the network information section in the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainLabel": "Цепочка",
   "@chainInfoModalContentChainLabel": {
     "description": "Label for the chain field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentShortNameLabel": "Краткое название",
   "@chainInfoModalContentShortNameLabel": {
     "description": "Label for the short name field in the network information section of the ChainInfoModalContent modal."
   },
-  
   "chainInfoModalContentChainIdLabel": "ID цепочки",
   "chainInfoModalContentSlip44Label": "Slip44",
   "chainInfoModalContentChainIdsLabel": "ID цепочек",
@@ -441,25 +364,20 @@
   "chainInfoModalContentExplorersTitle": "Обозреватели",
   "chainInfoModalContentDeleteProviderTitle": "Удалить сеть",
   "chainInfoModalContentSwipeToDelete": "Удалить сеть",
-
   "switchChainNetworkContentTitle": "Выбрать сеть",
   "switchChainNetworkContentButton": "Переключить сеть",
   "switchChainNetworkContentTestnetLabel": "Тестовая сеть",
   "switchChainNetworkContentIdLabel": "ID:",
-
   "watchAssetModalContentTitle": "Добавить предложенный токен",
   "watchAssetModalContentDescription": "Просмотрите и добавьте следующий токен, предложенный приложением.",
   "watchAssetModalContentTokenLabel": "Токен",
   "watchAssetModalContentBalanceLabel": "Баланс",
   "watchAssetModalContentLoadingButton": "Баланс...",
   "watchAssetModalContentAddButton": "Добавить",
-
   "connectedDappsModalSearchHint": "Поиск DApps",
   "connectedDappsModalNoDapps": "Нет подключенных DApps",
-
   "dappListItemConnected": "Подключено {time}",
   "dappListItemJustNow": "только что",
-
   "secretRecoveryModalRevealPhraseTitle": "Показать фразу восстановления",
   "secretRecoveryModalRevealPhraseDescription": "Если вы когда-либо смените браузер или компьютер, вам понадобится эта секретная фраза восстановления для доступа к вашим аккаунтам. Сохраните её в безопасном и секретном месте.",
   "secretRecoveryModalRevealPhraseButton": "Показать",
@@ -469,34 +387,27 @@
   "secretRecoveryModalKeystoreBackupTitle": "Резервное копирование Keystore",
   "secretRecoveryModalKeystoreBackupDescription": "Сохраните ваши приватные ключи в зашифрованном файле keystore, защищенном паролем. Это обеспечивает дополнительный уровень безопасности для вашего кошелька.",
   "secretRecoveryModalKeystoreBackupButton": "Создать Keystore",
-
   "backupConfirmationContentTitle": "Подтверждение резервного копирования",
   "backupConfirmationWarning": "ВНИМАНИЕ: Если вы потеряете или забудете вашу seed-фразу в точном порядке, вы навсегда потеряете ваши средства. Никогда не делитесь вашей seed-фразой с кем-либо, иначе ваши средства могут быть украдены. Восстановление BIP39 очень строгое - любая ошибка в словах при восстановлении приведет к потере средств.",
   "backupConfirmationContentWrittenDown": "Я записал всё",
   "backupConfirmationContentSafelyStored": "Я надежно сохранил резервную копию",
   "backupConfirmationContentWontLose": "Я уверен, что не потеряю резервную копию",
   "backupConfirmationContentNotShare": "Я понимаю, что нельзя делиться этими словами с кем-либо",
-
   "counterMaxValueError": "Достигнуто максимальное значение",
   "counterMinValueError": "Достигнуто минимальное значение",
-
   "biometricSwitchFaceId": "Включить Face ID",
   "biometricSwitchFingerprint": "Включить отпечаток пальца",
   "biometricSwitchBiometric": "Включить биометрический вход",
   "biometricSwitchPinCode": "Включить PIN-код устройства",
-
   "gasFeeOptionLow": "Низкий",
   "gasFeeOptionMarket": "Рыночный",
   "gasFeeOptionAggressive": "Агрессивный",
-
   "gasDetailsEstimatedGas": "Расчетный газ:",
   "gasDetailsGasPrice": "Цена газа:",
   "gasDetailsBaseFee": "Базовая комиссия:",
   "gasDetailsPriorityFee": "Приоритетная комиссия:",
   "gasDetailsMaxFee": "Максимальная комиссия:",
-
- "tokenTransferAmountUnknown": "Неизвестно",
-  
+  "tokenTransferAmountUnknown": "Неизвестно",
   "transactionDetailsModal_transaction": "Транзакция",
   "transactionDetailsModal_hash": "Хэш",
   "transactionDetailsModal_sig": "Подпись",
@@ -526,13 +437,10 @@
   "amountSection_rejected": "Отклонено",
   "appConnectModalContent_swipeToConnect": "Проведите для подключения",
   "appConnectModalContent_noAccounts": "Нет доступных аккаунтов",
-
   "browserActionMenuShare": "Поделиться",
   "browserActionMenuCopyLink": "Копировать ссылку",
-  "browserActionMenuClose": "Закрыть",
   "browserActionMenuRefresh": "Обновить",
   "browserActionMenuUrlBarTop": "URL панель сверху",
-
   "keystoreBackupTitle": "Резервное копирование Keystore",
   "keystoreBackupWarningTitle": "Защитите Ваш Keystore Файл",
   "keystoreBackupWarningMessage": "Файл keystore содержит ваши зашифрованные приватные ключи. Храните этот файл в безопасном месте и никогда не передавайте его никому. Для расшифровки этого файла вам понадобится созданный вами пароль.",
@@ -549,51 +457,31 @@
   "keystoreBackupSavedSuccess": "Файл keystore успешно сохранен",
   "keystoreBackupSaveFailed": "Не удалось сохранить файл keystore",
   "keystoreBackupTempLocation": "Расположение временного файла",
-
   "keystorePasswordHint": "Введите пароль от keystore",
   "keystoreRestoreButton": "Восстановить кошелек",
   "keystoreRestoreExtError": "Пожалуйста, выберите действительный файл .zp",
   "keystoreRestoreNoFile": "Файлы хранилища ключей не найдены",
   "keystoreRestoreFilesTitle": "Файлы хранилища ключей",
-
   "editGasDialogTitle": "Изменить параметры газа",
   "editGasDialogGasPrice": "Цена газа",
   "editGasDialogMaxPriorityFee": "Макс. приоритетная комиссия",
   "editGasDialogGasLimit": "Лимит газа",
-  "editGasDialogCancel": "Отмена",
-  "editGasDialogSave": "Сохранить",
   "editGasDialogInvalidGasValues": "Недопустимые значения газа. Проверьте ваши данные.",
-
   "addLedgerAccountPageAppBarTitle": "Добавить аккаунт Ledger",
   "addLedgerAccountPageGetAccountsButton": "Получить аккаунты",
   "addLedgerAccountPageCreateButton": "Создать",
   "addLedgerAccountPageAddButton": "Обновить",
-  "addLedgerAccountPageScanningMessage": "Сканирование устройств Ledger...",
-  "addLedgerAccountPageNoDevicesMessage": "Устройства Ledger не найдены",
-  "addLedgerAccountPageBluetoothOffError": "Bluetooth выключен. Пожалуйста, включите его для сканирования устройств Ledger.",
-  "addLedgerAccountPageEmptyWalletNameError": "Имя кошелька не может быть пустым",
-  "addLedgerAccountPageWalletNameTooLongError": "Имя кошелька слишком длинное (максимум 24 символа)",
-  "addLedgerAccountPageFailedToScanError": "Не удалось отсканировать устройства Ledger: {error}",
-  "addLedgerAccountPageNetworkOrLedgerMissingError": "Отсутствуют данные сети или Ledger",
   "addLedgerAccountPageNoAccountsSelectedError": "Аккаунты не выбраны",
   "addLedgerAccountPageNoWalletSelectedError": "Кошелёк не выбран",
-
   "transactionHistoryTitle": "История транзакций",
   "transactionHistoryDescription": "Показывать адреса из истории транзакций",
-
   "zilStakePageTitle": "Стейкинг Zilliqa",
   "noStakingPoolsFound": "Пулы для стейкинга не найдены",
-  "aprSort": "APR",
-  "commissionSort": "Комиссия",
-  "tvlSort": "TVL",
   "claimButton": "Забрать",
   "stakeButton": "Стейкать",
   "unstakeButton": "Отозвать",
-  "reinvest": "Реинвест",
   "aprLabel": "APR",
   "commissionLabel": "Комиссия",
-  "tvlLabel": "TVL",
-  "lpStakingBadge": "LP",
   "stakedAmount": "Заблокировано",
   "rewardsAvailable": "Награды",
   "pendingWithdrawals": "Ожидающие выводы",
@@ -603,54 +491,21 @@
   "unbondingPeriod": "Период отвязки",
   "currentBlock": "Текущий блок",
   "version": "Версия",
-
   "ledgerConnectPageTitle": "Подключить Ledger",
   "ledgerConnectPageInitializing": "Инициализация...",
-  "ledgerConnectPageReadyToScan": "Готово к сканированию. Нажмите кнопку обновления.",
-  "ledgerConnectPageInitializationError": "Ошибка инициализации Ledger: {error}",
-  "ledgerConnectPageInitErrorTitle": "Ошибка инициализации",
-  "ledgerConnectPageInitErrorContent": "Не удалось инициализировать интерфейсы Ledger: {error}",
-  "ledgerConnectPageBluetoothOffStatus": "Bluetooth выключен. Пожалуйста, включите Bluetooth на вашем устройстве.",
-  "ledgerConnectPageBluetoothOffTitle": "Bluetooth выключен",
-  "ledgerConnectPageBluetoothOffContent": "Пожалуйста, включите Bluetooth в настройках вашего устройства и попробуйте снова.",
-  "ledgerConnectPagePermissionDeniedStatus": "В разрешении на использование Bluetooth отказано. Пожалуйста, включите в настройках.",
-  "ledgerConnectPagePermissionRequiredTitle": "Требуется разрешение",
-  "ledgerConnectPagePermissionDeniedTitle": "В разрешении отказано",
-  "ledgerConnectPagePermissionDeniedContent": "Для сканирования устройств Ledger требуются разрешения Bluetooth. Пожалуйста, предоставьте разрешения в настройках.",
-  "ledgerConnectPagePermissionDeniedContentIOS": "Этому приложению требуется разрешение на использование Bluetooth для поиска устройств Ledger. Пожалуйста, включите разрешение Bluetooth в настройках вашего устройства.",
-  "ledgerConnectPageUnsupportedStatus": "Bluetooth LE не поддерживается на этом устройстве.",
-  "ledgerConnectPageUnsupportedTitle": "Неподдерживаемое устройство",
-  "ledgerConnectPageUnsupportedContent": "Это устройство не поддерживает Bluetooth Low Energy, который необходим для беспроводного подключения к устройствам Ledger.",
   "ledgerConnectPageScanningStatus": "Поиск устройств Ledger...",
   "ledgerConnectPageFoundDevicesStatus": "Найдено устройств: {count}...",
   "ledgerConnectPageScanErrorStatus": "Ошибка сканирования: {error}",
-  "ledgerConnectPageScanErrorTitle": "Ошибка сканирования",
   "ledgerConnectPageScanFinishedNoDevices": "Сканирование завершено. Устройства не найдены.",
   "ledgerConnectPageScanFinishedWithDevices": "Сканирование завершено. Найдено устройств: {count}. Выберите одно для подключения.",
-  "ledgerConnectPageFailedToStartScan": "Не удалось начать сканирование: {error}",
-  "ledgerConnectPageScanStopped": "Сканирование остановлено.",
-  "ledgerConnectPageScanStoppedWithDevices": "Сканирование остановлено. Найдено устройств: {count}.",
   "ledgerConnectPageConnectingStatus": "Подключение к {deviceName} ({connectionType})...",
-  "ledgerConnectPageConnectionTimeoutError": "Время подключения истекло через {seconds} секунд",
-  "ledgerConnectPageInterfaceUnavailableError": "Соответствующий интерфейс Ledger недоступен.",
   "ledgerConnectPageConnectionSuccessStatus": "Успешное подключение к {deviceName}!",
-  "ledgerConnectPageConnectionFailedTimeoutStatus": "Сбой подключения: время ожидания истекло после {count} попыток",
   "ledgerConnectPageConnectionFailedTitle": "Сбой подключения",
-  "ledgerConnectPageConnectionFailedTimeoutContent": "Время подключения истекло после {count} попыток. Убедитесь, что устройство разблокировано, и попробуйте снова.",
   "ledgerConnectPageConnectionFailedErrorStatus": "Сбой подключения: {error}",
-  "ledgerConnectPageConnectionFailedLedgerErrorContent": "Ошибка Ledger: {error}",
   "ledgerConnectPageConnectionFailedGenericContent": "Не удалось подключиться к {deviceName}.\nОшибка: {error}",
-  "ledgerConnectPageDeviceDisconnected": "Устройство отключено.",
-  "ledgerConnectPageListenerStopped": "Прослушиватель остановлен.",
-  "ledgerConnectPageFailedToMonitorDisconnects": "Не удалось отследить отключения.",
-  "ledgerConnectPageDisconnectingStatus": "Отключение от {deviceName}...",
   "ledgerConnectPageDisconnectedStatus": "Отключено от {deviceName}.",
-  "ledgerConnectPageDisconnectErrorStatus": "Ошибка при отключении от {deviceName}.",
   "ledgerConnectPageGoToSettings": "Перейти в настройки",
   "ledgerConnectPageNoDevicesFound": "Устройства не найдены. Убедитесь, что Ledger включен, разблокирован и Bluetooth/USB активен.\nПотяните вниз или используйте значок обновления для повторного сканирования.",
-  "ledgerConnectPageDisconnectButton": "Отключиться от {deviceName}",
-  "unknownDevice": "Неизвестно",
-
   "durationDay": "д",
   "durationHour": "ч",
   "durationMinute": "м",
@@ -658,7 +513,6 @@
   "durationNotAvailable": "Н/Д",
   "rewardsProgressTitle": "Прогресс награждения",
   "nodes": "узлы",
-
   "manageTokensPageTitle": "Токены",
   "manageTokensSearchHint": "Поиск токенов или вставьте адрес",
   "manageTokensFoundToken": "Найденный токен",
@@ -667,7 +521,6 @@
   "manageTokensFetchError": "Не удалось получить токен",
   "manageTokensWrongChain": "Токен принадлежит другой сети",
   "manageTokensClear": "Очистить",
-
   "signedMessageTypePersonalSign": "Личная подпись",
   "signedMessageTypeEip712": "EIP-712",
   "signedMessageTypeUnknown": "Неизвестно",
@@ -682,11 +535,9 @@
   "signedMessageData": "Данные сообщения",
   "signedMessageContent": "Содержимое",
   "signedMessageMessage": "Сообщение",
-
   "web3ErrorNoMethod": "Метод не указан",
   "web3ErrorUnsupportedMethod": "Метод \"{method}\" не поддерживается",
   "web3ErrorRequestInProgress": "Аналогичный запрос уже обрабатывается",
-  "web3ErrorUnknownRpc": "Неизвестная ошибка RPC",
   "web3ErrorNotConnected": "Этот домен не подключен. Пожалуйста, подключитесь сначала.",
   "web3ErrorInvalidParams": "Недопустимые параметры для {method}. Требуется: {params}",
   "web3ErrorAddressNotAuthorized": "Запрашиваемый адрес не авторизован",
