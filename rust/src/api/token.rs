@@ -12,6 +12,7 @@ pub use zilpay::background::bg_token::TokensManagement;
 pub use zilpay::proto::address::Address;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+    crypto::slip44::ZILLIQA,
     token::ft::FToken,
     wallet::{wallet_storage::StorageOperations, wallet_token::TokenManagement},
 };
@@ -19,6 +20,8 @@ use zilpay::{
 const UNISWAP_API_URL: &str =
     "https://interface.gateway.uniswap.org/v2/data.v1.DataApiService/GetPortfolio";
 const COINGECKO_API_URL: &str = "https://api.coingecko.com/api/v3/simple/price";
+const ZILLIQA_SCILLA_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens";
+const ZILLIQA_EVM_TOKENS_API: &str = "https://api.zilpay.io/api/v1/tokens_evm";
 const ZERO_EVM: &str = "0x0000000000000000000000000000000000000000";
 
 type CoinGeckoResponse = HashMap<String, HashMap<String, f64>>;
@@ -66,6 +69,27 @@ struct Portfolio {
 #[derive(Debug, Deserialize)]
 struct PortfolioResponse {
     portfolio: Option<Portfolio>,
+}
+
+#[derive(Debug, Deserialize)]
+struct ZilliqaEvmTokenResponse {
+    address: String,
+    decimals: u8,
+    name: String,
+    symbol: String,
+}
+
+#[derive(Debug, Deserialize)]
+struct ZilliqaScillaTokenResponse {
+    bech32: String,
+    name: String,
+    symbol: String,
+    decimals: u8,
+}
+
+#[derive(Debug, Deserialize)]
+struct ZilliqaScillaApiResponse {
+    list: Vec<ZilliqaScillaTokenResponse>,
 }
 
 pub async fn sync_balances(wallet_index: usize) -> Result<(), String> {
@@ -166,6 +190,88 @@ pub async fn fetch_token_meta(addr: String, wallet_index: usize) -> Result<FToke
     }
 }
 
+async fn fetch_zilliqa_tokens(
+    addr: &Address,
+    default_logo: Option<String>,
+    chain_hash: u64,
+) -> Result<Vec<FTokenInfo>, String> {
+    let client = reqwest::Client::new();
+
+    match addr {
+        Address::Secp256k1Sha256(_) => {
+            let response = client
+                .get(ZILLIQA_SCILLA_TOKENS_API)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+            if !response.status().is_success() {
+                return Err(format!("API error: {}", response.status()));
+            }
+
+            let api_response: ZilliqaScillaApiResponse = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+            let result = api_response
+                .list
+                .into_iter()
+                .map(|token| FTokenInfo {
+                    name: token.name,
+                    symbol: token.symbol,
+                    decimals: token.decimals,
+                    addr: token.bech32,
+                    addr_type: addr.prefix_type(),
+                    logo: default_logo.clone(),
+                    balances: HashMap::new(),
+                    rate: 0.0,
+                    default: false,
+                    native: false,
+                    chain_hash,
+                })
+                .collect();
+
+            Ok(result)
+        }
+        Address::Secp256k1Keccak256(_) => {
+            let response = client
+                .get(ZILLIQA_EVM_TOKENS_API)
+                .send()
+                .await
+                .map_err(|e| format!("HTTP request failed: {}", e))?;
+
+            if !response.status().is_success() {
+                return Err(format!("API error: {}", response.status()));
+            }
+
+            let tokens: Vec<ZilliqaEvmTokenResponse> = response
+                .json()
+                .await
+                .map_err(|e| format!("Failed to parse response: {}", e))?;
+
+            let result = tokens
+                .into_iter()
+                .map(|token| FTokenInfo {
+                    name: token.name,
+                    symbol: token.symbol,
+                    decimals: token.decimals,
+                    addr: token.address,
+                    addr_type: addr.prefix_type(),
+                    logo: default_logo.clone(),
+                    balances: HashMap::new(),
+                    rate: 0.0,
+                    default: false,
+                    native: false,
+                    chain_hash,
+                })
+                .collect();
+
+            Ok(result)
+        }
+    }
+}
+
 pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, String> {
     let guard = BACKGROUND_SERVICE.read().await;
     let service = guard.as_ref().ok_or(ServiceError::NotRunning)?;
@@ -195,10 +301,16 @@ pub async fn auto_hint_tokens(wallet_index: usize) -> Result<Vec<FTokenInfo>, St
         .addr
         .to_eth_checksummed()
         .unwrap_or_else(|_| account.addr.auto_format());
+
     let chain_id = account.chain_id;
     let chain_hash = account.chain_hash;
     let addr_type = account.addr.prefix_type();
     let default_logo = provider.config.ftokens.first().and_then(|t| t.logo.clone());
+
+    if account.slip_44 == ZILLIQA {
+        return fetch_zilliqa_tokens(&account.addr, default_logo, chain_hash).await;
+    }
+
     let request_body = serde_json::json!({
         "walletAccount": {
             "platformAddresses": [
