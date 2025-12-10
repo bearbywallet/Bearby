@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -29,8 +30,7 @@ class RevealSecretKey extends StatefulWidget {
   State<RevealSecretKey> createState() => _RevealSecretKeyState();
 }
 
-class _RevealSecretKeyState extends State<RevealSecretKey>
-    with StatusBarMixin {
+class _RevealSecretKeyState extends State<RevealSecretKey> with StatusBarMixin {
   bool isCopied = false;
   bool isAuthenticated = false;
   bool hasError = false;
@@ -42,7 +42,8 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
   Timer? _countdownTimer;
   int _remainingTime = 1800;
 
-  final _noScreenshot = NoScreenshot.instance;
+  final _noScreenshot =
+      Platform.isIOS || Platform.isAndroid ? NoScreenshot.instance : null;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -56,7 +57,7 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
   @override
   void dispose() {
     _countdownTimer?.cancel();
-    _noScreenshot.screenshotOn();
+    _noScreenshot?.screenshotOn();
     super.dispose();
   }
 
@@ -86,7 +87,9 @@ class _RevealSecretKeyState extends State<RevealSecretKey>
   }
 
   Future<void> _secureScreen() async {
-    await _noScreenshot.screenshotOff();
+    if (_noScreenshot != null) {
+      await _noScreenshot.screenshotOff();
+    }
   }
 
   void _onPasswordSubmit(BigInt walletIndex, BigInt accountIndex) async {

@@ -79,3 +79,29 @@ fn test_bip39_checksum_valid() {
     assert!(bip39_checksum_valid(CORRECT_WORDS.to_string()));
     assert!(!bip39_checksum_valid(INCORRECT_WORDS.to_string()));
 }
+
+#[test]
+fn test_intl_number_formating_repro() {
+    let value = "27000000".to_string(); // 27 USDT (6 decimals)
+    let decimals = 6;
+    let locale_str = "en_US";
+    let native_symbol = "USDT";
+    let converted_symbol = "USD";
+    let threshold = 1000.0;
+    let compact = true;
+    let rate = 1.0;
+
+    let (native, converted_val) = intl_number_formating(
+        value,
+        decimals,
+        locale_str,
+        native_symbol,
+        converted_symbol,
+        threshold,
+        compact,
+        rate,
+    );
+
+    println!("Native: {}", native);
+    println!("Converted: {}", converted_val);
+}

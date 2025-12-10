@@ -564,6 +564,7 @@ class Web3EIP1193Handler {
     }
 
     _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
 
     try {
       final connection =
@@ -574,7 +575,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
+          l10n?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -584,7 +585,6 @@ class Web3EIP1193Handler {
         final methodName = isPersonalSign ? 'personal_sign' : 'eth_sign';
         final paramOrder =
             isPersonalSign ? '[message, address]' : '[address, message]';
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -608,7 +608,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
+          l10n?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
@@ -682,6 +682,7 @@ class Web3EIP1193Handler {
     }
 
     _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
 
     try {
       final connection = Web3Utils.findConnected(
@@ -694,7 +695,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
+          l10n?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -715,7 +716,6 @@ class Web3EIP1193Handler {
 
       if (from == null) {
         _removeActiveRequest(method);
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -734,7 +734,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
+          l10n?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
@@ -807,7 +807,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.internalError,
-          AppLocalizations.of(context)?.web3ErrorNoNativeToken ?? '',
+          l10n?.web3ErrorNoNativeToken ?? '',
         );
       }
 
@@ -1120,6 +1120,7 @@ class Web3EIP1193Handler {
     }
 
     _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
 
     try {
       final connection =
@@ -1129,7 +1130,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorNotConnected ?? '',
+          l10n?.web3ErrorNotConnected ?? '',
         );
       }
 
@@ -1172,7 +1173,7 @@ class Web3EIP1193Handler {
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.unauthorized,
-          AppLocalizations.of(context)?.web3ErrorAddressNotAuthorized ?? '',
+          l10n?.web3ErrorAddressNotAuthorized ?? '',
         );
       }
 
@@ -1563,6 +1564,7 @@ class Web3EIP1193Handler {
     }
 
     _addActiveRequest(method);
+    final l10n = AppLocalizations.of(context);
 
     try {
       final params = message.payload['params'] as List<dynamic>?;
@@ -1580,7 +1582,6 @@ class Web3EIP1193Handler {
       final chainParams = params[0] as Map<String, dynamic>;
       if (!chainParams.containsKey(kParamChainId)) {
         _removeActiveRequest(method);
-        final l10n = AppLocalizations.of(context);
         return _returnError(
           message.uuid,
           Web3EIP1193ErrorCode.invalidInput,
@@ -1649,7 +1650,6 @@ class Web3EIP1193Handler {
           await appState.syncData();
         } else {
           _removeActiveRequest(method);
-          final l10n = AppLocalizations.of(context);
           return _returnError(
             message.uuid,
             Web3EIP1193ErrorCode.chainNotAdded,

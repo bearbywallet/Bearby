@@ -35,7 +35,8 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
   String? backupFilePath;
   Uint8List? keystoreBytes;
 
-  final _noScreenshot = NoScreenshot.instance;
+  final _noScreenshot =
+      Platform.isIOS || Platform.isAndroid ? NoScreenshot.instance : null;
   final _confirmPasswordController = TextEditingController();
   final _confirmPasswordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -49,12 +50,14 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
   @override
   void dispose() {
     _confirmPasswordController.dispose();
-    _noScreenshot.screenshotOn();
+    _noScreenshot?.screenshotOn();
     super.dispose();
   }
 
   Future<void> _secureScreen() async {
-    await _noScreenshot.screenshotOff();
+    if (_noScreenshot != null) {
+      await _noScreenshot.screenshotOff();
+    }
   }
 
   void _onCreateBackup(BigInt walletIndex, String name) async {

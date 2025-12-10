@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
@@ -40,7 +41,8 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   Timer? _countdownTimer;
   int _remainingTime = 3600;
 
-  final _noScreenshot = NoScreenshot.instance;
+  final _noScreenshot =
+      Platform.isIOS || Platform.isAndroid ? NoScreenshot.instance : null;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
@@ -54,12 +56,14 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   @override
   void dispose() {
     _countdownTimer?.cancel();
-    _noScreenshot.screenshotOn();
+    _noScreenshot?.screenshotOn();
     super.dispose();
   }
 
   Future<void> _secureScreen() async {
-    await _noScreenshot.screenshotOff();
+    if (_noScreenshot != null) {
+      await _noScreenshot.screenshotOff();
+    }
   }
 
   void _startCountdown() {
