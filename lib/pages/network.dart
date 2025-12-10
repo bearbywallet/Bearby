@@ -164,6 +164,37 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         .toList();
   }
 
+  List<NetworkItem> _getSortedNetworks(
+      List<NetworkItem> networks, NetworkConfigInfo? chain, WalletInfo? wallet) {
+    final sortedNetworks = List<NetworkItem>.from(networks);
+
+    sortedNetworks.sort((a, b) {
+      final aIsSelected = chain?.chainId == a.configInfo.chainId &&
+          chain?.slip44 == a.configInfo.slip44;
+      final bIsSelected = chain?.chainId == b.configInfo.chainId &&
+          chain?.slip44 == b.configInfo.slip44;
+
+      if (aIsSelected && !bIsSelected) return -1;
+      if (!aIsSelected && bIsSelected) return 1;
+
+      final aIsDefault = wallet?.defaultChainHash == a.configInfo.chainHash;
+      final bIsDefault = wallet?.defaultChainHash == b.configInfo.chainHash;
+
+      if (aIsDefault && !bIsDefault) return -1;
+      if (!aIsDefault && bIsDefault) return 1;
+
+      final aIsMainnet = !(a.configInfo.testnet ?? false);
+      final bIsMainnet = !(b.configInfo.testnet ?? false);
+
+      if (aIsMainnet && !bIsMainnet) return -1;
+      if (!aIsMainnet && bIsMainnet) return 1;
+
+      return 0;
+    });
+
+    return sortedNetworks;
+  }
+
   void _handleNetworkSelect(NetworkItem networkItem) async {
     final appState = Provider.of<AppState>(context, listen: false);
     final config = networkItem.configInfo;
@@ -174,7 +205,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         await appState.syncData();
       } catch (e) {
         setState(() {
-          errorMessage = '${AppLocalizations.of(context)!.networkPageAddError}$e';
+          errorMessage =
+              '${AppLocalizations.of(context)!.networkPageAddError}$e';
         });
         return;
       }
@@ -205,7 +237,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
         await _loadNetworks();
       } catch (e) {
         setState(() {
-          errorMessage = '${AppLocalizations.of(context)!.networkPageAddError}$e';
+          errorMessage =
+              '${AppLocalizations.of(context)!.networkPageAddError}$e';
         });
         return;
       }
@@ -223,33 +256,34 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     );
   }
 
-  Widget _buildNetworkList(
-      List<NetworkItem> networks,
-      AppTheme theme,
-      NetworkConfigInfo? chain,
-      WalletInfo? wallet) {
+  Widget _buildNetworkList(List<NetworkItem> networks, AppTheme theme,
+      NetworkConfigInfo? chain, WalletInfo? wallet) {
     if (networks.isEmpty) return const SizedBox.shrink();
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
-      children: networks.map((network) => NetworkCard(
-            configInfo: network.configInfo,
-            isAdded: network.isAdded,
-            isDefault:
-                wallet?.defaultChainHash == network.configInfo.chainHash,
-            isSelected: chain?.chainId == network.configInfo.chainId &&
-                chain?.slip44 == network.configInfo.slip44,
-            isTestnet: network.configInfo.testnet ?? false,
-            iconUrl:
-                viewChain(network: network.configInfo, theme: theme.value),
-            onNetworkSelect: (config) {
-              final item = networks.firstWhere((n) => n.configInfo.chainHash == config.chainHash);
-              _handleNetworkSelect(item);
-            },
-            onNetworkEdit: (config) {
-              final item = networks.firstWhere((n) => n.configInfo.chainHash == config.chainHash);
-              _handleEditNetwork(item);
-            },
-          )).toList(),
+      children: networks
+          .map((network) => NetworkCard(
+                configInfo: network.configInfo,
+                isAdded: network.isAdded,
+                isDefault:
+                    wallet?.defaultChainHash == network.configInfo.chainHash,
+                isSelected: chain?.chainId == network.configInfo.chainId &&
+                    chain?.slip44 == network.configInfo.slip44,
+                isTestnet: network.configInfo.testnet ?? false,
+                iconUrl:
+                    viewChain(network: network.configInfo, theme: theme.value),
+                onNetworkSelect: (config) {
+                  final item = networks.firstWhere(
+                      (n) => n.configInfo.chainHash == config.chainHash);
+                  _handleNetworkSelect(item);
+                },
+                onNetworkEdit: (config) {
+                  final item = networks.firstWhere(
+                      (n) => n.configInfo.chainHash == config.chainHash);
+                  _handleEditNetwork(item);
+                },
+              ))
+          .toList(),
     );
   }
 
@@ -260,9 +294,10 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final chain = appState.chain;
     final wallet = appState.wallet;
     final adaptivePadding = AdaptiveSize.getAdaptivePadding(context, 16);
-    final filteredNetworks = _getFilteredNetworks(allNetworks)
+    final filtered = _getFilteredNetworks(allNetworks)
         .where((network) => isTestnet || !(network.configInfo.testnet ?? false))
         .toList();
+    final filteredNetworks = _getSortedNetworks(filtered, chain, wallet);
     final l10n = AppLocalizations.of(context)!;
 
     return Scaffold(
@@ -308,7 +343,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                   Padding(
                       padding: const EdgeInsets.all(16),
                       child: Text(errorMessage!,
-                          style: theme.bodyText2.copyWith(color: theme.danger))),
+                          style:
+                              theme.bodyText2.copyWith(color: theme.danger))),
                 Expanded(
                   child: SingleChildScrollView(
                     physics: const BouncingScrollPhysics(),
@@ -317,10 +353,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                     child: Align(
                       alignment: Alignment.topLeft,
                       child: _buildNetworkList(
-                          filteredNetworks,
-                          theme,
-                          chain,
-                          wallet),
+                          filteredNetworks, theme, chain, wallet),
                     ),
                   ),
                 ),
