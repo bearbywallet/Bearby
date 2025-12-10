@@ -5,6 +5,7 @@ import 'package:zilpay/components/counter.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'dart:async';
 import 'package:zilpay/components/custom_app_bar.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -48,7 +49,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
     _bip39Index = appState.wallet!.accounts.length;
     _checkBiometricAvailability(appState);
 
-    if (appState.account?.addrType == 0) {
+    if (appState.account?.addrType == kScillaAddressType) {
       _zilliqaLegacy = true;
     }
   }
@@ -108,7 +109,7 @@ class _AddAccountState extends State<AddAccount> with StatusBarMixin {
       return false;
     }
 
-    return appState.chain?.slip44 == 313 &&
+    return appState.chain?.slip44 == kZilliqaSlip44 &&
         appState.wallet != null &&
         defaultChain.slip44 == appState.chain?.slip44;
   }

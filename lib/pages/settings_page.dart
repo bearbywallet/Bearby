@@ -4,6 +4,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/settings_item.dart';
 import 'package:zilpay/components/wallet_section.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -83,11 +84,11 @@ class _SettingsPageState extends State<SettingsPage> {
                                 theme: theme, appState: appState),
                             const SizedBox(height: 24),
                             _buildSettingsGroup(theme, [
-                              if (appState.chain?.slip44 == 313 &&
+                              if (appState.chain?.slip44 == kZilliqaSlip44 &&
                                   appState.wallet != null &&
                                   !appState.wallet!.walletType.contains(WalletType
                                       .ledger
-                                      .name)) // 313 this is officially  zilliqa slip44 number.
+                                      .name)) 
                                 Container(
                                   padding: const EdgeInsets.symmetric(
                                       horizontal: 16, vertical: 4),
@@ -114,7 +115,7 @@ class _SettingsPageState extends State<SettingsPage> {
                                       ),
                                       Switch(
                                         padding: EdgeInsets.all(0),
-                                        value: appState.account?.addrType == 0,
+                                        value: appState.account?.addrType == kScillaAddressType,
                                         onChanged: (bool value) async {
                                           BigInt walletIndex = BigInt.from(
                                               appState.selectedWallet);

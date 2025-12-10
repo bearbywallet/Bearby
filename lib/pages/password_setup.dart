@@ -7,6 +7,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/services/auth_guard.dart';
@@ -89,7 +90,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         _argon2 = argon2;
         _bypassChecksumValidation = bypassChecksumValidation ?? false;
 
-        if (_chain?.slip44 == 313) {
+        if (_chain?.slip44 == kZilliqaSlip44) {
           _zilLegacy = true;
         }
 
@@ -294,7 +295,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
 
       await _appState.syncData();
 
-      if (_zilLegacy && _chain?.slip44 == 313) {
+      if (_zilLegacy && _chain?.slip44 == kZilliqaSlip44) {
         BigInt walletIndex = BigInt.from(_appState.selectedWallet);
         await zilliqaSwapChain(
           walletIndex: walletIndex,
@@ -444,7 +445,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
                               color: theme.danger,
                             ),
                           ),
-                          if (_chain?.slip44 == 313)
+                          if (_chain?.slip44 == kZilliqaSlip44)
                             Padding(
                               padding:
                                   const EdgeInsets.symmetric(horizontal: 4),

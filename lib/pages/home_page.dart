@@ -10,6 +10,7 @@ import 'package:zilpay/components/net_btn.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/components/token_card.dart';
 import 'package:zilpay/components/wallet_header.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
@@ -243,7 +244,7 @@ class _HomePageState extends State<HomePage>
                 textColor: theme.primaryPurple,
               ),
               if (appState.account != null &&
-                  appState.chain?.slip44 == 313) ...[
+                  appState.chain?.slip44 == kZilliqaSlip44) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
@@ -262,13 +263,13 @@ class _HomePageState extends State<HomePage>
                 ),
               ],
               if (appState.account != null &&
-                  appState.chain?.slip44 == 313 &&
+                  appState.chain?.slip44 == kZilliqaSlip44 &&
                   !appState.wallet!.walletType
                       .contains(WalletType.ledger.name)) ...[
                 SizedBox(width: adaptivePaddingCard),
                 TileButton(
                   icon: SvgPicture.asset(
-                    appState.account?.addrType == 0
+                    appState.account?.addrType == kScillaAddressType
                         ? "assets/icons/scilla.svg"
                         : "assets/icons/solidity.svg",
                     width: iconSizeTileButton,
@@ -276,7 +277,7 @@ class _HomePageState extends State<HomePage>
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
-                  title: appState.account?.addrType == 0 ? "Scilla" : "EVM",
+                  title: appState.account?.addrType == kScillaAddressType ? "Scilla" : "EVM",
                   onPressed: () async {
                     BigInt walletIndex = BigInt.from(appState.selectedWallet);
                     await zilliqaSwapChain(

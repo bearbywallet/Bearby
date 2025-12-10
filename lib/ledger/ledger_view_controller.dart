@@ -4,6 +4,7 @@ import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/eth_ledger_app.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
@@ -156,7 +157,7 @@ class LedgerViewController extends ChangeNotifier {
     required AccountInfo account,
     required BigInt walletIndex,
   }) async {
-    if (account.slip44 == 60 || account.slip44 == 313) {
+    if (account.slip44 == kEthereumSlip44 || account.slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       final typedDataJson = jsonEncode(typedData.toJson());
       final eip712Hashes =
@@ -196,7 +197,7 @@ class LedgerViewController extends ChangeNotifier {
         transaction: transaction,
         walletIndex: walletIndex,
         accountIndex: account.index.toInt(),
-        slip44: 60,
+        slip44: kEthereumSlip44,
       );
 
       return sig.toBytes();
@@ -212,7 +213,7 @@ class LedgerViewController extends ChangeNotifier {
   }) async {
     String? sig;
 
-    if (account.slip44 == 313 && account.addrType == 0) {
+    if (account.slip44 == kZilliqaSlip44 && account.addrType == 0) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       final hashBytes = await prepareMessage(
         walletIndex: walletIndex,
@@ -223,7 +224,7 @@ class LedgerViewController extends ChangeNotifier {
         account.index.toInt(),
         hashBytes,
       );
-    } else if (account.slip44 == 313 || account.slip44 == 60) {
+    } else if (account.slip44 == kZilliqaSlip44 || account.slip44 == kEthereumSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       Uint8List bytes = utf8.encode(message);
       final personalSig = await evmApp.signPersonalMessage(
@@ -282,11 +283,11 @@ class LedgerViewController extends ChangeNotifier {
 
     List<LedgerAccount> accounts = [];
 
-    if (_detectedAppType == LedgerAppType.zilliqa && slip44 == 313) {
+    if (_detectedAppType == LedgerAppType.zilliqa && slip44 == kZilliqaSlip44) {
       final zilliqaApp = ZilliqaLedgerApp(_connectedTransport!);
       accounts = await zilliqaApp
           .getPublicAddress(List<int>.generate(count, (i) => i));
-    } else if (slip44 == 60 || slip44 == 313) {
+    } else if (slip44 == kEthereumSlip44 || slip44 == kZilliqaSlip44) {
       final evmApp = EthLedgerApp(_connectedTransport!);
       accounts = await evmApp.getAccounts(
         chainId: chainId,

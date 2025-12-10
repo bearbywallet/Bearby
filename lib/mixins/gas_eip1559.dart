@@ -1,3 +1,4 @@
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/src/rust/models/ftoken.dart';
 
 enum GasFeeOption { low, market, aggressive }
@@ -5,13 +6,13 @@ enum GasFeeOption { low, market, aggressive }
 BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
   switch (option) {
     case GasFeeOption.low:
-      final multiplied = priorityFee * BigInt.from(120);
+      final multiplied = priorityFee * BigInt.from(kGasPriceMultiplierLow);
       return multiplied ~/ BigInt.from(100);
     case GasFeeOption.market:
-      final multiplied = priorityFee * BigInt.from(200);
+      final multiplied = priorityFee * BigInt.from(kGasPriceMultiplierMarket);
       return multiplied ~/ BigInt.from(100);
     case GasFeeOption.aggressive:
-      final multiplied = priorityFee * BigInt.from(400);
+      final multiplied = priorityFee * BigInt.from(kGasPriceMultiplierAggressive);
       return multiplied ~/ BigInt.from(100);
   }
 }
@@ -19,15 +20,15 @@ BigInt calculateMaxPriorityFee(GasFeeOption option, BigInt priorityFee) {
 BigInt calculateGasPrice(GasFeeOption option, BigInt gasPrice) {
   switch (option) {
     case GasFeeOption.low:
-      final multiplied = gasPrice * BigInt.from(120);
+      final multiplied = gasPrice * BigInt.from(kGasPriceMultiplierLow);
       return multiplied ~/ BigInt.from(100);
 
     case GasFeeOption.market:
-      final multiplied = gasPrice * BigInt.from(150);
+      final multiplied = gasPrice * BigInt.from(kGasPriceMultiplierMarket);
       return multiplied ~/ BigInt.from(100);
 
     case GasFeeOption.aggressive:
-      final multiplied = gasPrice * BigInt.from(200);
+      final multiplied = gasPrice * BigInt.from(kGasPriceMultiplierAggressive);
       return multiplied ~/ BigInt.from(100);
   }
 }

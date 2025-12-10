@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
 
@@ -67,8 +68,8 @@ class ParsedEvmReceipt {
     if (value == null) return null;
     if (value is int) return value;
     if (value is String) {
-      if (value == '0x1') return 1;
-      if (value == '0x0') return 0;
+      if (value == kHexOne) return 1;
+      if (value == kHexZero) return 0;
       return int.tryParse(value);
     }
     return null;

@@ -11,6 +11,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -54,7 +55,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
     _amountController.text = amount;
     _accountNameController.text = appState.account?.name ?? "";
 
-    if (chain.slip44 == 313) {
+    if (chain.slip44 == kZilliqaSlip44) {
       zilliqaGetNFormat(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
@@ -404,7 +405,7 @@ class _ReceivePageState extends State<ReceivePage> with StatusBarMixin {
           backgroundColor: theme.cardBackground,
           textColor: theme.primaryPurple,
         ),
-        if (account != null && chain.slip44 == 313)
+        if (account != null && chain.slip44 == kZilliqaSlip44)
           TileButton(
             icon: SvgPicture.asset(
               useLegacyAddress

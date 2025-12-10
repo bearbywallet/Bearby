@@ -3,6 +3,7 @@ import 'package:flutter_svg/flutter_svg.dart';
 import 'package:provider/provider.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/jazzicon.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/book.dart';
 import 'package:zilpay/src/rust/api/methods.dart';
@@ -360,7 +361,7 @@ class _AddressSelectModalContentState
   }
 
   bool _isZilliqaNetwork(AppState appState) {
-    return appState.account?.slip44 == 313;
+    return appState.account?.slip44 == kZilliqaSlip44;
   }
 
   String _getNetworkIconPath(Entry entry) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
 import 'package:zilpay/ledger/transport/transport.dart';
@@ -145,7 +146,7 @@ class ZilliqaLedgerApp {
       tx: transaction,
       walletIndex: BigInt.from(walletIndex),
       accountIndex: BigInt.from(accountIndex),
-      slip44: 313,
+      slip44: kZilliqaSlip44,
     );
     final txnBytes = txProto.bytes;
 

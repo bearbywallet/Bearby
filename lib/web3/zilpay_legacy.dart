@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_inappwebview/flutter_inappwebview.dart';
 import 'package:provider/provider.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/mixins/transaction_parsing.dart';
 import 'package:zilpay/modals/sign_message.dart';
 import 'package:zilpay/modals/transfer.dart';
@@ -204,7 +205,7 @@ class ZilPayLegacyHandler {
     try {
       final appState = Provider.of<AppState>(context, listen: false);
 
-      if (appState.account?.addrType == 1 && appState.chain?.slip44 == 313) {
+      if (appState.account?.addrType == kEvmAddressType && appState.chain?.slip44 == kZilliqaSlip44) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -291,7 +292,7 @@ class ZilPayLegacyHandler {
         evm: null,
       );
 
-      if (account.addrType == 1) {
+      if (account.addrType == kEvmAddressType) {
         await zilliqaSwapChain(
           walletIndex: BigInt.from(appState.selectedWallet),
           accountIndex: appState.wallet!.selectedAccount,
@@ -360,7 +361,7 @@ class ZilPayLegacyHandler {
     final appState = Provider.of<AppState>(context, listen: false);
     final account = appState.account!;
 
-    if (account.addrType == 1) {
+    if (account.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
@@ -433,7 +434,7 @@ class ZilPayLegacyHandler {
       return;
     }
 
-    if (appState.account?.addrType == 1) {
+    if (appState.account?.addrType == kEvmAddressType) {
       await zilliqaSwapChain(
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,

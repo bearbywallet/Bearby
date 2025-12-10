@@ -31,6 +31,11 @@ const String kTestnetChainsPath = 'assets/chains/testnet-chains.json';
 const int kDefaultEvmDecimals = 18;
 const List<int> kDefaultEvmFeatures = [155, 1559, 4844];
 
+// Gas price multipliers
+const int kGasPriceMultiplierLow = 120;
+const int kGasPriceMultiplierMarket = 150;
+const int kGasPriceMultiplierAggressive = 200;
+
 // Testnet identifier
 const String kTestnetIdentifier = 'test';
 
@@ -79,4 +84,5 @@ const String kParamName = 'name';
 // Hex prefix
 const String kHexPrefix = '0x';
 const String kHexZero = '0x0';
+const String kHexOne = '0x1';
 const int kHexRadix = 16;

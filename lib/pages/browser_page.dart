@@ -11,6 +11,7 @@ import 'package:zilpay/components/image_cache.dart';
 import 'package:zilpay/components/smart_input.dart';
 import 'package:zilpay/components/tile_button.dart';
 import 'package:zilpay/config/search_engines.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/status_bar.dart';
@@ -188,11 +189,11 @@ class _BrowserPageState extends State<BrowserPage>
 
   Future<void> _initializeZilPayInjection(AppState appState) async {
     try {
-      if (appState.chain?.slip44 == 60 || appState.chain?.slip44 == 313) {
+      if (appState.chain?.slip44 == kEthereumSlip44 || appState.chain?.slip44 == kZilliqaSlip44) {
         await _webViewController?.injectJavascriptFileFromAsset(
             assetFilePath: 'assets/evm_inject.js');
       }
-      if (appState.chain?.slip44 == 313) {
+      if (appState.chain?.slip44 == kZilliqaSlip44) {
         String scilla =
             await rootBundle.loadString('assets/zilpay_legacy_inject.js');
         await _webViewController?.evaluateJavascript(source: scilla);
