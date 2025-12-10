@@ -179,25 +179,54 @@ class _ManageTokensPageState extends State<ManageTokensPage>
     if (!mounted) return;
 
     final appState = Provider.of<AppState>(context, listen: false);
-    if (!_canFetchApiTokens(appState)) return;
 
     setState(() => _isLoading = true);
 
-    try {
-      final tokens = await autoHintTokens(
-        walletIndex: BigInt.from(appState.selectedWallet),
-      );
+    List<FTokenInfo> apiTokens = [];
+    List<FTokenInfo> localTokens = [];
 
-      if (mounted) {
-        setState(() {
-          _suggestedTokens = tokens;
-        });
+    try {
+      if (_canFetchApiTokens(appState)) {
+        try {
+          apiTokens = await autoHintTokens(
+            walletIndex: BigInt.from(appState.selectedWallet),
+          );
+        } catch (e) {
+          debugPrint("Failed to fetch suggested tokens from API: \$e");
+        }
+      }
+
+      final Set<String> knownAddresses =
+          apiTokens.map((t) => t.addr.toLowerCase()).toSet();
+      final currentWalletTokens = appState.wallet?.tokens ?? [];
+
+      for (var t in currentWalletTokens) {
+        knownAddresses.add(t.addr.toLowerCase());
+      }
+
+      final targetChainHash = _currentChainHash ?? appState.chain?.chainHash;
+
+      if (targetChainHash != null) {
+        for (final wallet in appState.wallets) {
+          for (final token in wallet.tokens) {
+            if (token.chainHash == targetChainHash && !token.native) {
+              final addr = token.addr.toLowerCase();
+              if (!knownAddresses.contains(addr)) {
+                localTokens.add(token);
+                knownAddresses.add(addr);
+              }
+            }
+          }
+        }
       }
     } catch (e) {
-      debugPrint("Failed to fetch suggested tokens: $e");
+      debugPrint("Failed to prepare suggested tokens: \$e");
     } finally {
       if (mounted) {
-        setState(() => _isLoading = false);
+        setState(() {
+          _suggestedTokens = [...apiTokens, ...localTokens];
+          _isLoading = false;
+        });
       }
     }
   }
