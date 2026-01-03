@@ -65,7 +65,7 @@ mod btc_wallet_tests {
             accounts: vec![(0, "BTC Account".to_string())],
             passphrase: "".to_string(),
             wallet_name: "Bitcoin Wallet".to_string(),
-            biometric_type: "none".to_string(),
+            biometric_type: "faceId".to_string(),
             chain_hash: btc_testnet_provider.hash(),
             bip_purpose: DerivationPath::BIP44_PURPOSE,
             identifiers: vec![String::from("test btc")],
