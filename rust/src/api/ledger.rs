@@ -39,11 +39,18 @@ pub async fn add_ledger_wallet(
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let provider = core.get_provider(params.chain_hash)?;
+        let net = if provider.config.testnet.unwrap_or(false) {
+            Some(bitcoin::Network::Bitcoin)
+        } else if provider.config.testnet.unwrap_or(false) == true {
+            Some(bitcoin::Network::Testnet)
+        } else {
+            None
+        };
         let bip49 = DerivationPath::new(
             provider.config.slip_44,
             params.wallet_index,
             params.bip_purpose,
-            None,
+            net,
         );
         let pub_keys = params
             .pub_keys
@@ -91,14 +98,26 @@ pub async fn update_ledger_accounts(
         let wallet_data = wallet
             .get_wallet_data()
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
-
+        let selected_account = wallet_data
+            .get_selected_account()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
         let provider = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = DerivationPath::new(
-            provider.config.slip_44,
-            wallet_index,
-            DerivationPath::BIP44_PURPOSE,
-            None,
-        );
+        let bip49 = match selected_account.pub_key {
+            PubKey::Secp256k1Sha256(_)
+            | PubKey::Secp256k1Keccak256(_)
+            | PubKey::Ed25519Solana(_) => DerivationPath::new(
+                provider.config.slip_44,
+                wallet_index,
+                DerivationPath::BIP44_PURPOSE,
+                None,
+            ),
+            PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
+                provider.config.slip_44,
+                wallet_index,
+                DerivationPath::bip_from_address_type(btc_addr_type),
+                Some(net),
+            ),
+        };
         let mut accounts = accounts
             .into_iter()
             .map(|(ledger_index, pk, name)| {
