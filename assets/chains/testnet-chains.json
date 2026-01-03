@@ -1,5 +1,30 @@
 [
   {
+    "name": "Bitcoin Testnet",
+    "chain": "BTC",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "ssl://btc-testnet.zilpay.io:60402"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": null,
+        "addr": "tb1pqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqqq",
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "decimals": 8
+      }
+    ],
+    "chainIds": [1, 0],
+    "infoURL": "https://bitcoin.org",
+    "testnet": true,
+    "shortName": "bitcoin",
+    "slip44": 0,
+    "explorers": []
+  },
+  {
     "name": "Zilliqa Test",
     "chain": "ZIL",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
