@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:zilpay/config/bip_purposes.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ethereum/models.dart';
 import 'package:zilpay/ledger/ledger_operation.dart';
@@ -47,7 +48,7 @@ class EthLedgerApp {
   }
 
   Future<List<int>> _getPaths({required int slip44, required int index}) async {
-    final String path = "44'/$slip44'/0'/0/$index";
+    final String path = "$kBip44Purpose'/$slip44'/0'/0/$index";
     final paths = await ledgerSplitPath(path: path);
     return paths;
   }

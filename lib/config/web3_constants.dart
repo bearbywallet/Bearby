@@ -6,6 +6,7 @@ const String kAccountsChangedEvent = 'accountsChanged';
 const String kChainChangedEvent = 'chainChanged';
 
 // Network identifiers
+const int kBitcoinlip44 = 0;
 const int kZilliqaSlip44 = 313;
 const int kEthereumSlip44 = 60;
 final BigInt kZilliqaChainId = BigInt.one;

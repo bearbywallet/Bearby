@@ -9,6 +9,7 @@ import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/enable_card.dart';
 import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/bip_purposes.dart';
 import 'package:zilpay/ledger/common.dart';
 import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/ledger_view_controller.dart';
@@ -209,6 +210,7 @@ class _AddLedgerAccountPageState extends State<AddLedgerAccountPage>
             identifiers: identifiers,
             chainHash: chainHash,
             zilliqaLegacy: isZilliqaApp,
+            bipPurpose: kBip44Purpose,
           ),
           walletSettings: settings,
           ftokens: ftokens,

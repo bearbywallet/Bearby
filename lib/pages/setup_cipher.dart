@@ -27,6 +27,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
   NetworkConfigInfo? _chain;
   KeyPairInfo? _keys;
   bool _bypassChecksumValidation = false;
+  int? _bipPurpose;
   WalletArgonParamsInfo _argonParams = Argon2DefaultParams.owaspDefault();
   int selectedCipherIndex = 2;
 
@@ -72,6 +73,7 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
       _chain = args['chain'] as NetworkConfigInfo?;
       _keys = args['keys'] as KeyPairInfo?;
       _bypassChecksumValidation = args['ignore_checksum'] as bool? ?? false;
+      _bipPurpose = args['bipPurpose'] as int?;
     });
 
     cipherDescriptions[0]['title'] =
@@ -198,17 +200,25 @@ class _CipherSettingsPageState extends State<CipherSettingsPage>
                         backgroundColor: theme.primaryPurple,
                         text: AppLocalizations.of(context)!
                             .cipherSettingsPageConfirmButton,
-                        onPressed: () => Navigator.of(context).pushNamed(
-                          '/pass_setup',
-                          arguments: {
+                        onPressed: () {
+                          final args = {
                             'bip39': _bip39List,
                             'chain': _chain,
                             'keys': _keys,
                             'cipher': _getCipherOrders(),
                             'argon2': _argonParams,
                             'ignore_checksum': _bypassChecksumValidation,
-                          },
-                        ),
+                          };
+
+                          if (_bipPurpose != null) {
+                            args['bipPurpose'] = _bipPurpose;
+                          }
+
+                          Navigator.of(context).pushNamed(
+                            '/pass_setup',
+                            arguments: args,
+                          );
+                        },
                         borderRadius: 30.0,
                         height: 50.0,
                       ),

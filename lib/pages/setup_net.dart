@@ -5,6 +5,7 @@ import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/option_list.dart';
 import 'package:zilpay/components/smart_input.dart';
+import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
@@ -177,7 +178,7 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      '${l10n.setupNetworkSettingsPageChainIdLabel} ${chain.chainIds.where((id) => id != BigInt.zero).toList().join(",")}',
+                      '${l10n.setupNetworkSettingsPageChainIdLabel} ${chain.chainIds.toList().first}',
                       style: theme.bodyText2.copyWith(
                         color: theme.primaryPurple,
                       ),
@@ -324,15 +325,29 @@ class _SetupNetworkSettingsPageState extends State<SetupNetworkSettingsPage>
                               );
                               return;
                             } else {
-                              Navigator.of(context).pushNamed(
-                                '/cipher_setup',
-                                arguments: {
-                                  'bip39': _bip39List,
-                                  'keys': _keys,
-                                  'chain': chain,
-                                  'ignore_checksum': _bypassChecksumValidation,
-                                },
-                              );
+                              if (chain.slip44 == kBitcoinlip44) {
+                                Navigator.of(context).pushNamed(
+                                  '/bip_purpose_setup',
+                                  arguments: {
+                                    'bip39': _bip39List,
+                                    'keys': _keys,
+                                    'chain': chain,
+                                    'ignore_checksum':
+                                        _bypassChecksumValidation,
+                                  },
+                                );
+                              } else {
+                                Navigator.of(context).pushNamed(
+                                  '/cipher_setup',
+                                  arguments: {
+                                    'bip39': _bip39List,
+                                    'keys': _keys,
+                                    'chain': chain,
+                                    'ignore_checksum':
+                                        _bypassChecksumValidation,
+                                  },
+                                );
+                              }
                             }
                           },
                     borderRadius: 30.0,
