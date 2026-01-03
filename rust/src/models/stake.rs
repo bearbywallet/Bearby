@@ -1,5 +1,6 @@
+use zilpay::network::zil::{FinalOutput, LPToken, PendingWithdrawal, ZilValidator};
+
 use super::ftoken::FTokenInfo;
-use zilpay::network::stake::{FinalOutput, LPToken, PendingWithdrawal, ZilValidator};
 
 pub struct PendingWithdrawalInfo {
     pub amount: String,

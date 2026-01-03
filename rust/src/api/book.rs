@@ -13,6 +13,7 @@ pub use zilpay::settings::{
 };
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
+    config::key::PUB_KEY_SIZE,
     crypto::slip44::ZILLIQA,
     proto::{address::Address, pubkey::PubKey},
     wallet::{wallet_storage::StorageOperations, wallet_types::WalletTypes},
@@ -82,7 +83,11 @@ pub async fn get_combine_sort_addresses(wallet_index: usize) -> Result<Vec<Categ
 
             accounts.extend(wallet_data.accounts.iter().flat_map(|acc| {
                 let name = acc.name.clone();
-                let pub_key_bytes = acc.pub_key.as_bytes();
+                let pub_key_bytes = acc
+                    .pub_key
+                    .as_bytes()
+                    .try_into()
+                    .unwrap_or([0u8; PUB_KEY_SIZE]);
                 vec![
                     Entry {
                         name: name.clone(),

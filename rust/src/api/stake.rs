@@ -3,7 +3,7 @@ use std::sync::Arc;
 use zilpay::{
     background::{bg_provider::ProvidersManagement, bg_wallet::WalletManagement},
     errors::wallet::WalletErrors,
-    network::{scilla_stake::ZilliqaScillaStakeing, zil_stake_evm::ZilliqaEVMStakeing},
+    network::zil::{ZilliqaEVMStakeing, ZilliqaScillaStakeing},
     proto::{address::Address, U256},
     wallet::wallet_storage::StorageOperations,
 };

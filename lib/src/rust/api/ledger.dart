@@ -37,6 +37,7 @@ class LedgerParamsInput {
   final List<String> identifiers;
   final BigInt chainHash;
   final bool zilliqaLegacy;
+  final int bipPurpose;
 
   const LedgerParamsInput({
     required this.pubKeys,
@@ -48,6 +49,7 @@ class LedgerParamsInput {
     required this.identifiers,
     required this.chainHash,
     required this.zilliqaLegacy,
+    required this.bipPurpose,
   });
 
   @override
@@ -60,7 +62,8 @@ class LedgerParamsInput {
       biometricType.hashCode ^
       identifiers.hashCode ^
       chainHash.hashCode ^
-      zilliqaLegacy.hashCode;
+      zilliqaLegacy.hashCode ^
+      bipPurpose.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -75,5 +78,6 @@ class LedgerParamsInput {
           biometricType == other.biometricType &&
           identifiers == other.identifiers &&
           chainHash == other.chainHash &&
-          zilliqaLegacy == other.zilliqaLegacy;
+          zilliqaLegacy == other.zilliqaLegacy &&
+          bipPurpose == other.bipPurpose;
 }

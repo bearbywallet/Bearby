@@ -199,6 +199,7 @@ class AddSKWalletParams {
   final String biometricType;
   final List<String> identifiers;
   final BigInt chainHash;
+  final int bipPurpose;
 
   const AddSKWalletParams({
     required this.sk,
@@ -207,6 +208,7 @@ class AddSKWalletParams {
     required this.biometricType,
     required this.identifiers,
     required this.chainHash,
+    required this.bipPurpose,
   });
 
   @override
@@ -216,7 +218,8 @@ class AddSKWalletParams {
       walletName.hashCode ^
       biometricType.hashCode ^
       identifiers.hashCode ^
-      chainHash.hashCode;
+      chainHash.hashCode ^
+      bipPurpose.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -228,7 +231,8 @@ class AddSKWalletParams {
           walletName == other.walletName &&
           biometricType == other.biometricType &&
           identifiers == other.identifiers &&
-          chainHash == other.chainHash;
+          chainHash == other.chainHash &&
+          bipPurpose == other.bipPurpose;
 }
 
 class Bip39AddWalletParams {
@@ -241,6 +245,7 @@ class Bip39AddWalletParams {
   final String biometricType;
   final BigInt chainHash;
   final List<String> identifiers;
+  final int bipPurpose;
 
   const Bip39AddWalletParams({
     required this.password,
@@ -252,6 +257,7 @@ class Bip39AddWalletParams {
     required this.biometricType,
     required this.chainHash,
     required this.identifiers,
+    required this.bipPurpose,
   });
 
   @override
@@ -264,7 +270,8 @@ class Bip39AddWalletParams {
       walletName.hashCode ^
       biometricType.hashCode ^
       chainHash.hashCode ^
-      identifiers.hashCode;
+      identifiers.hashCode ^
+      bipPurpose.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -279,5 +286,6 @@ class Bip39AddWalletParams {
           walletName == other.walletName &&
           biometricType == other.biometricType &&
           chainHash == other.chainHash &&
-          identifiers == other.identifiers;
+          identifiers == other.identifiers &&
+          bipPurpose == other.bipPurpose;
 }

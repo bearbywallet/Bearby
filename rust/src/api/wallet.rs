@@ -56,6 +56,7 @@ pub struct Bip39AddWalletParams {
     pub biometric_type: String,
     pub chain_hash: u64,
     pub identifiers: Vec<String>,
+    pub bip_purpose: u32,
 }
 
 pub async fn add_bip39_wallet(
@@ -69,7 +70,12 @@ pub async fn add_bip39_wallet(
         let accounts_bip49 = params
             .accounts
             .into_iter()
-            .map(|(i, name)| (provider.get_bip49(i), name))
+            .map(|(i, name)| {
+                (
+                    DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, None),
+                    name,
+                )
+            })
             .collect::<Vec<(DerivationPath, String)>>();
         let ftokens = ftokens
             .into_iter()
@@ -105,6 +111,7 @@ pub struct AddSKWalletParams {
     pub biometric_type: String,
     pub identifiers: Vec<String>,
     pub chain_hash: u64,
+    pub bip_purpose: u32,
 }
 
 pub async fn add_sk_wallet(
@@ -118,7 +125,8 @@ pub async fn add_sk_wallet(
             .map(TryFrom::try_from)
             .collect::<Result<Vec<FToken>, TokenError>>()?;
         let provider = core.get_provider(params.chain_hash)?;
-        let bip49 = provider.get_bip49(0);
+        let bip49 = DerivationPath::new(provider.config.slip_44, 0, params.bip_purpose, None);
+
         let secret_key = secretkey_from_provider(&params.sk, bip49)?;
         let session = core.add_sk_wallet(BackgroundSKParams {
             ftokens,
@@ -165,7 +173,22 @@ pub async fn add_next_bip39_account(params: AddNextBip39AccountParams) -> Result
             .get_selected_account()
             .map_err(|e| ServiceError::WalletError(params.wallet_index, e))?;
         let default_chain = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = default_chain.get_bip49(params.account_index);
+        let bip49 = match selected_account.pub_key {
+            PubKey::Secp256k1Sha256(_)
+            | PubKey::Secp256k1Keccak256(_)
+            | PubKey::Ed25519Solana(_) => DerivationPath::new(
+                default_chain.config.slip_44,
+                params.account_index,
+                DerivationPath::BIP44_PURPOSE,
+                None,
+            ),
+            PubKey::Secp256k1Bitcoin((_, net, btc_addr_type)) => DerivationPath::new(
+                default_chain.config.slip_44,
+                params.account_index,
+                DerivationPath::bip_from_address_type(btc_addr_type),
+                Some(net),
+            ),
+        };
 
         wallet
             .add_next_bip39_account(

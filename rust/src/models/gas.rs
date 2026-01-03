@@ -1,5 +1,4 @@
-pub use zilpay::network::gas_parse::GasFeeHistory;
-pub use zilpay::network::gas_parse::RequiredTxParams;
+use zilpay::network::evm::{GasFeeHistory, RequiredTxParams};
 
 #[derive(Default, Debug)]
 pub struct GasFeeHistoryInfo {

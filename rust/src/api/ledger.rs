@@ -1,5 +1,6 @@
 use zilpay::{
-    background::bg_provider::ProvidersManagement, crypto::bip49::split_path,
+    background::bg_provider::ProvidersManagement,
+    crypto::bip49::{split_path, DerivationPath},
     wallet::wallet_storage::StorageOperations,
 };
 pub use zilpay::{
@@ -28,6 +29,7 @@ pub struct LedgerParamsInput {
     pub identifiers: Vec<String>,
     pub chain_hash: u64,
     pub zilliqa_legacy: bool,
+    pub bip_purpose: u32,
 }
 
 pub async fn add_ledger_wallet(
@@ -37,7 +39,12 @@ pub async fn add_ledger_wallet(
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let provider = core.get_provider(params.chain_hash)?;
-        let bip49 = provider.get_bip49(params.wallet_index);
+        let bip49 = DerivationPath::new(
+            provider.config.slip_44,
+            params.wallet_index,
+            params.bip_purpose,
+            None,
+        );
         let pub_keys = params
             .pub_keys
             .into_iter()
@@ -86,7 +93,12 @@ pub async fn update_ledger_accounts(
             .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
 
         let provider = core.get_provider(wallet_data.default_chain_hash)?;
-        let bip49 = provider.get_bip49(wallet_index);
+        let bip49 = DerivationPath::new(
+            provider.config.slip_44,
+            wallet_index,
+            DerivationPath::BIP44_PURPOSE,
+            None,
+        );
         let mut accounts = accounts
             .into_iter()
             .map(|(ledger_index, pk, name)| {

@@ -19,6 +19,8 @@ use crate::{
 
 use super::errors::ServiceError;
 
+extern crate bitcoin;
+
 pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
     if addr.starts_with("0x") {
         Address::from_eth_address(&addr).map_err(ServiceError::AddressError)
@@ -52,7 +54,11 @@ pub fn pubkey_from_provider(
         (slip44::ZILLIQA, true) => PubKey::Secp256k1Sha256(pub_key_bytes),
         (slip44::ZILLIQA, false) => PubKey::Secp256k1Keccak256(pub_key_bytes),
         (slip44::ETHEREUM, _) => PubKey::Secp256k1Keccak256(pub_key_bytes),
-        (slip44::BITCOIN, _) => PubKey::Secp256k1Bitcoin(pub_key_bytes),
+        (slip44::BITCOIN, _) => {
+            let network = bip49.network.unwrap_or(bitcoin::Network::Bitcoin);
+            let addr_type = bip49.get_address_type();
+            PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
+        },
         (slip44::SOLANA, _) => PubKey::Ed25519Solana(pub_key_bytes),
         _ => todo!(),
     };

@@ -198,6 +198,9 @@ async fn fetch_zilliqa_tokens(
     let client = reqwest::Client::new();
 
     match addr {
+        Address::Secp256k1Bitcoin(_) => {
+            return Err("btc is not supporting".to_string());
+        }
         Address::Secp256k1Sha256(_) => {
             let response = client
                 .get(ZILLIQA_SCILLA_TOKENS_API)

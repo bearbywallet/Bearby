@@ -16,6 +16,10 @@ impl From<KeyPair> for KeyPairInfo {
                 sk: hex::encode(sk),
                 pk: hex::encode(pk),
             },
+            KeyPair::Secp256k1Bitcoin((pk, sk, _, _)) => Self {
+                sk: hex::encode(sk),
+                pk: hex::encode(pk),
+            },
         }
     }
 }

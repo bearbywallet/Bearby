@@ -3674,8 +3674,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   AddSKWalletParams dco_decode_add_sk_wallet_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 6)
-      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
     return AddSKWalletParams(
       sk: dco_decode_String(arr[0]),
       password: dco_decode_String(arr[1]),
@@ -3683,6 +3683,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       biometricType: dco_decode_String(arr[3]),
       identifiers: dco_decode_list_String(arr[4]),
       chainHash: dco_decode_u_64(arr[5]),
+      bipPurpose: dco_decode_u_32(arr[6]),
     );
   }
 
@@ -3751,8 +3752,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Bip39AddWalletParams dco_decode_bip_39_add_wallet_params(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return Bip39AddWalletParams(
       password: dco_decode_String(arr[0]),
       mnemonicStr: dco_decode_String(arr[1]),
@@ -3763,6 +3764,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       biometricType: dco_decode_String(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
       identifiers: dco_decode_list_String(arr[8]),
+      bipPurpose: dco_decode_u_32(arr[9]),
     );
   }
 
@@ -4146,8 +4148,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   LedgerParamsInput dco_decode_ledger_params_input(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 9)
-      throw Exception('unexpected arr length: expect 9 but see ${arr.length}');
+    if (arr.length != 10)
+      throw Exception('unexpected arr length: expect 10 but see ${arr.length}');
     return LedgerParamsInput(
       pubKeys: dco_decode_list_record_u_8_string(arr[0]),
       walletIndex: dco_decode_usize(arr[1]),
@@ -4158,6 +4160,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       identifiers: dco_decode_list_String(arr[6]),
       chainHash: dco_decode_u_64(arr[7]),
       zilliqaLegacy: dco_decode_bool(arr[8]),
+      bipPurpose: dco_decode_u_32(arr[9]),
     );
   }
 
@@ -4660,12 +4663,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TransactionRequestInfo dco_decode_transaction_request_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 3)
-      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    if (arr.length != 4)
+      throw Exception('unexpected arr length: expect 4 but see ${arr.length}');
     return TransactionRequestInfo(
       metadata: dco_decode_transaction_metadata_info(arr[0]),
       scilla: dco_decode_opt_box_autoadd_transaction_request_scilla(arr[1]),
       evm: dco_decode_opt_box_autoadd_transaction_request_evm(arr[2]),
+      btc: dco_decode_opt_String(arr[3]),
     );
   }
 
@@ -4910,13 +4914,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_biometricType = sse_decode_String(deserializer);
     var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
+    var var_bipPurpose = sse_decode_u_32(deserializer);
     return AddSKWalletParams(
         sk: var_sk,
         password: var_password,
         walletName: var_walletName,
         biometricType: var_biometricType,
         identifiers: var_identifiers,
-        chainHash: var_chainHash);
+        chainHash: var_chainHash,
+        bipPurpose: var_bipPurpose);
   }
 
   @protected
@@ -4992,6 +4998,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_biometricType = sse_decode_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_identifiers = sse_decode_list_String(deserializer);
+    var var_bipPurpose = sse_decode_u_32(deserializer);
     return Bip39AddWalletParams(
         password: var_password,
         mnemonicStr: var_mnemonicStr,
@@ -5001,7 +5008,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         walletName: var_walletName,
         biometricType: var_biometricType,
         chainHash: var_chainHash,
-        identifiers: var_identifiers);
+        identifiers: var_identifiers,
+        bipPurpose: var_bipPurpose);
   }
 
   @protected
@@ -5417,6 +5425,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_identifiers = sse_decode_list_String(deserializer);
     var var_chainHash = sse_decode_u_64(deserializer);
     var var_zilliqaLegacy = sse_decode_bool(deserializer);
+    var var_bipPurpose = sse_decode_u_32(deserializer);
     return LedgerParamsInput(
         pubKeys: var_pubKeys,
         walletIndex: var_walletIndex,
@@ -5426,7 +5435,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         biometricType: var_biometricType,
         identifiers: var_identifiers,
         chainHash: var_chainHash,
-        zilliqaLegacy: var_zilliqaLegacy);
+        zilliqaLegacy: var_zilliqaLegacy,
+        bipPurpose: var_bipPurpose);
   }
 
   @protected
@@ -6138,8 +6148,9 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_decode_opt_box_autoadd_transaction_request_scilla(deserializer);
     var var_evm =
         sse_decode_opt_box_autoadd_transaction_request_evm(deserializer);
+    var var_btc = sse_decode_opt_String(deserializer);
     return TransactionRequestInfo(
-        metadata: var_metadata, scilla: var_scilla, evm: var_evm);
+        metadata: var_metadata, scilla: var_scilla, evm: var_evm, btc: var_btc);
   }
 
   @protected
@@ -6393,6 +6404,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.biometricType, serializer);
     sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);
+    sse_encode_u_32(self.bipPurpose, serializer);
   }
 
   @protected
@@ -6452,6 +6464,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_String(self.biometricType, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_list_String(self.identifiers, serializer);
+    sse_encode_u_32(self.bipPurpose, serializer);
   }
 
   @protected
@@ -6788,6 +6801,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_list_String(self.identifiers, serializer);
     sse_encode_u_64(self.chainHash, serializer);
     sse_encode_bool(self.zilliqaLegacy, serializer);
+    sse_encode_u_32(self.bipPurpose, serializer);
   }
 
   @protected
@@ -7357,6 +7371,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_box_autoadd_transaction_request_scilla(
         self.scilla, serializer);
     sse_encode_opt_box_autoadd_transaction_request_evm(self.evm, serializer);
+    sse_encode_opt_String(self.btc, serializer);
   }
 
   @protected

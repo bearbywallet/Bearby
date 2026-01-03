@@ -60,6 +60,7 @@ impl From<TransactionMetadataInfo> for TransactionMetadata {
                     v.symbol,
                 )
             }),
+            btc_utxo_amounts: None,
         }
     }
 }
