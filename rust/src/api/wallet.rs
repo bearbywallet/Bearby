@@ -67,12 +67,17 @@ pub async fn add_bip39_wallet(
     with_service_mut(|core| {
         let core_ref: &Background = &*core;
         let provider = core_ref.get_provider(params.chain_hash)?;
+        let net = if provider.config.testnet.unwrap_or(false) {
+            Some(bitcoin::Network::Testnet)
+        } else {
+            Some(bitcoin::Network::Bitcoin)
+        };
         let accounts_bip49 = params
             .accounts
             .into_iter()
             .map(|(i, name)| {
                 (
-                    DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, None),
+                    DerivationPath::new(provider.config.slip_44, i, params.bip_purpose, net),
                     name,
                 )
             })
