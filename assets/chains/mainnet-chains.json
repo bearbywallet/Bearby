@@ -1,5 +1,73 @@
 [
   {
+    "name": "Bitcoin",
+    "chain": "BTC",
+    "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
+    "rpc": [
+      "ssl://electrum.blockstream.info:50002",
+      "ssl://fulcrum.sethforprivacy.com:50002",
+      "ssl://btc.electroncash.dk:60002",
+      "ssl://electrum.bitaroo.net:50002",
+      "ssl://electrum.cakewallet.com:50002",
+      "ssl://bitcoin.aranguren.org:50002",
+      "ssl://electrum.legalise.it:50002",
+      "ssl://kirsche.emzy.de:50002",
+      "ssl://fortress.qtornado.com:443",
+      "ssl://fulcrum2.not.fyi:51002",
+      "ssl://electrum.kampfschnitzel.at:50002",
+      "ssl://fulcrum-core.1209k.com:50002",
+      "ssl://hippo.1209k.com:50002",
+      "ssl://blockitall.us:50002",
+      "ssl://mempool.au:50002",
+      "ssl://0xrpc.io:50002",
+      "ssl://det.electrum.blockitall.us:50002",
+      "ssl://blackie.c3-soft.com:57002",
+      "ssl://ip212-227-150-147.pbiaas.com:50002",
+      "ssl://api.ordimint.com:50002",
+      "ssl://fulcrum.theuplink.net:50002",
+      "ssl://bolt.schulzemic.net:50002",
+      "ssl://satoshi.stevenpolley.net:50002",
+      "ssl://smmalis37.ddns.net:50002",
+      "ssl://btc.reichster.de:50002",
+      "ssl://es.keff.org:50002",
+      "ssl://f.keff.org:50002",
+      "ssl://bitcoin.grey.pw:50002",
+      "ssl://e.keff.org:50002",
+      "ssl://e2.keff.org:50002",
+      "ssl://ssd.jhoenicke.de:50006"
+    ],
+    "features": [],
+    "ftokens": [
+      {
+        "native": true,
+        "logo": null,
+        "addr": "bc1pp00000000000000000000000000000000000000000000000000000h0ppz",
+        "name": "Bitcoin",
+        "symbol": "BTC",
+        "decimals": 8
+      }
+    ],
+    "chainIds": [0, 0],
+    "infoURL": "https://bitcoin.org",
+    "testnet": false,
+    "shortName": "bitcoin",
+    "slip44": 0,
+    "explorers": [
+      {
+        "name": "Mempool.space",
+        "url": "https://mempool.space",
+        "icon": "https://mempool.space/favicon.ico",
+        "standard": "none"
+      },
+      {
+        "name": "Blockchain.com",
+        "icon": "https://blockstream.info/favicon.ico",
+        "url": "https://www.blockchain.com/explorer",
+        "standard": "none"
+      }
+    ]
+  },
+  {
     "name": "Binance",
     "chain": "BNB",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
