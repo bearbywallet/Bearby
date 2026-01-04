@@ -239,6 +239,9 @@ class AppLocalizationsKo extends AppLocalizations {
   String get homePageReceiveButton => '수신';
 
   @override
+  String get homePageSendButton => '보내기';
+
+  @override
   String get revealSecretKeyTitle => '비밀 키 공개';
 
   @override

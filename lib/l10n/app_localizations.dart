@@ -557,6 +557,12 @@ abstract class AppLocalizations {
   /// **'Receive'**
   String get homePageReceiveButton;
 
+  /// No description provided for @homePageSendButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Send'**
+  String get homePageSendButton;
+
   /// Title for the RevealSecretKey page
   ///
   /// In en, this message translates to:

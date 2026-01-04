@@ -75,6 +75,7 @@
   "secretPhraseGeneratorPageNextButton": "下一步",
   "homePageErrorTitle": "无信号",
   "homePageReceiveButton": "接收",
+  "homePageSendButton": "发送",
   "revealSecretKeyTitle": "显示私钥",
   "revealSecretKeyPasswordHint": "密码",
   "revealSecretKeyInvalidPassword": "密码无效，错误：",

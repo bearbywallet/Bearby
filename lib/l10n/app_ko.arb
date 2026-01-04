@@ -75,6 +75,7 @@
   "secretPhraseGeneratorPageNextButton": "다음",
   "homePageErrorTitle": "신호 없음",
   "homePageReceiveButton": "수신",
+  "homePageSendButton": "보내기",
   "revealSecretKeyTitle": "비밀 키 공개",
   "revealSecretKeyPasswordHint": "비밀번호",
   "revealSecretKeyInvalidPassword": "잘못된 비밀번호, 오류:",

@@ -228,6 +228,30 @@ class _HomePageState extends State<HomePage>
             children: [
               TileButton(
                 icon: SvgPicture.asset(
+                  "assets/icons/send.svg",
+                  width: iconSizeTileButton,
+                  height: iconSizeTileButton,
+                  colorFilter: ColorFilter.mode(
+                    theme.primaryPurple,
+                    BlendMode.srcIn,
+                  ),
+                ),
+                title: l10n.homePageSendButton,
+                onPressed: () {
+                  if (filteredTokens.isNotEmpty) {
+                    final originalIndex = appState.wallet!.tokens.indexOf(filteredTokens[0]);
+                    Navigator.of(context).pushNamed(
+                      '/send',
+                      arguments: {'token_index': originalIndex},
+                    );
+                  }
+                },
+                backgroundColor: theme.cardBackground,
+                textColor: theme.primaryPurple,
+              ),
+              SizedBox(width: adaptivePaddingCard),
+              TileButton(
+                icon: SvgPicture.asset(
                   "assets/icons/receive.svg",
                   width: iconSizeTileButton,
                   height: iconSizeTileButton,
@@ -277,7 +301,9 @@ class _HomePageState extends State<HomePage>
                     colorFilter:
                         ColorFilter.mode(theme.primaryPurple, BlendMode.srcIn),
                   ),
-                  title: appState.account?.addrType == kScillaAddressType ? "Scilla" : "EVM",
+                  title: appState.account?.addrType == kScillaAddressType
+                      ? "Scilla"
+                      : "EVM",
                   onPressed: () async {
                     BigInt walletIndex = BigInt.from(appState.selectedWallet);
                     await zilliqaSwapChain(

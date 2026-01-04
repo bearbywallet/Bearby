@@ -304,6 +304,7 @@
     "description": "Label displayed when shows error on home page"
   },
   "homePageReceiveButton": "Receive",
+  "homePageSendButton": "Send",
   "revealSecretKeyTitle": "Reveal Secret Key",
   "@revealSecretKeyTitle": {
     "description": "Title for the RevealSecretKey page"

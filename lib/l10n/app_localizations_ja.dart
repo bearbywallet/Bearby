@@ -239,6 +239,9 @@ class AppLocalizationsJa extends AppLocalizations {
   String get homePageReceiveButton => '受信';
 
   @override
+  String get homePageSendButton => '送信';
+
+  @override
   String get revealSecretKeyTitle => '秘密鍵を表示';
 
   @override

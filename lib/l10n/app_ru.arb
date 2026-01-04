@@ -75,6 +75,7 @@
   "secretPhraseGeneratorPageNextButton": "Далее",
   "homePageErrorTitle": "Нет сигнала",
   "homePageReceiveButton": "Получить",
+  "homePageSendButton": "Отправить",
   "revealSecretKeyTitle": "Показать секретный ключ",
   "revealSecretKeyPasswordHint": "Пароль",
   "revealSecretKeyInvalidPassword": "неверный пароль, ошибка:",

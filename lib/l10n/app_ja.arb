@@ -75,6 +75,7 @@
   "secretPhraseGeneratorPageNextButton": "次へ",
   "homePageErrorTitle": "信号なし",
   "homePageReceiveButton": "受信",
+  "homePageSendButton": "送信",
   "revealSecretKeyTitle": "秘密鍵を表示",
   "revealSecretKeyPasswordHint": "パスワード",
   "revealSecretKeyInvalidPassword": "無効なパスワード、エラー:",

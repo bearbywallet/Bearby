@@ -239,6 +239,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get homePageReceiveButton => 'Receive';
 
   @override
+  String get homePageSendButton => 'Send';
+
+  @override
   String get revealSecretKeyTitle => 'Reveal Secret Key';
 
   @override
