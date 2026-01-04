@@ -1682,4 +1682,28 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get bipPurposeSetupPageTitle => '比特币地址';
+
+  @override
+  String get bip86Name => 'BIP86 (Taproot)';
+
+  @override
+  String get bip86Description => 'P2TR - 以bc1p开头的地址';
+
+  @override
+  String get bip84Name => 'BIP84 (Native SegWit)';
+
+  @override
+  String get bip84Description => 'P2WPKH - 以bc1q开头的地址';
+
+  @override
+  String get bip49Name => 'BIP49 (SegWit)';
+
+  @override
+  String get bip49Description => 'P2WPKH-nested-in-P2SH - 以3开头的地址';
+
+  @override
+  String get bip44Name => 'BIP44 (Legacy)';
+
+  @override
+  String get bip44Description => 'P2PKH - 以1开头的地址';
 }

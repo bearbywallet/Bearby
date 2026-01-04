@@ -541,5 +541,13 @@
   "web3ErrorNoValidRpcUrls": "未提供有效的 HTTP RPC URL",
   "web3ErrorMissingChainId": "缺少必需字段：chainId",
   "web3ErrorChainNotAdded": "请求的链尚未添加。请先使用 wallet_addEthereumChain。",
-  "bipPurposeSetupPageTitle": "比特币地址"
+  "bipPurposeSetupPageTitle": "比特币地址",
+  "bip86Name": "BIP86 (Taproot)",
+  "bip86Description": "P2TR - 以bc1p开头的地址",
+  "bip84Name": "BIP84 (Native SegWit)",
+  "bip84Description": "P2WPKH - 以bc1q开头的地址",
+  "bip49Name": "BIP49 (SegWit)",
+  "bip49Description": "P2WPKH-nested-in-P2SH - 以3开头的地址",
+  "bip44Name": "BIP44 (Legacy)",
+  "bip44Description": "P2PKH - 以1开头的地址"
 }

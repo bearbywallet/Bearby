@@ -3358,6 +3358,54 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Bitcoin Address'**
   String get bipPurposeSetupPageTitle;
+
+  /// Name for BIP86 address type
+  ///
+  /// In en, this message translates to:
+  /// **'BIP86 (Taproot)'**
+  String get bip86Name;
+
+  /// Description for BIP86 address type
+  ///
+  /// In en, this message translates to:
+  /// **'P2TR - Addresses starting with bc1p'**
+  String get bip86Description;
+
+  /// Name for BIP84 address type
+  ///
+  /// In en, this message translates to:
+  /// **'BIP84 (Native SegWit)'**
+  String get bip84Name;
+
+  /// Description for BIP84 address type
+  ///
+  /// In en, this message translates to:
+  /// **'P2WPKH - Addresses starting with bc1q'**
+  String get bip84Description;
+
+  /// Name for BIP49 address type
+  ///
+  /// In en, this message translates to:
+  /// **'BIP49 (SegWit)'**
+  String get bip49Name;
+
+  /// Description for BIP49 address type
+  ///
+  /// In en, this message translates to:
+  /// **'P2WPKH-nested-in-P2SH - Addresses starting with 3'**
+  String get bip49Description;
+
+  /// Name for BIP44 address type
+  ///
+  /// In en, this message translates to:
+  /// **'BIP44 (Legacy)'**
+  String get bip44Name;
+
+  /// Description for BIP44 address type
+  ///
+  /// In en, this message translates to:
+  /// **'P2PKH - Addresses starting with 1'**
+  String get bip44Description;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

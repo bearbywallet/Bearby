@@ -1682,4 +1682,28 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get bipPurposeSetupPageTitle => 'Bitcoin Address';
+
+  @override
+  String get bip86Name => 'BIP86 (Taproot)';
+
+  @override
+  String get bip86Description => 'P2TR - Addresses starting with bc1p';
+
+  @override
+  String get bip84Name => 'BIP84 (Native SegWit)';
+
+  @override
+  String get bip84Description => 'P2WPKH - Addresses starting with bc1q';
+
+  @override
+  String get bip49Name => 'BIP49 (SegWit)';
+
+  @override
+  String get bip49Description => 'P2WPKH-nested-in-P2SH - Addresses starting with 3';
+
+  @override
+  String get bip44Name => 'BIP44 (Legacy)';
+
+  @override
+  String get bip44Description => 'P2PKH - Addresses starting with 1';
 }

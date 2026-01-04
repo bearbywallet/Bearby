@@ -1682,4 +1682,28 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get bipPurposeSetupPageTitle => '비트코인 주소';
+
+  @override
+  String get bip86Name => 'BIP86 (Taproot)';
+
+  @override
+  String get bip86Description => 'P2TR - bc1p로 시작하는 주소';
+
+  @override
+  String get bip84Name => 'BIP84 (Native SegWit)';
+
+  @override
+  String get bip84Description => 'P2WPKH - bc1q로 시작하는 주소';
+
+  @override
+  String get bip49Name => 'BIP49 (SegWit)';
+
+  @override
+  String get bip49Description => 'P2WPKH-nested-in-P2SH - 3으로 시작하는 주소';
+
+  @override
+  String get bip44Name => 'BIP44 (Legacy)';
+
+  @override
+  String get bip44Description => 'P2PKH - 1로 시작하는 주소';
 }

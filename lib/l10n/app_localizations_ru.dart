@@ -1682,4 +1682,28 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get bipPurposeSetupPageTitle => 'Биткоин Адрес';
+
+  @override
+  String get bip86Name => 'BIP86 (Taproot)';
+
+  @override
+  String get bip86Description => 'P2TR - Адреса начинаются с bc1p';
+
+  @override
+  String get bip84Name => 'BIP84 (Native SegWit)';
+
+  @override
+  String get bip84Description => 'P2WPKH - Адреса начинаются с bc1q';
+
+  @override
+  String get bip49Name => 'BIP49 (SegWit)';
+
+  @override
+  String get bip49Description => 'P2WPKH-nested-in-P2SH - Адреса начинаются с 3';
+
+  @override
+  String get bip44Name => 'BIP44 (Legacy)';
+
+  @override
+  String get bip44Description => 'P2PKH - Адреса начинаются с 1';
 }

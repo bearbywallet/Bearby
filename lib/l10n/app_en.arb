@@ -2247,5 +2247,37 @@
   "bipPurposeSetupPageTitle": "Bitcoin Address",
   "@bipPurposeSetupPageTitle": {
     "description": "Title for the BIP purpose setup page"
+  },
+  "bip86Name": "BIP86 (Taproot)",
+  "@bip86Name": {
+    "description": "Name for BIP86 address type"
+  },
+  "bip86Description": "P2TR - Addresses starting with bc1p",
+  "@bip86Description": {
+    "description": "Description for BIP86 address type"
+  },
+  "bip84Name": "BIP84 (Native SegWit)",
+  "@bip84Name": {
+    "description": "Name for BIP84 address type"
+  },
+  "bip84Description": "P2WPKH - Addresses starting with bc1q",
+  "@bip84Description": {
+    "description": "Description for BIP84 address type"
+  },
+  "bip49Name": "BIP49 (SegWit)",
+  "@bip49Name": {
+    "description": "Name for BIP49 address type"
+  },
+  "bip49Description": "P2WPKH-nested-in-P2SH - Addresses starting with 3",
+  "@bip49Description": {
+    "description": "Description for BIP49 address type"
+  },
+  "bip44Name": "BIP44 (Legacy)",
+  "@bip44Name": {
+    "description": "Name for BIP44 address type"
+  },
+  "bip44Description": "P2PKH - Addresses starting with 1",
+  "@bip44Description": {
+    "description": "Description for BIP44 address type"
   }
 }

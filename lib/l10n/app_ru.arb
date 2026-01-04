@@ -553,5 +553,13 @@
   "web3ErrorNoValidRpcUrls": "Не предоставлены действительные HTTP RPC URL",
   "web3ErrorMissingChainId": "Отсутствует обязательное поле: chainId",
   "web3ErrorChainNotAdded": "Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain.",
-  "bipPurposeSetupPageTitle": "Биткоин Адрес"
+  "bipPurposeSetupPageTitle": "Биткоин Адрес",
+  "bip86Name": "BIP86 (Taproot)",
+  "bip86Description": "P2TR - Адреса начинаются с bc1p",
+  "bip84Name": "BIP84 (Native SegWit)",
+  "bip84Description": "P2WPKH - Адреса начинаются с bc1q",
+  "bip49Name": "BIP49 (SegWit)",
+  "bip49Description": "P2WPKH-nested-in-P2SH - Адреса начинаются с 3",
+  "bip44Name": "BIP44 (Legacy)",
+  "bip44Description": "P2PKH - Адреса начинаются с 1"
 }

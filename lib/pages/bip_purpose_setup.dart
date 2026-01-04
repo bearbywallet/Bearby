@@ -28,32 +28,30 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
 
   int _selectedPurposeIndex = 1;
 
-  final List<BipPurposeOption> _bipPurposeOptions = [
-    BipPurposeOption(
-      purpose: kBip86Purpose,
-      name: 'BIP86 (Taproot)',
-      description: 'P2TR - Addresses starting with bc1p',
-      path: "m/86'/0'/0'/0",
-    ),
-    BipPurposeOption(
-      purpose: kBip84Purpose,
-      name: 'BIP84 (Native SegWit)',
-      description: 'P2WPKH - Addresses starting with bc1q',
-      path: "m/84'/0'/0'/0",
-    ),
-    BipPurposeOption(
-      purpose: kBip49Purpose,
-      name: 'BIP49 (SegWit)',
-      description: 'P2WPKH-nested-in-P2SH - Addresses starting with 3',
-      path: "m/49'/0'/0'/0",
-    ),
-    BipPurposeOption(
-      purpose: kBip44Purpose,
-      name: 'BIP44 (Legacy)',
-      description: 'P2PKH - Addresses starting with 1',
-      path: "m/44'/0'/0'/0",
-    ),
-  ];
+  List<BipPurposeOption> _getBipPurposeOptions(AppLocalizations l10n) {
+    return [
+      BipPurposeOption(
+        purpose: kBip86Purpose,
+        name: l10n.bip86Name,
+        description: l10n.bip86Description,
+      ),
+      BipPurposeOption(
+        purpose: kBip84Purpose,
+        name: l10n.bip84Name,
+        description: l10n.bip84Description,
+      ),
+      BipPurposeOption(
+        purpose: kBip49Purpose,
+        name: l10n.bip49Name,
+        description: l10n.bip49Description,
+      ),
+      BipPurposeOption(
+        purpose: kBip44Purpose,
+        name: l10n.bip44Name,
+        description: l10n.bip44Description,
+      ),
+    ];
+  }
 
   @override
   void didChangeDependencies() {
@@ -138,9 +136,11 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
                         children: [
                           OptionsList(
                             options: List.generate(
-                              _bipPurposeOptions.length,
+                              _getBipPurposeOptions(l10n).length,
                               (index) => _buildPurposeItem(
-                                  _bipPurposeOptions[index], theme, index),
+                                  _getBipPurposeOptions(l10n)[index],
+                                  theme,
+                                  index),
                             ),
                             unselectedOpacity: 0.5,
                           ),
@@ -157,7 +157,8 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
                     text: l10n.setupNetworkSettingsPageNextButton,
                     onPressed: () {
                       final selectedPurpose =
-                          _bipPurposeOptions[_selectedPurposeIndex].purpose;
+                          _getBipPurposeOptions(l10n)[_selectedPurposeIndex]
+                              .purpose;
 
                       Navigator.of(context).pushNamed(
                         '/cipher_setup',
@@ -187,12 +188,10 @@ class BipPurposeOption {
   final int purpose;
   final String name;
   final String description;
-  final String path;
 
   BipPurposeOption({
     required this.purpose,
     required this.name,
     required this.description,
-    required this.path,
   });
 }
