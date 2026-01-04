@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
 import 'package:zilpay/components/input_amount.dart';
+import 'package:zilpay/components/load_button.dart';
 import 'package:zilpay/components/number_keyboard.dart';
 import 'package:zilpay/components/wallet_selector_card.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
@@ -35,6 +35,8 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   String? _walletName;
 
   late final AppState _appState;
+  final RoundedLoadingButtonController _btnController =
+      RoundedLoadingButtonController();
 
   bool get _isFormValid => _isValidAmount && _isValidAddress;
 
@@ -147,12 +149,17 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
                               onBackspace: handleBackspace,
                               onDotPress: () => handleKeyPress("."),
                             ),
-                            CustomButton(
-                              textColor: theme.buttonText,
-                              backgroundColor: theme.primaryPurple,
-                              text: l10n.sendTokenPageSubmitButton,
-                              onPressed: () => handleSubmit(appState),
-                              disabled: !_isFormValid,
+                            RoundedLoadingButton(
+                              controller: _btnController,
+                              onPressed: !_isFormValid ? null : () => handleSubmit(appState),
+                              color: theme.primaryPurple,
+                              valueColor: theme.buttonText,
+                              child: Text(
+                                l10n.sendTokenPageSubmitButton,
+                                style: theme.titleMedium.copyWith(
+                                  color: theme.buttonText,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -233,6 +240,8 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       return;
     }
 
+    _btnController.start();
+
     try {
       BigInt accountIndex = appState.wallet!.selectedAccount;
       FTokenInfo token = appState.wallet!.tokens[_tokenIndex];
@@ -250,7 +259,11 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       );
 
       TransactionRequestInfo tx = await createTokenTransfer(params: params);
-      if (!mounted) return;
+      if (!mounted) {
+        _btnController.stop();
+        return;
+      }
+      _btnController.stop();
       showConfirmTransactionModal(
         context: context,
         tx: tx,
@@ -265,6 +278,7 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
       );
     } catch (e) {
       if (!mounted) return;
+      _btnController.error();
 
       String errorMessage = e.toString();
 
@@ -287,6 +301,12 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
           actions: [],
         ),
       );
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          _btnController.reset();
+        }
+      });
     }
   }
 
@@ -294,6 +314,12 @@ class _SendTokenPageState extends State<SendTokenPage> with StatusBarMixin {
   void initState() {
     super.initState();
     _appState = Provider.of<AppState>(context, listen: false);
+  }
+
+  @override
+  void dispose() {
+    _btnController.dispose();
+    super.dispose();
   }
 
   void updateAddress(QRcodeScanResultInfo params, String name) {
