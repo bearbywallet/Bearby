@@ -1,6 +1,6 @@
 pub use zilpay::config::sha::SHA256_SIZE;
 pub use zilpay::errors::address::AddressError;
-pub use zilpay::proto::tx::{TransactionMetadata, TransactionRequest, BTCTransactionRequest};
+pub use zilpay::proto::tx::{BTCTransactionRequest, TransactionMetadata, TransactionRequest};
 pub use zilpay::proto::U256;
 pub use zilpay::proto::{address::Address, pubkey::PubKey};
 pub use zilpay::proto::{

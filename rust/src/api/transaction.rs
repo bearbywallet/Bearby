@@ -11,12 +11,14 @@ use crate::utils::utils::{decode_session, parse_address, with_service, with_wall
 use tokio::sync::mpsc;
 pub use zilpay::background::bg_provider::ProvidersManagement;
 pub use zilpay::background::bg_token::TokensManagement;
+use zilpay::background::bg_tx::update_tx_from_params;
 pub use zilpay::background::bg_tx::TransactionsManagement;
 pub use zilpay::background::bg_wallet::WalletManagement;
 use zilpay::background::bg_worker::{JobMessage, WorkerManager};
 use zilpay::crypto::bip49::{components_to_derivation_path, split_path, DerivationPath};
 pub use zilpay::errors::background::BackgroundError;
 pub use zilpay::errors::wallet::WalletErrors;
+use zilpay::network::evm::RequiredTxParams;
 pub use zilpay::proto::address::Address;
 use zilpay::proto::pubkey::PubKey;
 use zilpay::proto::signature::Signature;
@@ -556,6 +558,18 @@ pub async fn stop_history_worker() -> Result<(), String> {
     }
 
     Ok(())
+}
+
+pub async fn update_tx_with_params(
+    tx: TransactionRequestInfo,
+    params: RequiredTxParamsInfo,
+) -> Result<TransactionRequestInfo, String> {
+    let mut tx: TransactionRequest = tx.try_into().map_err(ServiceError::TransactionErrors)?;
+    let params: RequiredTxParams = params.into();
+
+    update_tx_from_params(&mut tx, params).map_err(ServiceError::TransactionErrors)?;
+
+    Ok(tx.into())
 }
 
 #[cfg(test)]

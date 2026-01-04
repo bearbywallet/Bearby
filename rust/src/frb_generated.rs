@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
     default_rust_auto_opaque = RustAutoOpaqueMoi,
 );
 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1098036928;
+pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 239785179;
 
 // Section: executor
 
@@ -4113,6 +4113,48 @@ fn wire__crate__api__token__update_rates_impl(
         },
     )
 }
+fn wire__crate__api__transaction__update_tx_with_params_impl(
+    port_: flutter_rust_bridge::for_generated::MessagePort,
+    ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
+    rust_vec_len_: i32,
+    data_len_: i32,
+) {
+    FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec, _, _, _>(
+        flutter_rust_bridge::for_generated::TaskInfo {
+            debug_name: "update_tx_with_params",
+            port: Some(port_),
+            mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal,
+        },
+        move || {
+            let message = unsafe {
+                flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(
+                    ptr_,
+                    rust_vec_len_,
+                    data_len_,
+                )
+            };
+            let mut deserializer =
+                flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_tx = <crate::models::transactions::request::TransactionRequestInfo>::sse_decode(
+                &mut deserializer,
+            );
+            let api_params =
+                <crate::models::gas::RequiredTxParamsInfo>::sse_decode(&mut deserializer);
+            deserializer.end();
+            move |context| async move {
+                transform_result_sse::<_, String>(
+                    (move || async move {
+                        let output_ok =
+                            crate::api::transaction::update_tx_with_params(api_tx, api_params)
+                                .await?;
+                        Ok(output_ok)
+                    })()
+                    .await,
+                )
+            }
+        },
+    )
+}
 fn wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
     port_: flutter_rust_bridge::for_generated::MessagePort,
     ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,
@@ -4799,6 +4841,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
         let mut var_metadata = <crate::models::transactions::transaction_metadata::TransactionMetadataInfo>::sse_decode(deserializer);
         let mut var_evm = <Option<String>>::sse_decode(deserializer);
         let mut var_scilla = <Option<String>>::sse_decode(deserializer);
+        let mut var_btc = <Option<String>>::sse_decode(deserializer);
         let mut var_signedMessage = <Option<String>>::sse_decode(deserializer);
         let mut var_timestamp = <u64>::sse_decode(deserializer);
         return crate::models::transactions::history::HistoricalTransactionInfo {
@@ -4806,6 +4849,7 @@ impl SseDecode for crate::models::transactions::history::HistoricalTransactionIn
             metadata: var_metadata,
             evm: var_evm,
             scilla: var_scilla,
+            btc: var_btc,
             signed_message: var_signedMessage,
             timestamp: var_timestamp,
         };
@@ -5543,6 +5587,10 @@ impl SseDecode for crate::models::gas::RequiredTxParamsInfo {
         let mut var_txEstimateGas = <u64>::sse_decode(deserializer);
         let mut var_blobBaseFee = <u128>::sse_decode(deserializer);
         let mut var_nonce = <u64>::sse_decode(deserializer);
+        let mut var_slow = <u64>::sse_decode(deserializer);
+        let mut var_market = <u64>::sse_decode(deserializer);
+        let mut var_fast = <u64>::sse_decode(deserializer);
+        let mut var_current = <u64>::sse_decode(deserializer);
         return crate::models::gas::RequiredTxParamsInfo {
             gas_price: var_gasPrice,
             max_priority_fee: var_maxPriorityFee,
@@ -5550,6 +5598,10 @@ impl SseDecode for crate::models::gas::RequiredTxParamsInfo {
             tx_estimate_gas: var_txEstimateGas,
             blob_base_fee: var_blobBaseFee,
             nonce: var_nonce,
+            slow: var_slow,
+            market: var_market,
+            fast: var_fast,
+            current: var_current,
         };
     }
 }
@@ -6116,22 +6168,28 @@ fn pde_ffi_dispatcher_primary_impl(
             wire__crate__api__ledger__update_ledger_accounts_impl(port, ptr, rust_vec_len, data_len)
         }
         103 => wire__crate__api__token__update_rates_impl(port, ptr, rust_vec_len, data_len),
-        104 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+        104 => wire__crate__api__transaction__update_tx_with_params_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        105 => {
+        105 => wire__crate__api__wallet__zilliqa_get_bech32_base16_address_impl(
+            port,
+            ptr,
+            rust_vec_len,
+            data_len,
+        ),
+        106 => {
             wire__crate__api__wallet__zilliqa_get_n_format_impl(port, ptr, rust_vec_len, data_len)
         }
-        106 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
+        107 => wire__crate__api__wallet__zilliqa_legacy_base16_to_bech32_impl(
             port,
             ptr,
             rust_vec_len,
             data_len,
         ),
-        107 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
+        108 => wire__crate__api__wallet__zilliqa_swap_chain_impl(port, ptr, rust_vec_len, data_len),
         _ => unreachable!(),
     }
 }
@@ -6685,6 +6743,7 @@ impl flutter_rust_bridge::IntoDart
             self.metadata.into_into_dart().into_dart(),
             self.evm.into_into_dart().into_dart(),
             self.scilla.into_into_dart().into_dart(),
+            self.btc.into_into_dart().into_dart(),
             self.signed_message.into_into_dart().into_dart(),
             self.timestamp.into_into_dart().into_dart(),
         ]
@@ -6868,6 +6927,10 @@ impl flutter_rust_bridge::IntoDart for crate::models::gas::RequiredTxParamsInfo 
             self.tx_estimate_gas.into_into_dart().into_dart(),
             self.blob_base_fee.into_into_dart().into_dart(),
             self.nonce.into_into_dart().into_dart(),
+            self.slow.into_into_dart().into_dart(),
+            self.market.into_into_dart().into_dart(),
+            self.fast.into_into_dart().into_dart(),
+            self.current.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7505,6 +7568,7 @@ impl SseEncode for crate::models::transactions::history::HistoricalTransactionIn
         );
         <Option<String>>::sse_encode(self.evm, serializer);
         <Option<String>>::sse_encode(self.scilla, serializer);
+        <Option<String>>::sse_encode(self.btc, serializer);
         <Option<String>>::sse_encode(self.signed_message, serializer);
         <u64>::sse_encode(self.timestamp, serializer);
     }
@@ -8082,6 +8146,10 @@ impl SseEncode for crate::models::gas::RequiredTxParamsInfo {
         <u64>::sse_encode(self.tx_estimate_gas, serializer);
         <u128>::sse_encode(self.blob_base_fee, serializer);
         <u64>::sse_encode(self.nonce, serializer);
+        <u64>::sse_encode(self.slow, serializer);
+        <u64>::sse_encode(self.market, serializer);
+        <u64>::sse_encode(self.fast, serializer);
+        <u64>::sse_encode(self.current, serializer);
     }
 }
 
