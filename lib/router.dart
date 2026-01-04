@@ -157,6 +157,8 @@ class AppRouter {
             return wrapWithProviders(const InitialPage());
           case '/language':
             return wrapWithProviders(const LanguagePage());
+          case '/bip_purpose_setup':
+            return wrapWithProviders(const BipPurposeSetupPage());
           default:
             return wrapWithProviders(const InitialPage());
         }
