@@ -137,6 +137,12 @@ Stream<String> startHistoryWorker({required BigInt walletIndex}) =>
 Future<void> stopHistoryWorker() =>
     RustLib.instance.api.crateApiTransactionStopHistoryWorker();
 
+Future<TransactionRequestInfo> updateTxWithParams(
+        {required TransactionRequestInfo tx,
+        required RequiredTxParamsInfo params}) =>
+    RustLib.instance.api
+        .crateApiTransactionUpdateTxWithParams(tx: tx, params: params);
+
 class Eip712Hashes {
   final Uint8List domainSeparator;
   final Uint8List hashStructMessage;

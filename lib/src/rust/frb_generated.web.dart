@@ -156,6 +156,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   QrConfigInfo dco_decode_box_autoadd_qr_config_info(dynamic raw);
 
   @protected
+  RequiredTxParamsInfo dco_decode_box_autoadd_required_tx_params_info(
+      dynamic raw);
+
+  @protected
   TokenTransferParamsInfo dco_decode_box_autoadd_token_transfer_params_info(
       dynamic raw);
 
@@ -559,6 +563,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   QrConfigInfo sse_decode_box_autoadd_qr_config_info(
+      SseDeserializer deserializer);
+
+  @protected
+  RequiredTxParamsInfo sse_decode_box_autoadd_required_tx_params_info(
       SseDeserializer deserializer);
 
   @protected
@@ -1006,6 +1014,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_qr_config_info(
       QrConfigInfo self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_required_tx_params_info(
+      RequiredTxParamsInfo self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_token_transfer_params_info(

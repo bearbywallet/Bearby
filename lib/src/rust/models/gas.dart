@@ -37,6 +37,10 @@ class RequiredTxParamsInfo {
   final BigInt txEstimateGas;
   final BigInt blobBaseFee;
   final BigInt nonce;
+  final BigInt slow;
+  final BigInt market;
+  final BigInt fast;
+  final BigInt current;
 
   const RequiredTxParamsInfo({
     required this.gasPrice,
@@ -45,6 +49,10 @@ class RequiredTxParamsInfo {
     required this.txEstimateGas,
     required this.blobBaseFee,
     required this.nonce,
+    required this.slow,
+    required this.market,
+    required this.fast,
+    required this.current,
   });
 
   @override
@@ -54,7 +62,11 @@ class RequiredTxParamsInfo {
       feeHistory.hashCode ^
       txEstimateGas.hashCode ^
       blobBaseFee.hashCode ^
-      nonce.hashCode;
+      nonce.hashCode ^
+      slow.hashCode ^
+      market.hashCode ^
+      fast.hashCode ^
+      current.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -66,5 +78,9 @@ class RequiredTxParamsInfo {
           feeHistory == other.feeHistory &&
           txEstimateGas == other.txEstimateGas &&
           blobBaseFee == other.blobBaseFee &&
-          nonce == other.nonce;
+          nonce == other.nonce &&
+          slow == other.slow &&
+          market == other.market &&
+          fast == other.fast &&
+          current == other.current;
 }

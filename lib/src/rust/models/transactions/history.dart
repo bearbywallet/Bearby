@@ -13,6 +13,7 @@ class HistoricalTransactionInfo {
   final TransactionMetadataInfo metadata;
   final String? evm;
   final String? scilla;
+  final String? btc;
   final String? signedMessage;
   final BigInt timestamp;
 
@@ -21,6 +22,7 @@ class HistoricalTransactionInfo {
     required this.metadata,
     this.evm,
     this.scilla,
+    this.btc,
     this.signedMessage,
     required this.timestamp,
   });
@@ -31,6 +33,7 @@ class HistoricalTransactionInfo {
       metadata.hashCode ^
       evm.hashCode ^
       scilla.hashCode ^
+      btc.hashCode ^
       signedMessage.hashCode ^
       timestamp.hashCode;
 
@@ -43,6 +46,7 @@ class HistoricalTransactionInfo {
           metadata == other.metadata &&
           evm == other.evm &&
           scilla == other.scilla &&
+          btc == other.btc &&
           signedMessage == other.signedMessage &&
           timestamp == other.timestamp;
 }

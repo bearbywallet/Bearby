@@ -17,9 +17,11 @@ Future<List<WalletInfo>> getWallets() =>
 Future<(String, String)> addBip39Wallet(
         {required Bip39AddWalletParams params,
         required WalletSettingsInfo walletSettings,
-        required List<FTokenInfo> ftokens}) =>
+        required List<FTokenInfo> additionalFtokens}) =>
     RustLib.instance.api.crateApiWalletAddBip39Wallet(
-        params: params, walletSettings: walletSettings, ftokens: ftokens);
+        params: params,
+        walletSettings: walletSettings,
+        additionalFtokens: additionalFtokens);
 
 Future<(String, String)> addSkWallet(
         {required AddSKWalletParams params,

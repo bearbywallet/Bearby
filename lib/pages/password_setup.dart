@@ -269,7 +269,7 @@ class _PasswordSetupPageState extends State<PasswordSetupPage>
         session = await addBip39Wallet(
           params: params,
           walletSettings: settings,
-          ftokens: ftokens,
+          additionalFtokens: ftokens,
         );
       } else if (_keys != null) {
         AddSKWalletParams params = AddSKWalletParams(

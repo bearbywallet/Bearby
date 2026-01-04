@@ -10,7 +10,7 @@
     "ftokens": [
       {
         "native": true,
-        "logo": null,
+        "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/bitcoin/%{contract_address}%/%{dark,light}%.webp",
         "addr": "1111111111111111111114oLvT2",
         "name": "Bitcoin",
         "symbol": "BTC",
