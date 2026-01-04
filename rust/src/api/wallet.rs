@@ -62,7 +62,7 @@ pub struct Bip39AddWalletParams {
 pub async fn add_bip39_wallet(
     params: Bip39AddWalletParams,
     wallet_settings: WalletSettingsInfo,
-    ftokens: Vec<FTokenInfo>,
+    additional_ftokens: Vec<FTokenInfo>,
 ) -> Result<(String, String), String> {
     with_service_mut(|core| {
         let core_ref: &Background = &*core;
@@ -82,7 +82,7 @@ pub async fn add_bip39_wallet(
                 )
             })
             .collect::<Vec<(DerivationPath, String)>>();
-        let ftokens = ftokens
+        let ftokens = additional_ftokens
             .into_iter()
             .map(TryFrom::try_from)
             .collect::<Result<Vec<FToken>, TokenError>>()?;

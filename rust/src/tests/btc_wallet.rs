@@ -7,8 +7,11 @@ mod btc_wallet_tests {
     use zilpay::crypto::bip49::DerivationPath;
     use zilpay::rpc::network_config::ChainConfig;
 
+    use crate::api::token::sync_balances;
+    use crate::api::transaction::create_token_transfer;
     use crate::api::wallet::{add_bip39_wallet, Bip39AddWalletParams};
     use crate::api::{backend::load_service, provider::get_chains_providers_from_json};
+    use crate::models::ftoken::FTokenInfo;
     use crate::models::settings::{WalletArgonParamsInfo, WalletSettingsInfo};
     use crate::service::service::BACKGROUND_SERVICE;
 
@@ -67,25 +70,40 @@ mod btc_wallet_tests {
             wallet_name: "Bitcoin Wallet".to_string(),
             biometric_type: "faceId".to_string(),
             chain_hash: btc_testnet_provider.hash(),
-            bip_purpose: DerivationPath::BIP44_PURPOSE,
+            bip_purpose: DerivationPath::BIP84_PURPOSE,
             identifiers: vec![String::from("test btc")],
         };
 
-        let ftokens: Vec<_> = btc_testnet_provider
+        let ftokens: Vec<FTokenInfo> = btc_testnet_provider
             .ftokens
             .clone()
             .into_iter()
             .map(Into::into)
             .collect();
 
-        let (session, wallet_address) = add_bip39_wallet(params, wallet_settings, ftokens)
+        let (session, wallet_address) = add_bip39_wallet(params, wallet_settings, vec![])
             .await
             .unwrap();
 
         assert!(!session.is_empty());
         assert!(!wallet_address.is_empty());
 
-        println!("Bitcoin BIP44 wallet created successfully!");
-        println!("Wallet address: {}", wallet_address);
+        sync_balances(0).await.unwrap();
+
+        let btc_token = ftokens.first().unwrap();
+
+        let transfer_params = crate::api::transaction::TokenTransferParamsInfo {
+            wallet_index: 0,
+            account_index: 0,
+            token: btc_token.clone(),
+            amount: "10000".to_string(),
+            recipient: "bc1q4qw42stdzjqs59xvlrlxr8526e3nunw7mp73te".to_string(),
+            icon: "".to_string(),
+        };
+
+        let tx = create_token_transfer(transfer_params).await.unwrap();
+
+        println!("Transaction created successfully!");
+        println!("Transaction: {:?}", tx);
     }
 }

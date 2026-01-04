@@ -22,13 +22,7 @@ use super::errors::ServiceError;
 extern crate bitcoin;
 
 pub fn parse_address(addr: String) -> Result<Address, ServiceError> {
-    if addr.starts_with("0x") {
-        Address::from_eth_address(&addr).map_err(ServiceError::AddressError)
-    } else {
-        Address::from_zil_bech32(&addr)
-            .or_else(|_| Address::from_eth_address(&addr))
-            .map_err(ServiceError::AddressError)
-    }
+    Address::from_str_hex(&addr).map_err(ServiceError::AddressError)
 }
 
 pub fn decode_session(session_cipher: Option<String>) -> Result<Vec<u8>, ServiceError> {
@@ -58,7 +52,7 @@ pub fn pubkey_from_provider(
             let network = bip49.network.unwrap_or(bitcoin::Network::Bitcoin);
             let addr_type = bip49.get_address_type();
             PubKey::Secp256k1Bitcoin((pub_key_bytes, network, addr_type))
-        },
+        }
         (slip44::SOLANA, _) => PubKey::Ed25519Solana(pub_key_bytes),
         _ => todo!(),
     };
