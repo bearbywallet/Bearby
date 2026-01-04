@@ -249,22 +249,25 @@ class _HistoryItemState extends State<HistoryItem>
       );
     }
 
-    final token = appState.wallet?.tokens.first;
+    final baseToken = appState.wallet?.tokens.firstWhere(
+      (t) => t.addrType == appState.account?.addrType,
+      orElse: () => appState.wallet!.tokens.first,
+    );
 
-    if (token == null) {
+    if (baseToken == null) {
       return const SizedBox.shrink();
     }
 
     final decimals =
-        widget.transaction.chainType == "EVM" && token.decimals < 18
+        widget.transaction.chainType == "EVM" && baseToken.decimals < 18
             ? 18
-            : token.decimals;
+            : baseToken.decimals;
 
     final (formattedValue, convertedValue) = formatingAmount(
       amount: widget.transaction.fee,
-      symbol: token.symbol,
+      symbol: baseToken.symbol,
       decimals: decimals,
-      rate: token.rate,
+      rate: baseToken.rate,
       appState: appState,
     );
 

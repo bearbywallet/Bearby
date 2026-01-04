@@ -113,6 +113,10 @@ class TransactionDetailsModal extends StatelessWidget {
       return _buildSignedMessageDetails(context, appState, theme, l10n);
     }
 
+    if (transaction.isBtcTransaction) {
+      return _buildBtcDetails(context, appState, theme, l10n);
+    }
+
     return Column(
       children: [
         DetailGroupCard(
@@ -400,6 +404,134 @@ class TransactionDetailsModal extends StatelessWidget {
     );
   }
 
+  Widget _buildBtcDetails(
+    BuildContext context,
+    AppState appState,
+    AppTheme theme,
+    AppLocalizations l10n,
+  ) {
+    final btcReceipt = transaction.btcReceipt;
+
+    return Column(
+      children: [
+        DetailGroupCard(
+          title: l10n.transactionDetailsModal_transaction,
+          theme: theme,
+          children: [
+            DetailItem(
+              label: l10n.transactionDetailsModal_hash,
+              value: transaction.transactionHash,
+              theme: theme,
+              isCopyable: true,
+            ),
+            if (btcReceipt?.confirmations != null)
+              DetailItem(
+                label: 'Confirmations',
+                value: btcReceipt!.confirmations.toString(),
+                theme: theme,
+              ),
+            DetailItem(
+              label: l10n.transactionDetailsModal_timestamp,
+              value: _formatTimestamp(),
+              theme: theme,
+            ),
+            if (btcReceipt?.lockTime != null)
+              DetailItem(
+                label: 'Lock Time',
+                value: btcReceipt!.lockTime.toString(),
+                theme: theme,
+              ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        if (btcReceipt?.inputs != null && btcReceipt!.inputs!.isNotEmpty) ...[
+          DetailGroupCard(
+            title: 'Inputs (${btcReceipt.inputsCount ?? btcReceipt.inputs!.length})',
+            theme: theme,
+            children: btcReceipt.inputs!.take(3).map((input) {
+              return DetailItem(
+                label: 'TXID',
+                value: '${input.txid ?? 'N/A'}:${input.vout ?? 0}',
+                theme: theme,
+                isCopyable: true,
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 12),
+        ],
+        if (btcReceipt?.outputs != null && btcReceipt!.outputs!.isNotEmpty) ...[
+          DetailGroupCard(
+            title: 'Outputs (${btcReceipt.outputsCount ?? btcReceipt.outputs!.length})',
+            theme: theme,
+            children: btcReceipt.outputs!.take(3).map((output) {
+              final token = appState.wallet?.tokens.first;
+              final decimals = transaction.tokenInfo?.decimals ?? token?.decimals ?? 8;
+              final symbol = transaction.tokenInfo?.symbol ?? token?.symbol ?? 'BTC';
+
+              final (formattedValue, _) = formatingAmount(
+                amount: output.value ?? BigInt.zero,
+                symbol: symbol,
+                decimals: decimals,
+                rate: 0,
+                appState: appState,
+              );
+
+              return DetailItem(
+                label: formattedValue,
+                value: output.scriptPubKey ?? 'N/A',
+                theme: theme,
+                isCopyable: true,
+              );
+            }).toList(),
+          ),
+          const SizedBox(height: 12),
+        ],
+        DetailGroupCard(
+          title: l10n.transactionDetailsModal_network,
+          theme: theme,
+          children: [
+            DetailItem(
+              label: l10n.transactionDetailsModal_chainType,
+              value: transaction.chainType,
+              theme: theme,
+            ),
+            DetailItem(
+              label: l10n.transactionDetailsModal_networkName,
+              value: _getNetworkName(appState, transaction.chainHash),
+              theme: theme,
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        DetailGroupCard(
+          title: l10n.transactionDetailsModal_gasFees,
+          theme: theme,
+          children: [
+            DetailItem(
+              label: l10n.transactionDetailsModal_fee,
+              value: _formatFeeWidget(appState, theme),
+              theme: theme,
+            ),
+          ],
+        ),
+        if (transaction.error != null) ...[
+          const SizedBox(height: 12),
+          DetailGroupCard(
+            title: l10n.transactionDetailsModal_error,
+            theme: theme,
+            children: [
+              DetailItem(
+                label: l10n.transactionDetailsModal_errorMessage,
+                value: transaction.error!,
+                theme: theme,
+              ),
+            ],
+          ),
+        ],
+      ],
+    );
+  }
+
   String _getLocalizedSignType(ParsedSignedMessage? signedMsg, AppLocalizations l10n) {
     if (signedMsg == null) return l10n.signedMessageTypeUnknown;
     if (signedMsg.isPersonalSign) return l10n.signedMessageTypePersonalSign;
@@ -600,20 +732,24 @@ class TransactionDetailsModal extends StatelessWidget {
   }
 
   (String, String) _formatFee(AppState appState) {
-    final token = appState.wallet?.tokens.first;
-    if (token == null) {
+    final baseToken = appState.wallet?.tokens.firstWhere(
+      (t) => t.addrType == appState.account?.addrType,
+      orElse: () => appState.wallet!.tokens.first,
+    );
+
+    if (baseToken == null) {
       return ('0', '');
     }
 
-    final decimals = transaction.chainType == "EVM" && token.decimals < 18
+    final decimals = transaction.chainType == "EVM" && baseToken.decimals < 18
         ? 18
-        : token.decimals;
+        : baseToken.decimals;
 
     return formatingAmount(
       amount: transaction.fee,
-      symbol: token.symbol,
+      symbol: baseToken.symbol,
       decimals: decimals,
-      rate: token.rate,
+      rate: baseToken.rate,
       appState: appState,
     );
   }
