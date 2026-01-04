@@ -94,13 +94,6 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
               color: theme.textSecondary,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            option.path,
-            style: theme.labelSmall.copyWith(
-              color: theme.primaryPurple,
-            ),
-          ),
         ],
       ),
       isSelected: _selectedPurposeIndex == index,
@@ -131,7 +124,7 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: adaptivePadding),
                   child: CustomAppBar(
-                    title: 'Bitcoin Address Type',
+                    title: l10n.bipPurposeSetupPageTitle,
                     onBackPressed: () => Navigator.pop(context),
                   ),
                 ),
@@ -143,14 +136,6 @@ class _BipPurposeSetupPageState extends State<BipPurposeSetupPage>
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text(
-                            'Select the address type you want to restore',
-                            style: theme.bodyLarge.copyWith(
-                              color: theme.textSecondary,
-                            ),
-                            textAlign: TextAlign.center,
-                          ),
-                          const SizedBox(height: 24),
                           OptionsList(
                             options: List.generate(
                               _bipPurposeOptions.length,

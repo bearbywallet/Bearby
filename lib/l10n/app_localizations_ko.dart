@@ -1679,4 +1679,7 @@ class AppLocalizationsKo extends AppLocalizations {
 
   @override
   String get web3ErrorChainNotAdded => '요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.';
+
+  @override
+  String get bipPurposeSetupPageTitle => '비트코인 주소';
 }

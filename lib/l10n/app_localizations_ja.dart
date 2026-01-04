@@ -1679,4 +1679,7 @@ class AppLocalizationsJa extends AppLocalizations {
 
   @override
   String get web3ErrorChainNotAdded => 'リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。';
+
+  @override
+  String get bipPurposeSetupPageTitle => 'ビットコインアドレス';
 }

@@ -552,5 +552,6 @@
   "web3ErrorMissingChainFields": "Отсутствуют обязательные поля для wallet_addEthereumChain",
   "web3ErrorNoValidRpcUrls": "Не предоставлены действительные HTTP RPC URL",
   "web3ErrorMissingChainId": "Отсутствует обязательное поле: chainId",
-  "web3ErrorChainNotAdded": "Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain."
+  "web3ErrorChainNotAdded": "Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain.",
+  "bipPurposeSetupPageTitle": "Биткоин Адрес"
 }

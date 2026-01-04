@@ -555,5 +555,6 @@
   "web3ErrorMissingChainFields": "wallet_addEthereumChain の必須フィールドがありません",
   "web3ErrorNoValidRpcUrls": "有効なHTTP RPC URLが提供されていません",
   "web3ErrorMissingChainId": "必須フィールドがありません: chainId",
-  "web3ErrorChainNotAdded": "リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。"
+  "web3ErrorChainNotAdded": "リクエストされたチェーンが追加されていません。まず wallet_addEthereumChain を使用してください。",
+  "bipPurposeSetupPageTitle": "ビットコインアドレス"
 }

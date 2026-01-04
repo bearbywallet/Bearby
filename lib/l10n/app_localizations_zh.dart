@@ -1679,4 +1679,7 @@ class AppLocalizationsZh extends AppLocalizations {
 
   @override
   String get web3ErrorChainNotAdded => '请求的链尚未添加。请先使用 wallet_addEthereumChain。';
+
+  @override
+  String get bipPurposeSetupPageTitle => '比特币地址';
 }

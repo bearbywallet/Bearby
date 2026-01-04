@@ -540,5 +540,6 @@
   "web3ErrorMissingChainFields": "wallet_addEthereumChain에 대한 필수 필드가 없습니다",
   "web3ErrorNoValidRpcUrls": "유효한 HTTP RPC URL이 제공되지 않았습니다",
   "web3ErrorMissingChainId": "필수 필드가 없습니다: chainId",
-  "web3ErrorChainNotAdded": "요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요."
+  "web3ErrorChainNotAdded": "요청한 체인이 추가되지 않았습니다. 먼저 wallet_addEthereumChain을 사용하세요.",
+  "bipPurposeSetupPageTitle": "비트코인 주소"
 }

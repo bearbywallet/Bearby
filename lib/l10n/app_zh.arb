@@ -540,5 +540,6 @@
   "web3ErrorMissingChainFields": "wallet_addEthereumChain 缺少必需字段",
   "web3ErrorNoValidRpcUrls": "未提供有效的 HTTP RPC URL",
   "web3ErrorMissingChainId": "缺少必需字段：chainId",
-  "web3ErrorChainNotAdded": "请求的链尚未添加。请先使用 wallet_addEthereumChain。"
+  "web3ErrorChainNotAdded": "请求的链尚未添加。请先使用 wallet_addEthereumChain。",
+  "bipPurposeSetupPageTitle": "比特币地址"
 }

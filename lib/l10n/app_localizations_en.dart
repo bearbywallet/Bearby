@@ -1679,4 +1679,7 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get web3ErrorChainNotAdded => 'The requested chain has not been added. Use wallet_addEthereumChain first.';
+
+  @override
+  String get bipPurposeSetupPageTitle => 'Bitcoin Address';
 }

@@ -3352,6 +3352,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'The requested chain has not been added. Use wallet_addEthereumChain first.'**
   String get web3ErrorChainNotAdded;
+
+  /// Title for the BIP purpose setup page
+  ///
+  /// In en, this message translates to:
+  /// **'Bitcoin Address'**
+  String get bipPurposeSetupPageTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

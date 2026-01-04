@@ -1679,4 +1679,7 @@ class AppLocalizationsRu extends AppLocalizations {
 
   @override
   String get web3ErrorChainNotAdded => 'Запрашиваемая сеть не была добавлена. Сначала используйте wallet_addEthereumChain.';
+
+  @override
+  String get bipPurposeSetupPageTitle => 'Биткоин Адрес';
 }
