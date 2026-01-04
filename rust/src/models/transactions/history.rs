@@ -46,6 +46,7 @@ impl From<HistoricalTransaction> for HistoricalTransactionInfo {
                     decimals: d,
                     symbol: s,
                 }),
+                btc_utxo_amounts: value.metadata.btc_utxo_amounts,
             },
             evm: value.evm,
             scilla: value.scilla,

@@ -116,7 +116,7 @@ abstract class RustLibApi extends BaseApi {
   Future<(String, String)> crateApiWalletAddBip39Wallet(
       {required Bip39AddWalletParams params,
       required WalletSettingsInfo walletSettings,
-      required List<FTokenInfo> ftokens});
+      required List<FTokenInfo> additionalFtokens});
 
   Future<List<FTokenInfo>> crateApiTokenAddFtoken(
       {required FTokenInfo meta, required BigInt walletIndex});
@@ -521,13 +521,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Future<(String, String)> crateApiWalletAddBip39Wallet(
       {required Bip39AddWalletParams params,
       required WalletSettingsInfo walletSettings,
-      required List<FTokenInfo> ftokens}) {
+      required List<FTokenInfo> additionalFtokens}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_bip_39_add_wallet_params(params, serializer);
         sse_encode_box_autoadd_wallet_settings_info(walletSettings, serializer);
-        sse_encode_list_f_token_info(ftokens, serializer);
+        sse_encode_list_f_token_info(additionalFtokens, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
             funcId: 1, port: port_);
       },
@@ -536,7 +536,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         decodeErrorData: sse_decode_String,
       ),
       constMeta: kCrateApiWalletAddBip39WalletConstMeta,
-      argValues: [params, walletSettings, ftokens],
+      argValues: [params, walletSettings, additionalFtokens],
       apiImpl: this,
     ));
   }
@@ -544,7 +544,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TaskConstMeta get kCrateApiWalletAddBip39WalletConstMeta =>
       const TaskConstMeta(
         debugName: "add_bip39_wallet",
-        argNames: ["params", "walletSettings", "ftokens"],
+        argNames: ["params", "walletSettings", "additionalFtokens"],
       );
 
   @override
@@ -4446,6 +4446,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Uint64List? dco_decode_opt_list_prim_u_64_strict(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_list_prim_u_64_strict(raw);
+  }
+
+  @protected
   Uint8List? dco_decode_opt_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_list_prim_u_8_strict(raw);
@@ -4623,8 +4629,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   TransactionMetadataInfo dco_decode_transaction_metadata_info(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
-    if (arr.length != 7)
-      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
     return TransactionMetadataInfo(
       chainHash: dco_decode_u_64(arr[0]),
       hash: dco_decode_opt_String(arr[1]),
@@ -4633,6 +4639,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       title: dco_decode_opt_String(arr[4]),
       signer: dco_decode_opt_String(arr[5]),
       tokenInfo: dco_decode_opt_box_autoadd_base_token_info(arr[6]),
+      btcUtxoAmounts: dco_decode_opt_list_prim_u_64_strict(arr[7]),
     );
   }
 
@@ -5929,6 +5936,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Uint64List? sse_decode_opt_list_prim_u_64_strict(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_list_prim_u_64_strict(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   Uint8List? sse_decode_opt_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -6096,6 +6115,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_signer = sse_decode_opt_String(deserializer);
     var var_tokenInfo =
         sse_decode_opt_box_autoadd_base_token_info(deserializer);
+    var var_btcUtxoAmounts = sse_decode_opt_list_prim_u_64_strict(deserializer);
     return TransactionMetadataInfo(
         chainHash: var_chainHash,
         hash: var_hash,
@@ -6103,7 +6123,8 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         icon: var_icon,
         title: var_title,
         signer: var_signer,
-        tokenInfo: var_tokenInfo);
+        tokenInfo: var_tokenInfo,
+        btcUtxoAmounts: var_btcUtxoAmounts);
   }
 
   @protected
@@ -7211,6 +7232,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_list_prim_u_64_strict(
+      Uint64List? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_list_prim_u_64_strict(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_list_prim_u_8_strict(
       Uint8List? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -7342,6 +7374,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.title, serializer);
     sse_encode_opt_String(self.signer, serializer);
     sse_encode_opt_box_autoadd_base_token_info(self.tokenInfo, serializer);
+    sse_encode_opt_list_prim_u_64_strict(self.btcUtxoAmounts, serializer);
   }
 
   @protected

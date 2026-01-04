@@ -71,7 +71,7 @@ fn wire__crate__api__wallet__add_bip39_wallet_impl(
                 <crate::api::wallet::Bip39AddWalletParams>::sse_decode(&mut deserializer);
             let api_wallet_settings =
                 <crate::models::settings::WalletSettingsInfo>::sse_decode(&mut deserializer);
-            let api_ftokens =
+            let api_additional_ftokens =
                 <Vec<crate::models::ftoken::FTokenInfo>>::sse_decode(&mut deserializer);
             deserializer.end();
             move |context| async move {
@@ -80,7 +80,7 @@ fn wire__crate__api__wallet__add_bip39_wallet_impl(
                         let output_ok = crate::api::wallet::add_bip39_wallet(
                             api_params,
                             api_wallet_settings,
-                            api_ftokens,
+                            api_additional_ftokens,
                         )
                         .await?;
                         Ok(output_ok)
@@ -5394,6 +5394,17 @@ impl SseDecode for Option<Vec<crate::models::transactions::access_list::AccessLi
     }
 }
 
+impl SseDecode for Option<Vec<u64>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
+        if (<bool>::sse_decode(deserializer)) {
+            return Some(<Vec<u64>>::sse_decode(deserializer));
+        } else {
+            return None;
+        }
+    }
+}
+
 impl SseDecode for Option<Vec<u8>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {
@@ -5576,6 +5587,7 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             <Option<crate::models::transactions::base_token::BaseTokenInfo>>::sse_decode(
                 deserializer,
             );
+        let mut var_btcUtxoAmounts = <Option<Vec<u64>>>::sse_decode(deserializer);
         return crate::models::transactions::transaction_metadata::TransactionMetadataInfo {
             chain_hash: var_chainHash,
             hash: var_hash,
@@ -5584,6 +5596,7 @@ impl SseDecode for crate::models::transactions::transaction_metadata::Transactio
             title: var_title,
             signer: var_signer,
             token_info: var_tokenInfo,
+            btc_utxo_amounts: var_btcUtxoAmounts,
         };
     }
 }
@@ -6908,6 +6921,7 @@ impl flutter_rust_bridge::IntoDart
             self.title.into_into_dart().into_dart(),
             self.signer.into_into_dart().into_dart(),
             self.token_info.into_into_dart().into_dart(),
+            self.btc_utxo_amounts.into_into_dart().into_dart(),
         ]
         .into_dart()
     }
@@ -7947,6 +7961,16 @@ impl SseEncode for Option<Vec<crate::models::transactions::access_list::AccessLi
     }
 }
 
+impl SseEncode for Option<Vec<u64>> {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
+        <bool>::sse_encode(self.is_some(), serializer);
+        if let Some(value) = self {
+            <Vec<u64>>::sse_encode(value, serializer);
+        }
+    }
+}
+
 impl SseEncode for Option<Vec<u8>> {
     // Codec=Sse (Serialization based), see doc to use other codecs
     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {
@@ -8086,6 +8110,7 @@ impl SseEncode for crate::models::transactions::transaction_metadata::Transactio
             self.token_info,
             serializer,
         );
+        <Option<Vec<u64>>>::sse_encode(self.btc_utxo_amounts, serializer);
     }
 }
 

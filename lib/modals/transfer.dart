@@ -121,6 +121,7 @@ class _ConfirmTransactionContentState
 
   bool get isEVM => widget.tx.evm != null;
   bool get isScilla => widget.tx.scilla != null;
+  bool get isBTC => widget.tx.btc != null;
 
   @override
   void initState() {
@@ -237,6 +238,8 @@ class _ConfirmTransactionContentState
           data: widget.tx.scilla!.data,
         ),
       );
+    } else if (isBTC) {
+      return widget.tx;
     } else {
       throw Exception('Unsupported transaction type');
     }
@@ -383,8 +386,8 @@ class _ConfirmTransactionContentState
                             const SizedBox(width: 8),
                             Expanded(
                                 child: Text(_error!,
-                                    style: theme.bodyText2.copyWith(
-                                        color: theme.danger))),
+                                    style: theme.bodyText2
+                                        .copyWith(color: theme.danger))),
                           ],
                         ),
                       ),

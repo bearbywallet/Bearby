@@ -15,6 +15,7 @@ class TransactionMetadataInfo {
   final String? title;
   final String? signer;
   final BaseTokenInfo? tokenInfo;
+  final Uint64List? btcUtxoAmounts;
 
   const TransactionMetadataInfo({
     required this.chainHash,
@@ -24,6 +25,7 @@ class TransactionMetadataInfo {
     this.title,
     this.signer,
     this.tokenInfo,
+    this.btcUtxoAmounts,
   });
 
   @override
@@ -34,7 +36,8 @@ class TransactionMetadataInfo {
       icon.hashCode ^
       title.hashCode ^
       signer.hashCode ^
-      tokenInfo.hashCode;
+      tokenInfo.hashCode ^
+      btcUtxoAmounts.hashCode;
 
   @override
   bool operator ==(Object other) =>
@@ -47,5 +50,6 @@ class TransactionMetadataInfo {
           icon == other.icon &&
           title == other.title &&
           signer == other.signer &&
-          tokenInfo == other.tokenInfo;
+          tokenInfo == other.tokenInfo &&
+          btcUtxoAmounts == other.btcUtxoAmounts;
 }
