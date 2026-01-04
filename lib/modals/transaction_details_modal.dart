@@ -478,7 +478,7 @@ class TransactionDetailsModal extends StatelessWidget {
 
               return DetailItem(
                 label: formattedValue,
-                value: output.scriptPubKey ?? 'N/A',
+                value: output.address ?? output.scriptPubKeyHex ?? 'N/A',
                 theme: theme,
                 isCopyable: true,
               );

@@ -138,96 +138,128 @@ class ParsedScillaReceipt {
 }
 
 class BtcInput {
-  final Map<String, dynamic>? previousOutput;
-  final String? scriptSig;
+  final String? txid;
+  final int? vout;
+  final Map<String, dynamic>? scriptSig;
   final int? sequence;
-  final List<String>? witness;
+  final List<String>? txinwitness;
 
   BtcInput({
-    this.previousOutput,
+    this.txid,
+    this.vout,
     this.scriptSig,
     this.sequence,
-    this.witness,
+    this.txinwitness,
   });
 
   factory BtcInput.fromJson(Map<String, dynamic> json) {
     return BtcInput(
-      previousOutput: json['previousOutput'] as Map<String, dynamic>?,
-      scriptSig: json['scriptSig'] as String?,
+      txid: json['txid'] as String?,
+      vout: json['vout'] as int?,
+      scriptSig: json['scriptSig'] as Map<String, dynamic>?,
       sequence: json['sequence'] as int?,
-      witness: (json['witness'] as List<dynamic>?)?.cast<String>(),
+      txinwitness: (json['txinwitness'] as List<dynamic>?)?.map((e) => e.toString()).toList(),
     );
   }
 
-  String? get txid => previousOutput?['txid'] as String?;
-  int? get vout => previousOutput?['vout'] as int?;
+  String? get scriptSigHex => scriptSig?['hex'] as String?;
+  String? get scriptSigAsm => scriptSig?['asm'] as String?;
 }
 
 class BtcOutput {
-  final String? scriptPubKey;
+  final int? n;
+  final Map<String, dynamic>? scriptPubKey;
   final BigInt? value;
 
   BtcOutput({
+    this.n,
     this.scriptPubKey,
     this.value,
   });
 
   factory BtcOutput.fromJson(Map<String, dynamic> json) {
     return BtcOutput(
-      scriptPubKey: json['scriptPubKey'] as String?,
-      value: _parseBigInt(json['value']),
+      n: json['n'] as int?,
+      scriptPubKey: json['scriptPubKey'] as Map<String, dynamic>?,
+      value: _parseBtcValue(json['value']),
     );
   }
 
-  static BigInt? _parseBigInt(dynamic value) {
+  static BigInt? _parseBtcValue(dynamic value) {
     if (value == null) return null;
+
     if (value is int) return BigInt.from(value);
-    if (value is String) return BigInt.tryParse(value);
+
+    if (value is double) {
+      return BigInt.from((value * 100000000).round());
+    }
+
+    if (value is String) {
+      final intValue = BigInt.tryParse(value);
+      if (intValue != null) return intValue;
+
+      final doubleValue = double.tryParse(value);
+      if (doubleValue != null) {
+        return BigInt.from((doubleValue * 100000000).round());
+      }
+    }
+
     return null;
   }
+
+  String? get address => scriptPubKey?['address'] as String?;
+  String? get scriptPubKeyHex => scriptPubKey?['hex'] as String?;
+  String? get scriptPubKeyAsm => scriptPubKey?['asm'] as String?;
+  String? get scriptPubKeyType => scriptPubKey?['type'] as String?;
 }
 
 class ParsedBtcReceipt {
-  final int? confirmations;
+  final String? txid;
+  final String? hash;
+  final int? version;
+  final int? locktime;
+  final int? size;
+  final int? vsize;
+  final int? weight;
   final List<BtcInput>? inputs;
-  final int? inputsCount;
-  final int? lockTime;
   final List<BtcOutput>? outputs;
-  final int? outputsCount;
-  final String? rawHex;
-  final String? transactionHash;
+  final int? confirmations;
   final BigInt? fee;
 
   ParsedBtcReceipt({
-    this.confirmations,
+    this.txid,
+    this.hash,
+    this.version,
+    this.locktime,
+    this.size,
+    this.vsize,
+    this.weight,
     this.inputs,
-    this.inputsCount,
-    this.lockTime,
     this.outputs,
-    this.outputsCount,
-    this.rawHex,
-    this.transactionHash,
+    this.confirmations,
     this.fee,
   });
 
   factory ParsedBtcReceipt.fromJson(Map<String, dynamic> json) {
-    final inputsList = (json['inputs'] as List<dynamic>?)
+    final inputsList = (json['vin'] as List<dynamic>?)
         ?.map((e) => BtcInput.fromJson(e as Map<String, dynamic>))
         .toList();
 
-    final outputsList = (json['outputs'] as List<dynamic>?)
+    final outputsList = (json['vout'] as List<dynamic>?)
         ?.map((e) => BtcOutput.fromJson(e as Map<String, dynamic>))
         .toList();
 
     return ParsedBtcReceipt(
-      confirmations: json['confirmations'] as int?,
+      txid: json['txid'] as String?,
+      hash: json['hash'] as String?,
+      version: json['version'] as int?,
+      locktime: json['locktime'] as int?,
+      size: json['size'] as int?,
+      vsize: json['vsize'] as int?,
+      weight: json['weight'] as int?,
       inputs: inputsList,
-      inputsCount: json['inputsCount'] as int?,
-      lockTime: json['lockTime'] as int?,
       outputs: outputsList,
-      outputsCount: json['outputsCount'] as int?,
-      rawHex: json['rawHex'] as String?,
-      transactionHash: json['transactionHash'] as String?,
+      confirmations: json['confirmations'] as int?,
       fee: _parseBigInt(json['fee']),
     );
   }
@@ -239,13 +271,10 @@ class ParsedBtcReceipt {
     return null;
   }
 
-  BigInt get totalInputValue {
-    return inputs?.fold<BigInt>(
-          BigInt.zero,
-          (sum, input) => sum,
-        ) ??
-        BigInt.zero;
-  }
+  String? get transactionHash => txid ?? hash;
+  int? get lockTime => locktime;
+  int? get inputsCount => inputs?.length;
+  int? get outputsCount => outputs?.length;
 
   BigInt get totalOutputValue {
     return outputs?.fold<BigInt>(
@@ -388,7 +417,7 @@ extension HistoricalTransactionInfoExt on HistoricalTransactionInfo {
 
   String get recipient {
     if (btc != null) {
-      return btcReceipt?.outputs?.firstOrNull?.scriptPubKey ?? '';
+      return btcReceipt?.outputs?.firstOrNull?.address ?? '';
     }
     return evmReceipt?.recipient ?? scillaReceipt?.recipient ?? '';
   }
