@@ -117,29 +117,22 @@ class GasDetails extends StatelessWidget {
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
-              if (txParamsInfo.feeHistory.priorityFee != BigInt.zero)
+              if (txParamsInfo.maxPriorityFee != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsPriorityFee,
                   formatGasPriceDetail(
-                    calculateMaxPriorityFee(
-                      selectedOption,
-                      txParamsInfo.feeHistory.priorityFee,
-                    ),
+                    txParamsInfo.maxPriorityFee,
                     token,
                   ),
                   effectiveTextColor,
                   effectiveSecondaryColor,
                 ),
               if (txParamsInfo.feeHistory.baseFee != BigInt.zero &&
-                  txParamsInfo.feeHistory.priorityFee != BigInt.zero)
+                  txParamsInfo.maxPriorityFee != BigInt.zero)
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsMaxFee,
                   formatGasPriceDetail(
-                    calculateFeeForOption(
-                      selectedOption,
-                      txParamsInfo.feeHistory.baseFee,
-                      txParamsInfo.feeHistory.priorityFee,
-                    ),
+                    txParamsInfo.feeHistory.baseFee + txParamsInfo.maxPriorityFee,
                     token,
                   ),
                   effectiveTextColor,
@@ -184,9 +177,7 @@ class GasDetails extends StatelessWidget {
 
 class GasEIP1559 extends StatefulWidget {
   final RequiredTxParamsInfo txParamsInfo;
-  final Function(BigInt maxPriorityFee) onChangeMaxPriorityFee;
-  final Function(BigInt gasPrice) onChangeGasPrice;
-  final Function(BigInt totalFee) onTotalFeeChange;
+  final Function(GasFeeOption option, BigInt selectedValue) onGasOptionChanged;
   final bool disabled;
   final int timeDiffBlock;
   final Color? primaryColor;
@@ -196,9 +187,7 @@ class GasEIP1559 extends StatefulWidget {
   const GasEIP1559({
     super.key,
     required this.txParamsInfo,
-    required this.onChangeMaxPriorityFee,
-    required this.onChangeGasPrice,
-    required this.onTotalFeeChange,
+    required this.onGasOptionChanged,
     required this.timeDiffBlock,
     this.disabled = false,
     this.primaryColor,
@@ -214,8 +203,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   late final AnimationController _expandController;
   late final Animation<double> _expandAnimation;
   bool _isExpanded = false;
-  GasFeeOption _selected = GasFeeOption.market;
-  BigInt _currentTotalFee = BigInt.zero;
+  GasFeeOption _selectedOption = GasFeeOption.market;
 
   @override
   void initState() {
@@ -245,52 +233,67 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.txParamsInfo != widget.txParamsInfo) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _updateGasFees();
-      });
+      final current = widget.txParamsInfo.current;
+      final slow = widget.txParamsInfo.slow;
+      final market = widget.txParamsInfo.market;
+      final fast = widget.txParamsInfo.fast;
+
+      GasFeeOption? detectedOption;
+      if (current == slow) {
+        detectedOption = GasFeeOption.low;
+      } else if (current == market) {
+        detectedOption = GasFeeOption.market;
+      } else if (current == fast) {
+        detectedOption = GasFeeOption.aggressive;
+      }
+
+      if (detectedOption != null && _selectedOption != detectedOption) {
+        setState(() {
+          _selectedOption = detectedOption!;
+        });
+      }
     }
   }
 
   void _initializeSelectedOption() {
     final appState = Provider.of<AppState>(context, listen: false);
-    _selected = appState.selectedGasOption;
-    _updateGasFees();
+    _selectedOption = appState.selectedGasOption;
   }
 
-  void _updateGasFees() {
-    BigInt maxPriorityFee = calculateMaxPriorityFee(
-      _selected,
-      widget.txParamsInfo.feeHistory.priorityFee,
-    );
-    BigInt gasPrice = calculateGasPrice(
-      _selected,
-      widget.txParamsInfo.gasPrice,
-    );
-
-    widget.onChangeMaxPriorityFee(maxPriorityFee);
-    widget.onChangeGasPrice(gasPrice);
-    _updateTotalFee();
-  }
-
-  void _updateTotalFee() {
-    final totalGasFee = calculateTotalGasCost(
-      _selected,
-      widget.txParamsInfo.feeHistory.baseFee,
-      widget.txParamsInfo.feeHistory.priorityFee,
-      widget.txParamsInfo.txEstimateGas,
-      widget.txParamsInfo.gasPrice,
-    );
-
-    if (_currentTotalFee != totalGasFee) {
-      _currentTotalFee = totalGasFee;
-      widget.onTotalFeeChange(totalGasFee);
+  BigInt _getValueForOption(GasFeeOption option) {
+    switch (option) {
+      case GasFeeOption.low:
+        return widget.txParamsInfo.slow;
+      case GasFeeOption.market:
+        return widget.txParamsInfo.market;
+      case GasFeeOption.aggressive:
+        return widget.txParamsInfo.fast;
     }
+  }
+
+  BigInt _calculateDisplayFee(GasFeeOption option) {
+    final baseFee = widget.txParamsInfo.feeHistory.baseFee;
+    final priorityFee = widget.txParamsInfo.feeHistory.priorityFee;
+    final gasLimit = widget.txParamsInfo.txEstimateGas;
+    final gasPrice = widget.txParamsInfo.gasPrice;
+    final multiplier = _getValueForOption(option);
+
+    if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
+      final adjustedPriorityFee = priorityFee * multiplier;
+      final adjustedMaxFee = (baseFee * BigInt.two) + adjustedPriorityFee;
+      return gasLimit * adjustedMaxFee;
+    } else if (gasPrice != BigInt.zero) {
+      final adjustedGasPrice = gasPrice * multiplier;
+      return gasLimit * adjustedGasPrice;
+    }
+
+    return BigInt.zero;
   }
 
   void _handleOptionTap(GasFeeOption option) {
     if (widget.disabled) return;
 
-    if (_selected == option) {
+    if (_selectedOption == option) {
       setState(() {
         _isExpanded = !_isExpanded;
         _isExpanded ? _expandController.forward() : _expandController.reverse();
@@ -299,7 +302,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     }
 
     setState(() {
-      _selected = option;
+      _selectedOption = option;
       _isExpanded = false;
       _expandController.reverse();
     });
@@ -307,15 +310,8 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     final appState = Provider.of<AppState>(context, listen: false);
     appState.setSelectedGasOption(option);
 
-    final maxPriorityFee = calculateMaxPriorityFee(
-      option,
-      widget.txParamsInfo.feeHistory.priorityFee,
-    );
-    widget.onChangeMaxPriorityFee(maxPriorityFee);
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _updateTotalFee();
-    });
+    final selectedValue = _getValueForOption(option);
+    widget.onGasOptionChanged(option, selectedValue);
   }
 
   Widget _buildGasOption({
@@ -331,16 +327,10 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
     final effectiveSecondaryColor =
         widget.secondaryColor ?? theme.textSecondary;
 
-    final isSelected = _selected == option;
+    final isSelected = _selectedOption == option;
     final confirmationTime = option.confirmationTime(widget.timeDiffBlock);
 
-    final totalGasFee = calculateTotalGasCost(
-      option,
-      widget.txParamsInfo.feeHistory.baseFee,
-      widget.txParamsInfo.feeHistory.priorityFee,
-      widget.txParamsInfo.txEstimateGas,
-      widget.txParamsInfo.gasPrice,
-    );
+    final totalGasFee = _calculateDisplayFee(option);
     final (normalizedGasFee, convertedGasFee) = formatingAmount(
       amount: totalGasFee,
       symbol: token.symbol,
@@ -429,6 +419,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
                     ),
                     if (isSelected)
                       SizeTransition(
+                        key: ValueKey('gas_details_$option'),
                         sizeFactor: _expandAnimation,
                         child: GasDetails(
                           txParamsInfo: widget.txParamsInfo,
@@ -464,7 +455,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
 
     return Column(
       children: [
-        if (_isExpanded || _selected == GasFeeOption.low)
+        if (_isExpanded || _selectedOption == GasFeeOption.low)
           _buildGasOption(
             option: GasFeeOption.low,
             optionTextColor: warningColor,
@@ -472,7 +463,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
             chain: chain,
             token: token,
           ),
-        if (_isExpanded || _selected == GasFeeOption.market)
+        if (_isExpanded || _selectedOption == GasFeeOption.market)
           _buildGasOption(
             option: GasFeeOption.market,
             optionTextColor: textColor,
@@ -480,7 +471,7 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
             chain: chain,
             token: token,
           ),
-        if (_isExpanded || _selected == GasFeeOption.aggressive)
+        if (_isExpanded || _selectedOption == GasFeeOption.aggressive)
           _buildGasOption(
             option: GasFeeOption.aggressive,
             optionTextColor: dangerColor,
@@ -491,22 +482,4 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
       ],
     );
   }
-}
-
-BigInt calculateTotalGasCost(
-  GasFeeOption option,
-  BigInt baseFee,
-  BigInt priorityFee,
-  BigInt gasLimit,
-  BigInt gasPrice,
-) {
-  if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
-    final maxFeePerGas = calculateFeeForOption(option, baseFee, priorityFee);
-    return gasLimit * maxFeePerGas;
-  } else if (gasPrice != BigInt.zero) {
-    final adjustedGasPrice = calculateGasPrice(option, gasPrice);
-    return gasLimit * adjustedGasPrice;
-  }
-
-  return BigInt.zero;
 }

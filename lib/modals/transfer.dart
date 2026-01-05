@@ -12,6 +12,7 @@ import 'package:zilpay/ledger/ledger_connector.dart';
 import 'package:zilpay/ledger/models/discovered_device.dart';
 import 'package:zilpay/mixins/adaptive_size.dart';
 import 'package:zilpay/mixins/amount.dart';
+import 'package:zilpay/mixins/gas_eip1559.dart';
 import 'package:zilpay/mixins/preprocess_url.dart';
 import 'package:zilpay/mixins/wallet_type.dart';
 import 'package:zilpay/modals/edit_gas_dialog.dart';
@@ -23,10 +24,8 @@ import 'package:zilpay/src/rust/models/ftoken.dart';
 import 'package:zilpay/src/rust/models/gas.dart';
 import 'package:zilpay/src/rust/models/connection.dart';
 import 'package:zilpay/src/rust/models/transactions/base_token.dart';
-import 'package:zilpay/src/rust/models/transactions/evm.dart';
 import 'package:zilpay/src/rust/models/transactions/history.dart';
 import 'package:zilpay/src/rust/models/transactions/request.dart';
-import 'package:zilpay/src/rust/models/transactions/scilla.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
 import 'package:zilpay/utils/utils.dart';
@@ -109,12 +108,15 @@ class _ConfirmTransactionContentState
     txEstimateGas: BigInt.zero,
     blobBaseFee: BigInt.zero,
     nonce: BigInt.zero,
+    slow: BigInt.zero,
+    market: BigInt.zero,
+    fast: BigInt.zero,
+    current: BigInt.zero,
   );
+  late TransactionRequestInfo _currentTx;
+  GasFeeOption _userSelectedOption = GasFeeOption.market;
   bool _loading = false;
   String? _error;
-  BigInt _maxPriorityFee = BigInt.zero;
-  BigInt _gasPrice = BigInt.zero;
-  BigInt _totalFee = BigInt.zero;
   bool _obscurePassword = true;
   Timer? _timerPooling;
   Timer? _scanTimeout;
@@ -123,11 +125,43 @@ class _ConfirmTransactionContentState
   bool get isScilla => widget.tx.scilla != null;
   bool get isBTC => widget.tx.btc != null;
 
+  BigInt _getValueForOption(GasFeeOption option, RequiredTxParamsInfo params) {
+    switch (option) {
+      case GasFeeOption.low:
+        return params.slow;
+      case GasFeeOption.market:
+        return params.market;
+      case GasFeeOption.aggressive:
+        return params.fast;
+    }
+  }
+
+  BigInt _calculateCurrentFee() {
+    final baseFee = _txParamsInfo.feeHistory.baseFee;
+    final priorityFee = _txParamsInfo.feeHistory.priorityFee;
+    final gasLimit = _txParamsInfo.txEstimateGas;
+    final gasPrice = _txParamsInfo.gasPrice;
+    final currentMultiplier = _txParamsInfo.current;
+
+    if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
+      final adjustedPriorityFee = priorityFee * currentMultiplier;
+      final adjustedMaxFee = (baseFee * BigInt.two) + adjustedPriorityFee;
+      return gasLimit * adjustedMaxFee;
+    } else if (gasPrice != BigInt.zero) {
+      final adjustedGasPrice = gasPrice * currentMultiplier;
+      return gasLimit * adjustedGasPrice;
+    }
+
+    return BigInt.zero;
+  }
+
   @override
   void initState() {
     super.initState();
     final appState = context.read<AppState>();
     _authGuard = context.read<AuthGuard>();
+    _currentTx = widget.tx;
+    _userSelectedOption = appState.selectedGasOption;
     _initGasPolling();
     _isLedgerWallet = appState.selectedWallet != -1 &&
         appState.wallets[appState.selectedWallet].walletType
@@ -186,14 +220,26 @@ class _ConfirmTransactionContentState
     try {
       if (initial) _error = null;
       final gas = await caclGasFee(
-        params: widget.tx,
+        params: _currentTx,
         walletIndex: BigInt.from(appState.selectedWallet),
         accountIndex: appState.wallet!.selectedAccount,
       );
 
-      if (mounted) {
-        setState(() => _txParamsInfo = gas);
-      }
+      final selectedValue = _getValueForOption(_userSelectedOption, gas);
+      final updatedGas = RequiredTxParamsInfo(
+        gasPrice: gas.gasPrice,
+        maxPriorityFee: gas.maxPriorityFee,
+        feeHistory: gas.feeHistory,
+        txEstimateGas: gas.txEstimateGas,
+        blobBaseFee: gas.blobBaseFee,
+        nonce: gas.nonce,
+        slow: gas.slow,
+        market: gas.market,
+        fast: gas.fast,
+        current: selectedValue,
+      );
+
+      await _updateTxParams(updatedGas);
     } catch (e) {
       debugPrint('Gas fee error: $e');
       if (initial && mounted) {
@@ -202,46 +248,24 @@ class _ConfirmTransactionContentState
     }
   }
 
-  TransactionRequestInfo _prepareTx(BigInt adjustedAmount) {
-    if (isEVM) {
-      return TransactionRequestInfo(
-        metadata: widget.tx.metadata,
-        evm: TransactionRequestEVM(
-          nonce: _txParamsInfo.nonce,
-          from: widget.tx.evm!.from,
-          to: widget.tx.evm!.to,
-          value: adjustedAmount.toString(),
-          data: widget.tx.evm!.data,
-          chainId: widget.tx.evm!.chainId,
-          accessList: widget.tx.evm!.accessList,
-          blobVersionedHashes: widget.tx.evm!.blobVersionedHashes,
-          maxFeePerBlobGas: widget.tx.evm!.maxFeePerBlobGas,
-          maxPriorityFeePerGas: _maxPriorityFee,
-          gasLimit: _txParamsInfo.txEstimateGas,
-          gasPrice:
-              _txParamsInfo.feeHistory.maxFee > BigInt.zero ? null : _gasPrice,
-          maxFeePerGas:
-              (_txParamsInfo.feeHistory.baseFee * BigInt.two) + _maxPriorityFee,
-        ),
+  Future<void> _updateTxParams(RequiredTxParamsInfo params) async {
+    try {
+      final updatedTx = await updateTxWithParams(
+        tx: _currentTx,
+        params: params,
       );
-    } else if (isScilla) {
-      return TransactionRequestInfo(
-        metadata: widget.tx.metadata,
-        scilla: TransactionRequestScilla(
-          chainId: widget.tx.scilla!.chainId,
-          nonce: _txParamsInfo.nonce + BigInt.one,
-          gasPrice: _gasPrice,
-          gasLimit: _txParamsInfo.txEstimateGas,
-          toAddr: widget.tx.scilla!.toAddr,
-          amount: adjustedAmount,
-          code: widget.tx.scilla!.code,
-          data: widget.tx.scilla!.data,
-        ),
-      );
-    } else if (isBTC) {
-      return widget.tx;
-    } else {
-      throw Exception('Unsupported transaction type');
+
+      if (mounted) {
+        setState(() {
+          _txParamsInfo = params;
+          _currentTx = updatedTx;
+        });
+      }
+    } catch (e) {
+      debugPrint('Update tx params error: $e');
+      if (mounted) {
+        setState(() => _error = e.toString());
+      }
     }
   }
 
@@ -403,13 +427,22 @@ class _ConfirmTransactionContentState
                                 appState.chain?.diffBlockTime.toInt() ?? 10,
                             txParamsInfo: _txParamsInfo,
                             disabled: _isDisabled,
-                            onChangeGasPrice: (gasPrice) =>
-                                setState(() => _gasPrice = gasPrice),
-                            onChangeMaxPriorityFee: (maxPriorityFee) =>
-                                setState(
-                                    () => _maxPriorityFee = maxPriorityFee),
-                            onTotalFeeChange: (totalFee) =>
-                                setState(() => _totalFee = totalFee),
+                            onGasOptionChanged: (option, selectedValue) async {
+                              setState(() => _userSelectedOption = option);
+                              final updatedParams = RequiredTxParamsInfo(
+                                gasPrice: _txParamsInfo.gasPrice,
+                                maxPriorityFee: _txParamsInfo.maxPriorityFee,
+                                feeHistory: _txParamsInfo.feeHistory,
+                                txEstimateGas: _txParamsInfo.txEstimateGas,
+                                blobBaseFee: _txParamsInfo.blobBaseFee,
+                                nonce: _txParamsInfo.nonce,
+                                slow: _txParamsInfo.slow,
+                                market: _txParamsInfo.market,
+                                fast: _txParamsInfo.fast,
+                                current: selectedValue,
+                              );
+                              await _updateTxParams(updatedParams);
+                            },
                             primaryColor: primaryColor,
                             textColor: textColor,
                             secondaryColor: secondaryColor,
@@ -425,9 +458,10 @@ class _ConfirmTransactionContentState
                                   barrierDismissible: false,
                                   builder: (context) => EditGasDialog(
                                     txParamsInfo: _txParamsInfo,
-                                    initialGasPrice: _gasPrice,
+                                    initialGasPrice: _txParamsInfo.gasPrice,
                                     initialNonce: _txParamsInfo.nonce,
-                                    initialMaxPriorityFee: _maxPriorityFee,
+                                    initialMaxPriorityFee:
+                                        _txParamsInfo.maxPriorityFee,
                                     data: widget.tx.evm?.data != null
                                         ? bytesToHex(widget.tx.evm!.data!)
                                         : null,
@@ -438,37 +472,24 @@ class _ConfirmTransactionContentState
                                       maxPriorityFee,
                                       gasLimit,
                                       nonce,
-                                    ) {
+                                    ) async {
                                       if (!mounted) return;
 
-                                      setState(() {
-                                        _gasPrice = gasPrice;
-                                        _maxPriorityFee = maxPriorityFee;
+                                      final updatedParams =
+                                          RequiredTxParamsInfo(
+                                        gasPrice: gasPrice,
+                                        maxPriorityFee: maxPriorityFee,
+                                        feeHistory: _txParamsInfo.feeHistory,
+                                        txEstimateGas: gasLimit,
+                                        blobBaseFee: _txParamsInfo.blobBaseFee,
+                                        nonce: nonce,
+                                        slow: _txParamsInfo.slow,
+                                        market: _txParamsInfo.market,
+                                        fast: _txParamsInfo.fast,
+                                        current: _txParamsInfo.current,
+                                      );
 
-                                        _txParamsInfo = RequiredTxParamsInfo(
-                                          gasPrice: _txParamsInfo.gasPrice,
-                                          maxPriorityFee:
-                                              _txParamsInfo.maxPriorityFee,
-                                          feeHistory: _txParamsInfo.feeHistory,
-                                          txEstimateGas: gasLimit,
-                                          blobBaseFee:
-                                              _txParamsInfo.blobBaseFee,
-                                          nonce: _txParamsInfo.nonce,
-                                        );
-
-                                        final BigInt baseFee =
-                                            _txParamsInfo.feeHistory.baseFee;
-                                        BigInt newTotalFee;
-
-                                        if (baseFee != BigInt.zero) {
-                                          final maxFeePerGas =
-                                              baseFee + maxPriorityFee;
-                                          newTotalFee = gasLimit * maxFeePerGas;
-                                        } else {
-                                          newTotalFee = gasLimit * gasPrice;
-                                        }
-                                        _totalFee = newTotalFee;
-                                      });
+                                      await _updateTxParams(updatedParams);
                                     },
                                     primaryColor: primaryColor,
                                     textColor: textColor,
@@ -544,39 +565,14 @@ class _ConfirmTransactionContentState
                         onSwipeComplete: () async {
                           setState(() => _loading = true);
                           try {
-                            final amount = toDecimalsWei(
-                              widget.amount,
-                              widget.token.decimals,
-                            );
-                            final fee = _totalFee;
-                            BigInt adjustedTokenValue = amount;
-                            bool isNativeTx =
-                                (widget.tx.evm?.data?.isEmpty ?? true) &&
-                                    (widget.tx.scilla?.data.isEmpty ?? true);
-                            final balance = BigInt.parse(widget.token.balances[
-                                    appState.wallet!.selectedAccount] ??
-                                '0');
-
-                            if (isNativeTx && amount == balance) {
-                              adjustedTokenValue = amount - fee;
-                            }
-
-                            if (!isNativeTx && isScilla) {
-                              adjustedTokenValue =
-                                  widget.tx.scilla?.amount ?? BigInt.zero;
-                            } else if (!widget.token.native && isEVM) {
-                              adjustedTokenValue = BigInt.tryParse(
-                                      widget.tx.evm?.value ?? "0") ??
-                                  BigInt.zero;
-                            }
-
-                            final tx = _prepareTx(adjustedTokenValue);
                             HistoricalTransactionInfo? sendedTx;
 
                             if (_isLedgerWallet) {
-                              sendedTx = await _signAndSendLedger(appState, tx);
+                              sendedTx = await _signAndSendLedger(
+                                  appState, _currentTx);
                             } else {
-                              sendedTx = await _signAndSend(appState, tx);
+                              sendedTx =
+                                  await _signAndSend(appState, _currentTx);
                             }
 
                             if (mounted && sendedTx != null) {
@@ -682,7 +678,7 @@ class _ConfirmTransactionContentState
           children: [
             TransactionAmountDisplay(
               amount: amount,
-              fee: _totalFee,
+              fee: _calculateCurrentFee(),
               token: widget.token,
               balance: balance,
               textColor: textColor,
