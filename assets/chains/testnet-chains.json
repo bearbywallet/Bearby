@@ -4,7 +4,10 @@
     "chain": "BTC",
     "logo": "https://raw.githubusercontent.com/zilpay/tokens_meta/refs/heads/master/ft/%{shortName}%/chain/%{dark,light}%.svg",
     "rpc": [
-      "ssl://btc-testnet.zilpay.io:60402"
+      "ssl://blackie.c3-soft.com:57006",
+      "ssl://ax101.blockeng.ch:60002",
+      "ssl://fulcrum3.reidenlake.com:50006",
+      "ssl://electrum.blockstream.info:60002"
     ],
     "features": [],
     "ftokens": [
@@ -22,7 +25,14 @@
     "testnet": true,
     "shortName": "bitcoin",
     "slip44": 0,
-    "explorers": []
+    "explorers": [
+      {
+        "name": "blockstream",
+        "icon": "https://blockstream.info/img/favicon.png",
+        "url": "https://blockstream.info/testnet/",
+        "standard": "EIP3091"
+      }
+    ]
   },
   {
     "name": "Zilliqa Test",
