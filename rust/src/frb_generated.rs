@@ -5587,10 +5587,10 @@ impl SseDecode for crate::models::gas::RequiredTxParamsInfo {
         let mut var_txEstimateGas = <u64>::sse_decode(deserializer);
         let mut var_blobBaseFee = <u128>::sse_decode(deserializer);
         let mut var_nonce = <u64>::sse_decode(deserializer);
-        let mut var_slow = <u64>::sse_decode(deserializer);
-        let mut var_market = <u64>::sse_decode(deserializer);
-        let mut var_fast = <u64>::sse_decode(deserializer);
-        let mut var_current = <u64>::sse_decode(deserializer);
+        let mut var_slow = <String>::sse_decode(deserializer);
+        let mut var_market = <String>::sse_decode(deserializer);
+        let mut var_fast = <String>::sse_decode(deserializer);
+        let mut var_current = <String>::sse_decode(deserializer);
         return crate::models::gas::RequiredTxParamsInfo {
             gas_price: var_gasPrice,
             max_priority_fee: var_maxPriorityFee,
@@ -8146,10 +8146,10 @@ impl SseEncode for crate::models::gas::RequiredTxParamsInfo {
         <u64>::sse_encode(self.tx_estimate_gas, serializer);
         <u128>::sse_encode(self.blob_base_fee, serializer);
         <u64>::sse_encode(self.nonce, serializer);
-        <u64>::sse_encode(self.slow, serializer);
-        <u64>::sse_encode(self.market, serializer);
-        <u64>::sse_encode(self.fast, serializer);
-        <u64>::sse_encode(self.current, serializer);
+        <String>::sse_encode(self.slow, serializer);
+        <String>::sse_encode(self.market, serializer);
+        <String>::sse_encode(self.fast, serializer);
+        <String>::sse_encode(self.current, serializer);
     }
 }
 

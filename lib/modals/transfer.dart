@@ -108,10 +108,10 @@ class _ConfirmTransactionContentState
     txEstimateGas: BigInt.zero,
     blobBaseFee: BigInt.zero,
     nonce: BigInt.zero,
-    slow: BigInt.zero,
-    market: BigInt.zero,
-    fast: BigInt.zero,
-    current: BigInt.zero,
+    slow: '0',
+    market: '0',
+    fast: '0',
+    current: '0',
   );
   late TransactionRequestInfo _currentTx;
   GasFeeOption _userSelectedOption = GasFeeOption.market;
@@ -128,31 +128,31 @@ class _ConfirmTransactionContentState
   BigInt _getValueForOption(GasFeeOption option, RequiredTxParamsInfo params) {
     switch (option) {
       case GasFeeOption.low:
-        return params.slow;
+        return BigInt.parse(params.slow);
       case GasFeeOption.market:
-        return params.market;
+        return BigInt.parse(params.market);
       case GasFeeOption.aggressive:
-        return params.fast;
+        return BigInt.parse(params.fast);
     }
   }
 
   BigInt _calculateCurrentFee() {
-    final baseFee = _txParamsInfo.feeHistory.baseFee;
-    final priorityFee = _txParamsInfo.feeHistory.priorityFee;
-    final gasLimit = _txParamsInfo.txEstimateGas;
-    final gasPrice = _txParamsInfo.gasPrice;
-    final currentMultiplier = _txParamsInfo.current;
+    final current = BigInt.parse(_txParamsInfo.current);
 
-    if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
-      final adjustedPriorityFee = priorityFee * currentMultiplier;
-      final adjustedMaxFee = (baseFee * BigInt.two) + adjustedPriorityFee;
-      return gasLimit * adjustedMaxFee;
-    } else if (gasPrice != BigInt.zero) {
-      final adjustedGasPrice = gasPrice * currentMultiplier;
-      return gasLimit * adjustedGasPrice;
+    if (current == BigInt.zero) {
+      return BigInt.zero;
     }
 
-    return BigInt.zero;
+    if (isBTC) {
+      return current;
+    }
+
+    final gasLimit = _txParamsInfo.txEstimateGas;
+    if (gasLimit == BigInt.zero) {
+      return BigInt.zero;
+    }
+
+    return gasLimit * current;
   }
 
   @override
@@ -236,7 +236,7 @@ class _ConfirmTransactionContentState
         slow: gas.slow,
         market: gas.market,
         fast: gas.fast,
-        current: selectedValue,
+        current: selectedValue.toString(),
       );
 
       await _updateTxParams(updatedGas);
@@ -426,6 +426,7 @@ class _ConfirmTransactionContentState
                             timeDiffBlock:
                                 appState.chain?.diffBlockTime.toInt() ?? 10,
                             txParamsInfo: _txParamsInfo,
+                            isBitcoin: isBTC,
                             disabled: _isDisabled,
                             onGasOptionChanged: (option, selectedValue) async {
                               setState(() => _userSelectedOption = option);
@@ -439,7 +440,7 @@ class _ConfirmTransactionContentState
                                 slow: _txParamsInfo.slow,
                                 market: _txParamsInfo.market,
                                 fast: _txParamsInfo.fast,
-                                current: selectedValue,
+                                current: selectedValue.toString(),
                               );
                               await _updateTxParams(updatedParams);
                             },

@@ -4646,10 +4646,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       txEstimateGas: dco_decode_u_64(arr[3]),
       blobBaseFee: dco_decode_U128(arr[4]),
       nonce: dco_decode_u_64(arr[5]),
-      slow: dco_decode_u_64(arr[6]),
-      market: dco_decode_u_64(arr[7]),
-      fast: dco_decode_u_64(arr[8]),
-      current: dco_decode_u_64(arr[9]),
+      slow: dco_decode_String(arr[6]),
+      market: dco_decode_String(arr[7]),
+      fast: dco_decode_String(arr[8]),
+      current: dco_decode_String(arr[9]),
     );
   }
 
@@ -6128,10 +6128,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var var_txEstimateGas = sse_decode_u_64(deserializer);
     var var_blobBaseFee = sse_decode_U128(deserializer);
     var var_nonce = sse_decode_u_64(deserializer);
-    var var_slow = sse_decode_u_64(deserializer);
-    var var_market = sse_decode_u_64(deserializer);
-    var var_fast = sse_decode_u_64(deserializer);
-    var var_current = sse_decode_u_64(deserializer);
+    var var_slow = sse_decode_String(deserializer);
+    var var_market = sse_decode_String(deserializer);
+    var var_fast = sse_decode_String(deserializer);
+    var var_current = sse_decode_String(deserializer);
     return RequiredTxParamsInfo(
         gasPrice: var_gasPrice,
         maxPriorityFee: var_maxPriorityFee,
@@ -7418,10 +7418,10 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_u_64(self.txEstimateGas, serializer);
     sse_encode_U128(self.blobBaseFee, serializer);
     sse_encode_u_64(self.nonce, serializer);
-    sse_encode_u_64(self.slow, serializer);
-    sse_encode_u_64(self.market, serializer);
-    sse_encode_u_64(self.fast, serializer);
-    sse_encode_u_64(self.current, serializer);
+    sse_encode_String(self.slow, serializer);
+    sse_encode_String(self.market, serializer);
+    sse_encode_String(self.fast, serializer);
+    sse_encode_String(self.current, serializer);
   }
 
   @protected

@@ -37,10 +37,10 @@ class RequiredTxParamsInfo {
   final BigInt txEstimateGas;
   final BigInt blobBaseFee;
   final BigInt nonce;
-  final BigInt slow;
-  final BigInt market;
-  final BigInt fast;
-  final BigInt current;
+  final String slow;
+  final String market;
+  final String fast;
+  final String current;
 
   const RequiredTxParamsInfo({
     required this.gasPrice,

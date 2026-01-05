@@ -34,10 +34,10 @@ pub struct RequiredTxParamsInfo {
     pub tx_estimate_gas: u64,
     pub blob_base_fee: u128,
     pub nonce: u64,
-    pub slow: u64,
-    pub market: u64,
-    pub fast: u64,
-    pub current: u64,
+    pub slow: String,
+    pub market: String,
+    pub fast: String,
+    pub current: String,
 }
 
 impl From<RequiredTxParams> for RequiredTxParamsInfo {
@@ -49,10 +49,10 @@ impl From<RequiredTxParams> for RequiredTxParamsInfo {
             tx_estimate_gas: value.tx_estimate_gas.try_into().unwrap_or_default(),
             blob_base_fee: value.blob_base_fee.try_into().unwrap_or_default(),
             nonce: value.nonce,
-            slow: value.slow,
-            market: value.market,
-            fast: value.fast,
-            current: value.current,
+            slow: value.slow.to_string(),
+            market: value.market.to_string(),
+            fast: value.fast.to_string(),
+            current: value.current.to_string(),
         }
     }
 }
@@ -66,10 +66,10 @@ impl From<RequiredTxParamsInfo> for RequiredTxParams {
             tx_estimate_gas: value.tx_estimate_gas.try_into().unwrap_or_default(),
             blob_base_fee: value.blob_base_fee.try_into().unwrap_or_default(),
             nonce: value.nonce,
-            slow: value.slow,
-            market: value.market,
-            fast: value.fast,
-            current: value.current,
+            slow: value.slow.parse().unwrap_or_default(),
+            market: value.market.parse().unwrap_or_default(),
+            fast: value.fast.parse().unwrap_or_default(),
+            current: value.current.parse().unwrap_or_default(),
         }
     }
 }

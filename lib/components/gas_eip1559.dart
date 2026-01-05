@@ -132,7 +132,8 @@ class GasDetails extends StatelessWidget {
                 _buildDetailRow(
                   AppLocalizations.of(context)!.gasDetailsMaxFee,
                   formatGasPriceDetail(
-                    txParamsInfo.feeHistory.baseFee + txParamsInfo.maxPriorityFee,
+                    txParamsInfo.feeHistory.baseFee +
+                        txParamsInfo.maxPriorityFee,
                     token,
                   ),
                   effectiveTextColor,
@@ -180,6 +181,7 @@ class GasEIP1559 extends StatefulWidget {
   final Function(GasFeeOption option, BigInt selectedValue) onGasOptionChanged;
   final bool disabled;
   final int timeDiffBlock;
+  final bool isBitcoin;
   final Color? primaryColor;
   final Color? textColor;
   final Color? secondaryColor;
@@ -189,6 +191,7 @@ class GasEIP1559 extends StatefulWidget {
     required this.txParamsInfo,
     required this.onGasOptionChanged,
     required this.timeDiffBlock,
+    this.isBitcoin = false,
     this.disabled = false,
     this.primaryColor,
     this.textColor,
@@ -263,31 +266,31 @@ class _GasEIP1559State extends State<GasEIP1559> with TickerProviderStateMixin {
   BigInt _getValueForOption(GasFeeOption option) {
     switch (option) {
       case GasFeeOption.low:
-        return widget.txParamsInfo.slow;
+        return BigInt.parse(widget.txParamsInfo.slow);
       case GasFeeOption.market:
-        return widget.txParamsInfo.market;
+        return BigInt.parse(widget.txParamsInfo.market);
       case GasFeeOption.aggressive:
-        return widget.txParamsInfo.fast;
+        return BigInt.parse(widget.txParamsInfo.fast);
     }
   }
 
   BigInt _calculateDisplayFee(GasFeeOption option) {
-    final baseFee = widget.txParamsInfo.feeHistory.baseFee;
-    final priorityFee = widget.txParamsInfo.feeHistory.priorityFee;
-    final gasLimit = widget.txParamsInfo.txEstimateGas;
-    final gasPrice = widget.txParamsInfo.gasPrice;
-    final multiplier = _getValueForOption(option);
+    final gasPriceForOption = _getValueForOption(option);
 
-    if (baseFee != BigInt.zero && priorityFee != BigInt.zero) {
-      final adjustedPriorityFee = priorityFee * multiplier;
-      final adjustedMaxFee = (baseFee * BigInt.two) + adjustedPriorityFee;
-      return gasLimit * adjustedMaxFee;
-    } else if (gasPrice != BigInt.zero) {
-      final adjustedGasPrice = gasPrice * multiplier;
-      return gasLimit * adjustedGasPrice;
+    if (gasPriceForOption == BigInt.zero) {
+      return BigInt.zero;
     }
 
-    return BigInt.zero;
+    if (widget.isBitcoin) {
+      return gasPriceForOption;
+    }
+
+    final gasLimit = widget.txParamsInfo.txEstimateGas;
+    if (gasLimit == BigInt.zero) {
+      return BigInt.zero;
+    }
+
+    return gasLimit * gasPriceForOption;
   }
 
   void _handleOptionTap(GasFeeOption option) {
