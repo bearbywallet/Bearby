@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:no_screenshot/no_screenshot.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -35,29 +34,19 @@ class _KeystoreBackupState extends State<KeystoreBackup> with StatusBarMixin {
   String? backupFilePath;
   Uint8List? keystoreBytes;
 
-  final _noScreenshot =
-      Platform.isIOS || Platform.isAndroid ? NoScreenshot.instance : null;
   final _confirmPasswordController = TextEditingController();
   final _confirmPasswordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
   @override
   void initState() {
-    _secureScreen();
     super.initState();
   }
 
   @override
   void dispose() {
     _confirmPasswordController.dispose();
-    _noScreenshot?.screenshotOn();
     super.dispose();
-  }
-
-  Future<void> _secureScreen() async {
-    if (_noScreenshot != null) {
-      await _noScreenshot.screenshotOff();
-    }
   }
 
   void _onCreateBackup(BigInt walletIndex, String name) async {

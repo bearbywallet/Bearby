@@ -1,10 +1,8 @@
 import 'dart:async';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:provider/provider.dart';
-import 'package:no_screenshot/no_screenshot.dart';
 import 'package:zilpay/components/async_qrcode.dart';
 import 'package:zilpay/components/button.dart';
 import 'package:zilpay/components/custom_app_bar.dart';
@@ -41,29 +39,19 @@ class _RevealSecretPhraseState extends State<RevealSecretPhrase>
   Timer? _countdownTimer;
   int _remainingTime = 3600;
 
-  final _noScreenshot =
-      Platform.isIOS || Platform.isAndroid ? NoScreenshot.instance : null;
   final _passwordController = TextEditingController();
   final _passwordInputKey = GlobalKey<SmartInputState>();
   final _btnController = RoundedLoadingButtonController();
 
   @override
   void initState() {
-    _secureScreen();
     super.initState();
   }
 
   @override
   void dispose() {
     _countdownTimer?.cancel();
-    _noScreenshot?.screenshotOn();
     super.dispose();
-  }
-
-  Future<void> _secureScreen() async {
-    if (_noScreenshot != null) {
-      await _noScreenshot.screenshotOff();
-    }
   }
 
   void _startCountdown() {
