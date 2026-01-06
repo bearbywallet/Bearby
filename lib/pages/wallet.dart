@@ -19,6 +19,7 @@ import 'package:zilpay/services/auth_guard.dart';
 import 'package:zilpay/services/biometric_service.dart';
 import 'package:zilpay/services/device.dart';
 import 'package:zilpay/src/rust/api/connections.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/api/wallet.dart';
 import 'package:zilpay/state/app_state.dart';
 import '../theme/app_theme.dart';
@@ -73,6 +74,7 @@ class _WalletPageState extends State<WalletPage> {
     _walletNameController.text = appState.wallet!.walletName;
     appState.syncConnections();
     _checkAuthMethods();
+    _initializeBipPurpose(appState);
   }
 
   @override
@@ -96,6 +98,40 @@ class _WalletPageState extends State<WalletPage> {
         _authMethods = [AuthMethod.none];
         _biometricsAvailable = false;
       });
+    }
+  }
+
+  Future<void> _initializeBipPurpose(AppState appState) async {
+    if (!_isBitcoinWallet(appState) || appState.account?.addr == null) {
+      return;
+    }
+
+    try {
+      final addressType = await bitcoinAddressTypeFromAddress(
+        addr: appState.account!.addr,
+      );
+      final index = _mapAddressTypeToBipIndex(addressType);
+
+      setState(() {
+        _selectedBipPurposeIndex = index;
+      });
+    } catch (e) {
+      debugPrint("Error determining BIP purpose: $e");
+    }
+  }
+
+  int _mapAddressTypeToBipIndex(String addressType) {
+    switch (addressType) {
+      case "p2tr":
+        return 0;
+      case "p2wpkh":
+      case "p2wsh":
+        return 1;
+      case "p2sh":
+        return 2;
+      case "p2pkh":
+      default:
+        return 3;
     }
   }
 

@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use flutter_rust_bridge::frb;
 use sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
@@ -7,6 +9,18 @@ use crate::utils::utils::parse_address;
 
 pub fn is_valid_address(addr: String) -> bool {
     parse_address(addr).is_ok()
+}
+
+pub fn bitcoin_address_type_from_address(addr: String) -> Result<String, String> {
+    let addr = bitcoin::Address::from_str(&addr)
+        .map_err(|e| e.to_string())?
+        .assume_checked();
+
+    if let Some(address_type) = addr.address_type() {
+        return Ok(address_type.to_string());
+    }
+
+    Err("invalid addr".to_string())
 }
 
 #[frb(sync)]
