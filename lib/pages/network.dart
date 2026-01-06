@@ -169,10 +169,8 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
     final sortedNetworks = List<NetworkItem>.from(networks);
 
     sortedNetworks.sort((a, b) {
-      final aIsSelected = chain?.chainId == a.configInfo.chainId &&
-          chain?.slip44 == a.configInfo.slip44;
-      final bIsSelected = chain?.chainId == b.configInfo.chainId &&
-          chain?.slip44 == b.configInfo.slip44;
+      final aIsSelected = chain?.chainHash == a.configInfo.chainHash;
+      final bIsSelected = chain?.chainHash == b.configInfo.chainHash;
 
       if (aIsSelected && !bIsSelected) return -1;
       if (!aIsSelected && bIsSelected) return 1;
@@ -267,8 +265,7 @@ class _NetworkPageState extends State<NetworkPage> with StatusBarMixin {
                 isAdded: network.isAdded,
                 isDefault:
                     wallet?.defaultChainHash == network.configInfo.chainHash,
-                isSelected: chain?.chainId == network.configInfo.chainId &&
-                    chain?.slip44 == network.configInfo.slip44,
+                isSelected: chain?.chainHash == network.configInfo.chainHash,
                 isTestnet: network.configInfo.testnet ?? false,
                 iconUrl:
                     viewChain(network: network.configInfo, theme: theme.value),
