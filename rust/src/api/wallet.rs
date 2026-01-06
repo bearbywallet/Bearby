@@ -1,3 +1,5 @@
+use std::str::FromStr;
+
 use zilpay::background::bg_provider::ProvidersManagement;
 use zilpay::background::bg_storage::StorageManagement;
 use zilpay::background::Background;
@@ -335,6 +337,70 @@ pub async fn set_biometric(
         )?;
 
         Ok(session_bytes.map(|v| hex::encode(v)))
+    })
+    .await
+    .map_err(Into::into)
+}
+
+pub async fn bitcoin_change_address_type(
+    wallet_index: usize,
+    new_address_type: String,
+    identifiers: Vec<String>,
+    password: String,
+    passphrase: Option<String>,
+) -> Result<(), String> {
+    with_service(|core| {
+        let address_type = bitcoin::AddressType::from_str(&new_address_type).map_err(|_| {
+            ServiceError::AddressError(zilpay::errors::address::AddressError::InvalidKeyType)
+        })?;
+        let seed = core.unlock_wallet_with_password(&password, &identifiers, wallet_index)?;
+        let wallet = core.get_wallet_by_index(wallet_index)?;
+        let mut wallet_data = wallet
+            .get_wallet_data()
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let provider = core.get_provider(wallet_data.default_chain_hash)?;
+        let new_bip_purpose = DerivationPath::bip_from_address_type(address_type);
+        let mnemonic = wallet
+            .reveal_mnemonic(&seed)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+        let mnemonic_seed = mnemonic
+            .to_seed(passphrase.as_deref().unwrap_or(""))
+            .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::Bip39Error(e)))?;
+
+        for (index, account) in wallet_data.accounts.iter_mut().enumerate() {
+            let net = match account.pub_key {
+                PubKey::Secp256k1Bitcoin((_, net, _)) => Some(net),
+                _ => {
+                    return Err(ServiceError::WalletError(
+                        wallet_index,
+                        WalletErrors::InvalidAccountType,
+                    ));
+                }
+            };
+
+            let new_path = DerivationPath::new(
+                provider.config.slip_44,
+                index,
+                new_bip_purpose,
+                net,
+            );
+
+            let keypair = zilpay::proto::keypair::KeyPair::from_bip39_seed(&mnemonic_seed, &new_path)
+                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+
+            account.pub_key = keypair
+                .get_pubkey()
+                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+            account.addr = keypair
+                .get_addr()
+                .map_err(|e| ServiceError::WalletError(wallet_index, WalletErrors::from(e)))?;
+        }
+
+        wallet
+            .save_wallet_data(wallet_data)
+            .map_err(|e| ServiceError::WalletError(wallet_index, e))?;
+
+        Ok(())
     })
     .await
     .map_err(Into::into)

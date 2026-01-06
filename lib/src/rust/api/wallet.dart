@@ -79,6 +79,19 @@ Future<String?> setBiometric(
         sessionCipher: sessionCipher,
         newBiometricType: newBiometricType);
 
+Future<void> bitcoinChangeAddressType(
+        {required BigInt walletIndex,
+        required String newAddressType,
+        required List<String> identifiers,
+        required String password,
+        String? passphrase}) =>
+    RustLib.instance.api.crateApiWalletBitcoinChangeAddressType(
+        walletIndex: walletIndex,
+        newAddressType: newAddressType,
+        identifiers: identifiers,
+        password: password,
+        passphrase: passphrase);
+
 Future<KeyPairInfo> revealKeypair(
         {required BigInt walletIndex,
         required BigInt accountIndex,
