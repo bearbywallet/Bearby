@@ -30,12 +30,22 @@ class MnemonicWordInput extends StatefulWidget {
 
 class _MnemonicWordInputState extends State<MnemonicWordInput> {
   late TextEditingController _controller;
+  late FocusNode _focusNode;
   bool _shouldUpdateText = true;
+  bool _isObscured = true;
 
   @override
   void initState() {
     super.initState();
     _controller = TextEditingController(text: widget.word);
+    _focusNode = FocusNode();
+    _focusNode.addListener(_handleFocusChange);
+  }
+
+  void _handleFocusChange() {
+    setState(() {
+      _isObscured = !_focusNode.hasFocus && _controller.text.isNotEmpty;
+    });
   }
 
   @override
@@ -43,13 +53,16 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
     super.didUpdateWidget(oldWidget);
     if (_shouldUpdateText && widget.word != _controller.text) {
       _controller.text = widget.word;
+      _isObscured = !_focusNode.hasFocus && widget.word.isNotEmpty;
     }
     _shouldUpdateText = true;
   }
 
   @override
   void dispose() {
+    _focusNode.removeListener(_handleFocusChange);
     _controller.dispose();
+    _focusNode.dispose();
     super.dispose();
   }
 
@@ -85,12 +98,14 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
           Expanded(
             child: TextField(
               controller: _controller,
+              focusNode: _focusNode,
               style: theme.bodyText1.copyWith(
                 color: widget.hasError
                     ? (widget.errorBorderColor ?? theme.danger)
                     : theme.textPrimary,
               ),
               enabled: widget.isEditable,
+              obscureText: _isObscured,
               decoration: const InputDecoration(
                 border: InputBorder.none,
                 isDense: true,
@@ -98,6 +113,9 @@ class _MnemonicWordInputState extends State<MnemonicWordInput> {
               ),
               onChanged: (value) {
                 _shouldUpdateText = false;
+                setState(() {
+                  _isObscured = !_focusNode.hasFocus && value.isNotEmpty;
+                });
                 if (widget.onChanged != null) {
                   widget.onChanged!(widget.index, value);
                 }
