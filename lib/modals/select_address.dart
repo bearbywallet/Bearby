@@ -6,8 +6,8 @@ import 'package:zilpay/components/jazzicon.dart';
 import 'package:zilpay/config/web3_constants.dart';
 import 'package:zilpay/modals/qr_scanner_modal.dart';
 import 'package:zilpay/src/rust/api/book.dart';
-import 'package:zilpay/src/rust/api/methods.dart';
 import 'package:zilpay/src/rust/api/qrcode.dart';
+import 'package:zilpay/src/rust/api/utils.dart';
 import 'package:zilpay/src/rust/models/qrcode.dart';
 import 'package:zilpay/state/app_state.dart';
 import 'package:zilpay/l10n/app_localizations.dart';
@@ -125,7 +125,7 @@ class _AddressSelectModalContentState
                 leftIconPath: 'assets/icons/qrcode.svg',
                 onChanged: (value) async {
                   try {
-                    bool isAddress = await isCryptoAddress(addr: value);
+                    bool isAddress = await isValidAddress(addr: value);
                     if (isAddress && mounted) {
                       QRcodeScanResultInfo params =
                           QRcodeScanResultInfo(recipient: value);

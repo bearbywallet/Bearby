@@ -3,6 +3,12 @@ use sha2::{Digest, Sha256};
 pub use zilpay::intl::number::{format_u256, CURRENCY_SYMBOLS};
 use zilpay::{background::Mnemonic, config::bip39::EN_WORDS, proto::U256};
 
+use crate::utils::utils::parse_address;
+
+pub fn is_valid_address(addr: String) -> bool {
+    parse_address(addr).is_ok()
+}
+
 #[frb(sync)]
 pub fn intl_number_formating(
     value: String,
